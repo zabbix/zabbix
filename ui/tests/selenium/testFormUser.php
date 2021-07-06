@@ -34,8 +34,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Admin',
 						'Groups' => 'Zabbix administrators',
-						'Password' => '123',
-						'Password (once again)' => '123'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
@@ -63,8 +63,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => '   ',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value for field "username": cannot be empty.'
@@ -76,8 +76,8 @@ class testFormUser extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Username' => 'Negative_Test1',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Field "user_groups" is mandatory.'
@@ -103,7 +103,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test3',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix'
+						'Password' => 'test5678'
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
@@ -117,7 +117,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test4',
 						'Groups' => 'Zabbix administrators',
-						'Password (once again)' => 'zabbix'
+						'Password (once again)' => 'test5678'
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
@@ -131,8 +131,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test5',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'PaSSwOrD',
-						'Password (once again)' => 'password'
+						'Password' => 'test5678',
+						'Password (once again)' => 'tEST5678'
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
@@ -146,8 +146,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test6',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Refresh' => ''
 					],
 					'error_title' => 'Cannot add user',
@@ -161,8 +161,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test7',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Refresh' => '123abc'
 					],
 					'role' => 'Super admin role',
@@ -177,8 +177,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test8',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Refresh' => '3601'
 					],
 					'role' => 'Super admin role',
@@ -192,8 +192,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test_2h',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Refresh' => '2h'
 					],
 					'role' => 'Super admin role',
@@ -207,8 +207,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test_61m',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Refresh' => '61m'
 					],
 					'role' => 'Super admin role',
@@ -223,8 +223,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test9',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Refresh' => '00000000000001'
 					],
 					'role' => 'Super admin role',
@@ -239,8 +239,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test10',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Rows per page' => '0'
 					],
 					'role' => 'Super admin role',
@@ -255,8 +255,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test11',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Rows per page' => 'abc123'
 					],
 					'role' => 'Super admin role',
@@ -271,8 +271,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test12',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'auto_logout' => [
 						'checked' => true,
@@ -289,8 +289,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test12_1m',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'auto_logout' => [
 						'checked' => true,
@@ -308,8 +308,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test13',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'auto_logout' => [
 						'checked' => true,
@@ -326,8 +326,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test13_1441m',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'auto_logout' => [
 						'checked' => true,
@@ -344,8 +344,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test13_25h',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'auto_logout' => [
 						'checked' => true,
@@ -363,8 +363,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test14',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'auto_logout' => [
 						'checked' => true,
@@ -382,8 +382,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test15',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'auto_logout' => [
 						'checked' => true,
@@ -400,8 +400,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test16',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'URL (after login)' => 'javascript:alert(123);'
 					],
 					'role' => 'Super admin role',
@@ -416,8 +416,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Negative_Test19',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'role' => 'Super admin role',
@@ -432,8 +432,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Mandatory_user',
 						'Groups' => 'Guests',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'role' => 'Guest role'
 				]
@@ -447,8 +447,8 @@ class testFormUser extends CWebTest {
 						'Name' => 'Антон Антонович',
 						'Surname' => 'Антонов',
 						'Groups' => ['Zabbix administrators'],
-						'Password' => 'абв',
-						'Password (once again)' => 'абв',
+						'Password' => 'абвгдеЁж',
+						'Password (once again)' => 'абвгдеЁж',
 						'Theme' => 'High-contrast dark',
 						'Auto-login' => false,
 						'Refresh' => '0',
@@ -654,7 +654,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Password' => 'zabbix'
+						'Password' => 'test5678'
 					],
 					'error_title' => 'Cannot update user',
 					'error_details' => 'Both passwords must be equal.'
@@ -665,7 +665,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Password (once again)' => 'zabbix'
+						'Password (once again)' => 'test5678'
 					],
 					'error_title' => 'Cannot update user',
 					'error_details' => 'Both passwords must be equal.'
@@ -677,8 +677,8 @@ class testFormUser extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'PaSSwOrD',
-						'Password (once again)' => 'password'
+						'Password' => 'test5678',
+						'Password (once again)' => 'teST5678'
 					],
 					'error_title' => 'Cannot update user',
 					'error_details' => 'Both passwords must be equal.'
@@ -690,8 +690,8 @@ class testFormUser extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678',
 						'Refresh' => ''
 					],
 					'error_title' => 'Cannot update user',
@@ -988,8 +988,8 @@ class testFormUser extends CWebTest {
 	public function testFormUser_PasswordUpdate() {
 		$data = [
 			'username' => 'user-zabbix',
-			'old_password' => 'zabbix',
-			'new_password' => 'zabbix_new',
+			'old_password' => 'test5678',
+			'new_password' => 'test5678_new',
 			'error_message' => 'Incorrect user name or password or account is temporarily blocked.',
 			'attempt_message' => '1 failed login attempt logged. Last failed attempt was from'
 		];
