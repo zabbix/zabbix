@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:18Z'
+  date: '2021-06-15T14:01:36Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,7 +15,7 @@ zabbix_export:
         
         To access the metrics, the client IP address must be explicitly allowed. See https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html.
         
-        Don't forget change macros {$GITLAB.URL}, {$GITLAB.PORT}. 
+        Don't forget change macros {$GITLAB.URL}.
         Some metrics may not be collected depending on your Gitlab instance version and configuration. See (Gitlab’s documentation[)https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html] for further information about its metric collection.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -215,7 +215,7 @@ zabbix_export:
           triggers:
             -
               uuid: 88d7ceb3a683436da666e8802b2d29b5
-              expression: '(last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2))=1 and length(last(/GitLab by HTTP/gitlab.deployments.version))>0'
+              expression: 'last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0'
               name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'GitLab version has changed. Ack to close.'
@@ -257,7 +257,7 @@ zabbix_export:
               type: PROMETHEUS_TO_JSON
               parameters:
                 - ''
-          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
+          url: '{$GITLAB.URL}/-/metrics'
           tags:
             -
               tag: Application
@@ -376,7 +376,7 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
-          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/liveness'
+          url: '{$GITLAB.URL}/-/liveness'
           status_codes: ''
           tags:
             -
@@ -393,7 +393,7 @@ zabbix_export:
           uuid: 7ef7142babfd4bc2b5b25be541c0511f
           name: 'GitLab: Pipelines: Auto DevOps pipelines, total'
           type: DEPENDENT
-          key: gitlab.pipeine.auto_devops_completed.total
+          key: gitlab.pipeline.auto_devops_completed.total
           delay: '0'
           history: 7d
           description: 'Counter of completed Auto DevOps pipelines.'
@@ -413,7 +413,7 @@ zabbix_export:
           uuid: 0ffa0a5c108644508252a03469e4f394
           name: 'GitLab: Pipelines: Auto DevOps pipelines, failed'
           type: DEPENDENT
-          key: gitlab.pipeine.auto_devops_completed_total.failed
+          key: gitlab.pipeline.auto_devops_completed_total.failed
           delay: '0'
           history: 7d
           description: 'Counter of completed Auto DevOps pipelines with status "failed".'
@@ -433,7 +433,7 @@ zabbix_export:
           uuid: f4265a3167a245c4998958106f6ee265
           name: 'GitLab: Pipelines: Created, total'
           type: DEPENDENT
-          key: gitlab.pipeine.created_total
+          key: gitlab.pipeline.created_total
           delay: '0'
           history: 7d
           description: 'Counter of pipelines created.'
@@ -453,9 +453,10 @@ zabbix_export:
           uuid: 23cb22f8f81e461c86f72a92cdfde7a5
           name: 'GitLab: Pipelines: CI/CD creation duration'
           type: DEPENDENT
-          key: gitlab.pipeine.pipeline_creation
+          key: gitlab.pipeline.pipeline_creation
           delay: '0'
           history: 7d
+          value_type: FLOAT
           units: s
           description: 'The sum of the time in seconds it takes to create a CI/CD pipeline.'
           preprocessing:
@@ -474,9 +475,10 @@ zabbix_export:
           uuid: 91c3acbb82524244a1ac400587641ffa
           name: 'GitLab: Pipelines: Pipelines: CI/CD creation count'
           type: DEPENDENT
-          key: gitlab.pipeine.pipeline_creation.count
+          key: gitlab.pipeline.pipeline_creation.count
           delay: '0'
           history: 7d
+          value_type: FLOAT
           description: 'The count of the time it takes to create a CI/CD pipeline.'
           preprocessing:
             -
@@ -494,7 +496,7 @@ zabbix_export:
           uuid: c80453c338814951a9e97d9f37e7d68f
           name: 'GitLab: Pipelines: Processing events, total'
           type: DEPENDENT
-          key: gitlab.pipeine.processing_events_total
+          key: gitlab.pipeline.processing_events_total
           delay: '0'
           history: 7d
           description: 'Total amount of pipeline processing events.'
@@ -540,7 +542,7 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
-          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/readiness'
+          url: '{$GITLAB.URL}/-/readiness'
           tags:
             -
               tag: Application
@@ -844,7 +846,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Average RSS\tMemory usage in bytes.'
+          description: "Average RSS\tMemory usage in bytes."
           preprocessing:
             -
               type: JSONPATH
@@ -865,7 +867,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Maxinun RSS\tMemory usage in bytes.'
+          description: "Maxinun RSS\tMemory usage in bytes."
           preprocessing:
             -
               type: JSONPATH
@@ -886,7 +888,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Minimum RSS\tMemory usage in bytes.'
+          description: "Minimum RSS\tMemory usage in bytes."
           preprocessing:
             -
               type: JSONPATH
@@ -1035,7 +1037,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.name=="upload_file_does_not_exist")].value.first()'
+                - "$[?(@.name==\"upload_file_does_not_exist\t\")].value.first()"
               error_handler: DISCARD_VALUE
           master_item:
             key: gitlab.get_metrics
@@ -1275,7 +1277,7 @@ zabbix_export:
               expression: 'min(/GitLab by HTTP/gitlab.puma.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.puma.max_threads[{#SINGLETON}])*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
               name: 'GitLab: Puma instance thread utilization is too high (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
-          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
+          url: '{$GITLAB.URL}/-/metrics'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -1362,7 +1364,7 @@ zabbix_export:
               expression: 'min(/GitLab by HTTP/gitlab.unicorn.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.unicorn.unicorn_workers[{#SINGLETON}])*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
               name: 'GitLab: Unicorn worker utilization is too high (over {$GITLAB.UNICORN.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
-          url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
+          url: '{$GITLAB.URL}/-/metrics'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -1382,10 +1384,6 @@ zabbix_export:
           macro: '{$GITLAB.OPEN.FDS.MAX.WARN}'
           value: '90'
           description: 'Maximum percentage of used file descriptors for trigger expression.'
-        -
-          macro: '{$GITLAB.PORT}'
-          value: '80'
-          description: 'The port of GitLab web endpoint'
         -
           macro: '{$GITLAB.PUMA.QUEUE.MAX.WARN}'
           value: '1'
@@ -1408,7 +1406,7 @@ zabbix_export:
           description: 'Maximum percentage of used Unicorn workers utilization for trigger expression.'
         -
           macro: '{$GITLAB.URL}'
-          value: localhost
+          value: 'http://localhost'
           description: 'GitLab instance URL'
       valuemaps:
         -

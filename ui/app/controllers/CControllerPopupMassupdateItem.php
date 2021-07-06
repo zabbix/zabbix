@@ -97,26 +97,6 @@ class CControllerPopupMassupdateItem extends CController {
 	}
 
 	/**
-	 * Get array of updated items or item prototypes hosts or templates.
-	 *
-	 * @return array
-	 */
-	protected function getHostsOrTemplates(): array {
-		$options = ['itemids' => $this->getInput('ids')];
-
-		if ($this->getInput('context') === 'host') {
-			$options['output'] = ['hostid'];
-			$result = API::Host()->get($options);
-		}
-		else {
-			$options['output'] = ['templateid'];
-			$result = CArrayHelper::renameObjectsKeys(API::Template()->get($options), ['templateid' => 'hostid']);
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Get array of updated items or item prototypes.
 	 *
 	 * @return array
@@ -248,17 +228,16 @@ class CControllerPopupMassupdateItem extends CController {
 				}
 			}
 
-			$hosts = $this->getHostsOrTemplates();
-
-			if ($prototype && $hosts) {
-				throw new Exception();
-			}
-
 			if (array_key_exists('headers', $input) && $input['headers']) {
-				$headers = (count($input['headers']['name']) == count($input['headers']['value']))
-					? array_combine($input['headers']['name'], $input['headers']['value'])
-					: [];
-				$input['headers'] = array_filter($headers, 'strlen');
+				$input['headers']['value'] += array_fill_keys(array_keys($input['headers']['name']), '');
+
+				$headers = [];
+				foreach ($input['headers']['name'] as $i => $header_name) {
+					if ($header_name !== '' || $input['headers']['value'][$i] !== '') {
+						$headers[$header_name] = $input['headers']['value'][$i];
+					}
+				}
+				$input['headers'] = $headers;
 			}
 
 			if (array_key_exists('preprocessing', $input) && $input['preprocessing']) {

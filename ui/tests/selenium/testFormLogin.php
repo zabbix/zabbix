@@ -76,8 +76,8 @@ class testFormLogin extends CLegacyWebTest {
 	}
 
 	/**
-	 * @on-before removeGuestFromDisabledGroup
-	 * @on-after addGuestToDisabledGroup
+	 * @onBefore removeGuestFromDisabledGroup
+	 * @onAfter addGuestToDisabledGroup
 	 *
 	 * @dataProvider data
 	 */

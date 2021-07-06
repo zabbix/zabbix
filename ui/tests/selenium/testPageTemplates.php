@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Linux by Zabbix agent';
+	public $templateName = 'IIS by Zabbix agent';
 
 	use FilterTrait;
 	use TableTrait;
@@ -32,7 +32,8 @@ class testPageTemplates extends CLegacyWebTest {
 	public static function allTemplates() {
 		// TODO: remove 'AND name NOT LIKE "%Cisco Catalyst%"' and change to single quotes after fix ZBX-19356
 		return CDBHelper::getRandomizedDataProvider("SELECT * FROM hosts WHERE status IN (".HOST_STATUS_TEMPLATE.")".
-				" AND name NOT LIKE '%Cisco Catalyst%' AND name NOT LIKE '%Mellanox%'", 25);
+				" AND name NOT LIKE '%Cisco Catalyst%' AND name NOT LIKE '%Mellanox%' AND name NOT LIKE ".
+				"'%Cisco UCS%'", 25);
 	}
 
 	public function testPageTemplates_CheckLayout() {

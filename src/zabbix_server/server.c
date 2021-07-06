@@ -325,7 +325,7 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 
-int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_DISABLED;
+int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
 char	*CONFIG_WEBSERVICE_URL	= NULL;
 
@@ -347,6 +347,37 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		/* make initial configuration sync before worker processes are forked */
 		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		*local_process_num = local_server_num - server_count + CONFIG_CONFSYNCER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_ALERTMANAGER_FORKS))
+	{
+		/* data collection processes might utilize CPU fully, start manager and worker processes beforehand */
+		*local_process_type = ZBX_PROCESS_TYPE_ALERTMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_ALERTMANAGER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_ALERTER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_ALERTER;
+		*local_process_num = local_server_num - server_count + CONFIG_ALERTER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_PREPROCMAN_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_PREPROCMAN;
+		*local_process_num = local_server_num - server_count + CONFIG_PREPROCMAN_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_PREPROCESSOR_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_PREPROCESSOR;
+		*local_process_num = local_server_num - server_count + CONFIG_PREPROCESSOR_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_LLDMANAGER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_LLDMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_LLDMANAGER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_LLDWORKER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_LLDWORKER;
+		*local_process_num = local_server_num - server_count + CONFIG_LLDWORKER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_IPMIMANAGER_FORKS))
 	{
@@ -437,36 +468,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
 		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_ALERTMANAGER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_ALERTMANAGER;
-		*local_process_num = local_server_num - server_count + CONFIG_ALERTMANAGER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_ALERTER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_ALERTER;
-		*local_process_num = local_server_num - server_count + CONFIG_ALERTER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_PREPROCMAN_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_PREPROCMAN;
-		*local_process_num = local_server_num - server_count + CONFIG_PREPROCMAN_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_PREPROCESSOR_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_PREPROCESSOR;
-		*local_process_num = local_server_num - server_count + CONFIG_PREPROCESSOR_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_LLDMANAGER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_LLDMANAGER;
-		*local_process_num = local_server_num - server_count + CONFIG_LLDMANAGER_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_LLDWORKER_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_LLDWORKER;
-		*local_process_num = local_server_num - server_count + CONFIG_LLDWORKER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_ALERTDB_FORKS))
 	{
@@ -1273,10 +1274,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	DBcheck_character_set();
 
-	if (SUCCEED == DBcheck_double_type())
-		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_ENABLED;
-	else
+	if (SUCCEED != DBcheck_double_type())
+	{
+		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
+		ZBX_DOUBLE_EPSILON = 0.000001;
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
+	}
 
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);

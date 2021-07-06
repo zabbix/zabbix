@@ -97,8 +97,8 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char		*diskname;
 	zbx_uint64_t	partitionid;
+	char		*diskname;
 }
 zbx_vmware_diskextent_t;
 
@@ -380,8 +380,9 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_VMPROP_GUESTHOSTNAME			17
 #define ZBX_VMWARE_VMPROP_GUESTFAMILY			18
 #define ZBX_VMWARE_VMPROP_GUESTFULLNAME			19
+#define ZBX_VMWARE_VMPROP_FOLDER			20
 
-#define ZBX_VMWARE_VMPROPS_NUM				20
+#define ZBX_VMWARE_VMPROPS_NUM				21
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0
@@ -392,6 +393,9 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_SOAP_FOLDER		"Folder"
 #define ZBX_VMWARE_SOAP_CLUSTER		"ClusterComputeResource"
 #define ZBX_VMWARE_SOAP_DEFAULT		"VMware"
+#define ZBX_VMWARE_SOAP_DS		"Datastore"
+#define ZBX_VMWARE_SOAP_HV		"HostSystem"
+#define ZBX_VMWARE_SOAP_VM		"VirtualMachine"
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

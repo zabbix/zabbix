@@ -424,7 +424,9 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 				unset($host);
 
-				if (!API::Host()->update($hosts)) {
+				$result = $hosts ? (bool) API::Host()->update($hosts) : true;
+
+				if ($result === false) {
 					throw new Exception();
 				}
 

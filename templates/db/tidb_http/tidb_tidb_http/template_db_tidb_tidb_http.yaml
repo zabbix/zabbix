@@ -864,7 +864,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5f863fc0944848fdad145f42c94dbea3
-              expression: '(last(/TiDB by HTTP/tidb.version,#1)<>last(/TiDB by HTTP/tidb.version,#2))=1 and length(last(/TiDB by HTTP/tidb.version))>0'
+              expression: 'last(/TiDB by HTTP/tidb.version,#1)<>last(/TiDB by HTTP/tidb.version,#2) and length(last(/TiDB by HTTP/tidb.version))>0'
               name: 'TiDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'TiDB version has changed. Ack to close.'

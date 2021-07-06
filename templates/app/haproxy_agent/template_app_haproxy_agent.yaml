@@ -92,7 +92,7 @@ zabbix_export:
           triggers:
             -
               uuid: db6ef8f306f64f0f81a590e4b45b370c
-              expression: '(last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2))=1 and length(last(/HAProxy by Zabbix agent/haproxy.version))>0'
+              expression: 'last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2) and length(last(/HAProxy by Zabbix agent/haproxy.version))>0'
               name: 'HAProxy: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'HAProxy version has changed. Ack to close.'

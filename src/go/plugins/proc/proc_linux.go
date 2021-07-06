@@ -121,6 +121,7 @@ type procQuery struct {
 	name    string
 	user    string
 	cmdline string
+	state   string
 }
 
 const (
@@ -128,6 +129,7 @@ const (
 	procInfoName
 	procInfoUser
 	procInfoCmdline
+	procInfoState
 )
 
 type procInfo struct {
@@ -136,6 +138,7 @@ type procInfo struct {
 	userid  int64
 	cmdline string
 	arg0    string
+	state   string
 }
 
 type cpuUtil struct {
@@ -169,6 +172,7 @@ func newCpuUtilQuery(q *procQuery, pattern *regexp.Regexp) (query *cpuUtilQuery,
 			return
 		}
 	}
+
 	query.cmdlinePattern = pattern
 	return
 }
@@ -181,13 +185,13 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 	p.mutex.Lock()
 	for q, stats := range p.queries {
 		if now.Sub(stats.accessed) > maxInactivityPeriod {
-			p.Debugf("removed unused CPU utilisation query %+v", q)
+			p.Debugf("removed unused CPU utilization query %+v", q)
 			delete(p.queries, q)
 			continue
 		}
 		var query *cpuUtilQuery
 		if query, stats.err = newCpuUtilQuery(&q, stats.cmdlinePattern); stats.err != nil {
-			p.Debugf("cannot create CPU utilisation query %+v: %s", q, stats.err)
+			p.Debugf("cannot create CPU utilization query %+v: %s", q, stats.err)
 			continue
 		}
 		queries = append(queries, query)
@@ -411,9 +415,45 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	return
 }
+func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags int, err error) {
+	regxp, err := regexp.Compile(q.cmdline)
+	if err != nil {
+		return nil, 0, fmt.Errorf("cannot compile regex for %s: %s", q.cmdline, err.Error())
+	}
+
+	if query, err = newCpuUtilQuery(q, regxp); err != nil {
+		return nil, 0, fmt.Errorf("cannot create CPU utilization query %+v: %s", q, err.Error())
+	}
+
+	if q.name != "" {
+		flags |= procInfoName | procInfoCmdline
+	}
+	if q.user != "" {
+		flags |= procInfoUser
+	}
+	if q.cmdline != "" {
+		flags |= procInfoCmdline
+	}
+	if q.state != "" {
+		flags |= procInfoState
+	}
+
+	return
+}
 
 // Export -
 func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	switch key {
+	case "proc.mem":
+		return p.exportProcMem(params)
+	case "proc.num":
+		return p.exportProcNum(params)
+	}
+
+	return nil, plugin.UnsupportedMetricError
+}
+
+func (p *PluginExport) exportProcMem(params []string) (result interface{}, err error) {
 	var name, mode, cmdline, memtype string
 	var usr *user.User
 
@@ -592,6 +632,67 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 	return memSize, nil
 }
 
+func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
+	var name, userName, state, cmdline string
+	switch len(params) {
+	case 4:
+		cmdline = params[3]
+		fallthrough
+	case 3:
+		switch params[2] {
+		case "all", "":
+		case "disk":
+			state = "D"
+		case "run":
+			state = "R"
+		case "sleep":
+			state = "S"
+		case "trace":
+			state = "T"
+		case "zomb":
+			state = "Z"
+		default:
+			return nil, errors.New("Invalid third parameter.")
+		}
+		fallthrough
+	case 2:
+		userName = params[1]
+		fallthrough
+	case 1:
+		name = params[0]
+	case 0:
+	default:
+		return nil, errors.New("Too many parameters.")
+	}
+
+	var count int
+
+	query, flags, err := p.prepareQuery(&procQuery{name, userName, cmdline, state})
+	if err != nil {
+		p.Debugf("Failed to prepare query: %s", err.Error())
+		return count, nil
+	}
+
+	procs, err := getProcesses(flags)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get local processes: %s", err.Error())
+	}
+
+	for _, proc := range procs {
+		if !query.match(proc) {
+			continue
+		}
+
+		if state != proc.state && state != "" {
+			continue
+		}
+
+		count++
+	}
+
+	return count, nil
+}
+
 func getMax(a, b float64) float64 {
 	if a > b {
 		return a
@@ -675,5 +776,8 @@ func (p *PluginExport) validFile(proc *procInfo, name string, uid int64, cmdRgx 
 
 func init() {
 	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
-	plugin.RegisterMetrics(&implExport, "ProcExporter", "proc.mem", "Process memory utilization values.")
+	plugin.RegisterMetrics(&implExport, "ProcExporter",
+		"proc.mem", "Process memory utilization values.",
+		"proc.num", "The number of processes.",
+	)
 }
