@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @backup role, module, users, report
  *
- * @on-before prepareRoleData, prepareUserData, prepareReportData
+ * @on-before prepareUserData, prepareReportData
  */
 class testUserRolesPermissions extends CWebTest {
 
@@ -58,21 +58,19 @@ class testUserRolesPermissions extends CWebTest {
 	protected static $reportid;
 
 	/**
-	 * Function used to create roles.
+	 * Function used to create user.
 	 */
-	public function prepareRoleData() {
-		$response = CDataHelper::call('role.create', [
+	public function prepareUserData() {
+		$role = CDataHelper::call('role.create', [
 			[
 				'name' => 'super_role',
 				'type' => 3
 			]
 		]);
-		$this->assertArrayHasKey('roleids', $response);
-		self::$super_roleid = $response['roleids'][0];
-	}
+		$this->assertArrayHasKey('roleids', $role);
+		self::$super_roleid = $role['roleids'][0];
 
-	public function prepareUserData() {
-		$response = CDataHelper::call('user.create', [
+		$user = CDataHelper::call('user.create', [
 			[
 				'username' => 'user_for_role',
 				'passwd' => 'zabbix',
@@ -84,8 +82,8 @@ class testUserRolesPermissions extends CWebTest {
 				]
 			]
 		]);
-		$this->assertArrayHasKey('userids', $response);
-		self::$super_user = $response['userids'][0];
+		$this->assertArrayHasKey('userids', $user);
+		self::$super_user = $user['userids'][0];
 	}
 
 	/**
@@ -204,7 +202,6 @@ class testUserRolesPermissions extends CWebTest {
 	 * @dataProvider getPageActionsData
 	 */
 	public function testUserRolesPermissions_PageActions($data) {
-		$this->page->login();
 		$this->page->userLogin('user_for_role', 'zabbix');
 		foreach ([true, false] as $action_status) {
 			$this->page->open($data['list_page']);
@@ -265,7 +262,6 @@ class testUserRolesPermissions extends CWebTest {
 	 * @dataProvider getProblemActionsData
 	 */
 	public function testUserRolesPermissions_ProblemActions($data) {
-		$this->page->login();
 		$this->page->userLogin('user_for_role', 'zabbix');
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
@@ -294,7 +290,6 @@ class testUserRolesPermissions extends CWebTest {
 			'Acknowledge problems' => false,
 			'Close problems' => false
 		];
-		$this->page->login();
 		$this->page->userLogin('user_for_role', 'zabbix');
 		foreach ([true, false] as $action_status) {
 			// Problem page.
@@ -401,7 +396,6 @@ class testUserRolesPermissions extends CWebTest {
 			'Web',
 			'Configuration'
 		];
-		$this->page->login();
 		$this->page->userLogin('user_for_role', 'zabbix');
 		foreach ([true, false] as $action_status) {
 			$this->page->open($data['link'])->waitUntilReady();
@@ -432,7 +426,6 @@ class testUserRolesPermissions extends CWebTest {
 			'Administration',
 			'Module 5 menu'
 		];
-		$this->page->login();
 		$this->page->userLogin('user_for_role', 'zabbix');
 		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 		$this->query('button:Scan directory')->one()->click();
@@ -1218,7 +1211,6 @@ class testUserRolesPermissions extends CWebTest {
 	 * Manage API token action check.
 	 */
 	public function testUserRolesPermissions_ManageApi() {
-		$this->page->login();
 		$this->page->userLogin('user_for_role', 'zabbix');
 		foreach ([true, false] as $action_status) {
 			if ($action_status) {
