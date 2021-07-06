@@ -2150,8 +2150,10 @@ class CHost extends CHostGeneral {
 		}
 		unset($host);
 
-		$db_hosts = $this->getHostMacros($db_hosts);
-		$hosts = $this->validateHostMacros($hosts, $db_hosts);
+		if (array_column($hosts, 'macros')) {
+			$db_hosts = $this->getHostMacros($db_hosts);
+			$hosts = $this->validateHostMacros($hosts, $db_hosts);
+		}
 
 		$inventory_fields = zbx_objectValues(getHostInventories(), 'db_field');
 

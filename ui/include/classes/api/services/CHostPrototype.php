@@ -543,8 +543,10 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_host_prototypes = $this->getHostMacros($db_host_prototypes);
-		$host_prototypes = $this->validateHostMacros($host_prototypes, $db_host_prototypes);
+		if (array_column($host_prototypes, 'macros')) {
+			$db_host_prototypes = $this->getHostMacros($db_host_prototypes);
+			$host_prototypes = $this->validateHostMacros($host_prototypes, $db_host_prototypes);
+		}
 
 		$hosts_by_ruleid = [];
 		$names_by_ruleid = [];

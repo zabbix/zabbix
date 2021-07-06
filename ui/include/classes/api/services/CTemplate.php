@@ -684,8 +684,10 @@ class CTemplate extends CHostGeneral {
 		}
 		unset($template);
 
-		$db_templates = $this->getHostMacros($db_templates);
-		$templates = $this->validateHostMacros($templates, $db_templates);
+		if (array_column($templates, 'macros')) {
+			$db_templates = $this->getHostMacros($db_templates);
+			$templates = $this->validateHostMacros($templates, $db_templates);
+		}
 	}
 
 	/**
