@@ -648,7 +648,7 @@ zabbix_export:
           triggers:
             -
               uuid: 61d0836efd33437894e1edd595373f1e
-              expression: '(last(/APC UPS Symmetra LX SNMP/system.name[sysName.0],#1)<>last(/APC UPS Symmetra LX SNMP/system.name[sysName.0],#2))=1 and length(last(/APC UPS Symmetra LX SNMP/system.name[sysName.0]))>0'
+              expression: 'last(/APC UPS Symmetra LX SNMP/system.name[sysName.0],#1)<>last(/APC UPS Symmetra LX SNMP/system.name[sysName.0],#2) and length(last(/APC UPS Symmetra LX SNMP/system.name[sysName.0]))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'

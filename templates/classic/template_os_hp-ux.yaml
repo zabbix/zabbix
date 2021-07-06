@@ -145,7 +145,7 @@ zabbix_export:
           triggers:
             -
               uuid: 07215ae05345423d8625962b85d9d4ec
-              expression: '(last(/HP-UX/system.hostname,#1)<>last(/HP-UX/system.hostname,#2))>0'
+              expression: 'last(/HP-UX/system.hostname,#1)<>last(/HP-UX/system.hostname,#2)'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -181,7 +181,7 @@ zabbix_export:
           triggers:
             -
               uuid: 34f76014b2d3434a8d1f1f0657b5605f
-              expression: '(last(/HP-UX/system.uname,#1)<>last(/HP-UX/system.uname,#2))>0'
+              expression: 'last(/HP-UX/system.uname,#1)<>last(/HP-UX/system.uname,#2)'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -210,7 +210,7 @@ zabbix_export:
           triggers:
             -
               uuid: f65c254d50e2454d9840784ff979f5d3
-              expression: '(last(/HP-UX/vfs.file.cksum[/etc/passwd],#1)<>last(/HP-UX/vfs.file.cksum[/etc/passwd],#2))>0'
+              expression: 'last(/HP-UX/vfs.file.cksum[/etc/passwd],#1)<>last(/HP-UX/vfs.file.cksum[/etc/passwd],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -
