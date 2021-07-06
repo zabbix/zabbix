@@ -643,7 +643,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b9667c535fe542eeb21dea7aaf2bbf80
-                  expression: '(last(/Cisco UCS SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2))=1 and length(last(/Cisco UCS SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Cisco UCS SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0'
                   name: '{#UNIT_LOCATION}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
@@ -912,7 +912,7 @@ zabbix_export:
               newvalue: equipmentProblem
             -
               value: '83'
-              newvalue: decomissioning
+              newvalue: decommissioning
             -
               value: '84'
               newvalue: chassisLimitExceeded
@@ -1088,7 +1088,7 @@ zabbix_export:
               newvalue: inoperable
             -
               value: '101'
-              newvalue: decomissioning
+              newvalue: decommissioning
             -
               value: '201'
               newvalue: biosRestore

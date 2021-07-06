@@ -1190,7 +1190,7 @@ zabbix_export:
           triggers:
             -
               uuid: e22c2e2213d74df98d344a95c8a96b6d
-              expression: '(last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"],#1)<>last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"],#2))=1 and length(last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]))>0'
+              expression: 'last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"],#1)<>last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"],#2) and length(last(/MySQL by Zabbix agent 2/mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]))>0'
               name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'MySQL version has changed. Ack to close.'

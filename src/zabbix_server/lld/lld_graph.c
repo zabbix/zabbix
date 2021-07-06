@@ -185,10 +185,10 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 		if (atoi(row[3]) != height)
 			graph->flags |= ZBX_FLAG_LLD_GRAPH_UPDATE_HEIGHT;
 
-		if (atof(row[4]) != yaxismin)
+		if (FAIL == zbx_double_compare(atof(row[4]), yaxismin))
 			graph->flags |= ZBX_FLAG_LLD_GRAPH_UPDATE_YAXISMIN;
 
-		if (atof(row[5]) != yaxismax)
+		if (FAIL == zbx_double_compare(atof(row[5]), yaxismax))
 			graph->flags |= ZBX_FLAG_LLD_GRAPH_UPDATE_YAXISMAX;
 
 		if ((unsigned char)atoi(row[6]) != show_work_period)
@@ -206,10 +206,10 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 		if ((unsigned char)atoi(row[10]) != show_3d)
 			graph->flags |= ZBX_FLAG_LLD_GRAPH_UPDATE_SHOW_3D;
 
-		if (atof(row[11]) != percent_left)
+		if (FAIL == zbx_double_compare(atof(row[11]), percent_left))
 			graph->flags |= ZBX_FLAG_LLD_GRAPH_UPDATE_PERCENT_LEFT;
 
-		if (atof(row[12]) != percent_right)
+		if (FAIL == zbx_double_compare(atof(row[12]), percent_right))
 			graph->flags |= ZBX_FLAG_LLD_GRAPH_UPDATE_PERCENT_RIGHT;
 
 		if ((unsigned char)atoi(row[13]) != ymin_type)

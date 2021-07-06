@@ -119,7 +119,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1316d7def24a4a80adfdf4bc8ac5a12c
-              expression: '(last(/HPE ProLiant DL360 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant DL360 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2))=1 and length(last(/HPE ProLiant DL360 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
+              expression: 'last(/HPE ProLiant DL360 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant DL360 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant DL360 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -173,7 +173,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6431a1a0b8494b50bcbd18e283e7158e
-              expression: '(last(/HPE ProLiant DL360 SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant DL360 SNMP/hp.server.name[sysName],#2))=1 and length(last(/HPE ProLiant DL360 SNMP/hp.server.name[sysName]))>0'
+              expression: 'last(/HPE ProLiant DL360 SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant DL360 SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant DL360 SNMP/hp.server.name[sysName]))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -780,7 +780,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ad74fc6568a0487e834b9e9da4127bb7
-                  expression: '(last(/HPE ProLiant DL360 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant DL360 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/HPE ProLiant DL360 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HPE ProLiant DL360 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant DL360 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant DL360 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
