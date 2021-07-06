@@ -96,7 +96,7 @@ zabbix_export:
           triggers:
             -
               uuid: c8e3831037544a87abbd671fe191ab98
-              expression: '(last(/DELL PowerEdge R840 SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.hw.firmware[racFirmwareVersion],#2))=1 and length(last(/DELL PowerEdge R840 SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0'
+              expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.hw.firmware[racFirmwareVersion],#2) and length(last(/DELL PowerEdge R840 SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0'
               name: 'Dell R840: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -149,7 +149,7 @@ zabbix_export:
           triggers:
             -
               uuid: 89f591b666d34aceb71715bfcdda6bff
-              expression: '(last(/DELL PowerEdge R840 SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.hw.serialnumber[systemServiceTag],#2))=1 and length(last(/DELL PowerEdge R840 SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
+              expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R840 SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
               name: 'Dell R840: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -203,7 +203,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7a56b961a858470d82c6fdef62f88f43
-              expression: '(last(/DELL PowerEdge R840 SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.name[sysName],#2))=1 and length(last(/DELL PowerEdge R840 SNMP/dell.server.name[sysName]))>0'
+              expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R840 SNMP/dell.server.name[sysName]))>0'
               name: 'Dell R840: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -304,7 +304,7 @@ zabbix_export:
           triggers:
             -
               uuid: 09a2b4ec3e1943b598347358b442b662
-              expression: '(last(/DELL PowerEdge R840 SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.sw.os[systemOSName],#2))=1 and length(last(/DELL PowerEdge R840 SNMP/dell.server.sw.os[systemOSName]))>0'
+              expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R840 SNMP/dell.server.sw.os[systemOSName]))>0'
               name: 'Dell R840: Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Ack to close.'
@@ -712,7 +712,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 98c1eb636c534d20ba14d19efe174d9c
-                  expression: '(last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2))=1 and length(last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
+                  expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
                   name: 'Dell R840: {#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'

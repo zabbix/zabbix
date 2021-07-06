@@ -234,7 +234,7 @@ zabbix_export:
           triggers:
             -
               uuid: ff7ad0676a774cf49a4568e752dd916b
-              expression: '(last(/Mellanox SNMP/system.name,#1)<>last(/Mellanox SNMP/system.name,#2))=1 and length(last(/Mellanox SNMP/system.name))>0'
+              expression: 'last(/Mellanox SNMP/system.name,#1)<>last(/Mellanox SNMP/system.name,#2) and length(last(/Mellanox SNMP/system.name))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -377,7 +377,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 585db2b2a42b4eb09770ca2241a557d0
-                  expression: '(last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
@@ -715,7 +715,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 46918cfc713a4b1da7eed32cead0070b
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
@@ -781,7 +781,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: 20e8f28ebc304ba185d475dbba51c4b8
@@ -801,7 +801,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: 6740479821cd49c199c345dd736a11f7
@@ -820,7 +820,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
           graph_prototypes:
             -

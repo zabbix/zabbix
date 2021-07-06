@@ -277,7 +277,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 35d62eb5323141a3a3f3afc4c9250243
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
@@ -343,7 +343,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: 913c87be8cd94aeb8a3f9e008a4cd560
@@ -363,7 +363,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: 15b436b13012415bb9773d3ddab22178
@@ -382,7 +382,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
           graph_prototypes:
             -

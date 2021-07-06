@@ -201,7 +201,7 @@ zabbix_export:
           triggers:
             -
               uuid: 052fb88fae1349d5b9a5fa5bcf24d0fa
-              expression: '(last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber,#2))=1 and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -255,7 +255,7 @@ zabbix_export:
           triggers:
             -
               uuid: a678341d899846158fea2deb57f923cf
-              expression: '(last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#2))=1 and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.name))>0'
+              expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.name))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -310,7 +310,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3e5d53072021491bb2af276aff3e1a0b
-              expression: '(last(/Cisco Catalyst 3750V2-24PS SNMP/system.sw.os,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.sw.os,#2))=1 and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.sw.os))>0'
+              expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/system.sw.os,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.sw.os,#2) and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.sw.os))>0'
               recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
@@ -319,7 +319,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
-                  expression: '(last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#2))=1 and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.name))>0'
+                  expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.name))>0'
         -
           uuid: a9070d15765c4acaa856dde8ece57340
           name: Uptime
@@ -468,7 +468,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 70aca80b5a8d414686967b104d301023
-                  expression: '(last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber[{#SNMPINDEX}],#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber[{#SNMPINDEX}],#2))=1 and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber[{#SNMPINDEX}],#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber[{#SNMPINDEX}],#2) and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'

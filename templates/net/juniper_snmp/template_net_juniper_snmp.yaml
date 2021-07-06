@@ -79,7 +79,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9f1f3316ed6f4d50a4c9f71a15f35d50
-              expression: '(last(/Juniper SNMP/system.hw.serialnumber,#1)<>last(/Juniper SNMP/system.hw.serialnumber,#2))=1 and length(last(/Juniper SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Juniper SNMP/system.hw.serialnumber,#1)<>last(/Juniper SNMP/system.hw.serialnumber,#2) and length(last(/Juniper SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -147,7 +147,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9249511ecf4a4a2d952aa0c4fe55a5d0
-              expression: '(last(/Juniper SNMP/system.sw.os[sysDescr.0],#1)<>last(/Juniper SNMP/system.sw.os[sysDescr.0],#2))=1 and length(last(/Juniper SNMP/system.sw.os[sysDescr.0]))>0'
+              expression: 'last(/Juniper SNMP/system.sw.os[sysDescr.0],#1)<>last(/Juniper SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Juniper SNMP/system.sw.os[sysDescr.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'

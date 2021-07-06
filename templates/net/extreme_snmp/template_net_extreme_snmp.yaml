@@ -138,7 +138,7 @@ zabbix_export:
           triggers:
             -
               uuid: dd9fbc501f9047fd8fae9dfd741e3778
-              expression: '(last(/Extreme EXOS SNMP/system.hw.firmware,#1)<>last(/Extreme EXOS SNMP/system.hw.firmware,#2))=1 and length(last(/Extreme EXOS SNMP/system.hw.firmware))>0'
+              expression: 'last(/Extreme EXOS SNMP/system.hw.firmware,#1)<>last(/Extreme EXOS SNMP/system.hw.firmware,#2) and length(last(/Extreme EXOS SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -189,7 +189,7 @@ zabbix_export:
           triggers:
             -
               uuid: db1760a34c884b1aa36e4fc4639791dd
-              expression: '(last(/Extreme EXOS SNMP/system.hw.serialnumber,#1)<>last(/Extreme EXOS SNMP/system.hw.serialnumber,#2))=1 and length(last(/Extreme EXOS SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Extreme EXOS SNMP/system.hw.serialnumber,#1)<>last(/Extreme EXOS SNMP/system.hw.serialnumber,#2) and length(last(/Extreme EXOS SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -242,7 +242,7 @@ zabbix_export:
           triggers:
             -
               uuid: af6a823b8f2d4fddae970828d0a3a9c9
-              expression: '(last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0],#1)<>last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0],#2))=1 and length(last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0]))>0'
+              expression: 'last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0],#1)<>last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0],#2) and length(last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
