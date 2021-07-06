@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup dashboard, hosts
@@ -50,7 +50,7 @@ class testFormTemplateDashboards extends CWebTest {
 	}
 
 	/**
-	 * Function creates template dashboards and defined the corresponding dashboard IDs.
+	 * Function creates template dashboards and defines the corresponding dashboard IDs.
 	 */
 	public static function prepareTemplateDashboardsData() {
 		CDataHelper::setSessionId(null);
@@ -135,9 +135,6 @@ class testFormTemplateDashboards extends CWebTest {
 								]
 							]
 						]
-					],
-					[
-						'widgets' => []
 					]
 				]
 			],
@@ -185,19 +182,18 @@ class testFormTemplateDashboards extends CWebTest {
 	public static function prepareHostLinkageToTemplateData() {
 		CDataHelper::setSessionId(null);
 		CDataHelper::call('host.update', [
-				'hostid' => self::HOST_FOR_TEMPLATE,
-				'templates' => [
-					[
-						'templateid' => self::UPDATE_TEMPLATEID
-					]
+			'hostid' => self::HOST_FOR_TEMPLATE,
+			'templates' => [
+				[
+					'templateid' => self::UPDATE_TEMPLATEID
 				]
+			]
 		]);
 	}
 
 	public function testFormTemplateDashboards_Layout() {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
-
 		$this->checkDialogue('Dashboard properties');
 
 		// Check the default new dashboard state (title, empty, editable).
@@ -208,11 +204,11 @@ class testFormTemplateDashboards extends CWebTest {
 
 		$controls = $dashboard->getControls();
 		$control_buttons = [
-			'id:dashboard-config',
-			'button:Add',
-			'id:dashboard-add',
-			'button:Save changes',
-			'link:Cancel'
+			'id:dashboard-config',		// Dashboard properties menu icon.
+			'button:Add',				// Add widget menu button.
+			'id:dashboard-add',			// Dashboard actions chevron.
+			'button:Save changes',		// Save changes button.
+			'link:Cancel'				// Cancel button.
 		];
 
 		// Check dashboard controls and their corresponding actions.
@@ -223,8 +219,8 @@ class testFormTemplateDashboards extends CWebTest {
 				case 'id:dashboard-config':
 					$controls->query($selector)->one()->click();
 					$this->checkDialogue('Dashboard properties');
-
 					break;
+
 				case 'id:dashboard-add':
 					$reference_items = [
 						'Add widget' => true,
@@ -234,12 +230,11 @@ class testFormTemplateDashboards extends CWebTest {
 					];
 					$controls->query($selector)->one()->click();
 					$this->checkPopup($reference_items);
-
 					break;
+
 				case 'button:Add':
 					$controls->query($selector)->one()->click();
 					$this->checkDialogue('Add widget');
-
 					break;
 			}
 		}
@@ -262,7 +257,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->checkPopup($page_popup_items, 'ACTIONS');
 
 		// Close the dashboard and corresponding popups so that the next scenario would start without alerts.
-		$this->closeDashboard();
+		$this->closeDialogues();
 	}
 
 	public static function getWidgetLayoutData() {
@@ -427,20 +422,17 @@ class testFormTemplateDashboards extends CWebTest {
 	public function testFormTemplateDashboards_WidgetDefaultLayout($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
-		$dashboard_dialogue = COverlayDialogElement::find()->one()->waitUntilVisible();
-		$dashboard_dialogue->close();
+		COverlayDialogElement::find()->one()->waitUntilVisible()->close();
 
 		// Select the required type of widget.
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
-		$widget_dialogue = COverlayDialogElement::find()->one()->asForm()->waitUntilVisible();
+		$widget_dialogue = COverlayDialogElement::find()->one()->asForm()->waitUntilReady();
 		$widget_dialogue->getField('Type')->fill($data['type']);
-		// Reload the dialogue as elements become stalled.
-		$widget_dialogue->reload();
-		$widget_form = $widget_dialogue->asForm();
+		COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Check form fields and their attributes based on field type.
 		foreach ($data['fields'] as $field_details) {
-			$field = $widget_form->getField($field_details['name']);
+			$field = $widget_dialogue->getField($field_details['name']);
 			$default_value = array_key_exists('value', $field_details) ? $field_details['value'] : '';
 
 			switch (CTestArrayHelper::get($field_details, 'type', 'input')) {
@@ -452,30 +444,29 @@ class testFormTemplateDashboards extends CWebTest {
 							$this->assertEquals($value, $field->getAttribute($attribute));
 						}
 					}
-
 					break;
+
 				case 'multiselect':
 					$default_value = [];
 					$this->assertEquals($default_value, array_values($field->getValue()));
 					$this->assertEquals('type here to search', $field->query('xpath:.//input')->one()->getAttribute('placeholder'));
-
 					break;
+
 				case 'dropdown':
 					$this->assertEquals($default_value, $field->getValue());
 					$this->assertEquals($field_details['possible_values'], $field->getOptions()->asText());
-
 					break;
+
 				case 'radio_button':
 					$this->assertEquals($default_value, $field->getValue());
 					$this->assertEquals($field_details['possible_values'], $field->getLabels()->asText());
-
 					break;
 			}
 		}
-		$this->assertTrue($widget_form->getField('Show header')->getValue());
+		$this->assertTrue($widget_dialogue->getField('Show header')->getValue());
 
 		// Close editing dashboard so that next test case would not failed with "Unexpected alert" error.
-		$this->closeDashboard();
+		$this->closeDialogues();
 	}
 
 	public static function getDashboardPropertiesData() {
@@ -1014,8 +1005,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$form = COverlayDialogElement::find()->one()->asForm()->waitUntilVisible();
 
 		$form->fill($data['fields']);
-		$form->reload();
-		$form->invalidate();
+		COverlayDialogElement::find()->one()->waitUntilReady();
 		$old_values = $form->getFields()->asValues();
 		$form->submit();
 
@@ -1040,8 +1030,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 		$form = CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
 		$form->fill($data['fields']);
-		$form->reload();
-		$form->invalidate();
+		COverlayDialogElement::find()->one()->waitUntilReady();
 		$old_values = $form->getFields()->asValues();
 		$form->submit();
 
@@ -1050,8 +1039,6 @@ class testFormTemplateDashboards extends CWebTest {
 
 	/**
 	 * Function that checks the layout of a template dashboard with widgets from monitoring hosts view.
-	 *
-	 * @ignoreBrowserErrors
 	 *
 	 * @onBefore prepareHostLinkageToTemplateData
 	 */
@@ -1073,120 +1060,6 @@ class testFormTemplateDashboards extends CWebTest {
 		}
 
 		$this->assertScreenshotExcept(null, $skip_elements, 'dashboard_on_host');
-	}
-
-	public static function getDashboardCopyData() {
-		return [
-			[
-				[
-					'copy element' => 'widget',
-					'copy to' => 'same page'
-				]
-			],
-			[
-				[
-					'copy element' => 'widget',
-					'copy to' => 'another page'
-				]
-			],
-			[
-				[
-					'copy element' => 'widget',
-					'copy to' => 'another dashboard'
-				]
-			],
-			[
-				[
-					'copy element' => 'widget',
-					'copy to' => 'another template'
-				]
-			],
-			[
-				[
-					'copy element' => 'page',
-					'copy to' => 'same dashboard'
-				]
-			],
-			[
-				[
-					'copy element' => 'page',
-					'copy to' => 'another dashboard',
-				]
-			],
-			[
-				[
-					'copy element' => 'page',
-					'copy to' => 'another template'
-				]
-			]
-		];
-	}
-
-	/**
-	 * Function that checks copy operation for template dashboard widgets and dashboard pages to different locations.
-	 *
-	 * @dataProvider getDashboardCopyData
-	 */
-	public function testFormTemplateDashboards_Copy($data) {
-		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
-		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
-
-		if ($data['copy element'] === 'widget') {
-			$dashboard->copyWidget('Clock widget');
-		}
-		else {
-			$dashboard->query('xpath://span[text()= "Page with widgets"]/../button')->one()->click();
-			CPopupMenuElement::find()->one()->waitUntilVisible()->select('Copy');
-		}
-
-		switch ($data['copy to']) {
-			case 'same page':
-				$dashboard->pasteWidget();
-				$this->assertEquals(2, $dashboard->query('xpath:.//h4[text()="Clock widget"]')->all()->count());
-
-				break;
-			case 'another page':
-				$this->query('xpath://span[@title="Page 2"]')->one()->click();
-				$dashboard->invalidate();
-				$dashboard->pasteWidget();
-				$this->assertEquals(1, $dashboard->query('xpath:.//h4[text()="Clock widget"]')->all()->count());
-
-				break;
-			case 'same dashboard':
-				$this->query('id:dashboard-add')->one()->click();
-				CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
-				sleep(1);
-				$this->assertEquals(2, $dashboard->query('xpath://span[@title="Page with widgets"]')->all()->count());
-
-				break;
-			case 'another dashboard':
-				$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$empty_dashboardid);
-				$this->page->waitUntilReady();
-
-				if ($data['copy element'] === 'widget') {
-					CDashboardElement::find()->one()->waitUntilVisible()->pasteWidget();
-					$this->assertEquals(1, $dashboard->query('xpath:.//h4[text()="Clock widget"]')->all()->count());
-				}
-				else {
-					$this->query('id:dashboard-add')->one()->click();
-					CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
-					sleep(1);
-					$this->assertEquals(1, $dashboard->query('xpath://span[@title="Page with widgets"]')->all()->count());
-				}
-
-				break;
-			case 'another template':
-				$this->page->open('zabbix.php?action=template.dashboard.edit&templateid=50002');
-				$this->page->waitUntilReady();
-				COverlayDialogElement::find()->one()->close();
-				$this->query('id:dashboard-add')->one()->click();
-				$this->assertFalse(CPopupMenuElement::find()->one()->getItem('Paste '.$data['copy element'])->isEnabled());
-
-				break;
-		}
-
-		// Close editing dashboard so that next test case would not failed with "Unexpected alert" error.
-		$this->closeDashboard();
 	}
 
 	/**
@@ -1253,9 +1126,9 @@ class testFormTemplateDashboards extends CWebTest {
 	}
 
 	/**
-	 * Function that properly closes a template dashboard before proceeding to the next test.
+	 * Function that closes all dialogues and alerts on a template dashboard before proceeding to the next test.
 	 */
-	private function closeDashboard() {
+	private function closeDialogues() {
 		if (COverlayDialogElement::find()->one(false)->isValid()) {
 			COverlayDialogElement::find()->one()->close();
 		}
@@ -1284,10 +1157,9 @@ class testFormTemplateDashboards extends CWebTest {
 				$this->assertEquals($old_values, $form->getFields()->asValues());
 			}
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
-			$this->closeDashboard();
+			$this->closeDialogues();
 		}
 		else {
-
 			// Wait for widgets to be present as dashboard is slow when there ame many widgets on it.
 			if ($check !== 'dashboard action') {
 				$name = ($data['fields']['Name'] === '') ? 'Local' : $data['fields']['Name'];

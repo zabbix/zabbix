@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup dashboard
@@ -73,15 +73,13 @@ class testPageTemplateDashboards extends CWebTest {
 		$this->assertTableStats($dashboards_count);
 
 		$all_dashboards = $this->query('id:all_dashboards')->one()->asCheckbox();
-		$selected_count = $this->query('id:selected_count')->one();
-
 		foreach ([false, true, false] as $checkbox_state) {
 			$expected_count = ($checkbox_state) ? $dashboards_count : 0;
 
 			if ($all_dashboards->isChecked() !== $checkbox_state) {
 				$all_dashboards->set($checkbox_state);
 			}
-			$this->assertEquals($expected_count.' selected', $selected_count->getText());
+			$this->assertEquals($expected_count.' selected', $this->query('id:selected_count')->one()->getText());
 		}
 
 		// Check tokens table headers.
@@ -95,7 +93,6 @@ class testPageTemplateDashboards extends CWebTest {
 
 		// Check list table contents.
 		$this->assertTableData($this->wrapDashboardNames());
-
 	}
 
 	/**
@@ -124,7 +121,6 @@ class testPageTemplateDashboards extends CWebTest {
 	public function testPageTemplateDashboards_Delete() {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::TEMPLATEID);
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilVisible();
-
 		$table->findRows($this->wrapDashboardNames(self::DASHBOARDS_2_DELETE))->select();
 
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();

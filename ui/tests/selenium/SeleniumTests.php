@@ -49,7 +49,6 @@ require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageItems.php';
 require_once dirname(__FILE__).'/testPageItemPrototypes.php';
-require_once dirname(__FILE__).'/testPageTemplateDashboards.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
@@ -136,7 +135,6 @@ require_once dirname(__FILE__).'/testFormTagsTrigger.php';
 require_once dirname(__FILE__).'/testFormTagsTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
-require_once dirname(__FILE__).'/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/users/testFormUser.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
@@ -178,6 +176,8 @@ require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
+require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
 require_once dirname(__FILE__).'/testSID.php';
 
 class SeleniumTests {
@@ -212,7 +212,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageItems');
 		$suite->addTestSuite('testPageItemPrototypes');
-		$suite->addTestSuite('testPageTemplateDashboards');
 		$suite->addTestSuite('testPageTriggers');
 		$suite->addTestSuite('testPageTriggerDescription');
 		$suite->addTestSuite('testPageTriggerUrl');
@@ -301,7 +300,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTagsTrigger');
 		$suite->addTestSuite('testFormTagsTriggerPrototype');
 		$suite->addTestSuite('testFormTemplate');
-		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormUser');
@@ -344,6 +342,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testFormTemplateDashboards');
+		$suite->addTestSuite('testPageTemplateDashboards');
 		$suite->addTestSuite('testSID');
 
 		return $suite;
