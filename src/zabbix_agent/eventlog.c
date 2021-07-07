@@ -335,6 +335,95 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
 	}
 }
 
+static zbx_uint64_t	get_eventlog6_last_id(const wchar_t *wsource)
+{
+	char		*err = NULL;
+	zbx_uint64_t	id = 0;
+	EVT_HANDLE	query, render_context= NULL, event_bookmark = NULL;
+	EVT_VARIANT*	renderedContent = NULL;
+	DWORD		status = 0;
+	DWORD		size_required = 0;
+	DWORD		size = DEFAULT_EVENT_CONTENT_SIZE;
+	DWORD		bookmarkedCount = 0;
+
+
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	/* start building the query */
+
+	/* create massive query for an event on a local computer*/
+	query = EvtQuery(NULL, wsource, NULL, EvtQueryChannelPath | EvtQueryReverseDirection);
+
+	if (NULL == query)
+	{
+		if (ERROR_EVT_CHANNEL_NOT_FOUND == (status = GetLastError()))
+			err = zbx_dsprintf(err, "EvtQuery channel missed:%s", strerror_from_system(status));
+		else
+			err = zbx_dsprintf(err, "EvtQuery failed:%s", strerror_from_system(status));
+
+		goto out;
+	}
+
+	/* create the system render */
+	if (NULL == (render_context = EvtCreateRenderContext(RENDER_ITEMS_COUNT, RENDER_ITEMS, EvtRenderContextValues)))
+	{
+		err = zbx_dsprintf(err, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
+		goto out;
+	}
+
+	/* get the entries and allocate the required space */
+	renderedContent = zbx_malloc(renderedContent, size);
+	if (TRUE != EvtNext(query, 1, &event_bookmark, INFINITE, 0, &size_required))
+	{
+		/* no data in eventlog */
+		err = zbx_dsprintf(err, "last EvtNext failed:%s", strerror_from_system(GetLastError()));
+		goto out;
+	}
+
+	/* obtain the information from selected events */
+	if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
+			&size_required, &bookmarkedCount))
+	{
+		/* information exceeds the allocated space */
+		if (ERROR_INSUFFICIENT_BUFFER != (status = GetLastError()))
+		{
+			err = zbx_dsprintf(err, "EvtRender failed:%s", strerror_from_system(status));
+			goto out;
+		}
+
+		renderedContent = (EVT_VARIANT*)zbx_realloc((void *)renderedContent, size_required);
+		size = size_required;
+
+		if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
+				&size_required, &bookmarkedCount))
+		{
+			err = zbx_dsprintf(err, "EvtRender failed:%s", strerror_from_system(GetLastError()));
+			goto out;
+		}
+	}
+
+	id = VAR_RECORD_NUMBER(renderedContent);
+
+out:
+	if (NULL != err)
+		zabbix_log(LOG_LEVEL_WARNING, "%s() error:%s", __func__, err);
+
+	zbx_free(err);
+	zbx_free(renderedContent);
+
+	if (NULL != query)
+		EvtClose(query);
+	if (NULL != render_context)
+		EvtClose(render_context);
+	if (NULL != event_bookmark)
+		EvtClose(event_bookmark);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() last EventRecordID:" ZBX_FS_UI64, __func__, id);
+
+	return id;
+}
+
 /* open eventlog using API 6 and return the number of records */
 static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize, EVT_HANDLE *render_context,
 		zbx_uint64_t *FirstID, zbx_uint64_t *LastID, char **error)
@@ -351,11 +440,14 @@ static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize,
 	zbx_uint64_t	numIDs = 0;
 	char		*tmp_str = NULL;
 	int		ret = FAIL;
+	zbx_uint64_t	last_evt_rec_id;
 
 	*FirstID = 0;
 	*LastID = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	last_evt_rec_id = get_eventlog6_last_id(wsource);
 
 	/* try to open the desired log */
 	if (NULL == (log = EvtOpenLog(NULL, wsource, EvtOpenChannelPath)))
@@ -453,8 +545,9 @@ out:
 		EvtClose(event_bookmark);
 	zbx_free(tmp_str);
 	zbx_free(renderedContent);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s FirstID:" ZBX_FS_UI64 " LastID:" ZBX_FS_UI64 " numIDs:" ZBX_FS_UI64,
-			__func__, zbx_result_string(ret), *FirstID, *LastID, numIDs);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s FirstID:" ZBX_FS_UI64 " LastID:" ZBX_FS_UI64 " numIDs:" ZBX_FS_UI64
+			" last EventRecordID:" ZBX_FS_UI64, __func__, zbx_result_string(ret), *FirstID, *LastID,
+			numIDs, last_evt_rec_id);
 
 	return ret;
 }
@@ -1072,13 +1165,6 @@ int	process_eventslog6(const char *server, unsigned short port, const char *even
 			/* do not flood local system if file grows too fast */
 			if (p_count >= (4 * rate * metric->refresh))
 				break;
-
-			/* fixed case of decrease the number of events in windows events during the next iteration */
-			if (lastlogsize == LastID)
-			{
-				error_code = ERROR_NO_MORE_ITEMS;
-				break;
-			}
 		}
 
 		if (i < required_buf_size)
