@@ -32,6 +32,11 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 		// Host groups.
 		$field_groups = new CWidgetFieldMsGroup('groupids', _('Host groups'));
 
+		if (array_key_exists('tags', $this->data) && $this->data['tags']) {
+			// API doesn't guarantee fields to be retrieved in same order as stored.
+			ksort($this->data['tags'], SORT_NUMERIC);
+		}
+
 		if (array_key_exists('groupids', $this->data)) {
 			$field_groups->setValue($this->data['groupids']);
 		}
