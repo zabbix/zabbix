@@ -38,16 +38,16 @@ const char	title_message[] = "zabbix_sender";
 const char	syslog_app_name[] = "zabbix_sender";
 
 const char	*usage_message[] = {
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "-k key", "-o value", NULL,
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-N]", "[-r]", "-i input-file",
-	NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "-k key", "-o value",
-	NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-N]", "[-r]",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "-k key", "-o value", NULL,
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "[-T]", "[-N]", "[-r]",
 	"-i input-file", NULL,
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "-k key",
+	"-o value", NULL,
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "[-T]",
+	"[-N]", "[-r]", "-i input-file", NULL,
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect cert", "--tls-ca-file CA-file",
-	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "--tls-connect cert",
+	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
@@ -56,8 +56,8 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert", "--tls-ca-file CA-file",
-	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "--tls-connect cert",
+	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
 	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13] cipher-string",
@@ -66,9 +66,10 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
-	"[-v]", "-c config-file [-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
-	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
-	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
+	"[-v]", "-c config-file [-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
+	"--tls-connect cert", "--tls-ca-file CA-file", "[--tls-crl-file CRL-file]",
+	"[--tls-server-cert-issuer cert-issuer]", "[--tls-server-cert-subject cert-subject]",
+	"--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
 #endif
@@ -76,9 +77,10 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
-	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
-	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
+	"--tls-connect cert", "--tls-ca-file CA-file", "[--tls-crl-file CRL-file]",
+	"[--tls-server-cert-issuer cert-issuer]", "[--tls-server-cert-subject cert-subject]",
+	"--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
 #endif
@@ -86,7 +88,7 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect psk",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
@@ -95,7 +97,7 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
-	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
@@ -104,8 +106,8 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
+	"--tls-connect psk", "--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
 #endif
@@ -113,8 +115,8 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"-k key", "-o value", NULL,
-	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
-	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
+	"--tls-connect psk", "--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
 #endif
@@ -129,6 +131,13 @@ const char	*usage_message[] = {
 };
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
+
+static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
+
+#define CONFIG_SENDER_TIMEOUT_MIN	1
+#define CONFIG_SENDER_TIMEOUT_MAX	300
+#define CONFIG_SENDER_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MIN)
+#define CONFIG_SENDER_TIMEOUT_MAX_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MAX)
 
 const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
@@ -150,6 +159,10 @@ const char	*help_message[] = {
 	"  -I --source-address IP-address   Specify source IP address. When used",
 	"                             together with --config, overrides \"SourceIP\"",
 	"                             parameter specified in agentd configuration file",
+	"",
+	"  -t --timeout seconds       Specify timeout. Valid range: " CONFIG_SENDER_TIMEOUT_MIN_STR "-"
+			CONFIG_SENDER_TIMEOUT_MAX_STR " seconds",
+	"                             (default: " ZBX_STR(GET_SENDER_TIMEOUT) " seconds)",
 	"",
 	"  -s --host host             Specify host name the item belongs to (as",
 	"                             registered in Zabbix frontend). Host IP address",
@@ -290,6 +303,7 @@ static struct zbx_option	longopts[] =
 	{"port",			1,	NULL,	'p'},
 	{"host",			1,	NULL,	's'},
 	{"source-address",		1,	NULL,	'I'},
+	{"timeout",			1,	NULL,	't'},
 	{"key",				1,	NULL,	'k'},
 	{"value",			1,	NULL,	'o'},
 	{"input-file",			1,	NULL,	'i'},
@@ -314,7 +328,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:I:z:p:s:k:o:TNi:rvhV";
+static char	shortopts[] = "c:I:t:z:p:s:k:o:TNi:rvhV";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -658,7 +672,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	}
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
-			GET_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+			CONFIG_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		if (1 == sendval_args->sync_timestamp)
 		{
@@ -969,6 +983,16 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 			case 'r':
 				REAL_TIME = 1;
+				break;
+			case 't':
+				if (FAIL == is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_SENDER_TIMEOUT,
+						sizeof(CONFIG_SENDER_TIMEOUT), CONFIG_SENDER_TIMEOUT_MIN,
+						CONFIG_SENDER_TIMEOUT_MAX))
+				{
+					zbx_error("Invalid timeout, valid range %d:%d seconds",
+							CONFIG_SENDER_TIMEOUT_MIN, CONFIG_SENDER_TIMEOUT_MAX);
+					exit(EXIT_FAILURE);
+				}
 				break;
 			case 'v':
 				if (LOG_LEVEL_WARNING > CONFIG_LOG_LEVEL)

@@ -1,0 +1,1492 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-11T15:22:23Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 9cc843a085bb4ee5af0dc4d764a7eee9
+      template: 'ZYXEL MGS3520-28x SNMP'
+      name: 'ZYXEL MGS3520-28x SNMP'
+      description: |
+        ZYXEL MGS3520-28x
+        
+        MIBs used:
+        RFC1213-MIB
+        ZYXEL-HW-MONITOR-MIB
+        ZYXEL-PORT-MIB
+        ZYXEL-ES-COMMON
+        ZYXEL-TRANSCEIVER-MIB
+        IF-MIB
+        
+        Known Issues:
+        
+          Description: Incorrect handling of SNMP bulk requests. Disable the use of bulk requests in the SNMP interface settings.
+          Version: all versions firmware
+          Device: ZYXEL MGS3520-28
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: dd305c07637b49c985aef490fb237359
+          name: 'ZYXEL MGS3520-28x: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: 'SNMP available'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 3bf5d80d383e4e98853caa02063d69c9
+              expression: 'max(/ZYXEL MGS3520-28x SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'ZYXEL MGS3520-28x: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+        -
+          uuid: be1d951beb564638a6102fe4b35fede0
+          name: 'ZYXEL MGS3520-28x: Contact'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.4.0
+          key: zyxel.3520_28.contact
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The textual identification of the contact person
+            for this managed node, together with information
+            on how to contact this person.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: abdb31aeb0034998b91ab8f9b475409f
+          name: 'ZYXEL MGS3520-28x: CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.15.3.2.4.0
+          key: zyxel.3520_28.cpuusage
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: ZYXEL-ES-COMMON
+            Show device CPU load in %, it's the snapshot of CPU load when 
+            getting the values.
+          tags:
+            -
+              tag: Application
+              value: CPU
+          triggers:
+            -
+              uuid: 96ed7ee3906541ea9cb2c95cf4da1a62
+              expression: 'min(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.cpuusage,5m)>{$CPU.UTIL.CRIT}'
+              name: 'ZYXEL MGS3520-28x: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          uuid: dd0ab3fa502b43969eec05ffd687450e
+          name: 'ZYXEL MGS3520-28x: ZyNOS F/W Version'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.6.0
+          key: zyxel.3520_28.fwversion
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ZYXEL-ES-COMMON'
+          inventory_link: SOFTWARE_FULL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 3785991565b948c2a1e1a2a140c42df4
+              expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion,#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion))>0'
+              name: 'ZYXEL MGS3520-28x: Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: d9923ed59ef14cbebfe2f6d24c0d8414
+          name: 'ZYXEL MGS3520-28x: Location'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.6.0
+          key: zyxel.3520_28.location
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The physical location of this node (e.g.,
+            `telephone closet, 3rd floor').
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 65116a646d734290926de9444a58ff2d
+          name: 'ZYXEL MGS3520-28x: MAC address'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
+          key: zyxel.3520_28.mac
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IF-MIB
+            The interface's address at the protocol layer
+            immediately `below' the network layer in the
+            protocol stack.  For interfaces which do not have
+            such an address (e.g., a serial line), this object
+            should contain an octet string of zero length.
+          inventory_link: MACADDRESS_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 89d6942524f84e6d80d02a80be25ce57
+          name: 'ZYXEL MGS3520-28x: Memory utilization'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.15.3.2.5.0
+          key: zyxel.3520_28.memusage
+          history: 7d
+          description: |
+            MIB: ZYXEL-ES-COMMON
+            Show device memory usage in %.
+          tags:
+            -
+              tag: Application
+              value: Memory
+          triggers:
+            -
+              uuid: 1a999dff1dd9481083681741e71aba76
+              expression: 'min(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.memusage,5m)>{$MEMORY.UTIL.MAX}'
+              name: 'ZYXEL MGS3520-28x: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+        -
+          uuid: 2dced10921704f8a9ccaabb2f951af15
+          name: 'ZYXEL MGS3520-28x: Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.1.0
+          key: zyxel.3520_28.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            A textual description of the entity.  This value
+            should include the full name and version
+            identification of the system's hardware type,
+            software operating-system, and networking
+            software.  It is mandatory that this only contain
+            printable ASCII characters.
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: d72bc70a67014d818d593d6c484fc9ee
+              expression: 'not(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.model)="MGS3520-28" or last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.model)="MGS3520-28F")'
+              name: 'ZYXEL MGS3520-28x: Template does not match hardware'
+              priority: INFO
+              description: 'This template is for Zyxel MGS3520-28x series, but connected to {ITEM.VALUE}'
+        -
+          uuid: bccc98beb7ea45d6a7463de339e8877e
+          name: 'ZYXEL MGS3520-28x: Host name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.5.0
+          key: zyxel.3520_28.name
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            An administratively-assigned name for this
+            managed node.  By convention, this is the node's
+            fully-qualified domain name.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 095d82b3c92340debb324844a6c7f8a8
+          name: 'ZYXEL MGS3520-28x: Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.12.0
+          key: zyxel.3520_28.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: ZYXEL-ES-COMMON
+            Serial number
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: e953886c5a464fc18bb1e221d801901c
+              expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber))>0'
+              name: 'ZYXEL MGS3520-28x: Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: 78959009721a453c8b8a2c49eb26c90c
+          name: 'ZYXEL MGS3520-28x: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.3.0
+          key: zyxel.3520_28.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: RFC1213-MIB
+            The time (in hundredths of a second) since the
+            network management portion of the system was last
+            re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 308761b6dffb44c7b827f6ca76312233
+              expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.uptime)<10m'
+              name: 'ZYXEL MGS3520-28x: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          uuid: e56b6958ca184f549d86502ad9aa10bc
+          name: 'Fan discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.FANRPM.THRESH.LOW},.1.3.6.1.4.1.890.1.15.3.26.1.1.1.6,{#ZYXEL.FAN.DESCRIPTION},.1.3.6.1.4.1.890.1.15.3.26.1.1.1.2]'
+          key: zyxel.3520_28.fan.discovery
+          delay: 1h
+          description: 'An entry in fanRpmTable.'
+          item_prototypes:
+            -
+              uuid: dd26e2542d174248af94102230e3b590
+              name: 'ZYXEL MGS3520-28x: {#ZYXEL.FAN.DESCRIPTION}'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.1.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.fan[{#SNMPINDEX}]'
+              history: 7d
+              units: '!rpm'
+              description: |
+                MIB: ZYXEL-HW-MONITOR-MIB
+                Current speed in Revolutions Per Minute (RPM) on the fan.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: 9eedeb7aaba943c0947896cd50b39c7f
+                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
+                  name: 'ZYXEL MGS3520-28x: {#ZYXEL.FAN.DESCRIPTION} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+          graph_prototypes:
+            -
+              uuid: 8599554de97e46e2bb7d3575d97f9453
+              name: 'ZYXEL MGS3520-28x: Fan #{#SNMPINDEX}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.fan[{#SNMPINDEX}]'
+        -
+          uuid: 800ea9596e6f4fa0b59966f9e9e7cf74
+          name: 'Interface discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.IF.NAME},.1.3.6.1.4.1.890.1.15.3.61.1.1.1.3,{#ZYXEL.IF.LINKUPTYPE},.1.3.6.1.4.1.890.1.15.3.61.2.1.1.2]'
+          key: zyxel.3520_28.net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'An entry in fanRpmTable.'
+          item_prototypes:
+            -
+              uuid: 43cf7ba65c39475b9614ed4b95e9b398
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Administrative status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.adminstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The desired state of the interface.  The
+                testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL MGS3520-28x port admin status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: de6bab43bf544489976261919ae52e98
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Interface name'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.descr[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IF-MIB
+                A textual string containing information about the interface
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 01f3cc6551bb4703b199e6c996ad48ce
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link speed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.highspeed[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                An estimate of the interface's current bandwidth in bits per second
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 68b987f900c0467ea77a8c8eb661f6d0
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming broadcast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.in.broadcastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a broadcast
+                address at this sub-layer.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: ddcef9809ee34de5bec1acbdc8abc162
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming multicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.in.multicastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a multicast
+                address at this sub-layer.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: e8c2a3a8ba654311bc90901502983b7a
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.in.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface,
+                including framing characters.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 003eb52b5fe44f509b3c04eef9cc2aa7
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming unicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.in.ucastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were not addressed to a multicast
+                or broadcast address at this sub-layer
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 8e060cde0fae44d792080fbc7da5a2a1
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming utilization'
+              type: CALCULATED
+              key: 'zyxel.3520_28.net.if.in.util[{#SNMPINDEX}]'
+              history: 7d
+              units: '%'
+              params: 'last(//zyxel.3520_28.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.3520_28.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3520_28.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3520_28.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
+              description: 'Interface utilization percentage'
+              preprocessing:
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 15a2c17e0bba4f0d824790c3caa9840f
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link type'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.2.1.1.2.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.link_type[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: ZYXEL-PORT-MIB
+                The entry shows the linkUp cable type (copper, fiber, xfp or cx4) for the combo ports.
+              valuemap:
+                name: 'ZYXEL MGS3520-28x operational mode port link up type'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: f42c5604726d4d21a840418e5668287c
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Interface description'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.1.1.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.name[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-PORT-MIB
+                Descriptive name that identifies this port.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: cfd32eee855647b79c95d6f151f13407
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                The testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL MGS3520-28x port operational status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: abb9d47ee9624d6f9805e6eedd5532c5
+                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+            -
+              uuid: 26f87786719c4192949536c74c146b4d
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing broadcast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.out.broadcastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                broadcast address at this sub-layer, including those that
+                were discarded or not sent.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 4227a6eb8cce4dd8ab582ffce2788e6e
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing multicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.out.multicastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                multicast address at this sub-layer, including those that
+                were discarded or not sent.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 9a7eb0b7569d4111a33d84d03b5018e4
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.out.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the
+                interface, including framing characters.  This object is a
+                64-bit version of ifOutOctets.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 768be526caa345b2b23996016a19e217
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing unicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.out.ucastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were not addressed to a
+                multicast or broadcast address at this sub-layer, including
+                those that were discarded or not sent.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: e2b22f4c39974628a4476120b310a6fb
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing utilization'
+              type: CALCULATED
+              key: 'zyxel.3520_28.net.if.out.util[{#SNMPINDEX}]'
+              history: 7d
+              units: '%'
+              params: 'last(//zyxel.3520_28.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.3520_28.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3520_28.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3520_28.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
+              description: 'Interface utilization percentage'
+              preprocessing:
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 285f30d057f8438ab0d94367bcd6bdfc
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Speed Duplex'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.1.1.1.1.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.net.if.speed_duplex[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: ZYXEL-PORT-MIB
+                Select The speed and the duplex mode of the Ethernet connection on this port. Selecting Auto 
+                (auto-negotiation) allows one port to negotiate with a peer port automatically to obtain the 
+                connection speed and duplex mode that both ends support. When auto-negotiation is turned on, 
+                a port on the Switch negotiates with the peer automatically to determine the connection speed 
+                and duplex mode. If the peer port does not support auto-negotiation or turns off this feature, 
+                the Switch determines the connection speed by detecting the signal on the cable and using half 
+                duplex mode. Thus requiring you to make sure that the settings of the peer port are the same in 
+                order to connect.
+              valuemap:
+                name: 'ZYXEL MGS3520-28x operational mode port speed duplex'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+          graph_prototypes:
+            -
+              uuid: a7a2aec27f0045eba26e86e8cb08853a
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Packets traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.in.ucastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.out.ucastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.in.multicastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.out.multicastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.in.broadcastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.out.broadcastpkts[{#SNMPINDEX}]'
+            -
+              uuid: b5446d1f3394422d81ca94dd617d6e95
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.in.traffic[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.out.traffic[{#SNMPINDEX}]'
+            -
+              uuid: 7314e57ea54c42d2ac6a341943204c04
+              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.out.util[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.net.if.in.util[{#SNMPINDEX}]'
+          overrides:
+            -
+              name: 'Trigger disabled'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '.*'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'Trigger enabled'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          uuid: c313274b317c42cab5b7dd3c88d0c14b
+          name: 'SFP with DDM discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.SFP.WARN.MAX},.1.3.6.1.4.1.890.1.15.3.84.1.2.1.4,{#ZYXEL.SFP.WARN.MIN},.1.3.6.1.4.1.890.1.15.3.84.1.2.1.5,{#ZYXEL.SFP.DESCRIPTION},.1.3.6.1.4.1.890.1.15.3.84.1.2.1.7]'
+          key: zyxel.3520_28.sfp.ddm.discovery
+          delay: 12h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.SFP.DESCRIPTION}'
+                value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.SFP.DESCRIPTION}'
+                value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'SFP DDM module discovery.'
+          item_prototypes:
+            -
+              uuid: f3f9077d771544bfa666f58b6ae59e9c
+              name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.2.1.6.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              value_type: FLOAT
+              units: '!{#ZYXEL.SFP.UNIT}'
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module DDM data ({#ZYXEL.SFP.DESCRIPTION}).
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#ZYXEL.SFP.PORT}'
+              trigger_prototypes:
+                -
+                  uuid: 27cd25ea30fa4f1c9b7b431218241d0c
+                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
+                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  priority: WARNING
+                  description: 'The upper threshold value of the parameter is exceeded'
+                -
+                  uuid: 1188909e81c14c23aa9eefbb25a4c367
+                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
+                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  priority: WARNING
+                  description: 'The parameter values are less than the lower threshold'
+          graph_prototypes:
+            -
+              uuid: 5d6e873606684351a68d649a8f7cd5d4
+              name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var nameMap = {
+                      'Temperature': '°C',
+                      'Voltage': 'V',
+                      'TxBias': 'mA',
+                      'TxPower': 'dbm',
+                      'RxPower': 'dbm'
+                  };
+                  var outArr = [];
+                  inArray.forEach(function (item, i, arr) {
+                      item['{#ZYXEL.SFP.PORT}'] = item['{#SNMPINDEX}'].split('.')[0];
+                      item['{#ZYXEL.SFP.UNIT}'] = nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']] === undefined ? "" : nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']];
+                      item['{#ZYXEL.SFP.WARN.MAX}'] /= 100;
+                      item['{#ZYXEL.SFP.WARN.MIN}'] /= 100;
+                      outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+        -
+          uuid: f7ab574d01c848f3a46eed870c5099a4
+          name: 'SFP without DDM discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.SFP.STATUS},.1.3.6.1.4.1.890.1.15.3.84.1.1.1.1]'
+          key: zyxel.3520_28.sfp.discovery
+          delay: 12h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.SFP.STATUS}'
+                value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.SFP.STATUS}'
+                value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'SFP module discovery.'
+          item_prototypes:
+            -
+              uuid: da89b981488d4a71b1a4c70032669ddc
+              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Date code'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.6.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.sfp.datecode[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module vendor's manufacturing date code.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 743a5eaf2c1049d4bf517c7e6f1f350d
+              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Part number'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.sfp.part[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Part number provided by transceiver module vendor.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: e40f07be73ca4e15acc109f8565f491b
+              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Revision'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.5.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.sfp.revision[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Revision level for part number provided by transceiver module vendor.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 42db7a2affe54f059015adeae188efea
+              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Serial number'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.4.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Serial number provided by transceiver module vendor.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: b9c3894fed8140c684be7c1fe2bbca8d
+                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              uuid: 8ff52d1298f74fa0a211c80373c25f9b
+              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.1.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.sfp.status[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module type.
+              valuemap:
+                name: 'ZYXEL MGS3520-28x SFP status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: b11f1d31e3a04b39b6e9ec40a800a7d5
+              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Transceiver'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.7.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.sfp.transceiver[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module type names.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 2656c166a30d4ee19465c8e9b2986a10
+              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Vendor'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.2.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.sfp.vendor[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module vendor name.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+        -
+          uuid: 0fa2bd401cc14847a8fd366b895a6a51
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.TEMP.THRESH.HIGH},.1.3.6.1.4.1.890.1.15.3.26.1.2.1.6,{#ZYXEL.TEMPDESCRIPTION},.1.3.6.1.4.1.890.1.15.3.26.1.2.1.2]'
+          key: zyxel.3520_28.temp.discovery
+          delay: 1h
+          description: 'An entry in tempTable.'
+          item_prototypes:
+            -
+              uuid: bbdae35cdac341ce8f092b693ced4210
+              name: 'ZYXEL MGS3520-28x: Temperature "{#ZYXEL.TEMPDESCRIPTION}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.2.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.temp[{#SNMPINDEX}]'
+              history: 7d
+              units: °C
+              description: |
+                MIB: ZYXEL-HW-MONITOR-MIB
+                The current temperature measured at this sensor
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: c2d4142fb8934eb7b66f5a5e4fa04398
+                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  name: 'ZYXEL MGS3520-28x: Temperature {#ZYXEL.TEMPDESCRIPTION} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the temperature'
+          graph_prototypes:
+            -
+              uuid: 96fcc6df9a324347a550dd0df84ac15a
+              name: 'ZYXEL MGS3520-28x: Temperature "{#ZYXEL.TEMPDESCRIPTION}"'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.temp[{#SNMPINDEX}]'
+        -
+          uuid: b390ed15aca64c49b654734ef35a9d60
+          name: 'Voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.VOLT.THRESH.LOW},.1.3.6.1.4.1.890.1.15.3.26.1.3.1.7,{#ZYXEL.DESCRIPTION},.1.3.6.1.4.1.890.1.15.3.26.1.3.1.2]'
+          key: zyxel.3520_28.volt.discovery
+          delay: 1h
+          description: 'An entry in voltageTable.'
+          item_prototypes:
+            -
+              uuid: 2b00ed37531f4dfc81aa2669cf227854
+              name: 'ZYXEL MGS3520-28x: Nominal "{#ZYXEL.DESCRIPTION}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.3.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3520_28.volt[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: ZYXEL-HW-MONITOR-MIB
+                The current voltage reading.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: 22b6f2f48eae4167b31c8fe3ccbc138a
+                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  name: 'ZYXEL MGS3520-28x: Voltage {#ZYXEL.DESCRIPTION} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply'
+          graph_prototypes:
+            -
+              uuid: 74f0c4aba0db42869c1797c0631b7d03
+              name: 'ZYXEL MGS3520-28x: Nominal "{#ZYXEL.DESCRIPTION}"'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MGS3520-28x SNMP'
+                    key: 'zyxel.3520_28.volt[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var outArr = []
+                  inArray.forEach(function(item, i, arr) {
+                  item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000; 
+                  outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+          value: 'NEED TRIGGERS'
+          description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+          value: 1|2|3|4
+          description: 'Filter of discoverable link types. 0 - Down link 1 - Cooper link 2 - Fiber link 3 - XFP 4 - CX4'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered by link types.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter by discoverable interface names.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered interfaces by name.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
+          value: 1|2
+          description: 'Filter of discoverable status. 0 - OK with DDM 1 - OK without DDM 2 - nonoperational'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered by status.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
+          value: '.*'
+          description: 'Filter by discoverable SFP modules name.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
+          value: N/A
+          description: 'Filter to exclude discovered SFP modules by name.'
+        -
+          macro: '{$ZYXEL.LLD.SFP.UPDATE}'
+          value: 10m
+          description: 'Receiving data from the SFP module is slow, we do not recommend setting the interval less than 10 minutes.'
+      valuemaps:
+        -
+          uuid: 5c5037a96f084a8182a5fb00f49ff285
+          name: 'SNMP available'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: 2b38ddd0e1a34cfab7dd6af9ebf28aca
+          name: 'ZYXEL MGS3520-28x operational mode port link up type'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Cooper
+            -
+              value: '2'
+              newvalue: Fiber
+            -
+              value: '3'
+              newvalue: XFP
+            -
+              value: '4'
+              newvalue: CX4
+        -
+          uuid: f23ebe496cfc4e659a09eff530b81a24
+          name: 'ZYXEL MGS3520-28x operational mode port speed duplex'
+          mappings:
+            -
+              value: '0'
+              newvalue: auto
+            -
+              value: '1'
+              newvalue: '10M half'
+            -
+              value: '2'
+              newvalue: '10M full'
+            -
+              value: '3'
+              newvalue: '100M half'
+            -
+              value: '4'
+              newvalue: '100M full'
+            -
+              value: '5'
+              newvalue: '1G full'
+            -
+              value: '6'
+              newvalue: '10G full'
+            -
+              value: '7'
+              newvalue: '12G full'
+            -
+              value: '8'
+              newvalue: '40G full'
+            -
+              value: '9'
+              newvalue: '1G auto'
+        -
+          uuid: 3e0566598e394d80988fb49cd3215922
+          name: 'ZYXEL MGS3520-28x port admin status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+        -
+          uuid: 2ffe41460977466cb09bc241b8d22739
+          name: 'ZYXEL MGS3520-28x port operational status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+            -
+              value: '4'
+              newvalue: Unknown
+            -
+              value: '5'
+              newvalue: Dormant
+            -
+              value: '6'
+              newvalue: NotPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: 4443c6780c8f4d16a5f1efd5426db02e
+          name: 'ZYXEL MGS3520-28x SFP status'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'OK with DDM'
+            -
+              value: '2'
+              newvalue: 'OK without DDM'
+            -
+              value: '3'
+              newvalue: nonoperational
+  graphs:
+    -
+      uuid: 13d4a0c9f81647c8ba9f712617c45402
+      name: 'ZYXEL MGS3520-28x: CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'ZYXEL MGS3520-28x SNMP'
+            key: zyxel.3520_28.cpuusage

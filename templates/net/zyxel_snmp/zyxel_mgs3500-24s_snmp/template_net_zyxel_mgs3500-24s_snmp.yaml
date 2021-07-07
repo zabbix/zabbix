@@ -1,0 +1,1492 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-11T15:21:48Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 89eef2fe23964f44bf9aec6d00e39efd
+      template: 'ZYXEL MES3500-24S SNMP'
+      name: 'ZYXEL MES3500-24S SNMP'
+      description: |
+        ZYXEL MES3500-24S
+        
+        MIBs used:
+        RFC1213-MIB
+        ZYXEL-HW-MONITOR-MIB
+        ZYXEL-PORT-MIB
+        ZYXEL-ES-COMMON
+        ZYXEL-TRANSCEIVER-MIB
+        IF-MIB
+        
+        Known Issues:
+        
+          Description: Incorrect handling of SNMP bulk requests. Disable the use of bulk requests in the SNMP interface settings.
+          Version: all versions firmware
+          Device: ZYXEL MGS3520-28
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 4b5994ccefe5492b8ee81c88f4871efe
+          name: 'ZYXEL MES3500-24S: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: 'SNMP available'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: d80bc493096b4da4857651e7e28829e7
+              expression: 'max(/ZYXEL MES3500-24S SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'ZYXEL MES3500-24S: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+        -
+          uuid: aa2cb34bb8a24ea883d13039175e7955
+          name: 'ZYXEL MES3500-24S: Contact'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.4.0
+          key: zyxel.3500_24s.contact
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The textual identification of the contact person
+            for this managed node, together with information
+            on how to contact this person.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 6fccaef6a6f84d97b825d46b62955b76
+          name: 'ZYXEL MES3500-24S: CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.15.3.2.4.0
+          key: zyxel.3500_24s.cpuusage
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: ZYXEL-ES-COMMON
+            Show device CPU load in %, it's the snapshot of CPU load when 
+            getting the values.
+          tags:
+            -
+              tag: Application
+              value: CPU
+          triggers:
+            -
+              uuid: 7bf51ce2b7a64f3f8151edc224c601e8
+              expression: 'min(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.cpuusage,5m)>{$CPU.UTIL.CRIT}'
+              name: 'ZYXEL MES3500-24S: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          uuid: 37410c60fd224987920640313a0b229b
+          name: 'ZYXEL MES3500-24S: ZyNOS F/W Version'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.6.0
+          key: zyxel.3500_24s.fwversion
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ZYXEL-ES-COMMON'
+          inventory_link: SOFTWARE_FULL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 182e8b14935445268c096a3e4fdb5795
+              expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fwversion,#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fwversion,#2) and length(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fwversion))>0'
+              name: 'ZYXEL MES3500-24S: Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: a2ee7e4d0dbc463aa9fc997f14740d0b
+          name: 'ZYXEL MES3500-24S: Location'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.6.0
+          key: zyxel.3500_24s.location
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The physical location of this node (e.g.,
+            `telephone closet, 3rd floor').
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 082f2005c90d4edebdddedd1ee946793
+          name: 'ZYXEL MES3500-24S: MAC address'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
+          key: zyxel.3500_24s.mac
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IF-MIB
+            The interface's address at the protocol layer
+            immediately `below' the network layer in the
+            protocol stack.  For interfaces which do not have
+            such an address (e.g., a serial line), this object
+            should contain an octet string of zero length.
+          inventory_link: MACADDRESS_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 1e8654e4f9ba487f971f5dc4c1fd5c9d
+          name: 'ZYXEL MES3500-24S: Memory utilization'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.15.3.2.5.0
+          key: zyxel.3500_24s.memusage
+          history: 7d
+          description: |
+            MIB: ZYXEL-ES-COMMON
+            Show device memory usage in %.
+          tags:
+            -
+              tag: Application
+              value: Memory
+          triggers:
+            -
+              uuid: d3a4dca93ad946589b1b83e0fe647dde
+              expression: 'min(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.memusage,5m)>{$MEMORY.UTIL.MAX}'
+              name: 'ZYXEL MES3500-24S: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+        -
+          uuid: a7d255bd093744ef853335e1b961bef7
+          name: 'ZYXEL MES3500-24S: Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.1.0
+          key: zyxel.3500_24s.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            A textual description of the entity.  This value
+            should include the full name and version
+            identification of the system's hardware type,
+            software operating-system, and networking
+            software.  It is mandatory that this only contain
+            printable ASCII characters.
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 96c011542d5b4473934e0de9e442479c
+              expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.model)<>"MES3500-24S"'
+              name: 'ZYXEL MES3500-24S: Template does not match hardware'
+              priority: INFO
+              description: 'This template is for Zyxel MES3500-24S series, but connected to {ITEM.VALUE}'
+        -
+          uuid: 9225792a06444aabb120c390c68c2a06
+          name: 'ZYXEL MES3500-24S: Host name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.5.0
+          key: zyxel.3500_24s.name
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            An administratively-assigned name for this
+            managed node.  By convention, this is the node's
+            fully-qualified domain name.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: a9e8c7ae033b4f7e95aadd663f3656d9
+          name: 'ZYXEL MES3500-24S: Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.12.0
+          key: zyxel.3500_24s.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: ZYXEL-ES-COMMON
+            Serial number
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 90268ffbf33049d6adc6ed96badd67ec
+              expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.serialnumber,#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.serialnumber,#2) and length(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.serialnumber))>0'
+              name: 'ZYXEL MES3500-24S: Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: b3f7ffa22b174e2c8ed8bf0deeb62b42
+          name: 'ZYXEL MES3500-24S: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.3.0
+          key: zyxel.3500_24s.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: RFC1213-MIB
+            The time (in hundredths of a second) since the
+            network management portion of the system was last
+            re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 6c8fce36fd9c49569be0ba2bfb70f478
+              expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.uptime)<10m'
+              name: 'ZYXEL MES3500-24S: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          uuid: a76d8952c6424abe926a5b9453bbc75d
+          name: 'Fan discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.FANRPM.THRESH.LOW},.1.3.6.1.4.1.890.1.15.3.26.1.1.1.6,{#ZYXEL.FAN.DESCRIPTION},.1.3.6.1.4.1.890.1.15.3.26.1.1.1.2]'
+          key: zyxel.3500_24s.fan.discovery
+          delay: 1h
+          description: 'An entry in fanRpmTable.'
+          item_prototypes:
+            -
+              uuid: 4f8bcd1fc9b54f3e94009c5a098ca4e0
+              name: 'ZYXEL MES3500-24S: {#ZYXEL.FAN.DESCRIPTION}'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.1.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.fan[{#SNMPINDEX}]'
+              history: 7d
+              units: '!rpm'
+              description: |
+                MIB: ZYXEL-HW-MONITOR-MIB
+                Current speed in Revolutions Per Minute (RPM) on the fan.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: 19846f8e671945c68b065ac53ebb2d38
+                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
+                  name: 'ZYXEL MES3500-24S: {#ZYXEL.FAN.DESCRIPTION} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+          graph_prototypes:
+            -
+              uuid: ed81cba771d34db3b50262ff0bbc73b4
+              name: 'ZYXEL MES3500-24S: Fan #{#SNMPINDEX}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.fan[{#SNMPINDEX}]'
+        -
+          uuid: 75336fa715834ade8a5434520543bf1c
+          name: 'Interface discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.IF.NAME},.1.3.6.1.4.1.890.1.15.3.61.1.1.1.3,{#ZYXEL.IF.LINKUPTYPE},.1.3.6.1.4.1.890.1.15.3.61.2.1.1.2]'
+          key: zyxel.3500_24s.net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'An entry in fanRpmTable.'
+          item_prototypes:
+            -
+              uuid: 40967a08563e4f62b56d0f3983a5b76a
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Administrative status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.adminstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The desired state of the interface.  The
+                testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL MES3500-24S port admin status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: d4f846a781f543539e05bc139e01a462
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Interface name'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.descr[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IF-MIB
+                A textual string containing information about the interface
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 27ac6ebffd2e47ecb9ebbece3ef3bb68
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Link speed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                An estimate of the interface's current bandwidth in bits per second
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: e406bba0c87a4607bc36d4be74ac5abb
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Incoming broadcast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.in.broadcastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a broadcast
+                address at this sub-layer.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 18a759f3be5247b282fe7f685ae4d18b
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Incoming multicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.in.multicastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a multicast
+                address at this sub-layer.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 6b87de872fa84ec8bc9c1058716617ff
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Incoming traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.in.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface,
+                including framing characters.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 6e04ed7c0b154deeb1a32150aff18b26
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Incoming unicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.in.ucastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were not addressed to a multicast
+                or broadcast address at this sub-layer
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 197cf5fd63d541439b282e154bcd4ef1
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Incoming utilization'
+              type: CALCULATED
+              key: 'zyxel.3500_24s.net.if.in.util[{#SNMPINDEX}]'
+              history: 7d
+              units: '%'
+              params: 'last(//zyxel.3500_24s.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
+              description: 'Interface utilization percentage'
+              preprocessing:
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: f357ac3f816d4232a2ba6ff571d95773
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Link type'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.2.1.1.2.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.link_type[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: ZYXEL-PORT-MIB
+                The entry shows the linkUp cable type (copper, fiber, xfp or cx4) for the combo ports.
+              valuemap:
+                name: 'ZYXEL MES3500-24S operational mode port link up type'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 5a6debce6aa6420e8c76f50c24fb541e
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Interface description'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.1.1.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.name[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-PORT-MIB
+                Descriptive name that identifies this port.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 419b897845244642a84a1bd224ec72a6
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                The testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL MES3500-24S port operational status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: 60f1b7c76a6b410db3f3a2ae40c3b74c
+                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+            -
+              uuid: 2ca954bd5d90447288da9ac4d75ec976
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Outgoing broadcast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.out.broadcastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                broadcast address at this sub-layer, including those that
+                were discarded or not sent.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: b229348293cd47b39e826f5be1285928
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Outgoing multicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.out.multicastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                multicast address at this sub-layer, including those that
+                were discarded or not sent.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 445163f587b24339adc9155bff798f7d
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Outgoing traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.out.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the
+                interface, including framing characters.  This object is a
+                64-bit version of ifOutOctets.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 8f080d3c0bd045e59d22585878bccbff
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Outgoing unicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.out.ucastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were not addressed to a
+                multicast or broadcast address at this sub-layer, including
+                those that were discarded or not sent.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 43b466a87757484dae36abe07e946bff
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Outgoing utilization'
+              type: CALCULATED
+              key: 'zyxel.3500_24s.net.if.out.util[{#SNMPINDEX}]'
+              history: 7d
+              units: '%'
+              params: 'last(//zyxel.3500_24s.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
+              description: 'Interface utilization percentage'
+              preprocessing:
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: ff93002a2b5341a8a287fdc78c7e9c6d
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Speed Duplex'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.1.1.1.1.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.net.if.speed_duplex[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: ZYXEL-PORT-MIB
+                Select The speed and the duplex mode of the Ethernet connection on this port. Selecting Auto 
+                (auto-negotiation) allows one port to negotiate with a peer port automatically to obtain the 
+                connection speed and duplex mode that both ends support. When auto-negotiation is turned on, 
+                a port on the Switch negotiates with the peer automatically to determine the connection speed 
+                and duplex mode. If the peer port does not support auto-negotiation or turns off this feature, 
+                the Switch determines the connection speed by detecting the signal on the cable and using half 
+                duplex mode. Thus requiring you to make sure that the settings of the peer port are the same in 
+                order to connect.
+              valuemap:
+                name: 'ZYXEL MES3500-24S operational mode port speed duplex'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+          graph_prototypes:
+            -
+              uuid: 86f5f836fba94de9aed70cf58c6cf1d4
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Packets traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.in.ucastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.out.ucastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.in.multicastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.out.multicastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.in.broadcastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.out.broadcastpkts[{#SNMPINDEX}]'
+            -
+              uuid: f9f04b1fffeb49d3995957c026a5de5b
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.in.traffic[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.out.traffic[{#SNMPINDEX}]'
+            -
+              uuid: a9d922236e12416a85f07c7caff3e3cb
+              name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.out.util[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.net.if.in.util[{#SNMPINDEX}]'
+          overrides:
+            -
+              name: 'Trigger disabled'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '.*'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'Trigger enabled'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          uuid: f90783a6170c4802a1833ae25008b618
+          name: 'SFP with DDM discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.SFP.WARN.MAX},.1.3.6.1.4.1.890.1.15.3.84.1.2.1.4,{#ZYXEL.SFP.WARN.MIN},.1.3.6.1.4.1.890.1.15.3.84.1.2.1.5,{#ZYXEL.SFP.DESCRIPTION},.1.3.6.1.4.1.890.1.15.3.84.1.2.1.7]'
+          key: zyxel.3500_24s.sfp.ddm.discovery
+          delay: 12h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.SFP.DESCRIPTION}'
+                value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.SFP.DESCRIPTION}'
+                value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'SFP DDM module discovery.'
+          item_prototypes:
+            -
+              uuid: 69d7fcbc7e3242c99737ef98efbac0a7
+              name: 'ZYXEL MES3500-24S: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.2.1.6.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.sfp.ddm[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              value_type: FLOAT
+              units: '!{#ZYXEL.SFP.UNIT}'
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module DDM data ({#ZYXEL.SFP.DESCRIPTION}).
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#ZYXEL.SFP.PORT}'
+              trigger_prototypes:
+                -
+                  uuid: 2a75ca5b7ef444d0a96dcf2d7c824f03
+                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
+                  name: 'ZYXEL MES3500-24S: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  priority: WARNING
+                  description: 'The upper threshold value of the parameter is exceeded'
+                -
+                  uuid: f2989317c3f847da84979dde3b4f4db4
+                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
+                  name: 'ZYXEL MES3500-24S: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  priority: WARNING
+                  description: 'The parameter values are less than the lower threshold'
+          graph_prototypes:
+            -
+              uuid: e5e5d83e9f9e429fb51ff79245335065
+              name: 'ZYXEL MES3500-24S: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.sfp.ddm[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var nameMap = {
+                      'Temperature': '°C',
+                      'Voltage': 'V',
+                      'TxBias': 'mA',
+                      'TxPower': 'dbm',
+                      'RxPower': 'dbm'
+                  };
+                  var outArr = [];
+                  inArray.forEach(function (item, i, arr) {
+                      item['{#ZYXEL.SFP.PORT}'] = item['{#SNMPINDEX}'].split('.')[0];
+                      item['{#ZYXEL.SFP.UNIT}'] = nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']] === undefined ? "" : nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']];
+                      item['{#ZYXEL.SFP.WARN.MAX}'] /= 100;
+                      item['{#ZYXEL.SFP.WARN.MIN}'] /= 100;
+                      outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+        -
+          uuid: 98536d7e95c145e6ba5d3a5531c570ce
+          name: 'SFP without DDM discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.SFP.STATUS},.1.3.6.1.4.1.890.1.15.3.84.1.1.1.1]'
+          key: zyxel.3500_24s.sfp.discovery
+          delay: 12h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.SFP.STATUS}'
+                value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.SFP.STATUS}'
+                value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'SFP module discovery.'
+          item_prototypes:
+            -
+              uuid: 7232bba1aed34b5aaeb2d4ce3ad8250f
+              name: 'ZYXEL MES3500-24S: SFP {#SNMPINDEX}: Date code'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.6.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.sfp.datecode[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module vendor's manufacturing date code.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 745310ab6da449aa8150956c076a2223
+              name: 'ZYXEL MES3500-24S: SFP {#SNMPINDEX}: Part number'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.sfp.part[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Part number provided by transceiver module vendor.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 4565c91a0641405ba4e3d853b5db86e5
+              name: 'ZYXEL MES3500-24S: SFP {#SNMPINDEX}: Revision'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.5.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.sfp.revision[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Revision level for part number provided by transceiver module vendor.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: b0fa1b76a33041bcab473b17b7b74eef
+              name: 'ZYXEL MES3500-24S: SFP {#SNMPINDEX}: Serial number'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.4.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Serial number provided by transceiver module vendor.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: f6533a3fe07c4f0290e7758ac4183a1f
+                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  name: 'ZYXEL MES3500-24S: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              uuid: 80aa0e87f7b24dfe9b525be735aa1ec3
+              name: 'ZYXEL MES3500-24S: SFP {#SNMPINDEX}: Status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.1.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.sfp.status[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module type.
+              valuemap:
+                name: 'ZYXEL MES3500-24S SFP status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 5175fe53ba2d4bb6a3ad1aa673b67777
+              name: 'ZYXEL MES3500-24S: SFP {#SNMPINDEX}: Transceiver'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.7.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.sfp.transceiver[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module type names.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 17c99b32a9674426807fdf5d469b324a
+              name: 'ZYXEL MES3500-24S: SFP {#SNMPINDEX}: Vendor'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.2.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.sfp.vendor[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-TRANSCEIVER-MIB
+                Transceiver module vendor name.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+        -
+          uuid: 774dd069aeb948569d21396dd8dceea1
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.TEMP.THRESH.HIGH},.1.3.6.1.4.1.890.1.15.3.26.1.2.1.6,{#ZYXEL.TEMPDESCRIPTION},.1.3.6.1.4.1.890.1.15.3.26.1.2.1.2]'
+          key: zyxel.3500_24s.temp.discovery
+          delay: 1h
+          description: 'An entry in tempTable.'
+          item_prototypes:
+            -
+              uuid: 64975a8449d7457c84715f27eb5018fc
+              name: 'ZYXEL MES3500-24S: Temperature "{#ZYXEL.TEMPDESCRIPTION}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.2.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.temp[{#SNMPINDEX}]'
+              history: 7d
+              units: °C
+              description: |
+                MIB: ZYXEL-HW-MONITOR-MIB
+                The current temperature measured at this sensor
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: c6db10ac3bec446e9152545119b555bc
+                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  name: 'ZYXEL MES3500-24S: Temperature {#ZYXEL.TEMPDESCRIPTION} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the temperature'
+          graph_prototypes:
+            -
+              uuid: c238ae64f1ca4e948b36cb423669c864
+              name: 'ZYXEL MES3500-24S: Temperature "{#ZYXEL.TEMPDESCRIPTION}"'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.temp[{#SNMPINDEX}]'
+        -
+          uuid: e8a886916c37490f9ba6b29c57d7331e
+          name: 'Voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.VOLT.THRESH.LOW},.1.3.6.1.4.1.890.1.15.3.26.1.3.1.7,{#ZYXEL.DESCRIPTION},.1.3.6.1.4.1.890.1.15.3.26.1.3.1.2]'
+          key: zyxel.3500_24s.volt.discovery
+          delay: 1h
+          description: 'An entry in voltageTable.'
+          item_prototypes:
+            -
+              uuid: 6134a567c193489aa1ca32d03c0c2c42
+              name: 'ZYXEL MES3500-24S: Nominal "{#ZYXEL.DESCRIPTION}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.3.1.3.{#SNMPINDEX}'
+              key: 'zyxel.3500_24s.volt[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: ZYXEL-HW-MONITOR-MIB
+                The current voltage reading.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: 52ac34f156aa434dace3447bb5745b34
+                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  name: 'ZYXEL MES3500-24S: Voltage {#ZYXEL.DESCRIPTION} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply'
+          graph_prototypes:
+            -
+              uuid: a94a590eed624cac8ece4ff2956419d8
+              name: 'ZYXEL MES3500-24S: Nominal "{#ZYXEL.DESCRIPTION}"'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL MES3500-24S SNMP'
+                    key: 'zyxel.3500_24s.volt[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var outArr = []
+                  inArray.forEach(function(item, i, arr) {
+                  item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000; 
+                  outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+          value: 'NEED TRIGGERS'
+          description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+          value: 1|2|3|4
+          description: 'Filter of discoverable link types. 0 - Down link 1 - Cooper link 2 - Fiber link 3 - XFP 4 - CX4'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered by link types.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter by discoverable interface names.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered interfaces by name.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
+          value: 1|2
+          description: 'Filter of discoverable status. 0 - OK with DDM 1 - OK without DDM 2 - nonoperational'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered by status.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
+          value: '.*'
+          description: 'Filter by discoverable SFP modules name.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
+          value: N/A
+          description: 'Filter to exclude discovered SFP modules by name.'
+        -
+          macro: '{$ZYXEL.LLD.SFP.UPDATE}'
+          value: 10m
+          description: 'Receiving data from the SFP module is slow, we do not recommend setting the interval less than 10 minutes.'
+      valuemaps:
+        -
+          uuid: 9e4265c1129d482fa12a09e657a7cda3
+          name: 'SNMP available'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: 615d399b1a6045359dfc262b364b4c55
+          name: 'ZYXEL MES3500-24S operational mode port link up type'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Cooper
+            -
+              value: '2'
+              newvalue: Fiber
+            -
+              value: '3'
+              newvalue: XFP
+            -
+              value: '4'
+              newvalue: CX4
+        -
+          uuid: 4217cd5f5c1f4b438cd4701c023da375
+          name: 'ZYXEL MES3500-24S operational mode port speed duplex'
+          mappings:
+            -
+              value: '0'
+              newvalue: auto
+            -
+              value: '1'
+              newvalue: '10M half'
+            -
+              value: '2'
+              newvalue: '10M full'
+            -
+              value: '3'
+              newvalue: '100M half'
+            -
+              value: '4'
+              newvalue: '100M full'
+            -
+              value: '5'
+              newvalue: '1G full'
+            -
+              value: '6'
+              newvalue: '10G full'
+            -
+              value: '7'
+              newvalue: '12G full'
+            -
+              value: '8'
+              newvalue: '40G full'
+            -
+              value: '9'
+              newvalue: '1G auto'
+        -
+          uuid: 7e705fdb791341b8a1c86ee7d85fbfea
+          name: 'ZYXEL MES3500-24S port admin status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+        -
+          uuid: 08e22f2eac034c9db9bba73040cea453
+          name: 'ZYXEL MES3500-24S port operational status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+            -
+              value: '4'
+              newvalue: Unknown
+            -
+              value: '5'
+              newvalue: Dormant
+            -
+              value: '6'
+              newvalue: NotPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: 161770392cdb4dcd92c3596b5ad6d06a
+          name: 'ZYXEL MES3500-24S SFP status'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'OK with DDM'
+            -
+              value: '2'
+              newvalue: 'OK without DDM'
+            -
+              value: '3'
+              newvalue: nonoperational
+  graphs:
+    -
+      uuid: 055310b8a5c94d94aeeaf75ff5d2de55
+      name: 'ZYXEL MES3500-24S: CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'ZYXEL MES3500-24S SNMP'
+            key: zyxel.3500_24s.cpuusage

@@ -1,0 +1,3086 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-26T14:58:50Z'
+  groups:
+    -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      uuid: d5eb4ce08a334098a85e6e02c534be90
+      template: 'Cisco UCS Manager SNMP'
+      name: 'Cisco UCS Manager SNMP'
+      description: |
+        This is a template for Cisco UCS Manager monitoring via Zabbix SNMP Agent that works without any external scripts.
+        
+        
+        MIBs used:
+        CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+        SNMPv2-MIB
+        CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB
+        CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
+        CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+        IF-MIB
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      items:
+        -
+          uuid: ad342e11ce9f4f79bf9b0182c3f83488
+          name: 'System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'cisco.ucs.contact[sysContact.0]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed
+            node, together with information on how to contact this person.  If no contact
+            information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 286fdb0fa49a4b378a6219a5ed76aac4
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'cisco.ucs.descr[sysDescr.0]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 88bd32f8520144858a8ddb03dd200638
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'cisco.ucs.location[sysLocation.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., `telephone closet,
+            3rd floor').  If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 8bd3a60e4c70450492432c6abfa7b5f9
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: 'cisco.ucs.name[sysName.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node.By
+            convention, this is the node's fully-qualified domain name.  If the name is unknown,
+            the value is the zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: 622ac72c0e534bba94bb93636e4dc103
+              expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.name[sysName.0],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.name[sysName.0],#2) and length(last(/Cisco UCS Manager SNMP/cisco.ucs.name[sysName.0]))>0'
+              name: 'System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 10d22e53318347658b2418ff33c26e0d
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'cisco.ucs.objectid[sysObjectID.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management
+            subsystem contained in the entity.  This value is allocated within the SMI enterprises
+            subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what
+            kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was
+            assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1
+            to its 'Fred Router'.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: b87e425f1bdf404a8e53ff277c0ff0c0
+          name: Uptime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'cisco.ucs.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time in seconds since the network management
+            portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 9026e680b409424e8fa29934878cb771
+              expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.uptime[sysUpTime.0])<10m'
+              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'No SNMP data collection'
+                  expression: 'max(/Cisco UCS Manager SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+        -
+          uuid: 5d839f68b6534dc8bd1fb5db7a757f02
+          name: 'SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'Item is used to collect all SNMP traps unmatched by other snmptrap items'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 0926417e279a4e52a7f12587e9422e92
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          description: |
+            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - not available
+            1 - available
+            2 - unknown
+          valuemap:
+            name: zabbix.host.available
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 010a749e3a3242cd8e3ea30459fae5a4
+              expression: 'max(/Cisco UCS Manager SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+      discovery_rules:
+        -
+          uuid: f44bb3e5a8ad4d0c98df56267700b171
+          name: 'Array controller cache discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DISKARRAY_CACHE_LOCATION},1.3.6.1.4.1.9.9.719.1.45.11.1.2]'
+          key: cisco.ucs.array.cache.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageControllerTable.'
+          item_prototypes:
+            -
+              uuid: 4e5214066fbb4c719c7e6abfba47e5f6
+              name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.11.1.9.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}]'
+              history: 1w
+              trends: 0d
+              description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+              trigger_prototypes:
+                -
+                  uuid: 0300b4bf4e0b42adb1b9e4985e80e356
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                  name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults'
+                -
+                  uuid: 158561ecab8b4bbd9c0a616f419bda10
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
+                  name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is not in optimal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!'
+                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+        -
+          uuid: bd1cf5ecd41f4dc49c6e31f32119787b
+          name: 'Array controller discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DISKARRAY_LOCATION},1.3.6.1.4.1.9.9.719.1.45.1.1.2]'
+          key: cisco.ucs.array.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageControllerTable.'
+          item_prototypes:
+            -
+              uuid: 5285422113b84c2e8cb00899e0b29493
+              name: '{#DISKARRAY_LOCATION}: Disk array controller model'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.1.1.5.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.diskarray.model[cucsStorageControllerModel.{#SNMPINDEX}]'
+              delay: 1d
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+            -
+              uuid: a732688d6fa347b597854078dd084935
+              name: '{#DISKARRAY_LOCATION}: Disk array controller status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.1.1.6.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}]'
+              history: 1w
+              trends: 0d
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:RaidBattery:operability managed object property.
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+              trigger_prototypes:
+                -
+                  uuid: 28c32222815f47e193d09afe5aafae79
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
+                  name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults'
+                -
+                  uuid: 4e758fac4df54388b5f4555bb170bdd3
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN:"degraded"}'
+                  name: '{#DISKARRAY_LOCATION}: Disk array controller is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
+                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
+                -
+                  uuid: 264e15d04626432987c2193bf190c56c
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])>{$DISK.ARRAY.STATUS.OK:"operable"}'
+                  name: '{#DISKARRAY_LOCATION}: Disk array controller is not in optimal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
+                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
+                    -
+                      name: '{#DISKARRAY_LOCATION}: Disk array controller is in warning state'
+                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN:"degraded"}'
+        -
+          uuid: c799941bb99a4ce0af2ab50253c40259
+          name: 'FAN discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#FAN_LOCATION},1.3.6.1.4.1.9.9.719.1.15.12.1.2]'
+          key: cisco.ucs.fan.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              uuid: 5e4aa59c4ec44fc7b97b9659c0d7a5c5
+              name: '{#FAN_LOCATION}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.15.12.1.9.{#SNMPINDEX}'
+              key: 'cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
+                Cisco UCS equipment:Fan:operState managed object property
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: 7417bd7646c248eb9664875d7d19e9ea
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"inoperable"}'
+                  name: '{#FAN_LOCATION}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+                -
+                  uuid: b3d6cb64470e4e4c9bf1d619c0015823
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.WARN:"degraded"}'
+                  name: '{#FAN_LOCATION}: Fan is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the fan unit'
+                  dependencies:
+                    -
+                      name: '{#FAN_LOCATION}: Fan is in critical state'
+                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"inoperable"}'
+        -
+          uuid: 20b43c2620114a9da4ff4d97b409f53e
+          name: 'Network interface discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          key: cisco.ucs.net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IFADMINSTATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IFADMINSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IFNAME.MATCHES}'
+                formulaid: G
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IFDESCR.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IFALIAS.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IFALIAS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IFTYPE.MATCHES}'
+                formulaid: K
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IFTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: L
+          description: 'Discovering interfaces from IF-MIB.'
+          item_prototypes:
+            -
+              uuid: 361a4c5a4b04432b84f4e6bfcd7775c6
+              name: 'Interface {#IFNAME}({#IFALIAS}): Interface description'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.descr[ifDescr.{#SNMPINDEX}]'
+              delay: 1h
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IF-MIB
+                A textual string containing information about the
+                interface.  This string should include the name of the
+                manufacturer, the product name and the version of the
+                interface hardware/software.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 009aeec02b3b46dc93bd52c2f1a4de0a
+              name: 'Interface {#IFNAME}({#IFALIAS}): Broadcast packets received'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.in.broadcast[ifHCInBroadcastPkts.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a broadcast
+                address at this sub-layer.  This object is a 64-bit version
+                of ifInBroadcastPkts.
+                
+                Discontinuities in the value of this counter can occur at
+                re-initialization of the management system, and at other
+                times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 533b7352983e4adfbd9ca1c0e2e5e4b1
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of inbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 84e21f59350248c185a79dd916587140
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.in.errors[ifInErrors.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: d72b570e01f5479db47628e399932988
+              name: 'Interface {#IFNAME}({#IFALIAS}): Multicast packets received'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.in.multicast[ifHCInMulticastPkts.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a multicast
+                address at this sub-layer.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.  This object
+                is a 64-bit version of ifInMulticastPkts.
+                
+                Discontinuities in the value of this counter can occur at
+                re-initialization of the management system, and at other
+                times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: eef7c3f6945a48e886de08a842c08f72
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.in[ifHCInOctets.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: f682fdf3144145f3998066a77353c4e2
+              name: 'Interface {#IFNAME}({#IFALIAS}): Broadcast packets sent'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.out.broadcast[ifHCOutBroadcastPkts.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                broadcast address at this sub-layer, including those that
+                were discarded or not sent.  This object is a 64-bit version
+                of ifOutBroadcastPkts.
+                
+                Discontinuities in the value of this counter can occur at
+                re-initialization of the management system, and at other
+                times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: b61c1b8a08aa40d696d03ae584230e8e
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of outbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 0b9d7feb75674225ac8e6ad0952380ac
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 3ddc4cca78f14dfc8e6d51efae831ba2
+              name: 'Interface {#IFNAME}({#IFALIAS}): Multicast packets sent'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.out.multicast[ifHCOutMulticastPkts.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                multicast address at this sub-layer, including those that
+                were discarded or not sent.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.  This object
+                is a 64-bit version of ifOutMulticastPkts.
+                
+                Discontinuities in the value of this counter can occur at
+                re-initialization of the management system, and at other
+                times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: e48a1926828645c49afec898d01fa81a
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.out[ifHCOutOctets.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 56aa529b14b14f6f8f9a9b5f1a2ba0d8
+              name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.speed[ifHighSpeed.{#SNMPINDEX}]'
+              delay: 5m
+              history: 7d
+              trends: 0d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 16a4394c6b824bacbc7f074d487fcdfb
+              name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                - The testing(3) state indicates that no operational packet scan be passed
+                - If ifAdminStatus is down(2) then ifOperStatus should be down(2)
+                - If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic
+                - It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)
+                - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state
+                - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
+              valuemap:
+                name: 'IF-MIB::ifOperStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+              trigger_prototypes:
+                -
+                  uuid: edfbf339b2664fae88e2a9003383e37f
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+            -
+              uuid: 00b0f0fb6c0b4026b438627edab908fb
+              name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              key: 'cisco.ucs.if.type[ifType.{#SNMPINDEX}]'
+              delay: 1h
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IF-MIB
+                The type of interface.
+                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                through updating the syntax of the IANAifType textual convention.
+              valuemap:
+                name: 'IF-MIB::ifType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+          trigger_prototypes:
+            -
+              uuid: caaa61b8d89540c496678d739610ae38
+              expression: |
+                min(/Cisco UCS Manager SNMP/cisco.ucs.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Cisco UCS Manager SNMP/cisco.ucs.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate on {#IFNAME} ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Recovers when value below {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+          graph_prototypes:
+            -
+              uuid: d5e5f60602cc41ba8e0b79a63644bf08
+              name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco UCS Manager SNMP'
+                    key: 'cisco.ucs.if.in[ifHCInOctets.{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Cisco UCS Manager SNMP'
+                    key: 'cisco.ucs.if.out[ifHCOutOctets.{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Cisco UCS Manager SNMP'
+                    key: 'cisco.ucs.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Cisco UCS Manager SNMP'
+                    key: 'cisco.ucs.if.in.errors[ifInErrors.{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Cisco UCS Manager SNMP'
+                    key: 'cisco.ucs.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Cisco UCS Manager SNMP'
+                    key: 'cisco.ucs.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).forEach(function (netif) {
+                      if (typeof netif["{#IFNAME}"] === 'undefined') {
+                          netif["{#IFNAME}"] = netif["{#IFDESCR}"];
+                      }
+                      if (typeof netif["{#IFALIAS}"] === 'undefined') {
+                          netif["{#IFALIAS}"] = "";
+                      }
+                      result.push(netif);
+                  });
+                  
+                  return JSON.stringify(result);
+                  
+        -
+          uuid: a8794333ae2c4104ac52c6ce421161fd
+          name: 'Physical disk discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DISK_LOCATION},1.3.6.1.4.1.9.9.719.1.45.4.1.2]'
+          key: cisco.ucs.physicalDisk.discovery
+          delay: 1h
+          description: 'Scanning table of physical drive entries CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalDiskTable.'
+          item_prototypes:
+            -
+              uuid: 3a1f21ccf92f43df869f66911ab5c0ea
+              name: '{#DISK_LOCATION}: Physical disk media type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.17.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.physicaldisk.media_type[cucsStorageLocalDiskDeviceType.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalDisk:deviceType managed object property. Actually returns 'HDD' or 'SSD'.
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageTechnology'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: 317d489e9bf94467a228f5bbccb03436
+              name: '{#DISK_LOCATION}: Physical disk model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.7.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.physicaldisk.model[cucsStorageLocalDiskModel.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalDisk:model managed object property.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: d768239496f2457fbec3a1103e84914d
+              name: '{#DISK_LOCATION}: Physical disk serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.12.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}]'
+              delay: 1h
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalDisk:serial managed object property. Actually returns part number code.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: 693cdcf58cb34def90ade23e2f2485cb
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}]))>0'
+                  name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Disk serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              uuid: c3c38ffc10fb4d139099c551b3c21728
+              name: '{#DISK_LOCATION}: Disk size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.13.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.physicaldisk.size[cucsStorageLocalDiskSize.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: 0d
+              units: B
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalDisk:size managed object property. In MB.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: ad4616916d6644f480a2687dbc56a4a3
+              name: '{#DISK_LOCATION}: Physical disk status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.18.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}]'
+              delay: 3m
+              trends: 0d
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalDisk:diskState managed object property.
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: ba92b99606fa4bf0bc4f1b6a362c2cdb
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.CRIT:"bad"} or last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.CRIT:"predictiveFailure"}'
+                  name: '{#DISK_LOCATION}: Physical disk error'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check physical disk for warnings or errors'
+                  dependencies:
+                    -
+                      name: '{#DISK_LOCATION}: Physical disk failed'
+                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"failed"}'
+                -
+                  uuid: eabf5aa62f004a2c996cc11bb5a6716a
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"failed"}'
+                  name: '{#DISK_LOCATION}: Physical disk failed'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check physical disk for warnings or errors'
+        -
+          uuid: 8ac363db6f2346bba13b63f75cdabd22
+          name: 'PSU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#PSU_LOCATION},1.3.6.1.4.1.9.9.719.1.15.56.1.2]'
+          key: cisco.ucs.psu.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              uuid: 88a07d360c42431ba4ef31cbe825dc72
+              name: '{#PSU_LOCATION}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.15.56.1.7.{#SNMPINDEX}'
+              key: 'cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
+                Cisco UCS equipment:Psu:operState managed object property
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: 0d2713cf2b72472c8d8896880476c20e
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"inoperable"}'
+                  name: '{#PSU_LOCATION}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+                -
+                  uuid: 468f08407a7448a384e5dcde589cb9d0
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.WARN:"degraded"}'
+                  name: '{#PSU_LOCATION}: Power supply is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the power supply unit for errors'
+                  dependencies:
+                    -
+                      name: '{#PSU_LOCATION}: Power supply is in critical state'
+                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"inoperable"}'
+        -
+          uuid: 90b24337c3304ff6a30428c7d46c26fd
+          name: 'Temperature CPU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_LOCATION},1.3.6.1.4.1.9.9.719.1.41.2.1.2]'
+          key: cisco.ucs.temp.cpu.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              uuid: 7b822aeed3e24358aace9693e7f03385
+              name: '{#SENSOR_LOCATION}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.41.2.1.10.{#SNMPINDEX}'
+              key: 'cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB
+                Cisco UCS processor:EnvStats:temperature managed object property
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: c3b3933ceb504207a87054a1f9773a76
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"CPU"}-3'
+                  name: '{#SENSOR_LOCATION}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  uuid: 13b393265f59431687b776297cb0b104
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"CPU"}-3'
+                  name: '{#SENSOR_LOCATION}: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"CPU"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"CPU"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"CPU"}-3'
+        -
+          uuid: b99a5c977c32418ea9efded6d507e3b5
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_LOCATION},1.3.6.1.4.1.9.9.719.1.9.44.1.2]'
+          key: cisco.ucs.temp.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              uuid: d57481cb764a429f928aa6de6837c4ae
+              name: '{#SENSOR_LOCATION}.IOH: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.44.1.13.{#SNMPINDEX}'
+              key: 'cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: aa4bf1c8b942462dbd21ccf8bd8c4a6b
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  uuid: 7751dd6bf1394daa9d918005d2d99d10
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+            -
+              uuid: d5e4b5b7e18c4545853c48db018dc127
+              name: '{#SENSOR_LOCATION}.Ambient: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.44.1.4.{#SNMPINDEX}'
+              key: 'cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 230958b560374a118857b77418c6ba11
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  uuid: 4cdcddd04b0e4625893a1e20ce22a10f
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+            -
+              uuid: 9980042de8d74353bf4a386bb0f28d30
+              name: '{#SENSOR_LOCATION}.Front: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.44.1.8.{#SNMPINDEX}'
+              key: 'cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 8ee1dfc360aa4aca84a03b452ead92ce
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  uuid: 196c9fe3facf4e3db348337714c77e17
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Front: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+            -
+              uuid: e20bfa52f31f4a1a9f08ba02fe27f90c
+              name: '{#SENSOR_LOCATION}.Rear: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.44.1.21.{#SNMPINDEX}'
+              key: 'cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: a8714fcba51c46f9aa84fa02fba37743
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  uuid: 87068c693e574cd3952ca90e95a7a681
+                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                    -
+                      name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
+                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+        -
+          uuid: 9c5d5ce2f672487db83cf91f22c1a413
+          name: 'Unit discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#UNIT_LOCATION},1.3.6.1.4.1.9.9.719.1.9.35.1.2]'
+          key: cisco.ucs.unit.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              uuid: 41ecc1caac444d2587d51e33057e6d39
+              name: '{#UNIT_LOCATION}: Hardware model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.35.1.32.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.model[cucsComputeRackUnitModel.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnit:model managed object property
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
+            -
+              uuid: ac3217187db3453eb8b9932fce7c79c4
+              name: '{#UNIT_LOCATION}: Hardware serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.35.1.47.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnit:serial managed object property
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: Inventory
+              trigger_prototypes:
+                -
+                  uuid: 27253665837647bb9c3be58f7d0881ae
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS Manager SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0'
+                  name: '{#UNIT_LOCATION}: Device has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Device serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              uuid: c6ebb7db809f4c62aae795a8b1c4b740
+              name: '{#UNIT_LOCATION}: Overall system health status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.35.1.42.{#SNMPINDEX}'
+              key: 'cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}]'
+              delay: 30s
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnit:operState managed object property
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Status
+              trigger_prototypes:
+                -
+                  uuid: 7f7c337f4f9f44a3a176acce5bf27f29
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"computeFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"configFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"unconfigFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"inoperable"}'
+                  name: '{#UNIT_LOCATION}: System status is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for errors'
+                -
+                  uuid: 15ee6a98f2af4da4bcaa95821ffff524
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"testFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"thermalProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"powerProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"voltageProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"diagnosticsFailed"}'
+                  name: '{#UNIT_LOCATION}: System status is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings'
+                  dependencies:
+                    -
+                      name: '{#UNIT_LOCATION}: System status is in critical state'
+                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"computeFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"configFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"unconfigFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"inoperable"}'
+        -
+          uuid: 6d0760c4d29d4113b179b0e5c18f7e3b
+          name: 'Virtual disk discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#VDISK_LOCATION},1.3.6.1.4.1.9.9.719.1.45.8.1.2]'
+          key: cisco.ucs.virtualDisk.discovery
+          delay: 1h
+          description: 'CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalLunTable'
+          item_prototypes:
+            -
+              uuid: c80f07f350bc472fb73282f5c80e16e3
+              name: '{#VDISK_LOCATION}: Layout type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.8.1.14.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.virtualdisk.layout[cucsStorageLocalLunType.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalLun:type managed object property
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 59a403629e8b40d981c2926ead601966
+              name: '{#VDISK_LOCATION}: Disk size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.8.1.13.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.virtualdisk.size[cucsStorageLocalLunSize.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: 0d
+              units: B
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalLun:size managed object property in MB.
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 39504e417781414081e1198adef562d4
+              name: '{#VDISK_LOCATION}: Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.8.1.10.{#SNMPINDEX}'
+              key: 'cisco.ucs.hw.virtualdisk.status[cucsStorageLocalLunPresence.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalLun:presence managed object property
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+              trigger_prototypes:
+                -
+                  uuid: 63232b4e1f6b411a93ff8abad1ff3200
+                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.virtualdisk.status[cucsStorageLocalLunPresence.{#SNMPINDEX}])<>{$VDISK.STATUS.OK:"equipped"}'
+                  name: '{#VDISK_LOCATION}: Virtual disk is not in OK state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check virtual disk for warnings or errors'
+      macros:
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+          value: '2'
+          description: 'The cache battery critical state for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
+          value: '1'
+          description: 'The cache battery normal state for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
+          value: '2'
+          description: 'The array controller critical state for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.OK:"operable"}'
+          value: '1'
+          description: 'The array controller normal state for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.WARN:"degraded"}'
+          value: '3'
+          description: 'The array controller warning state for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.CRIT:"bad"}'
+          value: '16'
+          description: 'The disk critical state for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.CRIT:"predictiveFailure"}'
+          value: '11'
+          description: 'The disk critical state for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.FAIL:"failed"}'
+          value: '9'
+          description: 'The disk fail state for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"inoperable"}'
+          value: '2'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.WARN:"degraded"}'
+          value: '3'
+          description: 'The warning value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.CRIT:"computeFailed"}'
+          value: '30'
+          description: 'The unit health critical state for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.CRIT:"configFailure"}'
+          value: '33'
+          description: 'The unit health critical state for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.CRIT:"inoperable"}'
+          value: '60'
+          description: 'The unit health critical state for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.CRIT:"unconfigFailure"}'
+          value: '34'
+          description: 'The unit health critical state for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.WARN:"diagnosticsFailed"}'
+          value: '204'
+          description: 'The unit health warning state for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.WARN:"powerProblem"}'
+          value: '62'
+          description: 'The unit health warning state for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.WARN:"testFailed"}'
+          value: '35'
+          description: 'The unit health warning state for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.WARN:"thermalProblem"}'
+          value: '60'
+          description: 'The unit health warning state for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.WARN:"voltageProblem"}'
+          value: '62'
+          description: 'The unit health warning state for trigger expression.'
+        -
+          macro: '{$IF.ERRORS.WARN}'
+          value: '2'
+        -
+          macro: '{$IFCONTROL}'
+          value: '1'
+        -
+          macro: '{$NET.IFADMINSTATUS.MATCHES}'
+          value: '^.*'
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level. Ignore notPresent(6) by default.'
+        -
+          macro: '{$NET.IFADMINSTATUS.NOT_MATCHES}'
+          value: ^2$
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level. Ignore down(2) administrative status by default.'
+        -
+          macro: '{$NET.IFALIAS.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
+        -
+          macro: '{$NET.IFALIAS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
+        -
+          macro: '{$NET.IFDESCR.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
+        -
+          macro: '{$NET.IFDESCR.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
+        -
+          macro: '{$NET.IFNAME.MATCHES}'
+          value: '^.*$'
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
+        -
+          macro: '{$NET.IFNAME.NOT_MATCHES}'
+          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12}|sup-fc0)'
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level. Filter out loopbacks, sup-fc0, nulls, docker veth links and docker0 bridge by default.'
+        -
+          macro: '{$NET.IFOPERSTATUS.MATCHES}'
+          value: '^.*$'
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
+        -
+          macro: '{$NET.IFOPERSTATUS.NOT_MATCHES}'
+          value: ^6$
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level. Ignore notPresent(6) by default.'
+        -
+          macro: '{$NET.IFTYPE.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
+        -
+          macro: '{$NET.IFTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
+        -
+          macro: '{$PSU.STATUS.CRIT:"inoperable"}'
+          value: '2'
+          description: 'The critical value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$PSU.STATUS.WARN:"degraded"}'
+          value: '3'
+          description: 'The warning value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$TEMP.MAX.CRIT:"Ambient"}'
+          value: '35'
+          description: 'The temperature maximum critical value for trigger expression.'
+        -
+          macro: '{$TEMP.MAX.WARN:"Ambient"}'
+          value: '30'
+          description: 'The temperature maximum warning value for trigger expression.'
+        -
+          macro: '{$VDISK.STATUS.OK:"equipped"}'
+          value: '10'
+          description: 'The vdisk normal state for trigger expression.'
+      dashboards:
+        -
+          uuid: b28e8cdadce64ba299c56054a18ea31d
+          name: 'Network interfaces'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_PROTOTYPE
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                        host: 'Cisco UCS Manager SNMP'
+      valuemaps:
+        -
+          uuid: 8648df22d8be42359900e11ea395a98c
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: operable
+            -
+              value: '2'
+              newvalue: inoperable
+            -
+              value: '3'
+              newvalue: degraded
+            -
+              value: '4'
+              newvalue: poweredOff
+            -
+              value: '5'
+              newvalue: powerProblem
+            -
+              value: '6'
+              newvalue: removed
+            -
+              value: '7'
+              newvalue: voltageProblem
+            -
+              value: '8'
+              newvalue: thermalProblem
+            -
+              value: '9'
+              newvalue: performanceProblem
+            -
+              value: '10'
+              newvalue: accessibilityProblem
+            -
+              value: '11'
+              newvalue: identityUnestablishable
+            -
+              value: '12'
+              newvalue: biosPostTimeout
+            -
+              value: '13'
+              newvalue: disabled
+            -
+              value: '14'
+              newvalue: malformedFru
+            -
+              value: '15'
+              newvalue: backplanePortProblem
+            -
+              value: '16'
+              newvalue: chassisIntrusion
+            -
+              value: '51'
+              newvalue: fabricConnProblem
+            -
+              value: '52'
+              newvalue: fabricUnsupportedConn
+            -
+              value: '81'
+              newvalue: config
+            -
+              value: '82'
+              newvalue: equipmentProblem
+            -
+              value: '83'
+              newvalue: decommissioning
+            -
+              value: '84'
+              newvalue: chassisLimitExceeded
+            -
+              value: '100'
+              newvalue: notSupported
+            -
+              value: '101'
+              newvalue: discovery
+            -
+              value: '102'
+              newvalue: discoveryFailed
+            -
+              value: '103'
+              newvalue: identify
+            -
+              value: '104'
+              newvalue: postFailure
+            -
+              value: '105'
+              newvalue: upgradeProblem
+            -
+              value: '106'
+              newvalue: peerCommProblem
+            -
+              value: '107'
+              newvalue: autoUpgrade
+            -
+              value: '108'
+              newvalue: linkActivateBlocked
+        -
+          uuid: 17dde900e96a47929b0abed0d5006c84
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence'
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: empty
+            -
+              value: '10'
+              newvalue: equipped
+            -
+              value: '11'
+              newvalue: missing
+            -
+              value: '12'
+              newvalue: mismatch
+            -
+              value: '13'
+              newvalue: equippedNotPrimary
+            -
+              value: '14'
+              newvalue: equippedSlave
+            -
+              value: '15'
+              newvalue: mismatchSlave
+            -
+              value: '16'
+              newvalue: missingSlave
+            -
+              value: '20'
+              newvalue: equippedIdentityUnestablishable
+            -
+              value: '21'
+              newvalue: mismatchIdentityUnestablishable
+            -
+              value: '22'
+              newvalue: equippedWithMalformedFru
+            -
+              value: '30'
+              newvalue: inaccessible
+            -
+              value: '40'
+              newvalue: unauthorized
+            -
+              value: '100'
+              newvalue: notSupported
+            -
+              value: '101'
+              newvalue: equippedUnsupported
+            -
+              value: '102'
+              newvalue: equippedDiscNotStarted
+            -
+              value: '103'
+              newvalue: equippedDiscInProgress
+            -
+              value: '104'
+              newvalue: equippedDiscError
+            -
+              value: '105'
+              newvalue: equippedDiscUnknown
+        -
+          uuid: c4a3603d4d8944ad8a8d2529bc3f1278
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState'
+          mappings:
+            -
+              value: '0'
+              newvalue: indeterminate
+            -
+              value: '1'
+              newvalue: unassociated
+            -
+              value: '10'
+              newvalue: ok
+            -
+              value: '11'
+              newvalue: discovery
+            -
+              value: '12'
+              newvalue: config
+            -
+              value: '13'
+              newvalue: unconfig
+            -
+              value: '14'
+              newvalue: powerOff
+            -
+              value: '15'
+              newvalue: restart
+            -
+              value: '20'
+              newvalue: maintenance
+            -
+              value: '21'
+              newvalue: test
+            -
+              value: '29'
+              newvalue: computeMismatch
+            -
+              value: '30'
+              newvalue: computeFailed
+            -
+              value: '31'
+              newvalue: degraded
+            -
+              value: '32'
+              newvalue: discoveryFailed
+            -
+              value: '33'
+              newvalue: configFailure
+            -
+              value: '34'
+              newvalue: unconfigFailed
+            -
+              value: '35'
+              newvalue: testFailed
+            -
+              value: '36'
+              newvalue: maintenanceFailed
+            -
+              value: '40'
+              newvalue: removed
+            -
+              value: '41'
+              newvalue: disabled
+            -
+              value: '50'
+              newvalue: inaccessible
+            -
+              value: '60'
+              newvalue: thermalProblem
+            -
+              value: '61'
+              newvalue: powerProblem
+            -
+              value: '62'
+              newvalue: voltageProblem
+            -
+              value: '63'
+              newvalue: inoperable
+            -
+              value: '101'
+              newvalue: decommissioning
+            -
+              value: '201'
+              newvalue: biosRestore
+            -
+              value: '202'
+              newvalue: cmosReset
+            -
+              value: '203'
+              newvalue: diagnostics
+            -
+              value: '204'
+              newvalue: diagnosticsFailed
+            -
+              value: '210'
+              newvalue: pendingReboot
+            -
+              value: '211'
+              newvalue: pendingReassociation
+            -
+              value: '212'
+              newvalue: svnicNotPresent
+        -
+          uuid: 7d09a2b8df18410ca871ed9e7dbe6aa1
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
+          mappings:
+            -
+              value: '0'
+              newvalue: unspecified
+            -
+              value: '1'
+              newvalue: simple
+            -
+              value: '2'
+              newvalue: mirror
+            -
+              value: '3'
+              newvalue: stripe
+            -
+              value: '4'
+              newvalue: raid
+            -
+              value: '5'
+              newvalue: stripeParity
+            -
+              value: '6'
+              newvalue: stripeDualParity
+            -
+              value: '7'
+              newvalue: mirrorStripe
+            -
+              value: '8'
+              newvalue: stripeParityStripe
+            -
+              value: '9'
+              newvalue: stripeDualParityStripe
+        -
+          uuid: 70a906bfe3b447a39e5a0f0ba5210ae2
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus'
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: online
+            -
+              value: '2'
+              newvalue: unconfiguredGood
+            -
+              value: '3'
+              newvalue: globalHotSpare
+            -
+              value: '4'
+              newvalue: dedicatedHotSpare
+            -
+              value: '5'
+              newvalue: jbod
+            -
+              value: '6'
+              newvalue: offline
+            -
+              value: '7'
+              newvalue: rebuilding
+            -
+              value: '8'
+              newvalue: copyback
+            -
+              value: '9'
+              newvalue: failed
+            -
+              value: '10'
+              newvalue: unconfiguredBad
+            -
+              value: '11'
+              newvalue: predictiveFailure
+            -
+              value: '12'
+              newvalue: disabledForRemoval
+            -
+              value: '13'
+              newvalue: foreignConfiguration
+            -
+              value: '14'
+              newvalue: zeroing
+            -
+              value: '15'
+              newvalue: good
+            -
+              value: '16'
+              newvalue: bad
+            -
+              value: '17'
+              newvalue: lockedForeignConfiguration
+        -
+          uuid: e1407fbe331343d3bda7d7eb122c085a
+          name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageTechnology'
+          mappings:
+            -
+              value: '0'
+              newvalue: unspecified
+            -
+              value: '1'
+              newvalue: hdd
+            -
+              value: '2'
+              newvalue: ssd
+            -
+              value: '3'
+              newvalue: nvme
+        -
+          uuid: 2b0fde08268f4ce7b47aae3827ebdf23
+          name: 'IF-MIB::ifOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '3'
+              newvalue: testing
+            -
+              value: '4'
+              newvalue: unknown
+            -
+              value: '5'
+              newvalue: dormant
+            -
+              value: '6'
+              newvalue: notPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: be402fda36e64dd2ad807925755735c4
+          name: 'IF-MIB::ifType'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: regular1822
+            -
+              value: '3'
+              newvalue: hdh1822
+            -
+              value: '4'
+              newvalue: ddnX25
+            -
+              value: '5'
+              newvalue: rfc877x25
+            -
+              value: '6'
+              newvalue: ethernetCsmacd
+            -
+              value: '7'
+              newvalue: iso88023Csmacd
+            -
+              value: '8'
+              newvalue: iso88024TokenBus
+            -
+              value: '9'
+              newvalue: iso88025TokenRing
+            -
+              value: '10'
+              newvalue: iso88026Man
+            -
+              value: '11'
+              newvalue: starLan
+            -
+              value: '12'
+              newvalue: proteon10Mbit
+            -
+              value: '13'
+              newvalue: proteon80Mbit
+            -
+              value: '14'
+              newvalue: hyperchannel
+            -
+              value: '15'
+              newvalue: fddi
+            -
+              value: '16'
+              newvalue: lapb
+            -
+              value: '17'
+              newvalue: sdlc
+            -
+              value: '18'
+              newvalue: ds1
+            -
+              value: '19'
+              newvalue: e1
+            -
+              value: '20'
+              newvalue: basicISDN
+            -
+              value: '21'
+              newvalue: primaryISDN
+            -
+              value: '22'
+              newvalue: propPointToPointSerial
+            -
+              value: '23'
+              newvalue: ppp
+            -
+              value: '24'
+              newvalue: softwareLoopback
+            -
+              value: '25'
+              newvalue: eon
+            -
+              value: '26'
+              newvalue: ethernet3Mbit
+            -
+              value: '27'
+              newvalue: nsip
+            -
+              value: '28'
+              newvalue: slip
+            -
+              value: '29'
+              newvalue: ultra
+            -
+              value: '30'
+              newvalue: ds3
+            -
+              value: '31'
+              newvalue: sip
+            -
+              value: '32'
+              newvalue: frameRelay
+            -
+              value: '33'
+              newvalue: rs232
+            -
+              value: '34'
+              newvalue: para
+            -
+              value: '35'
+              newvalue: arcnet
+            -
+              value: '36'
+              newvalue: arcnetPlus
+            -
+              value: '37'
+              newvalue: atm
+            -
+              value: '38'
+              newvalue: miox25
+            -
+              value: '39'
+              newvalue: sonet
+            -
+              value: '40'
+              newvalue: x25ple
+            -
+              value: '41'
+              newvalue: iso88022llc
+            -
+              value: '42'
+              newvalue: localTalk
+            -
+              value: '43'
+              newvalue: smdsDxi
+            -
+              value: '44'
+              newvalue: frameRelayService
+            -
+              value: '45'
+              newvalue: v35
+            -
+              value: '46'
+              newvalue: hssi
+            -
+              value: '47'
+              newvalue: hippi
+            -
+              value: '48'
+              newvalue: modem
+            -
+              value: '49'
+              newvalue: aal5
+            -
+              value: '50'
+              newvalue: sonetPath
+            -
+              value: '51'
+              newvalue: sonetVT
+            -
+              value: '52'
+              newvalue: smdsIcip
+            -
+              value: '53'
+              newvalue: propVirtual
+            -
+              value: '54'
+              newvalue: propMultiplexor
+            -
+              value: '55'
+              newvalue: ieee80212
+            -
+              value: '56'
+              newvalue: fibreChannel
+            -
+              value: '57'
+              newvalue: hippiInterface
+            -
+              value: '58'
+              newvalue: frameRelayInterconnect
+            -
+              value: '59'
+              newvalue: aflane8023
+            -
+              value: '60'
+              newvalue: aflane8025
+            -
+              value: '61'
+              newvalue: cctEmul
+            -
+              value: '62'
+              newvalue: fastEther
+            -
+              value: '63'
+              newvalue: isdn
+            -
+              value: '64'
+              newvalue: v11
+            -
+              value: '65'
+              newvalue: v36
+            -
+              value: '66'
+              newvalue: g703at64k
+            -
+              value: '67'
+              newvalue: g703at2mb
+            -
+              value: '68'
+              newvalue: qllc
+            -
+              value: '69'
+              newvalue: fastEtherFX
+            -
+              value: '70'
+              newvalue: channel
+            -
+              value: '71'
+              newvalue: ieee80211
+            -
+              value: '72'
+              newvalue: ibm370parChan
+            -
+              value: '73'
+              newvalue: escon
+            -
+              value: '74'
+              newvalue: dlsw
+            -
+              value: '75'
+              newvalue: isdns
+            -
+              value: '76'
+              newvalue: isdnu
+            -
+              value: '77'
+              newvalue: lapd
+            -
+              value: '78'
+              newvalue: ipSwitch
+            -
+              value: '79'
+              newvalue: rsrb
+            -
+              value: '80'
+              newvalue: atmLogical
+            -
+              value: '81'
+              newvalue: ds0
+            -
+              value: '82'
+              newvalue: ds0Bundle
+            -
+              value: '83'
+              newvalue: bsc
+            -
+              value: '84'
+              newvalue: async
+            -
+              value: '85'
+              newvalue: cnr
+            -
+              value: '86'
+              newvalue: iso88025Dtr
+            -
+              value: '87'
+              newvalue: eplrs
+            -
+              value: '88'
+              newvalue: arap
+            -
+              value: '89'
+              newvalue: propCnls
+            -
+              value: '90'
+              newvalue: hostPad
+            -
+              value: '91'
+              newvalue: termPad
+            -
+              value: '92'
+              newvalue: frameRelayMPI
+            -
+              value: '93'
+              newvalue: x213
+            -
+              value: '94'
+              newvalue: adsl
+            -
+              value: '95'
+              newvalue: radsl
+            -
+              value: '96'
+              newvalue: sdsl
+            -
+              value: '97'
+              newvalue: vdsl
+            -
+              value: '98'
+              newvalue: iso88025CRFPInt
+            -
+              value: '99'
+              newvalue: myrinet
+            -
+              value: '100'
+              newvalue: voiceEM
+            -
+              value: '101'
+              newvalue: voiceFXO
+            -
+              value: '102'
+              newvalue: voiceFXS
+            -
+              value: '103'
+              newvalue: voiceEncap
+            -
+              value: '104'
+              newvalue: voiceOverIp
+            -
+              value: '105'
+              newvalue: atmDxi
+            -
+              value: '106'
+              newvalue: atmFuni
+            -
+              value: '107'
+              newvalue: atmIma
+            -
+              value: '108'
+              newvalue: pppMultilinkBundle
+            -
+              value: '109'
+              newvalue: ipOverCdlc
+            -
+              value: '110'
+              newvalue: ipOverClaw
+            -
+              value: '111'
+              newvalue: stackToStack
+            -
+              value: '112'
+              newvalue: virtualIpAddress
+            -
+              value: '113'
+              newvalue: mpc
+            -
+              value: '114'
+              newvalue: ipOverAtm
+            -
+              value: '115'
+              newvalue: iso88025Fiber
+            -
+              value: '116'
+              newvalue: tdlc
+            -
+              value: '117'
+              newvalue: gigabitEthernet
+            -
+              value: '118'
+              newvalue: hdlc
+            -
+              value: '119'
+              newvalue: lapf
+            -
+              value: '120'
+              newvalue: v37
+            -
+              value: '121'
+              newvalue: x25mlp
+            -
+              value: '122'
+              newvalue: x25huntGroup
+            -
+              value: '123'
+              newvalue: trasnpHdlc
+            -
+              value: '124'
+              newvalue: interleave
+            -
+              value: '125'
+              newvalue: fast
+            -
+              value: '126'
+              newvalue: ip
+            -
+              value: '127'
+              newvalue: docsCableMaclayer
+            -
+              value: '128'
+              newvalue: docsCableDownstream
+            -
+              value: '129'
+              newvalue: docsCableUpstream
+            -
+              value: '130'
+              newvalue: a12MppSwitch
+            -
+              value: '131'
+              newvalue: tunnel
+            -
+              value: '132'
+              newvalue: coffee
+            -
+              value: '133'
+              newvalue: ces
+            -
+              value: '134'
+              newvalue: atmSubInterface
+            -
+              value: '135'
+              newvalue: l2vlan
+            -
+              value: '136'
+              newvalue: l3ipvlan
+            -
+              value: '137'
+              newvalue: l3ipxvlan
+            -
+              value: '138'
+              newvalue: digitalPowerline
+            -
+              value: '139'
+              newvalue: mediaMailOverIp
+            -
+              value: '140'
+              newvalue: dtm
+            -
+              value: '141'
+              newvalue: dcn
+            -
+              value: '142'
+              newvalue: ipForward
+            -
+              value: '143'
+              newvalue: msdsl
+            -
+              value: '144'
+              newvalue: ieee1394
+            -
+              value: '145'
+              newvalue: if-gsn
+            -
+              value: '146'
+              newvalue: dvbRccMacLayer
+            -
+              value: '147'
+              newvalue: dvbRccDownstream
+            -
+              value: '148'
+              newvalue: dvbRccUpstream
+            -
+              value: '149'
+              newvalue: atmVirtual
+            -
+              value: '150'
+              newvalue: mplsTunnel
+            -
+              value: '151'
+              newvalue: srp
+            -
+              value: '152'
+              newvalue: voiceOverAtm
+            -
+              value: '153'
+              newvalue: voiceOverFrameRelay
+            -
+              value: '154'
+              newvalue: idsl
+            -
+              value: '155'
+              newvalue: compositeLink
+            -
+              value: '156'
+              newvalue: ss7SigLink
+            -
+              value: '157'
+              newvalue: propWirelessP2P
+            -
+              value: '158'
+              newvalue: frForward
+            -
+              value: '159'
+              newvalue: rfc1483
+            -
+              value: '160'
+              newvalue: usb
+            -
+              value: '161'
+              newvalue: ieee8023adLag
+            -
+              value: '162'
+              newvalue: bgppolicyaccounting
+            -
+              value: '163'
+              newvalue: frf16MfrBundle
+            -
+              value: '164'
+              newvalue: h323Gatekeeper
+            -
+              value: '165'
+              newvalue: h323Proxy
+            -
+              value: '166'
+              newvalue: mpls
+            -
+              value: '167'
+              newvalue: mfSigLink
+            -
+              value: '168'
+              newvalue: hdsl2
+            -
+              value: '169'
+              newvalue: shdsl
+            -
+              value: '170'
+              newvalue: ds1FDL
+            -
+              value: '171'
+              newvalue: pos
+            -
+              value: '172'
+              newvalue: dvbAsiIn
+            -
+              value: '173'
+              newvalue: dvbAsiOut
+            -
+              value: '174'
+              newvalue: plc
+            -
+              value: '175'
+              newvalue: nfas
+            -
+              value: '176'
+              newvalue: tr008
+            -
+              value: '177'
+              newvalue: gr303RDT
+            -
+              value: '178'
+              newvalue: gr303IDT
+            -
+              value: '179'
+              newvalue: isup
+            -
+              value: '180'
+              newvalue: propDocsWirelessMaclayer
+            -
+              value: '181'
+              newvalue: propDocsWirelessDownstream
+            -
+              value: '182'
+              newvalue: propDocsWirelessUpstream
+            -
+              value: '183'
+              newvalue: hiperlan2
+            -
+              value: '184'
+              newvalue: propBWAp2Mp
+            -
+              value: '185'
+              newvalue: sonetOverheadChannel
+            -
+              value: '186'
+              newvalue: digitalWrapperOverheadChannel
+            -
+              value: '187'
+              newvalue: aal2
+            -
+              value: '188'
+              newvalue: radioMAC
+            -
+              value: '189'
+              newvalue: atmRadio
+            -
+              value: '190'
+              newvalue: imt
+            -
+              value: '191'
+              newvalue: mvl
+            -
+              value: '192'
+              newvalue: reachDSL
+            -
+              value: '193'
+              newvalue: frDlciEndPt
+            -
+              value: '194'
+              newvalue: atmVciEndPt
+            -
+              value: '195'
+              newvalue: opticalChannel
+            -
+              value: '196'
+              newvalue: opticalTransport
+            -
+              value: '197'
+              newvalue: propAtm
+            -
+              value: '198'
+              newvalue: voiceOverCable
+            -
+              value: '199'
+              newvalue: infiniband
+            -
+              value: '200'
+              newvalue: teLink
+            -
+              value: '201'
+              newvalue: q2931
+            -
+              value: '202'
+              newvalue: virtualTg
+            -
+              value: '203'
+              newvalue: sipTg
+            -
+              value: '204'
+              newvalue: sipSig
+            -
+              value: '205'
+              newvalue: docsCableUpstreamChannel
+            -
+              value: '206'
+              newvalue: econet
+            -
+              value: '207'
+              newvalue: pon155
+            -
+              value: '208'
+              newvalue: pon622
+            -
+              value: '209'
+              newvalue: bridge
+            -
+              value: '210'
+              newvalue: linegroup
+            -
+              value: '211'
+              newvalue: voiceEMFGD
+            -
+              value: '212'
+              newvalue: voiceFGDEANA
+            -
+              value: '213'
+              newvalue: voiceDID
+            -
+              value: '214'
+              newvalue: mpegTransport
+            -
+              value: '215'
+              newvalue: sixToFour
+            -
+              value: '216'
+              newvalue: gtp
+            -
+              value: '217'
+              newvalue: pdnEtherLoop1
+            -
+              value: '218'
+              newvalue: pdnEtherLoop2
+            -
+              value: '219'
+              newvalue: opticalChannelGroup
+            -
+              value: '220'
+              newvalue: homepna
+            -
+              value: '221'
+              newvalue: gfp
+            -
+              value: '222'
+              newvalue: ciscoISLvlan
+            -
+              value: '223'
+              newvalue: actelisMetaLOOP
+            -
+              value: '224'
+              newvalue: fcipLink
+            -
+              value: '225'
+              newvalue: rpr
+            -
+              value: '226'
+              newvalue: qam
+            -
+              value: '227'
+              newvalue: lmp
+            -
+              value: '228'
+              newvalue: cblVectaStar
+            -
+              value: '229'
+              newvalue: docsCableMCmtsDownstream
+            -
+              value: '230'
+              newvalue: adsl2
+            -
+              value: '231'
+              newvalue: macSecControlledIF
+            -
+              value: '232'
+              newvalue: macSecUncontrolledIF
+            -
+              value: '233'
+              newvalue: aviciOpticalEther
+            -
+              value: '234'
+              newvalue: atmbond
+            -
+              value: '235'
+              newvalue: voiceFGDOS
+            -
+              value: '236'
+              newvalue: mocaVersion1
+            -
+              value: '237'
+              newvalue: ieee80216WMAN
+            -
+              value: '238'
+              newvalue: adsl2plus
+            -
+              value: '239'
+              newvalue: dvbRcsMacLayer
+            -
+              value: '240'
+              newvalue: dvbTdm
+            -
+              value: '241'
+              newvalue: dvbRcsTdma
+            -
+              value: '242'
+              newvalue: x86Laps
+            -
+              value: '243'
+              newvalue: wwanPP
+            -
+              value: '244'
+              newvalue: wwanPP2
+            -
+              value: '245'
+              newvalue: voiceEBS
+            -
+              value: '246'
+              newvalue: ifPwType
+            -
+              value: '247'
+              newvalue: ilan
+            -
+              value: '248'
+              newvalue: pip
+            -
+              value: '249'
+              newvalue: aluELP
+            -
+              value: '250'
+              newvalue: gpon
+            -
+              value: '251'
+              newvalue: vdsl2
+            -
+              value: '252'
+              newvalue: capwapDot11Profile
+            -
+              value: '253'
+              newvalue: capwapDot11Bss
+            -
+              value: '254'
+              newvalue: capwapWtpVirtualRadio
+            -
+              value: '255'
+              newvalue: bits
+            -
+              value: '256'
+              newvalue: docsCableUpstreamRfPort
+            -
+              value: '257'
+              newvalue: cableDownstreamRfPort
+            -
+              value: '258'
+              newvalue: vmwareVirtualNic
+            -
+              value: '259'
+              newvalue: ieee802154
+            -
+              value: '260'
+              newvalue: otnOdu
+            -
+              value: '261'
+              newvalue: otnOtu
+            -
+              value: '262'
+              newvalue: ifVfiType
+            -
+              value: '263'
+              newvalue: g9981
+            -
+              value: '264'
+              newvalue: g9982
+            -
+              value: '265'
+              newvalue: g9983
+            -
+              value: '266'
+              newvalue: aluEpon
+            -
+              value: '267'
+              newvalue: aluEponOnu
+            -
+              value: '268'
+              newvalue: aluEponPhysicalUni
+            -
+              value: '269'
+              newvalue: aluEponLogicalLink
+            -
+              value: '270'
+              newvalue: aluGponOnu
+            -
+              value: '271'
+              newvalue: aluGponPhysicalUni
+            -
+              value: '272'
+              newvalue: vmwareNicTeam
+            -
+              value: '277'
+              newvalue: docsOfdmDownstream
+            -
+              value: '278'
+              newvalue: docsOfdmaUpstream
+            -
+              value: '279'
+              newvalue: gfast
+            -
+              value: '280'
+              newvalue: sdci
+            -
+              value: '281'
+              newvalue: xboxWireless
+            -
+              value: '282'
+              newvalue: fastdsl
+            -
+              value: '283'
+              newvalue: docsCableScte55d1FwdOob
+            -
+              value: '284'
+              newvalue: docsCableScte55d1RetOob
+            -
+              value: '285'
+              newvalue: docsCableScte55d2DsOob
+            -
+              value: '286'
+              newvalue: docsCableScte55d2UsOob
+            -
+              value: '287'
+              newvalue: docsCableNdf
+            -
+              value: '288'
+              newvalue: docsCableNdr
+            -
+              value: '289'
+              newvalue: ptm
+            -
+              value: '290'
+              newvalue: ghn
+        -
+          uuid: 9ea529bf28a84fae95f1506ca6ca37b8
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

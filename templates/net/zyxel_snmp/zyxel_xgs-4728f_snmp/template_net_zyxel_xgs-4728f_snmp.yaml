@@ -1,0 +1,1514 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-11T15:22:44Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: ab18a5665b7d4bed876881b5c4e8ce51
+      template: 'ZYXEL XGS-4728F SNMP'
+      name: 'ZYXEL XGS-4728F SNMP'
+      description: |
+        ZYXEL XGS-4728F
+        
+        MIBs used:
+        RFC1213-MIB
+        ZYXEL-XGS4728F-MIB
+        IF-MIB
+         ZYXEL-XGS4728F-MIB
+        
+        Known Issues:
+        
+          Description: Incorrect handling of SNMP bulk requests. Disable the use of bulk requests in the SNMP interface settings.
+          Version: all versions firmware
+          Device: ZYXEL XGS-4728F
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 8b2b855bc92447dda391d251db268dc9
+          name: 'ZYXEL XGS-4728F: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: 'SNMP available'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: fd9a321842544253896e5a4c1a58ced3
+              expression: 'max(/ZYXEL XGS-4728F SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'ZYXEL XGS-4728F: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+        -
+          uuid: 23ae05ce4d5c4022a716ed9e8e701ae9
+          name: 'ZYXEL XGS-4728F: Contact'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.4.0
+          key: zyxel.4728f.contact
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The textual identification of the contact person
+            for this managed node, together with information
+            on how to contact this person.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 1cccb7e7616944aa8747508e96f54968
+          name: 'ZYXEL XGS-4728F: CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.5.8.46.12.7.0
+          key: zyxel.4728f.cpuusage
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: ZYXEL-XGS4728F-MIB
+            Show device CPU load in %, it's the snapshot of CPU load when 
+            getting the values.
+          tags:
+            -
+              tag: Application
+              value: CPU
+          triggers:
+            -
+              uuid: 20f368f955f74fc9b8380b1bbff7e057
+              expression: 'min(/ZYXEL XGS-4728F SNMP/zyxel.4728f.cpuusage,5m)>{$CPU.UTIL.CRIT}'
+              name: 'ZYXEL XGS-4728F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          uuid: 222a051f0b84433faa6f29237b6d1552
+          name: 'ZYXEL XGS-4728F: ZyNOS F/W Version'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.46.1]'
+          key: zyxel.4728f.fwversion
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ZYXEL-XGS4728F-MIB'
+          inventory_link: SOFTWARE_FULL
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var tmpObj = {};
+                  inArray.forEach(function(item, i, arr) {
+                    tmpObj[item["{#SNMPINDEX}"]] = item["{#SNMP.ARRAY}"]
+                  });
+                  var strOut = 'V' + tmpObj["1.0"] + '.' + tmpObj["2.0"]
+                    + '(' + tmpObj["3.0"] + '.' + tmpObj["4.0"] + ')_' 
+                    + tmpObj["7.0"] + '.' + tmpObj["6.0"] + '.' + tmpObj["5.0"];
+                  return strOut;
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 5da304609e8c45d980c46579f6848f0a
+              expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion))>0'
+              name: 'ZYXEL XGS-4728F: Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: cc5065f635bc486cb90898f842fa8a61
+          name: 'ZYXEL XGS-4728F: Location'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.6.0
+          key: zyxel.4728f.location
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The physical location of this node (e.g.,
+            `telephone closet, 3rd floor').
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 9a646e8e82c844c08754c7e72e161712
+          name: 'ZYXEL XGS-4728F: MAC address'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
+          key: zyxel.4728f.mac
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IF-MIB
+            The interface's address at the protocol layer
+            immediately `below' the network layer in the
+            protocol stack.  For interfaces which do not have
+            such an address (e.g., a serial line), this object
+            should contain an octet string of zero length.
+          inventory_link: MACADDRESS_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: a152c262c465441da0f1924bc7614a23
+          name: 'ZYXEL XGS-4728F: Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.1.0
+          key: zyxel.4728f.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            A textual description of the entity.  This value
+            should include the full name and version
+            identification of the system's hardware type,
+            software operating-system, and networking
+            software.  It is mandatory that this only contain
+            printable ASCII characters.
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 0329f3f5aa6a4315a4f3611ad662103e
+              expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.model)<>"XGS-4728F"'
+              name: 'ZYXEL XGS-4728F: Template does not match hardware'
+              priority: INFO
+              description: 'This template is for Zyxel XGS-4728F, but connected to {ITEM.VALUE}'
+        -
+          uuid: 49e365a43809409f8d4636f88e4d64a9
+          name: 'ZYXEL XGS-4728F: Host name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.5.0
+          key: zyxel.4728f.name
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            An administratively-assigned name for this
+            managed node.  By convention, this is the node's
+            fully-qualified domain name.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 79c80ac11d854edea93a598c4b28ffc0
+          name: 'ZYXEL XGS-4728F: Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.5.8.46.1.10.0
+          key: zyxel.4728f.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: ZYXEL-XGS4728F-MIB
+            Serial number
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 4df7c31c3079411baabd4ae66e580652
+              expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber))>0'
+              name: 'ZYXEL XGS-4728F: Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: b3302cbfbae64d55a638240ffb368b9c
+          name: 'ZYXEL XGS-4728F: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.3.0
+          key: zyxel.4728f.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: RFC1213-MIB
+            The time (in hundredths of a second) since the
+            network management portion of the system was last
+            re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 36b9a7d3d3fb45f782a5ea05de6816f9
+              expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.uptime)<10m'
+              name: 'ZYXEL XGS-4728F: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          uuid: bc0d797343b240bdbd5765dc2e7821fd
+          name: 'Fan discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.FANRPM.THRESH.LOW},.1.3.6.1.4.1.890.1.5.8.46.9.1.1.5]'
+          key: zyxel.4728f.fan.discovery
+          delay: 1h
+          description: 'An entry in fanRpmTable.'
+          item_prototypes:
+            -
+              uuid: 6ac1481e18bd419d884a556306e57f18
+              name: 'ZYXEL XGS-4728F: Fan #{#SNMPINDEX}'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.9.1.1.2.{#SNMPINDEX}'
+              key: 'zyxel.4728f.fan[{#SNMPINDEX}]'
+              history: 7d
+              units: '!rpm'
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Current speed in Revolutions Per Minute (RPM) on the fan.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: 012219b8b16941b59d1f9a3f685e9f38
+                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
+                  name: 'ZYXEL XGS-4728F: FAN{#SNMPINDEX} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+          graph_prototypes:
+            -
+              uuid: 96aed516a0254866b0d0b43095b8a5b7
+              name: 'ZYXEL XGS-4728F: Fan #{#SNMPINDEX}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.fan[{#SNMPINDEX}]'
+        -
+          uuid: 06f0e151e2a146028f80e60031d49b48
+          name: 'Memory pool discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.MEMORY.NAME},.1.3.6.1.4.1.890.1.5.8.46.124.1.1.2]'
+          key: zyxel.4728f.memory.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              uuid: ead18ee81f074ab68e4104345e5b4b2b
+              name: 'ZYXEL XGS-4728F: Memory "{#ZYXEL.MEMORY.NAME}" utilization'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.124.1.1.5.{#SNMPINDEX}'
+              key: 'zyxel.4728f.memory[{#SNMPINDEX}]'
+              history: 7d
+              units: '%'
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Utilization of memory pool in %.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Memory
+              trigger_prototypes:
+                -
+                  uuid: 90b328c3b56c417eb938091338bd07fc
+                  expression: 'min(/ZYXEL XGS-4728F SNMP/zyxel.4728f.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  name: 'ZYXEL XGS-4728F: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  priority: AVERAGE
+                  description: 'The system is running out of free memory.'
+        -
+          uuid: 75a0f2676e134b6e8ab9e8c11ac17d57
+          name: 'Interface discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.IF.NAME},.1.3.6.1.4.1.890.1.5.8.46.23.1.1.3,{#ZYXEL.IF.LINKUPTYPE},.1.3.6.1.4.1.890.1.5.8.46.23.1.1.5]'
+          key: zyxel.4728f.net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'An entry in fanRpmTable.'
+          item_prototypes:
+            -
+              uuid: 36f7fdbfa4164677ad91351be394f050
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Administrative status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.adminstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The desired state of the interface.  The
+                testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL XGS-4728F port admin status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: dbc94a6eabd64eefbe97f57f8831e834
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Interface name'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.descr[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IF-MIB
+                A textual string containing information about the interface
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 840096d5a418425c851ea7d236b7e34e
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Link speed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                An estimate of the interface's current bandwidth in bits per second
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 0105dea3226d46f8868aa07aa3f416a2
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming broadcast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.in.broadcastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a broadcast
+                address at this sub-layer.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: de7b202e7240422dbdbc40e78689e6fe
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming multicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.in.multicastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a multicast
+                address at this sub-layer.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 075b04bdaff54a2cafc1b177e59df3be
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.in.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface,
+                including framing characters.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: c2a8e3985ed1414789b1bfe226de6d37
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming unicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.in.ucastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were not addressed to a multicast
+                or broadcast address at this sub-layer
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 72f7ee1e5099452aa4804d988adfb7a5
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Incoming utilization'
+              type: CALCULATED
+              key: 'zyxel.4728f.net.if.in.util[{#SNMPINDEX}]'
+              history: 7d
+              units: '%'
+              params: 'last(//zyxel.4728f.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
+              description: 'Interface utilization percentage'
+              preprocessing:
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: db488317d10e43eea21ecaa74d7a58dc
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Link type'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.23.1.1.5.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.link_type[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB:  ZYXEL-XGS4728F-MIB
+                Physical connection type
+              valuemap:
+                name: 'ZYXEL XGS-4728F operational mode port link up type'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 8877747043f94216b92ef7f097925d8e
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Interface description'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.23.1.1.3.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.name[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB:  ZYXEL-XGS4728F-MIB
+                A textual string containing information about the interface
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: b091be1b0a8f415b82d73b3537cf6187
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.operstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                The testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL XGS-4728F port operational status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: 3f3ce5111d47490382cb0c18e2d36f77
+                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+            -
+              uuid: ad7378144b254962aad0a73fb151e097
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing broadcast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.out.broadcastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                broadcast address at this sub-layer, including those that
+                were discarded or not sent.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 67b776b7f51e4b24bad3b616979d7f98
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing multicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.out.multicastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                multicast address at this sub-layer, including those that
+                were discarded or not sent.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 4afef8d3601646f1bfc81090b090c11c
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.out.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the
+                interface, including framing characters.  This object is a
+                64-bit version of ifOutOctets.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: ba1b314aacd0449fa0c9730fdb8ee3f9
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing unicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.out.ucastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were not addressed to a
+                multicast or broadcast address at this sub-layer, including
+                those that were discarded or not sent.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 7941df5f5b884b33bcda9951e4b0158d
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Outgoing utilization'
+              type: CALCULATED
+              key: 'zyxel.4728f.net.if.out.util[{#SNMPINDEX}]'
+              history: 7d
+              units: '%'
+              params: 'last(//zyxel.4728f.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
+              description: 'Interface utilization percentage'
+              preprocessing:
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: f56f1c0cf5d34435895ea489eb71b84a
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Speed Duplex'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.23.1.1.1.{#SNMPINDEX}'
+              key: 'zyxel.4728f.net.if.speed_duplex[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB:  ZYXEL-XGS4728F-MIB
+                Transmission mode
+              valuemap:
+                name: 'ZYXEL XGS-4728F operational mode port speed duplex'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+          graph_prototypes:
+            -
+              uuid: 18c2bd830caa49308459d64ef85cfc71
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Packets traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.in.ucastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.out.ucastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.in.multicastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.out.multicastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.in.broadcastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.out.broadcastpkts[{#SNMPINDEX}]'
+            -
+              uuid: a8c07b7801d64c24bfedf10ea193f697
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.in.traffic[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.out.traffic[{#SNMPINDEX}]'
+            -
+              uuid: 37e8454c3fa04f88be36d875638110c6
+              name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.out.util[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.net.if.in.util[{#SNMPINDEX}]'
+          overrides:
+            -
+              name: 'Trigger disabled'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '.*'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'Trigger enabled'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          uuid: 6e0b5b991865448780e042d98168d72c
+          name: 'SFP with DDM discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.SFP.WARN.MAX},.1.3.6.1.4.1.890.1.5.8.46.117.2.1.5,{#ZYXEL.SFP.WARN.MIN},.1.3.6.1.4.1.890.1.5.8.46.117.2.1.6,{#ZYXEL.SFP.DESCRIPTION},.1.3.6.1.4.1.890.1.5.8.46.117.2.1.8]'
+          key: zyxel.4728f.sfp.ddm.discovery
+          delay: 12h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.SFP.DESCRIPTION}'
+                value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.SFP.DESCRIPTION}'
+                value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'SFP DDM module discovery.'
+          item_prototypes:
+            -
+              uuid: 0071554e36064f7ea40d680a0c310b27
+              name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.117.2.1.7.{#SNMPINDEX}'
+              key: 'zyxel.4728f.sfp.ddm[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              value_type: FLOAT
+              units: '!{#ZYXEL.SFP.UNIT}'
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Transceiver module DDM data ({#ZYXEL.SFP.DESCRIPTION}).
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#ZYXEL.SFP.PORT}'
+              trigger_prototypes:
+                -
+                  uuid: 409c52cfed074352810bacfd52aa89f0
+                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
+                  name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  priority: WARNING
+                  description: 'The upper threshold value of the parameter is exceeded'
+                -
+                  uuid: a2c40df40a334f6da00a438eb70f8374
+                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
+                  name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  priority: WARNING
+                  description: 'The parameter values are less than the lower threshold'
+          graph_prototypes:
+            -
+              uuid: 109ff7d258524b82bdbf4662e612795b
+              name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.sfp.ddm[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var nameMap = {
+                      'Temperature': '°C',
+                      'Voltage': 'V',
+                      'TxBias': 'mA',
+                      'TxPower': 'dbm',
+                      'RxPower': 'dbm'
+                  };
+                  var outArr = [];
+                  inArray.forEach(function (item, i, arr) {
+                      item['{#ZYXEL.SFP.PORT}'] = item['{#SNMPINDEX}'].split('.')[0];
+                      item['{#ZYXEL.SFP.UNIT}'] = nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']] === undefined ? "" : nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']];
+                      item['{#ZYXEL.SFP.WARN.MAX}'] /= 100;
+                      item['{#ZYXEL.SFP.WARN.MIN}'] /= 100;
+                      outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+        -
+          uuid: f8112c4b07ed4bb1b918f58dbb9ec294
+          name: 'SFP without DDM discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.SFP.STATUS},.1.3.6.1.4.1.890.1.5.8.46.117.1.1.2]'
+          key: zyxel.4728f.sfp.discovery
+          delay: 12h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.SFP.STATUS}'
+                value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.SFP.STATUS}'
+                value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'SFP module discovery.'
+          item_prototypes:
+            -
+              uuid: 59c000d4324d4e8ca07203843bbea7b5
+              name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Date code'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.117.1.1.7.{#SNMPINDEX}'
+              key: 'zyxel.4728f.sfp.datecode[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Transceiver module vendor's manufacturing date code.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: c585762763604f83a9d14b7df21188ee
+              name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Part number'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.117.1.1.4.{#SNMPINDEX}'
+              key: 'zyxel.4728f.sfp.part[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Part number provided by transceiver module vendor.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 33395170c38043828cedbfbedea959cc
+              name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Revision'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.117.1.1.6.{#SNMPINDEX}'
+              key: 'zyxel.4728f.sfp.revision[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Revision level for part number provided by transceiver module vendor.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 175f4200563549a0ae1ebaed18eeb636
+              name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Serial number'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.117.1.1.5.{#SNMPINDEX}'
+              key: 'zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Serial number provided by transceiver module vendor.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: 632be557ffed439e98425eaa59361e50
+                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              uuid: 5d3d0c6135924b2088b2f97d30a743cb
+              name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.117.1.1.2.{#SNMPINDEX}'
+              key: 'zyxel.4728f.sfp.status[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Transceiver module status.
+              valuemap:
+                name: 'ZYXEL XGS-4728F SFP status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: b16f7fe769a74ea99aafaa60a97d286c
+              name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Transceiver'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.117.1.1.8.{#SNMPINDEX}'
+              key: 'zyxel.4728f.sfp.transceiver[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Transceiver module type names.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 5abb9b467e934873808b4b49bdd74f5f
+              name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX}: Vendor'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.117.1.1.3.{#SNMPINDEX}'
+              key: 'zyxel.4728f.sfp.vendor[{#SNMPINDEX}]'
+              delay: '{$ZYXEL.LLD.SFP.UPDATE}'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                Transceiver module vendor name.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+        -
+          uuid: fa0881c21d834db1b421ae727254bff9
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.TEMP.THRESH.HIGH},.1.3.6.1.4.1.890.1.5.8.46.9.2.1.5]'
+          key: zyxel.4728f.temp.discovery
+          delay: 1h
+          description: |
+            An entry in tempTable.
+            Index of temperature unit. 1:MAC, 2:CPU, 3:PHY
+          item_prototypes:
+            -
+              uuid: db030cd64cdc471cb5298ceb9973155a
+              name: 'ZYXEL XGS-4728F: Temperature "{#ZYXEL.TEMP.ID}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.9.2.1.2.{#SNMPINDEX}'
+              key: 'zyxel.4728f.temp[{#SNMPINDEX}]'
+              history: 7d
+              units: °C
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                The current temperature measured at this sensor
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 6181f094ae4c4cf4ae4b2e198e2f9b6e
+                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  name: 'ZYXEL XGS-4728F: Temperature {#ZYXEL.TEMP.ID} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the temperature'
+          graph_prototypes:
+            -
+              uuid: 1068300241bb430b8c51048303922e55
+              name: 'ZYXEL XGS-4728F: Temperature "{#ZYXEL.TEMP.ID}"'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.temp[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var nameMap = {"1":"MAC", "2":"CPU", "3":"PHY"};
+                  var outArr = [];
+                  inArray.forEach(function(item, i, arr) {
+                  item["{#ZYXEL.TEMP.ID}"] = nameMap[item["{#SNMPINDEX}"]] 
+                  outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+        -
+          uuid: 1fa3870c99d6408dbf78c7f2ad87341d
+          name: 'Voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.VOLT.THRESH.LOW},.1.3.6.1.4.1.890.1.5.8.46.9.3.1.6,{#ZYXEL.VOLT.NOMINAL},.1.3.6.1.4.1.890.1.5.8.46.9.3.1.5]'
+          key: zyxel.4728f.volt.discovery
+          delay: 1h
+          description: 'An entry in voltageTable.'
+          item_prototypes:
+            -
+              uuid: 2999674cc176471887c1878b881b8422
+              name: 'ZYXEL XGS-4728F: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.9.3.1.2.{#SNMPINDEX}'
+              key: 'zyxel.4728f.volt[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: ZYXEL-XGS4728F-MIB
+                The current voltage reading.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: 631202a132dc44afa90b0537f9957ee1
+                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  name: 'ZYXEL XGS-4728F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply'
+          graph_prototypes:
+            -
+              uuid: 560c37d174e741a6a2590d17574123ed
+              name: 'ZYXEL XGS-4728F: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL XGS-4728F SNMP'
+                    key: 'zyxel.4728f.volt[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var outArr = []
+                  inArray.forEach(function(item, i, arr) {
+                  item["{#ZYXEL.VOLT.NOMINAL}"] = "+" + item["{#ZYXEL.VOLT.NOMINAL}"] / 1000 + "V";
+                  item["{#ZYXEL.VOLT.THRESH.LOW}"] = item["{#ZYXEL.VOLT.THRESH.LOW}"] / 1000; 
+                  outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+          value: 'NEED TRIGGERS'
+          description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+          value: 1|2
+          description: 'Filter of discoverable link types. 0 - Down link 1 - Cooper link 2 - Fiber link'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered by link types.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter by discoverable interface names.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered interfaces by name.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
+          value: 1|2
+          description: 'Filter of discoverable status. 0 - OK with DDM 1 - OK without DDM 2 - nonoperational'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered by status.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
+          value: '.*'
+          description: 'Filter by discoverable SFP modules name.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
+          value: N/A
+          description: 'Filter to exclude discovered SFP modules by name.'
+        -
+          macro: '{$ZYXEL.LLD.SFP.UPDATE}'
+          value: 10m
+          description: 'Receiving data from the SFP module is slow, we do not recommend setting the interval less than 10 minutes.'
+      valuemaps:
+        -
+          uuid: a7acf3b0ac684d4e80c560bcd3dd2dc6
+          name: 'SNMP available'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: 042ccfb45b0a4ef7bc8842f731dd8c4f
+          name: 'ZYXEL XGS-4728F operational mode port link up type'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Cooper
+            -
+              value: '2'
+              newvalue: Fiber
+            -
+              value: '3'
+              newvalue: XFP
+            -
+              value: '4'
+              newvalue: CX4
+        -
+          uuid: d466ff32531d4eaea989c07aa5989d6b
+          name: 'ZYXEL XGS-4728F operational mode port speed duplex'
+          mappings:
+            -
+              value: '0'
+              newvalue: auto
+            -
+              value: '1'
+              newvalue: '10M half'
+            -
+              value: '2'
+              newvalue: '10M full'
+            -
+              value: '3'
+              newvalue: '100M half'
+            -
+              value: '4'
+              newvalue: '100M full'
+            -
+              value: '5'
+              newvalue: '1G full'
+        -
+          uuid: 250f228ead4b433f987d42014255a617
+          name: 'ZYXEL XGS-4728F port admin status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+        -
+          uuid: ed13145eeefd44dda083716080725e60
+          name: 'ZYXEL XGS-4728F port operational status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+            -
+              value: '4'
+              newvalue: Unknown
+            -
+              value: '5'
+              newvalue: Dormant
+            -
+              value: '6'
+              newvalue: NotPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: 49b0a85b7da947ab91e47ed2f2123907
+          name: 'ZYXEL XGS-4728F SFP status'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'OK with DDM'
+            -
+              value: '2'
+              newvalue: 'OK without DDM'
+            -
+              value: '3'
+              newvalue: nonoperational
+  graphs:
+    -
+      uuid: dfd68fb23bf349068005997de6b0515a
+      name: 'ZYXEL XGS-4728F: CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'ZYXEL XGS-4728F SNMP'
+            key: zyxel.4728f.cpuusage

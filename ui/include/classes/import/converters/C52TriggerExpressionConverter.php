@@ -53,13 +53,6 @@ class C52TriggerExpressionConverter extends CConverter {
 	protected $item;
 
 	/**
-	 * Either to add parentheses around subexpression.
-	 *
-	 * @var bool
-	 */
-	protected $wrap_subexpressions;
-
-	/**
 	 * Old trigger expression syntax parser.
 	 *
 	 * @var C10TriggerExpression
@@ -85,15 +78,24 @@ class C52TriggerExpressionConverter extends CConverter {
 		$this->item = (array_key_exists('item', $trigger_data) && $trigger_data['item']) ? $trigger_data['item'] : '';
 		$this->host = (array_key_exists('host', $trigger_data) && $this->item) ? $trigger_data['host'] : '';
 
-		if (($this->parser->parse($trigger_data['expression'])) !== false) {
+		if ($this->parser->parse($trigger_data['expression']) !== false) {
 			$functions = $this->parser->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO);
 			$this->hanged_refs = $this->checkHangedFunctionsPerHost($functions);
-			$parts = $this->getExpressionParts(0, $this->parser->result->length - 1);
-			$this->wrap_subexpressions = ($parts['type'] === 'operator');
-			$extra_expressions = [];
-			$this->convertExpressionParts($trigger_data['expression'], [$parts], $extra_expressions);
 
-			$extra_expressions = array_filter($extra_expressions);
+			$extra_expressions = [];
+
+			for ($i = count($functions) - 1; $i >= 0; $i--) {
+				[$new_expr, $extra_expr] = $this->convertFunction($functions[$i]['data'], $this->host, $this->item);
+
+				$trigger_data['expression'] = substr_replace($trigger_data['expression'], $new_expr,
+					$functions[$i]['pos'], $functions[$i]['length']
+				);
+
+				if ($extra_expr !== null) {
+					$extra_expressions[] = $extra_expr;
+				}
+			}
+
 			if ($extra_expressions) {
 				$extra_expressions = array_keys(array_flip($extra_expressions));
 
@@ -105,61 +107,6 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 
 		return $trigger_data['expression'];
-	}
-
-	/**
-	 * Convert expressions parts.
-	 *
-	 * @param string $expression          Expression string.
-	 * @param array $expression_elements  Expression tree.
-	 * @param array $extra_expr           Array to accumulate strings to add at the end of converted expression.
-	 */
-	protected function convertExpressionParts(string &$expression, array $expression_elements, array &$extra_expr
-			): void {
-		for ($i = count($expression_elements) - 1; $i >= 0; $i--) {
-			$part = $expression_elements[$i];
-
-			if ($part['type'] === 'operator') {
-				$this->convertExpressionParts($expression, $part['elements'], $extra_expr);
-			}
-			elseif ($part['type'] === 'expression') {
-				$this->convertSingleExpressionPart($expression, $part, $extra_expr);
-			}
-		}
-	}
-
-	/**
-	 * Convert expression part.
-	 *
-	 * @param string $expression         Expression string.
-	 * @param array $expression_element  Expression part to convert.
-	 * @param array $extra_expr          Array to accumulate strings to add at the end of converted expression.
-	 */
-	protected function convertSingleExpressionPart(string &$expression, array $expression_element, array &$extra_expr) {
-		$expression_data = new C10TriggerExpression(['allow_func_only' => true]);
-
-		if (($expression_data->parse($expression_element['expression'])) !== false) {
-			$fn_list = $expression_data->result->getTokensByType(C10TriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO);
-
-			for ($i = count($fn_list) - 1; $i >= 0; $i--) {
-				$fn = $fn_list[$i]['data'];
-				[$new_expression, $_extra_expr] = $this->convertFunction($fn, $this->host, $this->item);
-
-				$extra_expr[] = $_extra_expr;
-
-				$expression_element['expression'] = substr_replace($expression_element['expression'], $new_expression,
-					$fn_list[$i]['pos'], $fn_list[$i]['length']
-				);
-			}
-
-			if ($this->wrap_subexpressions && count($fn_list) > 1) {
-				$expression_element['expression'] = '('.$expression_element['expression'].')';
-			}
-
-			$expression = substr_replace($expression, $expression_element['expression'],
-				$expression_element['pos'], $expression_element['length']
-			);
-		}
 	}
 
 	/**
@@ -183,7 +130,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				: false;
 		}
 
-		$extra_expr = '';
+		$extra_expr = null;
 
 		$parameters = [
 			'unquotable' => array_filter($fn['functionParamsRaw']['parameters'], function ($param) {
@@ -588,161 +535,6 @@ class C52TriggerExpressionConverter extends CConverter {
 		}
 
 		return $hanged_refs;
-	}
-
-	/**
-	 * Split expression into sub-expressions.
-	 *
-	 * @param int $start
-	 * @param int $end
-	 *
-	 * @return array
-	 */
-	protected function getExpressionParts(int $start, int $end): array {
-		$blank_symbols = [' ', "\r", "\n", "\t"];
-
-		$result = [];
-		foreach (['or', 'and'] as $operator) {
-			$operator_found = false;
-			$left_parentheses = -1;
-			$right_parentheses = -1;
-			$expressions = [];
-			$open_symbol_pos = $start;
-			$operator_pos = 0;
-			$operator_token = '';
-
-			for ($i = $start, $level = 0; $i <= $end; $i++) {
-				switch ($this->parser->expression[$i]) {
-					case ' ':
-					case "\r":
-					case "\n":
-					case "\t":
-						if ($open_symbol_pos == $i) {
-							$open_symbol_pos++;
-						}
-						break;
-
-					case '(':
-						if ($level == 0) {
-							$left_parentheses = $i;
-						}
-						$level++;
-						break;
-
-					case ')':
-						$level--;
-						if ($level == 0) {
-							$right_parentheses = $i;
-						}
-						break;
-
-					case '{':
-					case '"':
-						// Skip any previously found tokens starting with brace or double quote.
-						foreach ($this->parser->result->getTokens() as $expression_token) {
-							$expr_endpos = $expression_token['pos'] + $expression_token['length'];
-
-							if ($expression_token['pos'] >= $i && $i < $expr_endpos) {
-								$i = $expr_endpos;
-								break;
-							}
-						}
-						break;
-
-					default:
-						// Try to parse an operator.
-						if ($operator[$operator_pos] === $this->parser->expression[$i]) {
-							$operator_pos++;
-							$operator_token .= $this->parser->expression[$i];
-
-							// Operator found.
-							if ($operator_token === $operator) {
-								/*
-								 * Once reached the end of a complete expression, parse the expression on the left side
-								 * of the operator.
-								 */
-								if ($level == 0) {
-									// Find the last symbol of the expression before the operator.
-									$close_symbol_pos = $i - strlen($operator);
-
-									// Trim blank symbols after the expression.
-									while (in_array($this->parser->expression[$close_symbol_pos], $blank_symbols)) {
-										$close_symbol_pos--;
-									}
-
-									$expressions[] = $this->getExpressionParts($open_symbol_pos, $close_symbol_pos);
-									$open_symbol_pos = $i + 1;
-									$operator_found = true;
-								}
-								$operator_pos = 0;
-								$operator_token = '';
-							}
-						}
-				}
-			}
-
-			// Trim blank symbols in the end of the trigger expression.
-			$close_symbol_pos = $end;
-			while (in_array($this->parser->expression[$close_symbol_pos], $blank_symbols)) {
-				$close_symbol_pos--;
-			}
-
-			/*
-			 * We've found a whole expression and parsed the expression on the left side of the operator, parse the
-			 * expression on the right.
-			 */
-			if ($operator_found) {
-				$expressions[] = $this->getExpressionParts($open_symbol_pos, $close_symbol_pos);
-
-				// Trim blank symbols in the beginning of the trigger expression.
-				$open_symbol_pos = $start;
-				while (in_array($this->parser->expression[$open_symbol_pos], $blank_symbols)) {
-					$open_symbol_pos++;
-				}
-
-				// Trim blank symbols in the end of the trigger expression.
-				$close_symbol_pos = $end;
-				while (in_array($this->parser->expression[$close_symbol_pos], $blank_symbols)) {
-					$close_symbol_pos--;
-				}
-
-				$expr = substr($this->parser->expression, $open_symbol_pos, $close_symbol_pos - $open_symbol_pos + 1);
-				$result = [
-					'pos' => $open_symbol_pos,
-					'length' => strlen($expr),
-					'expression' => $expr,
-					'type' => 'operator',
-					'elements' => $expressions
-				];
-				break;
-			}
-			/*
-			 * If we've tried both operators and didn't find anything, it means there's only one expression return the
-			 * result.
-			 */
-			elseif ($operator === 'and') {
-				// Trim extra parentheses.
-				if ($open_symbol_pos == $left_parentheses && $close_symbol_pos == $right_parentheses) {
-					$open_symbol_pos++;
-					$close_symbol_pos--;
-
-					$result = $this->getExpressionParts($open_symbol_pos, $close_symbol_pos);
-				}
-				// No extra parentheses remain, return the result.
-				else {
-					$expr = substr($this->parser->expression, $open_symbol_pos, $close_symbol_pos - $open_symbol_pos + 1
-					);
-					$result = [
-						'pos' => $open_symbol_pos,
-						'length' => strlen($expr),
-						'expression' => $expr,
-						'type' => 'expression'
-					];
-				}
-			}
-		}
-
-		return $result;
 	}
 
 	/**

@@ -1,0 +1,1204 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-11T15:20:25Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 8e6d7067cd094e56a52db999b3199edc
+      template: 'ZYXEL IES1248-51 SNMP'
+      name: 'ZYXEL IES1248-51 SNMP'
+      description: |
+        ZYXEL IES1248-51
+        
+        MIBs used:
+        RFC1213-MIB
+        ADSL-LINE-MIB
+        ZYXEL-IESCOMMON-MIB
+        IF-MIB
+        
+        Known Issues:
+        
+          Description: Incorrect handling of SNMP bulk requests. Disable the use of bulk requests in the SNMP interface settings.
+          Version: all versions firmware
+          Device: ZYXEL IES1248-51
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 03cf90df51e0466c8b31744ce820276f
+          name: 'ZYXEL IES1248-51: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: 'SNMP available'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 40466f29b8e54dc88cb49e818fc48281
+              expression: 'max(/ZYXEL IES1248-51 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'ZYXEL IES1248-51: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+        -
+          uuid: a01b8490f3b94ac5ab500d67171cfe1a
+          name: 'ZYXEL IES1248-51: Contact'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.4.0
+          key: zyxel.ies1248.contact
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The textual identification of the contact person
+            for this managed node, together with information
+            on how to contact this person.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 56974ccbede04e9eb966951ac3c88250
+          name: 'ZYXEL IES1248-51: ZyNOS F/W Version'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.5.13.1.1.3.1.4.0.0
+          key: zyxel.ies1248.fwversion
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ZYXEL-IESCOMMON-MIB'
+          inventory_link: SOFTWARE_FULL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: b64e891456674457ab4abf994b097277
+              expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fwversion,#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fwversion,#2) and length(last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fwversion))>0'
+              name: 'ZYXEL IES1248-51: Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: 600e6a8b9dd549b69f64f1a536bce7de
+          name: 'ZYXEL IES1248-51: Location'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.6.0
+          key: zyxel.ies1248.location
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The physical location of this node (e.g.,
+            `telephone closet, 3rd floor').
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: ad09c90a951a4c41b935a70f58f5c26a
+          name: 'ZYXEL IES1248-51: MAC address'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
+          key: zyxel.ies1248.mac
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IF-MIB
+            The interface's address at the protocol layer
+            immediately `below' the network layer in the
+            protocol stack.  For interfaces which do not have
+            such an address (e.g., a serial line), this object
+            should contain an octet string of zero length.
+          inventory_link: MACADDRESS_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 427ef42e55ca498db16d078ed41e7ad9
+          name: 'ZYXEL IES1248-51: Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.1.0
+          key: zyxel.ies1248.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            A textual description of the entity.  This value
+            should include the full name and version
+            identification of the system's hardware type,
+            software operating-system, and networking
+            software.  It is mandatory that this only contain
+            printable ASCII characters.
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 21b638f9f1154b6bb78a652d8e54c1c2
+              expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.model)<>"IES1248-51"'
+              name: 'ZYXEL IES1248-51: Template does not match hardware'
+              priority: INFO
+              description: 'This template is for Zyxel IES1248-51, but connected to {ITEM.VALUE}'
+        -
+          uuid: 8c6546b670d4455aa1234c35bb033ac7
+          name: 'ZYXEL IES1248-51: Host name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.5.0
+          key: zyxel.ies1248.name
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            An administratively-assigned name for this
+            managed node.  By convention, this is the node's
+            fully-qualified domain name.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 0d30380bb9a24bd1939d16287d5d0711
+          name: 'ZYXEL IES1248-51: Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.5.13.1.1.2.1.3.0
+          key: zyxel.ies1248.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: ZYXEL-IESCOMMON-MIB
+            Serial number
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 2f2972169c164053a8d439b0e572b0c6
+              expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.serialnumber,#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.serialnumber,#2) and length(last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.serialnumber))>0'
+              name: 'ZYXEL IES1248-51: Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: bafdca2040ba44be911fd1e5a09f3298
+          name: 'ZYXEL IES1248-51: Alarm status'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.5.13.1.1.3.1.8.0.0
+          key: zyxel.ies1248.slot.alarm
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: ZYXEL-IESCOMMON-MIB
+            This variable indicates the alarm status of the module.
+            It is a bit map represented a sum, therefore, it can represent
+            multiple defects simultaneously. The moduleNoDefect should be set
+            if and only if no other flag is set.
+            The various bit positions are:
+            1   moduleNoDefect
+            2   moduleOverHeat
+            3   moduleFanRpmLow
+            4   moduleVoltageLow
+            5   moduleThermalSensorFailure
+            6   modulePullOut
+            7   powerDC48VAFailure
+            8   powerDC48VBFailure
+            9   extAlarmInputTrigger
+            10   moduleDown
+            11   mscSwitchOverOK
+            12   networkTopologyChange
+            13   macSpoof
+            14   cpuHigh
+            15   memoryUsageHigh
+            16   packetBufferUsageHigh
+            17   loopguardOccurence
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var valueArray = [
+                      'moduleNoDefect',
+                      'moduleOverHeat',
+                      'moduleFanRpmLow',
+                      'moduleVoltageLow',
+                      'moduleThermalSensorFailure',
+                      'modulePullOut',
+                      'powerDC48VAFailure',
+                      'powerDC48VBFailure',
+                      'extAlarmInputTrigger',
+                      'moduleDown',
+                      'mscSwitchOverOK',
+                      'networkTopologyChange',
+                      'macSpoof',
+                      'cpuHigh',
+                      'memoryUsageHigh',
+                      'packetBufferUsageHigh',
+                      'loopguardOccurence'
+                  ];
+                  var base2 = parseInt(value).toString(2);
+                  var outArray = [];
+                  for (var i = 0; i < base2.length; ++i) {
+                      if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
+                  }
+                  return outArray.join();
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 6b1b1b27241f42229e8b159320371356
+              expression: 'find(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.slot.alarm,,"like","moduleNoDefect")=0'
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX} alarm'
+              priority: AVERAGE
+              description: 'The slot reported an error.'
+        -
+          uuid: ba41848140394ac29fe9b77e77627f20
+          name: 'ZYXEL IES1248-51: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.3.0
+          key: zyxel.ies1248.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: RFC1213-MIB
+            The time (in hundredths of a second) since the
+            network management portion of the system was last
+            re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: bbccceac3dc24b9ab76a820fe5be4788
+              expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.uptime)<10m'
+              name: 'ZYXEL IES1248-51: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          uuid: 9ffacb42c2fe4abd9e8d10e4b8803fc2
+          name: 'Fan discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.FANRPM.THRESH.LOW},.1.3.6.1.4.1.890.1.5.13.1.2.1.1.5]'
+          key: zyxel.ies1248.fan.discovery
+          delay: 1h
+          description: 'An entry in fanRpmTable.'
+          item_prototypes:
+            -
+              uuid: d420958f89f04467b5aa4d41c565160b
+              name: 'ZYXEL IES1248-51: Fan #{#SNMPINDEX}'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.13.1.2.1.1.2.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.fan[{#SNMPINDEX}]'
+              history: 7d
+              units: '!rpm'
+              description: |
+                MIB: ZYXEL-IESCOMMON-MIB
+                Current speed in Revolutions Per Minute (RPM) on the fan.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: 86f18f4e598443ab9e0ec30554d78e1a
+                  expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
+                  name: 'ZYXEL IES1248-51: FAN{#SNMPINDEX} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+          graph_prototypes:
+            -
+              uuid: f8d2136dab70403a98da660bcf4c02a2
+              name: 'ZYXEL IES1248-51: Fan #{#SNMPINDEX}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL IES1248-51 SNMP'
+                    key: 'zyxel.ies1248.fan[{#SNMPINDEX}]'
+        -
+          uuid: 47dc5ba65f25444c961b7684d65bbc07
+          name: 'ADSL interface discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.IF.NAME},.1.3.6.1.2.1.2.2.1.2,{#ZYXEL.IF.LINKSTATUS},.1.3.6.1.2.1.2.2.1.8]'
+          key: zyxel.ies1248.net.adsl.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.IF.LINKSTATUS}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.IF.LINKSTATUS}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: adsl
+                formulaid: C
+          item_prototypes:
+            -
+              uuid: ca789e47cbfc4ee080a25e7003e92fad
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Administrative status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.adminstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The desired state of the interface.  The
+                testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL IES1248-51 port admin status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 7c13234155f343bc90bf1584a7f0fb3f
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUC attenuation'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.10.94.1.1.2.1.5.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.atuc.atn[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: dB
+              description: |
+                MIB: ADSL-LINE-MIB
+                Measured difference in the total power transmitted by
+                the peer ATU and the total power received by this ATU. 
+                The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES1248-51, during negotiation/provisioning message interchanges.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: 23e50c0031c1457596b1366a40606ef9
+                  expression: 'min(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
+                  name: 'ZYXEL IES1248-51: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
+                  priority: WARNING
+                  description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
+            -
+              uuid: 524bf397c9a640c48716fa20e4c45034
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUC output power'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.10.94.1.1.2.1.7.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.atuc.outpwr[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: dB
+              description: |
+                MIB: ADSL-LINE-MIB
+                Measured total output power transmitted by this ATU. 
+                The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES1248-51, during negotiation/provisioning message interchanges.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: ed1768b17f0f434392c5cbc91ddd5222
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUC noise margin'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.10.94.1.1.2.1.4.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.atuc.snrmgn[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: dB
+              description: |
+                MIB: ADSL-LINE-MIB
+                Noise Margin as seen by this ATU with respect to its
+                received signal in tenth dB. 
+                The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES1248-51, during negotiation/provisioning message interchanges.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: 23bbc44b2f114afe99a8175a2b7f0ddd
+                  expression: 'min(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
+                  name: 'ZYXEL IES1248-51: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
+                  priority: WARNING
+                  description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
+            -
+              uuid: 0dd3a9f10abb4a8a92f627228c9fbb52
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUR attenuation'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.10.94.1.1.3.1.5.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.atur.atn[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: dB
+              description: |
+                MIB: ADSL-LINE-MIB
+                Measured difference in the total power transmitted by
+                the peer ATU and the total power received by this ATU. 
+                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: 2132fed26fe54a7daa017b7264c37f1c
+                  expression: 'min(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
+                  name: 'ZYXEL IES1248-51: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
+                  priority: WARNING
+                  description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
+            -
+              uuid: 54c5b104d96945eca7cf402a2e910f90
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUR output power'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.10.94.1.1.3.1.7.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.atur.outpwr[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: dB
+              description: |
+                MIB: ADSL-LINE-MIB
+                Measured total output power transmitted by this ATU. 
+                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 9744b18d3eec4bd2954ec7ea29e341fd
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUR noise margin'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.10.94.1.1.3.1.4.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.atur.snrmgn[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: dB
+              description: |
+                MIB: ADSL-LINE-MIB
+                Noise Margin as seen by this ATU with respect to its
+                received signal in tenth dB. 
+                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: 2d8f752b376f4c10bc8efbd39c8f45a9
+                  expression: 'min(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
+                  name: 'ZYXEL IES1248-51: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
+                  priority: WARNING
+                  description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
+            -
+              uuid: b7f622f72f98417cab3954717d311080
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Incoming traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.in.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface,
+                including framing characters.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: bff933861d744ee5a3229c2c6b1dc4c0
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Interface name'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.name[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IF-MIB
+                A textual string containing information about the interface
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 25c07c59e30e42b191162fa40066c8b8
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                The testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL IES1248-51 port operational status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: 93a58c14939d4c3491646171910fe5ad
+                  expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}],#2)'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.operstatus[{#SNMPINDEX}])<>2'
+                  name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+            -
+              uuid: 6df1c990c9dc49caa151dfc989d055b9
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Outgoing traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.adsl.out.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the
+                interface, including framing characters.  This object is a
+                64-bit version of ifOutOctets.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+          graph_prototypes:
+            -
+              uuid: 7c9c5ff332394b97a311225de08b6bc6
+              name: 'ZYXEL IES1248-51: ADSL port {#SNMPINDEX}: Traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL IES1248-51 SNMP'
+                    key: 'zyxel.ies1248.net.adsl.in.traffic[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL IES1248-51 SNMP'
+                    key: 'zyxel.ies1248.net.adsl.out.traffic[{#SNMPINDEX}]'
+          overrides:
+            -
+              name: 'Trigger disabled'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '.*'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'Trigger enabled'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          uuid: 4b32903336ad4c9e826cfd65a89a8960
+          name: 'Ethernet interface discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.IF.NAME},.1.3.6.1.2.1.2.2.1.2,{#ZYXEL.IF.LINKSTATUS},.1.3.6.1.2.1.2.2.1.8]'
+          key: zyxel.ies1248.net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.IF.LINKSTATUS}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.IF.LINKSTATUS}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: enet
+                formulaid: C
+          item_prototypes:
+            -
+              uuid: 8d402a2674084fdb9d26bc5caeafc34f
+              name: 'ZYXEL IES1248-51: Port {#ZYXEL.IF.NAME}: Administrative status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.if.adminstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The desired state of the interface.  The
+                testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL IES1248-51 port admin status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#ZYXEL.IF.NAME}'
+            -
+              uuid: de5cf230831840cc985b63ba58d05059
+              name: 'ZYXEL IES1248-51: Port {#ZYXEL.IF.NAME}: Incoming traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.if.in.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface,
+                including framing characters.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#ZYXEL.IF.NAME}'
+            -
+              uuid: eeb4236d4ebe4cb396413f13d1fa669b
+              name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Interface name'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.if.name[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IF-MIB
+                A textual string containing information about the interface
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#ZYXEL.IF.NAME}'
+            -
+              uuid: cd0bbc3c587a47e6a2a2307343a377b7
+              name: 'ZYXEL IES1248-51: Port {#ZYXEL.IF.NAME}: Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                The testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL IES1248-51 port operational status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#ZYXEL.IF.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 8d90a989c82a4890a3a1a0b8eeb53462
+                  expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  name: 'ZYXEL IES1248-51: Port {#ZYXEL.IF.NAME}: Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+            -
+              uuid: 2e39a01f6315444cb3ae47836945b514
+              name: 'ZYXEL IES1248-51: Port {#ZYXEL.IF.NAME}: Outgoing traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.net.if.out.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the
+                interface, including framing characters.  This object is a
+                64-bit version of ifOutOctets.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#ZYXEL.IF.NAME}'
+          graph_prototypes:
+            -
+              uuid: 1988adb1e96b423a8df3c55ea2f63d47
+              name: 'ZYXEL IES1248-51: Ethernet port {#SNMPINDEX}: Traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL IES1248-51 SNMP'
+                    key: 'zyxel.ies1248.net.if.in.traffic[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL IES1248-51 SNMP'
+                    key: 'zyxel.ies1248.net.if.out.traffic[{#SNMPINDEX}]'
+          overrides:
+            -
+              name: 'Trigger disabled'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '.*'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'Trigger enabled'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          uuid: f8e1575174f9414e9ddf1459a420b2d6
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.TEMP.ID}, .1.3.6.1.4.1.890.1.5.13.1.2.3.1.1,{#ZYXEL.TEMP.THRESH.HIGH},.1.3.6.1.4.1.890.1.5.13.1.2.3.1.5]'
+          key: zyxel.ies1248.temp.discovery
+          delay: 1h
+          description: 'An entry in tempTable.'
+          item_prototypes:
+            -
+              uuid: 3049c6b2d6024949bbb240c9104418e6
+              name: 'ZYXEL IES1248-51: Temperature "{#ZYXEL.TEMP.ID}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.13.1.2.3.1.2.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.temp[{#SNMPINDEX}]'
+              history: 7d
+              units: °C
+              description: |
+                MIB: ZYXEL-IESCOMMON-MIB
+                The current temperature measured at this sensor
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: f0d7f5282c784224b0cd5f76d3c2ad90
+                  expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  name: 'ZYXEL IES1248-51: Temperature {#ZYXEL.TEMP.ID} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the temperature'
+          graph_prototypes:
+            -
+              uuid: a5ec11a8936746c492fcf2e4462c7ca7
+              name: 'ZYXEL IES1248-51: "Temperature {#ZYXEL.TEMP.ID}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL IES1248-51 SNMP'
+                    key: 'zyxel.ies1248.temp[{#SNMPINDEX}]'
+        -
+          uuid: a2df63bd07f24277acf36e7a3854bd81
+          name: 'Voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.VOLT.THRESH.LOW},.1.3.6.1.4.1.890.1.5.13.1.2.2.1.6,{#ZYXEL.VOLT.NOMINAL}, .1.3.6.1.4.1.890.1.5.13.1.2.2.1.5]'
+          key: zyxel.ies1248.volt.discovery
+          delay: 1h
+          description: 'An entry in voltageTable.'
+          item_prototypes:
+            -
+              uuid: 747034dc53c34554ad141a70dd5905f0
+              name: 'ZYXEL IES1248-51: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.13.1.2.2.1.2.{#SNMPINDEX}'
+              key: 'zyxel.ies1248.volt[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: ZYXEL-IESCOMMON-MIB
+                The current voltage reading.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: 9815420fe46c45ce8731b9688b4a543e
+                  expression: 'last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  name: 'ZYXEL IES1248-51: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply'
+          graph_prototypes:
+            -
+              uuid: ebbc2726558c4504aa6bd22844d0bc83
+              name: 'ZYXEL IES1248-51: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL IES1248-51 SNMP'
+                    key: 'zyxel.ies1248.volt[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var outArr = []
+                  inArray.forEach(function (item, i, arr) {
+                      item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+                      item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+                      item["{#ZYXEL.VOLT.NOMINAL}"] = "+" + item["{#ZYXEL.VOLT.NOMINAL}"] / 1000 + "V";
+                      item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000;
+                      item["{#ZYXEL.VOLT.THRESH.HIGH}"] /= 1000;
+                      outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+      macros:
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$ZYXEL.ADSL.ATN.MAX}'
+          value: '40'
+          description: 'Type the maximum signal attenuation'
+        -
+          macro: '{$ZYXEL.ADSL.SNR.MIN}'
+          value: '8'
+          description: 'Type the minimum signal to noise margin (0-31 dB)'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+          value: 'NEED TRIGGERS'
+          description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable link types.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}'
+          value: '2'
+          description: 'Filter to exclude discovered by link types.'
+      valuemaps:
+        -
+          uuid: 34ea860866f24498927b73f4ce438837
+          name: 'SNMP available'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: b933d3a98256457d906de8f7da377bac
+          name: 'ZYXEL IES1248-51 port admin status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+        -
+          uuid: e780cc91765849a0ace3d2eb2e4824a0
+          name: 'ZYXEL IES1248-51 port operational status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+            -
+              value: '4'
+              newvalue: Unknown
+            -
+              value: '5'
+              newvalue: Dormant
+            -
+              value: '6'
+              newvalue: NotPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown

@@ -1,0 +1,1161 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-11T15:19:49Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 73f123bb9ffe4587a0269c7e8752b2ed
+      template: 'ZYXEL GS-4012F SNMP'
+      name: 'ZYXEL GS-4012F SNMP'
+      description: |
+        ZYXEL GS-4012F
+        
+        MIBs used:
+        ZYXEL-GS4012F-MIB
+        RFC1213-MIB
+        IF-MIB
+        
+        Known Issues:
+        
+          Description: Incorrect handling of SNMP bulk requests. Disable the use of bulk requests in the SNMP interface settings.
+          Version: all versions firmware
+          Device: ZYXEL GS-4012F
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 2839fec9602a4162bb0acfb1be89fd57
+          name: 'ZYXEL GS-4012F: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: 'SNMP available'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 07b74d3face24c838c7efe8dfb87564e
+              expression: 'max(/ZYXEL GS-4012F SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'ZYXEL GS-4012F: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+        -
+          uuid: 831444715edf4a12baf6a5727ba9276c
+          name: 'ZYXEL GS-4012F: Contact'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.4.0
+          key: zyxel.4012f.contact
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The textual identification of the contact person
+            for this managed node, together with information
+            on how to contact this person.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: e2a6ce044f6d40bebb50927cc70bd593
+          name: 'ZYXEL GS-4012F: CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.5.8.20.12.7.0
+          key: zyxel.4012f.cpuusage
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: ZYXEL-GS4012F-MIB
+            Show device CPU load in %, it's the snapshot of CPU load when 
+            getting the values.
+          tags:
+            -
+              tag: Application
+              value: CPU
+          triggers:
+            -
+              uuid: 2052d9e6becd48e5a3aed8037eaf9e87
+              expression: 'min(/ZYXEL GS-4012F SNMP/zyxel.4012f.cpuusage,5m)>{$CPU.UTIL.CRIT}'
+              name: 'ZYXEL GS-4012F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          uuid: adb85140eb8c4b6489078dc79bd61a87
+          name: 'ZYXEL GS-4012F: ZyNOS F/W Version'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.20.1]'
+          key: zyxel.4012f.fwversion
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ZYXEL-GS4012F-MIB'
+          inventory_link: SOFTWARE_FULL
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var tmpObj = {};
+                  inArray.forEach(function(item, i, arr) {
+                    tmpObj[item["{#SNMPINDEX}"]] = item["{#SNMP.ARRAY}"]
+                  });
+                  var strOut = 'V' + tmpObj["1.0"] + '.' + tmpObj["2.0"]
+                    + '(' + tmpObj["3.0"] + '.' + tmpObj["4.0"] + ')_' 
+                    + tmpObj["7.0"] + '.' + tmpObj["6.0"] + '.' + tmpObj["5.0"];
+                  return strOut;
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: ecde6db248674039a30874f29e704e65
+              expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion,#2) and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion))>0'
+              name: 'ZYXEL GS-4012F: Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: f55214647bab4544adb7d9a63e8be69d
+          name: 'ZYXEL GS-4012F: Location'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.6.0
+          key: zyxel.4012f.location
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The physical location of this node (e.g.,
+            `telephone closet, 3rd floor').
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 770d70d2ebcb4978b6c6fae0692ab77f
+          name: 'ZYXEL GS-4012F: MAC address'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
+          key: zyxel.4012f.mac
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IF-MIB
+            The interface's address at the protocol layer
+            immediately `below' the network layer in the
+            protocol stack.  For interfaces which do not have
+            such an address (e.g., a serial line), this object
+            should contain an octet string of zero length.
+          inventory_link: MACADDRESS_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 25c5e9b3d34f4bb8805e2a6c43934f51
+          name: 'ZYXEL GS-4012F: Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.1.0
+          key: zyxel.4012f.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            A textual description of the entity.  This value
+            should include the full name and version
+            identification of the system's hardware type,
+            software operating-system, and networking
+            software.  It is mandatory that this only contain
+            printable ASCII characters.
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 1ba1faabe15c4d46adaa4dc74c5dc05c
+              expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.model)<>"GS-4012F"'
+              name: 'ZYXEL GS-4012F: Template does not match hardware'
+              priority: INFO
+              description: 'This template is for Zyxel GS-4012F, but connected to {ITEM.VALUE}'
+        -
+          uuid: 38fb81dca1db49bc83343ba197bfe980
+          name: 'ZYXEL GS-4012F: Host name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.5.0
+          key: zyxel.4012f.name
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            An administratively-assigned name for this
+            managed node.  By convention, this is the node's
+            fully-qualified domain name.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 0080e896f1384245887a191d87496fa9
+          name: 'ZYXEL GS-4012F: Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.890.1.5.8.20.1.10.0
+          key: zyxel.4012f.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: ZYXEL-GS4012F-MIB
+            Serial number
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: ae941404115d4b10809bce603528ceaa
+              expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#2) and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber))>0'
+              name: 'ZYXEL GS-4012F: Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: 1c14e77679fe4ee6b167036d8888867e
+          name: 'ZYXEL GS-4012F: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.3.0
+          key: zyxel.4012f.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: RFC1213-MIB
+            The time (in hundredths of a second) since the
+            network management portion of the system was last
+            re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 93c70a5dd2504d0d9b13a17af942d45e
+              expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.uptime)<10m'
+              name: 'ZYXEL GS-4012F: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          uuid: 344cd89247db49ba854ab6edb504086d
+          name: 'Fan discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.FANRPM.THRESH.LOW},.1.3.6.1.4.1.890.1.5.8.20.9.1.1.5]'
+          key: zyxel.4012f.fan.discovery
+          delay: 1h
+          description: 'An entry in fanRpmTable.'
+          item_prototypes:
+            -
+              uuid: 0f7fb278c896436c96fb1b5006ee4e06
+              name: 'ZYXEL GS-4012F: Fan #{#SNMPINDEX}'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.9.1.1.2.{#SNMPINDEX}'
+              key: 'zyxel.4012f.fan[{#SNMPINDEX}]'
+              history: 7d
+              units: '!rpm'
+              description: |
+                MIB: ZYXEL-GS4012F-MIB
+                Current speed in Revolutions Per Minute (RPM) on the fan.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: c91993daf9e44102a04b1ff2b72bf773
+                  expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
+                  name: 'ZYXEL GS-4012F: FAN{#SNMPINDEX} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+          graph_prototypes:
+            -
+              uuid: 9c17e54a98324a9bb35c3a4234efe55f
+              name: 'ZYXEL GS-4012F: Fan #{#SNMPINDEX}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.fan[{#SNMPINDEX}]'
+        -
+          uuid: 2f731cdb2e2943fbae17b6858859eb7a
+          name: 'Interface discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.IF.NAME},.1.3.6.1.4.1.890.1.5.8.20.23.1.1.3,{#ZYXEL.IF.LINKUPTYPE},.1.3.6.1.4.1.890.1.5.8.20.23.1.1.5]'
+          key: zyxel.4012f.net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+                value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'An entry in fanRpmTable.'
+          item_prototypes:
+            -
+              uuid: 2b87dc4104704d3891ac061aaa81c629
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Administrative status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.adminstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The desired state of the interface.  The
+                testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL GS-4012F port admin status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 32abe2903d1c4652a74a44c5154f1451
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Interface name'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.descr[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IF-MIB
+                A textual string containing information about the interface
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 42040f2ca85e4f80bdc4bdc9d0ef5966
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Link speed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.highspeed[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                An estimate of the interface's current bandwidth in bits per second
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: a71a364726524a6e9d00eb4098fa5faa
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming broadcast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.in.broadcastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a broadcast
+                address at this sub-layer.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 8dda9a8e70bc44c5acca08284eb94bac
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming multicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.in.multicastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were addressed to a multicast
+                address at this sub-layer.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 7240d04927a742dd93844c1fcc68dba0
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.in.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface,
+                including framing characters.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 4b7a80cf38d44dd9b270dcbc5c44ecfc
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming unicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.in.ucastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The number of packets, delivered by this sub-layer to a
+                higher (sub-)layer, which were not addressed to a multicast
+                or broadcast address at this sub-layer
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 8c0eca407f47404a86d26c5fb1885f87
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming utilization'
+              type: CALCULATED
+              key: 'zyxel.4012f.net.if.in.util[{#SNMPINDEX}]'
+              history: 7d
+              units: '%'
+              params: 'last(//zyxel.4012f.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.4012f.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.4012f.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.4012f.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
+              description: 'Interface utilization percentage'
+              preprocessing:
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: a63165d407e740c38cab55aefeccbca8
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Link type'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.23.1.1.5.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.link_type[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: ZYXEL-GS4012F-MIB
+                Physical connection type
+              valuemap:
+                name: 'ZYXEL GS-4012F operational mode port link up type'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 5c439eae60184abd8ec9b209cda19f8b
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Interface description'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.23.1.1.3.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.name[{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ZYXEL-GS4012F-MIB
+                A textual string containing information about the interface
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 033b0e5b141b437c805b845f2e3f54a0
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.operstatus[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                The testing(3) state indicates that no operational
+                packets can be passed.
+              valuemap:
+                name: 'ZYXEL GS-4012F port operational status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+              trigger_prototypes:
+                -
+                  uuid: 9c332411a6db46acaab2b49ccabd2970
+                  expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+            -
+              uuid: 0f3decaec17a4812aac826056cce9e8a
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing broadcast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.out.broadcastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                broadcast address at this sub-layer, including those that
+                were discarded or not sent.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 5ac33c29b537409cb6347548290e5ecc
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing multicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.out.multicastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were addressed to a
+                multicast address at this sub-layer, including those that
+                were discarded or not sent.  For a MAC layer protocol, this
+                includes both Group and Functional addresses.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 69ab1d86cd0347b49e2500a1d8e7e6a8
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing traffic'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.out.traffic[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the
+                interface, including framing characters.  This object is a
+                64-bit version of ifOutOctets.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 870c54f85d57473c8b48ed896d5e2b2b
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing unicast packages'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.out.ucastpkts[{#SNMPINDEX}]'
+              history: 7d
+              units: packets/s
+              description: |
+                MIB: IF-MIB
+                The total number of packets that higher-level protocols
+                requested be transmitted, and which were not addressed to a
+                multicast or broadcast address at this sub-layer, including
+                those that were discarded or not sent.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 98fffdb492a149b7b684e3867b113d37
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing utilization'
+              type: CALCULATED
+              key: 'zyxel.4012f.net.if.out.util[{#SNMPINDEX}]'
+              history: 7d
+              units: '%'
+              params: 'last(//zyxel.4012f.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.4012f.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.4012f.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.4012f.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
+              description: 'Interface utilization percentage'
+              preprocessing:
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+            -
+              uuid: 64037c50f0344d02ae06690e91c7ead8
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Speed Duplex'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.23.1.1.1.{#SNMPINDEX}'
+              key: 'zyxel.4012f.net.if.speed_duplex[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: ZYXEL-GS4012F-MIB
+                Transmission mode
+              valuemap:
+                name: 'ZYXEL GS-4012F operational mode port speed duplex'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Port {#SNMPINDEX}'
+          graph_prototypes:
+            -
+              uuid: 1cad0c1a40a8472da2edee9cd889e6cf
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Packets traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.in.ucastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.out.ucastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.in.multicastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.out.multicastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.in.broadcastpkts[{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.out.broadcastpkts[{#SNMPINDEX}]'
+            -
+              uuid: ca2e18634f87486987251a2894eabaa0
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.in.traffic[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.out.traffic[{#SNMPINDEX}]'
+            -
+              uuid: 3223519ee24947c5a82b584fc3f2dd3d
+              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.out.util[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.net.if.in.util[{#SNMPINDEX}]'
+          overrides:
+            -
+              name: 'Trigger disabled'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '.*'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'Trigger enabled'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#ZYXEL.IF.NAME}'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          uuid: de7fbcbcaa8a460d8048e7816ccc1a87
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.TEMP.THRESH.HIGH},.1.3.6.1.4.1.890.1.5.8.20.9.2.1.5]'
+          key: zyxel.4012f.temp.discovery
+          delay: 1h
+          description: |
+            An entry in tempTable.
+            Index of temperature unit. 1:MAC, 2:CPU, 3:PHY
+          item_prototypes:
+            -
+              uuid: ee82e6f1916a4ce7b5cd77f0249cc2af
+              name: 'ZYXEL GS-4012F: Temperature "{#ZYXEL.TEMP.ID}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.9.2.1.2.{#SNMPINDEX}'
+              key: 'zyxel.4012f.temp[{#SNMPINDEX}]'
+              history: 7d
+              units: °C
+              description: |
+                MIB: ZYXEL-GS4012F-MIB
+                The current temperature measured at this sensor
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 719aad00708e4fd3b99997834c5d68b2
+                  expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  name: 'ZYXEL GS-4012F: Temperature {#ZYXEL.TEMP.ID} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the temperature'
+          graph_prototypes:
+            -
+              uuid: f2dbed78c1d2440480cff0d1b243a546
+              name: 'ZYXEL GS-4012F: Temperature "{#ZYXEL.TEMP.ID}"'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.temp[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var nameMap = {"1":"MAC", "2":"CPU", "3":"PHY"};
+                  var outArr = [];
+                  inArray.forEach(function(item, i, arr) {
+                  item["{#ZYXEL.TEMP.ID}"] = nameMap[item["{#SNMPINDEX}"]] 
+                  outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+        -
+          uuid: 88047112669f4d7eae81c8bb514ddecb
+          name: 'Voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ZYXEL.VOLT.THRESH.LOW},.1.3.6.1.4.1.890.1.5.8.20.9.3.1.6,{#ZYXEL.VOLT.NOMINAL},.1.3.6.1.4.1.890.1.5.8.20.9.3.1.5]'
+          key: zyxel.4012f.volt.discovery
+          delay: 1h
+          description: 'An entry in voltageTable.'
+          item_prototypes:
+            -
+              uuid: b5cb92c8d63a41158e7072b8ebf33ca1
+              name: 'ZYXEL GS-4012F: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.9.3.1.2.{#SNMPINDEX}'
+              key: 'zyxel.4012f.volt[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: ZYXEL-GS4012F-MIB
+                The current voltage reading.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: 7d28666404bd4cedb687214846f89d4a
+                  expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  name: 'ZYXEL GS-4012F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply'
+          graph_prototypes:
+            -
+              uuid: 021bf935acc542d89a0a26120e995671
+              name: 'ZYXEL GS-4012F: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'ZYXEL GS-4012F SNMP'
+                    key: 'zyxel.4012f.volt[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var inArray = JSON.parse(value);
+                  var outArr = []
+                  inArray.forEach(function(item, i, arr) {
+                  item["{#ZYXEL.VOLT.NOMINAL}"] = "+" + item["{#ZYXEL.VOLT.NOMINAL}"] / 1000 + "V";
+                  item["{#ZYXEL.VOLT.THRESH.LOW}"] = item["{#ZYXEL.VOLT.THRESH.LOW}"] / 1000; 
+                  outArr.push(item)
+                  });
+                  return JSON.stringify(outArr);
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+          value: 'NEED TRIGGERS'
+          description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+          value: 1|2
+          description: 'Filter of discoverable link types. 0 - Down link 1 - Cooper link 2 - Fiber link'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered by link types.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter by discoverable interface names.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered interfaces by name.'
+      valuemaps:
+        -
+          uuid: c6ba6086ed584ba0a4dd58ffe8564fbf
+          name: 'SNMP available'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: 82cce670bef64a47b326bb8b1a2f6cd8
+          name: 'ZYXEL GS-4012F operational mode port link up type'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Cooper
+            -
+              value: '2'
+              newvalue: Fiber
+        -
+          uuid: d7d38cadffc240f9a01434546659d036
+          name: 'ZYXEL GS-4012F operational mode port speed duplex'
+          mappings:
+            -
+              value: '0'
+              newvalue: auto
+            -
+              value: '1'
+              newvalue: '10M half'
+            -
+              value: '2'
+              newvalue: '10M full'
+            -
+              value: '3'
+              newvalue: '100M half'
+            -
+              value: '4'
+              newvalue: '100M full'
+            -
+              value: '5'
+              newvalue: '1G full'
+        -
+          uuid: 7456d212b8f44f7da215fc86f39e3956
+          name: 'ZYXEL GS-4012F port admin status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+        -
+          uuid: afa699db0bfc4cfbb48729932967230e
+          name: 'ZYXEL GS-4012F port operational status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+            -
+              value: '4'
+              newvalue: Unknown
+            -
+              value: '5'
+              newvalue: Dormant
+            -
+              value: '6'
+              newvalue: NotPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+  graphs:
+    -
+      uuid: 966ba518f4e045ed98d2edf65df45078
+      name: 'ZYXEL GS-4012F: CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'ZYXEL GS-4012F SNMP'
+            key: zyxel.4012f.cpuusage

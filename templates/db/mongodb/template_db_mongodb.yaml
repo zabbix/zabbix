@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:43Z'
+  date: '2021-05-11T14:36:37Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1032,7 +1032,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0856e13b7e7644c5b353fcfa577acb51
-              expression: '(last(/MongoDB node by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.version,#2))=1 and length(last(/MongoDB node by Zabbix Agent 2/mongodb.version))>0'
+              expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.version,#2) and length(last(/MongoDB node by Zabbix Agent 2/mongodb.version))>0'
               name: 'MongoDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB version has changed. Ack to close.'
@@ -1064,7 +1064,9 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Collect collections metrics.'
+          description: |
+            Collect collections metrics.
+            Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
           item_prototypes:
             -
               uuid: fbcfeba93bce4f3fa965176b9b3208b0
@@ -1830,7 +1832,9 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Collect database metrics.'
+          description: |
+            Collect database metrics.
+            Note, depending on the number of DBs this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}.
           item_prototypes:
             -
               uuid: cbb85c1a212a49a1bbdd9336f4a8fe68
@@ -2371,6 +2375,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - $.metrics.repl.preload.docs.totalMillis
+                  error_handler: DISCARD_VALUE
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2395,6 +2400,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - $.metrics.repl.preload.docs.num
+                  error_handler: DISCARD_VALUE
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2420,6 +2426,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - $.metrics.repl.preload.indexes.totalMillis
+                  error_handler: DISCARD_VALUE
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2444,6 +2451,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - $.metrics.repl.preload.indexes.num
+                  error_handler: DISCARD_VALUE
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2481,8 +2489,8 @@ zabbix_export:
                   value: 'MongoDB Replica Set: {#RS_NAME}'
               trigger_prototypes:
                 -
-                  uuid: 56d48d92586d4d459865cb5d2fd9f5ef
-                  expression: 'change(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}])=1'
+                  uuid: f9f29647a3db426c9c303fc47cfc48eb
+                  expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}],#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}],#2)'
                   recovery_mode: NONE
                   name: 'MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})'
                   priority: WARNING
@@ -2629,6 +2637,22 @@ zabbix_export:
                   value: 'Number of unhealthy replicas'
                   status: ENABLED
                   discover: DISCOVER
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Replication lag'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'Arbiter metrics'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#NODE_STATE}'
+                    value: '7'
+                    formulaid: A
+              operations:
                 -
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE

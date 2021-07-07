@@ -46,7 +46,8 @@ class C52ImportConverterTest extends CImportConverterTest {
 								$calculated + ['params' => 'last("vm.memory.used[hrStorageUsed.{#SNMPINDEX}]")/last("vm.memory.total[hrStorageSize.{#SNMPINDEX}]")*100'],
 								$calculated + ['params' => 'last("system.swap.size[,total]") - last("system.swap.size[,total]") / 100 * last("perf_counter_en[\\"\\Paging file(_Total)\\% Usage\\"]")'],
 								$calculated + ['params' => 'avg("zbxnext_6451:'."\n\r\n".'agent_numeric[wcache,values]",600)'],
-								$calculated + ['params' => 'abschange("trap1") + avg(trap1,1h,1d) + band(trap1,,12)=4 + count(trap1,10m) + count(trap1,10m,"error",eq) + count(trap1,10m,12) + count(trap1, 10m,12,gt) + count(trap1, #10,12,gt) + count(trap1, 10m,12,gt,1d) + count(trap1,10m,6/7,band) + count(trap1, 10m,,,1d) + count(trap1,10m,"56",eq) + count("Zabbix server:trap3",10m,error,eq) + date("trap1") + dayofmonth(trap1) + dayofweek(trap1) + delta(trap1,30s) + diff(trap1) + forecast(trap1,#10,,1h) + forecast(trap1,1h,,30m) + forecast(trap1,1h,1d,12h) + forecast(trap1,1h,,10m,exponential) + forecast(trap1,1h,,2h,polynomial3,max) + fuzzytime(trap1,40) + count(trap2,10m,56,eq)']
+								$calculated + ['params' => 'abschange("trap1") + avg(trap1,1h,1d) + band(trap1,,12)=4 + count(trap1,10m) + count(trap1,10m,"error",eq) + count(trap1,10m,12) + count(trap1, 10m,12,gt) + count(trap1, #10,12,gt) + count(trap1, 10m,12,gt,1d) + count(trap1,10m,6/7,band) + count(trap1, 10m,,,1d) + count(trap1,10m,"56",eq) + count("Zabbix server:trap3",10m,error,eq) + date("trap1") + dayofmonth(trap1) + dayofweek(trap1) + delta(trap1,30s) + diff(trap1) + forecast(trap1,#10,,1h) + forecast(trap1,1h,,30m) + forecast(trap1,1h,1d,12h) + forecast(trap1,1h,,10m,exponential) + forecast(trap1,1h,,2h,polynomial3,max) + fuzzytime(trap1,40) + count(trap2,10m,56,eq)'],
+								$calculated + ['params' => 'band(trap1,,12)']
 							]
 						]
 					]
@@ -103,6 +104,10 @@ class C52ImportConverterTest extends CImportConverterTest {
 								],
 								$calculated + [
 									'params' => 'abs(change(/'.'/trap1)) + avg(/'.'/trap1,1h:now-1d) + bitand(last(/'.'/trap1),12)=4 + count(/'.'/trap1,10m) + count(/'.'/trap1,10m,"eq","error") + count(/'.'/trap1,10m,,"12") + count(/'.'/trap1,10m,"gt","12") + count(/'.'/trap1,#10,"gt","12") + count(/'.'/trap1,10m:now-1d,"gt","12") + count(/'.'/trap1,10m,"bitand","6/7") + count(/'.'/trap1,10m:now-1d) + count(/'.'/trap1,10m,"eq","56") + count(/Zabbix server/trap3,10m,"eq","error") + date() + dayofmonth() + dayofweek() + (max(/'.'/trap1,30s)-min(/'.'/trap1,30s)) + (last(/'.'/trap1,#1)<>last(/'.'/trap1,#2)) + forecast(/'.'/trap1,#10,1h) + forecast(/'.'/trap1,1h,30m) + forecast(/'.'/trap1,1h:now-1d,12h) + forecast(/'.'/trap1,1h,10m,"exponential") + forecast(/'.'/trap1,1h,2h,"polynomial3","max") + fuzzytime(/'.'/trap1,40s) + count(/'.'/trap2,10m,"eq","56")',
+									'uuid' => '4b6197500eda44dda4f76faadd01614c'
+								],
+								$calculated + [
+									'params' => 'bitand(last(/'.'/trap1),12)',
 									'uuid' => '4b6197500eda44dda4f76faadd01614c'
 								]
 							]

@@ -148,7 +148,8 @@ zbx_timezone_t;
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
 
-#define ZBX_DOUBLE_EPSILON	0.000001
+extern double	ZBX_DOUBLE_EPSILON;
+
 int	zbx_double_compare(double a, double b);
 
 /* item types */
@@ -1326,6 +1327,7 @@ int	zbx_get_file_time(const char *path, zbx_file_time_t *time);
 void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
+char	*zbx_fgets(char *buffer, int size, FILE *fp);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 

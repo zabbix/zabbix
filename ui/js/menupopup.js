@@ -1425,17 +1425,21 @@ jQuery(function($) {
 			});
 		}
 
+		link.addClass('menu-popup-item');
+
 		if (options.disabled) {
-			link.addClass('menu-popup-item-disabled');
+			link.addClass('disabled');
 		}
 		else {
-			link.addClass('menu-popup-item');
-
 			if (typeof options.url !== 'undefined') {
 				link.attr('href', options.url);
 
 				if ('target' in options) {
 					link.attr('target', options.target);
+				}
+
+				if ('rel' in options) {
+					link.attr('rel', options.rel);
 				}
 			}
 

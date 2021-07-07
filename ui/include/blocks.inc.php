@@ -187,6 +187,7 @@ function getSystemStatusData(array $filter) {
 				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
 				'selectValueMap' => ['mappings'],
 				'triggerids' => array_keys($data['triggers']),
+				'webitems' => true,
 				'preservekeys' => true
 			]);
 
@@ -614,6 +615,38 @@ function make_status_of_zbx() {
 			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
 			''
 		]);
+	}
+
+	// Check DB version.
+	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+		$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+
+		if ($dbversion_status !== '') {
+			$dbversion_status = json_decode($dbversion_status);
+
+			foreach ($dbversion_status as $dbversion) {
+				if ($dbversion->flag != DB_VERSION_SUPPORTED) {
+					switch ($dbversion->flag) {
+						case DB_VERSION_LOWER_THAN_MINIMUM:
+							$error = _s('Minimum required database version is %1$s.', $dbversion->min_version);
+							break;
+
+						case DB_VERSION_HIGHER_THAN_MAXIMUM:
+							$error = _s('Maximum required database version is %1$s.', $dbversion->max_version);
+							break;
+
+						case DB_VERSION_FAILED_TO_RETRIEVE:
+							$error = _('Unable to retrieve database version.');
+							$dbversion->current_version = '';
+							break;
+					}
+
+					$table->addRow(
+						(new CRow([$dbversion->database, $dbversion->current_version, $error]))->addClass(ZBX_STYLE_RED)
+					);
+				}
+			}
+		}
 	}
 
 	return $table;

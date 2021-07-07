@@ -1,0 +1,1543 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-06-18T08:46:26Z'
+  groups:
+    -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      uuid: d41c5d0fa91545d68cced1b5dabe4bf1
+      template: 'DELL PowerEdge R820 SNMP'
+      name: 'DELL PowerEdge R820 SNMP'
+      description: |
+        Template for DELL PowerEdge R820 servers with iDRAC version 7 and later.
+        
+        MIBs used:
+        IDRAC-MIB-SMIv2
+        SNMPv2-MIB
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      items:
+        -
+          uuid: 0c1af8afd1614bc3b8800a82d0a6284c
+          name: 'Dell R820: System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'dell.server.contact[sysContact]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 683f8893691545e196fe29271c1891a8
+          name: 'Dell R820: System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'dell.server.descr[sysDescr]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 13dd8f4372454b37a20944930ce6576b
+          name: 'Dell R820: Firmware version'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
+          key: 'dell.server.hw.firmware[racFirmwareVersion]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the firmware version of a remote access card.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: db34a06be1bc43e2a244148cb742bcea
+              expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R820 SNMP/dell.server.hw.firmware[racFirmwareVersion],#2) and length(last(/DELL PowerEdge R820 SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0'
+              name: 'Dell R820: Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 5d5c17d601b844bdb15cbc416f2ef51f
+          name: 'Dell R820: Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
+          key: 'dell.server.hw.model[systemModelName]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the model name of the system.
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 16a277126bd743b4927ab1ffec1eba49
+          name: 'Dell R820: Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
+          key: 'dell.server.hw.serialnumber[systemServiceTag]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the service tag of the system.
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 07b08a664af94a889e000aaf4d137bbb
+              expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R820 SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R820 SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
+              name: 'Dell R820: Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: 6f4584e8a6c844c8aeae104acd7bd183
+          name: 'Dell R820: System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'dell.server.location[sysLocation]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., 'telephone closet, 3rd floor'). If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 55f5f0b14f0946a38675576e432b8b9a
+          name: 'Dell R820: System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: 'dell.server.name[sysName]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: 57624ace90564129926aadc7019452ff
+              expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R820 SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R820 SNMP/dell.server.name[sysName]))>0'
+              name: 'Dell R820: System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 0261571f73a04d9497414e5f0426cf40
+          name: 'Dell R820: System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'dell.server.objectid[sysObjectID]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 25d3060aadfd471f8b7f41ad5a9e32de
+          name: 'Dell R820: Overall system health status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
+          key: 'dell.server.status[globalSystemStatus]'
+          history: 7d
+          trends: 0d
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.
+          valuemap:
+            name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: ba4a8d9fc5ef43af959456a10c8f7daf
+              expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.DISASTER}'
+              name: 'Dell R820: System is in unrecoverable state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: DISASTER
+              description: 'Please check the device for faults.'
+            -
+              uuid: 6626cc1193d04c48be02de9b261d0d4e
+              expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
+              name: 'Dell R820: System status is in critical state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Please check the device for errors.'
+            -
+              uuid: 535ea4f1ed6a44ebacbc94c899f60965
+              expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.WARN}'
+              name: 'Dell R820: System status is in warning state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Please check the device for warnings.'
+              dependencies:
+                -
+                  name: 'Dell R820: System status is in critical state'
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
+        -
+          uuid: 4b628614ee35470caec5847c027d859a
+          name: 'Dell R820: Operating system'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
+          key: 'dell.server.sw.os[systemOSName]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the name of the operating system that the host is running.
+          inventory_link: OS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: f0331e24079347d58f3e5df328cfbd0c
+              expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R820 SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R820 SNMP/dell.server.sw.os[systemOSName]))>0'
+              name: 'Dell R820: Operating system description has changed'
+              priority: INFO
+              description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 090f33ba9d0740f9a2c1709d6a4c2a75
+          name: 'Dell R820: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'dell.server.uptime[sysUpTime]'
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 97c232039b0e441997642bb39cc7bf2b
+              expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.uptime[sysUpTime])<10m'
+              name: 'Dell R820: {HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          uuid: d8d796228d244407b9863ee4304b029a
+          name: 'Dell R820: SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: c783af10c24e415b84774f74af6da797
+          name: 'Dell R820: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: zabbix.host.available
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 85492273336d43219fa7e2eef4208359
+              expression: 'max(/DELL PowerEdge R820 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'Dell R820: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+      discovery_rules:
+        -
+          uuid: 73377d2d3eb2404799dc1b0f9e749404
+          name: 'Array controller cache discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#BATTERY_NUM},1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.1,{#BATTERY_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.21]'
+          key: array.cache.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: IDRAC-MIB-SMIv2::batteryTable'
+          item_prototypes:
+            -
+              uuid: b142e451fead4672ba0d2b455a102416
+              name: 'Dell R820: {#BATTERY_NAME} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
+              key: 'dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                Current state of battery.
+                Possible values:
+                1: The current state could not be determined.
+                2: The battery is operating normally.
+                3: The battery has failed and needs to be replaced.
+                4: The battery temperature is high or charge level is depleting.
+                5: The battery is missing or not detected.
+                6: The battery is undergoing the re-charge phase.
+                7: The battery voltage or charge level is below the threshold.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::batteryState'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+              trigger_prototypes:
+                -
+                  uuid: e6e2bd66c55744b0854d95669c0aa626
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                  name: 'Dell R820: {#BATTERY_NAME} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: 3a7bfd13ad224bb6b0d4a3d38aa0a319
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+                  name: 'Dell R820: {#BATTERY_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: {#BATTERY_NAME} is in critical state'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                -
+                  uuid: e7d512abbd204adc81e2f5a59f0e761b
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
+                  name: 'Dell R820: {#BATTERY_NAME} is not in optimal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: {#BATTERY_NAME} is in critical state'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                    -
+                      name: 'Dell R820: {#BATTERY_NAME} is in warning state'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 2e9bcfcead13476988199706245b8a9d
+          name: 'Array controller discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38,{#CNTLR_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.79]'
+          key: array.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: IDRAC-MIB-SMIv2::controllerTable'
+          item_prototypes:
+            -
+              uuid: e50a32f54b6a4d54becf7c9939a6007e
+              name: 'Dell R820: {#CNTLR_NAME} Model'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
+              key: 'dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The controller's name as represented in Storage Management.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+            -
+              uuid: f79dda7db0e547b8997c79c336d9d02e
+              name: 'Dell R820: {#CNTLR_NAME} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
+              key: 'dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The status of the controller itself without the propagation of any contained component status.
+                Possible values:
+                1: Other
+                2: Unknown
+                3: OK
+                4: Non-critical
+                5: Critical
+                6: Non-recoverable
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+              trigger_prototypes:
+                -
+                  uuid: 70087ca390524853bd80dd6906ed038d
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                  name: 'Dell R820: {#CNTLR_NAME} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: {#CNTLR_NAME} is in unrecoverable state'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                -
+                  uuid: b516a87aac0d48c285cf23c8a2d5e9be
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                  name: 'Dell R820: {#CNTLR_NAME} is in unrecoverable state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: DISASTER
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: a53035ca17604f69b2d878c50b69bbc1
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
+                  name: 'Dell R820: {#CNTLR_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: {#CNTLR_NAME} is in critical state'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                    -
+                      name: 'Dell R820: {#CNTLR_NAME} is in unrecoverable state'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 48e74d0a9b5f4462b64995d17f23fe59
+          name: 'FAN discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.12.1.5,{#FAN_DESCR},1.3.6.1.4.1.674.10892.5.4.700.12.1.8,{#TYPE},1.3.6.1.4.1.674.10892.5.4.700.12.1.7]'
+          key: fan.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: '3'
+                formulaid: A
+          description: 'IDRAC-MIB-SMIv2::coolingDeviceTable'
+          item_prototypes:
+            -
+              uuid: 0b53b770508749dcaac7ef348dc09f00
+              name: 'Dell R820: {#FAN_DESCR} Speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}'
+              key: 'dell.server.sensor.fan.speed[coolingDeviceReading.{#SNMPINDEX}]'
+              history: 7d
+              units: rpm
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                This attribute defines the reading for a cooling device
+                of subtype other than coolingDeviceSubTypeIsDiscrete. When the value
+                for coolingDeviceSubType is other than coolingDeviceSubTypeIsDiscrete, the
+                value returned for this attribute is the speed in RPM or the OFF/ON value
+                of the cooling device. When the value for coolingDeviceSubType is
+                coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+            -
+              uuid: f93dd5111b2048cca8e6e8f56de08bdb
+              name: 'Dell R820: {#FAN_DESCR} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
+              key: 'dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                This attribute defines the probe status of the cooling device.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: faf3982240ea4424af8b3c9135d240ca
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
+                  name: 'Dell R820: {#FAN_DESCR} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit.'
+                -
+                  uuid: 6f80cea251574ed7895694de10f0742c
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalLower"}'
+                  name: 'Dell R820: {#FAN_DESCR} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the fan unit.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: {#FAN_DESCR} is in critical state'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 887eeb6cf32049268ad707197094b55c
+          name: 'Physical disk discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.2]'
+          key: physicaldisk.discovery
+          delay: 1h
+          description: 'Scanning  table of physical drive entries IDRAC-MIB-SMIv2::physicalDiskTable.'
+          item_prototypes:
+            -
+              uuid: da742cf6e1484ff9a8413875804d7526
+              name: 'Dell R820: {#DISK_NAME} Media type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The media type of the physical disk. Possible Values:
+                1: The media type could not be determined.
+                2: Hard Disk Drive (HDD).
+                3: Solid State Drive (SSD).
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: 4835203bcd3c4593b5ea7eeb305d5113
+              name: 'Dell R820: {#DISK_NAME} Model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The model number of the physical disk.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: 1e9bdf7d87154337bee56afdc90f8bb8
+              name: 'Dell R820: {#DISK_NAME} Serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The physical disk's unique identification number from the manufacturer.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: 2c5ca847d2ca41e199740645c74a2fd7
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
+                  name: 'Dell R820: {#DISK_NAME} has been replaced (new serial number received)'
+                  priority: INFO
+                  description: '{#DISK_NAME} serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              uuid: ce1d44085834444b9626aa4a2860f6ba
+              name: 'Dell R820: {#DISK_NAME} Size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              units: B
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The size of the physical disk in megabytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: 03a477755abd4e7d953ecd73c7aded5d
+              name: 'Dell R820: {#DISK_NAME} S.M.A.R.T. Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                Indicates whether the physical disk has received a predictive failure alert.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::BooleanType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: b2b1013ff96243d48b468213c56bf51f
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  name: 'Dell R820: {#DISK_NAME} S.M.A.R.T. failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Disk probably requires replacement.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: {#DISK_NAME} failed'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+            -
+              uuid: 558251231b9d45d692d12cea9a29f56a
+              name: 'Dell R820: {#DISK_NAME} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The status of the physical disk itself without the propagation of any contained component status.
+                Possible values:
+                1: Other
+                2: Unknown
+                3: OK
+                4: Non-critical
+                5: Critical
+                6: Non-recoverable
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: a78f3f6171e748e695d464adefe1978c
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+                  name: 'Dell R820: {#DISK_NAME} failed'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check physical disk for warnings or errors.'
+                -
+                  uuid: f62e8c34700e4b668af71da9a8d0c973
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN:"nonCritical"}'
+                  name: 'Dell R820: {#DISK_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check physical disk for warnings or errors.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: {#DISK_NAME} failed'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R820 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 852e7a5cd38e4e57b95d224399f46dfc
+          name: 'PSU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.600.12.1.5,{#PSU_DESCR},1.3.6.1.4.1.674.10892.5.4.600.12.1.8]'
+          key: psu.discovery
+          delay: 1h
+          description: 'IDRAC-MIB-SMIv2::powerSupplyTable'
+          item_prototypes:
+            -
+              uuid: 4b19b4fee82644e6a0540aae1590c965
+              name: 'Dell R820: {#PSU_DESCR}'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
+              key: 'dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                0600.0012.0001.0005 This attribute defines the status of the power supply.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: 8e28009ef16c441d93bc0fa794232b4c
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
+                  name: 'Dell R820: Power supply {#PSU_DESCR} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors.'
+                -
+                  uuid: 1de5a20506d04b3a84deaa70b232101b
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.WARN:"nonCritical"}'
+                  name: 'Dell R820: Power supply {#PSU_DESCR} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the power supply unit for errors.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: Power supply {#PSU_DESCR} is in critical state'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 20bbe037e9a74cd0a19b38e4032c4842
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.20.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.674.10892.5.4.700.20.1.8]'
+          key: temp.discovery
+          delay: 1h
+          description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
+          item_prototypes:
+            -
+              uuid: 88eb37d3574c4c2195301cdbbf9c100c
+              name: 'Dell R820: {#SENSOR_LOCALE} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
+              key: 'dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              value_type: FLOAT
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                This attribute defines the probe status of the temperature probe.
+                Possible values:
+                other(1),               -- probe status is not one of the following:
+                unknown(2),             -- probe status is unknown (not known or monitored)
+                ok(3),                  -- probe is reporting a value within the thresholds
+                nonCriticalUpper(4),    -- probe has crossed the upper noncritical threshold
+                criticalUpper(5),       -- probe has crossed the upper critical threshold
+                nonRecoverableUpper(6), -- probe has crossed the upper non-recoverable threshold
+                nonCriticalLower(7),    -- probe has crossed the lower noncritical threshold
+                criticalLower(8),       -- probe has crossed the lower critical threshold
+                nonRecoverableLower(9), -- probe has crossed the lower non-recoverable threshold
+                failed(10)              -- probe is not functional
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 9a082c7fc18641fe8e2d42d9c2acc607
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                  name: 'Dell R820: Probe {#SENSOR_LOCALE} is in critical status'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: fdf4ccc98a894cabbdf4cbd4d32b2270
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+                  name: 'Dell R820: Probe {#SENSOR_LOCALE} is in warning status'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: Probe {#SENSOR_LOCALE} is in critical status'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                -
+                  uuid: c26c12068ec2429694491c3c74380091
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$SENSOR.TEMP.STATUS.OK}'
+                  name: 'Dell R820: Probe {#SENSOR_LOCALE} is not in optimal status'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'Please check the device for faults.'
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'Dell R820: Probe {#SENSOR_LOCALE} is in critical status'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                    -
+                      name: 'Dell R820: Probe {#SENSOR_LOCALE} is in warning status'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+            -
+              uuid: 3b9e0ab38ca04a0fb398b1b8d1b8ea1f
+              name: 'Dell R820: {#SENSOR_LOCALE} Value'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
+              key: 'dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete. When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete, the value returned for this attribute is the temperature that the probe is reading in Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 04686c5d20454e0a9751a8432135c399
+          name: 'Virtual disk discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.2]'
+          key: virtualdisk.discovery
+          delay: 1h
+          description: 'IDRAC-MIB-SMIv2::virtualDiskTable'
+          item_prototypes:
+            -
+              uuid: 154fcb823eee4091a1dfd9b722865f17
+              name: 'Dell R820: {#DISK_NAME} Layout type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The virtual disk's RAID type.
+                Possible values:
+                1: Not one of the following
+                2: RAID-0
+                3: RAID-1
+                4: RAID-5
+                5: RAID-6
+                6: RAID-10
+                7: RAID-50
+                8: RAID-60
+                9: Concatenated RAID 1
+                10: Concatenated RAID 5
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 66a948daf88b4df990062176b47a158b
+              name: 'Dell R820: {#DISK_NAME} Read policy'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.readpolicy[virtualDiskReadPolicy.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The read policy used by the controller for read operations on this virtual disk.
+                Possible values:
+                1: No Read Ahead.
+                2: Read Ahead.
+                3: Adaptive Read Ahead.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskReadPolicy'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: c0c4bb68166544af806b7658902f63c9
+              name: 'Dell R820: {#DISK_NAME} Size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              units: B
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The size of the virtual disk in megabytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 30695b02e4454b30933f12819180a9b0
+              name: 'Dell R820: {#DISK_NAME} Current state'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The state of the virtual disk when there are progressive operations ongoing.
+                Possible values:
+                1: There is no active operation running.
+                2: The virtual disk configuration has changed. The physical disks included in the virtual disk are being modified to support the new configuration.
+                3: A Consistency Check (CC) is being performed on the virtual disk.
+                4: The virtual disk is being initialized.
+                5: BackGround Initialization (BGI) is being performed on the virtual disk.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: dc25467bcd3c43bb93ccab52d51f5dee
+              name: 'Dell R820: {#DISK_NAME} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The current state of this virtual disk (which includes any member physical disks.)
+                Possible states:
+                1: The current state could not be determined.
+                2: The virtual disk is operating normally or optimally.
+                3: The virtual disk has encountered a failure. Data on the disk is lost or is about to be lost.
+                4: The virtual disk encountered a failure with one or all of the constituent redundant physical disks.
+                The data on the virtual disk might no longer be fault tolerant.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskState'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+              trigger_prototypes:
+                -
+                  uuid: 1c5a5635d0b548839e19d8272642f0aa
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
+                  name: 'Dell R820: {#DISK_NAME} failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the virtual disk for warnings or errors.'
+                -
+                  uuid: 6d35cf89f9a44498b25303811609ccdb
+                  expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.WARN:"degraded"}'
+                  name: 'Dell R820: {#DISK_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the virtual disk for warnings or errors.'
+                  dependencies:
+                    -
+                      name: 'Dell R820: {#DISK_NAME} failed'
+                      expression: 'last(/DELL PowerEdge R820 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
+            -
+              uuid: fba006c757214d84ac9efedeecadf302
+              name: 'Dell R820: {#DISK_NAME} Write policy'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.writepolicy[virtualDiskWritePolicy.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The write policy used by the controller for write operations on this virtual disk.
+                Possible values:
+                1: Write Through.
+                2: Write Back.
+                3: Force Write Back.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      macros:
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+          value: '3'
+          description: 'The critical status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
+          value: '2'
+          description: 'The OK status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+          value: '4'
+          description: 'The warning status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.CRIT}'
+          value: '5'
+          description: 'The critical status of the disk array for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.FAIL}'
+          value: '6'
+          description: 'The disaster status of the disk array for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.WARN}'
+          value: '4'
+          description: 'The warning status of the disk array for trigger expression.'
+        -
+          macro: '{$DISK.SMART.STATUS.FAIL}'
+          value: '1'
+          description: 'The critical S.M.A.R.T status of the disk for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.FAIL:"critical"}'
+          value: '5'
+          description: 'The critical status of the disk for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.FAIL:"nonRecoverable"}'
+          value: '6'
+          description: 'The critical status of the disk for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.WARN:"nonCritical"}'
+          value: '4'
+          description: 'The warning status of the disk for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"criticalLower"}'
+          value: '8'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"criticalUpper"}'
+          value: '5'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"failed"}'
+          value: '10'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"nonRecoverableLower"}'
+          value: '9'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"nonRecoverableUpper"}'
+          value: '6'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.WARN:"nonCriticalLower"}'
+          value: '7'
+          description: 'The warning value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.WARN:"nonCriticalUpper"}'
+          value: '4'
+          description: 'The warning value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.CRIT}'
+          value: '5'
+          description: 'The critical status of the health for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.DISASTER}'
+          value: '6'
+          description: 'The disaster status of the health for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.WARN}'
+          value: '4'
+          description: 'The warning status of the health for trigger expression.'
+        -
+          macro: '{$PSU.STATUS.CRIT:"critical"}'
+          value: '5'
+          description: 'The critical value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$PSU.STATUS.CRIT:"nonRecoverable"}'
+          value: '6'
+          description: 'The critical value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$PSU.STATUS.WARN:"nonCritical"}'
+          value: '4'
+          description: 'The warning value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.CRIT:"criticalLower"}'
+          value: '8'
+          description: 'The critical status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"}'
+          value: '5'
+          description: 'The critical status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+          value: '9'
+          description: 'The critical status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"}'
+          value: '6'
+          description: 'The critical status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.OK}'
+          value: '3'
+          description: 'The OK status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+          value: '7'
+          description: 'The warning status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"}'
+          value: '4'
+          description: 'The warning status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$VDISK.STATUS.CRIT:"failed"}'
+          value: '3'
+          description: 'The critical status of the virtual disk for trigger expression.'
+        -
+          macro: '{$VDISK.STATUS.WARN:"degraded"}'
+          value: '4'
+          description: 'The warning status of the virtual disk for trigger expression.'
+      valuemaps:
+        -
+          uuid: 1ac64ea780474ceb91de5038ed9a3046
+          name: 'IDRAC-MIB-SMIv2::batteryState'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: Ready
+            -
+              value: '3'
+              newvalue: Failed
+            -
+              value: '4'
+              newvalue: Degraded
+            -
+              value: '5'
+              newvalue: Missing
+            -
+              value: '6'
+              newvalue: Charging
+            -
+              value: '7'
+              newvalue: 'Below threshold'
+        -
+          uuid: 234f3debc9424c38a793d3913a6ae15a
+          name: 'IDRAC-MIB-SMIv2::BooleanType'
+          mappings:
+            -
+              value: '0'
+              newvalue: ok
+            -
+              value: '1'
+              newvalue: failed
+        -
+          uuid: cafb2094b58742e4a1affff59eff8f3f
+          name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCritical
+            -
+              value: '5'
+              newvalue: critical
+            -
+              value: '6'
+              newvalue: nonRecoverable
+        -
+          uuid: 8aea183646034b20afa2bb48a2f81099
+          name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCritical
+            -
+              value: '5'
+              newvalue: critical
+            -
+              value: '6'
+              newvalue: nonRecoverable
+        -
+          uuid: e06877de7dd14b52b8338796d6da8e5f
+          name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: HDD
+            -
+              value: '3'
+              newvalue: SSD
+        -
+          uuid: e8b8263d6214491eb17893e0ebba0aed
+          name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCriticalUpper
+            -
+              value: '5'
+              newvalue: criticalUpper
+            -
+              value: '6'
+              newvalue: nonRecoverableUpper
+            -
+              value: '7'
+              newvalue: nonCriticalLower
+            -
+              value: '8'
+              newvalue: criticalLower
+            -
+              value: '9'
+              newvalue: nonRecoverableLower
+            -
+              value: '10'
+              newvalue: failed
+        -
+          uuid: ef48e8403dc84d048f7177a26224ac99
+          name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: RAID-0
+            -
+              value: '3'
+              newvalue: RAID-1
+            -
+              value: '4'
+              newvalue: RAID-5
+            -
+              value: '5'
+              newvalue: RAID-6
+            -
+              value: '6'
+              newvalue: RAID-10
+            -
+              value: '7'
+              newvalue: RAID-50
+            -
+              value: '8'
+              newvalue: RAID-60
+            -
+              value: '9'
+              newvalue: 'Concatenated RAID 1'
+            -
+              value: '10'
+              newvalue: 'Concatenated RAID 5'
+        -
+          uuid: 2f814b3be15f438c8e7062645e3b2fd2
+          name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Not applicable'
+            -
+              value: '2'
+              newvalue: Reconstructing
+            -
+              value: '3'
+              newvalue: Resynching
+            -
+              value: '4'
+              newvalue: Initializing
+            -
+              value: '5'
+              newvalue: 'Background init'
+        -
+          uuid: a273ff1ff94c44f98e1ff312223712b8
+          name: 'IDRAC-MIB-SMIv2::virtualDiskReadPolicy'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'No Read Ahead'
+            -
+              value: '2'
+              newvalue: 'Read Ahead'
+            -
+              value: '3'
+              newvalue: 'Adaptive Read Ahead'
+        -
+          uuid: 91fea9a659114dfa90ca363ad879b243
+          name: 'IDRAC-MIB-SMIv2::virtualDiskState'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: Online
+            -
+              value: '3'
+              newvalue: Failed
+            -
+              value: '4'
+              newvalue: Degraded
+        -
+          uuid: 633fb28afa934585abc60c3b91a278fa
+          name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Write Through'
+            -
+              value: '2'
+              newvalue: 'Write Back'
+            -
+              value: '3'
+              newvalue: 'Force Write Back'
+        -
+          uuid: 4d5e4fb93a594bac8ef3b9e62da06fa4
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

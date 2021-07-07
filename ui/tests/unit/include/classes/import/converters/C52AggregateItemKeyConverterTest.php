@@ -57,7 +57,7 @@ class C52AggregateItemKeyConverterTest extends TestCase {
 			],
 			[
 				'grpsum["MySQL\\Servers","trap1",last]',
-				'sum(last_foreach(/*/trap1?[group="MySQL\\Servers"]))'
+				'sum(last_foreach(/*/trap1?[group="MySQL\\\\Servers"]))'
 			],
 			[
 				'grpsum[ "Zabbix servers" , trap1 , last, 30s ]',
@@ -65,13 +65,12 @@ class C52AggregateItemKeyConverterTest extends TestCase {
 			],
 			[
 				'grpavg[{$M},trap1,avg,{$M3}s]',
-				'avg(avg_foreach(/*/trap1?[group="{$M}"],{$M3}s))'
+				'avg(avg_foreach(/*/trap1?[group="{$M}"],"{$M3}s"))'
 			],
 			[
 				'grpfunc["Host group",item key,func1,timeperiod]',
-				'func(func1_foreach(/*/item key?[group="Host group"],timeperiod))'
+				'func(func1_foreach(/*/item key?[group="Host group"],"timeperiod"))'
 			],
-
 			[
 				'simplekey',
 				'simplekey'

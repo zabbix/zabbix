@@ -589,7 +589,7 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
  * @return string
  */
 function triggerExpressionReplaceHost(string $expression, string $src_host, string $dst_host): string {
-	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+	$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
 
 	if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
 		$hist_functions = $expression_parser->getResult()->getTokensOfTypes(
@@ -649,7 +649,7 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): arra
 
 	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
 	$exceeded_trigs = (count($triggers_by_name) > $limit);
-	$triggers_by_name = array_slice($triggers_by_name, 0, $limit);
+	$triggers_by_name = array_slice($triggers_by_name, 0, $limit, true);
 	foreach ($triggers_by_name as $name => $triggers) {
 		$triggers_by_name[$name] = array_slice($triggers, 0, $limit, true);
 	}
@@ -1195,7 +1195,7 @@ function analyzeExpression(string $expression, int $type, string &$error = null)
 		return ['', null];
 	}
 
-	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+	$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
 
 	if ($expression_parser->parse($expression) != CParser::PARSE_SUCCESS) {
 		$error = $expression_parser->getError();
@@ -1330,7 +1330,7 @@ function expressionHighLevelErrors($expression) {
 
 	if (!isset($errors[$expression])) {
 		$errors[$expression] = [];
-		$expression_parser = new CExpressionParser(['lldmacros' => true]);
+		$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
 		if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
 			$tokens = $expression_parser->getResult()->getTokensOfTypes([
 				CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION,
@@ -1353,7 +1353,7 @@ function expressionHighLevelErrors($expression) {
 		return $ret;
 	}
 
-	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+	$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
 	if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
 		$tokens = $expression_parser->getResult()->getTokensOfTypes([
 			CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION,
@@ -1563,7 +1563,7 @@ function remakeExpression($expression, $expression_id, $action, $new_expression,
 		return false;
 	}
 
-	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+	$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
 	if ($action !== 'R' && $expression_parser->parse($new_expression) != CParser::PARSE_SUCCESS) {
 		$error = $expression_parser->getError();
 		return false;
@@ -1923,7 +1923,7 @@ function get_item_function_info(string $expr) {
 		'truncate' => ['any' => $rule_float]
 	];
 
-	$expression_parser = new CExpressionParser(['lldmacros' => true]);
+	$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
 	$expression_parser->parse($expr);
 	$token = $expression_parser->getResult()->getTokens()[0];
 

@@ -471,10 +471,6 @@ $icon-widget-btn: (
 }
 
 .menu-popup {
-	.menu-popup-item-disabled {
-		color: $form-disabled-font-color;
-	}
-
 	.menu-popup-item {
 		&:hover,
 		&:focus,
@@ -498,6 +494,11 @@ $icon-widget-btn: (
 			&::before {
 				background: url($sprite-path) no-repeat -164px -835px;
 			}
+		}
+
+		&.disabled {
+			background-color: transparent;
+			color: $form-disabled-font-color;
 		}
 	}
 }

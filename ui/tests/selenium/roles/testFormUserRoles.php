@@ -25,8 +25,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup role, module, users
- * @on-before prepareRoleData
- * @on-before prepareUserData
+ * @onBefore prepareRoleData
+ * @onBefore prepareUserData
  */
 class testFormUserRoles extends CWebTest {
 
@@ -999,8 +999,9 @@ class testFormUserRoles extends CWebTest {
 			$form->checkValue($data['fields']);
 
 			if (array_key_exists('api_methods', $data)) {
-				$multiselect_field = $this->query('class:multiselect-control')->asMultiselect()->one();
-				$this->assertEquals($data['api_methods'], $multiselect_field->getValue());
+				$api_methods = $this->query('class:multiselect-control')->asMultiselect()->one()->getValue();
+				rsort($api_methods);
+				$this->assertEquals($data['api_methods'], $api_methods);
 			}
 		}
 	}

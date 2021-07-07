@@ -1,0 +1,3000 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-27T13:57:40Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 8cad0f2564694416b60bd8a414948641
+      template: 'Template App Nginx Plus by HTTP'
+      name: 'Template App Nginx Plus by HTTP'
+      description: |
+        Get Nginx Plus metrics by HTTP agent.
+        Metrics are collected by requests to Nginx Plus API.
+        Don't forget to change macros {$NGINX.API.ENDPOINT}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 26c121f9c50a4e90b4502e2bd7f42992
+          name: 'Nginx: Get connections'
+          type: HTTP_AGENT
+          key: nginx.connections
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns statistics of client connections.'
+          url: '{$NGINX.API.ENDPOINT}/6/connections/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: 1734b26ca856405e8c08f222944cadc3
+          name: 'Nginx: Connections accepted, rate'
+          type: DEPENDENT
+          key: nginx.connections.accepted.rate
+          delay: '0'
+          history: 7d
+          description: 'The total number of accepted client connections per second.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.accepted
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: nginx.connections
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: a0fd403c29e4452a9be0aecb650ab063
+          name: 'Nginx: Connections active'
+          type: DEPENDENT
+          key: nginx.connections.active
+          delay: '0'
+          history: 7d
+          description: 'The current number of active client connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.active
+          master_item:
+            key: nginx.connections
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: 06395827019542b7bd381d42beb76b10
+          name: 'Nginx: Connections dropped'
+          type: DEPENDENT
+          key: nginx.connections.dropped
+          delay: '0'
+          history: 7d
+          description: 'The total number of dropped client connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.dropped
+          master_item:
+            key: nginx.connections
+          tags:
+            -
+              tag: Application
+              value: Nginx
+          triggers:
+            -
+              uuid: 91c9dab8147a4d0086019119e4e55b5e
+              expression: 'min(/Template App Nginx Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
+              name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: 'The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
+        -
+          uuid: 0c0e5a2ba5f643e09d07e34d724aff9a
+          name: 'Nginx: Connections idle'
+          type: DEPENDENT
+          key: nginx.connections.idle
+          delay: '0'
+          history: 7d
+          description: 'The current number of idle client connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.idle
+          master_item:
+            key: nginx.connections
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: 51c50d69acdb451395736902733673fe
+          name: 'Nginx: Get HTTP location zones'
+          type: HTTP_AGENT
+          key: nginx.http.location_zones
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns status information for each HTTP location zone.'
+          url: '{$NGINX.API.ENDPOINT}/6/http/location_zones/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: 5b337c675bc14d9ab3ac6d2cf5b82dce
+          name: 'Nginx: Get HTTP zones'
+          type: HTTP_AGENT
+          key: nginx.http.server_zones
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns status information for each HTTP server zone.'
+          url: '{$NGINX.API.ENDPOINT}/6/http/server_zones/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: 4ec5e9b1d17141f49db5d9bf29134a49
+          name: 'Nginx: Get HTTP upstreams'
+          type: HTTP_AGENT
+          key: nginx.http.upstreams
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns status of each HTTP upstream server group and its servers.'
+          url: '{$NGINX.API.ENDPOINT}/6/http/upstreams/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: d6c37400f8e64d89a698896afa6589de
+          name: 'Nginx: Get info'
+          type: HTTP_AGENT
+          key: nginx.info
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Return status of nginx running instance.'
+          url: '{$NGINX.API.ENDPOINT}/6/nginx/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: 178f9f0c2ae74a6bbf1ae6965021ccde
+          name: 'Nginx: Address'
+          type: DEPENDENT
+          key: nginx.info.address
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The address of the server that accepted status request.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.address
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: nginx.info
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: 14c417b374ef4674bb374979135f8617
+          name: 'Nginx: Get info error'
+          type: DEPENDENT
+          key: nginx.info.error
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Nginx error description.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error.text
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nginx.info
+          tags:
+            -
+              tag: Application
+              value: Nginx
+          triggers:
+            -
+              uuid: e444c708371748bd831bba6c8d9a92e0
+              expression: 'length(last(/Template App Nginx Plus by HTTP/nginx.info.error))>0'
+              name: 'Nginx: Server response error (text: {ITEM.VALUE})'
+              priority: HIGH
+        -
+          uuid: 9baff3e318d84cd78c6a8ec6ae294de5
+          name: 'Nginx: Generation'
+          type: DEPENDENT
+          key: nginx.info.generation
+          delay: '0'
+          history: 7d
+          description: 'The total number of configuration reloads.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.generation
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: nginx.info
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: 1baceaa7af4d45e487a448670e213c94
+          name: 'Nginx: Uptime'
+          type: DEPENDENT
+          key: nginx.info.uptime
+          delay: '0'
+          history: 7d
+          units: uptime
+          description: 'Server uptime.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.load_timestamp
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.floor((Date.now() - new Date(value)) / 1000);'
+          master_item:
+            key: nginx.info
+          tags:
+            -
+              tag: Application
+              value: Nginx
+          triggers:
+            -
+              uuid: 396fb4be618e45578566971d5399d611
+              expression: 'nodata(/Template App Nginx Plus by HTTP/nginx.info.uptime,30m)=1'
+              name: 'Nginx: Failed to fetch info data (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for metrics for the last 30 minutes'
+              manual_close: 'YES'
+            -
+              uuid: 95622a29bd58444b9f0bd985db99f922
+              expression: 'last(/Template App Nginx Plus by HTTP/nginx.info.uptime)<10m'
+              name: 'Nginx: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          uuid: 89059effd28641e08e2002c807784bcb
+          name: 'Nginx: Version'
+          type: DEPENDENT
+          key: nginx.info.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of nginx.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: nginx.info
+          tags:
+            -
+              tag: Application
+              value: Nginx
+          triggers:
+            -
+              uuid: a91ff018fe4f4a1495b08adeb2b0005f
+              expression: 'last(/Template App Nginx Plus by HTTP/nginx.info.version,#1)<>last(/Template App Nginx Plus by HTTP/nginx.info.version,#2) and length(last(/Template App Nginx Plus by HTTP/nginx.info.version))>0'
+              name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Nginx version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 65377fc7308340348199c4c63720a7e1
+          name: 'Nginx: Get requests'
+          type: HTTP_AGENT
+          key: nginx.requests
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns status of client HTTP requests.'
+          url: '{$NGINX.API.ENDPOINT}/6/http/requests/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: 630c4f81f9f44397a156e2d4e5d21af8
+          name: 'Nginx: Requests current'
+          type: DEPENDENT
+          key: nginx.requests.current
+          delay: '0'
+          history: 7d
+          description: 'The current number of client requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.current
+          master_item:
+            key: nginx.requests
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: 8130bfb659a94641b97a1abcdb9a4f66
+          name: 'Nginx: Requests total, rate'
+          type: DEPENDENT
+          key: nginx.requests.total.rate
+          delay: '0'
+          history: 7d
+          description: 'The total number of client requests per second.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: nginx.requests
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: 9ea35f4f2ca24187896b7f44fb410d24
+          name: 'Nginx: Get resolvers'
+          type: HTTP_AGENT
+          key: nginx.resolvers
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns status information for each resolver zone.'
+          url: '{$NGINX.API.ENDPOINT}/6/resolvers/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: e0798bb2d16c418781e19880fd78832c
+          name: 'Nginx: Get SSL'
+          type: HTTP_AGENT
+          key: nginx.ssl
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns SSL statistics.'
+          url: '{$NGINX.API.ENDPOINT}/6/ssl/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: 09c7ab8555d046a69a96889185650dfe
+          name: 'Nginx: SSL handshakes, rate'
+          type: DEPENDENT
+          key: nginx.ssl.handshakes.rate
+          delay: '0'
+          history: 7d
+          description: 'The total number of successful SSL handshakes per second.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.handshakes
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: nginx.ssl
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: 77fcc55ced2045e099b37580f7ef6d5b
+          name: 'Nginx: SSL handshakes failed, rate'
+          type: DEPENDENT
+          key: nginx.ssl.handshakes_failed.rate
+          delay: '0'
+          history: 7d
+          description: 'The total number of failed SSL handshakes per second.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.handshakes_failed
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: nginx.ssl
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: 98ec8bec834a42caba8d260d939beb0e
+          name: 'Nginx: SSL session reuses, rate'
+          type: DEPENDENT
+          key: nginx.ssl.session_reuses.rate
+          delay: '0'
+          history: 7d
+          description: 'The total number of session reuses during SSL handshake per second.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.session_reuses
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: nginx.ssl
+          tags:
+            -
+              tag: Application
+              value: Nginx
+        -
+          uuid: 148a8612964b445ba37e340c9341f49d
+          name: 'Nginx: Get Stream server zones'
+          type: HTTP_AGENT
+          key: nginx.stream.server_zones
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns status information for each stream server zone.'
+          url: '{$NGINX.API.ENDPOINT}/6/stream/server_zones/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: c48ca144a8414b2db1c35d518ca5a24f
+          name: 'Nginx: Get Stream upstreams'
+          type: HTTP_AGENT
+          key: nginx.stream.upstreams
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Returns status of each stream upstream server group and its servers.'
+          url: '{$NGINX.API.ENDPOINT}/6/stream/upstreams/'
+          status_codes: '200,404'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+      discovery_rules:
+        -
+          uuid: 33fdb45a55544c628c0106ed193ebc0b
+          name: 'HTTP location zones discovery'
+          type: DEPENDENT
+          key: nginx.http.location_zones.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: e75bc85680534ec18df16b9e69bc248c
+              name: 'Nginx: HTTP location zone [{#NAME}]: Discarded, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.discarded.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of requests completed without sending a response per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].discarded'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+            -
+              uuid: 17e01c9171bd493f98b37811dcf49802
+              name: 'Nginx: HTTP location zone [{#NAME}]: Received, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.received.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes received from clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].received'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+            -
+              uuid: c646c18580ef4b8695cbc03ce0d5122d
+              name: 'Nginx: HTTP location zone [{#NAME}]: Requests, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.requests.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of client requests received from clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].requests'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+            -
+              uuid: 82c9f68d10ec47f1a701eee692e3b9ae
+              name: 'Nginx: HTTP location zone [{#NAME}]: Responses 1xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.responses.1xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “1xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.1xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+            -
+              uuid: 0cedd14450ba44f0b4c026afabb522a9
+              name: 'Nginx: HTTP location zone [{#NAME}]: Responses 2xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.responses.2xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “2xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.2xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+            -
+              uuid: 046a2a3b9a644dc1b4a0078b6722c867
+              name: 'Nginx: HTTP location zone [{#NAME}]: Responses 3xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.responses.3xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “3xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.3xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+            -
+              uuid: 32eb7cb8f04044d6a00ead678ff44a00
+              name: 'Nginx: HTTP location zone [{#NAME}]: Responses 4xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.responses.4xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “4xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.4xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+            -
+              uuid: dd5a27eb32da42d7998f89a96e29304f
+              name: 'Nginx: HTTP location zone [{#NAME}]: Responses 5xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.responses.5xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “5xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.5xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+            -
+              uuid: b6e3c7f074b54531aa57dce55169aedd
+              name: 'Nginx: HTTP location zone [{#NAME}]: Responses total, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.responses.total.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of responses sent to clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.total'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+            -
+              uuid: 0af45d37b3a24d5491054aa3cf319315
+              name: 'Nginx: HTTP location zone [{#NAME}]: Sent, rate'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.sent.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes sent to clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].sent'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.location_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP location zone [{#NAME}]'
+          graph_prototypes:
+            -
+              uuid: 85880c097a1c47bfafa35de05304abbc
+              name: 'Nginx: HTTP location zone [{#NAME}]: Requests'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.location_zones.requests.rate[{#NAME}]'
+            -
+              uuid: 6b05907e4c544986b977a1b496ca92e2
+              name: 'Nginx: HTTP location zone [{#NAME}]: Responses'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.location_zones.responses.2xx.rate[{#NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.location_zones.responses.1xx.rate[{#NAME}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.location_zones.responses.3xx.rate[{#NAME}]'
+                -
+                  sortorder: '3'
+                  drawtype: GRADIENT_LINE
+                  color: A54F10
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.location_zones.responses.4xx.rate[{#NAME}]'
+                -
+                  sortorder: '4'
+                  drawtype: GRADIENT_LINE
+                  color: FC6EA3
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.location_zones.responses.5xx.rate[{#NAME}]'
+          master_item:
+            key: nginx.http.location_zones
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var output = [];
+                  
+                  Object.keys(JSON.parse(value)).forEach(function (v) {
+                      output.push({ '{#NAME}': v })
+                  });
+                  
+                  return JSON.stringify(output);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+        -
+          uuid: 85ad3fc40daa45b7a2fe00d570c5626c
+          name: 'HTTP server zones discovery'
+          type: DEPENDENT
+          key: nginx.http.server_zones.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.HTTP.ZONE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: 46d056a7870545e49db03b0ec2bd1e9b
+              name: 'Nginx: HTTP server zone [{#NAME}]: Discarded, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.discarded.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of requests completed without sending a response per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].discarded'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: e8dd5302fced4d23ba93656f383222d9
+              name: 'Nginx: HTTP server zone [{#NAME}]: Processing'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.processing[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of client requests that are currently being processed.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].processing'
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: edc834403218460b8c7b8b3ca0709a76
+              name: 'Nginx: HTTP server zone [{#NAME}]: Received, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.received.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes received from clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].received'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: e33079d5cc684a5687bd7cd10eaec541
+              name: 'Nginx: HTTP server zone [{#NAME}]: Requests, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.requests.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of client requests received from clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].requests'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: 2b37ee1a3c1243c38534f70acf7a32d9
+              name: 'Nginx: HTTP server zone [{#NAME}]: Responses 1xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.responses.1xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “1xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.1xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: 4e127d8bfac940f1b3703053ada05fbd
+              name: 'Nginx: HTTP server zone [{#NAME}]: Responses 2xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.responses.2xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “2xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.2xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: 6add98c2b5334160a0e4cc363f53cb7e
+              name: 'Nginx: HTTP server zone [{#NAME}]: Responses 3xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.responses.3xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “3xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.3xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: 1f2cd6dcddf948a9bf17f05c68502f46
+              name: 'Nginx: HTTP server zone [{#NAME}]: Responses 4xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.responses.4xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “4xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.4xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: fc6654f2627e47cbbe1a7628c073520a
+              name: 'Nginx: HTTP server zone [{#NAME}]: Responses 5xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.responses.5xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “5xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.5xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: fd81275f0c994a62a9412d595d7d2e8b
+              name: 'Nginx: HTTP server zone [{#NAME}]: Responses total, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.responses.total.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of responses sent to clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.total'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+            -
+              uuid: 91acfc8de0e64d52820d509ced251e5b
+              name: 'Nginx: HTTP server zone [{#NAME}]: Sent, rate'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.sent.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes sent to clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].sent'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP zone [{#NAME}]'
+          graph_prototypes:
+            -
+              uuid: ba4bc0201f0741078e1512fd79bddf59
+              name: 'Nginx: HTTP server zone [{#NAME}]: Requests'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.server_zones.requests.rate[{#NAME}]'
+            -
+              uuid: 5870e9a861f046b3946c2464c6c5007d
+              name: 'Nginx: HTTP server zone [{#NAME}]: Responses'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.server_zones.responses.2xx.rate[{#NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.server_zones.responses.1xx.rate[{#NAME}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.server_zones.responses.3xx.rate[{#NAME}]'
+                -
+                  sortorder: '3'
+                  drawtype: GRADIENT_LINE
+                  color: A54F10
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.server_zones.responses.4xx.rate[{#NAME}]'
+                -
+                  sortorder: '4'
+                  drawtype: GRADIENT_LINE
+                  color: FC6EA3
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.server_zones.responses.5xx.rate[{#NAME}]'
+          master_item:
+            key: nginx.http.server_zones
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var output = [];
+                  
+                  Object.keys(JSON.parse(value)).forEach(function (v) {
+                      output.push({ '{#NAME}': v })
+                  });
+                  
+                  return JSON.stringify(output);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+        -
+          uuid: 007e9b12e7164f629d90a6f377333dc8
+          name: 'HTTP upstream peers discovery'
+          type: DEPENDENT
+          key: nginx.http.upstream.peers.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#UPSTREAM}'
+                value: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#UPSTREAM}'
+                value: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: ad270fab134c44ae83c154670db4d317
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Active'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.active[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The current number of active connections.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].active.first()'
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: cd7455016ac549598df2551a716545ef
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Fails, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.fails.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of unsuccessful attempts to communicate with the server per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].fails.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: b0607f003d7a4713a28f0d75b7933087
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Header time'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.header_time.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              units: '!ms'
+              description: 'The average time to get the response header from the server.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].header_time.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 89f89850409a4aff8447b9f7c2839f01
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, check'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of health check requests made.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.checks.first()'
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 31292e9dbc8c45dd936ed1e77d44940b
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, fails'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of failed health checks.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.fails.first()'
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 89c57fb94cab4635b14532961560a8bf
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, unhealthy'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'How many times the server became unhealthy (state “unhealthy”).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.unhealthy.first()'
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 8731deb89d1c4fc2bab90aca5802c721
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Received, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.received.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes received from this server per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].received.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 3ff18cfb4028421e9af0460aeaa2d6a4
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Requests, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.requests.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of client requests forwarded to this server per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].requests.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 6ca38995050e44488df4fde7dc543541
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 1xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “1xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.1xx.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: e526b61c48eb45568ef92434eee3a2cb
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 2xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “2xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.2xx.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 7b2851137d77418a8548e92332c66c86
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 3xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “3xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.3xx.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: cb81f113d289409ca26af48aeb68f8cc
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 4xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “4xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.4xx.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 172cb81d02f04fd48c7b82d8ae7dac69
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 5xx, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of responses with “5xx” status codes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.5xx.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: d587254989c743b4aa9c8043bf18baa5
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses total, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of responses obtained from this server.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.total.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 868562df5ab44d3cadeb6fa294b33559
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Response time'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.response_time.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              units: '!ms'
+              description: 'The average time to get the full response from the server.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].response_time.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 2a0a36d22acf453e80d79820990db9b8
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Sent, rate'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.sent.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes sent to this server per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].sent.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 33eacaa48f974c348e37475341a6c8af
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: State'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+              trigger_prototypes:
+                -
+                  uuid: fc6586fe2eef457bac1d71ce0313f95d
+                  expression: 'find(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
+                  name: 'Nginx: HTTP upstream server is not in UP or DOWN state.'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+            -
+              uuid: e89e6c141217465794febd9131ccafae
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Unavail'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].unavail.first()'
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+          trigger_prototypes:
+            -
+              uuid: e7b4782a796b4710b50a96f3d24c8208
+              expression: 'sum(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))'
+              name: 'Nginx: Too many HTTP requests with code 4xx (over {$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}% for 5m)'
+              priority: WARNING
+            -
+              uuid: f542573d149547d3844f635bf2a87120
+              expression: 'sum(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))'
+              name: 'Nginx: Too many HTTP requests with code 5xx (over {$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}% for 5m)'
+              priority: HIGH
+          graph_prototypes:
+            -
+              uuid: 63582bcbe4c741e88cd64a43ff1b7d9d
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
+            -
+              uuid: 49cd8f25969d486ab4482b4986b1815a
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]'
+                -
+                  sortorder: '3'
+                  drawtype: GRADIENT_LINE
+                  color: A54F10
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]'
+                -
+                  sortorder: '4'
+                  drawtype: GRADIENT_LINE
+                  color: FC6EA3
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]'
+          master_item:
+            key: nginx.http.upstreams
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  Object.keys(input).forEach(function (upstream) {
+                      input[upstream].peers.forEach(function (peer) {
+                          output.push({ '{#UPSTREAM}': upstream, '{#PEER}': peer.server })
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+                  
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+        -
+          uuid: 0cdb09e9004540239fd49eab09e3f324
+          name: 'HTTP upstreams discovery'
+          type: DEPENDENT
+          key: nginx.http.upstreams.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: ef9a2a71c3a340c894f82c29503d6b6b
+              name: 'Nginx: HTTP upstream [{#NAME}]: Keepalive'
+              type: DEPENDENT
+              key: 'nginx.http.upstreams.keepalive[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The current number of idle keepalive connections.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].keepalive'
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#NAME}]'
+            -
+              uuid: 1a426d42dada4eb082aa4e912ae1256c
+              name: 'Nginx: HTTP upstream [{#NAME}]: Zombies'
+              type: DEPENDENT
+              key: 'nginx.http.upstreams.zombies[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The current number of servers removed from the group but still processing active client requests.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].zombies'
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#NAME}]'
+            -
+              uuid: 8aa415f2a55a4e8fb28ea87a8d307bd4
+              name: 'Nginx: HTTP upstream [{#NAME}]: Zone'
+              type: DEPENDENT
+              key: 'nginx.http.upstreams.zone[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The name of the shared memory zone that keeps the group’s configuration and run-time state.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].zone'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: HTTP upstream [{#NAME}]'
+          master_item:
+            key: nginx.http.upstreams
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var output = [];
+                  
+                  Object.keys(JSON.parse(value)).forEach(function (v) {
+                      output.push({ '{#NAME}': v })
+                  });
+                  
+                  return JSON.stringify(output);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+        -
+          uuid: 1f75b67c7c4044dfa8727cc7363e86d0
+          name: 'Resolvers discovery'
+          type: DEPENDENT
+          key: nginx.resolvers.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.RESOLVER.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: 8fd2a1c5c148423886dccb939ca61b62
+              name: 'Nginx: Resolver [{#NAME}]: Requests addr, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.requests.addr.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of requests to resolve addresses to names per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].requests.addr'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: fb149324f11a4edc9971e9e2572282a6
+              name: 'Nginx: Resolver [{#NAME}]: Requests name, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.requests.name.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of requests to resolve names to addresses per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].requests.name'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: 9ebd08e8b6a3416c940b16a03158bafe
+              name: 'Nginx: Resolver [{#NAME}]: Requests srv, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.requests.srv.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of requests to resolve SRV records per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].requests.srv'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: 8a7db7d9c24f4f88b9ad9dde32b2b2e0
+              name: 'Nginx: Resolver [{#NAME}]: Responses formerr, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.responses.formerr.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of FORMERR (Format error) responses per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.formerr'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: bf5a55d771724cfeaec90950f653b181
+              name: 'Nginx: Resolver [{#NAME}]: Responses noerror, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.responses.noerror.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of successful responses per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.noerror'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: 46cd31140a3342568c7d7ae0cdae6270
+              name: 'Nginx: Resolver [{#NAME}]: Responses notimp, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.responses.notimp.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of NOTIMP (Unimplemented) responses per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.notimp'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: b4e002955de844a69a755076993b0577
+              name: 'Nginx: Resolver [{#NAME}]: Responses nxdomain, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.responses.nxdomain.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of NXDOMAIN (Host not found) responses per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.nxdomain'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: 114f260fc9754e80927494dce51f9e46
+              name: 'Nginx: Resolver [{#NAME}]: Responses refused, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.responses.refused.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of REFUSED (Operation refused) responses per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.refused'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: 7b4f4f609807407e849525f9f99c0fcc
+              name: 'Nginx: Resolver [{#NAME}]: Responses servfail, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.responses.servfail.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of SERVFAIL (Server failure) responses per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.servfail'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: 28b11b8bfd6143ada94b041390281a2f
+              name: 'Nginx: Resolver [{#NAME}]: Responses timedout, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.responses.timedout.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of timed out requests per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.timedout'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+            -
+              uuid: b68f19ad119941b58da491d2cd827277
+              name: 'Nginx: Resolver [{#NAME}]: Responses unknown, rate'
+              type: DEPENDENT
+              key: 'nginx.resolvers.responses.unknown.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of requests completed with an unknown error per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].responses.unknown'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Resolver [{#NAME}]'
+          graph_prototypes:
+            -
+              uuid: 7c91ca5b8477468fa19c56b621e0c32a
+              name: 'Nginx: Resolver [{#NAME}]: Requests'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.requests.name.rate[{#NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.requests.srv.rate[{#NAME}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.requests.addr.rate[{#NAME}]'
+            -
+              uuid: e3535ce974114e6188752937c1bdb2c7
+              name: 'Nginx: Resolver [{#NAME}]: Responses'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.responses.noerror.rate[{#NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.responses.formerr.rate[{#NAME}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.responses.servfail.rate[{#NAME}]'
+                -
+                  sortorder: '3'
+                  drawtype: GRADIENT_LINE
+                  color: A54F10
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.responses.nxdomain.rate[{#NAME}]'
+                -
+                  sortorder: '4'
+                  drawtype: GRADIENT_LINE
+                  color: FC6EA3
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.responses.notimp.rate[{#NAME}]'
+                -
+                  sortorder: '5'
+                  drawtype: GRADIENT_LINE
+                  color: 6C59DC
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.responses.refused.rate[{#NAME}]'
+                -
+                  sortorder: '6'
+                  drawtype: GRADIENT_LINE
+                  color: AC8C14
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.responses.timedout.rate[{#NAME}]'
+                -
+                  sortorder: '7'
+                  drawtype: GRADIENT_LINE
+                  color: 611F27
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.resolvers.responses.unknown.rate[{#NAME}]'
+          master_item:
+            key: nginx.resolvers
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var output = [];
+                  
+                  Object.keys(JSON.parse(value)).forEach(function (v) {
+                      output.push({ '{#NAME}': v })
+                  });
+                  
+                  return JSON.stringify(output);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+        -
+          uuid: bdc6582408be488997720ef8a4d1108e
+          name: 'Stream server zones discovery'
+          type: DEPENDENT
+          key: nginx.stream.server_zones.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.STREAM.ZONE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.STREAM.ZONE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: e321037e23ff484cb4dc89a8e187919c
+              name: 'Nginx: Stream server zone [{#NAME}]: Connections, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.connections.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of connections accepted from clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].connections'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream zone [{#NAME}]'
+            -
+              uuid: c9e9d883123842d291c922d5bbcca8f3
+              name: 'Nginx: Stream server zone [{#NAME}]: Discarded, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.discarded.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of connections completed without creating a session per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].discarded'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream zone [{#NAME}]'
+            -
+              uuid: f8d16f41fe9e4be685c28bb4acd2187f
+              name: 'Nginx: Stream server zone [{#NAME}]: Processing'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.processing[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of client connections that are currently being processed.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].processing'
+              master_item:
+                key: nginx.stream.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream zone [{#NAME}]'
+            -
+              uuid: 47a9959627e3423e9739b55dac23edd2
+              name: 'Nginx: Stream server zone [{#NAME}]: Received, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.received.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes received from clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].received'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream zone [{#NAME}]'
+            -
+              uuid: 2aafb1ae6ce24f14a3494826d63cfce2
+              name: 'Nginx: Stream server zone [{#NAME}]: Sent, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.sent.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes sent to clients per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].sent'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream zone [{#NAME}]'
+            -
+              uuid: 7399335b883040c495b5cbfade3e182e
+              name: 'Nginx: Stream server zone [{#NAME}]: Sessions 2xx, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of sessions completed with status codes “2xx” per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].sessions.2xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream zone [{#NAME}]'
+            -
+              uuid: 5e654682849748bea849db9ab73f7075
+              name: 'Nginx: Stream server zone [{#NAME}]: Sessions 4xx, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of sessions completed with status codes “4xx” per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].sessions.4xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream zone [{#NAME}]'
+            -
+              uuid: 0cdc4545f6dc4a1e8f247291302824a4
+              name: 'Nginx: Stream server zone [{#NAME}]: Sessions 5xx, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of sessions completed with status codes “5xx” per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].sessions.5xx'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream zone [{#NAME}]'
+            -
+              uuid: 30313c91655042b8948422c13fbdfca3
+              name: 'Nginx: Stream server zone [{#NAME}]: Sessions total, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.sessions.total.rate[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of completed client sessions per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].sessions.total'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.server_zones
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream zone [{#NAME}]'
+          graph_prototypes:
+            -
+              uuid: f833112506e941d791057925c58bd1d9
+              name: 'Nginx: Stream server zone [{#NAME}]: Sessions'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]'
+          master_item:
+            key: nginx.stream.server_zones
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var output = [];
+                  
+                  Object.keys(JSON.parse(value)).forEach(function (v) {
+                      output.push({ '{#NAME}': v })
+                  });
+                  
+                  return JSON.stringify(output);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+        -
+          uuid: 435f8bc40dd244aabb7daee4be7d54e5
+          name: 'Stream upstream peers discovery'
+          type: DEPENDENT
+          key: nginx.stream.upstream.peers.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#UPSTREAM}'
+                value: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#UPSTREAM}'
+                value: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: 3337df557e734de8b019216c5c06fcea
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Active'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.active[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The current number of connections.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].active.first()'
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 2ae319abd31b40b7a765c300e5dfa954
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Connections'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.connections.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of client connections forwarded to this server.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].connections.first()'
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: f98409ef166b47f3a70d46dffe233166
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Connect time'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.connect_time.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              units: '!ms'
+              description: 'The average time to connect to the upstream server.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].connect_time.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 0b1000ddc883422cb9fb3382a839c10a
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Fails, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.fails.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of unsuccessful attempts to communicate with the server per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].fails.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 23a02d1c0a63483fb1eb4914a7e48ecf
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: First byte time'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.first_byte_time.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              units: '!ms'
+              description: 'The average time to receive the first byte of data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].first_byte_time.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: dac0196daad74fc385a336c7dbddbcfd
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, check'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of health check requests made.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.checks.first()'
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: af2a6991b432439cb4afb071974a05e7
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, fails'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of failed health checks.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.fails.first()'
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 089bbb9c602a4654a3d2c582c643745f
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, unhealthy'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'How many times the server became unhealthy (state “unhealthy”).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.unhealthy.first()'
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 12193b1723eb419a9bbcb235c7b45308
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Received, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.received.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes received from this server per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].received.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: bda851b725454395b59988f03c534b3b
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Response time'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.response_time.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              units: '!ms'
+              description: 'The average time to receive the last byte of data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].response_time.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: 6ae8685716cf487fa72534a76e4b286a
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Sent, rate'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.sent.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of bytes sent to this server per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].sent.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+            -
+              uuid: ae7b6564244845518816fffc38bbf9aa
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: State'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+              trigger_prototypes:
+                -
+                  uuid: 20ef9b9e953246ef856dd46033595e52
+                  expression: 'find(/Template App Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Template App Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
+                  name: 'Nginx: Stream upstream server is not in UP or DOWN state.'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+            -
+              uuid: 732f0ea262454ab3a4cfeb09aea66b9b
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Unavail'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: 7d
+              description: 'How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].unavail.first()'
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+          graph_prototypes:
+            -
+              uuid: abb23d681d0a461db00648b412b176c8
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.stream.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.stream.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template App Nginx Plus by HTTP'
+                    key: 'nginx.stream.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
+          master_item:
+            key: nginx.stream.upstreams
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  Object.keys(input).forEach(function (upstream) {
+                      input[upstream].peers.forEach(function (peer) {
+                          output.push({ '{#UPSTREAM}': upstream, '{#PEER}': peer.server })
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+                  
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+        -
+          uuid: 8a8f9d8b47f84bd98a5315ae30944240
+          name: 'Stream upstreams discovery'
+          type: DEPENDENT
+          key: nginx.stream.upstreams.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: 5537680fbc024713a077932cc55ef3a7
+              name: 'Nginx: Stream upstream [{#NAME}]: Zombies'
+              type: DEPENDENT
+              key: 'nginx.stream.upstreams.zombies[{#NAME}]'
+              delay: '0'
+              history: 7d
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].zombies'
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#NAME}]'
+            -
+              uuid: 8c273c10ece545a58e4d34f6d3812fe0
+              name: 'Nginx: Stream upstream [{#NAME}]: Zone'
+              type: DEPENDENT
+              key: 'nginx.stream.upstreams.zone[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}''].zone'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: Application
+                  value: 'Nginx: Stream upstream [{#NAME}]'
+          master_item:
+            key: nginx.stream.upstreams
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var output = [];
+                  
+                  Object.keys(JSON.parse(value)).forEach(function (v) {
+                      output.push({ '{#NAME}': v })
+                  });
+                  
+                  return JSON.stringify(output);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+      macros:
+        -
+          macro: '{$NGINX.API.ENDPOINT}'
+          description: 'NGINX Plus API URL in the format `<scheme>://<host>:<port>/<location>/`'
+        -
+          macro: '{$NGINX.DROP_RATE.MAX.WARN}'
+          value: '1'
+          description: 'The critical rate of the dropped connections for trigger expression.'
+        -
+          macro: '{$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}'
+          value: '5'
+          description: 'Maximum percentage of errors with status code 4xx (for trigger expression).'
+        -
+          macro: '{$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}'
+          value: '5'
+          description: 'Maximum percentage of errors with status code 4xx (for trigger expression).'
+        -
+          macro: '{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable HTTP location zones'
+        -
+          macro: '{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered HTTP location zones'
+        -
+          macro: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable HTTP upstreams'
+        -
+          macro: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered HTTP upstreams'
+        -
+          macro: '{$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable HTTP server zones'
+        -
+          macro: '{$NGINX.LLD.FILTER.HTTP.ZONE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered HTTP server zones'
+        -
+          macro: '{$NGINX.LLD.FILTER.RESOLVER.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Resolvers'
+        -
+          macro: '{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Resolvers'
+        -
+          macro: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Stream upstreams'
+        -
+          macro: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Stream upstreams'
+        -
+          macro: '{$NGINX.LLD.FILTER.STREAM.ZONE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Stream server zones'
+        -
+          macro: '{$NGINX.LLD.FILTER.STREAM.ZONE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Stream server zones'
+  graphs:
+    -
+      uuid: a8b239f2f21a471fa3ac6a10a0419e9c
+      name: 'Nginx: Connections'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App Nginx Plus by HTTP'
+            key: nginx.connections.accepted.rate
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Template App Nginx Plus by HTTP'
+            key: nginx.connections.dropped
+        -
+          sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: F63100
+          item:
+            host: 'Template App Nginx Plus by HTTP'
+            key: nginx.connections.active
+        -
+          sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: A54F10
+          item:
+            host: 'Template App Nginx Plus by HTTP'
+            key: nginx.connections.idle
+    -
+      uuid: 4be7153e244b4c28a53c527aa9fd5706
+      name: 'Nginx: Requests'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App Nginx Plus by HTTP'
+            key: nginx.requests.total.rate
+    -
+      uuid: b1c647610c974bc8aad4fb55e1e3c8d3
+      name: 'Nginx: SSL'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App Nginx Plus by HTTP'
+            key: nginx.ssl.handshakes.rate
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Template App Nginx Plus by HTTP'
+            key: nginx.ssl.handshakes_failed.rate
+        -
+          sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: F63100
+          item:
+            host: 'Template App Nginx Plus by HTTP'
+            key: nginx.ssl.session_reuses.rate
+    -
+      uuid: b2da29d4951745db8a66a076eb99d0aa
+      name: 'Nginx: Uptime'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Template App Nginx Plus by HTTP'
+            key: nginx.info.uptime

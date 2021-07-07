@@ -828,7 +828,7 @@ class testFormTabIndicators extends CWebTest {
 	}
 
 	/**
-	 * @on-before-once prepareServiceData
+	 * @onBeforeOnce prepareServiceData
 	 */
 	public function testFormTabIndicators_CheckServiceIndicators() {
 		$this->page->login()->open('services.php?form=1&parentname=root')->waitUntilReady();

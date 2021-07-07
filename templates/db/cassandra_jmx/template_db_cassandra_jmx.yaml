@@ -67,7 +67,7 @@ zabbix_export:
           triggers:
             -
               uuid: 855abdc321c74b6baf672c67f6483c1c
-              expression: '(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#1)<>last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#2))=1 and length(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]))>0'
+              expression: 'last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#1)<>last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#2) and length(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]))>0'
               name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Cassandra version has changed. Ack to close.'
