@@ -2840,7 +2840,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				break;
 			case ZBX_TOKEN_SIMPLE_MACRO:
 				if (0 == (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY |
-							MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_SCRIPT_NORMAL |
+							MACRO_TYPE_MESSAGE_UPDATE | MACRO_TYPE_SCRIPT_NORMAL |
 							MACRO_TYPE_SCRIPT_RECOVERY)) ||
 						EVENT_SOURCE_TRIGGERS != ((NULL != r_event) ? r_event : event)->source)
 				{
@@ -2866,7 +2866,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		ret = SUCCEED;
 
 		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY |
-				MACRO_TYPE_MESSAGE_ACK |
+				MACRO_TYPE_MESSAGE_UPDATE |
 				MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
 		/* MACRO_TYPE_SCRIPT_NORMAL and MACRO_TYPE_SCRIPT_RECOVERY behave pretty similar to */
 		/* MACRO_TYPE_MESSAGE_NORMAL and MACRO_TYPE_MESSAGE_RECOVERY. Therefore the code is not duplicated */
@@ -2931,22 +2931,22 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 				else if (0 == strcmp(m, MVAR_ACK_MESSAGE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_MESSAGE))
 				{
-					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
 						replace_to = zbx_strdup(replace_to, ack->message);
 				}
 				else if (0 == strcmp(m, MVAR_ACK_TIME) || 0 == strcmp(m, MVAR_EVENT_UPDATE_TIME))
 				{
-					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
 						replace_to = zbx_strdup(replace_to, zbx_time2str(ack->clock, tz));
 				}
 				else if (0 == strcmp(m, MVAR_ACK_DATE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_DATE))
 				{
-					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
 						replace_to = zbx_strdup(replace_to, zbx_date2str(ack->clock, tz));
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_ACTION))
 				{
-					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
 					{
 						get_problem_update_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
 								ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
@@ -2956,7 +2956,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_STATUS))
 				{
-					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
 						replace_to = zbx_strdup(replace_to, "1");
 					else
 						replace_to = zbx_strdup(replace_to, "0");
@@ -3162,7 +3162,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", c_event->trigger.value);
 				}
-				else if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack &&
+				else if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack &&
 						0 == strcmp(m, MVAR_USER_FULLNAME))
 				{
 					const char	*user_name1;

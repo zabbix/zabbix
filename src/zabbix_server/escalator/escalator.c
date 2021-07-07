@@ -638,7 +638,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
 	if (NULL != ack)
-		message_type = MACRO_TYPE_MESSAGE_ACK;
+		message_type = MACRO_TYPE_MESSAGE_UPDATE;
 
 	result = DBselect("%s", sql);
 
@@ -825,8 +825,9 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 		if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
 			goto clean;
 
-		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, MACRO_TYPE_MESSAGE_ACK,
-				evt_src, ZBX_OPERATION_MODE_ACK, default_timezone, user_timezone);
+		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack,
+				MACRO_TYPE_MESSAGE_UPDATE, evt_src, ZBX_OPERATION_MODE_UPDATE, default_timezone,
+				user_timezone);
 clean:
 		zbx_free(user_timezone);
 	}
@@ -1252,7 +1253,7 @@ static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event,
 	int		message_type;
 
 	if (NULL != ack)
-		message_type = MACRO_TYPE_MESSAGE_ACK;
+		message_type = MACRO_TYPE_MESSAGE_UPDATE;
 	else
 		message_type = (NULL != r_event ? MACRO_TYPE_MESSAGE_RECOVERY : MACRO_TYPE_MESSAGE_NORMAL);
 
@@ -1717,20 +1718,20 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 
 /******************************************************************************
  *                                                                            *
- * Function: escalation_execute_acknowledge_operations                        *
+ * Function: escalation_execute_update_operations                             *
  *                                                                            *
- * Purpose: execute escalation acknowledge operations                         *
+ * Purpose: execute escalation update operations                              *
  *                                                                            *
  * Parameters: event  - [IN] the event                                        *
  *             action - [IN] the action                                       *
  *             ack    - [IN] the acknowledge                                  *
  *                                                                            *
- * Comments: Action acknowledge operations have a single escalation step, so  *
- *           alerts created by escalation acknowledge operations must have    *
+ * Comments: Action update operations have a single escalation step, so       *
+ *           alerts created by escalation update operations must have         *
  *           esc_step field set to 1.                                         *
  *                                                                            *
  ******************************************************************************/
-static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, const DB_EVENT *r_event,
+static void	escalation_execute_update_operations(const DB_EVENT *event, const DB_EVENT *r_event,
 		const DB_ACTION *action, const DB_ACKNOWLEDGE *ack, const char *default_timezone)
 {
 	DB_RESULT	result;
@@ -1748,8 +1749,8 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 				" and o.operationtype in (%d,%d,%d)"
 				" and o.recovery=%d",
 			action->actionid,
-			OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE,
-			ZBX_OPERATION_MODE_ACK);
+			OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_UPDATE_MESSAGE,
+			ZBX_OPERATION_MODE_UPDATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1760,18 +1761,21 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 		{
 			case OPERATION_TYPE_MESSAGE:
 				add_object_msg(action->actionid, operationid, &user_msg, event, r_event, ack,
-						MACRO_TYPE_MESSAGE_ACK, action->eventsource, ZBX_OPERATION_MODE_ACK,
+						MACRO_TYPE_MESSAGE_UPDATE, action->eventsource, ZBX_OPERATION_MODE_UPDATE,
 						default_timezone);
 				break;
-			case OPERATION_TYPE_ACK_MESSAGE:
+			case OPERATION_TYPE_UPDATE_MESSAGE:
 				add_sentusers_msg(&user_msg, action->actionid, operationid, event, r_event, ack,
-						action->eventsource, ZBX_OPERATION_MODE_ACK, default_timezone);
-				add_sentusers_ack_msg(&user_msg, action->actionid, operationid, event, r_event, ack,
-						action->eventsource, default_timezone);
+						action->eventsource, ZBX_OPERATION_MODE_UPDATE, default_timezone);
+				if (NULL != ack)
+				{
+					add_sentusers_ack_msg(&user_msg, action->actionid, operationid, event, r_event,
+							ack, action->eventsource, default_timezone);
+				}
 				break;
 			case OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, ack, action->actionid, operationid, 1,
-						MACRO_TYPE_MESSAGE_ACK, default_timezone);
+						MACRO_TYPE_MESSAGE_UPDATE, default_timezone);
 				break;
 		}
 	}
@@ -2208,10 +2212,39 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 		ack.old_severity = atoi(row[4]);
 		ack.new_severity = atoi(row[5]);
 
-		escalation_execute_acknowledge_operations(event, r_event, action, &ack, default_timezone);
+		escalation_execute_update_operations(event, r_event, action, &ack, default_timezone);
 	}
 
 	DBfree_result(result);
+
+	escalation->status = ESCALATION_STATUS_COMPLETED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: escalation_acknowledge                                           *
+ *                                                                            *
+ * Purpose: process escalation acknowledge                                    *
+ *                                                                            *
+ * Parameters: escalation - [IN/OUT] the escalation to recovery               *
+ *             action     - [IN]     the action                               *
+ *             event      - [IN]     the event                                *
+ *             r_event    - [IN]     the recovery event                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	escalation_update(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
+		const char *default_timezone)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " servicealarmid:" ZBX_FS_UI64 " status:%s",
+			__func__, escalation->escalationid, escalation->acknowledgeid,
+			zbx_escalation_status_string(escalation->status));
+
+	escalation_execute_update_operations(event, NULL, action, NULL, default_timezone);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2441,7 +2474,11 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		/* Execute operations and recovery operations, mark changes in 'diffs' for batch saving in DB below. */
 		diff = escalation_create_diff(escalation);
 
-		if (0 != escalation->acknowledgeid)
+		if (0 != escalation->servicealarmid)
+		{
+			escalation_update(escalation, action, event, default_timezone);
+		}
+		else if (0 != escalation->acknowledgeid)
 		{
 			zbx_uint64_t		r_eventid = 0;
 			zbx_uint64_pair_t	event_pair;
