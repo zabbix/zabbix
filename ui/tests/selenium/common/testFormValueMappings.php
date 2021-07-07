@@ -414,7 +414,7 @@ class testFormValueMappings extends CWebTest {
 					],
 					'trim' => true,
 					'update valuemap' => self::UPDATE_VALUEMAP1,
-					'screenshot id' => 'ValuemapScreenshot1'
+					'screenshot_id' => 'ValuemapScreenshot1'
 				]
 			],
 			// Value mapping with duplicate name.
@@ -674,9 +674,9 @@ class testFormValueMappings extends CWebTest {
 
 			// Check the screenshot of the whole value mappings tab.
 			$this->openValueMappingTab($source, false);
-//			if (CTestArrayHelper::get($data, 'screenshot id')) {
-//				$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot id']);
-//			}
+			if (CTestArrayHelper::get($data, 'screenshot_id')) {
+				$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot_id']);
+			}
 
 			// Check all mappings that belong to the created value mapping.
 			$this->query('link', $data['name'])->one()->click();
