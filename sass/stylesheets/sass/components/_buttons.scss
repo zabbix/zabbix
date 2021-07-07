@@ -1,0 +1,108 @@
+%btn-icon {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	min-height: auto;
+	padding: 0;
+	line-height: 18px;
+	text-decoration: none;
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: transparent;
+	border: 0;
+	border-radius: 2px;
+	opacity: .5;
+	transition: opacity .2s ease-out;
+
+	&:hover,
+	&:focus,
+	&:active {
+		text-decoration: none;
+		background-color: transparent;
+		outline: none;
+		opacity: 1;
+	}
+}
+
+%btn-remove-icon {
+	font-size: $font-h2-size;
+	font-weight: bold;
+	color: $font-alt-color;
+	text-align: center;
+	cursor: pointer;
+
+	&::before {
+		content: '\00d7';
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: $font-alt-color;
+		outline: none;
+	}
+}
+
+.btn-add,
+.btn-edit,
+.btn-import {
+	@extend %btn-icon;
+	background-image: url($sprite-path);
+	background-repeat: no-repeat;
+
+	&::-moz-focus-inner {
+		padding: 0;
+	}
+
+	&:not(:first-child) {
+		margin-left: 5px;
+	}
+}
+
+.btn-add {
+	background-position: -45px -550px;
+}
+
+.btn-edit {
+	background-position: -45px -477px;
+}
+
+.btn-import {
+	background-position: -45px -514px;
+}
+
+.btn-remove {
+	@extend %btn-icon;
+	@extend %btn-remove-icon;
+
+	&:not(:first-child) {
+		margin-left: 5px;
+	}
+}
+
+.overlay-close-btn {
+	@extend %btn-icon;
+	@extend %btn-remove-icon;
+	position: absolute;
+	top: 1px;
+	right: 1px;
+	z-index: 1000;
+}
+
+.subfilter-disable-btn {
+	@extend %btn-icon;
+	@extend %btn-remove-icon;
+	margin: 0;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	opacity: 1;
+
+	&:hover {
+		color: darken($font-selected-color, 5%);
+	}
+
+	&:focus,
+	&:active {
+		color: darken($font-selected-color, 10%);
+	}
+}

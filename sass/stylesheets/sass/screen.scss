@@ -27,12 +27,15 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/sidebar";
 @import "layout/form-grid";
 
+@import "components/buttons";
 @import "components/dashboard";
 @import "components/diff";
 @import "components/form-search";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
+@import "components/radio-list-control";
+@import "components/service/info";
 @import "components/tabfilter";
 @import "components/toc";
 @import "components/z-select";
@@ -190,7 +193,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 }
 
 .hor-list {
-	li {
+	> li {
 		display: inline-block;
 		margin: 0 6px 0 0;
 
@@ -229,12 +232,8 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 				&.breadcrumbs > li {
 					margin-right: 0;
 
-					&::after {
+					&:not(:last-child)::after {
 						content: "/";
-					}
-
-					&:last-child::after {
-						content: "";
 					}
 				}
 			}
@@ -689,6 +688,11 @@ form {
 	.opdata {
 		max-width: 300px;
 	}
+
+	.list-table-actions {
+		text-align: right;
+		white-space: nowrap;
+	}
 }
 
 .table-paging {
@@ -913,6 +917,7 @@ form {
 }
 
 .wordwrap {
+	white-space: normal;
 	word-break: break-all;
 }
 
@@ -1301,7 +1306,7 @@ form {
 	width: 100%;
 	color: $font-color;
 
-	li {
+	> li {
 		display: table-row;
 
 		&.display-none {
@@ -1517,107 +1522,6 @@ form {
 			user-select: none;
 			text-align: right;
 		}
-	}
-}
-
-.radio-list-control {
-	display: inline-block;
-	white-space: nowrap;
-
-	li {
-		position: relative;
-		display: inline-block;
-		margin: 0 -1px 0 0;
-
-		&:first-child {
-			border-radius: 3px 0 0 3px;
-
-			label {
-				border-radius: 2px 0 0 2px;
-			}
-		}
-
-		&:last-child {
-			border-radius: 0 3px 3px 0;
-
-			label {
-				border-radius: 0 2px 2px 0;
-			}
-		}
-
-		&:only-child {
-			border-radius: 3px;
-
-			label {
-				border-radius: 2px;
-			}
-		}
-	}
-
-	label {
-		display: inline-block;
-		border: 1px solid $form-border-color;
-		line-height: 1.2em;
-		padding: 4px 11px;
-		transition: background-color .2s ease-out;
-	}
-
-	input[type="radio"] {
-		position: absolute !important;
-		top: auto !important;
-		width: 1px !important;
-		height: 1px !important;
-		opacity: 0;
-
-		+ label {
-			color: $font-color;
-			border-color: $form-border-color;
-			background-color: $form-bg-color;
-
-			&:hover {
-				background-color: $btn-form-hover-color;
-			}
-
-			&:active {
-				border-color: $form-border-color;
-				background-color: $btn-form-hover-color;
-			}
-		}
-
-		&:focus + label {
-			border-color: $form-border-focus-color;
-			background-color: $btn-form-hover-color;
-			position: relative;
-			z-index: 2;
-		}
-
-		&:checked + label {
-			color: $white;
-			border-color: $ui-bg-selected-color;
-			background-color: $ui-bg-selected-color;
-			position: relative;
-			z-index: 1;
-		}
-
-		&:checked:focus + label {
-			box-shadow: 0 0 0 2px rgba($blue, .35);
-			position: relative;
-			z-index: 2;
-		}
-
-		&:checked[disabled] + label {
-			background-color: lighten($ui-bg-selected-color, 33%) !important;
-			transition: none;
-		}
-
-		&[disabled] + label {
-			transition: none;
-			@extend %form-disabled;
-		}
-	}
-
-	+ .icon-info {
-		margin-left: 5px;
 	}
 }
 
@@ -2183,6 +2087,7 @@ $icon-widget-btn: (
 		}
 	}
 
+	.btn-info,
 	.btn-time,
 	.filter-trigger {
 		border-radius: 2px;
@@ -2206,6 +2111,7 @@ $icon-widget-btn: (
 		}
 	}
 
+	.btn-info,
 	.btn-time {
 		padding: 0 34px 0 10px;
 
@@ -2216,6 +2122,15 @@ $icon-widget-btn: (
 			height: 24px;
 			width: 24px;
 			background: url($sprite-path) no-repeat -87px -583px;
+		}
+	}
+
+	.btn-info {
+		width: initial;
+		background-image: none;
+
+		&::after {
+			background: url($sprite-path) no-repeat -398px -407px;
 		}
 	}
 
@@ -2233,6 +2148,7 @@ $icon-widget-btn: (
 	}
 
 	.ui-state-focus {
+		.btn-info,
 		.btn-time,
 		.filter-trigger {
 			box-shadow: 0 0 0 2px rgba($blue, .35);
@@ -2240,6 +2156,7 @@ $icon-widget-btn: (
 		}
 
 		&.ui-tabs-active {
+			.btn-info,
 			.btn-time,
 			.filter-trigger {
 				box-shadow: 0 0 0 2px rgba($blue, .35);
@@ -2248,6 +2165,7 @@ $icon-widget-btn: (
 	}
 
 	.ui-tabs-active {
+		.btn-info,
 		.btn-time,
 		.filter-trigger {
 			color: $font-color;
@@ -2257,6 +2175,13 @@ $icon-widget-btn: (
 			border-radius: 2px 2px 0 0;
 			margin: -1px 0 0 6px;
 			padding: 1px 34px 7px 10px;
+		}
+
+		.btn-info {
+			&::after {
+				background-position: -398px -430px;
+				top: 1px;
+			}
 		}
 
 		.btn-time {
@@ -2275,6 +2200,7 @@ $icon-widget-btn: (
 
 	.ui-state-hover {
 		&.ui-tabs-active {
+			.btn-info,
 			.btn-time,
 			.filter-trigger {
 				background-color: $action-hover-color;
@@ -3010,15 +2936,12 @@ $form-icon-btn: (
 				content: "";
 			}
 		}
-	}
 
-	.menu-popup-item-disabled {
-		display: block;
-		height: 24px;
-		line-height: 24px;
-		color: $font-alt-color;
-		border: 0;
-		cursor: default;
+		&.disabled {
+			background-color: transparent;
+			color: $font-alt-color;
+			opacity: 1;
+		}
 	}
 
 	h3 {
@@ -3091,8 +3014,9 @@ $form-icon-btn: (
 		}
 
 		.overlay-dialogue-controls {
-			text-align: right;
-			padding: 0 0 10px;
+			display: flex;
+			justify-content: flex-end;
+			padding: 0 10px 10px;
 
 			z-select {
 				text-align: left;
@@ -4041,56 +3965,6 @@ a.link-action {
 	}
 }
 
-.progress-bar-container {
-	display: inline-block;
-	white-space: nowrap;
-	position: relative;
-
-	a {
-		border: none !important;
-
-		&:hover,
-		&:focus {
-			.progress-bar-label {
-				display: block;
-			}
-		}
-	}
-}
-
-.progress-bar-bg {
-	padding: 3px 0 2px;
-	font-size: $font-h3-size;
-	line-height: 1em;
-	display: inline-block;
-
-	&.green-bg {
-		background-color: darken(desaturate($alt-green, 10%), 16%);
-	}
-
-	&.red-bg {
-		background-color: darken(desaturate($alt-red, 10%), 5%);
-	}
-}
-
-.progress-bar-label {
-	display: none;
-	color: $white;
-	font-size: $font-h3-size;
-
-	span {
-		position: absolute;
-
-		&:first-child {
-			left: .35em;
-		}
-
-		&:last-child {
-			right: .35em;
-		}
-	}
-}
-
 %status {
 	padding: 2px 3px 1px;
 	font-size: $font-h3-size;
@@ -4244,6 +4118,14 @@ a.link-action {
 	high-bg: $alt-dark-orange,
 	disaster-bg: $alt-red,
 ) {
+	// Dynamically generated classes:
+	//  .na-bg
+	//  .normal-bg
+	//  .info-bg
+	//  .average-bg
+	//  .warning-bg
+	//  .high-bg
+	//  .disaster-bg
 	.#{$severity-type} {
 		color: darken($color, 45%);
 		position: relative;
@@ -4357,86 +4239,6 @@ td.inactive-bg {
 		top: 3px;
 		left: -3px;
 		position: absolute;
-	}
-}
-
-// Close/Remove icon.
-%close-icon {
-	display: block;
-	padding: 0;
-	width: 18px;
-	height: 18px;
-	line-height: 18px;
-	text-align: center;
-	color: $font-alt-color;
-	font-size: $font-h2-size;
-	font-weight: bold;
-	text-decoration: none;
-	cursor: pointer;
-	opacity: .5;
-	transition: opacity .2s ease-out;
-
-	&::before {
-		content: '\00d7';
-	}
-
-	&:hover,
-	&:focus,
-	&:active {
-		color: $font-alt-color;
-		text-decoration: none;
-		opacity: 1;
-	}
-}
-
-.remove-btn {
-	position: absolute;
-	top: 5px;
-	right: 5px;
-	min-height: auto;
-	border: 0;
-	background-color: $transparent !important;
-	@extend %close-icon;
-	border-radius: 2px;
-
-	&:focus {
-		box-shadow: none;
-	}
-}
-
-.overlay-close-btn {
-	position: absolute;
-	z-index: 1000;
-	top: 1px;
-	right: 1px;
-	min-height: auto;
-	border: 0;
-	background-color: $transparent !important;
-	@extend %close-icon;
-	border-radius: 2px;
-}
-
-a.overlay-close-btn {
-	@extend .overlay-close-btn;
-}
-
-.subfilter-disable-btn {
-	width: 18px;
-	height: 18px;
-	line-height: 18px;
-	color: $font-selected-color;
-	background-color: $ui-bg-selected-color;
-	@extend %close-icon;
-	border-radius: 2px;
-	opacity: 1;
-
-	&:hover {
-		color: darken($font-selected-color, 5%);
-	}
-
-	&:focus,
-	&:active {
-		color: darken($font-selected-color, 10%);
 	}
 }
 
@@ -4591,13 +4393,6 @@ span {
 .overlay-dialogue.modal .overlay-dialogue-body {
 	&.is-loading {
 		overflow: hidden;
-
-		&:before {
-			top: 42px;
-			right: 1px;
-			bottom: 42px;
-			left: 1px;
-		}
 	}
 }
 
@@ -4904,7 +4699,7 @@ svg {
 	.overrides-list-item {
 		display: table-row;
 
-		.remove-btn {
+		.btn-remove {
 			position: relative;
 			right: -73px;
 			top: 3px;
@@ -4946,12 +4741,7 @@ svg {
 				position: absolute;
 				right: 0;
 				top: 0;
-				border: 0;
-
-				&:focus,
-				&:hover {
-					background: none;
-				}
+				min-height: 24px;
 			}
 		}
 	}
@@ -4982,7 +4772,7 @@ svg {
 	.list-accordion-item {
 		display: table-row;
 
-		.remove-btn {
+		.btn-remove {
 			position: relative;
 			right: -10px;
 			top: 3px;
@@ -5312,55 +5102,13 @@ svg {
 					display: flex;
 					width: 85px;
 
-					.edit-item-btn,
-					.remove-item-btn,
-					.import-items-btn,
-					.add-child-btn {
-						margin-left: 5px;
-						cursor: pointer;
-						border: 0;
-						opacity: .5;
-						float: left;
-
-						&::-moz-focus-inner {
-							padding: 0;
+					.btn-add,
+					.btn-edit,
+					.btn-import,
+					.btn-remove {
+						&:focus {
+							box-shadow: none;
 						}
-					}
-					.edit-item-btn:hover,
-					.remove-item-btn:hover,
-					.import-items-btn:hover,
-					.add-child-btn:hover {
-						opacity: 1;
-					}
-					.edit-item-btn:focus,
-					.remove-item-btn:focus,
-					.import-items-btn:focus,
-					.add-child-btn:focus {
-						opacity: 1;
-						outline: none;
-					}
-					.add-child-btn {
-						background: url($sprite-path) no-repeat -47px -551px;
-						background-color: $transparent !important;
-						height: 15px;
-						width: 14px;
-					}
-					.edit-item-btn {
-						background: url($sprite-path) no-repeat -47px -478px;
-						background-color: $transparent !important;
-						height: 15px;
-						width: 14px;
-					}
-					.import-items-btn {
-						background: url($sprite-path) no-repeat -47px -515px;
-						background-color: $transparent !important;
-						height: 15px;
-						width: 14px;
-					}
-					.remove-btn {
-						position: relative;
-						margin-left: 10px;
-						top: 0;
 					}
 				}
 
@@ -6484,10 +6232,6 @@ z-select,
 	tbody {
 		td {
 			border-bottom: 1px solid $table-border-color;
-
-			&.wordwrap {
-				white-space: normal;
-			}
 		}
 
 		tr:first-child td {

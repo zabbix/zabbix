@@ -391,6 +391,18 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
+			],
+			'services' => [
+				'title' => _('Services'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'serviceid,name',
+				'form' => [
+					'name' => 'serviceform',
+					'id' => 'services'
+				],
+				'table_columns' => [
+					_('Name')
+				]
 			]
 		];
 	}
@@ -616,7 +628,7 @@ class CControllerPopupGeneric extends CController {
 			$host_options['templated_hosts'] = 1;
 			$group_options['templated_hosts'] = 1;
 		}
-		elseif ($this->source_table !== 'templates') {
+		elseif ($this->source_table !== 'templates' && $this->source_table !== 'host_templates') {
 			$group_options['with_hosts_and_templates'] = 1;
 		}
 
@@ -645,7 +657,7 @@ class CControllerPopupGeneric extends CController {
 				? API::HostGroup()->get([
 					'output' => ['name', 'groupid'],
 					'groupids' => $this->groupids
-				] + $group_options)
+				])
 				: [];
 
 			$filter['groups'] = [
@@ -1380,6 +1392,17 @@ class CControllerPopupGeneric extends CController {
 				$records = API::Dashboard()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['dashboardid' => 'id']);
+				break;
+
+			case 'services':
+				$options += [
+					'output' => ['serviceid', 'name'],
+					'preservekeys' => true
+				];
+
+				$records = API::Service()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['serviceid' => 'id']);
 				break;
 		}
 

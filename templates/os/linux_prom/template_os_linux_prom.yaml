@@ -792,7 +792,7 @@ zabbix_export:
           triggers:
             -
               uuid: e827e944568b46e284820630482317bd
-              expression: '(last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2))=1 and length(last(/Linux by Prom/system.name[node_exporter]))>0'
+              expression: 'last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2) and length(last(/Linux by Prom/system.name[node_exporter]))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -847,7 +847,7 @@ zabbix_export:
           triggers:
             -
               uuid: 00974d5b128c4b1db64ca100770fb11b
-              expression: '(last(/Linux by Prom/system.sw.os[node_exporter],#1)<>last(/Linux by Prom/system.sw.os[node_exporter],#2))=1 and length(last(/Linux by Prom/system.sw.os[node_exporter]))>0'
+              expression: 'last(/Linux by Prom/system.sw.os[node_exporter],#1)<>last(/Linux by Prom/system.sw.os[node_exporter],#2) and length(last(/Linux by Prom/system.sw.os[node_exporter]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -855,7 +855,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
-                  expression: '(last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2))=1 and length(last(/Linux by Prom/system.name[node_exporter]))>0'
+                  expression: 'last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2) and length(last(/Linux by Prom/system.name[node_exporter]))>0'
         -
           uuid: ccc3c4d69fef412aa53c6a7320ef44fb
           name: 'Free swap space'
@@ -1297,7 +1297,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e35b59dc09754451a721793831edc3d4
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
@@ -1361,7 +1361,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: 08d5857e474042b5906288156c8c5d52
@@ -1384,7 +1384,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: 11e2c8023463482da878cdad5bb7de76
@@ -1404,7 +1404,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: 6e8269b2260e42de97aec08043a768df
@@ -1423,7 +1423,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
           graph_prototypes:
             -

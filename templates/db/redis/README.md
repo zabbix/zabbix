@@ -1,5 +1,5 @@
 
-# Redis
+# Redis by Zabbix agent 2
 
 ## Overview
 
@@ -7,7 +7,7 @@ For Zabbix version: 5.4 and higher
 The template to monitor Redis server by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `Redis` — collects metrics by polling zabbix-agent2.
+Template `Redis by Zabbix agent 2` — collects metrics by polling zabbix-agent2.
 
 
 

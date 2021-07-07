@@ -27,8 +27,6 @@
 
 #ifndef HAVE_SQLITE3
 
-extern unsigned char program_type;
-
 static int	DBpatch_5050000(void)
 {
 	return SUCCEED;
@@ -226,11 +224,129 @@ static int	DBpatch_5050011(void)
 
 static int	DBpatch_5050012(void)
 {
+	const ZBX_TABLE table =
+		{"service_tag", "servicetagid", 0,
+			{
+				{"servicetagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050013(void)
+{
+	const ZBX_FIELD	field = {"serviceid", NULL, "services", "serviceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("service_tag", 1, &field);
+}
+
+static int	DBpatch_5050014(void)
+{
+	return DBdrop_field("services_links", "soft");
+}
+
+static int	DBpatch_5050015(void)
+{
+	return DBcreate_index("service_tag", "service_tag_1", "serviceid", 0);
+}
+
+static void	DBpatch_get_role_rules(zbx_uint64_t roleid, int *ui_default_access, int *actions_default_access,
+		int *ui_conf_services)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	result = DBselect("select value_int,name from role_rule where roleid=" ZBX_FS_UI64 " and name in "
+			"('ui.default_access', 'actions.default_access', 'ui.configuration.services')", roleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		int	value;
+		char	*name;
+
+		value = atoi(row[0]);
+		name = row[1];
+
+		if (0 == strcmp(name, "ui.default_access"))
+		{
+			*ui_default_access = value;
+		}
+		else if (0 == strcmp(name, "actions.default_access"))
+		{
+			*actions_default_access = value;
+		}
+		else if (0 == strcmp(name, "ui.configuration.services"))
+		{
+			*ui_conf_services = value;
+		}
+	}
+
+	DBfree_result(result);
+}
+
+static int	DBpatch_5050016(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+
+	result = DBselect("select distinct roleid from role_rule");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_int64_t	roleid;
+		int ui_def_access = -1, act_def_access = -1, ui_conf_services = -1;
+
+		ZBX_STR2UINT64(roleid, row[0]);
+
+		DBpatch_get_role_rules(roleid, &ui_def_access, &act_def_access, &ui_conf_services);
+
+		if (ui_def_access == act_def_access && -1 != ui_conf_services)
+		{
+			if (ZBX_DB_OK > DBexecute("update role_rule set name='actions.manage_services' where"
+					" roleid=" ZBX_FS_UI64 " and name='ui.configuration.services'", roleid))
+			{
+				ret = FAIL;
+				goto out;
+			}
+		}
+		else if (1 == ui_def_access && -1 == ui_conf_services && 0 == act_def_access)
+		{
+			if (ZBX_DB_OK > DBexecute("insert into role_rule (role_ruleid,roleid,type,name,value_int,"
+					"value_str,value_moduleid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",0,"
+					"'actions.manage_services',1,'',NULL)", DBget_maxid("role_rule"), roleid))
+			{
+				ret = FAIL;
+				goto out;
+			}
+		}
+		else if (0 == ui_def_access && 1 == ui_conf_services && 1 == act_def_access)
+		{
+			if (ZBX_DB_OK > DBexecute("delete from role_rule where roleid=" ZBX_FS_UI64 " and "
+					"name='ui.configuration.services'", roleid))
+			{
+				ret = FAIL;
+				goto out;
+			}
+		}
+	}
+out:
+	DBfree_result(result);
+	return ret;
+}
+
+static int	DBpatch_5050017(void)
+{
 	const ZBX_FIELD	field = {"servicealarmid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("escalations", &field);
 }
-
 
 #endif
 
@@ -251,5 +367,10 @@ DBPATCH_ADD(5050009, 0, 1)
 DBPATCH_ADD(5050010, 0, 1)
 DBPATCH_ADD(5050011, 0, 1)
 DBPATCH_ADD(5050012, 0, 1)
+DBPATCH_ADD(5050013, 0, 1)
+DBPATCH_ADD(5050014, 0, 1)
+DBPATCH_ADD(5050015, 0, 1)
+DBPATCH_ADD(5050016, 0, 1)
+DBPATCH_ADD(5050017, 0, 1)
 
 DBPATCH_END()

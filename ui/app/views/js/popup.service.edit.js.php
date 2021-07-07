@@ -1,0 +1,279 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2021 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
+window.service_edit_popup = {
+	overlay: null,
+	form: null,
+
+	init({children, trigger_descriptions}) {
+		this.overlay = overlays_stack.getById('service_edit');
+		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+
+		const template = document.createElement('template');
+
+		template.innerHTML = `
+			<div class="multiselect-button">
+				<button type="button" class="<?= ZBX_STYLE_BTN_GREY ?>"></button>
+			</div>
+		`;
+
+		const muiltiselect_button_wrap = template.content.firstElementChild;
+		const muiltiselect_button = muiltiselect_button_wrap.querySelector('button');
+
+		muiltiselect_button.textContent = <?= json_encode(_('Select')); ?>;
+		muiltiselect_button.addEventListener('click', () => {
+			this.selectParents();
+		});
+
+		document.getElementById('parent_serviceids_').parentElement.appendChild(muiltiselect_button_wrap);
+
+		for (const service of children) {
+			this.addChild({
+				serviceid: service.serviceid,
+				name: service.name,
+				trigger_description: service.triggerid != 0 ? trigger_descriptions[service.triggerid] : ''
+			});
+		}
+
+		const $tabs = $('#tabs');
+
+		$tabs.tabs();
+		$tabs.on('tabsactivate', () => {
+			$tabs.resize();
+		});
+
+		for (const id of ['algorithm', 'showsla']) {
+			document
+				.getElementById(id)
+				.addEventListener('change', () => this.update());
+		}
+
+		this.update();
+
+		document
+			.getElementById('times')
+			.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-add')) {
+					this.editTime();
+				}
+				else if (e.target.classList.contains('js-edit')) {
+					this.editTime(e.target.closest('tr'));
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					e.target.closest('tr').remove();
+				}
+			});
+
+		document
+			.getElementById('children')
+			.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-add')) {
+					this.selectChildren();
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					e.target.closest('tr').remove();
+				}
+			});
+	},
+
+	update() {
+		const status_enabled = document.getElementById('algorithm').value != <?= SERVICE_ALGORITHM_NONE ?>;
+		const showsla = document.getElementById('showsla').checked;
+
+		document.getElementById('trigger').disabled = !status_enabled;
+		document.getElementById('trigger-button').disabled = !status_enabled;
+		document.getElementById('showsla').disabled = !status_enabled;
+		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
+	},
+
+	editTime(row = null) {
+		let popup_params;
+
+		if (row !== null) {
+			const row_index = row.dataset.row_index;
+
+			popup_params = {
+				edit: '1',
+				row_index,
+				type: row.querySelector(`[name="times[${row_index}][type]"`).value,
+				ts_from: row.querySelector(`[name="times[${row_index}][ts_from]"`).value,
+				ts_to: row.querySelector(`[name="times[${row_index}][ts_to]"`).value,
+				note: row.querySelector(`[name="times[${row_index}][note]"`).value
+			};
+		}
+		else {
+			let row_index = 0;
+
+			while (document.querySelector(`#times [data-row_index="${row_index}"]`) !== null) {
+				row_index++;
+			}
+
+			popup_params = {row_index};
+		}
+
+		const overlay = PopUp('popup.service.time.edit', popup_params, 'service_time_edit', document.activeElement);
+
+		overlay.$dialogue[0].addEventListener('submit', (e) => {
+			const new_row = e.detail;
+
+			if (row !== null) {
+				row.insertAdjacentHTML('afterend', new_row);
+				row.remove();
+			}
+			else {
+				document
+					.querySelector('#times tbody')
+					.insertAdjacentHTML('beforeend', new_row);
+			}
+		});
+	},
+
+	addChild(service) {
+		const input_name = `child_serviceids[${service.serviceid}]`;
+
+		if (document.querySelector(`#children tbody input[name="${input_name}"]`) !== null) {
+			return;
+		}
+
+		const template = document.createElement('template');
+
+		template.innerHTML = `
+			<tr>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-name" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
+					<input type="hidden">
+				</td>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-trigger_descripition" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;"></td>
+				<td>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"></button>
+				</td>
+			</tr>
+		`;
+
+		const row = template.content.firstElementChild;
+
+		row.querySelector('.js-name').insertAdjacentText('afterbegin', service.name);
+
+		const input = row.querySelector('.js-name input');
+		input.name = input_name;
+		input.value = service.serviceid;
+
+		row.querySelector('.js-trigger_descripition').textContent = service.trigger_description;
+		row.querySelector('.js-remove').textContent = <?= json_encode(_('Remove')); ?>;
+
+		document
+			.querySelector('#children tbody')
+			.appendChild(row);
+	},
+
+	selectChildren() {
+		const overlay = PopUp('popup.services', {title: <?= json_encode(_('Add child services')); ?>}, 'services',
+			document.activeElement
+		);
+
+		overlay.$dialogue[0].addEventListener('submit', (e) => {
+			for (const service of e.detail) {
+				this.addChild(service);
+			}
+		});
+	},
+
+	selectParents() {
+		const overlay = PopUp('popup.services', {title: <?= json_encode(_('Add parent services')); ?>}, 'services',
+			document.activeElement
+		);
+
+		overlay.$dialogue[0].addEventListener('submit', (e) => {
+			const data = [];
+
+			for (const service of e.detail) {
+				data.push({id: service.serviceid, name: service.name});
+			}
+
+			jQuery('#parent_serviceids_').multiSelect('addData', data);
+		});
+	},
+
+	submit() {
+		const fields = getFormFields(this.form);
+
+		fields.name = fields.name.trim();
+
+		for (const el of this.form.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+
+		this.overlay.setLoading();
+
+		const curl = new Curl(this.form.getAttribute('action'));
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+			body: urlEncodeData(fields)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('errors' in response) {
+					throw {html_string: response.errors};
+				}
+
+				postMessageOk(response.title);
+
+				if ('messages' in response) {
+					postMessageDetails('success', response.messages);
+				}
+
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				location.href = location.href;
+			})
+			.catch((error) => {
+				let message_box;
+
+				if (typeof error === 'object' && 'html_string' in error) {
+					message_box = new DOMParser().parseFromString(error.html_string, 'text/html').body.
+						firstElementChild;
+				}
+				else {
+					const error = <?= json_encode(_('Unexpected server error.')) ?>;
+
+					message_box = makeMessageBox('bad', [], error, true, false)[0];
+				}
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+};
+
+service_edit_popup.init(<?= json_encode([
+	'children' => $data['form']['children'],
+	'trigger_descriptions' => $data['form']['trigger_descriptions']
+]) ?>);

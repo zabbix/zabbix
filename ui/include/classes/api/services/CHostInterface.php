@@ -624,6 +624,10 @@ class CHostInterface extends CApiService {
 	}
 
 	protected function validateMassRemove(array $data) {
+		if (!$data['hostids'] || !$data['interfaces']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		// Check permissions.
 		$this->checkHostPermissions($data['hostids']);
 
@@ -645,12 +649,8 @@ class CHostInterface extends CApiService {
 				'port' => $interface['port']
 			];
 
-			if (array_key_exists('bulk', $interface)) {
-				$filter['bulk'] = $interface['bulk'];
-			}
-
 			// check main interfaces
-			$interfacesToRemove = API::getApiService()->select($this->tableName(), [
+			$interfacesToRemove = DB::select($this->tableName(), [
 				'output' => ['interfaceid'],
 				'filter' => $filter
 			]);
@@ -671,6 +671,10 @@ class CHostInterface extends CApiService {
 	 * @return array
 	 */
 	public function massRemove(array $data) {
+		if (!array_key_exists('hostids', $data) || !array_key_exists('interfaces', $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
+		}
+
 		$data['interfaces'] = zbx_toArray($data['interfaces']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 

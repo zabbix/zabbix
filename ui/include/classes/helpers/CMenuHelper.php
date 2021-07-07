@@ -72,8 +72,8 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
 				? (new CMenuItem(_('Services')))
-					->setUrl(new CUrl('srv_status.php'), 'srv_status.php')
-					->setAliases(['report.services', 'chart5.php'])
+					->setAction('service.list')
+					->setAliases(['service.list.edit'])
 				: null
 		];
 		$submenu_monitoring = array_filter($submenu_monitoring);
@@ -207,9 +207,6 @@ class CMenuHelper {
 				? (new CMenuItem(_('Discovery')))
 					->setAction('discovery.list')
 					->setAliases(['discovery.edit'])
-				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES)
-				? (new CMenuItem(_('Services')))->setUrl(new CUrl('services.php'), 'services.php')
 				: null
 		];
 		$submenu_configuration = array_filter($submenu_configuration);

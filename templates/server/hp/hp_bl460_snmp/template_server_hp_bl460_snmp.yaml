@@ -1,0 +1,2490 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-05-28T06:39:38Z'
+  groups:
+    -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      uuid: 172ec7e51f1c4a6ba49baffbab3dda97
+      template: 'HPE ProLiant BL460 SNMP'
+      name: 'HPE ProLiant BL460 SNMP'
+      description: |
+        Template for HPE ProLiant BL460 servers with HP iLO version 4 and later.
+        
+        MIBs used:
+        CPQHLTH-MIB
+        SNMPv2-MIB
+        CPQNIC-MIB
+        CPQSINFO-MIB
+        CPQIDA-MIB
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      items:
+        -
+          uuid: 0747f8f3cc624f469324c127577aa9f9
+          name: 'System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'hp.server.contact[sysContact]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: cc714f5445be431192dbeb553f0aa5c5
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'hp.server.descr[sysDescr]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: bf4baaaa76dc4f39bd39c62742f03e26
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
+          key: 'hp.server.hw.model[cpqSiProductName]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: CPQSINFO-MIB
+            The machine product name. The name of the machine used in this system.
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 6d5e2b9ae30b4c43a91cada24c4cc240
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
+          key: 'hp.server.hw.serialnumber[cpqSiSysSerialNum]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: CPQSINFO-MIB
+            The serial number of the physical system unit. The string will be empty if the system does not report the serial number function.
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 1bc442ba67dc42d298d98feb845d8730
+              expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant BL460 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant BL460 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
+              name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: b85a86fa36bd484cbd36cd25d2a605f9
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'hp.server.location[sysLocation]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 3df8b71c3f14432e8cd43fbc24f12447
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: 'hp.server.name[sysName]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: 87570f607b174ebe887920034a1be1ef
+              expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant BL460 SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant BL460 SNMP/hp.server.name[sysName]))>0'
+              name: 'System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 8573488eb0114109bc3c94f2edf00792
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'hp.server.objectid[sysObjectID]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 3891df22d63d4be5a62c8a27ac9d8965
+          name: 'System temperature status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
+          key: 'hp.server.sensor.temp.status[cpqHeThermalCondition]'
+          history: 7d
+          trends: 0d
+          description: |
+            MIB: CPQHLTH-MIB
+            This value specifies the overall condition of the system's thermal environment.
+            This value will be one of the following:
+            other(1)  Temperature could not be determined.
+            ok(2)  The temperature sensor is within normal operating range.
+            degraded(3)  The temperature sensor is outside of normal operating range.
+            failed(4)  The temperature sensor detects a condition that could  permanently damage the system.
+          valuemap:
+            name: 'CPQSINFO-MIB::status'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Temperature
+        -
+          uuid: a8ea3fc6a5914a868be12f21342a9678
+          name: 'Overall system health status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
+          key: 'hp.server.status[cpqHeMibCondition]'
+          history: 7d
+          trends: 0d
+          description: |
+            MIB: CPQHLTH-MIB
+            The overall condition. This object represents the overall status of the server information represented by this MIB.
+          valuemap:
+            name: 'CPQSINFO-MIB::status'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 4d7ac12aec954df2b369ddd0536d3bd5
+              expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
+              name: 'System status is in critical state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Please check the device for errors.'
+            -
+              uuid: 9ffbca9c012541b9a36956b4ae06d339
+              expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}'
+              name: 'System status is in warning state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Please check the device for warnings.'
+              dependencies:
+                -
+                  name: 'System status is in critical state'
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
+        -
+          uuid: 65ec5672f1de4852b1ee52ce57e4f58f
+          name: Uptime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'hp.server.uptime[sysUpTime]'
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 9159ee66dbe4498cba29daca24ddcb5f
+              expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.uptime[sysUpTime])<10m'
+              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          uuid: 37dc9b6453184fe58435d12d422582d9
+          name: 'SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'Item is used to collect all SNMP traps unmatched by other snmptrap items'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: d2e80ecf16bb49af99eb52a45b8c11cf
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: zabbix.host.available
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 236a5d37e58a415aa81db6e59eb826dc
+              expression: 'max(/HPE ProLiant BL460 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+      discovery_rules:
+        -
+          uuid: 79cb6edf94f441eea4b429e8474fa0c9
+          name: 'Array controller cache discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#CACHE_STATUS},1.3.6.1.4.1.232.3.2.2.2.1.2,{#CACHE_CNTRL_INDEX},1.3.6.1.4.1.232.3.2.2.2.1.1]'
+          key: array.cache.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: CPQIDA-MIB::cpqDaAccelTable'
+          item_prototypes:
+            -
+              uuid: 0cf60fc04cc243df95145b5e3128b598
+              name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.6.{#SNMPINDEX}'
+              key: 'hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Cache Module Board Backup Power Status. This monitors the status of each backup power source on the board.
+                The backup power source can only recharge when the system has power applied. The type of backup power source used is indicated by cpqDaAccelBackupPowerSource.
+                The following values are valid:
+                Other (1)  Indicates that the instrument agent does not recognize  backup power status.  You may need to update your software.
+                
+                Ok (2)  The backup power source is fully charged.
+                
+                Recharging (3)  The array controller has one or more cache module backup power  sources that are recharging.
+                Cache module operations such as Battery/Flash Backed Write Cache, Expansion, Extension and Migration are temporarily suspended until the backup power source is fully charged.
+                Cache module operations will automatically resume  when charging is complete.
+                
+                Failed (4)  The battery pack is below the sufficient voltage level and  has not recharged in 36 hours.
+                Your Cache Module board  needs to be serviced.
+                
+                Degraded (5)  The battery is still operating, however, one of the batteries  in the pack has failed to recharge properly.
+                Your Cache  Module board should be serviced as soon as possible.
+                
+                NotPresent (6)  A backup power source is not present on the cache module board. Some controllers do not have backup power sources.
+                
+                Capacitor Failed (7)  The flash backed cache module capacitor is below the sufficient voltage level and has not recharged in 10 minutes.  Your Cache Module board needs to be serviced.
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaAccelBattery'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+              trigger_prototypes:
+                -
+                  uuid: 42c0ff05c06f47089322dface6c54778
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: 28f83720bdd84ab3acb43cc8caac7507
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"}'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
+            -
+              uuid: 10e011c0c8cf4571bfdd2ab414c1853b
+              name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.2.{#SNMPINDEX}'
+              key: 'hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.
+                Note that for some controller models, a cache module board that physically attaches to the controller or chipset may not be an available option.
+                
+                The status can be:
+                Other (1)
+                 Indicates that the instrument agent does not recognize the status of the cache module. You may need to upgrade the instrument agent.
+                
+                Invalid (2)
+                 Indicates that a cache module board has not been installed in this system or is present but not configured.
+                
+                Enabled (3)
+                 Indicates that cache operations are currently configured and enabled for at least one logical drive.
+                
+                Temporarily Disabled (4)
+                 Indicates that cache operations have been temporarily disabled. View the cache module board error code object to determine why the write cache operations have been temporarily disabled.
+                
+                Permanently Disabled (5)
+                 Indicates that cache operations have been permanently disabled. View the cache module board error code object to determine why the write cache operations have been disabled.
+                
+                Cache Module Flash Memory Not Attached (6)
+                 Indicates that the flash memory component of the flash backed cache module is not attached. This status will be set when the flash memory is not attached and the Supercap is attached. This value is only used on flash backed cache modules that support removable flash memory.
+                
+                Cache Module Degraded Failsafe Speed (7)
+                 Indicates that the cache module board is currently degraded and operating at a failsafe speed. View variables cpqDaCacheMemoryDataWidth and cpqDaCacheMemoryTransferRate to obtain the cache module board`s current memory data width and memory transfer rate.
+                
+                Cache Module Critical Failure (8)
+                 Indicates that the cache module board has encountered a critical failure. The controller is currently operating in Zero Memory Raid mode.
+                
+                Read Cache Could Not Be Mapped (9)
+                 Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available. This status may be caused by virtual space limitations in certain operating systems and is only applicable to B-Series controllers.
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaAccelStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+              trigger_prototypes:
+                -
+                  uuid: d9fc0ecef7844e7190d89f4747f82661
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: 9b60ae9eec734644bcff9cbac9407b08
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+                -
+                  uuid: 61e28304c16f4855abfbcef8249a2fa6
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.OK:"enabled"} and last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.WARN:"invalid"}'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+                    -
+                      name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 3e72130010414c7dbc3b7b050df9e577
+          name: 'Array controller discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.2.1.1.1,{#CNTLR_SLOT},1.3.6.1.4.1.232.3.2.2.1.1.5,{#CNTLR_LOCATION},1.3.6.1.4.1.232.3.2.2.1.1.20]'
+          key: array.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: CPQIDA-MIB::cpqDaCntlrTable'
+          item_prototypes:
+            -
+              uuid: be46bc977cdd4a85a364628a21df099d
+              name: '{#CNTLR_LOCATION}: Disk array controller model'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.2.{#SNMPINDEX}'
+              key: 'hp.server.hw.diskarray.model[cpqDaCntlrModel.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Array Controller Model. The type of controller card.
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaCntlrModel'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+            -
+              uuid: d89a3b9bab6c4439a9797ee9208fec26
+              name: '{#CNTLR_LOCATION}: Disk array controller status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.6.{#SNMPINDEX}'
+              key: 'hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                This value represents the overall condition of this controller,
+                and any associated logical drives, physical drives, and array accelerators.
+              valuemap:
+                name: 'CPQSINFO-MIB::status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+              trigger_prototypes:
+                -
+                  uuid: d0e8bcc0510c4e86bfcd3e9d601f83e0
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                  name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: a38ea92527b44599b690c068a62481ed
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
+                  name: '{#CNTLR_LOCATION}: Disk array controller is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: cbcd697782e34a5e87cef72d65229a87
+          name: 'FAN discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.7.1.9]'
+          key: fan.discovery
+          delay: 1h
+          description: 'CPQHLTH-MIB::cpqHeFltTolFanCondition'
+          item_prototypes:
+            -
+              uuid: 02b11840d01245cfbac4e3a5264c713e
+              name: 'Fan {#SNMPINDEX}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.7.1.9.{#SNMPINDEX}'
+              key: 'hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: CPQHLTH-MIB
+                The condition of the fan.
+                This value will be one of the following:
+                other(1)  Fan status detection is not supported by this system or driver.
+                ok(2)  The fan is operating properly.
+                degraded(2)  A redundant fan is not operating properly.
+                failed(4)  A non-redundant fan is not operating properly.
+              valuemap:
+                name: 'CPQSINFO-MIB::status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: ab33e6666fd14aac8f703c72fd9b760e
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
+                  name: 'Fan {#SNMPINDEX}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit.'
+                -
+                  uuid: a9098b4dcbe04b3a82f0353f115345d7
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.WARN}'
+                  name: 'Fan {#SNMPINDEX}: Fan is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the fan unit.'
+                  dependencies:
+                    -
+                      name: 'Fan {#SNMPINDEX}: Fan is in critical state'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: dbe83d07252743f2bc889ce320730d78
+          name: 'Network interface discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ADAPTER_INDEX},1.3.6.1.4.1.232.18.2.3.1.1.1,{#ADAPTER_NAME},1.3.6.1.4.1.232.18.2.3.1.1.39]'
+          key: net.if.discovery
+          delay: 1h
+          description: 'CPQIDA-MIB::cpqNicIfPhysAdapterTable'
+          item_prototypes:
+            -
+              uuid: 1b446f4de8be4eeab2410756739eae6c
+              name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.18.2.3.1.1.14.{#SNMPINDEX}'
+              key: 'hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQNIC-MIB
+                The physical adapter status. The following values are valid:
+                unknown(1)
+                  The instrument agent was not able to determine the status of the adapter. The instrument agent may need to be upgraded.
+                ok(2)
+                  The physical adapter is operating properly.
+                generalFailure(3)
+                  The physical adapter has failed.
+                linkFailure(4)
+                  The physical adapter has lost link. Check the cable connections to this adapter.
+              valuemap:
+                name: 'CPQNIC-MIB::cpqNicIfPhysAdapterStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Network interfaces'
+              trigger_prototypes:
+                -
+                  uuid: 477f8237ed7c4d99af92e94f7563e01c
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
+                  name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the physical adapter.'
+                -
+                  uuid: 5962382262854335bc42ae47203e44a7
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=4'
+                  name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has lost link'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the cable connections to this adapter.'
+                  dependencies:
+                    -
+                      name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 4ec2950e764249dc9c091e92dbba4137
+          name: 'Physical disk discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.5.1.1.5,{#DISK_LOCATION},1.3.6.1.4.1.232.3.2.5.1.1.64]'
+          key: physicaldisk.discovery
+          delay: 1h
+          description: 'Scanning  table of physical drive entries CPQIDA-MIB::cpqDaPhyDrvTable.'
+          item_prototypes:
+            -
+              uuid: 6ebfcb4a2bd44407920c47f060ec6307
+              name: '{#DISK_LOCATION}: Physical disk media type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.69.{#SNMPINDEX}'
+              key: 'hp.server.hw.physicaldisk.media_type[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Drive Array Physical Drive Media Type. The following values are defined:
+                other(1)  The instrument agent is unable to determine the physical drive’s media type.
+                rotatingPlatters(2)  The physical drive media is composed of rotating platters.
+                solidState(3)  The physical drive media is composed of solid state electronics.
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: 6c59eaa90b964ad4b9f5a0511d620e9d
+              name: '{#DISK_LOCATION}: Physical disk model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.3.{#SNMPINDEX}'
+              key: 'hp.server.hw.physicaldisk.model[cpqDaPhyDrvModel.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive Model. This is a text description of the physical drive.
+                The text that appears depends upon who manufactured the drive and the drive type.
+                If a drive fails, note the model to identify the type of drive necessary for replacement.
+                If a model number is not present, you may not have properly initialized the drive array to which the physical drive is attached for monitoring.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: f4f6e63dd1714c2ca721baebb478f5ab
+              name: '{#DISK_LOCATION}: Physical disk serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.51.{#SNMPINDEX}'
+              key: 'hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive Serial Number.
+                This is the serial number assigned to the physical drive.
+                This value is based upon the serial number as returned by the SCSI inquiry command
+                but may have been modified due to space limitations.  This can be used for identification purposes.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: d3dbef930bca4808ae3bf32ba84a987a
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
+                  name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Disk serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              uuid: dee3a8bb94184bad80d058cb9ac3d324
+              name: '{#DISK_LOCATION}: Disk size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.45.{#SNMPINDEX}'
+              key: 'hp.server.hw.physicaldisk.size[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              units: B
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive Size in MB.
+                This is the size of the physical drive in megabytes.
+                This value is calculated using the value 1,048,576 (2^20) as a megabyte.
+                Drive manufacturers sometimes use the number 1,000,000 as a megabyte when giving drive capacities so this value may differ
+                from the advertised size of a drive. This field is only applicable for controllers which support SCSI drives,
+                and therefore is not supported by the IDA or IDA-2 controllers. The field will contain 0xFFFFFFFF if the drive capacity cannot be calculated
+                or if the controller does not support SCSI drives.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: e08b144330824b9f8a9df61f4e4016b4
+              name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.57.{#SNMPINDEX}'
+              key: 'hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive S.M.A.R.T Status. The following values are defined:
+                other(1)  The agent is unable to determine if the status of S.M.A.R.T  predictive failure monitoring for this drive.
+                ok(2)  Indicates the drive is functioning properly.
+                replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  error and should be replaced.
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: 6fb9a3a867f74290974b106755763369
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Disk probably requires replacement.'
+                  dependencies:
+                    -
+                      name: '{#DISK_LOCATION}: Physical disk failed'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
+            -
+              uuid: d0449cc58efb4258ba71e8d6837cab20
+              name: '{#DISK_LOCATION}: Physical disk status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.6.{#SNMPINDEX}'
+              key: 'hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive Status. This shows the status of the physical drive. The following values are valid for the physical drive status:
+                other (1)  Indicates that the instrument agent does not recognize  the drive.
+                You may need to upgrade your instrument agent  and/or driver software.
+                ok (2)  Indicates the drive is functioning properly.
+                failed (3)  Indicates that the drive is no longer operating and  should be replaced.
+                predictiveFailure(4)  Indicates that the drive has a predictive failure error and  should be replaced.
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: 21224423e69148a797e5ae4fcdda8ed5
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
+                  name: '{#DISK_LOCATION}: Physical disk failed'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check physical disk for warnings or errors.'
+                -
+                  uuid: ff246b7598f24ab88aa6e7119750e57b
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN}'
+                  name: '{#DISK_LOCATION}: Physical disk is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check physical disk for warnings or errors.'
+                  dependencies:
+                    -
+                      name: '{#DISK_LOCATION}: Physical disk failed'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 5b9a240a6b864513b2b0ac8a4f0a0c07
+          name: 'PSU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.9.3.1.5,{#CHASSIS_NUM},1.3.6.1.4.1.232.6.2.9.3.1.1,{#BAY_NUM},1.3.6.1.4.1.232.6.2.9.3.1.2]'
+          key: psu.discovery
+          delay: 1h
+          description: 'CPQHLTH-MIB::cpqHeFltTolPowerSupplyStatus'
+          item_prototypes:
+            -
+              uuid: c49420a345664c719d9eb02f0ee866c1
+              name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.9.3.1.4.{#SNMPINDEX}'
+              key: 'hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: CPQHLTH-MIB
+                The condition of the power supply. This value will be one of the following:
+                other(1)  The status could not be determined or not present.
+                ok(2)  The power supply is operating normally.
+                degraded(3)  A temperature sensor, fan or other power supply component is  outside of normal operating range.
+                failed(4)  A power supply component detects a condition that could  permanently damage the system.
+              valuemap:
+                name: 'CPQSINFO-MIB::status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: c0976740671a4ee1b524b2be84eac05f
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
+                  name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors.'
+                -
+                  uuid: 4245fe8df0ec42fb8698cd54810357d0
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.WARN}'
+                  name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the power supply unit for errors.'
+                  dependencies:
+                    -
+                      name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 641f9eebbb134b34960f92037c694802
+          name: 'Temperature ambient discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: temp.ambient.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPINDEX}'
+                value: 0\.1
+                formulaid: B
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '11'
+                formulaid: A
+          description: |
+            Scanning table of Temperature Sensor Entries:
+            CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter
+          item_prototypes:
+            -
+              uuid: 6d81b9d2bfff4312810a50d340f8ba17
+              name: 'Ambient: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 12ca340ef2cc4d639940375e84fc1384
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1'
+                  name: 'Ambient: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  uuid: 83775e86b0b6450399f0739bcd7aeb42
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4'
+                  name: 'Ambient: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  uuid: 1e61e8b2ba4346f2962a3498a147f65e
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3'
+                  name: 'Ambient: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
+              uuid: 1cfee00e1b4d49528589520036b4bf8d
+              name: 'Ambient: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: Ambient
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: aa4918f21cf14e2c94ac155ac3a0b0b4
+          name: 'Temperature CPU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: temp.cpu.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '6'
+                formulaid: A
+          description: |
+            Scanning table of Temperature Sensor Entries:
+            CPQHLTH-MIB::cpqHeTemperatureTable with cpu(6) filter
+          item_prototypes:
+            -
+              uuid: 0fa15e127d03487cb4fbfaaaacf4fe96
+              name: 'CPU-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: b3b17ce8480f4ff5bbc4cba02e53190d
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1'
+                  name: 'CPU-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  uuid: 1d2cc0b823134b9b901a0292e731f882
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4'
+                  name: 'CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  uuid: c9edcad3712d4915a5a3700916621525
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3'
+                  name: 'CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
+              uuid: 4f67a2ca1b9d4b179770558df5b8edb7
+              name: 'CPU-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: CPU-{#SNMPINDEX}
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: c3b3cfe6aa4c47d0ab66b9a969df85bd
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: temp.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: (4|8|9|12|13)
+                formulaid: A
+          description: |
+            Scanning table of Temperature Sensor Entries:
+            CPQHLTH-MIB::cpqHeTemperatureTable
+          item_prototypes:
+            -
+              uuid: 4f13e0a5d45e4847931829f9abd30795
+              name: '{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 1978105618f44f439f40b7e6b7dbb5dc
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1'
+                  name: '{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  uuid: feee1c3e792044ecbb07ffed47b2fddd
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4'
+                  name: '{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  uuid: 250291ba7b404dd287b14034145d7ee0
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3'
+                  name: '{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
+              uuid: c21a7b49d03f4b2e9c532777d4931236
+              name: '{#SNMPINDEX}: Temperature sensor location'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.3.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.locale[cpqHeTemperatureLocale.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                This specifies the location of the temperature sensor present in the system.
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+            -
+              uuid: 8ac8567f26884cab9d175d9f9934d575
+              name: '{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: {#SNMPINDEX}
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: be33f30661ba4c3e88ace96906b0a74c
+          name: 'Temperature I/O discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: temp.io.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '5'
+                formulaid: A
+          description: |
+            Scanning table of Temperature Sensor Entries:
+            CPQHLTH-MIB::cpqHeTemperatureTable with ioBoard(5) filter
+          item_prototypes:
+            -
+              uuid: 0addee41af6e489fbf2a9747d9cab50e
+              name: 'I/O-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 2d06da621e5946ea88bf158cabd4fcbd
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1'
+                  name: 'I/O-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  uuid: 5ca16e1ea7d84aa7bed31ba05f7df50e
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4'
+                  name: 'I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  uuid: 8a2468bf1cd14065af733b0d045c6031
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3'
+                  name: 'I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
+              uuid: 2fa250ea6f1e472d9e90984d0918c50d
+              name: 'I/O-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: I/O-{#SNMPINDEX}
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: d4dc4e4e6fab415baae36e98877205c5
+          name: 'Temperature memory discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: temp.memory.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '7'
+                formulaid: A
+          description: |
+            Scanning table of Temperature Sensor Entries:
+            CPQHLTH-MIB::cpqHeTemperatureTable with memory(7) filter
+          item_prototypes:
+            -
+              uuid: 8468b9ca183e44569f6d467f7d103b11
+              name: 'Memory-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 997f65c5ee1d473dbe22a8517091cf3e
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1'
+                  name: 'Memory-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  uuid: 8c3b5591160e4797ae1b49f9f14439ff
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4'
+                  name: 'Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  uuid: 8665b434ba594073bc55f44b668dcee0
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3'
+                  name: 'Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
+              uuid: 7441c5de35fd4ff2b6a20c1896525bd4
+              name: 'Memory-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: Memory-{#SNMPINDEX}
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 6df0ad42b4c74a19b9bdfc240db626bb
+          name: 'Temperature PSU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: temp.psu.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '10'
+                formulaid: A
+          description: |
+            Scanning table of Temperature Sensor Entries:
+            CPQHLTH-MIB::cpqHeTemperatureTable with powerSupply(10) filter
+          item_prototypes:
+            -
+              uuid: 222d768e05d442ecb12a4cc83100438d
+              name: 'PSU-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: a292c5aaa1b3428aa4b011854d9c5e1d
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1'
+                  name: 'PSU-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  uuid: f557d93b186b42b4931e23640e54648f
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4'
+                  name: 'PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  uuid: e3cac6176199401181fbbeacf4838bad
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3'
+                  name: 'PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
+              uuid: ca1e5c260caa48368fa299a9dc007512
+              name: 'PSU-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: PSU-{#SNMPINDEX}
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: dfa25ab78aab4cf081e3857f2a40dee4
+          name: 'Temperature system discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: temp.system.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '3'
+                formulaid: A
+          description: |
+            Scanning table of Temperature Sensor Entries:
+            CPQHLTH-MIB::cpqHeTemperatureTable with system(3) filter
+          item_prototypes:
+            -
+              uuid: 10f22e6ea868460c98cc97f24a6c83e4
+              name: 'System-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 1bad1b13dcdf4689b9a784e44726196b
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1'
+                  name: 'System-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  uuid: 42fff974036d4fb6b9181adf1b3efa09
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4'
+                  name: 'System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  uuid: d184f774ab614a0b9f1f7ebc82cd1356
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3'
+                  name: 'System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
+              uuid: e25f6cbbb1d444ff851895b37dfcde5d
+              name: 'System-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'hp.server.sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: System-{#SNMPINDEX}
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 92ab660734234833adfe7108df529c24
+          name: 'Virtual disk discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.3.1.1.2,{#DISK_NAME},1.3.6.1.4.1.232.3.2.3.1.1.14]'
+          key: virtualdisk.discovery
+          delay: 1h
+          description: 'CPQIDA-MIB::cpqDaLogDrvTable'
+          item_prototypes:
+            -
+              uuid: a468686d8de44b958b26a69b4c8d11ed
+              name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Layout type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.3.{#SNMPINDEX}'
+              key: 'hp.server.hw.virtualdisk.layout[cpqDaLogDrvFaultTol.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                Logical Drive Fault Tolerance.
+                This shows the fault tolerance mode of the logical drive.
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 1e890df502e04b5ba34b3ddc8d9aea57
+              name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Disk size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.9.{#SNMPINDEX}'
+              key: 'hp.server.hw.virtualdisk.size[cpqDaLogDrvSize.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              units: B
+              description: |
+                Logical Drive Size.
+                This is the size of the logical drive in megabytes.  This value
+                is calculated using the value 1,048,576 (2^20) as a megabyte.
+                Drive manufacturers sometimes use the number 1,000,000 as a
+                megabyte when giving drive capacities so this value may
+                differ from the advertised size of a drive.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 3702a04cf01a4390805535af4f0b8172
+              name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.4.{#SNMPINDEX}'
+              key: 'hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}]'
+              history: 7d
+              description: 'Logical Drive Status.'
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+              trigger_prototypes:
+                -
+                  uuid: e11c5781a34642c49ad15cdcd71dacc3
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
+                  name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check virtual disk for warnings or errors.'
+                -
+                  uuid: 10f0bdba64184a9389a46b9bab18719a
+                  expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])<>{$VDISK.STATUS.OK}'
+                  name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check virtual disk for warnings or errors.'
+                  dependencies:
+                    -
+                      name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
+                      expression: 'last(/HPE ProLiant BL460 SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      macros:
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
+          value: '7'
+          description: 'The critical status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"}'
+          value: '4'
+          description: 'The critical status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"}'
+          value: '5'
+          description: 'The warning status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"notPresent"}'
+          value: '6'
+          description: 'The warning status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+          value: '8'
+          description: 'The critical status of the disk array cache for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.STATUS.OK:"enabled"}'
+          value: '3'
+          description: 'The normal status of the disk array cache for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"}'
+          value: '7'
+          description: 'The warning status of the disk array cache for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
+          value: '6'
+          description: 'The warning status of the disk array cache for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"}'
+          value: '9'
+          description: 'The warning status of the disk array cache for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.STATUS.WARN:"invalid"}'
+          value: '2'
+          description: 'The warning status of the disk array cache for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.CRIT}'
+          value: '4'
+          description: 'The critical status of the disk array for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.WARN}'
+          value: '3'
+          description: 'The warning status of the disk array for trigger expression.'
+        -
+          macro: '{$DISK.SMART.STATUS.FAIL:"replaceDrive"}'
+          value: '3'
+          description: 'The critical S.M.A.R.T status of the disk for trigger expression.'
+        -
+          macro: '{$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+          value: '4'
+          description: 'The critical S.M.A.R.T status of the disk for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.FAIL}'
+          value: '3'
+          description: 'The critical status of the disk for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.WARN}'
+          value: '4'
+          description: 'The warning status of the disk for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT}'
+          value: '4'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.WARN}'
+          value: '3'
+          description: 'The warning value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.CRIT}'
+          value: '4'
+          description: 'The critical status of the health for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.WARN}'
+          value: '3'
+          description: 'The warning status of the health for trigger expression.'
+        -
+          macro: '{$PSU.STATUS.CRIT}'
+          value: '4'
+          description: 'The critical value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$PSU.STATUS.WARN}'
+          value: '3'
+          description: 'The warning value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$VDISK.STATUS.CRIT}'
+          value: '3'
+          description: 'The critical status of the virtual disk for trigger expression.'
+        -
+          macro: '{$VDISK.STATUS.OK}'
+          value: '2'
+          description: 'The normal status of the virtual disk for trigger expression.'
+      valuemaps:
+        -
+          uuid: 1b67de295fef454cb89744b101cf5a19
+          name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: degraded
+            -
+              value: '4'
+              newvalue: failed
+        -
+          uuid: 07d063dcbb3d4f1a8642bfd93afcd327
+          name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: system
+            -
+              value: '4'
+              newvalue: systemBoard
+            -
+              value: '5'
+              newvalue: ioBoard
+            -
+              value: '6'
+              newvalue: cpu
+            -
+              value: '7'
+              newvalue: memory
+            -
+              value: '8'
+              newvalue: storage
+            -
+              value: '9'
+              newvalue: removableMedia
+            -
+              value: '10'
+              newvalue: powerSupply
+            -
+              value: '11'
+              newvalue: ambient
+            -
+              value: '12'
+              newvalue: chassis
+            -
+              value: '13'
+              newvalue: bridgeCard
+        -
+          uuid: 009fd99d3734459285fa037c4a0ca201
+          name: 'CPQIDA-MIB::cpqDaAccelBattery'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: Ok
+            -
+              value: '3'
+              newvalue: Recharging
+            -
+              value: '4'
+              newvalue: Failed
+            -
+              value: '5'
+              newvalue: Degraded
+            -
+              value: '6'
+              newvalue: 'Not Present'
+            -
+              value: '7'
+              newvalue: 'Capacitor failed'
+        -
+          uuid: e138320082fc4aa69f3b23dad80272b2
+          name: 'CPQIDA-MIB::cpqDaAccelStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: invalid
+            -
+              value: '3'
+              newvalue: enabled
+            -
+              value: '4'
+              newvalue: tmpDisabled
+            -
+              value: '5'
+              newvalue: permDisabled
+            -
+              value: '6'
+              newvalue: cacheModFlashMemNotAttached
+            -
+              value: '7'
+              newvalue: cacheModDegradedFailsafeSpeed
+            -
+              value: '8'
+              newvalue: cacheModCriticalFailure
+            -
+              value: '9'
+              newvalue: cacheReadCacheNotMapped
+        -
+          uuid: 4891472973f84343ade2c5b61d96fcef
+          name: 'CPQIDA-MIB::cpqDaCntlrModel'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ida
+            -
+              value: '3'
+              newvalue: idaExpansion
+            -
+              value: '4'
+              newvalue: ida-2
+            -
+              value: '5'
+              newvalue: smart
+            -
+              value: '6'
+              newvalue: smart-2e
+            -
+              value: '7'
+              newvalue: smart-2p
+            -
+              value: '8'
+              newvalue: smart-2sl
+            -
+              value: '9'
+              newvalue: smart-3100es
+            -
+              value: '10'
+              newvalue: smart-3200
+            -
+              value: '11'
+              newvalue: smart-2dh
+            -
+              value: '12'
+              newvalue: smart-221
+            -
+              value: '13'
+              newvalue: sa-4250es
+            -
+              value: '14'
+              newvalue: sa-4200
+            -
+              value: '15'
+              newvalue: sa-integrated
+            -
+              value: '16'
+              newvalue: sa-431
+            -
+              value: '17'
+              newvalue: sa-5300
+            -
+              value: '18'
+              newvalue: raidLc2
+            -
+              value: '19'
+              newvalue: sa-5i
+            -
+              value: '20'
+              newvalue: sa-532
+            -
+              value: '21'
+              newvalue: sa-5312
+            -
+              value: '22'
+              newvalue: sa-641
+            -
+              value: '23'
+              newvalue: sa-642
+            -
+              value: '24'
+              newvalue: sa-6400
+            -
+              value: '25'
+              newvalue: sa-6400em
+            -
+              value: '26'
+              newvalue: sa-6i
+            -
+              value: '27'
+              newvalue: sa-generic
+            -
+              value: '29'
+              newvalue: sa-p600
+            -
+              value: '30'
+              newvalue: sa-p400
+            -
+              value: '31'
+              newvalue: sa-e200
+            -
+              value: '32'
+              newvalue: sa-e200i
+            -
+              value: '33'
+              newvalue: sa-p400i
+            -
+              value: '34'
+              newvalue: sa-p800
+            -
+              value: '35'
+              newvalue: sa-e500
+            -
+              value: '36'
+              newvalue: sa-p700m
+            -
+              value: '37'
+              newvalue: sa-p212
+            -
+              value: '38'
+              newvalue: sa-p410
+            -
+              value: '39'
+              newvalue: sa-p410i
+            -
+              value: '40'
+              newvalue: sa-p411
+            -
+              value: '41'
+              newvalue: sa-b110i
+            -
+              value: '42'
+              newvalue: sa-p712m
+            -
+              value: '43'
+              newvalue: sa-p711m
+            -
+              value: '44'
+              newvalue: sa-p812
+            -
+              value: '45'
+              newvalue: sw-1210m
+            -
+              value: '46'
+              newvalue: sa-p220i
+            -
+              value: '47'
+              newvalue: sa-p222
+            -
+              value: '48'
+              newvalue: sa-p420
+            -
+              value: '49'
+              newvalue: sa-p420i
+            -
+              value: '50'
+              newvalue: sa-p421
+            -
+              value: '51'
+              newvalue: sa-b320i
+            -
+              value: '52'
+              newvalue: sa-p822
+            -
+              value: '53'
+              newvalue: sa-p721m
+            -
+              value: '54'
+              newvalue: sa-b120i
+            -
+              value: '55'
+              newvalue: hps-1224
+            -
+              value: '56'
+              newvalue: hps-1228
+            -
+              value: '57'
+              newvalue: hps-1228m
+            -
+              value: '58'
+              newvalue: sa-p822se
+            -
+              value: '59'
+              newvalue: hps-1224e
+            -
+              value: '60'
+              newvalue: hps-1228e
+            -
+              value: '61'
+              newvalue: hps-1228em
+            -
+              value: '62'
+              newvalue: sa-p230i
+            -
+              value: '63'
+              newvalue: sa-p430i
+            -
+              value: '64'
+              newvalue: sa-p430
+            -
+              value: '65'
+              newvalue: sa-p431
+            -
+              value: '66'
+              newvalue: sa-p731m
+            -
+              value: '67'
+              newvalue: sa-p830i
+            -
+              value: '68'
+              newvalue: sa-p830
+            -
+              value: '69'
+              newvalue: sa-p831
+            -
+              value: '70'
+              newvalue: sa-p530
+            -
+              value: '71'
+              newvalue: sa-p531
+            -
+              value: '72'
+              newvalue: sa-p244br
+            -
+              value: '73'
+              newvalue: sa-p246br
+            -
+              value: '74'
+              newvalue: sa-p440
+            -
+              value: '75'
+              newvalue: sa-p440ar
+            -
+              value: '76'
+              newvalue: sa-p441
+            -
+              value: '77'
+              newvalue: sa-p741m
+            -
+              value: '78'
+              newvalue: sa-p840
+            -
+              value: '79'
+              newvalue: sa-p841
+            -
+              value: '80'
+              newvalue: sh-h240ar
+            -
+              value: '81'
+              newvalue: sh-h244br
+            -
+              value: '82'
+              newvalue: sh-h240
+            -
+              value: '83'
+              newvalue: sh-h241
+            -
+              value: '84'
+              newvalue: sa-b140i
+            -
+              value: '85'
+              newvalue: sh-generic
+            -
+              value: '86'
+              newvalue: sa-p240nr
+            -
+              value: '87'
+              newvalue: sh-h240nr
+            -
+              value: '88'
+              newvalue: sa-p840ar
+            -
+              value: '89'
+              newvalue: sa-p542d
+            -
+              value: '90'
+              newvalue: s100i
+            -
+              value: '91'
+              newvalue: e208i-p
+            -
+              value: '92'
+              newvalue: e208i-a
+            -
+              value: '93'
+              newvalue: e208i-c
+            -
+              value: '94'
+              newvalue: e208e-p
+            -
+              value: '95'
+              newvalue: p204i-b
+            -
+              value: '96'
+              newvalue: p204i-c
+            -
+              value: '97'
+              newvalue: p408i-p
+            -
+              value: '98'
+              newvalue: p408i-a
+            -
+              value: '99'
+              newvalue: p408e-p
+            -
+              value: '100'
+              newvalue: p408i-c
+            -
+              value: '101'
+              newvalue: p408e-m
+            -
+              value: '102'
+              newvalue: p416ie-m
+            -
+              value: '103'
+              newvalue: p816i-a
+            -
+              value: '104'
+              newvalue: p408i-sb
+        -
+          uuid: a368b7472246477599d6278df8348bc9
+          name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
+          mappings:
+            -
+              value: '0'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: none
+            -
+              value: '3'
+              newvalue: RAID-1/RAID-10
+            -
+              value: '4'
+              newvalue: RAID-4
+            -
+              value: '5'
+              newvalue: RAID-5
+            -
+              value: '7'
+              newvalue: RAID-6
+            -
+              value: '8'
+              newvalue: RAID-50
+            -
+              value: '9'
+              newvalue: RAID-60
+            -
+              value: '10'
+              newvalue: 'RAID-1 ADM'
+            -
+              value: '11'
+              newvalue: 'RAID-10 ADM'
+        -
+          uuid: aab16842347c4e58b9bbee274dad3c62
+          name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: failed
+            -
+              value: '4'
+              newvalue: unconfigured
+            -
+              value: '5'
+              newvalue: recovering
+            -
+              value: '6'
+              newvalue: readyForRebuild
+            -
+              value: '7'
+              newvalue: rebuilding
+            -
+              value: '8'
+              newvalue: wrongDrive
+            -
+              value: '9'
+              newvalue: badConnect
+            -
+              value: '10'
+              newvalue: overheating
+            -
+              value: '11'
+              newvalue: shutdown
+            -
+              value: '12'
+              newvalue: expanding
+            -
+              value: '13'
+              newvalue: notAvailable
+            -
+              value: '14'
+              newvalue: queuedForExpansion
+            -
+              value: '15'
+              newvalue: multipathAccessDegraded
+            -
+              value: '16'
+              newvalue: erasing
+            -
+              value: '17'
+              newvalue: predictiveSpareRebuildReady
+            -
+              value: '18'
+              newvalue: rapidParityInitInProgress
+            -
+              value: '19'
+              newvalue: rapidParityInitPending
+            -
+              value: '20'
+              newvalue: noAccessEncryptedNoCntlrKey
+            -
+              value: '21'
+              newvalue: unencryptedToEncryptedInProgress
+            -
+              value: '22'
+              newvalue: newLogDrvKeyRekeyInProgress
+            -
+              value: '23'
+              newvalue: noAccessEncryptedCntlrEncryptnNotEnbld
+            -
+              value: '24'
+              newvalue: unencryptedToEncryptedNotStarted
+            -
+              value: '25'
+              newvalue: newLogDrvKeyRekeyRequestReceived
+        -
+          uuid: b3b110016c8c4272b9228161798a9bbd
+          name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: rotatingPlatters
+            -
+              value: '3'
+              newvalue: solidState
+        -
+          uuid: 5b016d244c6845f7afcc80361aec2af1
+          name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: replaceDrive
+            -
+              value: '4'
+              newvalue: replaceDriveSSDWearOut
+        -
+          uuid: 2f4e1eb1f32847b3808372d02f752575
+          name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: failed
+            -
+              value: '4'
+              newvalue: predictiveFailure
+        -
+          uuid: 3fe7ff0237a54f6cae3a1b8ffdabf157
+          name: 'CPQNIC-MIB::cpqNicIfPhysAdapterStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: unknown
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: generalFailure
+            -
+              value: '4'
+              newvalue: linkFailure
+        -
+          uuid: 342d09a1cfe543b9ac1555daee9f2235
+          name: 'CPQSINFO-MIB::status'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: ok
+            -
+              value: '3'
+              newvalue: degraded
+            -
+              value: '4'
+              newvalue: failed
+        -
+          uuid: c57a256a525b46b0a1d0646200de57e2
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

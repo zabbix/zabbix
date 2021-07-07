@@ -952,11 +952,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	scriptitem_es_engine_init();
 
-#ifdef HAVE_NETSNMP
-	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
-		zbx_init_snmp();
-#endif
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif

@@ -61,7 +61,7 @@ zabbix_export:
           triggers:
             -
               uuid: 62a9cd04a4dc4f5a9b59a01e54fb983f
-              expression: '(last(/Mikrotik SNMP/system.hw.firmware,#1)<>last(/Mikrotik SNMP/system.hw.firmware,#2))=1 and length(last(/Mikrotik SNMP/system.hw.firmware))>0'
+              expression: 'last(/Mikrotik SNMP/system.hw.firmware,#1)<>last(/Mikrotik SNMP/system.hw.firmware,#2) and length(last(/Mikrotik SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -113,7 +113,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6c1dcb2e8e76405887af69a6a08e53df
-              expression: '(last(/Mikrotik SNMP/system.hw.serialnumber,#1)<>last(/Mikrotik SNMP/system.hw.serialnumber,#2))=1 and length(last(/Mikrotik SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Mikrotik SNMP/system.hw.serialnumber,#1)<>last(/Mikrotik SNMP/system.hw.serialnumber,#2) and length(last(/Mikrotik SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -144,7 +144,7 @@ zabbix_export:
           triggers:
             -
               uuid: 739f60e0862d4fe88cc2a5fe626211a8
-              expression: '(last(/Mikrotik SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/Mikrotik SNMP/system.sw.os[mtxrLicVersion.0],#2))=1 and length(last(/Mikrotik SNMP/system.sw.os[mtxrLicVersion.0]))>0'
+              expression: 'last(/Mikrotik SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/Mikrotik SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/Mikrotik SNMP/system.sw.os[mtxrLicVersion.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'

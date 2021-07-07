@@ -183,9 +183,6 @@ class CMultiSelect extends CTag {
 			$mapped_options['selectedLimit'] = '1';
 		}
 
-		$autocomplete_parameters = [];
-		$popup_parameters = [];
-
 		if (array_key_exists('autosuggest', $options)) {
 			$valid_fields = ['filter_preselect_fields'];
 
@@ -212,7 +209,11 @@ class CMultiSelect extends CTag {
 			}
 		}
 
+		$autocomplete_parameters = [];
+
 		if (array_key_exists('popup', $options)) {
+			$popup_parameters = [];
+
 			$valid_fields = ['parameters', 'filter_preselect_fields'];
 
 			foreach ($options['popup'] as $field => $value) {
@@ -406,9 +407,10 @@ class CMultiSelect extends CTag {
 					$autocomplete_parameters['context'] = $parameters['context'];
 				}
 			}
+
+			$mapped_options['popup']['parameters'] = $popup_parameters;
 		}
 
-		$mapped_options['popup']['parameters'] = $popup_parameters;
 		$mapped_options['objectOptions'] = $autocomplete_parameters;
 
 		return $mapped_options;

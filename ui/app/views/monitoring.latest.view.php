@@ -46,7 +46,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		'tags' => $data['filter']['tags']
 	]);
 
-	$widget->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'latest.view')))
+	$widget->addItem((new CFilter())
+		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'latest.view'))
 		->setProfile('web.latest.filter')
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'latest.view'))->removeId())
@@ -101,6 +102,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 						(new CCheckBox('filter_show_without_data'))
 							->setChecked($data['filter']['show_without_data'] == 1)
 							->setAttribute('disabled', $data['filter']['hostids'] ? null : 'disabled')
+							->setUncheckedValue(0)
 					]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 				])
 		])

@@ -38,6 +38,7 @@ if (array_key_exists('no_data', $data)) {
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('class.calendar.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
@@ -126,7 +127,7 @@ $widget = (new CWidget())
 
 if ($data['has_time_selector']) {
 	$widget->addItem(
-		(new CFilter(new CUrl()))
+		(new CFilter())
 			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
 			->addTimeSelector($data['time_period']['from'], $data['time_period']['to'],

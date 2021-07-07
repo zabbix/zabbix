@@ -118,7 +118,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 				// filter only normal and discovery created hosts
 				$options = [
-					'output' => ['hostid', 'inventory_mode'],
+					'output' => ['hostid', 'inventory_mode', 'flags'],
 					'hostids' => $hostids,
 					'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
 				];
@@ -289,7 +289,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 						}
 					}
 
-					if (array_key_exists('inventory_mode', $new_values)) {
+					/*
+					 * Inventory mode cannot be changed for discovered hosts. If discovered host has disabled inventory
+					 * mode, inventory values also cannot be changed.
+					 */
+					if (array_key_exists('inventory_mode', $new_values)
+							&& $host['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						$host['inventory'] = $host_inventory;
 					}
 					elseif ($host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
@@ -407,10 +412,21 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					unset($host['parentTemplates']);
 
 					$host = $new_values + $host;
+
+					/*
+					 * API prevents changing host inventory_mode for discovered hosts. However, inventory values can
+					 * still be updated if inventory mode allows it.
+					 */
+					if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+						unset($host['inventory_mode']);
+					}
+					unset($host['flags']);
 				}
 				unset($host);
 
-				if (!API::Host()->update($hosts)) {
+				$result = $hosts ? (bool) API::Host()->update($hosts) : true;
+
+				if ($result === false) {
 					throw new Exception();
 				}
 

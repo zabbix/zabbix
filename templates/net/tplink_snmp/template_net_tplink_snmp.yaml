@@ -62,7 +62,7 @@ zabbix_export:
           triggers:
             -
               uuid: ee797ebfc568468d8a3e9a8b388afb6d
-              expression: '(last(/TP-LINK SNMP/system.hw.firmware,#1)<>last(/TP-LINK SNMP/system.hw.firmware,#2))=1 and length(last(/TP-LINK SNMP/system.hw.firmware))>0'
+              expression: 'last(/TP-LINK SNMP/system.hw.firmware,#1)<>last(/TP-LINK SNMP/system.hw.firmware,#2) and length(last(/TP-LINK SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -117,7 +117,7 @@ zabbix_export:
           triggers:
             -
               uuid: 57a906ac8f994ebaa2543a5eb4949db7
-              expression: '(last(/TP-LINK SNMP/system.hw.serialnumber,#1)<>last(/TP-LINK SNMP/system.hw.serialnumber,#2))=1 and length(last(/TP-LINK SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/TP-LINK SNMP/system.hw.serialnumber,#1)<>last(/TP-LINK SNMP/system.hw.serialnumber,#2) and length(last(/TP-LINK SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
