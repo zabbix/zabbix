@@ -35,6 +35,7 @@ DIST_SUBDIRS = \
 	zbxdiag \
 	zbxtrends \
 	zbxavailability \
+	zbxaudit \
 	zbxeval
 
 if SERVER
@@ -59,6 +60,7 @@ SERVER_SUBDIRS = \
 	zbxdiag \
 	zbxtrends \
 	zbxavailability \
+	zbxaudit \
 	zbxeval
 else
 if PROXY
