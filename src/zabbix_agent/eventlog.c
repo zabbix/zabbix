@@ -875,7 +875,7 @@ int	process_eventslog6(const char *server, unsigned short port, const char *even
 	int		s_count = 0, p_count = 0, send_err = SUCCEED, ret = FAIL, match = SUCCEED;
 	DWORD		required_buf_size = 0, error_code = ERROR_SUCCESS;
 
-	unsigned long	evt_timestamp, evt_eventid;
+	unsigned long	evt_timestamp, evt_eventid = 0;
 	char		*evt_provider, *evt_source, *evt_message, str_logeventid[8];
 	unsigned short	evt_severity;
 	EVT_HANDLE	event_bookmarks[EVT_ARRAY_SIZE];
@@ -1094,7 +1094,7 @@ out:
 	}
 
 	zbx_free(eventlog_name_w);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s last eventid:%lu", __func__, zbx_result_string(ret), evt_eventid);
 
 	return ret;
 }
