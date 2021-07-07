@@ -22,7 +22,7 @@ This template was tested on:
 
 This template works with self-hosted GitLab instances. Internal service metrics are collected from GitLab /-/metrics endpoint.
 To access the metrics, the client IP address must be [explicitly allowed](https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html).
-Don't forget to change the macros {$GITLAB.URL}, {$GITLAB.PORT}. 
+Don't forget to change the macros {$GITLAB.URL}. 
 Also, see the Macros section for a list of macros used to set trigger values.  
 *NOTE.* Some metrics may not be collected depending on your Gitlab instance version and configuration. See [Gitlab’s documentation](https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html) for further information about its metric collection.
 
@@ -37,13 +37,12 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$GITLAB.HTTP.FAIL.MAX.WARN} |<p>Maximum number of HTTP requests failures for trigger expression.</p> |`2` |
 |{$GITLAB.OPEN.FDS.MAX.WARN} |<p>Maximum percentage of used file descriptors for trigger expression.</p> |`90` |
-|{$GITLAB.PORT} |<p>The port of GitLab web endpoint</p> |`80` |
 |{$GITLAB.PUMA.QUEUE.MAX.WARN} |<p>Maximum number of Puma queued requests for trigger expression.</p> |`1` |
 |{$GITLAB.PUMA.UTILIZATION.MAX.WARN} |<p>Maximum percentage of used Puma thread utilization for trigger expression.</p> |`90` |
 |{$GITLAB.REDIS.FAIL.MAX.WARN} |<p>Maximum number of Redis client exceptions for trigger expression.</p> |`2` |
 |{$GITLAB.UNICORN.QUEUE.MAX.WARN} |<p>Maximum number of Unicorn queued requests for trigger expression.</p> |`1` |
 |{$GITLAB.UNICORN.UTILIZATION.MAX.WARN} |<p>Maximum percentage of used Unicorn workers utilization for trigger expression.</p> |`90` |
-|{$GITLAB.URL} |<p>GitLab instance URL</p> |`localhost` |
+|{$GITLAB.URL} |<p>GitLab instance URL</p> |`http://localhost` |
 
 ## Template links
 
@@ -60,8 +59,8 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|GitLab |GitLab: Instance readiness check |<p>The readiness probe checks whether the GitLab instance is ready to accept traffic via Rails Controllers.</p> |HTTP_AGENT |gitlab.readiness<p>**Preprocessing**:</p><p>- JSONPATH: `$.master_check[0].status`</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p> |
-|GitLab |GitLab: Application server status |<p>Checks whether the application server is running. This probe is used to know if Rails Controllers are not deadlocked due to a multi-threading.</p> |HTTP_AGENT |gitlab.liveness<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p> |
+|GitLab |GitLab: Instance readiness check |<p>The readiness probe checks whether the GitLab instance is ready to accept traffic via Rails Controllers.</p> |HTTP_AGENT |gitlab.readiness<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED<p>- JSONPATH: `$.master_check[0].status`</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p> |
+|GitLab |GitLab: Application server status |<p>Checks whether the application server is running. This probe is used to know if Rails Controllers are not deadlocked due to a multi-threading.</p> |HTTP_AGENT |gitlab.liveness<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED<p>- JSONPATH: `$.status`</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p> |
 |GitLab |GitLab: Version |<p>Version of the GitLab instance.</p> |DEPENDENT |gitlab.deployments.version<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="deployments")].labels.version.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |GitLab |GitLab: Ruby: First process start time |<p>Minimum UNIX timestamp of ruby processes start time.</p> |DEPENDENT |gitlab.ruby.process_start_time_seconds.first<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="ruby_process_start_time_seconds")].value.min()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |GitLab |GitLab: Ruby: Last process start time |<p>Maximum UNIX timestamp ruby processes start time.</p> |DEPENDENT |gitlab.ruby.process_start_time_seconds.last<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="ruby_process_start_time_seconds")].value.max()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
@@ -69,12 +68,12 @@ There are no template links in this template.
 |GitLab |GitLab: User CAPTCHA logins failed, total |<p>Counter of failed CAPTCHA attempts during login.</p> |DEPENDENT |gitlab.failed_login_captcha_total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="failed_login_captcha_total")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |GitLab |GitLab: User CAPTCHA logins, total |<p>Counter of successful CAPTCHA attempts during login.</p> |DEPENDENT |gitlab.successful_login_captcha_total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="successful_login_captcha_total")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |GitLab |GitLab: Upload file does not exist	 |<p>Number of times an upload record could not find its file.</p> |DEPENDENT |gitlab.upload_file_does_not_exist<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="upload_file_does_not_exist	")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|GitLab |GitLab: Pipelines: Processing events, total  |<p>Total amount of pipeline processing events.</p> |DEPENDENT |gitlab.pipeine.processing_events_total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="gitlab_ci_pipeline_processing_events_total")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|GitLab |GitLab: Pipelines: Created, total  |<p>Counter of pipelines created.</p> |DEPENDENT |gitlab.pipeine.created_total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="pipelines_created_total")].value.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|GitLab |GitLab: Pipelines: Auto DevOps pipelines, total |<p>Counter of completed Auto DevOps pipelines.</p> |DEPENDENT |gitlab.pipeine.auto_devops_completed.total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="auto_devops_pipelines_completed_total")].value.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|GitLab |GitLab: Pipelines: Auto DevOps pipelines, failed |<p>Counter of completed Auto DevOps pipelines with status "failed".</p> |DEPENDENT |gitlab.pipeine.auto_devops_completed_total.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="auto_devops_pipelines_completed_total" && @.labels.status == "failed")].value.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|GitLab |GitLab: Pipelines: CI/CD creation duration |<p>The sum of the time in seconds it takes to create a CI/CD pipeline.</p> |DEPENDENT |gitlab.pipeine.pipeline_creation<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="gitlab_ci_pipeline_creation_duration_seconds_sum")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|GitLab |GitLab: Pipelines: Pipelines: CI/CD creation count |<p>The count of the time it takes to create a CI/CD pipeline.</p> |DEPENDENT |gitlab.pipeine.pipeline_creation.count<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="gitlab_ci_pipeline_creation_duration_seconds_count")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|GitLab |GitLab: Pipelines: Processing events, total  |<p>Total amount of pipeline processing events.</p> |DEPENDENT |gitlab.pipeline.processing_events_total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="gitlab_ci_pipeline_processing_events_total")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|GitLab |GitLab: Pipelines: Created, total  |<p>Counter of pipelines created.</p> |DEPENDENT |gitlab.pipeline.created_total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="pipelines_created_total")].value.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|GitLab |GitLab: Pipelines: Auto DevOps pipelines, total |<p>Counter of completed Auto DevOps pipelines.</p> |DEPENDENT |gitlab.pipeline.auto_devops_completed.total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="auto_devops_pipelines_completed_total")].value.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|GitLab |GitLab: Pipelines: Auto DevOps pipelines, failed |<p>Counter of completed Auto DevOps pipelines with status "failed".</p> |DEPENDENT |gitlab.pipeline.auto_devops_completed_total.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="auto_devops_pipelines_completed_total" && @.labels.status == "failed")].value.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|GitLab |GitLab: Pipelines: CI/CD creation duration |<p>The sum of the time in seconds it takes to create a CI/CD pipeline.</p> |DEPENDENT |gitlab.pipeline.pipeline_creation<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="gitlab_ci_pipeline_creation_duration_seconds_sum")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|GitLab |GitLab: Pipelines: Pipelines: CI/CD creation count |<p>The count of the time it takes to create a CI/CD pipeline.</p> |DEPENDENT |gitlab.pipeline.pipeline_creation.count<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="gitlab_ci_pipeline_creation_duration_seconds_count")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |GitLab |GitLab: Database: Connection pool, busy |<p>Connections to the main database in use where the owner is still alive.</p> |DEPENDENT |gitlab.database.connection_pool_busy<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="gitlab_database_connection_pool_busy" && @.labels.class == "ActiveRecord::Base")].value.sum()`</p> |
 |GitLab |GitLab: Database: Connection pool, current |<p>Current connections to the main database in the pool.</p> |DEPENDENT |gitlab.database.connection_pool_connections<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="gitlab_database_connection_pool_connections" && @.labels.class == "ActiveRecord::Base")].value.sum()`</p> |
 |GitLab |GitLab: Database: Connection pool, dead |<p>Connections to the main database in use where the owner is not alive.</p> |DEPENDENT |gitlab.database.connection_pool_dead<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="gitlab_database_connection_pool_dead" && @.labels.class == "ActiveRecord::Base")].value.sum()`</p> |
@@ -115,7 +114,7 @@ There are no template links in this template.
 |GitLab: Unicorn stats |GitLab: Unicorn: Workers |<p>The number of Unicorn workers</p> |DEPENDENT |gitlab.unicorn.unicorn_workers[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=='unicorn_workers')].value.sum()`</p> |
 |GitLab: Unicorn stats |GitLab: Unicorn: Active connections |<p>The number of active Unicorn connections.</p> |DEPENDENT |gitlab.unicorn.active_connections[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=='unicorn_active_connections')].value.sum()`</p> |
 |GitLab: Unicorn stats |GitLab: Unicorn: Queued connections |<p>The number of queued Unicorn connections.</p> |DEPENDENT |gitlab.unicorn.queued_connections[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=='unicorn_queued_connections')].value.sum()`</p> |
-|Zabbix_raw_items |GitLab: Get instance metrics |<p>-</p> |HTTP_AGENT |gitlab.get_metrics<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON |
+|Zabbix_raw_items |GitLab: Get instance metrics |<p>-</p> |HTTP_AGENT |gitlab.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED<p>- PROMETHEUS_TO_JSON |
 
 ## Triggers
 

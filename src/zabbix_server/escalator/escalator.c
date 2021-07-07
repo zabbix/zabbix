@@ -1103,46 +1103,41 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		/* get host details */
 
-		if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
+		if (0 != host.hostid)	/* target is from "Host" list or "Host group" list */
 		{
-			if (0 != host.hostid)	/* target is from "Host" list or "Host group" list */
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					goto skip;
-				}
+				goto skip;
+			}
 
-				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-				strscpy(host.host, row[2]);
-				host.tls_connect = (unsigned char)atoi(row[17]);
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+			strscpy(host.host, row[2]);
+			host.tls_connect = (unsigned char)atoi(row[17]);
 #ifdef HAVE_OPENIPMI
-				host.ipmi_authtype = (signed char)atoi(row[18]);
-				host.ipmi_privilege = (unsigned char)atoi(row[19]);
-				strscpy(host.ipmi_username, row[20]);
-				strscpy(host.ipmi_password, row[21]);
+			host.ipmi_authtype = (signed char)atoi(row[18]);
+			host.ipmi_privilege = (unsigned char)atoi(row[19]);
+			strscpy(host.ipmi_username, row[20]);
+			strscpy(host.ipmi_password, row[21]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
-			}
-			else if (SUCCEED == (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
-					sizeof(error))))	/* target is "Current host" */
-			{
-				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					goto skip;
-				}
-
-				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-			}
 		}
-		else
-			zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
+		else if (SUCCEED == (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
+				sizeof(error))))	/* target is "Current host" */
+		{
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				goto skip;
+			}
+
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+		}
 
 		/* substitute macros in script body and webhook parameters */
 

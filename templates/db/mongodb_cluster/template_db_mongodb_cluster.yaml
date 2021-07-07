@@ -800,7 +800,7 @@ zabbix_export:
           triggers:
             -
               uuid: 921ee489887943838d69558f103ad646
-              expression: '(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#2))=1 and length(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version))>0'
+              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version))>0'
               name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB cluster version has changed. Ack to close.'

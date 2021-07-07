@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/common/testFormValueMappings.php';
 /**
  * @backup valuemap, hosts
  *
- * @on-before prepareTemplateValueMappings
+ * @onBefore prepareTemplateValueMappings
  */
 class testFormValueMappingsTemplate extends testFormValueMappings {
 	/**
@@ -95,7 +95,7 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 	}
 
 	/**
-	 * @backup-once valuemap
+	 * @backupOnce valuemap
 	 *
 	 * @dataProvider getValuemapData
 	 */
@@ -104,7 +104,7 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 	}
 
 	/**
-	 * @backup-once valuemap
+	 * @backupOnce valuemap
 	 *
 	 * @dataProvider getValuemapData
 	 */

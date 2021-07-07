@@ -1,5 +1,5 @@
 
-# Oracle by Zabbix Agent 2
+# Oracle by Zabbix agent 2
 
 ## Overview
 

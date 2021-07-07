@@ -146,7 +146,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2923ab6f81d64579b6ba778bc0467042
-              expression: '(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2))=1 and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
+              expression: 'last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
               name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'WildFly version has changed. Ack to close.'
@@ -554,7 +554,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6b432b25debe4277a971bc8a906e07b1
-                  expression: '(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2))=1 and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0'
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0'
                   name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'Deployment status has changed. Ack to close.'

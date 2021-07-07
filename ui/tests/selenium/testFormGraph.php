@@ -197,6 +197,7 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
+			$this->zbxTestOpen('templates.php?page=2');
 			$this->zbxTestClickLinkTextWait($data['template']);
 			$hostid = 30000;
 		}

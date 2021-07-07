@@ -1,5 +1,5 @@
 
-# Ceph by Zabbix Agent2
+# Ceph by Zabbix agent 2
 
 ## Overview
 
@@ -7,7 +7,7 @@ For Zabbix version: 5.4 and higher
 The template to monitor Ceph cluster by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `Ceph by Zabbix Agent2` — collects metrics by polling zabbix-agent2.
+Template `Ceph by Zabbix agent 2` — collects metrics by polling zabbix-agent2.
 
 
 
@@ -93,7 +93,7 @@ There are no template links in this template.
 |Ceph |Ceph: Ceph OSD avg PGs |<p>Average amount of PGs on OSDs</p> |DEPENDENT |ceph.osd_pgs.avg<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_pgs.avg`</p> |
 |Ceph |Ceph: Ceph OSD Apply latency Avg |<p>Average apply latency of OSDs</p> |DEPENDENT |ceph.osd_latency_apply.avg<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_apply.avg`</p> |
 |Ceph |Ceph: Ceph OSD Apply latency Max |<p>Maximum apply latency of OSDs</p> |DEPENDENT |ceph.osd_latency_apply.max<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_apply.max`</p> |
-|Ceph |Ceph: Ceph OSD Apply latency Min |<p>Miniumum apply latency of OSDs</p> |DEPENDENT |ceph.osd_latency_apply.min<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_apply.min`</p> |
+|Ceph |Ceph: Ceph OSD Apply latency Min |<p>Minimum apply latency of OSDs</p> |DEPENDENT |ceph.osd_latency_apply.min<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_apply.min`</p> |
 |Ceph |Ceph: Ceph OSD Commit latency Avg |<p>Average commit latency of OSDs</p> |DEPENDENT |ceph.osd_latency_commit.avg<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_commit.avg`</p> |
 |Ceph |Ceph: Ceph OSD Commit latency Max |<p>Maximum commit latency of OSDs</p> |DEPENDENT |ceph.osd_latency_commit.max<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_commit.max`</p> |
 |Ceph |Ceph: Ceph OSD Commit latency Min |<p>Minimum commit latency of OSDs</p> |DEPENDENT |ceph.osd_latency_commit.min<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_commit.min`</p> |

@@ -579,7 +579,7 @@ class C52ImportConverter extends CConverter {
 		$expression_converter = new C52TriggerExpressionConverter();
 		$event_name_converter = new C52EventNameConverter();
 
-		$expression_parser = new CExpressionParser();
+		$expression_parser = new CExpressionParser(['usermacros' => true]);
 
 		foreach ($triggers as &$trigger) {
 			$trigger['expression'] = $expression_converter->convert([

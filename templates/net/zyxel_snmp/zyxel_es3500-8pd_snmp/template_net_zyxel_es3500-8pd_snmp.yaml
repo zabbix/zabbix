@@ -144,7 +144,7 @@ zabbix_export:
           triggers:
             -
               uuid: bd6d0fe201094c00b6c93d7c04c27729
-              expression: '(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.fwversion,#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.fwversion,#2))=1 and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.fwversion))>0'
+              expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.fwversion,#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.fwversion,#2) and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.fwversion))>0'
               name: 'ZYXEL ES3500-8PD: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -287,7 +287,7 @@ zabbix_export:
           triggers:
             -
               uuid: 83548aba74c148e28e6611d5abfb9694
-              expression: '(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber,#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber,#2))=1 and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber))>0'
+              expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber,#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber,#2) and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber))>0'
               name: 'ZYXEL ES3500-8PD: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -638,7 +638,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 27ba4832c79d447186ae6de254aad9d7
-                  expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Link down'
@@ -1097,7 +1097,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 46739144d51b441886d544829749cf21
-                  expression: '(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
