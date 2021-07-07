@@ -104,6 +104,7 @@ class testFormValueMappings extends CWebTest {
 		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
 		$dropdown_values = $dropdown->getOptions()->asText();
 		$this->assertEquals($types, $dropdown_values);
+
 		foreach ($types as $type) {
 			$dropdown->select($type);
 			if ($type === 'default') {
@@ -159,8 +160,7 @@ class testFormValueMappings extends CWebTest {
 						]
 					],
 					'trim' => true,
-					'update valuemap' => self::UPDATE_VALUEMAP1,
-					'screenshot id' => 'ValuemapScreenshot1'
+					'update valuemap' => self::UPDATE_VALUEMAP1
 				]
 			],
 			// Successful creation/update of value mapping with multiple mappings and type equals.
@@ -198,8 +198,7 @@ class testFormValueMappings extends CWebTest {
 
 					],
 					'trim' => true,
-					'update valuemap' => self::UPDATE_VALUEMAP1,
-					'screenshot id' => 'ValuemapScreenshot1'
+					'update valuemap' => self::UPDATE_VALUEMAP1
 				]
 			],
 			// Mapping type - is greater than or equals.
@@ -240,8 +239,7 @@ class testFormValueMappings extends CWebTest {
 						]
 					],
 					'trim' => true,
-					'update valuemap' => self::UPDATE_VALUEMAP1,
-					'screenshot id' => 'ValuemapScreenshot1'
+					'update valuemap' => self::UPDATE_VALUEMAP1
 				]
 			],
 			// Mapping type - is less than or equals.
@@ -282,8 +280,7 @@ class testFormValueMappings extends CWebTest {
 						]
 					],
 					'trim' => true,
-					'update valuemap' => self::UPDATE_VALUEMAP1,
-					'screenshot id' => 'ValuemapScreenshot1'
+					'update valuemap' => self::UPDATE_VALUEMAP1
 				]
 			],
 			// Mapping type - in range.
@@ -329,8 +326,7 @@ class testFormValueMappings extends CWebTest {
 						]
 					],
 					'trim' => true,
-					'update valuemap' => self::UPDATE_VALUEMAP1,
-					'screenshot id' => 'ValuemapScreenshot1'
+					'update valuemap' => self::UPDATE_VALUEMAP1
 				]
 			],
 			// Mapping type - regex.
@@ -356,8 +352,7 @@ class testFormValueMappings extends CWebTest {
 						]
 					],
 					'trim' => true,
-					'update valuemap' => self::UPDATE_VALUEMAP1,
-					'screenshot id' => 'ValuemapScreenshot1'
+					'update valuemap' => self::UPDATE_VALUEMAP1
 				]
 			],
 			// Mapping type - equals with range.
@@ -378,8 +373,7 @@ class testFormValueMappings extends CWebTest {
 						]
 					],
 					'trim' => true,
-					'update valuemap' => self::UPDATE_VALUEMAP1,
-					'screenshot id' => 'ValuemapScreenshot1'
+					'update valuemap' => self::UPDATE_VALUEMAP1
 				]
 			],
 			// Mapping type - all available types.
@@ -423,11 +417,9 @@ class testFormValueMappings extends CWebTest {
 					'screenshot id' => 'ValuemapScreenshot1'
 				]
 			],
-			// TODO: remove the "skip_for_update" flag when ZBX-19105 is fixed.
 			// Value mapping with duplicate name.
 			[
 				[
-					'skip_for_update' =>true,
 					'expected' => TEST_BAD,
 					'name' => '  Valuemap for delete  ',
 					'mappings' => [
@@ -612,25 +604,24 @@ class testFormValueMappings extends CWebTest {
 					],
 					'error_details' => 'Incorrect value for field "Value": invalid range expression.'
 				]
+			],
+			// Incorrect value for - regexp.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message empty regexp value field',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'regexp',
+							'value' => '',
+							'newvalue' => 'empty value'
+						]
+					],
+					'error_details' => 'Incorrect value for field "Value": cannot be empty.'
+				]
 			]
-			// TODO: Uncomment after ZBX-19497 fix
-//			// Incorrect value for - regexp.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'name' => 'error message empty regexp value field',
-//					'mappings' => [
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'type' => 'regexp',
-//							'value' => '',
-//							'newvalue' => 'empty value'
-//						]
-//					],
-//					'error_details' => 'Incorrect value for field "Value": cannot be empty.'
-//				]
-//			]
 		];
 	}
 
@@ -642,11 +633,6 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $action	Action to be performed with value mappings.
 	 */
 	public function checkAction($data, $source, $action) {
-		// TODO: Remove the below condition once ZBX-19105 is fixed.
-		if (CTestArrayHelper::get($data, 'skip_for_update') && $action === 'update') {
-			return;
-		}
-
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid';
 			$old_hash = CDBHelper::getHash($sql);
@@ -688,7 +674,9 @@ class testFormValueMappings extends CWebTest {
 
 			// Check the screenshot of the whole value mappings tab.
 			$this->openValueMappingTab($source, false);
-//			$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot id']);
+//			if (CTestArrayHelper::get($data, 'screenshot id')) {
+//				$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot id']);
+//			}
 
 			// Check all mappings that belong to the created value mapping.
 			$this->query('link', $data['name'])->one()->click();
