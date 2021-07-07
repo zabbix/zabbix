@@ -46,7 +46,8 @@ $filterColumn->addRow(new CLabel(_('Recipients'), 'filter_userids__ms'), [
 ]);
 
 $auditWidget->addItem(
-	(new CFilter(new CUrl('auditacts.php')))
+	(new CFilter())
+		->setResetUrl(new CUrl('auditacts.php'))
 		->setProfile($data['timeline']['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])

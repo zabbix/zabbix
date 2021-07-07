@@ -96,13 +96,6 @@ function testUserSound(idx) {
 	}
 }
 
-function removeObjectById(id) {
-	var obj = document.getElementById(id);
-	if (obj != null && typeof(obj) == 'object') {
-		obj.parentNode.removeChild(obj);
-	}
-}
-
 /**
  * Converts all HTML symbols into HTML entities.
  */

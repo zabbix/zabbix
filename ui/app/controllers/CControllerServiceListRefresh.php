@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,9 +19,9 @@
 **/
 
 
-$(() => {
-	const $form = $(document.forms['srv_status']);
-	$form.find('[name="period"]').on('change', (e) => {
-		$form.submit();
-	})
-});
+class CControllerServiceListRefresh extends CControllerServiceList {
+
+	protected function doAction(): void {
+
+	}
+}

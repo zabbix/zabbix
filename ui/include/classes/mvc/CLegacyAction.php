@@ -63,18 +63,18 @@ class CLegacyAction extends CAction {
 		}
 
 		if ($user_type < USER_TYPE_ZABBIX_USER) {
-			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart4.php', 'chart5.php', 'chart6.php', 'chart7.php',
-				'history.php', 'hostinventories.php', 'hostinventoriesoverview.php', 'httpdetails.php', 'image.php',
-				'imgstore.php', 'jsrpc.php', 'map.php', 'overview.php', 'toptriggers.php', 'tr_events.php',
-				'srv_status.php', 'sysmap.php', 'sysmaps.php', 'report2.php'
+			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart4.php', 'chart6.php', 'chart7.php', 'history.php',
+				'hostinventories.php', 'hostinventoriesoverview.php', 'httpdetails.php', 'image.php', 'imgstore.php',
+				'jsrpc.php', 'map.php', 'overview.php', 'toptriggers.php', 'tr_events.php', 'sysmap.php', 'sysmaps.php',
+				'report2.php'
 			];
 		}
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
 			$denied = array_merge($denied, ['actionconf.php',
-				'disc_prototypes.php', 'graphs.php', 'host_discovery.php', 'host_prototypes.php',
-				'hostgroups.php', 'hosts.php', 'httpconf.php', 'items.php', 'maintenance.php', 'report4.php',
-				'services.php', 'templates.php', 'trigger_prototypes.php', 'triggers.php'
+				'disc_prototypes.php', 'graphs.php', 'host_discovery.php', 'host_prototypes.php', 'hostgroups.php',
+				'hosts.php', 'httpconf.php', 'items.php', 'maintenance.php', 'report4.php', 'templates.php',
+				'trigger_prototypes.php', 'triggers.php'
 			]);
 		}
 
@@ -95,7 +95,6 @@ class CLegacyAction extends CAction {
 				CRoleHelper::UI_MONITORING_OVERVIEW => ['overview.php'],
 				CRoleHelper::UI_MONITORING_LATEST_DATA => ['history.php'],
 				CRoleHelper::UI_MONITORING_MAPS => ['image.php', 'map.php', 'sysmap.php', 'sysmaps.php'],
-				CRoleHelper::UI_MONITORING_SERVICES => ['chart5.php', 'srv_status.php'],
 				CRoleHelper::UI_INVENTORY_OVERVIEW => ['hostinventoriesoverview.php'],
 				CRoleHelper::UI_INVENTORY_HOSTS => ['hostinventories.php'],
 				CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => ['report2.php'],
@@ -110,8 +109,7 @@ class CLegacyAction extends CAction {
 				CRoleHelper::UI_CONFIGURATION_TEMPLATES => ['templates.php'],
 				CRoleHelper::UI_CONFIGURATION_HOSTS => ['hosts.php'],
 				CRoleHelper::UI_CONFIGURATION_MAINTENANCE => ['maintenance.php'],
-				CRoleHelper::UI_CONFIGURATION_ACTIONS => ['actionconf.php'],
-				CRoleHelper::UI_CONFIGURATION_SERVICES => ['services.php']
+				CRoleHelper::UI_CONFIGURATION_ACTIONS => ['actionconf.php']
 			];
 		}
 

@@ -956,7 +956,7 @@ class testFormTabIndicators extends CWebTest {
 
 			case 'data_set':
 				if ($action === USER_ACTION_REMOVE) {
-					$form->query('class:remove-btn')->all()->click();
+					$form->query('class:btn-remove')->all()->click();
 				}
 				else {
 					for ($i = 0; $i < $tab['new_entries']; $i++) {

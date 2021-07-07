@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -22,11 +22,20 @@
 /**
  * @var CView $this
  */
-?>
-<script type="text/javascript">
-	$(() => {
-		$('z-select[name="period"],z-select[name="year"]').on('change', (e) => {
-			document.forms['report.services'].submit();
-		});
-	});
-</script>
+
+$output = [
+	'body' => (new CPartial('service.time.row', [
+		'row_index' => $data['row_index'],
+		'type' => $data['form']['type'],
+		'ts_from' => $data['form']['ts_from'],
+		'ts_to' => $data['form']['ts_to'],
+		'note' => $data['form']['note']
+	]))->getOutput()
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);

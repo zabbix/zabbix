@@ -3530,12 +3530,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'services',
 				'ref_field' => 'serviceid'
-			],
-			'soft' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
 			]
 		]
 	],
@@ -8551,7 +8545,7 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
-			],
+			]
 		]
 	],
 	'service_problem' => [
@@ -8567,7 +8561,7 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'problem',
-				'ref_field' => 'eventid',
+				'ref_field' => 'eventid'
 			],
 			'serviceid' => [
 				'null' => false,
@@ -8579,9 +8573,38 @@ return [
 			'severity' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
-				'length' => 1,
+				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'service_tag' => [
+		'key' => 'servicetagid',
+		'fields' => [
+			'servicetagid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
 			],
+			'serviceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'services',
+				'ref_field' => 'serviceid'
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			]
 		]
 	],
 	'dbversion' => [

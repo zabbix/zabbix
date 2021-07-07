@@ -23,124 +23,77 @@
  * @var CView $this
  */
 
-$output = [];
-
-// Create form.
-$services_form = (new CForm())
+$form = (new CForm())
 	->cleanItems()
-	->setName('services_form');
+	->setName('services-form')
+	->addVar('title', $data['title']);
 
-if (array_key_exists('service', $data)) {
-	$services_form->addItem((new CVar('serviceid', $data['service']['serviceid']))->removeId());
-}
+$controls = (new CForm())
+	->cleanItems()
+	->setName('services_filter_form')
+	->addItem(
+		(new CList())
+			->addItem(new CLabel(_('Name'), 'services_filter_name'))
+			->addItem(
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setId('services_filter_name')
+					->setAttribute('autofocus', 'autofocus')
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 
-// Create table.
-$services_table = (new CTableInfo())
+			)
+			->addItem(new CSubmitButton(_('Apply')))
+			->addItem(
+				(new CSimpleButton(_('Reset')))
+					->setAttribute('type', 'reset')
+					->addClass(ZBX_STYLE_BTN_ALT)
+			)
+	);
+
+$services = (new CTableInfo())
 	->setHeader([
-		array_key_exists('db_cservices', $data)
-			? (new CColHeader(
-					(new CCheckBox('all_services'))
-						->onClick("javascript: checkAll('".$services_form->getName()."', 'all_services', 'services');")
-				))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Service'),
+		(new CColHeader(new CCheckBox('serviceid_all')))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Name'),
 		_('Status calculation'),
 		_('Trigger')
 	]);
 
-$js_action_onclick = ' jQuery(this).removeAttr("onclick");';
-$js_action_onclick .= ' overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));';
-$js_action_onclick .= ' return false;';
-
-// Add table rows.
-if (array_key_exists('db_pservices', $data)) {
-	// Add root item.
-	if ($data['parentid'] == 0) {
-		$description = new CSpan(_('root'));
+foreach ($data['services'] as $service) {
+	if ($service['triggerid'] != 0) {
+		$trigger_description = $service['trigger'] ? $service['trigger']['description'] : _('Inaccessible trigger');
 	}
 	else {
-		$description = (new CLink(_('root'), '#'))
-			->onClick('javascript:
-				jQuery(\'#parent_name\', window.document).val('.zbx_jsvalue(_('root')).');
-				jQuery(\'#parentname\', window.document).val('.zbx_jsvalue(_('root')).');
-				jQuery(\'#parentid\', window.document).val('.zbx_jsvalue(0).');'.
-				$js_action_onclick
-			);
+		$trigger_description = '';
 	}
 
-	$services_table->addRow([$description, _('Note'), '-']);
-
-	foreach ($data['db_pservices'] as $db_service) {
-		if (bccomp($data['parentid'], $db_service['serviceid']) == 0) {
-			$description = new CSpan($db_service['name']);
-		}
-		else {
-			$description = (new CLink($db_service['name'], '#'))
-				->addClass('link')
-				->onClick('javascript:
-					jQuery(\'#parent_name\', window.document).val('.zbx_jsvalue($db_service['name']).');
-					jQuery(\'#parentname\', window.document).val('.zbx_jsvalue($db_service['name']).');
-					jQuery(\'#parentid\', window.document).val('.zbx_jsvalue($db_service['serviceid']).');'.
-					$js_action_onclick
-				);
-		}
-
-		$services_table->addRow([$description, serviceAlgorithm($db_service['algorithm']), $db_service['trigger']]);
-	}
-
-	$output['buttons'] = null;
+	$services->addRow([
+		new CCol([
+			(new CCheckBox('serviceid', $service['serviceid']))->removeId(),
+			new CVar('name', $service['name']),
+			new CVar('trigger_description', $trigger_description)
+		]),
+		(new CCol(
+			(new CLink($service['name']))->addClass('js-name')
+		))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol(serviceAlgorithm($service['algorithm'])))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($trigger_description))->addClass(ZBX_STYLE_WORDBREAK)
+	]);
 }
-elseif (array_key_exists('db_cservices', $data)) {
-	foreach ($data['db_cservices'] as $service) {
-		$description = (new CLink($service['name'], '#'))
-			->addClass('service-name')
-			->setId('service-name-'.$service['serviceid'])
-			->setAttribute('data-name', $service['name'])
-			->setAttribute('data-serviceid', $service['serviceid'])
-			->setAttribute('data-trigger', $service['trigger']);
 
-		$cb = (new CCheckBox('services['.$service['serviceid'].']', $service['serviceid']))
-			->addClass('service-select');
+$form->addItem($services);
 
-		$services_table->addRow([$cb, $description, serviceAlgorithm($service['algorithm']), $service['trigger']]);
-	}
-
-	$output['script_inline'] =
-		'jQuery(document).ready(function() {'.
-			'jQuery(".service-name").click(function() {'.
-				'var e = jQuery(this);'.
-				'window.add_child_service(e.data("name"), e.data("serviceid"), e.data("trigger"));'.
-				$js_action_onclick.
-			'});'.
-
-			'cookie.init();'.
-			'chkbxRange.init();'.
-		'});'.
-
-		'var addSelectedServices = function() {'.
-			'var e;'.
-			'jQuery(".service-select:checked").each(function(key, cb) {'.
-				'e = jQuery("#service-name-" + jQuery(cb).val());'.
-				'window.add_child_service(e.data("name"), e.data("serviceid"), e.data("trigger"));'.
-			'});'.
-
-			'return true;'.
-		'};';
-
-	$output['buttons'] = [
+$output = [
+	'header' => $data['title'],
+	'controls' => $controls->toString(),
+	'body' => $form->toString(),
+	'buttons' => [
 		[
 			'title' => _('Select'),
-			'class' => '',
-			'action' => 'return addSelectedServices();'
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'services_popup.submit();'
 		]
-	];
-}
-
-$services_form->addItem($services_table);
-
-$output += [
-	'header' => $data['title'],
-	'body' => (new CDiv($services_form))->toString()
+	],
+	'script_inline' => $this->readJsFile('popup.services.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
