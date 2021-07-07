@@ -111,7 +111,7 @@ class testGraphLinking extends CIntegrationTest {
 					'optemplate' =>
 					$templateids_for_api_call
 				]
-			],
+			]
 		]);
 
 		$this->assertArrayHasKey('actionids', $response['result']);
