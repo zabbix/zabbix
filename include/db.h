@@ -783,6 +783,7 @@ typedef struct
 {
 	zbx_uint64_t		eventid;
 	int			clock;
+	int			ns;
 	int			value;
 	int			severity;
 

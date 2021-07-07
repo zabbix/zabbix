@@ -2801,8 +2801,9 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 	if (NULL == (result = DBselect(
 			"select actionid,eventsource,evaltype,formula"
 			" from actions"
-			" where status=%d",
-			ACTION_STATUS_ACTIVE)))
+			" where eventsource<>%d"
+				" and status=%d",
+			EVENT_SOURCE_SERVICE, ACTION_STATUS_ACTIVE)))
 	{
 		return FAIL;
 	}

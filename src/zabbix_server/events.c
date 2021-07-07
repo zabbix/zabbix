@@ -1934,7 +1934,8 @@ void	zbx_events_update_itservices(void)
 		recovery->r_event->tags.values_num = 0;
 
 		zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
-				recovery->r_event->value, recovery->r_event->severity, &recovery->r_event->tags);
+				recovery->r_event->ns, recovery->r_event->value, recovery->r_event->severity,
+				&recovery->r_event->tags);
 
 		recovery->r_event->tags.values_num = values_num;
 	}
@@ -1949,8 +1950,8 @@ void	zbx_events_update_itservices(void)
 		if (TRIGGER_VALUE_PROBLEM != event->value)
 			continue;
 
-		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->value,
-				event->severity, &event->tags);
+		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->ns,
+				event->value, event->severity, &event->tags);
 	}
 
 	if (NULL == data)

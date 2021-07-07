@@ -374,6 +374,10 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_METADATA		24
 #define CONDITION_TYPE_EVENT_TAG		25
 #define CONDITION_TYPE_EVENT_TAG_VALUE		26
+#define CONDITION_TYPE_SERVICE			27
+#define CONDITION_TYPE_SERVICE_NAME		28
+#define CONDITION_TYPE_SERVICE_TAG		29
+#define CONDITION_TYPE_SERVICE_TAG_VALUE	30
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
@@ -681,6 +685,10 @@ const char	*zbx_trigger_state_string(unsigned char state);
 #define TRIGGER_RECOVERY_MODE_EXPRESSION		0
 #define TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION	1
 #define TRIGGER_RECOVERY_MODE_NONE			2
+
+/* business service values */
+#define SERVICE_VALUE_OK		0
+#define SERVICE_VALUE_PROBLEM		1
 
 #define ITEM_LOGTYPE_INFORMATION	1
 #define ITEM_LOGTYPE_WARNING		2

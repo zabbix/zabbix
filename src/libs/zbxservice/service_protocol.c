@@ -24,7 +24,7 @@
 #include "dbcache.h"
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int clock, int value, int severity, const zbx_vector_ptr_t *tags)
+		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags)
 {
 	zbx_uint32_t	data_len = 0, *len = NULL;
 	int		i;
@@ -32,6 +32,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 
 	zbx_serialize_prepare_value(data_len, eventid);
 	zbx_serialize_prepare_value(data_len, clock);
+	zbx_serialize_prepare_value(data_len, ns);
 	zbx_serialize_prepare_value(data_len, value);
 	zbx_serialize_prepare_value(data_len, severity);
 	zbx_serialize_prepare_value(data_len, tags->values_num);
@@ -64,6 +65,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 
 	ptr += zbx_serialize_value(ptr, eventid);
 	ptr += zbx_serialize_value(ptr, clock);
+	ptr += zbx_serialize_value(ptr, ns);
 	ptr += zbx_serialize_value(ptr, value);
 	ptr += zbx_serialize_value(ptr, severity);
 	ptr += zbx_serialize_value(ptr, tags->values_num);
@@ -94,6 +96,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 
 		data += zbx_deserialize_value(data, &event->eventid);
 		data += zbx_deserialize_value(data, &event->clock);
+		data += zbx_deserialize_value(data, &event->ns);
 		data += zbx_deserialize_value(data, &event->value);
 		data += zbx_deserialize_value(data, &event->severity);
 		data += zbx_deserialize_value(data, &values_num);
