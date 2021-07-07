@@ -1039,6 +1039,9 @@ class testFormTemplateDashboards extends CWebTest {
 
 	/**
 	 * Function that checks the layout of a template dashboard with widgets from monitoring hosts view.
+	 * The ignore browser errors annotation is required due to the errors coming from the URL opened in the URL widget.
+	 *
+	 * @ignoreBrowserErrors
 	 *
 	 * @onBefore prepareHostLinkageToTemplateData
 	 */
