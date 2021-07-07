@@ -440,7 +440,7 @@ static int	get_vcenter_vmprop(AGENT_REQUEST *request, const char *username, cons
 {
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
-	char			*url, *uuid, *value;
+	const char		*url, *uuid, *value;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() propid:%d", __func__, propid);
@@ -559,7 +559,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 		AGENT_RESULT *result)
 {
 	struct zbx_json		json_data;
-	char			*url;
+	const char		*url;
 	zbx_vmware_service_t	*service;
 	int			i, ret = SYSINFO_RET_FAIL;
 
@@ -608,7 +608,7 @@ out:
 int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *name;
+	const char		*url, *name;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_cluster_t	*cluster;
 	int			ret = SYSINFO_RET_FAIL;
@@ -774,7 +774,7 @@ out:
 int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url;
+	const char		*url;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
@@ -846,7 +846,7 @@ out:
 int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_cluster_t	*cluster = NULL;
@@ -914,7 +914,7 @@ int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_hv_cpu_usage_perf(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
@@ -960,7 +960,7 @@ out:
 int	check_vcenter_hv_cpu_utilization(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
@@ -1000,8 +1000,7 @@ out:
 int	check_vcenter_hv_power(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *max;
-	const char		*path;
+	const char		*path, *url, *uuid, *max;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int 			ret = SYSINFO_RET_FAIL;
@@ -1061,7 +1060,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		AGENT_RESULT *result)
 {
 	struct zbx_json		json_data;
-	char			*url, *name;
+	const char		*url, *name;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 	zbx_vmware_hv_t		*hv;
@@ -1470,7 +1469,7 @@ out:
 int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *mode, *uuid;
+	const char		*url, *mode, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
@@ -1517,7 +1516,7 @@ out:
 int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *mode, *uuid;
+	const char		*url, *mode, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
@@ -1564,7 +1563,7 @@ out:
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
@@ -1605,7 +1604,7 @@ out:
 int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	struct zbx_json		json_data;
@@ -1638,8 +1637,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 	for (i = 0; i < hv->dsnames.values_num; i++)
 	{
 		zbx_vmware_dsname_t	*dsname = hv->dsnames.values[i];
-		zbx_uint64_t		total = 0;
-		int			j;
+		int			j, total = 0;
 
 
 		for (j = 0; j < dsname->hvdisks.values_num; j++)
@@ -1647,8 +1645,9 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(&json_data, "{#MULTIPATH.COUNT}", total);
-		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}", dsname->hvdisks.values_num);
+		zbx_json_adduint64(&json_data, "{#MULTIPATH.COUNT}", (unsigned int)total);
+		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}",
+				(unsigned int)dsname->hvdisks.values_num);
 
 		zbx_json_close(&json_data);
 	}
@@ -1671,7 +1670,7 @@ out:
 static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
 		const char *perfcounter, zbx_uint64_t access_filter, AGENT_RESULT *result)
 {
-	char			*url, *mode, *uuid, *name;
+	const char		*url, *mode, *uuid, *name;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
@@ -1975,8 +1974,8 @@ unlock:
 int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char	*url, *uuid, *name, *param;
-	int	ret = SYSINFO_RET_FAIL, mode;
+	const char	*url, *uuid, *name, *param;
+	int		ret = SYSINFO_RET_FAIL, mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2066,8 +2065,7 @@ out:
 int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *path;
-	const char 		*instance;
+	const char		*instance, *url, *uuid, *path;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_uint64_t		counterid;
@@ -2126,7 +2124,8 @@ out:
 int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *hv_uuid, *ds_list = NULL;
+	const char		*url, *hv_uuid;
+	char			*ds_list = NULL;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			i, ret = SYSINFO_RET_FAIL;
@@ -2178,12 +2177,12 @@ out:
 int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *hv_uuid, *ds_name, *partition;
+	const char		*url, *hv_uuid, *ds_name, *partition;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_dsname_t	*dsname;
-	int			ret = SYSINFO_RET_FAIL, i, j;
-	zbx_uint64_t		partitionid = 0, multipath_count = 0;
+	int			ret = SYSINFO_RET_FAIL, i, j, multipath_count = 0;
+	zbx_uint64_t		partitionid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2288,7 +2287,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 		}
 	}
 
-	SET_UI64_RESULT(result, multipath_count);
+	SET_UI64_RESULT(result, (unsigned int)multipath_count);
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
@@ -2301,7 +2300,8 @@ out:
 int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *ds_name, *hv_list = NULL, *hv_name;
+	const char		*url, *ds_name, *hv_name;
+	char			*hv_list = NULL;
 	zbx_vmware_service_t	*service;
 	int			i, ret = SYSINFO_RET_FAIL;
 	zbx_vmware_datastore_t	*datastore = NULL;
@@ -2372,8 +2372,8 @@ out:
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char	*url, *name, *param;
-	int	ret = SYSINFO_RET_FAIL, mode;
+	const char	*url, *name, *param;
+	int		ret = SYSINFO_RET_FAIL, mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2400,7 +2400,7 @@ out:
 int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url;
+	const char		*url;
 	zbx_vmware_service_t	*service;
 	struct zbx_json		json_data;
 	int			i, j, ret = SYSINFO_RET_FAIL;
@@ -2420,8 +2420,7 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
 	for (i = 0; i < service->data->datastores.values_num; i++)
 	{
@@ -2461,7 +2460,7 @@ out:
 static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
 		const char *perfcounter, zbx_uint64_t access_filter, AGENT_RESULT *result)
 {
-	char			*url, *mode, *name;
+	const char		*url, *mode, *name;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
@@ -2607,7 +2606,7 @@ int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const
 int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_cluster_t	*cluster = NULL;
 	int			ret = SYSINFO_RET_FAIL;
@@ -2714,7 +2713,7 @@ int	check_vcenter_vm_datacenter_name(AGENT_REQUEST *request, const char *usernam
 {
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2759,7 +2758,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 		AGENT_RESULT *result)
 {
 	struct zbx_json		json_data;
-	char			*url, *vm_name, *hv_name;
+	const char		*url, *vm_name, *hv_name;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_vm_t		*vm;
@@ -2821,6 +2820,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.GUESTFULLNAME}",
 					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_GUESTFULLNAME]),
 					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#VM.FOLDER}",
+					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_FOLDER]), ZBX_JSON_TYPE_STRING);
 
 			zbx_json_close(&json_data);
 		}
@@ -2846,7 +2847,7 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 {
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
-	char			*url, *uuid, *name;
+	const char		*url, *uuid, *name;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3054,7 +3055,7 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
 	zbx_vmware_dev_t	*dev;
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	int			i, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3120,9 +3121,8 @@ out:
 int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *instance, *mode;
 	zbx_vmware_service_t	*service;
-	const char		*path;
+	const char		*path, *url, *uuid, *instance, *mode;
 	int 			coeff, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3183,9 +3183,8 @@ out:
 int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *instance, *mode;
 	zbx_vmware_service_t	*service;
-	const char		*path;
+	const char		*path, *url, *uuid, *instance, *mode;
 	int 			coeff, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3306,7 +3305,7 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
 	zbx_vmware_dev_t	*dev;
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	int			i, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3371,9 +3370,8 @@ out:
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *instance, *mode;
 	zbx_vmware_service_t	*service;
-	const char		*path;
+	const char		*path, *url, *uuid, *instance, *mode;
 	int			coeff, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3434,9 +3432,8 @@ out:
 int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *instance, *mode;
 	zbx_vmware_service_t	*service;
-	const char		*path;
+	const char		*path, *url, *uuid, *instance, *mode;
 	int			coeff, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3500,7 +3497,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
-	char			*url, *uuid;
+	const char		*url, *uuid;
 	int			i, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3562,7 +3559,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 {
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
-	char			*url, *uuid, *fsname, *mode;
+	const char		*url, *uuid, *fsname, *mode;
 	int			i, ret = SYSINFO_RET_FAIL;
 	zbx_vmware_fs_t		*fs = NULL;
 
@@ -3638,8 +3635,7 @@ out:
 int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *path;
-	const char 		*instance;
+	const char 		*instance, *url, *uuid, *path;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
 	zbx_uint64_t		counterid;
@@ -3698,7 +3694,7 @@ out:
 int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url;
+	const char		*url;
 	zbx_vmware_service_t	*service;
 	struct zbx_json		json_data;
 	int			i, ret = SYSINFO_RET_FAIL;
@@ -3748,9 +3744,9 @@ out:
 int	check_vcenter_vm_net_if_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *instance;
 	zbx_vmware_service_t	*service;
-	int 			ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
+	const char		*url, *uuid, *instance;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

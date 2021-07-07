@@ -759,7 +759,7 @@ typedef struct
 }
 zbx_interface_availability_t;
 
-ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *);
+ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *)
 
 typedef struct
 {
@@ -870,7 +870,7 @@ zbx_db_tag_t;
 void	zbx_db_tag_free(zbx_db_tag_t *tag);
 int	zbx_db_tag_compare_func(const void *d1, const void *d2);
 
-ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *);
+ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
 
 typedef enum
 {

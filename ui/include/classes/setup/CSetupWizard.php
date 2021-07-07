@@ -20,7 +20,7 @@
 
 
 /**
- * Setup wizzard form.
+ * Setup wizard form.
  */
 class CSetupWizard extends CForm {
 
@@ -642,12 +642,23 @@ class CSetupWizard extends CForm {
 
 		$error = false;
 
-		// Create session secret key.
-		if (!$this->dbConnect($db_user, $db_pass) || !CEncryptHelper::updateKey(CEncryptHelper::generateKey())) {
+		/*
+		 * Create session secret key for first installation. If installation already exists, don't make a new key
+		 * because that will terminate the existing session.
+		 */
+		$db_connect = $this->dbConnect($db_user, $db_pass);
+		$is_superadmin = (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN);
+		$session_key_update_failed = ($db_connect && !$is_superadmin)
+			? !CEncryptHelper::updateKey(CEncryptHelper::generateKey())
+			: false;
+
+		if (!$db_connect || $session_key_update_failed) {
 			$this->STEP_FAILED = true;
 			$this->setConfig('step', 2);
+
 			return $this->stage2();
 		}
+
 		$this->dbClose();
 
 		if (!$config->save()) {

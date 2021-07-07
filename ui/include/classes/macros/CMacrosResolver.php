@@ -890,7 +890,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'usermacros' => true
 		];
 
-		$expression_parser = new CExpressionParser(['collapsed_expression' => true, 'lldmacros' => true]);
+		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'collapsed_expression' => true
+		]);
 
 		// Find macros.
 		foreach ($triggers as $key => $trigger) {

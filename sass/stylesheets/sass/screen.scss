@@ -3010,15 +3010,12 @@ $form-icon-btn: (
 				content: "";
 			}
 		}
-	}
 
-	.menu-popup-item-disabled {
-		display: block;
-		height: 24px;
-		line-height: 24px;
-		color: $font-alt-color;
-		border: 0;
-		cursor: default;
+		&.disabled {
+			background-color: transparent;
+			color: $font-alt-color;
+			opacity: 1;
+		}
 	}
 
 	h3 {
@@ -4591,13 +4588,6 @@ span {
 .overlay-dialogue.modal .overlay-dialogue-body {
 	&.is-loading {
 		overflow: hidden;
-
-		&:before {
-			top: 42px;
-			right: 1px;
-			bottom: 42px;
-			left: 1px;
-		}
 	}
 }
 

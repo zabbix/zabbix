@@ -1,0 +1,1543 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-06-18T08:44:54Z'
+  groups:
+    -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      uuid: 9fde0e1c36f8453da72f97535d4e74ca
+      template: 'DELL PowerEdge R740 SNMP'
+      name: 'DELL PowerEdge R740 SNMP'
+      description: |
+        Template for DELL PowerEdge R740 servers with iDRAC version 7 and later.
+        
+        MIBs used:
+        IDRAC-MIB-SMIv2
+        SNMPv2-MIB
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      items:
+        -
+          uuid: a0886c2161f04d2d9c0611c03cb9f2b3
+          name: 'Dell R740: System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'dell.server.contact[sysContact]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 48db6854d25c40f2bcbe736cd0d07b38
+          name: 'Dell R740: System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'dell.server.descr[sysDescr]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: c32ef141053241cfa8874f9f6b87f2a9
+          name: 'Dell R740: Firmware version'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
+          key: 'dell.server.hw.firmware[racFirmwareVersion]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the firmware version of a remote access card.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: fc9618eb512e4d9b9eddf21c2700582e
+              expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R740 SNMP/dell.server.hw.firmware[racFirmwareVersion],#2) and length(last(/DELL PowerEdge R740 SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0'
+              name: 'Dell R740: Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: e786d1813aff4098b8b9f75c57e767a0
+          name: 'Dell R740: Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
+          key: 'dell.server.hw.model[systemModelName]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the model name of the system.
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 07581939572b47c9b1752899e100aefb
+          name: 'Dell R740: Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
+          key: 'dell.server.hw.serialnumber[systemServiceTag]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the service tag of the system.
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 21ee92eed6f04ea59864dd09b1fac68a
+              expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R740 SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R740 SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
+              name: 'Dell R740: Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: 774878145ad344408e2cc2c8d7f1eb3b
+          name: 'Dell R740: System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'dell.server.location[sysLocation]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., 'telephone closet, 3rd floor'). If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 3794e08f1f404a18b834e1134ab4b036
+          name: 'Dell R740: System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: 'dell.server.name[sysName]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: edc8087b2d2b423fb637b7caefeb50fb
+              expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R740 SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R740 SNMP/dell.server.name[sysName]))>0'
+              name: 'Dell R740: System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 4d696ff91efc40dd9df759276cfa239e
+          name: 'Dell R740: System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'dell.server.objectid[sysObjectID]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 0e55ea34eb984e3d8b0ec22f5a8086d2
+          name: 'Dell R740: Overall system health status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
+          key: 'dell.server.status[globalSystemStatus]'
+          history: 7d
+          trends: 0d
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.
+          valuemap:
+            name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 2a44b7a84ef84d25a40e58239cc305d1
+              expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.DISASTER}'
+              name: 'Dell R740: System is in unrecoverable state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: DISASTER
+              description: 'Please check the device for faults.'
+            -
+              uuid: 7efda5ac8a21449ba32ff3f005433fc1
+              expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
+              name: 'Dell R740: System status is in critical state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Please check the device for errors.'
+            -
+              uuid: 5d3dd609897a4f9ba644db1916045a6f
+              expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.WARN}'
+              name: 'Dell R740: System status is in warning state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Please check the device for warnings.'
+              dependencies:
+                -
+                  name: 'Dell R740: System status is in critical state'
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
+        -
+          uuid: 869eb1dae24e44c1acdfb128d6080ecd
+          name: 'Dell R740: Operating system'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
+          key: 'dell.server.sw.os[systemOSName]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the name of the operating system that the host is running.
+          inventory_link: OS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 9917b5d4d2684398b09ce42842b15146
+              expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R740 SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R740 SNMP/dell.server.sw.os[systemOSName]))>0'
+              name: 'Dell R740: Operating system description has changed'
+              priority: INFO
+              description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: eea538aa7a344a548b713de22c36beaf
+          name: 'Dell R740: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'dell.server.uptime[sysUpTime]'
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 91449180f6dd435f8104a51ae5645fc3
+              expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.uptime[sysUpTime])<10m'
+              name: 'Dell R740: {HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          uuid: d829666064144c05b45982114d4b62fe
+          name: 'Dell R740: SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 3d357c53b0774e01b286062d9aa4acbe
+          name: 'Dell R740: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: zabbix.host.available
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 6c5688c758b64c2f91f2523855578be9
+              expression: 'max(/DELL PowerEdge R740 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'Dell R740: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+      discovery_rules:
+        -
+          uuid: f857333511534d31ba074025893d9cc2
+          name: 'Array controller cache discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#BATTERY_NUM},1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.1,{#BATTERY_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.21]'
+          key: array.cache.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: IDRAC-MIB-SMIv2::batteryTable'
+          item_prototypes:
+            -
+              uuid: be4a3804b89640248fdc06dcfaf497db
+              name: 'Dell R740: {#BATTERY_NAME} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
+              key: 'dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                Current state of battery.
+                Possible values:
+                1: The current state could not be determined.
+                2: The battery is operating normally.
+                3: The battery has failed and needs to be replaced.
+                4: The battery temperature is high or charge level is depleting.
+                5: The battery is missing or not detected.
+                6: The battery is undergoing the re-charge phase.
+                7: The battery voltage or charge level is below the threshold.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::batteryState'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+              trigger_prototypes:
+                -
+                  uuid: 19f9217f3d3a4f98a516c3569d35bd21
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                  name: 'Dell R740: {#BATTERY_NAME} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: b89350f48b354abf864372e3210cbb76
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+                  name: 'Dell R740: {#BATTERY_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#BATTERY_NAME} is in critical state'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                -
+                  uuid: df1277db9cae4a10b18d08a38fefaec5
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
+                  name: 'Dell R740: {#BATTERY_NAME} is not in optimal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#BATTERY_NAME} is in critical state'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                    -
+                      name: 'Dell R740: {#BATTERY_NAME} is in warning state'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 4be96c48d54649f193b9bc561c03c11e
+          name: 'Array controller discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38,{#CNTLR_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.79]'
+          key: array.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: IDRAC-MIB-SMIv2::controllerTable'
+          item_prototypes:
+            -
+              uuid: 0890ad92aa0543a2b88ab54d87ab2b8d
+              name: 'Dell R740: {#CNTLR_NAME} Model'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
+              key: 'dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The controller's name as represented in Storage Management.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+            -
+              uuid: 28e9ac765bc04849bdbbbda006415f9d
+              name: 'Dell R740: {#CNTLR_NAME} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
+              key: 'dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The status of the controller itself without the propagation of any contained component status.
+                Possible values:
+                1: Other
+                2: Unknown
+                3: OK
+                4: Non-critical
+                5: Critical
+                6: Non-recoverable
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Disk arrays'
+              trigger_prototypes:
+                -
+                  uuid: 1be163a9cbf241deb9075ff06b596eb6
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                  name: 'Dell R740: {#CNTLR_NAME} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#CNTLR_NAME} is in unrecoverable state'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                -
+                  uuid: 9ba11fff789445e69be1a53fa7d0e07e
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                  name: 'Dell R740: {#CNTLR_NAME} is in unrecoverable state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: DISASTER
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: 0c06b18258914e7c8dc9941d0b94f512
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
+                  name: 'Dell R740: {#CNTLR_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#CNTLR_NAME} is in critical state'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                    -
+                      name: 'Dell R740: {#CNTLR_NAME} is in unrecoverable state'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 65b22817caf3430795f98dd137660936
+          name: 'FAN discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.12.1.5,{#FAN_DESCR},1.3.6.1.4.1.674.10892.5.4.700.12.1.8,{#TYPE},1.3.6.1.4.1.674.10892.5.4.700.12.1.7]'
+          key: fan.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: '3'
+                formulaid: A
+          description: 'IDRAC-MIB-SMIv2::coolingDeviceTable'
+          item_prototypes:
+            -
+              uuid: bf2405914d064eafb6ee07f143ed8872
+              name: 'Dell R740: {#FAN_DESCR} Speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}'
+              key: 'dell.server.sensor.fan.speed[coolingDeviceReading.{#SNMPINDEX}]'
+              history: 7d
+              units: rpm
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                This attribute defines the reading for a cooling device
+                of subtype other than coolingDeviceSubTypeIsDiscrete. When the value
+                for coolingDeviceSubType is other than coolingDeviceSubTypeIsDiscrete, the
+                value returned for this attribute is the speed in RPM or the OFF/ON value
+                of the cooling device. When the value for coolingDeviceSubType is
+                coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+            -
+              uuid: f7e5afd5c5d04fa482a1a3b6c55c1fe4
+              name: 'Dell R740: {#FAN_DESCR} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
+              key: 'dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                This attribute defines the probe status of the cooling device.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: 87d1cd50bf134d6e8bf30e1c97b63880
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
+                  name: 'Dell R740: {#FAN_DESCR} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit.'
+                -
+                  uuid: 79dc96ea76e44df9b7e0615c97bcd3a7
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalLower"}'
+                  name: 'Dell R740: {#FAN_DESCR} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the fan unit.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#FAN_DESCR} is in critical state'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: fea760333bef4fbdb8162692fdcc5941
+          name: 'Physical disk discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.2]'
+          key: physicaldisk.discovery
+          delay: 1h
+          description: 'Scanning  table of physical drive entries IDRAC-MIB-SMIv2::physicalDiskTable.'
+          item_prototypes:
+            -
+              uuid: 7074a7eee90a405eafdc9cd88f1f013b
+              name: 'Dell R740: {#DISK_NAME} Media type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The media type of the physical disk. Possible Values:
+                1: The media type could not be determined.
+                2: Hard Disk Drive (HDD).
+                3: Solid State Drive (SSD).
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: 380aaeeabbbd44b59d1afffdfedb0452
+              name: 'Dell R740: {#DISK_NAME} Model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The model number of the physical disk.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: f76c78de6bde438f8764165f5bae69ed
+              name: 'Dell R740: {#DISK_NAME} Serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The physical disk's unique identification number from the manufacturer.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: 6a99f1c73c9644369947c25d187e812c
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
+                  name: 'Dell R740: {#DISK_NAME} has been replaced (new serial number received)'
+                  priority: INFO
+                  description: '{#DISK_NAME} serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              uuid: 7c425c1e8ce44e649afeef826c40fcf7
+              name: 'Dell R740: {#DISK_NAME} Size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              units: B
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The size of the physical disk in megabytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: cac85f9f55a64fe79f393b5b738e2ec8
+              name: 'Dell R740: {#DISK_NAME} S.M.A.R.T. Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                Indicates whether the physical disk has received a predictive failure alert.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::BooleanType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: b8d469d16cd7455a94daeeeafb1be82e
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  name: 'Dell R740: {#DISK_NAME} S.M.A.R.T. failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Disk probably requires replacement.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#DISK_NAME} failed'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+            -
+              uuid: 72672e6e76c24b469dbf296389d7a285
+              name: 'Dell R740: {#DISK_NAME} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
+              key: 'dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The status of the physical disk itself without the propagation of any contained component status.
+                Possible values:
+                1: Other
+                2: Unknown
+                3: OK
+                4: Non-critical
+                5: Critical
+                6: Non-recoverable
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: 940630ac993842379dbd17168fcc3f4e
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+                  name: 'Dell R740: {#DISK_NAME} failed'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check physical disk for warnings or errors.'
+                -
+                  uuid: 4b252f24da774362a77be992e0c2e1da
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN:"nonCritical"}'
+                  name: 'Dell R740: {#DISK_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check physical disk for warnings or errors.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#DISK_NAME} failed'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R740 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 2d12dc932f974895a55c16d511487fbb
+          name: 'PSU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.600.12.1.5,{#PSU_DESCR},1.3.6.1.4.1.674.10892.5.4.600.12.1.8]'
+          key: psu.discovery
+          delay: 1h
+          description: 'IDRAC-MIB-SMIv2::powerSupplyTable'
+          item_prototypes:
+            -
+              uuid: 7e15cbbcf34d43a2bb55a46705fa44a1
+              name: 'Dell R740: {#PSU_DESCR}'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
+              key: 'dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                0600.0012.0001.0005 This attribute defines the status of the power supply.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: 6e055e9cf8e34d189b96c121f05cb529
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
+                  name: 'Dell R740: Power supply {#PSU_DESCR} is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors.'
+                -
+                  uuid: 65f2765b5b4e4297ac7cc93499466cc2
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.WARN:"nonCritical"}'
+                  name: 'Dell R740: Power supply {#PSU_DESCR} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the power supply unit for errors.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: Power supply {#PSU_DESCR} is in critical state'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 69f433d988ac4cb2ad702d972d640896
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.20.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.674.10892.5.4.700.20.1.8]'
+          key: temp.discovery
+          delay: 1h
+          description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
+          item_prototypes:
+            -
+              uuid: 1630c8d0f27446a485eb317005dd391f
+              name: 'Dell R740: {#SENSOR_LOCALE} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
+              key: 'dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              value_type: FLOAT
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                This attribute defines the probe status of the temperature probe.
+                Possible values:
+                other(1),               -- probe status is not one of the following:
+                unknown(2),             -- probe status is unknown (not known or monitored)
+                ok(3),                  -- probe is reporting a value within the thresholds
+                nonCriticalUpper(4),    -- probe has crossed the upper noncritical threshold
+                criticalUpper(5),       -- probe has crossed the upper critical threshold
+                nonRecoverableUpper(6), -- probe has crossed the upper non-recoverable threshold
+                nonCriticalLower(7),    -- probe has crossed the lower noncritical threshold
+                criticalLower(8),       -- probe has crossed the lower critical threshold
+                nonRecoverableLower(9), -- probe has crossed the lower non-recoverable threshold
+                failed(10)              -- probe is not functional
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: a145a8ebf20641b8b2907e1c3e4048d5
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                  name: 'Dell R740: Probe {#SENSOR_LOCALE} is in critical status'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: fa01e3ea0b5e44739f5ceef4db36cf43
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+                  name: 'Dell R740: Probe {#SENSOR_LOCALE} is in warning status'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: Probe {#SENSOR_LOCALE} is in critical status'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                -
+                  uuid: 128395cf2bbf43cf9311bb6dd6573f40
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$SENSOR.TEMP.STATUS.OK}'
+                  name: 'Dell R740: Probe {#SENSOR_LOCALE} is not in optimal status'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'Please check the device for faults.'
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'Dell R740: Probe {#SENSOR_LOCALE} is in critical status'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                    -
+                      name: 'Dell R740: Probe {#SENSOR_LOCALE} is in warning status'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R740 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+            -
+              uuid: a87195afc4704b1db8b32bcbf5e6c8a9
+              name: 'Dell R740: {#SENSOR_LOCALE} Value'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
+              key: 'dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete. When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete, the value returned for this attribute is the temperature that the probe is reading in Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: b991939e3f2249e08833bb1c61c036ba
+          name: 'Virtual disk discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.2]'
+          key: virtualdisk.discovery
+          delay: 1h
+          description: 'IDRAC-MIB-SMIv2::virtualDiskTable'
+          item_prototypes:
+            -
+              uuid: e55b1c2d1b7d498b9a46e483a16fc6dc
+              name: 'Dell R740: {#DISK_NAME} Layout type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The virtual disk's RAID type.
+                Possible values:
+                1: Not one of the following
+                2: RAID-0
+                3: RAID-1
+                4: RAID-5
+                5: RAID-6
+                6: RAID-10
+                7: RAID-50
+                8: RAID-60
+                9: Concatenated RAID 1
+                10: Concatenated RAID 5
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 4c7c8f0890cd40a9a86afd50dc1f4cd8
+              name: 'Dell R740: {#DISK_NAME} Read policy'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.readpolicy[virtualDiskReadPolicy.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The read policy used by the controller for read operations on this virtual disk.
+                Possible values:
+                1: No Read Ahead.
+                2: Read Ahead.
+                3: Adaptive Read Ahead.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskReadPolicy'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: ccd5cfbb6e7e419c9169e6ef28c722f8
+              name: 'Dell R740: {#DISK_NAME} Size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
+              history: 7d
+              trends: 0d
+              units: B
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The size of the virtual disk in megabytes.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 6fa2291e865246e7ae786ed666f442b8
+              name: 'Dell R740: {#DISK_NAME} Current state'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The state of the virtual disk when there are progressive operations ongoing.
+                Possible values:
+                1: There is no active operation running.
+                2: The virtual disk configuration has changed. The physical disks included in the virtual disk are being modified to support the new configuration.
+                3: A Consistency Check (CC) is being performed on the virtual disk.
+                4: The virtual disk is being initialized.
+                5: BackGround Initialization (BGI) is being performed on the virtual disk.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 9b9d9e1d8999455ea8d70834164ecff0
+              name: 'Dell R740: {#DISK_NAME} Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The current state of this virtual disk (which includes any member physical disks.)
+                Possible states:
+                1: The current state could not be determined.
+                2: The virtual disk is operating normally or optimally.
+                3: The virtual disk has encountered a failure. Data on the disk is lost or is about to be lost.
+                4: The virtual disk encountered a failure with one or all of the constituent redundant physical disks.
+                The data on the virtual disk might no longer be fault tolerant.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskState'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+              trigger_prototypes:
+                -
+                  uuid: 128bcdb7dc7b445390edd429d01dabf8
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
+                  name: 'Dell R740: {#DISK_NAME} failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the virtual disk for warnings or errors.'
+                -
+                  uuid: ce63508ee9c64b80bfaf95568dd7954f
+                  expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.WARN:"degraded"}'
+                  name: 'Dell R740: {#DISK_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the virtual disk for warnings or errors.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#DISK_NAME} failed'
+                      expression: 'last(/DELL PowerEdge R740 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
+            -
+              uuid: 8dc6e7a46374409a9f614b854d2ee503
+              name: 'Dell R740: {#DISK_NAME} Write policy'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}'
+              key: 'dell.server.hw.virtualdisk.writepolicy[virtualDiskWritePolicy.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              description: |
+                MIB: IDRAC-MIB-SMIv2
+                The write policy used by the controller for write operations on this virtual disk.
+                Possible values:
+                1: Write Through.
+                2: Write Back.
+                3: Force Write Back.
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      macros:
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+          value: '3'
+          description: 'The critical status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
+          value: '2'
+          description: 'The OK status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+          value: '4'
+          description: 'The warning status of the disk array cache battery for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.CRIT}'
+          value: '5'
+          description: 'The critical status of the disk array for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.FAIL}'
+          value: '6'
+          description: 'The disaster status of the disk array for trigger expression.'
+        -
+          macro: '{$DISK.ARRAY.STATUS.WARN}'
+          value: '4'
+          description: 'The warning status of the disk array for trigger expression.'
+        -
+          macro: '{$DISK.SMART.STATUS.FAIL}'
+          value: '1'
+          description: 'The critical S.M.A.R.T status of the disk for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.FAIL:"critical"}'
+          value: '5'
+          description: 'The critical status of the disk for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.FAIL:"nonRecoverable"}'
+          value: '6'
+          description: 'The critical status of the disk for trigger expression.'
+        -
+          macro: '{$DISK.STATUS.WARN:"nonCritical"}'
+          value: '4'
+          description: 'The warning status of the disk for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"criticalLower"}'
+          value: '8'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"criticalUpper"}'
+          value: '5'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"failed"}'
+          value: '10'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"nonRecoverableLower"}'
+          value: '9'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.CRIT:"nonRecoverableUpper"}'
+          value: '6'
+          description: 'The critical value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.WARN:"nonCriticalLower"}'
+          value: '7'
+          description: 'The warning value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$FAN.STATUS.WARN:"nonCriticalUpper"}'
+          value: '4'
+          description: 'The warning value of the FAN sensor for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.CRIT}'
+          value: '5'
+          description: 'The critical status of the health for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.DISASTER}'
+          value: '6'
+          description: 'The disaster status of the health for trigger expression.'
+        -
+          macro: '{$HEALTH.STATUS.WARN}'
+          value: '4'
+          description: 'The warning status of the health for trigger expression.'
+        -
+          macro: '{$PSU.STATUS.CRIT:"critical"}'
+          value: '5'
+          description: 'The critical value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$PSU.STATUS.CRIT:"nonRecoverable"}'
+          value: '6'
+          description: 'The critical value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$PSU.STATUS.WARN:"nonCritical"}'
+          value: '4'
+          description: 'The warning value of the PSU sensor for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.CRIT:"criticalLower"}'
+          value: '8'
+          description: 'The critical status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"}'
+          value: '5'
+          description: 'The critical status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+          value: '9'
+          description: 'The critical status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"}'
+          value: '6'
+          description: 'The critical status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.OK}'
+          value: '3'
+          description: 'The OK status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+          value: '7'
+          description: 'The warning status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"}'
+          value: '4'
+          description: 'The warning status of the temperature probe for trigger expression.'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+        -
+          macro: '{$VDISK.STATUS.CRIT:"failed"}'
+          value: '3'
+          description: 'The critical status of the virtual disk for trigger expression.'
+        -
+          macro: '{$VDISK.STATUS.WARN:"degraded"}'
+          value: '4'
+          description: 'The warning status of the virtual disk for trigger expression.'
+      valuemaps:
+        -
+          uuid: 00de3138244c4b758736da399416b193
+          name: 'IDRAC-MIB-SMIv2::batteryState'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: Ready
+            -
+              value: '3'
+              newvalue: Failed
+            -
+              value: '4'
+              newvalue: Degraded
+            -
+              value: '5'
+              newvalue: Missing
+            -
+              value: '6'
+              newvalue: Charging
+            -
+              value: '7'
+              newvalue: 'Below threshold'
+        -
+          uuid: 30da32599eab4478bc8645382d02a460
+          name: 'IDRAC-MIB-SMIv2::BooleanType'
+          mappings:
+            -
+              value: '0'
+              newvalue: ok
+            -
+              value: '1'
+              newvalue: failed
+        -
+          uuid: c51def0f0ce640e7ae70f9fe0da7589d
+          name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCritical
+            -
+              value: '5'
+              newvalue: critical
+            -
+              value: '6'
+              newvalue: nonRecoverable
+        -
+          uuid: 349663986938482ca7e4519516a289ea
+          name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCritical
+            -
+              value: '5'
+              newvalue: critical
+            -
+              value: '6'
+              newvalue: nonRecoverable
+        -
+          uuid: 1945a0e1d81f495ab41c9ef848e8fde9
+          name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: HDD
+            -
+              value: '3'
+              newvalue: SSD
+        -
+          uuid: b3e8adf66be04293ab6b1416705721a6
+          name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: unknown
+            -
+              value: '3'
+              newvalue: ok
+            -
+              value: '4'
+              newvalue: nonCriticalUpper
+            -
+              value: '5'
+              newvalue: criticalUpper
+            -
+              value: '6'
+              newvalue: nonRecoverableUpper
+            -
+              value: '7'
+              newvalue: nonCriticalLower
+            -
+              value: '8'
+              newvalue: criticalLower
+            -
+              value: '9'
+              newvalue: nonRecoverableLower
+            -
+              value: '10'
+              newvalue: failed
+        -
+          uuid: c6b9cc21da864d47982d1bb4223d5826
+          name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
+          mappings:
+            -
+              value: '1'
+              newvalue: Other
+            -
+              value: '2'
+              newvalue: RAID-0
+            -
+              value: '3'
+              newvalue: RAID-1
+            -
+              value: '4'
+              newvalue: RAID-5
+            -
+              value: '5'
+              newvalue: RAID-6
+            -
+              value: '6'
+              newvalue: RAID-10
+            -
+              value: '7'
+              newvalue: RAID-50
+            -
+              value: '8'
+              newvalue: RAID-60
+            -
+              value: '9'
+              newvalue: 'Concatenated RAID 1'
+            -
+              value: '10'
+              newvalue: 'Concatenated RAID 5'
+        -
+          uuid: 4dbff414bf354da499f98c7391453e47
+          name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Not applicable'
+            -
+              value: '2'
+              newvalue: Reconstructing
+            -
+              value: '3'
+              newvalue: Resynching
+            -
+              value: '4'
+              newvalue: Initializing
+            -
+              value: '5'
+              newvalue: 'Background init'
+        -
+          uuid: 5d2e0552eab844728f62b95db3d9dd24
+          name: 'IDRAC-MIB-SMIv2::virtualDiskReadPolicy'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'No Read Ahead'
+            -
+              value: '2'
+              newvalue: 'Read Ahead'
+            -
+              value: '3'
+              newvalue: 'Adaptive Read Ahead'
+        -
+          uuid: 2d250d26187e410492725f1022ae7b26
+          name: 'IDRAC-MIB-SMIv2::virtualDiskState'
+          mappings:
+            -
+              value: '1'
+              newvalue: Unknown
+            -
+              value: '2'
+              newvalue: Online
+            -
+              value: '3'
+              newvalue: Failed
+            -
+              value: '4'
+              newvalue: Degraded
+        -
+          uuid: 9536e2ee81374408aa40ad069533d6da
+          name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Write Through'
+            -
+              value: '2'
+              newvalue: 'Write Back'
+            -
+              value: '3'
+              newvalue: 'Force Write Back'
+        -
+          uuid: a5ac79d4c3f14ce59155b61cb0780e57
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

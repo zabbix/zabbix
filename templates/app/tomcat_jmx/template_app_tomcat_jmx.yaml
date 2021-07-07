@@ -46,7 +46,7 @@ zabbix_export:
           triggers:
             -
               uuid: 152d235652914aa2af78334385334214
-              expression: '(last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#2))=1 and length(last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo]))>0'
+              expression: 'last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo]))>0'
               name: 'Tomcat: Version has been changed'
               priority: INFO
               description: 'Tomcat version has changed. Ack to close.'

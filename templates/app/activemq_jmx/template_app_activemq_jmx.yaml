@@ -70,7 +70,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7902d81681874aa3acf33d90316f9864
-                  expression: '(last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#1)<>last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#2))=1 and length(last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion]))>0'
+                  expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#1)<>last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#2) and length(last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion]))>0'
                   name: 'Broker {#JMXBROKERNAME}: Version has been changed'
                   priority: INFO
                   description: 'Broker {#JMXBROKERNAME} version has changed. Ack to close.'

@@ -276,7 +276,7 @@ zabbix_export:
           triggers:
             -
               uuid: f48fb8ce1229492dae62de362c8c9539
-              expression: '(last(/FreeBSD/system.hostname,#1)<>last(/FreeBSD/system.hostname,#2))>0'
+              expression: 'last(/FreeBSD/system.hostname,#1)<>last(/FreeBSD/system.hostname,#2)'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -351,7 +351,7 @@ zabbix_export:
           triggers:
             -
               uuid: ea2f9c186798420da781bd835fa0eaed
-              expression: '(last(/FreeBSD/system.uname,#1)<>last(/FreeBSD/system.uname,#2))>0'
+              expression: 'last(/FreeBSD/system.uname,#1)<>last(/FreeBSD/system.uname,#2)'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -400,7 +400,7 @@ zabbix_export:
           triggers:
             -
               uuid: 27b4e5de411949a4befa7171a2af6441
-              expression: '(last(/FreeBSD/vfs.file.cksum[/etc/passwd],#1)<>last(/FreeBSD/vfs.file.cksum[/etc/passwd],#2))>0'
+              expression: 'last(/FreeBSD/vfs.file.cksum[/etc/passwd],#1)<>last(/FreeBSD/vfs.file.cksum[/etc/passwd],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -

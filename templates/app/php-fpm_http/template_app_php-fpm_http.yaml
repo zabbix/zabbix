@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:24Z'
+  date: '2021-06-18T12:21:11Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -134,7 +134,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: 'last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+last(//php-fpm.listen_queue_len)=0)*100'
+          params: 'last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+(last(//php-fpm.listen_queue_len)=0))*100'
           description: 'Queue utilization'
           tags:
             -
@@ -329,7 +329,7 @@ zabbix_export:
           triggers:
             -
               uuid: 8cfa50bcea744075954d0a9c8a132330
-              expression: '(last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2))=1'
+              expression: 'last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2)'
               name: 'PHP-FPM: Manager  changed (new value received: {ITEM.VALUE})'
               priority: INFO
               description: 'PHP-FPM manager changed. Ack to close.'
@@ -453,7 +453,7 @@ zabbix_export:
           triggers:
             -
               uuid: d6c891de92c34bdba80a2ba88f975271
-              expression: '(last(/PHP-FPM by HTTP/php-fpm.version,#1)<>last(/PHP-FPM by HTTP/php-fpm.version,#2))=1 and length(last(/PHP-FPM by HTTP/php-fpm.version))>0'
+              expression: 'last(/PHP-FPM by HTTP/php-fpm.version,#1)<>last(/PHP-FPM by HTTP/php-fpm.version,#2) and length(last(/PHP-FPM by HTTP/php-fpm.version))>0'
               name: 'PHP-FPM: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'PHP-FPM version has changed. Ack to close.'

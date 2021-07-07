@@ -191,7 +191,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6fb6045405af4c89b09750f57ada472a
-              expression: '(last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2))=1 and length(last(/TiDB PD by HTTP/pd.version))>0'
+              expression: 'last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0'
               name: 'PD: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'PD version has changed. Ack to close.'

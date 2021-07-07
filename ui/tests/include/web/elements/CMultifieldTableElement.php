@@ -22,6 +22,9 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use \Facebook\WebDriver\Exception\UnrecognizedExceptionException;
+use \Facebook\WebDriver\Exception\ElementNotInteractableException;
+
 /**
  * Multifield table element.
  */
@@ -174,9 +177,17 @@ class CMultifieldTableElement extends CTableElement {
 					$pos = strrpos($value, '[');
 					if ($pos !== false) {
 						$name = substr($value, $pos + 1, -1);
+						if (is_numeric($name)) {
+							$value = substr($value, 0, $pos);
+							$pos = strrpos($value, '[');
+
+							if ($pos !== false) {
+								$name = substr($value, $pos + 1, -1);
+							}
+						}
 					}
 
-					if (!$name) {
+					if (!$name || is_numeric($name)) {
 						$name = $label;
 					}
 				}
@@ -326,7 +337,12 @@ class CMultifieldTableElement extends CTableElement {
 				try {
 					$controls[$name]->fill($value);
 				}
-				catch (Exception $e1) {
+				catch (\Exception $e1) {
+					if (!($e1 instanceof UnrecognizedExceptionException)
+							&& !($e1 instanceof ElementNotInteractableException)) {
+						throw $e1;
+					}
+
 					try {
 						$controls = $this->getRowControls($this->getRow($index));
 						$controls[$name]->fill($value);
@@ -434,6 +450,7 @@ class CMultifieldTableElement extends CTableElement {
 			$data = [$data];
 		}
 
+		// If the first row  already presents in multifield table no need to press Add.
 		$rows = $this->getRows()->count();
 		if (count($data) >= 1 && CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
 			if ($this->mapping === null) {
@@ -455,7 +472,7 @@ class CMultifieldTableElement extends CTableElement {
 			foreach ($values as $key => $value) {
 				// Elements with predefined values are always ignored.
 				if (in_array(CTestArrayHelper::get($fields, $key), [CDropdownElement::class, CCheckboxElement::class,
-					CRadioButtonList::class, CSegmentedRadioElement::class])) {
+						CRadioButtonList::class, CSegmentedRadioElement::class])) {
 					continue;
 				}
 

@@ -134,7 +134,7 @@ zabbix_export:
           triggers:
             -
               uuid: 072bf35ea9d04c559ada5cb13d4b6802
-              expression: '(last(/Generic SNMP/system.name,#1)<>last(/Generic SNMP/system.name,#2))=1 and length(last(/Generic SNMP/system.name))>0'
+              expression: 'last(/Generic SNMP/system.name,#1)<>last(/Generic SNMP/system.name,#2) and length(last(/Generic SNMP/system.name))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'

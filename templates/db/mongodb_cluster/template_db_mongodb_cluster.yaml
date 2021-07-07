@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:40Z'
+  date: '2021-05-11T14:37:54Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -41,6 +41,7 @@ zabbix_export:
                 - |
                   data = JSON.parse(value)
                   return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTime.ts)/Math.pow(2,32);
+                  
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
@@ -375,6 +376,7 @@ zabbix_export:
                 - |
                   data = JSON.parse(value)
                   return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
+                  
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
@@ -798,7 +800,7 @@ zabbix_export:
           triggers:
             -
               uuid: 921ee489887943838d69558f103ad646
-              expression: '(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#2))=1 and length(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version))>0'
+              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version))>0'
               name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB cluster version has changed. Ack to close.'
@@ -856,7 +858,9 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Collect collections metrics.'
+          description: |
+            Collect collections metrics.
+            Note, depending on the number of DBs and collections this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
           item_prototypes:
             -
               uuid: 253af5ef7858482fbeaa0c06c033b47a
@@ -1060,7 +1064,9 @@ zabbix_export:
                 value: '{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Collect database metrics.'
+          description: |
+            Collect database metrics.
+            Note, depending on the number of DBs this discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}.
           item_prototypes:
             -
               uuid: 6dea9a371b94402aad9f8c6d7fcc5761

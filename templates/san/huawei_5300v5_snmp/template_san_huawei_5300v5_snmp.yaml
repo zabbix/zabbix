@@ -102,7 +102,7 @@ zabbix_export:
           triggers:
             -
               uuid: b6eb791cc14644dfb0a69a2cce150ab1
-              expression: '(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#2))=1 and length(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version]))>0'
+              expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#2) and length(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version]))>0'
               name: 'OceanStor 5300 V5: Storage version has been changed'
               priority: INFO
               description: 'OceanStor 5300 V5 version has changed. Ack to close.'
@@ -270,7 +270,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8b8ec3f843e74533a43f24393004cc84
-                  expression: '(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#2))=1'
+                  expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#2)'
                   name: 'Controller {#ID}: Role has been changed'
                   priority: WARNING
                   manual_close: 'YES'

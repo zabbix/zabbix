@@ -623,7 +623,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2f5aa644755c4d18a3eafc74bde2d3ad
-              expression: '(last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2))=1 and length(last(/Windows generic by Zabbix agent active/system.hostname))>0'
+              expression: 'last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2) and length(last(/Windows generic by Zabbix agent active/system.hostname))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -1174,7 +1174,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d2af1fae64c940f2b2b923e159b836e6
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
@@ -1230,7 +1230,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: 3bdd014bdaf04f0885816cbf1da11309
@@ -1250,7 +1250,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: e29c3aa283d74838b45040394a3eabe1
@@ -1269,7 +1269,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
           graph_prototypes:
             -
@@ -1372,7 +1372,7 @@ zabbix_export:
       dashboards:
         -
           uuid: 1f4737b4a5364b35a8358dccedf6a492
-          name: 'Netowrk interfaces'
+          name: 'Network interfaces'
           pages:
             -
               widgets:

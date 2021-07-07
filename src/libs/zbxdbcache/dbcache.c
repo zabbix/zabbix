@@ -617,7 +617,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
-	result = DBselect("%s", sql);
+	result = DBselect("%s order by itemid,clock", sql);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -942,6 +942,17 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	zbx_trend_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_TREND	*p1 = (const ZBX_DC_TREND *)d1;
+	const ZBX_DC_TREND	*p2 = (const ZBX_DC_TREND *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->itemid, p2->itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->clock, p2->clock);
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBmass_update_trends                                             *
@@ -962,6 +973,7 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 	{
 		trends_tmp = (ZBX_DC_TREND *)zbx_malloc(NULL, trends_num * sizeof(ZBX_DC_TREND));
 		memcpy(trends_tmp, trends, trends_num * sizeof(ZBX_DC_TREND));
+		qsort(trends_tmp, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 		while (0 < trends_num)
 			DBflush_trends(trends_tmp, &trends_num, trends_diff);
@@ -1573,6 +1585,9 @@ static void	DCsync_trends(void)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS) && 0 != trends_num)
 		DCexport_all_trends(trends, trends_num);
 
+	if (0 < trends_num)
+		qsort(trends, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
+
 	DBbegin();
 
 	while (trends_num > 0)
@@ -2112,33 +2127,26 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 
 /******************************************************************************
  *                                                                            *
- * Function: DCmass_proxy_update_items                                        *
+ * Function: DCmass_proxy_prepare_itemdiff                                    *
  *                                                                            *
- * Purpose: update items info after new value is received                     *
+ * Purpose: prepare itemdiff after receiving new values                       *
  *                                                                            *
  * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
- *                                                                            *
- * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
+ *             item_diff   - vector to store prepared diff                    *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
+static void	DCmass_proxy_prepare_itemdiff(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *item_diff)
 {
-	int			i;
-	zbx_vector_ptr_t	item_diff;
-	zbx_item_diff_t		*diffs;
+	int	i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&item_diff);
-	zbx_vector_ptr_reserve(&item_diff, history_num);
-
-	/* preallocate zbx_item_diff_t structures for item_diff vector */
-	diffs = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t) * history_num);
+	zbx_vector_ptr_reserve(item_diff, history_num);
 
 	for (i = 0; i < history_num; i++)
 	{
-		zbx_item_diff_t	*diff = &diffs[i];
+		zbx_item_diff_t	*diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
 
 		diff->itemid = history[i].itemid;
 		diff->state = history[i].state;
@@ -2151,30 +2159,43 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME;
 		}
 
-		zbx_vector_ptr_append(&item_diff, diff);
+		zbx_vector_ptr_append(item_diff, diff);
 	}
 
-	if (0 != item_diff.values_num)
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCmass_proxy_update_items                                        *
+ *                                                                            *
+ * Purpose: update items info after new value is received                     *
+ *                                                                            *
+ * Parameters: item_diff - diff of items to be updated                        *
+ *                                                                            *
+ * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 != item_diff->values_num)
 	{
 		size_t	sql_offset = 0;
 
-		zbx_vector_ptr_sort(&item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &item_diff,
+		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
 				ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
-
-		DCconfig_items_apply_changes(&item_diff);
 	}
-
-	zbx_vector_ptr_destroy(&item_diff);
-	zbx_free(diffs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2472,7 +2493,7 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
+static void	DBmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	int	i, h_num = 0, h_meta_num = 0, hlog_num = 0, notsupported_num = 0;
 
@@ -2902,13 +2923,15 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 
 static void	sync_proxy_history(int *total_num, int *more)
 {
-	int			history_num;
+	int			history_num, txn_rc;
 	time_t			sync_start;
 	zbx_vector_ptr_t	history_items;
+	zbx_vector_ptr_t	item_diff;
 	ZBX_DC_HISTORY		history[ZBX_HC_SYNC_MAX];
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
+	zbx_vector_ptr_create(&item_diff);
 
 	sync_start = time(NULL);
 
@@ -2929,29 +2952,46 @@ static void	sync_proxy_history(int *total_num, int *more)
 		hc_get_item_values(history, &history_items);	/* copy item data from history cache */
 		proxy_prepare_history(history, history_items.values_num);
 
+		DCmass_proxy_prepare_itemdiff(history, history_num, &item_diff);
+
 		do
 		{
 			DBbegin();
 
-			DCmass_proxy_add_history(history, history_num);
-			DCmass_proxy_update_items(history, history_num);
+			DBmass_proxy_add_history(history, history_num);
+			DBmass_proxy_update_items(&item_diff);
 		}
-		while (ZBX_DB_DOWN == DBcommit());
+		while (ZBX_DB_DOWN == (txn_rc = DBcommit()));
 
 		LOCK_CACHE;
 
 		hc_push_items(&history_items);	/* return items to history cache */
-		cache->history_num -= history_num;
 
-		if (0 != hc_queue_get_size())
+		if (ZBX_DB_FAIL != txn_rc)
+		{
+			if (0 != item_diff.values_num)
+				DCconfig_items_apply_changes(&item_diff);
+
+			cache->history_num -= history_num;
+
+			if (0 != hc_queue_get_size())
+				*more = ZBX_SYNC_MORE;
+
+			UNLOCK_CACHE;
+
+			*total_num += history_num;
+
+			hc_free_item_values(history, history_num);
+		}
+		else
+		{
 			*more = ZBX_SYNC_MORE;
-
-		UNLOCK_CACHE;
-
-		*total_num += history_num;
+			UNLOCK_CACHE;
+		}
 
 		zbx_vector_ptr_clear(&history_items);
-		hc_free_item_values(history, history_num);
+		zbx_vector_ptr_clear_ext(&item_diff, zbx_default_mem_free_func);
+		zbx_vector_ptr_destroy(&item_diff);
 
 		/* Exit from sync loop if we have spent too much time here */
 		/* unless we are doing full sync. This is done to allow    */
@@ -4178,17 +4218,40 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 		item_value = &values[i];
 
-		while (SUCCEED != hc_clone_history_data(&data, item_value))
+		/* a record with metadata and no value can be dropped if  */
+		/* the metadata update is copied to the last queued value */
+		if (NULL != (item = hc_get_item(item_value->itemid)) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE) &&
+				0 != (item_value->flags & ZBX_DC_FLAG_META))
 		{
-			UNLOCK_CACHE;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
-			sleep(1);
-
-			LOCK_CACHE;
+			/* skip metadata updates when only one value is queued, */
+			/* because the item might be already being processed    */
+			if (item->head != item->tail)
+			{
+				item->head->lastlogsize = item_value->lastlogsize;
+				item->head->mtime = item_value->mtime;
+				item->head->flags |= ZBX_DC_FLAG_META;
+				continue;
+			}
 		}
 
-		if (NULL == (item = hc_get_item(item_value->itemid)))
+		if (SUCCEED != hc_clone_history_data(&data, item_value))
+		{
+			do
+			{
+				UNLOCK_CACHE;
+
+				zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
+				sleep(1);
+
+				LOCK_CACHE;
+			}
+			while (SUCCEED != hc_clone_history_data(&data, item_value));
+
+			item = hc_get_item(item_value->itemid);
+		}
+
+		if (NULL == item)
 		{
 			item = hc_add_item(item_value->itemid, data);
 			hc_queue_item(item);
