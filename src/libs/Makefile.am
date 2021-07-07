@@ -84,6 +84,7 @@ PROXY_SUBDIRS = \
 	zbxdiag \
 	zbxtrends \
 	zbxavailability \
+	zbxaudit \
 	zbxeval
 endif
 endif
