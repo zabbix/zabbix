@@ -1104,7 +1104,7 @@ class testFormTemplateDashboards extends CWebTest {
 					$form->getField('Type')->getOptions()->asText()
 			);
 		}
-		$form->submit();
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
