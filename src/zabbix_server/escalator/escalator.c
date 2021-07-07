@@ -1588,7 +1588,8 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		if (0 == next_esc_period || next_esc_period > esc_period)
 			next_esc_period = esc_period;
 
-		if (SUCCEED == check_operation_conditions(event, operationid, (unsigned char)atoi(row[3])))
+		if (EVENT_SOURCE_SERVICE == action->eventsource ||
+				SUCCEED == check_operation_conditions(event, operationid, (unsigned char)atoi(row[3])))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
@@ -1613,7 +1614,8 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 
 	flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid, NULL);
 
-	if (EVENT_SOURCE_TRIGGERS == action->eventsource || EVENT_SOURCE_INTERNAL == action->eventsource)
+	if (EVENT_SOURCE_TRIGGERS == action->eventsource || EVENT_SOURCE_INTERNAL == action->eventsource ||
+			EVENT_SOURCE_SERVICE == action->eventsource)
 	{
 		char	*sql;
 
