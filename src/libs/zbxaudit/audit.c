@@ -20,6 +20,7 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "db.h"
+#include "dbcache.h"
 
 #include "audit.h"
 
@@ -41,17 +42,24 @@ static void add_str_json(struct zbx_json *json, const char *key, const char *val
  *           "manual script on event"                                         *
  *                                                                            *
  ******************************************************************************/
-int	auditlog_global_script(unsigned char script_type, unsigned char script_execute_on, char *script_command_orig,
-		zbx_uint64_t hostid, char *hostname, zbx_uint64_t eventid, zbx_uint64_t proxy_hostid,
-		zbx_uint64_t userid, const char *clientip, const char *output, const char *error)
+int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
+		char *script_command_orig, zbx_uint64_t hostid, char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *clientip, const char *output,
+		const char *error)
 {
 	int	ret = SUCCEED;
 	char	auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
 		eventid_s[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
 
 	struct zbx_json	details_json;
+	zbx_config_t	cfg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDIT_LOGGING_ENABLED);
+
+	if (AUDIT_LOGGING_ENABLED != cfg.audit_logging_enabled)
+		goto out;
 
 	zbx_new_cuid(auditid_cuid);
 
@@ -97,7 +105,7 @@ int	auditlog_global_script(unsigned char script_type, unsigned char script_execu
 	}
 
 	zbx_json_free(&details_json);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

@@ -934,7 +934,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
 					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
 					"compression_status", "compress_older", "instanceid",
-					"default_timezone"};	/* sync with zbx_dbsync_compare_config() */
+					"default_timezone",
+					"audit_logging_enabled"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, ret;
@@ -1075,6 +1076,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	}
 #endif
 	DCstrpool_replace(found, &config->config->default_timezone, row[31]);
+
+	config->config->audit_logging_enabled = atoi(row[32]);
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
@@ -3579,7 +3582,7 @@ static void	DCsync_template_items(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, itemid;
 	unsigned char		tag;
 	int			ret, found;
-	ZBX_DC_TEMPLATE_ITEM 	*item;
+	ZBX_DC_TEMPLATE_ITEM	*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3615,7 +3618,7 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, itemid;
 	unsigned char		tag;
 	int			ret, found;
-	ZBX_DC_PROTOTYPE_ITEM 	*item;
+	ZBX_DC_PROTOTYPE_ITEM	*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -12180,6 +12183,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE))
 		cfg->default_timezone = zbx_strdup(NULL, config->config->default_timezone);
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_AUDIT_LOGGING_ENABLED))
+		cfg->audit_logging_enabled = config->config->audit_logging_enabled;
 
 	UNLOCK_CACHE;
 

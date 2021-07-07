@@ -545,6 +545,7 @@ typedef struct
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
 	const char	*default_timezone;
+	int		audit_logging_enabled;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;

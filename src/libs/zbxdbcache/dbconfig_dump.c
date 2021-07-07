@@ -72,6 +72,8 @@ static void	DCdump_config(void)
 			config->config->hk.trends_global, config->config->hk.trends);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  default timezone '%s'", config->config->default_timezone);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  audit_logging_enabled: %d", config->config->audit_logging_enabled);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }

@@ -90,6 +90,13 @@ static int	DBpatch_5050006(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5050007(void)
+{
+	const ZBX_FIELD	field = {"audit_logging_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -103,5 +110,6 @@ DBPATCH_ADD(5050003, 0, 1)
 DBPATCH_ADD(5050004, 0, 1)
 DBPATCH_ADD(5050005, 0, 1)
 DBPATCH_ADD(5050006, 0, 1)
+DBPATCH_ADD(5050007, 0, 1)
 
 DBPATCH_END()

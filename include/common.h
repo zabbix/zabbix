@@ -1644,6 +1644,10 @@ char	*zbx_create_token(zbx_uint64_t seed);
 
 int	zbx_str_extract(const char *text, size_t len, char **value);
 
+/* audit logging mode */
+#define AUDIT_LOGGING_DISABLED	0
+#define AUDIT_LOGGING_ENABLED	1
+
 #define AUDIT_ACTION_EXECUTE	7
 #define AUDIT_RESOURCE_SCRIPT	25
 
