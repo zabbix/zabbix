@@ -1072,6 +1072,13 @@ int	process_eventslog6(const char *server, unsigned short port, const char *even
 			/* do not flood local system if file grows too fast */
 			if (p_count >= (4 * rate * metric->refresh))
 				break;
+
+			/* fixed case of decrease the number of events in windows events during the next iteration */
+			if (lastlogsize == LastID)
+			{
+				error_code = ERROR_NO_MORE_ITEMS;
+				break;
+			}
 		}
 
 		if (i < required_buf_size)
