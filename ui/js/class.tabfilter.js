@@ -380,6 +380,11 @@ class CTabFilter extends CBaseComponent {
 				else {
 					item.fire(TABFILTERITEM_EVENT_COLLAPSE);
 				}
+
+				if (this._timeselector instanceof CTabFilterItem && item !== this._timeselector
+						&& this._timeselector._expanded) {
+					this._timeselector.removeExpanded();
+				}
 			},
 
 			expand: (ev) => {
@@ -443,9 +448,11 @@ class CTabFilter extends CBaseComponent {
 
 			/**
 			 * Event handler for 'Delete' button.
+			 *
+			 * @param {object} ev.detail.idx2  Index of deleted tab.
 			 */
-			deleteActiveFilterTab: (ev) => {
-				this.delete(this._active_item);
+			deleteFilterTab: (ev) => {
+				this.delete(this._items[ev.detail.idx2]);
 			},
 
 			/**
@@ -716,7 +723,7 @@ class CTabFilter extends CBaseComponent {
 
 		this.on('keydown', this._events.keydown);
 		this.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateActiveFilterTab);
-		this.on(TABFILTERITEM_EVENT_DELETE, this._events.deleteActiveFilterTab);
+		this.on(TABFILTERITEM_EVENT_DELETE, this._events.deleteFilterTab);
 		this.on('submit', (ev) => {
 			ev.preventDefault();
 			this._filters_footer.querySelector('[name="filter_apply"]').dispatchEvent(new CustomEvent('click'));
