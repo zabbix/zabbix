@@ -2844,6 +2844,7 @@ form.is-loading {
   white-space: nowrap; }
 
 .wordwrap {
+  white-space: normal;
   word-break: break-all; }
 
 .wordbreak {
@@ -4196,8 +4197,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
         margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
-      text-align: right;
-      padding: 0 0 10px; }
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 10px 10px; }
       .overlay-dialogue.modal .overlay-dialogue-controls z-select {
         text-align: left;
         padding: inherit; }
@@ -6416,8 +6418,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .valuemap-list-table tbody td {
   border-bottom: 1px solid #383838; }
-  .valuemap-list-table tbody td.wordwrap {
-    white-space: normal; }
 .valuemap-list-table tbody tr:first-child td {
   border-top: 1px solid #383838; }
 

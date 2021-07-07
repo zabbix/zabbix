@@ -38,9 +38,9 @@ class CService extends CApiService {
 
 	/**
 	 * @param array $options
-
+	 *
 	 * @return array|int
-
+	 *
 	 * @throws APIException
 	 */
 	public function get(array $options = []) {
@@ -61,7 +61,7 @@ class CService extends CApiService {
 				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
 				'algorithm' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', array_keys(serviceAlgorithm()))],
 				'triggerid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'showsla' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0,1']
+				'showsla' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON])]
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
@@ -119,9 +119,9 @@ class CService extends CApiService {
 
 	/**
 	 * @param array $services
-
+	 *
 	 * @return array
-
+	 *
 	 * @throws APIException
 	 */
 	public function create(array $services): array {
@@ -147,7 +147,7 @@ class CService extends CApiService {
 
 	/**
 	 * @param array $services
-
+	 *
 	 * @throws APIException
 	 */
 	private function validateCreate(array &$services): void {
@@ -195,9 +195,9 @@ class CService extends CApiService {
 
 	/**
 	 * @param array $services
-
+	 *
 	 * @return array
-
+	 *
 	 * @throws APIException
 	 */
 	public function update(array $services): array {
@@ -233,7 +233,7 @@ class CService extends CApiService {
 	/**
 	 * @param array      $services
 	 * @param array|null $db_services
-
+	 *
 	 * @throws APIException
 	 */
 	private function validateUpdate(array &$services, array &$db_services = null): void {
@@ -295,9 +295,9 @@ class CService extends CApiService {
 
 	/**
 	 * @param array $serviceids
-
+	 *
 	 * @return array
-
+	 *
 	 * @throws APIException
 	 */
 	public function delete(array $serviceids): array {
@@ -458,7 +458,7 @@ class CService extends CApiService {
 	/**
 	 * @param array      $services
 	 * @param array|null $db_services
-
+	 *
 	 * @throws APIException
 	 */
 	private function checkTriggerAndChildrenExclusivity(array $services, array $db_services = null): void {
@@ -483,7 +483,7 @@ class CService extends CApiService {
 	/**
 	 * @param array      $services
 	 * @param array|null $db_services
-
+	 *
 	 * @throws APIException
 	 */
 	private function checkTriggerPermissions(array $services, array $db_services = null): void {
@@ -519,7 +519,7 @@ class CService extends CApiService {
 
 	/**
 	 * @param array $services
-
+	 *
 	 * @throws APIException
 	 */
 	private function checkParents(array $services): void {
@@ -559,7 +559,7 @@ class CService extends CApiService {
 
 	/**
 	 * @param array $services
-
+	 *
 	 * @throws APIException
 	 */
 	private function checkChildren(array $services): void {
@@ -589,7 +589,7 @@ class CService extends CApiService {
 	/**
 	 * @param array      $services
 	 * @param array|null $db_services
-
+	 *
 	 * @throws APIException
 	 */
 	private function checkCircularReferences(array $services, array $db_services = null): void {
@@ -635,7 +635,7 @@ class CService extends CApiService {
 	/**
 	 * @param array $add_references
 	 * @param array $del_references
-
+	 *
 	 * @return bool
 	 */
 	private function hasCircularReferences(array $add_references, array $del_references): bool {

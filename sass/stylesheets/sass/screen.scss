@@ -917,6 +917,7 @@ form {
 }
 
 .wordwrap {
+	white-space: normal;
 	word-break: break-all;
 }
 
@@ -3016,8 +3017,9 @@ $form-icon-btn: (
 		}
 
 		.overlay-dialogue-controls {
-			text-align: right;
-			padding: 0 0 10px;
+			display: flex;
+			justify-content: flex-end;
+			padding: 0 10px 10px;
 
 			z-select {
 				text-align: left;
@@ -6240,10 +6242,6 @@ z-select,
 	tbody {
 		td {
 			border-bottom: 1px solid $table-border-color;
-
-			&.wordwrap {
-				white-space: normal;
-			}
 		}
 
 		tr:first-child td {

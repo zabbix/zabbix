@@ -19,28 +19,34 @@
 **/
 
 
-class CControllerPopupServiceTimeEdit extends CControllerPopup {
+class CControllerPopupServiceTimeEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'type' =>		'in '.implode(',', [SERVICE_TIME_TYPE_UPTIME, SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_ONETIME_DOWNTIME]),
-			'ts_from' =>	'string',
-			'ts_to' =>		'string',
-			'note' =>		'string',
-			'edit' =>		'in 1',
-			'update' =>		'in 1'
+			'form_refresh' => 	'int32',
+			'edit' => 			'in 1',
+			'row_index' =>		'required|int32',
+			'type' =>			'in '.implode(',', [SERVICE_TIME_TYPE_UPTIME, SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_ONETIME_DOWNTIME]),
+			'ts_from' =>		'int32',
+			'ts_to' =>			'int32',
+			'note' =>			'string',
+			'from' =>			'string',
+			'till' =>			'string',
+			'from_week' =>		'in '.implode(',', range(0, 6)),
+			'from_hour' =>		'string',
+			'from_minute' =>	'string',
+			'till_week' =>		'in '.implode(',', range(0, 6)),
+			'till_hour' =>		'string',
+			'till_minute' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
 			);
 		}
 
@@ -53,55 +59,73 @@ class CControllerPopupServiceTimeEdit extends CControllerPopup {
 	}
 
 	protected function doAction(): void {
-		$this->setResponse($this->hasInput('update') ? $this->prepareJsonResponse() : $this->prepareViewResponse());
-	}
+		$type = $this->getInput('type', SERVICE_TIME_TYPE_UPTIME);
 
-	protected function prepareJsonResponse(): CControllerResponse {
-		$data = [
-			'type' => SERVICE_TIME_TYPE_UPTIME,
-			'ts_from' => 0,
-			'ts_to' => 0,
-			'note' => ''
-		];
-		$this->getInputs($data, ['type', 'ts_from', 'ts_to', 'note', 'edit']);
+		$form = ['type' => $type];
 
-		$type_names = [
-			SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
-			SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
-			SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
-		];
-		$data['type_name'] = $type_names[$data['type']];
+		switch ($type) {
+			case SERVICE_TIME_TYPE_UPTIME:
+			case SERVICE_TIME_TYPE_DOWNTIME:
+				if ($this->hasInput('form_refresh')) {
+					$form += [
+						'from_week' => $this->getInput('from_week', ''),
+						'from_hour' => $this->getInput('from_hour', ''),
+						'from_minute' => $this->getInput('from_minute', ''),
+						'till_week' => $this->getInput('till_week', ''),
+						'till_hour' => $this->getInput('till_hour', ''),
+						'till_minute' => $this->getInput('till_minute', '')
+					];
+				}
+				else {
+					$from = $this->hasInput('ts_from') ? strtotime('last Sunday') + $this->getInput('ts_from') : null;
+					$till = $this->hasInput('ts_to') ? strtotime('last Sunday') + $this->getInput('ts_to') : null;
 
-		if ($data['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-			$data['time_from'] = zbx_date2str(DATE_TIME_FORMAT, $data['ts_from']);
-			$data['time_till'] = zbx_date2str(DATE_TIME_FORMAT, $data['ts_to']);
+					$form += [
+						'from_week' => $from !== null ? date('w', $from) : 0,
+						'from_hour' => $from !== null ? date('H', $from) : '',
+						'from_minute' => $from !== null ? date('i', $from) : '',
+						'till_week' => $till !== null ? date('w', $till) : 0,
+						'till_hour' => $till !== null ? date('H', $till) : '',
+						'till_minute' => $till !== null ? date('i', $till) : ''
+					];
+				}
+				break;
+
+			case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
+				$default_from = date(DATE_TIME_FORMAT, strtotime('today'));
+				$default_till = date(DATE_TIME_FORMAT, strtotime('tomorrow'));
+
+				if ($this->hasInput('form_refresh')) {
+					$form += [
+						'note' => $this->getInput('note', ''),
+						'from' => $this->getInput('from', $default_from),
+						'till' => $this->getInput('till', $default_till)
+					];
+				}
+				else {
+					$form += [
+						'note' => $this->getInput('note', ''),
+						'from' => $this->hasInput('ts_from')
+							? date(DATE_TIME_FORMAT, (int) $this->getInput('ts_from'))
+							: $default_from,
+						'till' => $this->hasInput('ts_to')
+							? date(DATE_TIME_FORMAT, (int) $this->getInput('ts_to'))
+							: $default_till,
+					];
+				}
+				break;
 		}
-		else {
-			$data['time_from'] = dowHrMinToStr($data['ts_from']);
-			$data['time_till'] = dowHrMinToStr($data['ts_to']);
-		}
 
-		return (new CControllerResponseData(['main_block' => json_encode($data)]))->disableView();
-	}
-
-	protected function prepareViewResponse(): CControllerResponse {
 		$data = [
-			'action' => $this->getAction(),
-			'edit' => 0,
-			'type' => SERVICE_TIME_TYPE_UPTIME,
-			'ts_from' => 0,
-			'ts_to' => 0,
-			'note' => ''
-		];
-		$this->getInputs($data, array_keys($data));
-
-		$data += [
-			'title' => _('Service time'),
+			'title' => $this->hasInput('edit') ? _('Edit service time') : _('New service time'),
+			'is_edit' => $this->hasInput('edit'),
+			'row_index' => $this->getInput('row_index'),
+			'form' => $form,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		return new CControllerResponseData($data);
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

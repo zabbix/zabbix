@@ -90,13 +90,13 @@
 				}
 
 				element.addEventListener('click', (e) => {
-					PopUp('popup.service.edit', popup_options, null, e.target);
+					PopUp('popup.service.edit', popup_options, 'service_edit', e.target);
 				});
 			}
 
 			for (const element of document.querySelectorAll('.js-edit-service')) {
 				element.addEventListener('click', (e) => {
-					PopUp('popup.service.edit', {serviceid: element.dataset.serviceid}, null, e.target);
+					PopUp('popup.service.edit', {serviceid: element.dataset.serviceid}, 'service_edit', e.target);
 				});
 			}
 

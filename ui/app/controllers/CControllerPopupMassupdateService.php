@@ -21,7 +21,7 @@
 
 require_once __DIR__.'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateService extends CControllerPopup {
+class CControllerPopupMassupdateService extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [

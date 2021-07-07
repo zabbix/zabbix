@@ -21,35 +21,23 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupServiceEdit extends CControllerPopup {
+class CControllerPopupServiceEdit extends CController {
 
-	protected $service = [];
+	private $service;
 
 	protected function checkInput(): bool {
 		$fields = [
 			'serviceid' =>			'db services.serviceid',
-			'name' =>				'db services.name',
 			'parent_serviceids' =>	'array_db services.serviceid',
-			'algorithm' =>			'db services.algorithm|in '.implode(',', [SERVICE_ALGORITHM_NONE, SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN]),
-			'triggerid' =>			'db services.triggerid',
-			'sortorder' =>			'db services.sortorder|ge 0|le 999',
-			'showsla' =>			'db services.showsla|in '.SERVICE_SHOW_SLA_OFF.','.SERVICE_SHOW_SLA_ON,
-			'goodsla' =>			'string',
-			'times' =>				'array',
-			'tags' =>				'array',
-			'child_serviceids' =>	'array_db services.serviceid'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
 			);
 		}
 
@@ -63,7 +51,7 @@ class CControllerPopupServiceEdit extends CControllerPopup {
 		}
 
 		if ($this->hasInput('serviceid')) {
-			$services = API::Service()->get([
+			$this->service = API::Service()->get([
 				'output' => ['serviceid', 'name', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder'],
 				'selectParents' => ['serviceid', 'name'],
 				'selectChildren' => ['serviceid', 'name', 'triggerid'],
@@ -72,112 +60,93 @@ class CControllerPopupServiceEdit extends CControllerPopup {
 				'serviceids' => $this->getInput('serviceid')
 			]);
 
-			if (!$services) {
+			if (!$this->service) {
 				return false;
 			}
 
-			$service = reset($services);
-			$service['trigger'] = '';
+			$this->service = $this->service[0];
 
-			if ($service['triggerid'] != 0) {
-				$trigger = API::Trigger()->get([
-					'output' => ['description'],
-					'selectHosts' => ['name'],
-					'expandDescription' => true,
-					'triggerids' => $service['triggerid']
-				]);
-				$trigger = reset($trigger);
-				$host = reset($trigger['hosts']);
-				$service['trigger'] = $host['name'].NAME_DELIMITER.$trigger['description'];
-			}
-
-			$this->service = $service;
+			CArrayHelper::sort($this->service['parents'], ['name']);
+			CArrayHelper::sort($this->service['parents'], ['name']);
+			CArrayHelper::sort($this->service['children'], ['name']);
+			CArrayHelper::sort($this->service['times'], ['type', 'ts_from', 'ts_to']);
 		}
 
 		return true;
 	}
 
 	protected function doAction(): void {
-		$db_defaults = DB::getDefaults('services');
+		$trigger_descriptions = [];
 
-		$data = [
-			'serviceid' => 0,
-			'name' => '',
-			'ms_parent_services' => [],
-			'algorithm' => SERVICE_ALGORITHM_MAX,
-			'triggerid' => 0,
-			'trigger' => '',
-			'sortorder' => $db_defaults['sortorder'],
-			'showsla' => $db_defaults['showsla'],
-			'goodsla' => $db_defaults['goodsla'],
-			'times' => [],
-			'tags' => [['tag' => '', 'value' => '']],
-			'children' => [],
-			'form_refresh' => 0
-		];
+		if ($this->service !== null) {
+			$triggerids = [];
 
-		if ($this->hasInput('serviceid')) {
-			$data['serviceid'] = $this->service['serviceid'];
-			$data['name'] = $this->service['name'];
-			$data['algorithm'] = $this->service['algorithm'];
-			$data['triggerid'] = $this->service['triggerid'];
-			$data['trigger'] = $this->service['trigger'];
-			$data['sortorder'] = $this->service['sortorder'];
-			$data['showsla'] = $this->service['showsla'];
-			$data['goodsla'] = $this->service['goodsla'];
-			$data['times'] = $this->service['times'];
-			$data['tags'] = $this->service['tags'];
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
-
-			if ($this->service['parents']) {
-				$data['ms_parent_services'] = CArrayHelper::renameObjectsKeys($this->service['parents'], [
-					'serviceid' => 'id'
-				]);
-				CArrayHelper::sort($data['ms_parent_services'], ['name']);
+			if ($this->service['triggerid'] != 0) {
+				$triggerids[$this->service['triggerid']] = true;
 			}
 
-			if ($this->service['children']) {
-				$triggerids = [];
-				foreach ($this->service['children'] as $child) {
-					if ($child['triggerid'] != 0) {
-						$triggerids[$child['triggerid']] = true;
+			foreach ($this->service['children'] as $service) {
+				if ($service['triggerid'] != 0) {
+					$triggerids[$service['triggerid']] = true;
+				}
+			}
+
+			if ($triggerids) {
+				$triggerids = array_keys($triggerids);
+
+				$triggers = API::Trigger()->get([
+					'output' => ['description'],
+					'selectHosts' => ['name'],
+					'expandDescription' => true,
+					'triggerids' => $triggerids,
+					'preservekeys' => true
+				]);
+
+				foreach ($triggerids as $triggerid) {
+					if (array_key_exists($triggerid, $triggers)) {
+						$trigger_descriptions[$triggerid] = $triggers[$triggerid]['hosts'][0]['name'].NAME_DELIMITER.
+							$triggers[$triggerid]['description'];
+					}
+					else {
+						$trigger_descriptions[$triggerid] = _('Inaccessible trigger');
 					}
 				}
-
-				$triggers = $triggerids
-					? API::Trigger()->get([
-						'output' => ['description'],
-						'expandDescription' => true,
-						'triggerids' => array_keys($triggerids),
-						'preservekeys' => true
-					])
-					: [];
-
-				foreach ($this->service['children'] as $child) {
-					$data['children'][] = [
-						'serviceid' => $child['serviceid'],
-						'name' => $child['name'],
-						'triggerid' => $child['triggerid'],
-						'trigger' => ($child['triggerid'] != 0 && array_key_exists($child['triggerid'], $triggers))
-							? $triggers[$child['triggerid']]['description']
-							: ''
-					];
-				}
-
-				CArrayHelper::sort($data['children'], ['name', 'serviceid']);
 			}
 		}
 
-		if ($this->hasInput('parent_serviceids')) {
-			$data['ms_parent_services'] = CArrayHelper::renameObjectsKeys(API::Service()->get([
+		if ($this->service !== null) {
+			$parents = $this->service['parents'];
+		}
+		elseif ($this->hasInput('parent_serviceids')) {
+			$parents = API::Service()->get([
 				'output' => ['serviceid', 'name'],
 				'serviceids' => $this->getInput('parent_serviceids')
-			]), ['serviceid' => 'id']);
+			]);
+		}
+		else {
+			$parents = [];
 		}
 
-		$data += [
+		$defaults = DB::getDefaults('services');
+
+		$data = [
 			'title' => _('Service'),
-			'errors' => hasErrorMesssages() ? getMessages() : null,
+			'serviceid' => $this->service !== null ? $this->service['serviceid'] : null,
+			'form' => [
+				'name' => $this->service !== null ? $this->service['name'] : $defaults['name'],
+				'parents' => $parents,
+				'children' => $this->service !== null ? $this->service['children'] : [],
+				'algorithm' => $this->service !== null ? $this->service['algorithm'] : $defaults['algorithm'],
+				'triggerid' => $this->service !== null ? $this->service['triggerid'] : 0,
+				'sortorder' => $this->service !== null ? $this->service['sortorder'] : $defaults['sortorder'],
+				'showsla' => $this->service !== null ? $this->service['showsla'] : $defaults['showsla'],
+				'goodsla' => $this->service !== null ? $this->service['goodsla'] : $defaults['goodsla'],
+				'times' => $this->service !== null ? $this->service['times'] : [],
+				'tags' => ($this->service !== null && $this->service['tags'])
+					? $this->service['tags']
+					: [['tag' => '', 'value' => '']],
+				'trigger_descriptions' => $trigger_descriptions
+			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
