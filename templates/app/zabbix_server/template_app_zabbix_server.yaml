@@ -839,7 +839,7 @@ zabbix_export:
           triggers:
             -
               uuid: 456403a2063c4e2298f9e3f60a7a3180
-              expression: '(last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2))=1 and length(last(/Zabbix server health/zabbix[version]))>0'
+              expression: 'last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2) and length(last(/Zabbix server health/zabbix[version]))>0'
               name: 'Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Zabbix server version has changed. Ack to close.'

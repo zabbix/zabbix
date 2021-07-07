@@ -215,7 +215,7 @@ zabbix_export:
           triggers:
             -
               uuid: 88d7ceb3a683436da666e8802b2d29b5
-              expression: '(last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2))=1 and length(last(/GitLab by HTTP/gitlab.deployments.version))>0'
+              expression: 'last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0'
               name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'GitLab version has changed. Ack to close.'

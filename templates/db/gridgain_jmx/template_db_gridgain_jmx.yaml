@@ -777,7 +777,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4cc201fb67664fc49d36bbec95b574ce
-                  expression: '(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2))=1 and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0'
+                  expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0'
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
@@ -1011,7 +1011,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 40641263a3d840e89e46ba6f57076a0a
-                  expression: '(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#2))=1 and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator]))>0'
+                  expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator]))>0'
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
                   priority: WARNING
                   description: 'GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
@@ -1361,7 +1361,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 94d82f9db4f449e491782e14f6973f9b
-                  expression: '(last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#2))=1 and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches]))>0'
+                  expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches]))>0'
                   name: 'Cache group [{#JMXNAME}]: List of caches has changed'
                   priority: INFO
                   description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'

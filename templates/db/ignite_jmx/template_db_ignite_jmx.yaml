@@ -774,7 +774,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 08a1f4bd227e4f96b501a4681bf9fc8f
-                  expression: '(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#2))=1 and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion]))>0'
+                  expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion]))>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
@@ -983,7 +983,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 82e24abcc7874382a2af0018a4a001e1
-                  expression: '(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#2))=1 and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator]))>0'
+                  expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator]))>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
                   priority: WARNING
                   description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
@@ -1327,7 +1327,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b500b51a688d4b55942ce7311e82c54f
-                  expression: '(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#2))=1 and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches]))>0'
+                  expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches]))>0'
                   name: 'Cache group [{#JMXNAME}]: List of caches has changed'
                   priority: INFO
                   description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'

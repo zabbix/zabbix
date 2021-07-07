@@ -869,7 +869,7 @@ zabbix_export:
           triggers:
             -
               uuid: f1a260626ae6446d89e1e725e14c1098
-              expression: '(last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2))=1 and length(last(/Asterisk by HTTP/asterisk.version))>0'
+              expression: 'last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0'
               name: 'Asterisk: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Asterisk version has changed. Ack to close.'

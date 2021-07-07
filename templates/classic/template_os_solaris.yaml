@@ -251,7 +251,7 @@ zabbix_export:
           triggers:
             -
               uuid: cc5a9c97827f4091b83af8be33d58560
-              expression: '(last(/Solaris/system.hostname,#1)<>last(/Solaris/system.hostname,#2))>0'
+              expression: 'last(/Solaris/system.hostname,#1)<>last(/Solaris/system.hostname,#2)'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -326,7 +326,7 @@ zabbix_export:
           triggers:
             -
               uuid: dc293e688ac54ac0aee61e398d8bc5c5
-              expression: '(last(/Solaris/system.uname,#1)<>last(/Solaris/system.uname,#2))>0'
+              expression: 'last(/Solaris/system.uname,#1)<>last(/Solaris/system.uname,#2)'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -375,7 +375,7 @@ zabbix_export:
           triggers:
             -
               uuid: 50e5be0acabb41658ec82772d9ec234e
-              expression: '(last(/Solaris/vfs.file.cksum[/etc/passwd],#1)<>last(/Solaris/vfs.file.cksum[/etc/passwd],#2))>0'
+              expression: 'last(/Solaris/vfs.file.cksum[/etc/passwd],#1)<>last(/Solaris/vfs.file.cksum[/etc/passwd],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -
