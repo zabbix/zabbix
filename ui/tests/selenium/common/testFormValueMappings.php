@@ -671,13 +671,8 @@ class testFormValueMappings extends CWebTest {
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_GOOD, ucfirst($source).' updated');
 
-			// Check the screenshot of the whole value mappings tab.
-			$this->openValueMappingTab($source, false);
-//			if (CTestArrayHelper::get($data, 'screenshot_id')) {
-//				$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot_id']);
-//			}
-
 			// Check all mappings that belong to the created value mapping.
+			$this->openValueMappingTab($source, false);
 			$this->query('link', $data['name'])->one()->click();
 			$this->checkMappings($data);
 			if ($action === 'update') {
@@ -685,6 +680,12 @@ class testFormValueMappings extends CWebTest {
 				$dialog->submit();
 				COverlayDialogElement::ensureNotPresent();
 				$this->query('button:Update')->waitUntilClickable()->one()->click();
+			}
+
+			// Check the screenshot of the whole value mappings tab.
+			if (CTestArrayHelper::get($data, 'screenshot_id')) {
+				$this->openValueMappingTab($source, false);
+				$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot_id']);
 			}
 		}
 	}
