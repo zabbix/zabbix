@@ -71,20 +71,33 @@ class testFormValueMappingsHost extends testFormValueMappings {
 				'hostid' => self::HOSTID,
 				'mappings' => [
 					[
-						'value' => 'oneoneoneoneoneoneoneoneoneoneone',
-						'newvalue' => '11111111111'
+						'type' => '0',
+						'value' => '10',
+						'newvalue' => 'default value'
 					],
 					[
-						'value' => 'two',
-						'newvalue' => '2'
+						'type' => '1',
+						'value' => '11',
+						'newvalue' => 'greater or equals 11'
 					],
 					[
-						'value' => 'threethreethreethreethreethreethreethreethreethree',
-						'newvalue' => '3333333333'
+						'type' => '2',
+						'value' => '12',
+						'newvalue' => 'less or equals 12'
 					],
 					[
-						'value' => 'four',
-						'newvalue' => '4'
+						'type' => '3',
+						'value' => '13-16',
+						'newvalue' => 'from 13 to 16'
+					],
+					[
+						'type' => '4',
+						'value' => '42',
+						'newvalue' => 'Answer to the Ultimate Question of Life, Universe and Everything'
+					],
+					[
+						'type' => '5',
+						'newvalue' => 'default value'
 					]
 				]
 			]
