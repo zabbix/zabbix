@@ -463,6 +463,8 @@ typedef struct
 	zbx_uint64_t		eventid;
 	zbx_uint64_t		r_eventid;
 	zbx_uint64_t		acknowledgeid;
+	zbx_uint64_t		servicealarmid;
+	zbx_uint64_t		serviceid;
 	int			nextcheck;
 	int			esc_step;
 	zbx_escalation_status_t	status;

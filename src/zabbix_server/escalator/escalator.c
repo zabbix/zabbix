@@ -42,6 +42,7 @@ extern int	CONFIG_ESCALATOR_FORKS;
 #define ZBX_ESCALATION_SOURCE_DEFAULT	0
 #define ZBX_ESCALATION_SOURCE_ITEM	1
 #define ZBX_ESCALATION_SOURCE_TRIGGER	2
+#define ZBX_ESCALATION_SOURCE_SERVICE	4
 
 #define ZBX_ESCALATION_UNSET		-1
 #define ZBX_ESCALATION_CANCEL		0
@@ -2669,9 +2670,19 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 						CONFIG_ESCALATOR_FORKS, process_num - 1);
 			}
 			break;
+		case ZBX_ESCALATION_SOURCE_SERVICE:
+			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
+					"triggerid is null and itemid is null and serviceid is not null");
+			if (1 < CONFIG_ESCALATOR_FORKS)
+			{
+				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
+						" and " ZBX_SQL_MOD(serviceid, %d) "=%d",
+						CONFIG_ESCALATOR_FORKS, process_num - 1);
+			}
+			break;
 		case ZBX_ESCALATION_SOURCE_DEFAULT:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
-					"triggerid is null and itemid is null");
+					"triggerid is null and itemid is null and serviceid is null");
 			if (1 < CONFIG_ESCALATOR_FORKS)
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
@@ -2682,7 +2693,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	}
 
 	result = DBselect("select escalationid,actionid,triggerid,eventid,r_eventid,nextcheck,esc_step,status,itemid,"
-					"acknowledgeid"
+					"acknowledgeid,servicealarmid,serviceid"
 				" from escalations"
 				" where %s and nextcheck<=%d"
 				" order by actionid,triggerid,itemid,escalationid", filter,
@@ -2715,6 +2726,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		escalation->status = atoi(row[7]);
 		ZBX_DBROW2UINT64(escalation->itemid, row[8]);
 		ZBX_DBROW2UINT64(escalation->acknowledgeid, row[9]);
+		ZBX_DBROW2UINT64(escalation->servicealarmid, row[10]);
+		ZBX_DBROW2UINT64(escalation->serviceid, row[11]);
 
 		zbx_vector_ptr_append(&escalations, escalation);
 		zbx_vector_uint64_append(&actionids, escalation->actionid);
@@ -2809,6 +2822,8 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER,
 				cfg.default_timezone);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM,
+				cfg.default_timezone);
+		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_SERVICE,
 				cfg.default_timezone);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT,
 				cfg.default_timezone);
