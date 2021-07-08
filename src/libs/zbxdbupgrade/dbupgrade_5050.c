@@ -83,9 +83,7 @@ static int	DBpatch_5050006(void)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog' and field_name='auditid'"))
-	{
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
