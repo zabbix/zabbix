@@ -341,8 +341,16 @@ DB_TRIGGER;
 
 typedef struct
 {
+	zbx_uint64_t	serviceid;
+	char		*name;
+}
+DB_SERVICE;
+
+typedef struct
+{
 	zbx_uint64_t		eventid;
 	DB_TRIGGER		trigger;
+	DB_SERVICE		service;
 	zbx_uint64_t		objectid;
 	char			*name;
 	int			source;
@@ -494,6 +502,14 @@ typedef struct
 	int		new_severity;
 }
 DB_ACKNOWLEDGE;
+
+typedef struct
+{
+	zbx_uint64_t	service_alarmid;
+	zbx_uint64_t	value;
+	int		clock;
+}
+zbx_service_alarm_t;
 
 int	DBinit(char **error);
 void	DBdeinit(void);
