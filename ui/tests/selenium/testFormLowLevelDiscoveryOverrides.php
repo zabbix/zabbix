@@ -1468,7 +1468,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 1,
-												'Type' => 'Flexible',
+												'type' => 'Flexible',
 												'delay' => '60s',
 												'period' => '1-5,01:01-13:05'
 											]
