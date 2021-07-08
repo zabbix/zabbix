@@ -1601,7 +1601,7 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
  * @param string      $class                  CSS class of the message box. Possible values:
  *                                            ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
  * @param array       $messages
- * @param array       $messages[]['message']
+ * @param string      $messages[]['message']
  * @param string|null $title
  * @param bool        $show_close_box
  * @param bool        $show_details
