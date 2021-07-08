@@ -1607,7 +1607,7 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
  *
  * @return CTag
  */
-function makeMessageBox(string $class, array $messages, ?string $title = null, bool $show_close_box = true,
+function makeMessageBox(string $class, array $messages, string $title = null, bool $show_close_box = true,
 		bool $show_details = false): CTag {
 	$msg_details = null;
 	$link_details = null;
@@ -1726,15 +1726,42 @@ function getMessages($good = false, $title = null, $show_close_box = true) {
 	return $message_box;
 }
 
-function show_messages($good = false, $okmsg = null, $errmsg = null) {
+function show_messages($good = null, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES, $ZBX_MESSAGES_PREPARED;
 
 	if (defined('ZBX_API_REQUEST')) {
 		return null;
 	}
 
-	$title = $good ? $okmsg : $errmsg;
 	$messages = isset($ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+
+	if ($good === null) {
+		$has_errors = false;
+		$has_warnings = false;
+
+		foreach ($messages as $message) {
+			$has_errors = $has_errors || ($message['type'] === 'error');
+			$has_warnings = $has_warnings || ($message['type'] === 'warning');
+		}
+
+		if ($has_errors) {
+			$class = ZBX_STYLE_MSG_BAD;
+			$good = false;
+		}
+		elseif ($has_warnings) {
+			$class = ZBX_STYLE_MSG_WARNING;
+			$good = true;
+		}
+		else {
+			$class = ZBX_STYLE_MSG_GOOD;
+			$good = true;
+		}
+	}
+	else {
+		$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
+	}
+
+	$title = $good ? $okmsg : $errmsg;
 
 	$ZBX_MESSAGES = [];
 
@@ -1758,7 +1785,7 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 			foreach ($messages as $message) {
 				$image_messages[] = [
 					'text' => $message['message'],
-					'color' => $message['type'] == 'error'
+					'color' => ($message['type'] === 'error')
 						? ['R' => 255, 'G' => 55, 'B' => 55]
 						: ['R' => 155, 'G' => 155, 'B' => 55]
 				];
@@ -1811,11 +1838,11 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 
 			// Prepare messages for inclusion within the layout engine.
 			$ZBX_MESSAGES_PREPARED[] = [
-				'is_good' => $good,
+				'class' => $class,
 				'messages' => $messages,
 				'title' => $title,
 				'show_close_box' => true,
-				'show_details' => !$good
+				'show_details' => ($class === ZBX_STYLE_MSG_BAD)
 			];
 
 			break;
@@ -1909,8 +1936,8 @@ function get_prepared_messages(array $options = []): ?string {
 
 	$html = '';
 	foreach (array_merge($messages_authentication, $messages_session, $messages_current) as $box) {
-		$html .= makeMessageBox($box['is_good'] ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD, $box['messages'],
-			$box['title'], $box['show_close_box'], $box['show_details']
+		$html .= makeMessageBox($box['class'], $box['messages'], $box['title'], $box['show_close_box'],
+			$box['show_details']
 		)->toString();
 	}
 
@@ -1939,6 +1966,25 @@ function info($msgs) {
 
 	foreach ($msgs as $msg) {
 		$ZBX_MESSAGES[] = ['type' => 'info', 'message' => $msg];
+	}
+}
+
+/**
+ * Add a warning message to the global message array.
+ *
+ * @param array|string $messages
+ */
+function warning($messages): void {
+	global $ZBX_MESSAGES;
+
+	if (!isset($ZBX_MESSAGES)) {
+		$ZBX_MESSAGES = [];
+	}
+
+	zbx_value2array($messages);
+
+	foreach ($messages as $message) {
+		$ZBX_MESSAGES[] = ['type' => 'warning', 'message' => $message];
 	}
 }
 
