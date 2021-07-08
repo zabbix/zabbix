@@ -156,7 +156,7 @@ class CWebTest extends CTest {
 		$class_annotations = $this->getAnnotationsByType($this->annotations, 'class');
 
 		// Suppress browser error on a test case level.
-		$supress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignore-browser-errors');
+		$supress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignoreBrowserErrors');
 		self::$supress_suite_errors = ($supress_suite_errors !== null);
 
 		// Browsers supported by test suite.
@@ -197,7 +197,7 @@ class CWebTest extends CTest {
 		$method_annotations = $this->getAnnotationsByType($this->annotations, 'method');
 		if ($method_annotations !== null) {
 			// Suppress browser error on a test case level.
-			$supress_case_errors = $this->getAnnotationsByType($method_annotations, 'ignore-browser-errors');
+			$supress_case_errors = $this->getAnnotationsByType($method_annotations, 'ignoreBrowserErrors');
 			$this->supress_case_errors = ($supress_case_errors !== null);
 		}
 

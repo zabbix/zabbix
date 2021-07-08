@@ -67,6 +67,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_timespec_t		ts;
 	zbx_mock_handle_t	handle;
 
+	ZBX_DOUBLE_EPSILON = 0.000001;
+
 	err = zbx_vc_init(&error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
 

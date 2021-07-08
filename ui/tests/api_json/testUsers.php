@@ -1825,8 +1825,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	 * @on-before removeGuestFromDisabledGroup
-	 * @on-after addGuestToDisabledGroup
+	 * @onBefore removeGuestFromDisabledGroup
+	 * @onAfter addGuestToDisabledGroup
 	 *
 	 * @dataProvider login_data
 	 */

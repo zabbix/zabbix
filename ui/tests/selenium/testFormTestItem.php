@@ -30,7 +30,7 @@ class testFormTestItem extends testItemTest {
 	/**
 	 * Check Test item Button enabled/disabled state depending on item type for Host.
 	 *
-	 * @backup-once items
+	 * @backupOnce items
 	 */
 	public function testFormTestItem_CheckButtonStateHost() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(), 'Item for Test Button check', 'Item',

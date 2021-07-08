@@ -187,14 +187,19 @@ class CPage {
 	/**
 	 * Login as specified user.
 	 *
-	 * @param string  $sessionid   session id
-	 * @param integer $user_id     user id
+	 * @param string  $sessionid
+	 * @param integer $userid
 	 *
 	 * @return $this
 	 */
-	public function login($sessionid = '09e7d4286dfdca4ba7be15e0f3b2b55a', $user_id = 1) {
-		if (!CDBHelper::getRow('select null from sessions where status=0 AND sessionid='.zbx_dbstr($sessionid))) {
-			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$user_id.')');
+	public function login($sessionid = '09e7d4286dfdca4ba7be15e0f3b2b55a', $userid = 1) {
+		$session = CDBHelper::getRow('SELECT status FROM sessions WHERE sessionid='.zbx_dbstr($sessionid));
+
+		if (!$session) {
+			DBexecute('INSERT INTO sessions (sessionid,userid) VALUES ('.zbx_dbstr($sessionid).','.$userid.')');
+		}
+		elseif ($session['status'] != 0) {	/* ZBX_SESSION_ACTIVE */
+			DBexecute('UPDATE sessions SET status=0 WHERE sessionid='.zbx_dbstr($sessionid));
 		}
 
 		$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);

@@ -514,7 +514,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$db_hosts = DBselect(
 			'SELECT h.hostid,h.host'.
 			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.host', array_keys($hosts)).
+			' WHERE '.dbConditionString('h.host', array_keys($hosts)).
 				' AND '.dbConditionInt('h.status',
 					[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE]
 				)
@@ -938,12 +938,16 @@ abstract class CTriggerGeneral extends CApiService {
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
-		$db_trigger_tags = API::getApiService()->select('trigger_tag', [
-			'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
-			'filter' => ['triggerid' => array_keys($_db_triggers)],
-			'preservekeys' => true
-		]);
-		$_db_triggers = $this->createRelationMap($db_trigger_tags, 'triggerid', 'triggertagid')
+		$db_trigger_tags = $_db_triggers
+			? DB::select('trigger_tag', [
+				'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
+				'filter' => ['triggerid' => array_keys($_db_triggers)],
+				'preservekeys' => true
+			])
+			: [];
+
+		$_db_triggers = $this
+			->createRelationMap($db_trigger_tags, 'triggerid', 'triggertagid')
 			->mapMany($_db_triggers, $db_trigger_tags, 'tags');
 
 		$read_only_fields = ['description', 'expression', 'recovery_mode', 'recovery_expression', 'correlation_mode',

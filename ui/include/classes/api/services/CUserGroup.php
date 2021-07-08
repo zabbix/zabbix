@@ -931,57 +931,65 @@ class CUserGroup extends CApiService {
 
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$dbUsers = [];
 			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'userid', 'users_groups');
+			$related_ids = $relationMap->getRelatedIds();
 
-			$get_access = ($this->outputIsRequested('gui_access', $options['selectUsers'])
-				|| $this->outputIsRequested('debug_mode', $options['selectUsers'])
-				|| $this->outputIsRequested('users_status', $options['selectUsers'])) ? true : null;
+			if ($related_ids) {
+				$get_access = ($this->outputIsRequested('gui_access', $options['selectUsers'])
+					|| $this->outputIsRequested('debug_mode', $options['selectUsers'])
+					|| $this->outputIsRequested('users_status', $options['selectUsers'])) ? true : null;
 
-			$dbUsers = API::User()->get([
-				'output' => $options['selectUsers'],
-				'userids' => $relationMap->getRelatedIds(),
-				'getAccess' => $get_access,
-				'preservekeys' => true
-			]);
+				$dbUsers = API::User()->get([
+					'output' => $options['selectUsers'],
+					'userids' => $related_ids,
+					'getAccess' => $get_access,
+					'preservekeys' => true
+				]);
+			}
 
 			$result = $relationMap->mapMany($result, $dbUsers, 'users');
 		}
 
 		// adding usergroup rights
 		if ($options['selectRights'] !== null && $options['selectRights'] != API_OUTPUT_COUNT) {
+			$db_rights = [];
 			$relationMap = $this->createRelationMap($result, 'groupid', 'rightid', 'rights');
+			$related_ids = $relationMap->getRelatedIds();
 
-			if (is_array($options['selectRights'])) {
-				$pk_field = $this->pk('rights');
+			if ($related_ids) {
+				if (is_array($options['selectRights'])) {
+					$pk_field = $this->pk('rights');
 
-				$output_fields = [
-					$pk_field => $this->fieldId($pk_field, 'r')
-				];
+					$output_fields = [
+						$pk_field => $this->fieldId($pk_field, 'r')
+					];
 
-				foreach ($options['selectRights'] as $field) {
-					if ($this->hasField($field, 'rights')) {
-						$output_fields[$field] = $this->fieldId($field, 'r');
+					foreach ($options['selectRights'] as $field) {
+						if ($this->hasField($field, 'rights')) {
+							$output_fields[$field] = $this->fieldId($field, 'r');
+						}
 					}
+
+					$output_fields = implode(',', $output_fields);
+				}
+				else {
+					$output_fields = 'r.*';
 				}
 
-				$output_fields = implode(',', $output_fields);
-			}
-			else {
-				$output_fields = 'r.*';
-			}
+				$db_rights = DBfetchArray(DBselect(
+					'SELECT '.$output_fields.
+					' FROM rights r'.
+					' WHERE '.dbConditionInt('r.rightid', $related_ids).
+						((self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? '' : ' AND r.permission>'.PERM_DENY)
+				));
+				$db_rights = zbx_toHash($db_rights, 'rightid');
 
-			$db_rights = DBfetchArray(DBselect(
-				'SELECT '.$output_fields.
-				' FROM rights r'.
-				' WHERE '.dbConditionInt('r.rightid', $relationMap->getRelatedIds()).
-					((self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? '' : ' AND r.permission>'.PERM_DENY)
-			));
-			$db_rights = zbx_toHash($db_rights, 'rightid');
-
-			foreach ($db_rights as &$db_right) {
-				unset($db_right['rightid'], $db_right['groupid']);
+				foreach ($db_rights as &$db_right) {
+					unset($db_right['rightid'], $db_right['groupid']);
+				}
+				unset($db_right);
 			}
-			unset($db_right);
 
 			$result = $relationMap->mapMany($result, $db_rights, 'rights');
 		}

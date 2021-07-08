@@ -93,7 +93,7 @@ foreach ($data['tags'] as $i => $tag) {
 						(new CUrl('templates.php'))
 							->setArgument('form', 'update')
 							->setArgument('templateid', $templateid)
-					))->setAttribute('target', '_blank');
+					))->setTarget('_blank');
 				}
 				else {
 					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);

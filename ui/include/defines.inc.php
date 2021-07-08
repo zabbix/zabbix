@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.12rc1');
-define('ZABBIX_API_VERSION',	'5.0.12');
+define('ZABBIX_VERSION',		'5.0.14rc1');
+define('ZABBIX_API_VERSION',	'5.0.14');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		5000000);
 
@@ -1965,3 +1965,6 @@ define('ZBX_IFRAME_SANDBOX', '');
  *  - null - disable X-Frame-options header.
  */
 define('X_FRAME_OPTIONS', 'SAMEORIGIN');
+
+// Allows to set "rel" tag value "noreferer" when setting target="_blank".
+define('ZBX_NOREFERER', true);

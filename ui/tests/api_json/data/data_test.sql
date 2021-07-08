@@ -7,6 +7,10 @@ UPDATE hosts SET status=0 WHERE host='Zabbix server';
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50029,50009,1,2,1,'127.0.0.1','','161');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50030,50009,1,4,1,'127.0.0.1','','12345');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50031,50009,1,3,1,'127.0.0.1','','623');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community, securityname, securitylevel, authpassphrase, privpassphrase, authprotocol, privprotocol, contextname) VALUES (50029, 2, 1, '{$SNMP_COMMUNITY}', '', 0, '', '', 0, 0, '');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50012,'API group for hosts',0);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50013,'API group for templates',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
@@ -33,7 +37,7 @@ INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'AP
 INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (900,40066,'API discovery application');
 INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,900,'API discovery application');
 INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375,40068);
-INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (1900,900,40067);
+INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (9000,900,40067);
 
 -- valuemap
 INSERT INTO valuemaps (valuemapid,name) VALUES (399,'API value map for update');

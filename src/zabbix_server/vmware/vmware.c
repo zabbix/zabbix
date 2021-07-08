@@ -3687,6 +3687,67 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_service_get_event_latestpage                              *
+ *                                                                            *
+ * Purpose: reads events from "latest page" and moves it back in time         *
+ *                                                                            *
+ * Parameters: service        - [IN] the vmware service                       *
+ *             easyhandle     - [IN] the CURL handle                          *
+ *             event_session  - [IN] event session (EventHistoryCollector)    *
+ *                                   identifier                               *
+ *             xdoc           - [OUT] the result as xml document              *
+ *             error          - [OUT] the error message in the case of failure*
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_get_event_latestpage(const zbx_vmware_service_t *service, CURL *easyhandle,
+		const char *event_session, xmlDoc **xdoc, char **error)
+{
+#	define ZBX_POST_VMWARE_READ_EVENT_LATEST_PAGE						\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrievePropertiesEx>"							\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>EventHistoryCollector</ns0:type>"		\
+					"<ns0:pathSet>latestPage</ns0:pathSet>"			\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"EventHistoryCollector\">%s</ns0:obj>"	\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+			"<ns0:options/>"							\
+		"</ns0:RetrievePropertiesEx>"							\
+		ZBX_POST_VSPHERE_FOOTER
+
+	int	ret = FAIL;
+	char	tmp[MAX_STRING_LEN], *event_session_esc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	event_session_esc = xml_escape_dyn(event_session);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_READ_EVENT_LATEST_PAGE,
+			vmware_service_objects[service->type].property_collector, event_session_esc);
+
+	zbx_free(event_session_esc);
+
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, xdoc, error))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+
+#	undef ZBX_POST_VMWARE_READ_EVENT_LATEST_PAGE
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_destroy_event_session                             *
  *                                                                            *
  * Purpose: destroys event session                                            *
@@ -3855,29 +3916,35 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
  *                                                                            *
  * Purpose: parse multiple events data                                        *
  *                                                                            *
- * Parameters: events   - [IN/OUT] the array of parsed events                 *
- *             last_key - [IN] the key of last parsed event                   *
- *             xdoc     - [IN] xml document with eventlog records             *
- *             alloc_sz - [OUT] allocated memory size for events              *
+ * Parameters: events     - [IN/OUT] the array of parsed events               *
+ *             last_key   - [IN] the key of last parsed event                 *
+ *             is_prop    - [IN] read events from RetrieveProperties XML      *
+ *             xdoc       - [IN] xml document with eventlog records           *
+ *             alloc_sz   - [OUT] allocated memory size for events            *
+ *             node_count - [OUT] count of xml event nodes                    *
  *                                                                            *
  * Return value: The count of events successfully parsed                      *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, xmlDoc *xdoc,
-		zbx_uint64_t *alloc_sz)
+static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, const int is_prop,
+		xmlDoc *xdoc, zbx_uint64_t *alloc_sz, int *node_count)
 {
+#	define LAST_KEY(evs)	(((const zbx_vmware_event_t *)evs->values[evs->values_num - 1])->key)
+
 	zbx_vector_id_xmlnode_t	ids;
 	int			i, parsed_num = 0;
 	char			*value;
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
+	static int		is_clear = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() last_key:" ZBX_FS_UI64, __func__, last_key);
 
 	xpathCtx = xmlXPathNewContext(xdoc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)"/*/*/*"ZBX_XPATH_LN("returnval"), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)(0 == is_prop ? "/*/*/*"ZBX_XPATH_LN("returnval") :
+			"/*/*/*"ZBX_XPATH_LN("returnval")"/*/*/*"ZBX_XPATH_LN("Event")), xpathCtx)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot make evenlog list parsing query.");
 		goto clean;
@@ -3885,6 +3952,9 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
+		if (NULL != node_count)
+			*node_count = 0;
+
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find items in evenlog list.");
 		goto clean;
 	}
@@ -3892,6 +3962,9 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 	nodeset = xpathObj->nodesetval;
 	zbx_vector_id_xmlnode_create(&ids);
 	zbx_vector_id_xmlnode_reserve(&ids, nodeset->nodeNr);
+
+	if (NULL != node_count)
+		*node_count = nodeset->nodeNr;
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -3931,6 +4004,18 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 		zbx_vector_id_xmlnode_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_ptr_reserve(events, ids.values_num + events->values_alloc);
 
+		/* validate that last event from "latestPage" is connected with first event from ReadPreviousEvents */
+		if (0 != events->values_num && LAST_KEY(events) != ids.values[ids.values_num -1].id + 1)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d id gap:%d", __func__,
+					events->values_num, is_clear,
+					(int)(LAST_KEY(events) - (ids.values[ids.values_num -1].id + 1)));
+
+			/* if sequence of events is not continuous, ignore events from "latestPage" property */
+			if (0 != is_clear)
+				zbx_vector_ptr_clear_ext(events, (zbx_clean_func_t)vmware_event_free);
+		}
+
 		/* we are reading "scrollable views" in reverse chronological order, */
 		/* so inside a "scrollable view" latest events should come first too */
 		for (i = ids.values_num - 1; i >= 0; i--)
@@ -3939,6 +4024,15 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 				parsed_num++;
 		}
 	}
+	else if (0 != last_key && 0 != events->values_num && LAST_KEY(events) != last_key + 1)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d last_key id gap:%d", __func__,
+				events->values_num, is_clear, (int)(LAST_KEY(events) - (last_key + 1)));
+
+		/* if sequence of events is not continuous, ignore events from "latestPage" property */
+		if (0 != is_clear)
+			zbx_vector_ptr_clear_ext(events, (zbx_clean_func_t)vmware_event_free);
+	}
 
 	zbx_vector_id_xmlnode_destroy(&ids);
 clean:
@@ -3946,10 +4040,13 @@ clean:
 		xmlXPathFreeObject(xpathObj);
 
 	xmlXPathFreeContext(xpathCtx);
+	is_clear = is_prop;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() parsed:%d", __func__, parsed_num);
 
 	return parsed_num;
+
+#	undef LAST_KEY
 }
 
 /******************************************************************************
@@ -3972,8 +4069,14 @@ clean:
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_uint64_t last_key, zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
 {
+#	define ATTEMPTS_NUM	4
+#	define EVENT_TAG	1
+#	define RETURNVAL_TAG	0
+#	define LAST_KEY(evs)	(((const zbx_vmware_event_t *)evs->values[evs->values_num - 1])->key)
+
 	char		*event_session = NULL, *err = NULL;
-	int		ret = FAIL, soap_count = 5; /* 10 - initial value of eventlog records number in one response */
+	int		ret = FAIL, node_count = 1, soap_retry = ATTEMPTS_NUM,
+			soap_count = 5; /* 10 - initial value of eventlog records number in one response */
 	xmlDoc		*doc = NULL;
 	zbx_uint64_t	eventlog_last_key;
 
@@ -3993,6 +4096,18 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	else
 		eventlog_last_key = last_key;
 
+	if (SUCCEED != vmware_service_get_event_latestpage(service, easyhandle, event_session, &doc, error))
+		goto end_session;
+
+	if (0 < vmware_service_parse_event_data(events, eventlog_last_key, EVENT_TAG, doc, alloc_sz, NULL) &&
+			LAST_KEY(events) == eventlog_last_key + 1)
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "%s() latestPage events:%d", __func__, events->values_num);
+
+		ret = SUCCEED;
+		goto end_session;
+	}
+
 	do
 	{
 		zbx_xml_free_doc(doc);
@@ -4003,12 +4118,9 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		else if (ZBX_MAXQUERYMETRICS_UNLIMITED != soap_count)
 			soap_count = ZBX_MAXQUERYMETRICS_UNLIMITED;
 
-		if (0 != events->values_num &&
-				(((const zbx_vmware_event_t *)events->values[events->values_num - 1])->key -
-				eventlog_last_key -1) < (unsigned int)soap_count)
+		if (0 != events->values_num && (LAST_KEY(events) - eventlog_last_key -1) < (unsigned int)soap_count)
 		{
-			soap_count = ((const zbx_vmware_event_t *)events->values[events->values_num - 1])->key -
-					eventlog_last_key - 1;
+			soap_count = (int)(LAST_KEY(events) - eventlog_last_key - 1);
 		}
 
 		if (!ZBX_IS_RUNNING() || (0 < soap_count && SUCCEED != vmware_service_read_previous_events(easyhandle,
@@ -4016,8 +4128,18 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		{
 			goto end_session;
 		}
+
+		if (0 != node_count)
+			soap_retry = ATTEMPTS_NUM;
 	}
-	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, doc, alloc_sz));
+	while (0 < vmware_service_parse_event_data(events, eventlog_last_key, RETURNVAL_TAG, doc, alloc_sz,
+			&node_count) || (0 == node_count && 0 < soap_retry--));
+
+	if (0 != eventlog_last_key && 0 != events->values_num && LAST_KEY(events) != eventlog_last_key + 1)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d id gap:%d", __func__, events->values_num,
+				(int)(LAST_KEY(events) - (eventlog_last_key + 1)));
+	}
 
 	ret = SUCCEED;
 end_session:
@@ -4034,6 +4156,11 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __func__, zbx_result_string(ret), events->values_num);
 
 	return ret;
+
+#	undef ATTEMPTS_NUM
+#	undef EVENT_TAG
+#	undef RETURNVAL_TAG
+#	undef LAST_KEY
 }
 
 /******************************************************************************
@@ -4579,13 +4706,51 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 
 	zbx_vector_ptr_create(&counters);
 
-	if (SUCCEED != vmware_service_get_perf_counters(service, easyhandle, &counters, error))
-		goto out;
-
 	if (SUCCEED != vmware_service_get_contents(easyhandle, &version, &fullname, error))
 		goto out;
 
+	if (0 == (service->state & ZBX_VMWARE_STATE_NEW) && 0 == strcmp(service->version, version))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (SUCCEED != vmware_service_get_perf_counters(service, easyhandle, &counters, error))
+		goto out;
+
 	zbx_vmware_lock();
+
+	if (NULL != service->version)
+		vmware_shared_strfree(service->version);
+
+	if (NULL != service->fullname)
+		vmware_shared_strfree(service->fullname);
+
+	if (0 != service->entities.num_data)
+	{
+		zbx_hashset_iter_t		iter;
+		zbx_vmware_perf_entity_t	*entity;
+
+		zbx_hashset_iter_reset(&service->entities, &iter);
+
+		while (NULL != (entity = (zbx_vmware_perf_entity_t *)zbx_hashset_iter_next(&iter)))
+			vmware_shared_perf_entity_clean(entity);
+
+		zbx_hashset_clear(&service->entities);
+	}
+
+	if (0 != service->counters.num_data)
+	{
+		zbx_hashset_iter_t		iter;
+		zbx_vmware_counter_t		*counter;
+
+		zbx_hashset_iter_reset(&service->counters, &iter);
+
+		while (NULL != (counter = (zbx_vmware_counter_t *)zbx_hashset_iter_next(&iter)))
+			vmware_counter_shared_clean(counter);
+
+		zbx_hashset_clear(&service->counters);
+	}
 
 	service->fullname = vmware_shared_strdup(fullname);
 	vmware_counters_shared_copy(&service->counters, &counters);
@@ -4807,11 +4972,8 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &data->error))
 		goto clean;
 
-	if (0 != (service->state & ZBX_VMWARE_STATE_NEW) &&
-			SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
-	{
+	if (SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
 		goto clean;
-	}
 
 	if (NULL != service->data && 0 != service->data->events.values_num && 0 == evt_skip_old &&
 			((const zbx_vmware_event_t *)service->data->events.values[0])->key > evt_last_key)
@@ -4845,11 +5007,21 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	for (i = 0; i < hvs.values_num; i++)
 	{
-		zbx_vmware_hv_t	hv_local;
+		zbx_vmware_hv_t	hv_local, *hv;
 
 		if (SUCCEED == vmware_service_init_hv(service, easyhandle, hvs.values[i], &data->datastores, &hv_local,
 				&data->error))
 		{
+			if (NULL != (hv = zbx_hashset_search(&data->hvs, &hv_local)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Duplicate uuid of new hv id:%s name:%s uuid:%s and"
+					" discovered hv with id:%s name:%s", hv_local.id,
+					ZBX_NULL2EMPTY_STR(hv_local.props[ZBX_VMWARE_HVPROP_NAME]), hv_local.uuid,
+					hv->id, ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]));
+				vmware_hv_clean(&hv_local);
+				continue;
+			}
+
 			zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
 		}
 		else if (NULL != data->error)

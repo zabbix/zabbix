@@ -1,0 +1,2682 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-05-10T18:31:46Z</date>
+   <groups>
+      <group>
+         <name>Templates/Network devices</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template ZYXEL IES-6000 SNMP</template>
+         <name>Template ZYXEL IES-6000 SNMP</name>
+         <description>ZYXEL IES-6000&#13;
+&#13;
+MIBs used:&#13;
+RFC1213-MIB&#13;
+ADSL-LINE-MIB&#13;
+ZYXEL-IES5000-MIB&#13;
+IF-MIB&#13;
+&#13;
+Known Issues:&#13;
+&#13;
+  Description: Incorrect handling of SNMP bulk requests. Disable the use of bulk requests in the SNMP interface settings.&#13;
+  Version: all versions firmware&#13;
+  Device: ZYXEL IES-6000&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Network devices</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>CPU</name>
+            </application>
+            <application>
+               <name>Fans</name>
+            </application>
+            <application>
+               <name>Inventory</name>
+            </application>
+            <application>
+               <name>Memory</name>
+            </application>
+            <application>
+               <name>Network interfaces</name>
+            </application>
+            <application>
+               <name>Power supply</name>
+            </application>
+            <application>
+               <name>Status</name>
+            </application>
+            <application>
+               <name>Temperature</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>ZYXEL IES-6000: SNMP agent availability</name>
+               <type>INTERNAL</type>
+               <key>zabbix[host,snmp,available]</key>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>SNMP available</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{max({$SNMP.TIMEOUT})}=0</expression>
+                     <name>ZYXEL IES-6000: No SNMP data collection</name>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                     <description>SNMP is not available for polling. Please check device connectivity and SNMP settings.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>ZYXEL IES-6000: Contact</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>.1.3.6.1.2.1.1.4.0</snmp_oid>
+               <key>zyxel.ies6000.contact</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>MIB: RFC1213-MIB&#13;
+The textual identification of the contact person&#13;
+for this managed node, together with information&#13;
+on how to contact this person.</description>
+               <inventory_link>CONTACT</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>ZYXEL IES-6000: Location</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>.1.3.6.1.2.1.1.6.0</snmp_oid>
+               <key>zyxel.ies6000.location</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>MIB: RFC1213-MIB&#13;
+The physical location of this node (e.g.,&#13;
+`telephone closet, 3rd floor').</description>
+               <inventory_link>LOCATION</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>ZYXEL IES-6000: MAC address</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>.1.3.6.1.2.1.2.2.1.6.1</snmp_oid>
+               <key>zyxel.ies6000.mac</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>MIB: IF-MIB&#13;
+The interface's address at the protocol layer&#13;
+immediately `below' the network layer in the&#13;
+protocol stack.  For interfaces which do not have&#13;
+such an address (e.g., a serial line), this object&#13;
+should contain an octet string of zero length.</description>
+               <inventory_link>MACADDRESS_A</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>ZYXEL IES-6000: Hardware model name</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>.1.3.6.1.2.1.1.1.0</snmp_oid>
+               <key>zyxel.ies6000.model</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>MIB: RFC1213-MIB&#13;
+A textual description of the entity.  This value&#13;
+should include the full name and version&#13;
+identification of the system's hardware type,&#13;
+software operating-system, and networking&#13;
+software.  It is mandatory that this only contain&#13;
+printable ASCII characters.</description>
+               <inventory_link>MODEL</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;&gt;"IES-6000"</expression>
+                     <name>ZYXEL IES-6000: Template does not match hardware</name>
+                     <priority>INFO</priority>
+                     <description>This template is for Zyxel IES-6000, but connected to {ITEM.VALUE}</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>ZYXEL IES-6000: Host name</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>.1.3.6.1.2.1.1.5.0</snmp_oid>
+               <key>zyxel.ies6000.name</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>MIB: RFC1213-MIB&#13;
+An administratively-assigned name for this&#13;
+managed node.  By convention, this is the node's&#13;
+fully-qualified domain name.</description>
+               <inventory_link>NAME</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>ZYXEL IES-6000: Uptime</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>.1.3.6.1.2.1.1.3.0</snmp_oid>
+               <key>zyxel.ies6000.uptime</key>
+               <delay>30s</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>ENABLED</status>
+               <units>uptime</units>
+               <description>MIB: RFC1213-MIB&#13;
+The time (in hundredths of a second) since the&#13;
+network management portion of the system was last&#13;
+re-initialized.</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.01</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>ZYXEL IES-6000: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Packet buffer discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#ZYXEL.BUFFERHIGHTHRESH}, .1.3.6.1.4.1.890.1.5.13.5.11.3.5.1.4]</snmp_oid>
+               <key>zyxel.ies6000.buffer.discovery</key>
+               <delay>1h</delay>
+               <description>A table that contains packet buffer usage information.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Packet buffer utilization</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.11.3.5.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.buffer[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>%</units>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The packet buffer usage in the past 60 seconds.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{#ZYXEL.BUFFERHIGHTHRESH}</expression>
+                           <name>ZYXEL IES-6000: High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID} (&gt;{#ZYXEL.BUFFERHIGHTHRESH}% for 5m)</name>
+                           <priority>AVERAGE</priority>
+                           <description>The system is running out of free buffer.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Packet buffer utilization</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.buffer[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var inArray = JSON.parse(value);
+var outArr = []
+inArray.forEach(function (item, i, arr) {
+    item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+    item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+    outArr.push(item)
+});
+return JSON.stringify(outArr);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>CPU discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#ZYXEL.CPU.THRESH.HIGH}, .1.3.6.1.4.1.890.1.5.13.5.11.3.4.1.4]</snmp_oid>
+               <key>zyxel.ies6000.cpu.discovery</key>
+               <delay>1h</delay>
+               <description>A table that contains CPU utilization information.&#13;
+This table is supported by R1.03 and later versions.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: CPU utilization</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.11.3.4.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.cpu[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>%</units>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The CPU utilization in the past 60 seconds.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{#ZYXEL.CPU.THRESH.HIGH}</expression>
+                           <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} high CPU utilization (over {#ZYXEL.CPU.THRESH.HIGH}% for 5m)</name>
+                           <opdata>Current utilization: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>CPU utilization is too high. The system might be slow to respond.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: CPU utilization</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.cpu[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var inArray = JSON.parse(value);
+var outArr = []
+inArray.forEach(function (item, i, arr) {
+    item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+    item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+    outArr.push(item)
+});
+return JSON.stringify(outArr);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Fan discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#ZYXEL.FANRPM.THRESH.HIGH}, .1.3.6.1.4.1.890.1.5.13.5.11.3.1.1.7,{#ZYXEL.FANRPM.THRESH.LOW}, .1.3.6.1.4.1.890.1.5.13.5.11.3.1.1.5]</snmp_oid>
+               <key>zyxel.ies6000.fan.discovery</key>
+               <delay>1h</delay>
+               <description>An entry in fanRpmTable.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Fan #{#SNMPINDEX}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.11.3.1.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.fan[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>!rpm</units>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+Current speed in Revolutions Per Minute (RPM) on the fan.</description>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;{#ZYXEL.FANRPM.THRESH.LOW} or {last()}&gt;{#ZYXEL.FANRPM.THRESH.HIGH}</expression>
+                           <name>ZYXEL IES-6000: FAN{#SNMPINDEX} is in critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the fan unit</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Fan #{#SNMPINDEX}</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.fan[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Memory discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#ZYXEL.MEMORYHIGHTHRESH},  .1.3.6.1.4.1.890.1.5.13.5.11.3.6.1.4]</snmp_oid>
+               <key>zyxel.ies6000.memory.discovery</key>
+               <delay>1h</delay>
+               <description>A table that contains memory usage information.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Memory utilization</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.11.3.6.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.memory[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>%</units>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The memory usage in the past 60 seconds.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{#ZYXEL.MEMORYHIGHTHRESH}</expression>
+                           <name>ZYXEL IES-6000: High memory utilization in Slot {#ZYXEL.SLOT.ID} pool (&gt;{#ZYXEL.MEMORYHIGHTHRESH}% for 5m)</name>
+                           <priority>AVERAGE</priority>
+                           <description>The system is running out of free memory.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Memory utilization</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.memory[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var inArray = JSON.parse(value);
+var outArr = []
+inArray.forEach(function (item, i, arr) {
+    item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+    item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+    outArr.push(item)
+});
+return JSON.stringify(outArr);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>ADSL interface discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#ZYXEL.IF.NAME},.1.3.6.1.2.1.31.1.1.1.1,{#ZYXEL.IF.LINKSTATUS},.1.3.6.1.2.1.2.2.1.8,{#ZYXEL.IF.DESC},.1.3.6.1.2.1.31.1.1.1.18]</snmp_oid>
+               <key>zyxel.ies6000.net.adsl.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#ZYXEL.IF.DESC}</macro>
+                        <value>{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ZYXEL.IF.DESC}</macro>
+                        <value>{$ZYXEL.LLD.FILTER.IF.DESC.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ZYXEL.IF.LINKSTATUS}</macro>
+                        <value>{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}</value>
+                        <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ZYXEL.IF.LINKSTATUS}</macro>
+                        <value>{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>D</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ZYXEL.IF.NAME}</macro>
+                        <value>adsl</value>
+                        <formulaid>E</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Administrative status</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.adminstatus[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>MIB: IF-MIB&#13;
+The desired state of the interface.  The&#13;
+testing(3) state indicates that no operational&#13;
+packets can be passed.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>ZYXEL IES-6000 port admin status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUC attenuation</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.10.94.1.1.2.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.atuc.atn[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>dB</units>
+                     <description>MIB: ADSL-LINE-MIB&#13;
+Measured difference in the total power transmitted by&#13;
+the peer ATU and the total power received by this ATU. &#13;
+The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES-6000, during negotiation/provisioning message interchanges.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ZYXEL.ADSL.ATN.MAX}</expression>
+                           <name>ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (&gt;{$ZYXEL.ADSL.ATN.MAX}dB for 5m)</name>
+                           <priority>WARNING</priority>
+                           <description>The reductions in amplitude of the downstream and upstream DSL signals.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUC output power</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.10.94.1.1.2.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.atuc.outpwr[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>dB</units>
+                     <description>MIB: ADSL-LINE-MIB&#13;
+Measured total output power transmitted by this ATU. &#13;
+The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES-6000, during negotiation/provisioning message interchanges.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUC noise margin</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.10.94.1.1.2.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.atuc.snrmgn[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>dB</units>
+                     <description>MIB: ADSL-LINE-MIB&#13;
+Noise Margin as seen by this ATU with respect to its&#13;
+received signal in tenth dB. &#13;
+The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES-6000, during negotiation/provisioning message interchanges.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&lt;{$ZYXEL.ADSL.SNR.MIN}</expression>
+                           <name>ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (&lt;{$ZYXEL.ADSL.SNR.MIN}dB for 5m)</name>
+                           <priority>WARNING</priority>
+                           <description>Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUR attenuation</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.10.94.1.1.3.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.atur.atn[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>dB</units>
+                     <description>MIB: ADSL-LINE-MIB&#13;
+Measured difference in the total power transmitted by&#13;
+the peer ATU and the total power received by this ATU. &#13;
+The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ZYXEL.ADSL.ATN.MAX}</expression>
+                           <name>ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (&gt;{$ZYXEL.ADSL.ATN.MAX}dB for 5m)</name>
+                           <priority>WARNING</priority>
+                           <description>The reductions in amplitude of the downstream and upstream DSL signals.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUR output power</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.10.94.1.1.3.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.atur.outpwr[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>dB</units>
+                     <description>MIB: ADSL-LINE-MIB&#13;
+Measured total output power transmitted by this ATU. &#13;
+The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUR noise margin</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.10.94.1.1.3.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.atur.snrmgn[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>dB</units>
+                     <description>MIB: ADSL-LINE-MIB&#13;
+Noise Margin as seen by this ATU with respect to its&#13;
+received signal in tenth dB. &#13;
+The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&lt;{$ZYXEL.ADSL.SNR.MIN}</expression>
+                           <name>ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (&lt;{$ZYXEL.ADSL.SNR.MIN}dB for 5m)</name>
+                           <priority>WARNING</priority>
+                           <description>Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Interface description</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.18.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.descr[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: IF-MIB&#13;
+A textual string containing information about the interface</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming broadcast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.in.broadcastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The number of packets, delivered by this sub-layer to a&#13;
+higher (sub-)layer, which were addressed to a broadcast&#13;
+address at this sub-layer.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming multicast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.in.multicastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The number of packets, delivered by this sub-layer to a&#13;
+higher (sub-)layer, which were addressed to a multicast&#13;
+address at this sub-layer.  For a MAC layer protocol, this&#13;
+includes both Group and Functional addresses.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming traffic</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.in.traffic[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>bps</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of octets received on the interface,&#13;
+including framing characters.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming unicast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.in.ucastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The number of packets, delivered by this sub-layer to a&#13;
+higher (sub-)layer, which were not addressed to a multicast&#13;
+or broadcast address at this sub-layer</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Interface name</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.1.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.name[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: IF-MIB&#13;
+A textual string containing information about the interface</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Operational status</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>MIB: IF-MIB&#13;
+The current operational state of the interface.&#13;
+The testing(3) state indicates that no operational&#13;
+packets can be passed.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>ZYXEL IES-6000 port operational status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=2 and {diff()}=1</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
+                           <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Link down</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>This trigger expression works as follows:&#13;
+1. Can be triggered if operations status is down.&#13;
+2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)&#13;
+&#13;
+WARNING: if closed manually - won't fire again on next poll, because of .diff.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing broadcast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.out.broadcastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of packets that higher-level protocols&#13;
+requested be transmitted, and which were addressed to a&#13;
+broadcast address at this sub-layer, including those that&#13;
+were discarded or not sent.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing multicast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.out.multicastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of packets that higher-level protocols&#13;
+requested be transmitted, and which were addressed to a&#13;
+multicast address at this sub-layer, including those that&#13;
+were discarded or not sent.  For a MAC layer protocol, this&#13;
+includes both Group and Functional addresses.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing traffic</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.out.traffic[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>bps</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of octets transmitted out of the&#13;
+interface, including framing characters.  This object is a&#13;
+64-bit version of ifOutOctets.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing unicast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.adsl.out.ucastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of packets that higher-level protocols&#13;
+requested be transmitted, and which were not addressed to a&#13;
+multicast or broadcast address at this sub-layer, including&#13;
+those that were discarded or not sent.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Packets traffic</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.adsl.in.ucastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.adsl.out.ucastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.adsl.in.multicastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.adsl.out.multicastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>4</sortorder>
+                           <color>FC6EA3</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.adsl.in.broadcastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>5</sortorder>
+                           <color>6C59DC</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.adsl.out.broadcastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Traffic</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.adsl.in.traffic[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.adsl.out.traffic[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var inArray = JSON.parse(value);
+var outArr = []
+inArray.forEach(function (item, i, arr) {
+    item['{#ZYXEL.SLOT.ID}'] = Math.floor(item['{#SNMPINDEX}'] / 100);
+    item['{#ZYXEL.PORTID}'] = item['{#SNMPINDEX}'] % 100;
+    outArr.push(item)
+});
+return JSON.stringify(outArr);
+</params>
+                  </step>
+               </preprocessing>
+               <overrides>
+                  <override>
+                     <name>Trigger disabled</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ZYXEL.IF.NAME}</macro>
+                              <value>.*</value>
+                              <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>.*</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Trigger enabled</name>
+                     <step>2</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ZYXEL.IF.NAME}</macro>
+                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
+                              <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>.*</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Ethernet interface discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#ZYXEL.IF.NAME},.1.3.6.1.2.1.31.1.1.1.1,{#ZYXEL.IF.LINKSTATUS},.1.3.6.1.2.1.2.2.1.8,{#ZYXEL.IF.DESC},.1.3.6.1.2.1.31.1.1.1.18]</snmp_oid>
+               <key>zyxel.ies6000.net.if.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#ZYXEL.IF.DESC}</macro>
+                        <value>{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ZYXEL.IF.DESC}</macro>
+                        <value>{$ZYXEL.LLD.FILTER.IF.DESC.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ZYXEL.IF.LINKSTATUS}</macro>
+                        <value>{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}</value>
+                        <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ZYXEL.IF.LINKSTATUS}</macro>
+                        <value>{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>D</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ZYXEL.IF.NAME}</macro>
+                        <value>enet</value>
+                        <formulaid>E</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Administrative status</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.adminstatus[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>MIB: IF-MIB&#13;
+The desired state of the interface.  The&#13;
+testing(3) state indicates that no operational&#13;
+packets can be passed.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>ZYXEL IES-6000 port admin status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Interface description</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.18.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.descr[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: IF-MIB&#13;
+A textual string containing information about the interface</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Link speed</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>bps</units>
+                     <description>MIB: IF-MIB&#13;
+An estimate of the interface's current bandwidth in bits per second</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1000000</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming broadcast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.in.broadcastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The number of packets, delivered by this sub-layer to a&#13;
+higher (sub-)layer, which were addressed to a broadcast&#13;
+address at this sub-layer.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming multicast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.in.multicastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The number of packets, delivered by this sub-layer to a&#13;
+higher (sub-)layer, which were addressed to a multicast&#13;
+address at this sub-layer.  For a MAC layer protocol, this&#13;
+includes both Group and Functional addresses.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming traffic</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>bps</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of octets received on the interface,&#13;
+including framing characters.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming unicast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.in.ucastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The number of packets, delivered by this sub-layer to a&#13;
+higher (sub-)layer, which were not addressed to a multicast&#13;
+or broadcast address at this sub-layer</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming utilization</name>
+                     <type>CALCULATED</type>
+                     <key>zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>%</units>
+                     <params>last(zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]) * (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) &lt;&gt; 0) /
+( last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100</params>
+                     <description>Interface utilization percentage</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>IN_RANGE</type>
+                           <params>0
+100</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Interface name</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.1.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.name[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: IF-MIB&#13;
+A textual string containing information about the interface</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Operational status</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>MIB: IF-MIB&#13;
+The current operational state of the interface.&#13;
+The testing(3) state indicates that no operational&#13;
+packets can be passed.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>ZYXEL IES-6000 port operational status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=2 and {diff()}=1</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
+                           <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Link down</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>This trigger expression works as follows:&#13;
+1. Can be triggered if operations status is down.&#13;
+2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)&#13;
+&#13;
+WARNING: if closed manually - won't fire again on next poll, because of .diff.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing broadcast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.out.broadcastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of packets that higher-level protocols&#13;
+requested be transmitted, and which were addressed to a&#13;
+broadcast address at this sub-layer, including those that&#13;
+were discarded or not sent.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing multicast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.out.multicastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of packets that higher-level protocols&#13;
+requested be transmitted, and which were addressed to a&#13;
+multicast address at this sub-layer, including those that&#13;
+were discarded or not sent.  For a MAC layer protocol, this&#13;
+includes both Group and Functional addresses.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing traffic</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>bps</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of octets transmitted out of the&#13;
+interface, including framing characters.  This object is a&#13;
+64-bit version of ifOutOctets.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing unicast packages</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.net.if.out.ucastpkts[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>packets/s</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of packets that higher-level protocols&#13;
+requested be transmitted, and which were not addressed to a&#13;
+multicast or broadcast address at this sub-layer, including&#13;
+those that were discarded or not sent.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing utilization</name>
+                     <type>CALCULATED</type>
+                     <key>zyxel.ies6000.net.if.out.util[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>%</units>
+                     <params>last(zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]) * (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) &lt;&gt; 0) /
+( last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100</params>
+                     <description>Interface utilization percentage</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Port {#SNMPINDEX}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>IN_RANGE</type>
+                           <params>0
+100</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Packets traffic</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.in.ucastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.out.ucastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.in.multicastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.out.multicastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>4</sortorder>
+                           <color>FC6EA3</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.in.broadcastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>5</sortorder>
+                           <color>6C59DC</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.out.broadcastpkts[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Traffic</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Port {#SNMPINDEX}: Utilization</name>
+                     <ymin_type_1>FIXED</ymin_type_1>
+                     <ymax_type_1>FIXED</ymax_type_1>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.out.util[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <overrides>
+                  <override>
+                     <name>Trigger disabled</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ZYXEL.IF.NAME}</macro>
+                              <value>.*</value>
+                              <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>.*</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>Trigger enabled</name>
+                     <step>2</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#ZYXEL.IF.NAME}</macro>
+                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
+                              <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>.*</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Slot discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#ZYXEL.SLOTSTATUS},.1.3.6.1.4.1.890.1.5.13.5.6.3.1.7,{#ZYXEL.SLOT.ID},.1.3.6.1.4.1.890.1.5.13.5.6.3.1.1]</snmp_oid>
+               <key>zyxel.ies6000.slot.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#ZYXEL.SLOTSTATUS}</macro>
+                        <value>{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#ZYXEL.SLOTSTATUS}</macro>
+                        <value>{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>The table which contains the slot information in a chassis.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Alarm status</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.8.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.alarm[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+This variable indicates the alarm status of the module.&#13;
+It is a bit map represented a sum, therefore, it can represent&#13;
+multiple defects simultaneously. The moduleNoDefect should be set&#13;
+if and only if no other flag is set.&#13;
+The various bit positions are:&#13;
+1   moduleNoDefect&#13;
+2   moduleOverHeat&#13;
+3   moduleFanRpmLow&#13;
+4   moduleVoltageLow&#13;
+5   moduleThermalSensorFailure&#13;
+6   modulePullOut&#13;
+7   powerDC48VAFailure&#13;
+8   powerDC48VBFailure&#13;
+9   extAlarmInputTrigger&#13;
+10   moduleDown&#13;
+11   mscSwitchOverOK&#13;
+12   networkTopologyChange&#13;
+13   macSpoof&#13;
+14   cpuHigh&#13;
+15   memoryUsageHigh&#13;
+16   packetBufferUsageHigh&#13;
+17   loopguardOccurence</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>var valueArray = [
+    'moduleNoDefect',
+    'moduleOverHeat',
+    'moduleFanRpmLow',
+    'moduleVoltageLow',
+    'moduleThermalSensorFailure',
+    'modulePullOut',
+    'powerDC48VAFailure',
+    'powerDC48VBFailure',
+    'extAlarmInputTrigger',
+    'moduleDown',
+    'mscSwitchOverOK',
+    'networkTopologyChange',
+    'macSpoof',
+    'cpuHigh',
+    'memoryUsageHigh',
+    'packetBufferUsageHigh',
+    'loopguardOccurence'
+];
+var base2 = parseInt(value).toString(2);
+var outArray = [];
+for (var i = 0; i &lt; base2.length; ++i) {
+    if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
+}
+return outArray.join();
+</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str("moduleNoDefect")}=0</expression>
+                           <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} alarm</name>
+                           <priority>AVERAGE</priority>
+                           <description>The slot reported an error.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: DSL modem code version</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The DSL modem code version of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: DSL modem code has changed</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>INFO</priority>
+                           <description>Firmware version has changed. Ack to close</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Description</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.desc[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The descriptions of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Driver version</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The DSL driver of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Driver has changed</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>INFO</priority>
+                           <description>Firmware version has changed. Ack to close</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Firmware version</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The firmware version of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Firmware has changed</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>INFO</priority>
+                           <description>Firmware version has changed. Ack to close</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Hardware version</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.10.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The hardware version of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Hardware version has changed</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>INFO</priority>
+                           <description>Firmware version has changed. Ack to close</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: MAC address 1</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.12.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.mac1[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The MAC Address of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: MAC address 2</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.13.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.mac2[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The MAC Address of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Serial number</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.9.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.serial[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The serial number of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been replaced (new serial number received)</name>
+                           <priority>INFO</priority>
+                           <description>Slot {#ZYXEL.SLOT.ID} serial number has changed. Ack to close</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Status</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.status[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The module state of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>ZYXEL IES-6000 module status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Type</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.type[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+Card type of the plug-in card.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>ZYXEL IES-6000 module type</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Uptime</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.6.3.1.11.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.slot.uptime[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>s</units>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The time (in seconds) since the plug-in card was last re-initialized.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#ZYXEL.TEMP.THRESH.LOW},.1.3.6.1.4.1.890.1.5.13.5.11.3.3.1.7,{#ZYXEL.TEMP.THRESH.HIGH},.1.3.6.1.4.1.890.1.5.13.5.11.3.3.1.5]</snmp_oid>
+               <key>zyxel.ies6000.temp.discovery</key>
+               <delay>1h</delay>
+               <description>An entry in tempTable.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Temperature "{#ZYXEL.TEMP.ID}"</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.11.3.3.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.temp[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <units>°C</units>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The current temperature measured at this sensor</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{#ZYXEL.TEMP.THRESH.HIGH} or {last()}&lt;{#ZYXEL.TEMP.THRESH.LOW}</expression>
+                           <name>ZYXEL IES-6000: Temperature Slot {#ZYXEL.SLOT.ID} Sensor: {#ZYXEL.TEMP.ID} is in critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the temperature</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: "Temperature Slot {#ZYXEL.SLOT.ID} Sensor: {#ZYXEL.TEMP.ID}</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.temp[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var inArray = JSON.parse(value);
+var outArr = [];
+inArray.forEach(function (item, i, arr) {
+    item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+    item['{#ZYXEL.TEMP.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+    outArr.push(item);
+});
+return JSON.stringify(outArr);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Voltage discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#ZYXEL.VOLT.THRESH.HIGH},.1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.8,{#ZYXEL.VOLT.THRESH.LOW}, .1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.6,{#ZYXEL.VOLT.NOMINAL},.1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.5]</snmp_oid>
+               <key>zyxel.ies6000.volt.discovery</key>
+               <delay>1h</delay>
+               <description>An entry in voltageTable.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Nominal "{#ZYXEL.VOLT.NOMINAL}"</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>.1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>zyxel.ies6000.volt[{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>V</units>
+                     <description>MIB: ZYXEL-IES5000-MIB&#13;
+The current voltage reading.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Slot {#ZYXEL.SLOT.ID}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;{#ZYXEL.VOLT.THRESH.LOW} or {last()}&gt;{#ZYXEL.VOLT.THRESH.HIGH}</expression>
+                           <name>ZYXEL IES-6000: Voltage Slot {#ZYXEL.SLOT.ID} {#ZYXEL.VOLT.NOMINAL} is in critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the power supply</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Nominal "{#ZYXEL.VOLT.NOMINAL}"</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <key>zyxel.ies6000.volt[{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var inArray = JSON.parse(value);
+var outArr = []
+inArray.forEach(function (item, i, arr) {
+    item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+    item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+    item["{#ZYXEL.VOLT.NOMINAL}"] = "+" + item["{#ZYXEL.VOLT.NOMINAL}"] / 1000 + "V";
+    item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000;
+    item["{#ZYXEL.VOLT.THRESH.HIGH}"] /= 1000;
+    outArr.push(item)
+});
+return JSON.stringify(outArr);
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$SNMP.TIMEOUT}</macro>
+               <value>5m</value>
+               <description>The time interval for SNMP agent availability trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.ADSL.ATN.MAX}</macro>
+               <value>40</value>
+               <description>Type the maximum signal attenuation</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.ADSL.SNR.MIN}</macro>
+               <value>8</value>
+               <description>Type the minimum signal to noise margin (0-31 dB)</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}</macro>
+               <value>1</value>
+               <description>Filter to exclude discovered slots by status.</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</macro>
+               <value>NEED TRIGGERS</value>
+               <description>Triggers will be created only for interfaces whose description contains the value of this macro</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter by discoverable interface names.</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER.IF.DESC.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered interfaces by name.</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable link types.</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}</macro>
+               <value>2</value>
+               <description>Filter to exclude discovered by link types.</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter by discoverable slot status.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>SNMP available</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>not available</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>available</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>ZYXEL IES-6000 module status</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Empty</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Testing</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Standby</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>ZYXEL IES-6000 module type</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>101</value>
+               <newvalue>msc1000G</newvalue>
+            </mapping>
+            <mapping>
+               <value>102</value>
+               <newvalue>alc1248G_51</newvalue>
+            </mapping>
+            <mapping>
+               <value>103</value>
+               <newvalue>alc1248G_53</newvalue>
+            </mapping>
+            <mapping>
+               <value>104</value>
+               <newvalue>slc1248G_22</newvalue>
+            </mapping>
+            <mapping>
+               <value>105</value>
+               <newvalue>vlc1224G_41</newvalue>
+            </mapping>
+            <mapping>
+               <value>106</value>
+               <newvalue>msc1024G</newvalue>
+            </mapping>
+            <mapping>
+               <value>107</value>
+               <newvalue>alc1272G_51</newvalue>
+            </mapping>
+            <mapping>
+               <value>108</value>
+               <newvalue>vop1248G_61_SIP</newvalue>
+            </mapping>
+            <mapping>
+               <value>109</value>
+               <newvalue>msc1000GA</newvalue>
+            </mapping>
+            <mapping>
+               <value>110</value>
+               <newvalue>vlc1324G_51</newvalue>
+            </mapping>
+            <mapping>
+               <value>111</value>
+               <newvalue>msc1224G</newvalue>
+            </mapping>
+            <mapping>
+               <value>112</value>
+               <newvalue>vop1248G_61_H248</newvalue>
+            </mapping>
+            <mapping>
+               <value>113</value>
+               <newvalue>vlc1348G_51</newvalue>
+            </mapping>
+            <mapping>
+               <value>114</value>
+               <newvalue>elc1220G_55</newvalue>
+            </mapping>
+            <mapping>
+               <value>115</value>
+               <newvalue>msc1024GA</newvalue>
+            </mapping>
+            <mapping>
+               <value>116</value>
+               <newvalue>vlc1324G_53</newvalue>
+            </mapping>
+            <mapping>
+               <value>117</value>
+               <newvalue>ima1408G_81</newvalue>
+            </mapping>
+            <mapping>
+               <value>118</value>
+               <newvalue>vlc1424G_56</newvalue>
+            </mapping>
+            <mapping>
+               <value>119</value>
+               <newvalue>slc1348G_22</newvalue>
+            </mapping>
+            <mapping>
+               <value>120</value>
+               <newvalue>vlc1348G_53</newvalue>
+            </mapping>
+            <mapping>
+               <value>121</value>
+               <newvalue>alc1372G_51</newvalue>
+            </mapping>
+            <mapping>
+               <value>122</value>
+               <newvalue>msc1024GB</newvalue>
+            </mapping>
+            <mapping>
+               <value>123</value>
+               <newvalue>msc1224GB</newvalue>
+            </mapping>
+            <mapping>
+               <value>124</value>
+               <newvalue>vop1372G_61_H248</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>ZYXEL IES-6000 operational mode port speed duplex</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>auto</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>10M half</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>10M full</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>100M half</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>100M full</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>1G full</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>ZYXEL IES-6000 operational mode port link up type</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Cooper</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Fiber</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>ZYXEL IES-6000 port admin status</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Testing</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>ZYXEL IES-6000 port operational status</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Testing</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Dormant</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>NotPresent</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>lowerLayerDown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>
