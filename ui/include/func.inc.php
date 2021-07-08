@@ -1598,9 +1598,10 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 /**
  * Create a message box.
  *
- * @param string      $class           CSS class of the message box.
- *                                     Possible values: ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
+ * @param string      $class                  CSS class of the message box. Possible values:
+ *                                            ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
  * @param array       $messages
+ * @param array       $messages[]['message']
  * @param string|null $title
  * @param bool        $show_close_box
  * @param bool        $show_details
@@ -1703,14 +1704,14 @@ function filter_messages(array $messages = []) {
 }
 
 /**
- * Returns the message box when messages are present; null otherwise
+ * Returns a message box if there are messages. Otherwise, null.
  *
  * @param  bool    $good            Parameter passed to makeMessageBox to specify message box style.
  * @param  string  $title           Message box title.
  * @param  bool    $show_close_box  Show or hide close button in error message box.
  * @global array   $ZBX_MESSAGES
  *
- * @return CDiv|null
+ * @return CTag|null
  */
 function getMessages($good = false, $title = null, $show_close_box = true) {
 	global $ZBX_MESSAGES;
@@ -1970,7 +1971,7 @@ function info($msgs) {
 }
 
 /**
- * Add a warning message to the global message array.
+ * Add warning messages to the global message array.
  *
  * @param array|string $messages
  */
