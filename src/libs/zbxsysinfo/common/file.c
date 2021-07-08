@@ -37,16 +37,17 @@ extern int	CONFIG_TIMEOUT;
 int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
-	char		*filename;
+	char		*filename, *mode;
 	int		ret = SYSINFO_RET_FAIL;
 
-	if (1 < request->nparam)
+	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
 	}
 
 	filename = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
 	if (NULL == filename || '\0' == *filename)
 	{
@@ -54,13 +55,39 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 != zbx_stat(filename, &buf))
+	if (NULL != mode && 0 == strcmp(mode, "lines"))
+	{
+		FILE		*f;
+		zbx_uint64_t	lines = 0;
+		char		sym;
+
+		if (NULL == (f = fopen(filename, "r")))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
+			goto err;
+		}
+
+		while (EOF != (sym = fgetc(f)))
+		{
+			if (sym == '\n')
+				lines++;
+		}
+
+		fclose(f);
+		SET_UI64_RESULT(result, lines);
+	}
+	else if (NULL != mode && 0 != strcmp(mode, "bytes"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto err;
+	}
+	else if (0 != zbx_stat(filename, &buf))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
-
-	SET_UI64_RESULT(result, buf.st_size);
+	else
+		SET_UI64_RESULT(result, buf.st_size);
 
 	ret = SYSINFO_RET_OK;
 err:
