@@ -421,7 +421,7 @@ class testActions extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 
 		$this->reloadConfigurationCache();
-		
+
 		sleep(2);
 
 		// Check if there are no alerts for this action
