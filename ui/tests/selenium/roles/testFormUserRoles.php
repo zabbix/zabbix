@@ -66,6 +66,8 @@ class testFormUserRoles extends CWebTest {
 	 * Function used to create roles.
 	 */
 	public function prepareRoleData() {
+		CDataHelper::setSessionId(null);
+
 		$response = CDataHelper::call('role.create', [
 			[
 				'name' => 'role_for_update',

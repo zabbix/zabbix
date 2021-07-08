@@ -85,7 +85,7 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getGuiData
 	 */
 	public function testLanguage_Gui($data) {
-		$this->page->userLogin('Admin', 'zabbix');
+		$this->page->login();
 		$this->page->open('zabbix.php?action=gui.edit');
 
 		// Change default language.
@@ -249,7 +249,7 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getCreateUserData
 	 */
 	public function testLanguage_CreateUser($data) {
-		$this->page->userLogin('Admin', 'zabbix');
+		$this->page->login();
 		$this->page->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
