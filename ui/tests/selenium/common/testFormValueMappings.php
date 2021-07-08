@@ -319,7 +319,8 @@ class testFormValueMappings extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid';
+			$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid=v.valuemapid'.
+					' ORDER BY v.name, v.valuemapid, vm.sortorder';
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
@@ -415,7 +416,8 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $source		Entity (host or template) for which the scenario is executed.
 	 */
 	public function checkSimpleUpdate($source) {
-		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid ORDER BY v.name, vm.sortorder';
+		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid=v.valuemapid'.
+				' ORDER BY v.name, v.valuemapid, vm.sortorder';
 		$old_hash = CDBHelper::getHash($sql);
 
 		// Open configuration of a value mapping and save it without making any changes.
@@ -456,7 +458,8 @@ class testFormValueMappings extends CWebTest {
 			]
 		];
 
-		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid';
+		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid=v.valuemapid'.
+				' ORDER BY v.name, v.valuemapid, vm.sortorder';
 		$old_hash = CDBHelper::getHash($sql);
 
 		// Open value mapping configuration and update its fields.
