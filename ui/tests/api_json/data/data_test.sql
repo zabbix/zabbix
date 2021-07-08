@@ -72,6 +72,11 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (50015,'API discovery group {#HV.NAME}',0,4);
 INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 108, 'API discovery group {#HV.NAME}');
 
+
+-- host tags
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50032, 'API host with tag', 'API host with tag', 0, 0, '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (50033, 50032, 'b', 'b');
+
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'API user group for update');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'API user group for update with user and rights');
