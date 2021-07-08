@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-07T10:51:00Z</date>
+   <date>2021-07-08T14:45:55Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template APP Systemd by Zabbix Agent 2</template>
-         <name>Template APP Systemd by Zabbix Agent 2</name>
+         <template>Template APP Systemd by Zabbix agent 2</template>
+         <name>Template APP Systemd by Zabbix agent 2</name>
          <description>Get systemd units metrics from plugin for the zabbix-agent2.&#13;
   1. Setup and configure zabbix-agent2 compiled with the Systemd monitoring plugin.&#13;
   2. Set filters with macros if you want to override default filter parameters.&#13;
