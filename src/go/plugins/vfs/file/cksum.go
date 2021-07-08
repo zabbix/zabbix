@@ -23,7 +23,11 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"zabbix.com/pkg/std"
 )
+
+type checkSum func(file std.File, start time.Time, timeout int) (result interface{}, err error)
 
 var crctable []uint32 = []uint32{
 	0x0,
@@ -80,12 +84,56 @@ var crctable []uint32 = []uint32{
 	0xa2f33668, 0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,
 }
 
+func crc32(file std.File, start time.Time, timeout int) (result interface{}, err error) {
+	var crc uint32
+	var flen uint32
+	bnum := 16 * 1024
+	buf := make([]byte, bnum)
+
+	for bnum > 0 {
+		bnum, _ = file.Read(buf)
+
+		for _, b := range buf[:bnum] {
+			crc = (crc << 8) ^ crctable[((crc>>24)^uint32(b))&0xff]
+		}
+
+		flen += uint32(bnum)
+		if time.Since(start) > time.Duration(timeout)*time.Second {
+			return 0, errors.New("Timeout while processing item")
+		}
+	}
+
+	for 0 != flen {
+		crc = (crc << 8) ^ crctable[((crc>>24)^flen)&0xff]
+		flen >>= 8
+	}
+	return ^crc, nil
+
+}
+
 func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
-	if len(params) > 1 {
+	if len(params) > 2 {
 		return nil, errors.New("Too many parameters.")
 	}
 	if len(params) == 0 || params[0] == "" {
 		return nil, errors.New("Invalid first parameter.")
+	}
+
+	mode := "crc32"
+	if len(params) == 2 && params[1] != "" {
+		mode = params[1]
+	}
+
+	var ckSum checkSum
+	switch mode {
+	case "crc32":
+		ckSum = crc32
+	case "md5":
+		ckSum = md5sum
+	case "sha256":
+		ckSum = sha256sum
+	default:
+		return nil, errors.New("Invalid second parameter.")
 	}
 
 	start := time.Now()
@@ -96,28 +144,5 @@ func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
 	}
 	defer file.Close()
 
-	bnum := 16 * 1024
-	buf := make([]byte, bnum)
-
-	var crc, flen uint32
-
-	for bnum > 0 {
-		bnum, _ = file.Read(buf)
-
-		for _, b := range buf[:bnum] {
-			crc = (crc << 8) ^ crctable[((crc>>24)^uint32(b))&0xff]
-		}
-
-		flen += uint32(bnum)
-		if time.Since(start) > time.Duration(p.options.Timeout)*time.Second {
-			return nil, errors.New("Timeout while processing item")
-		}
-	}
-
-	for 0 != flen {
-		crc = (crc << 8) ^ crctable[((crc>>24)^flen)&0xff]
-		flen >>= 8
-	}
-	return ^crc, nil
-
+	return ckSum(file, start, p.options.Timeout)
 }

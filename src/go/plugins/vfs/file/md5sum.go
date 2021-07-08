@@ -25,7 +25,26 @@ import (
 	"fmt"
 	"io"
 	"time"
+
+	"zabbix.com/pkg/std"
 )
+
+func md5sum(file std.File, start time.Time, timeout int) (result interface{}, err error) {
+	var bnum int64
+	bnum = 16 * 1024
+	buf := make([]byte, bnum)
+
+	hash := md5.New()
+
+	for bnum > 0 {
+		bnum, _ = io.CopyBuffer(hash, file, buf)
+		if time.Since(start) > time.Duration(timeout)*time.Second {
+			return nil, errors.New("Timeout while processing item")
+		}
+	}
+
+	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+}
 
 func (p *Plugin) exportMd5sum(params []string) (result interface{}, err error) {
 	if len(params) > 1 {
@@ -43,19 +62,5 @@ func (p *Plugin) exportMd5sum(params []string) (result interface{}, err error) {
 	}
 	defer file.Close()
 
-	var bnum int64
-	bnum = 16 * 1024
-	buf := make([]byte, bnum)
-
-	hash := md5.New()
-
-	for bnum > 0 {
-		bnum, _ = io.CopyBuffer(hash, file, buf)
-		if time.Since(start) > time.Duration(p.options.Timeout)*time.Second {
-			return nil, errors.New("Timeout while processing item")
-		}
-	}
-
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
-
+	return md5sum(file, start, p.options.Timeout)
 }
