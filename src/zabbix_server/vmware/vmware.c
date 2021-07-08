@@ -5249,7 +5249,12 @@ static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, 
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		value = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i], "*[local-name()='value'][last()]");
+		if (NULL == (value = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i],
+				"*[local-name()='value'][text() != '-1'][last()]")))
+		{
+			value = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i], "*[local-name()='value'][last()]");
+		}
+
 		instance = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i], "*[local-name()='id']"
 				"/*[local-name()='instance']");
 		counter = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i], "*[local-name()='id']"
@@ -5263,7 +5268,11 @@ static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, 
 			perfvalue->instance = (NULL != instance ? instance : zbx_strdup(NULL, ""));
 
 			if (0 == strcmp(value, "-1") || SUCCEED != is_uint64(value, &perfvalue->value))
+			{
 				perfvalue->value = UINT64_MAX;
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() inaccessible counterid:%s instance:%s value:%s",
+						__func__, counter, perfvalue->instance, value);
+			}
 			else if (FAIL == ret)
 				ret = SUCCEED;
 
@@ -5499,7 +5508,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 						st_str);
 			}
 
-			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>1</ns0:maxSample>");
+			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>2</ns0:maxSample>");
 
 			for (j = start_counter; j < entity->counters.values_num && counters_num < counters_max; j++)
 			{

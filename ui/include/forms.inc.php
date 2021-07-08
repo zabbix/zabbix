@@ -1793,7 +1793,10 @@ function getTriggerFormData(array $data) {
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];
 			$data['url'] = $trigger['url'];
-			$data['discover'] = $trigger['discover'];
+
+			if ($data['parent_discoveryid'] !== null) {
+				$data['discover'] = $trigger['discover'];
+			}
 
 			$db_triggers = DBselect(
 				'SELECT t.triggerid,t.description'.

@@ -13,7 +13,7 @@ This template was tested on:
 
 ### Setup Squid
 Enable SNMP support following [official documentation](https://wiki.squid-cache.org/Features/Snmp).
-Required parameters in squid.conf: 
+Required parameters in squid.conf:
 ```
 snmp_port <port_number>
 acl <zbx_acl_name> snmp_community <community_name>
@@ -65,7 +65,7 @@ There are no template links in this template.
 |Squid |Squid: Cache swap low water mark |<p>Cache Swap Low Water Mark</p> |SNMP |squid[cacheSwapLowWM] |
 |Squid |Squid: Cache swap high water mark |<p>Cache Swap High Water Mark</p> |SNMP |squid[cacheSwapHighWM] |
 |Squid |Squid: Cache swap directory size |<p>The total of the cache_dir space allocated</p> |SNMP |squid[cacheSwapMaxSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
-|Squid |Squid: Cache swap current size |<p>Storage Swap Size</p> |SNMP |squid[cacheCurrentSwapSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
+|Squid |Squid: Cache swap current size |<p>Storage Swap Size</p> |SNMP |squid[cacheCurrentSwapSize] |
 |Squid |Squid: File descriptor count - current used |<p>Number of file descriptors in use</p> |SNMP |squid[cacheCurrentFileDescrCnt] |
 |Squid |Squid: File descriptor count - current maximum |<p>Highest number of file descriptors in use</p> |SNMP |squid[cacheCurrentFileDescrMax] |
 |Squid |Squid: File descriptor count - current reserved |<p>Reserved number of file descriptors</p> |SNMP |squid[cacheCurrentResFileDescrCnt] |

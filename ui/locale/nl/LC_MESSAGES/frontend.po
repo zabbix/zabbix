@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 19:52+0300\n"
+"POT-Creation-Date: 2021-06-21 11:17+0300\n"
 "PO-Revision-Date: 2021-03-19 18:01+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: NL\n"
@@ -621,7 +621,7 @@ msgstr "Actief tot"
 #: app/views/popup.media.php:127 app/views/popup.mediatype.message.php:95
 #: app/views/popup.triggerwizard.php:110 app/views/popup.triggerwizard.php:144
 #: include/classes/widgets/CWidgetHelper.php:502 include/forms.inc.php:1474
-#: include/forms.inc.php:2014 include/views/configuration.action.edit.php:130
+#: include/forms.inc.php:2017 include/views/configuration.action.edit.php:130
 #: include/views/configuration.action.edit.php:314
 #: include/views/configuration.action.edit.php:400
 #: include/views/configuration.action.edit.php:480
@@ -1635,9 +1635,9 @@ msgstr "Annuleer"
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
 msgstr ""
 
-#: include/classes/api/services/CGraph.php:703
-#: include/classes/api/services/CGraph.php:717
-#: include/classes/api/services/CGraph.php:731
+#: include/classes/api/services/CGraph.php:706
+#: include/classes/api/services/CGraph.php:720
+#: include/classes/api/services/CGraph.php:734
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "Kan geen niet-numeriek item \"%1$s\" aan grafiek \"%2$s\" toevoegen."
@@ -1665,7 +1665,7 @@ msgstr ""
 msgid "Cannot add correlation condition"
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:962
+#: include/classes/api/services/CTrigger.php:970
 #: include/classes/api/services/CTriggerPrototype.php:780
 msgid "Cannot add dependency from a host to a template."
 msgstr "Kan geen host afhankelijkheid toevoegen aan een template."
@@ -1916,12 +1916,12 @@ msgstr "Kan geen host-prototype aanmaken op ontdekte host \"%1$s\"."
 msgid "Cannot create another database connection."
 msgstr "Kan geen andere database verbinding opzetten."
 
-#: include/classes/api/services/CTrigger.php:996
+#: include/classes/api/services/CTrigger.php:1004
 #: include/classes/api/services/CTriggerPrototype.php:811
 msgid "Cannot create circular dependencies."
 msgstr "Kan geen circulaire afhankelijkheden maken."
 
-#: include/classes/api/services/CTrigger.php:968
+#: include/classes/api/services/CTrigger.php:976
 msgid "Cannot create dependency on trigger itself."
 msgstr "Kan geen afhankelijkheid maken op de trigger zelf."
 
@@ -1975,7 +1975,7 @@ msgid_plural "Cannot delete dashboards"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/api/services/CTrigger.php:866
+#: include/classes/api/services/CTrigger.php:874
 #: include/classes/api/services/CTriggerPrototype.php:577
 msgid "Cannot delete dependency"
 msgstr "Kan de afhankelijkheid niet verwijderen"
@@ -2019,7 +2019,7 @@ msgstr[1] "Kan groepen niet verwijderen"
 msgid "Cannot delete host"
 msgstr "Kan host niet verwijderen"
 
-#: include/classes/api/services/CHost.php:1454
+#: include/classes/api/services/CHost.php:1463
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2050,7 +2050,7 @@ msgstr "Kan afbeelding niet verwijderen"
 msgid "Cannot delete interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1241
+#: include/classes/api/services/CHost.php:1250
 msgid "Cannot delete inventory."
 msgstr "Kan inventarisatie niet verwijderen"
 
@@ -2146,7 +2146,7 @@ msgstr "Kan applicatie in template niet verwijderen"
 msgid "Cannot delete templated graph prototype."
 msgstr ""
 
-#: include/classes/api/services/CGraph.php:560
+#: include/classes/api/services/CGraph.php:563
 msgid "Cannot delete templated graph."
 msgstr ""
 
@@ -2158,7 +2158,7 @@ msgstr "Kan host-prototype (overgenomen uit sjabloon) niet verwijderen."
 msgid "Cannot delete templated item prototype."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:764
+#: include/classes/api/services/CItem.php:767
 msgid "Cannot delete templated item."
 msgstr "Kan een template item niet verwijderen."
 
@@ -2166,7 +2166,7 @@ msgstr "Kan een template item niet verwijderen."
 msgid "Cannot delete templated items."
 msgstr "Kan template items niet verwijderen."
 
-#: include/classes/api/services/CTrigger.php:653
+#: include/classes/api/services/CTrigger.php:661
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Kan de template trigger \"%1$s:%2$s\" niet verwijderen."
@@ -2498,7 +2498,7 @@ msgstr "Kan boom niet opmaken. Controleer de structuur van de service links."
 msgid "Cannot format tree."
 msgstr "Kan structuur niet formatteren."
 
-#: include/classes/api/services/CTemplate.php:905
+#: include/classes/api/services/CTemplate.php:906
 msgid "Cannot have empty visible template name."
 msgstr "Weergavenaam van sjabloon mag niet leeg zijn."
 
@@ -2513,12 +2513,12 @@ msgstr[1] "Kan sjabloon niet importeren \"%1$s\", gekoppelde sjablonen \"%2$s\" 
 msgid "Cannot insert trigger expression"
 msgstr "Kan trigger-expressie niet invoegen"
 
-#: include/classes/api/services/CHost.php:1219
+#: include/classes/api/services/CHost.php:1228
 msgid "Cannot link template"
 msgstr "Kan template niet ontkoppelen"
 
-#: include/classes/api/services/CTemplate.php:992
-#: include/classes/api/services/CTemplate.php:1006
+#: include/classes/api/services/CTemplate.php:993
+#: include/classes/api/services/CTemplate.php:1007
 msgid "Cannot link template."
 msgstr "Kan sjabloon niet koppelen."
 
@@ -2534,19 +2534,19 @@ msgstr[1] ""
 msgid "Cannot logout."
 msgstr "Kan niet uitloggen."
 
-#: include/classes/api/services/CHost.php:1085
+#: include/classes/api/services/CHost.php:1094
 msgid "Cannot mass update host name."
 msgstr "Kan hostnaam niet in bulk bijwerken."
 
-#: include/classes/api/services/CTemplate.php:1130
+#: include/classes/api/services/CTemplate.php:1131
 msgid "Cannot mass update template name."
 msgstr "Kan sjabloonnaam niet in bulk bijwerken."
 
-#: include/classes/api/services/CHost.php:1071
+#: include/classes/api/services/CHost.php:1080
 msgid "Cannot mass update visible host name."
 msgstr "Kan de zichtbare hostnaam niet in bulk bijwerken."
 
-#: include/classes/api/services/CTemplate.php:1095
+#: include/classes/api/services/CTemplate.php:1096
 msgid "Cannot mass update visible template name."
 msgstr "Kan weergavenaam van sjabloon niet in bulk bijwerken."
 
@@ -2655,9 +2655,9 @@ msgstr ""
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "\"templateid\" kan niet ingesteld worden voor scherm \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1136
-#: include/classes/api/services/CHost.php:2084
-#: include/classes/api/services/CHost.php:2245
+#: include/classes/api/services/CHost.php:1145
+#: include/classes/api/services/CHost.php:2093
+#: include/classes/api/services/CHost.php:2254
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Inventory velden kunnen niet ingesteld worden voor uitgeschakelde inventaris."
 
@@ -2693,12 +2693,12 @@ msgstr "Kan Web scenarios niet ontkoppelen en opschonen."
 msgid "Cannot unlink and clear applications."
 msgstr "Kan applicaties niet ontkoppelen en opschonen."
 
-#: include/classes/api/services/CHost.php:1194
+#: include/classes/api/services/CHost.php:1203
 msgid "Cannot unlink template"
 msgstr "Kan template niet ontkoppelen"
 
-#: include/classes/api/services/CTemplate.php:957
-#: include/classes/api/services/CTemplate.php:980
+#: include/classes/api/services/CTemplate.php:958
+#: include/classes/api/services/CTemplate.php:981
 msgid "Cannot unlink template."
 msgstr "Kan sjabloon niet ontkoppelen."
 
@@ -2738,7 +2738,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2222
+#: include/classes/api/services/CHost.php:2231
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr ""
@@ -2749,8 +2749,8 @@ msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:923
-#: include/classes/api/services/CTrigger.php:697
-#: include/classes/api/services/CTrigger.php:826
+#: include/classes/api/services/CTrigger.php:705
+#: include/classes/api/services/CTrigger.php:834
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr ""
@@ -2854,7 +2854,7 @@ msgstr "Kan geen groepen updaten voor ontdekte host \"%1$s\"."
 msgid "Cannot update host"
 msgstr "Kan host niet bijwerken"
 
-#: include/classes/api/services/CHost.php:1033
+#: include/classes/api/services/CHost.php:1042
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr ""
 
@@ -2976,8 +2976,8 @@ msgstr "Kan applicatie in template niet bijwerken."
 msgid "Cannot update templates"
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:856
-#: include/classes/api/services/CTemplate.php:1191
+#: include/classes/api/services/CTemplate.php:857
+#: include/classes/api/services/CTemplate.php:1192
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Kan geen sjablonen op ontdekte host \"%1$s\" bijwerken."
@@ -4898,7 +4898,7 @@ msgstr "Trigger verwijderen?"
 msgid "Delete web scenario?"
 msgstr "Webdraaiboek verwijderen?"
 
-#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Verwijderd: Host %1$s\"."
@@ -4908,7 +4908,7 @@ msgstr "Verwijderd: Host %1$s\"."
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Verwijderd: Host prototype \"%1$s\" op \"%2$s\"."
 
-#: include/classes/api/services/CTemplate.php:822
+#: include/classes/api/services/CTemplate.php:823
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Verwijderd: Sjabloon \"%1$s\"."
@@ -5490,7 +5490,7 @@ msgstr ""
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:1138
+#: include/classes/api/services/CTrigger.php:1146
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dupliceer afhankelijkheden in trigger \"%1$s\"."
@@ -5500,14 +5500,14 @@ msgstr "Dupliceer afhankelijkheden in trigger \"%1$s\"."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2020
-#: include/classes/api/services/CHost.php:2275
+#: include/classes/api/services/CHost.php:2029
+#: include/classes/api/services/CHost.php:2284
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2027
-#: include/classes/api/services/CHost.php:2295
+#: include/classes/api/services/CHost.php:2036
+#: include/classes/api/services/CHost.php:2304
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
@@ -5717,9 +5717,9 @@ msgstr ""
 #: include/classes/api/services/CHostGeneral.php:154
 #: include/classes/api/services/CHostInterface.php:574
 #: include/classes/api/services/CHostInterface.php:618
-#: include/classes/api/services/CHost.php:846
-#: include/classes/api/services/CHost.php:1418
-#: include/classes/api/services/CHost.php:1954
+#: include/classes/api/services/CHost.php:855
+#: include/classes/api/services/CHost.php:1427
+#: include/classes/api/services/CHost.php:1963
 #: include/classes/api/services/CHostPrototype.php:950
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
@@ -5738,8 +5738,8 @@ msgstr ""
 #: include/classes/api/services/CService.php:366
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
-#: include/classes/api/services/CTemplate.php:630
-#: include/classes/api/services/CTrigger.php:794
+#: include/classes/api/services/CTemplate.php:631
+#: include/classes/api/services/CTrigger.php:802
 #: include/classes/api/services/CUserMacro.php:479
 #: include/classes/api/services/CUserMacro.php:526
 #: include/classes/api/services/CUserMacro.php:626
@@ -6225,8 +6225,8 @@ msgstr "Expressie kan niet leeg zijn"
 msgid "Expression constructor"
 msgstr "Expressie bouwer"
 
-#: include/forms.inc.php:1847 include/forms.inc.php:1853
-#: include/forms.inc.php:1862
+#: include/forms.inc.php:1850 include/forms.inc.php:1856
+#: include/forms.inc.php:1865
 msgid "Expression syntax error."
 msgstr ""
 
@@ -6281,7 +6281,7 @@ msgstr ""
 msgid "Failed to update dashboard"
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:579
+#: include/classes/api/services/CTemplate.php:580
 msgid "Failed to update template."
 msgstr "Bijwerken van sjabloon mislukt."
 
@@ -6329,8 +6329,8 @@ msgstr "Veld \"%1$s\" kan niet worden ingesteld op NULL."
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
 #: include/classes/api/services/CHostGroup.php:983
-#: include/classes/api/services/CHost.php:991
-#: include/classes/api/services/CTemplate.php:884
+#: include/classes/api/services/CHost.php:1000
+#: include/classes/api/services/CTemplate.php:885
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
 #, c-format
@@ -6382,7 +6382,7 @@ msgstr ""
 msgid "Field \"%1$s\" must be missing."
 msgstr "Veld \"%1$s\" moet ontbreken."
 
-#: include/classes/api/services/CTemplate.php:464
+#: include/classes/api/services/CTemplate.php:465
 msgid "Field \"host\" is mandatory."
 msgstr "Veld \"host\" is verplicht."
 
@@ -6767,40 +6767,40 @@ msgstr "Verlooplijn"
 msgid "Graph"
 msgstr "Grafiek"
 
-#: include/classes/api/services/CGraph.php:430
+#: include/classes/api/services/CGraph.php:433
 #: include/classes/api/services/CGraphPrototype.php:441
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon).Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon).Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon).Grafiek \"%1$s\" bestaat al op \"%2$s\" (overgenomen van een ander sjabloon)."
 
-#: include/classes/api/services/CGraph.php:451
-#: include/classes/api/services/CGraph.php:458
+#: include/classes/api/services/CGraph.php:454
+#: include/classes/api/services/CGraph.php:461
 #: include/classes/api/services/CGraphPrototype.php:467
 #: include/classes/api/services/CGraphPrototype.php:474
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\" (items zijn niet identiek)."
 
-#: include/classes/api/services/CGraph.php:405
+#: include/classes/api/services/CGraph.php:408
 #: include/classes/api/services/CGraphPrototype.php:416
 #: include/graphs.inc.php:440
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "Grafiek \"%1$s\" bestaat al op \"%2$s\"."
 
-#: include/classes/api/services/CGraph.php:367
+#: include/classes/api/services/CGraph.php:370
 #: include/classes/api/services/CGraphPrototype.php:371
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymax waarde item)."
 
-#: include/classes/api/services/CGraph.php:375
+#: include/classes/api/services/CGraph.php:378
 #: include/classes/api/services/CGraphPrototype.php:380
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr "Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item).Grafiek \"%1$s\" kan niet erven. Geen vereiste items op \"%2$s\" (Ymin waarde item)."
 
-#: include/classes/api/services/CGraph.php:361
+#: include/classes/api/services/CGraph.php:364
 #: include/classes/api/services/CGraphPrototype.php:365
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
@@ -6923,8 +6923,8 @@ msgstr ""
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes.Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes.Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes.Grafiek met de naam \"%1$s\" bestaat al in grafieken of grafiek prototypes."
 
-#: include/classes/api/services/CGraph.php:412
-#: include/classes/api/services/CGraph.php:433
+#: include/classes/api/services/CGraph.php:415
+#: include/classes/api/services/CGraph.php:436
 #: include/classes/api/services/CGraphPrototype.php:423
 #: include/classes/api/services/CGraphPrototype.php:444
 msgid "Graph with same name but other type exist."
@@ -7319,17 +7319,17 @@ msgid_plural "Hosts"
 msgstr[0] "Host"
 msgstr[1] "Hosts"
 
-#: include/classes/api/services/CHost.php:1098
-#: include/classes/api/services/CTemplate.php:496
+#: include/classes/api/services/CHost.php:1107
+#: include/classes/api/services/CTemplate.php:497
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Host \"%1$s\" bestaat reeds."
 
 #: include/classes/api/services/CHostGroup.php:1541
-#: include/classes/api/services/CHost.php:1057
-#: include/classes/api/services/CHost.php:1991
-#: include/classes/api/services/CHost.php:2185
+#: include/classes/api/services/CHost.php:1066
+#: include/classes/api/services/CHost.php:2000
+#: include/classes/api/services/CHost.php:2194
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr ""
@@ -7617,7 +7617,7 @@ msgstr "Host subnetmasker"
 msgid "Host time"
 msgstr "Host tijd"
 
-#: include/classes/api/services/CHost.php:920
+#: include/classes/api/services/CHost.php:929
 msgid "Host update failed."
 msgstr "Host update is mislukt."
 
@@ -7630,17 +7630,17 @@ msgstr "Host bijgewerkt"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2115
-#: include/classes/api/services/CHost.php:2356
-#: include/classes/api/services/CTemplate.php:1156
+#: include/classes/api/services/CHost.php:2124
+#: include/classes/api/services/CHost.php:2365
+#: include/classes/api/services/CTemplate.php:1157
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Host met de naam \"%1$s\" bestaat al."
 
-#: include/classes/api/services/CHost.php:2121
-#: include/classes/api/services/CHost.php:2363
-#: include/classes/api/services/CTemplate.php:522
-#: include/classes/api/services/CTemplate.php:1121
+#: include/classes/api/services/CHost.php:2130
+#: include/classes/api/services/CHost.php:2372
+#: include/classes/api/services/CTemplate.php:523
+#: include/classes/api/services/CTemplate.php:1122
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Host met de weergavenaam \"%1$s\" bestaat al."
@@ -8319,7 +8319,7 @@ msgstr "Onjuiste argumenten doorgegeven aan de functie"
 #: include/classes/api/services/CHostInterface.php:1173
 #: include/classes/api/services/CHostInterface.php:1191
 #: include/classes/api/services/CHostInterface.php:1208
-#: include/classes/api/services/CHost.php:1382
+#: include/classes/api/services/CHost.php:1391
 #: include/classes/api/services/CHostPrototype.php:457
 #: include/classes/api/services/CHostPrototype.php:478
 #: include/classes/api/services/CItemGeneral.php:264
@@ -8372,9 +8372,9 @@ msgstr "Onjuiste bulkwaarde voor interface."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Onjuiste berekening SLA waarde voor service \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1080
-#: include/classes/api/services/CHost.php:1979
-#: include/classes/api/services/CHost.php:2269
+#: include/classes/api/services/CHost.php:1089
+#: include/classes/api/services/CHost.php:1988
+#: include/classes/api/services/CHost.php:2278
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
@@ -8385,8 +8385,8 @@ msgstr ""
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Verkeerde tekens gebruikt voor proxy naam \"%1$s\"."
 
-#: include/classes/api/services/CTemplate.php:474
-#: include/classes/api/services/CTemplate.php:1166
+#: include/classes/api/services/CTemplate.php:475
+#: include/classes/api/services/CTemplate.php:1167
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Ongeldige karakters gebruikers voor sjabloonnaam \"%1$s\"."
@@ -8553,9 +8553,9 @@ msgstr "Verkeerde index voor afbeelding."
 #: include/classes/api/services/CAction.php:2927
 #: include/classes/api/services/CAction.php:2939
 #: include/classes/api/services/CHostInterface.php:664
-#: include/classes/api/services/CHost.php:1063
-#: include/classes/api/services/CHost.php:1973
-#: include/classes/api/services/CHost.php:2171
+#: include/classes/api/services/CHost.php:1072
+#: include/classes/api/services/CHost.php:1982
+#: include/classes/api/services/CHost.php:2180
 #: include/classes/api/services/CImage.php:435
 #: include/classes/api/services/CImage.php:480
 #: include/classes/api/services/CProxy.php:619
@@ -8563,10 +8563,10 @@ msgstr "Verkeerde index voor afbeelding."
 #: include/classes/api/services/CProxy.php:729
 #: include/classes/api/services/CProxy.php:751
 #: include/classes/api/services/CScreen.php:426
-#: include/classes/api/services/CTemplate.php:469
-#: include/classes/api/services/CTemplate.php:610
+#: include/classes/api/services/CTemplate.php:470
+#: include/classes/api/services/CTemplate.php:611
 #: include/classes/api/services/CTemplateScreen.php:596
-#: include/classes/api/services/CTrigger.php:799
+#: include/classes/api/services/CTrigger.php:807
 msgid "Incorrect input parameters."
 msgstr ""
 
@@ -8580,8 +8580,8 @@ msgstr ""
 msgid "Incorrect interface port \"%1$s\" provided."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2090
-#: include/classes/api/services/CHost.php:2251
+#: include/classes/api/services/CHost.php:2099
+#: include/classes/api/services/CHost.php:2260
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
 msgstr ""
@@ -8753,8 +8753,8 @@ msgstr ""
 msgid "Incorrect source value."
 msgstr "Verkeerde bronwaarde."
 
-#: include/classes/api/services/CHost.php:2062
-#: include/classes/api/services/CHost.php:2217
+#: include/classes/api/services/CHost.php:2071
+#: include/classes/api/services/CHost.php:2226
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Onjuiste status voor host \"%1$s\"."
@@ -9041,21 +9041,21 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:771
 #: include/classes/api/services/CEvent.php:812
 #: include/classes/api/services/CEvent.php:869
-#: include/classes/api/services/CHost.php:1021
-#: include/classes/api/services/CHost.php:1871
-#: include/classes/api/services/CHost.php:1877
-#: include/classes/api/services/CHost.php:1892
-#: include/classes/api/services/CHost.php:1898
-#: include/classes/api/services/CHost.php:1903
-#: include/classes/api/services/CHost.php:1909
-#: include/classes/api/services/CHost.php:1917
-#: include/classes/api/services/CHost.php:1923
+#: include/classes/api/services/CHost.php:1030
+#: include/classes/api/services/CHost.php:1880
+#: include/classes/api/services/CHost.php:1886
+#: include/classes/api/services/CHost.php:1901
+#: include/classes/api/services/CHost.php:1907
+#: include/classes/api/services/CHost.php:1912
+#: include/classes/api/services/CHost.php:1918
+#: include/classes/api/services/CHost.php:1926
 #: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:1938
-#: include/classes/api/services/CHost.php:2000
-#: include/classes/api/services/CHost.php:2056
-#: include/classes/api/services/CHost.php:2194
-#: include/classes/api/services/CHost.php:2211
+#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1947
+#: include/classes/api/services/CHost.php:2009
+#: include/classes/api/services/CHost.php:2065
+#: include/classes/api/services/CHost.php:2203
+#: include/classes/api/services/CHost.php:2220
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:223
@@ -9105,8 +9105,8 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:2084
 #: include/classes/api/services/CItemGeneral.php:2098
 #: include/classes/api/services/CItemGeneral.php:2262
-#: include/classes/api/services/CItem.php:830
-#: include/classes/api/services/CItem.php:838
+#: include/classes/api/services/CItem.php:833
+#: include/classes/api/services/CItem.php:841
 #: include/classes/api/services/CItemPrototype.php:990
 #: include/classes/api/services/CItemPrototype.php:998
 #: include/classes/api/services/CMaintenance.php:495
@@ -9148,7 +9148,7 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:797
 #: include/classes/api/services/CScreen.php:394
 #: include/classes/api/services/CScreen.php:400
-#: include/classes/api/services/CTemplate.php:429
+#: include/classes/api/services/CTemplate.php:430
 #: include/classes/api/services/CTriggerGeneral.php:703
 #: include/classes/api/services/CTriggerGeneral.php:709
 #: include/classes/api/services/CTriggerGeneral.php:729
@@ -9784,7 +9784,7 @@ msgstr ""
 msgid "Inventory"
 msgstr "Inventaris"
 
-#: include/classes/api/services/CHost.php:1260
+#: include/classes/api/services/CHost.php:1269
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventaris voor host \"%1$s\" uitgeschakeld."
@@ -9857,7 +9857,7 @@ msgstr "Item \"%1$s\" bestaat al op \"%2$s\"."
 msgid "Item \"%1$s\" cannot be copied without its master item."
 msgstr ""
 
-#: include/classes/api/services/CItem.php:947
+#: include/classes/api/services/CItem.php:950
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Item \"%1$s\" kan een ontbrekende host inventaris veld nummer \"%2$d\" niet invullen. Keuzes zijn: van 0 (niet bevolken) tot %3$d."
@@ -12075,8 +12075,8 @@ msgstr "Geen interface gevonden."
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2069
-#: include/classes/api/services/CHost.php:2262
+#: include/classes/api/services/CHost.php:2078
+#: include/classes/api/services/CHost.php:2271
 #, c-format
 msgid "No interfaces for host \"%1$s\"."
 msgstr ""
@@ -12193,8 +12193,8 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:859
 #: include/classes/api/services/CGraphGeneral.php:64
 #: include/classes/api/services/CGraphGeneral.php:86
-#: include/classes/api/services/CGraph.php:555
-#: include/classes/api/services/CGraph.php:689
+#: include/classes/api/services/CGraph.php:558
+#: include/classes/api/services/CGraph.php:692
 #: include/classes/api/services/CGraphPrototype.php:572
 #: include/classes/api/services/CGraphPrototype.php:657
 #: include/classes/api/services/CGraphPrototype.php:719
@@ -12212,10 +12212,10 @@ msgstr ""
 #: include/classes/api/services/CHostInterface.php:585
 #: include/classes/api/services/CHostInterface.php:859
 #: include/classes/api/services/CHostInterface.php:888
-#: include/classes/api/services/CHost.php:1387
-#: include/classes/api/services/CHost.php:1422
-#: include/classes/api/services/CHost.php:2045
-#: include/classes/api/services/CHost.php:2177
+#: include/classes/api/services/CHost.php:1396
+#: include/classes/api/services/CHost.php:1431
+#: include/classes/api/services/CHost.php:2054
+#: include/classes/api/services/CHost.php:2186
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
@@ -12235,7 +12235,7 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:215
 #: include/classes/api/services/CItemGeneral.php:317
 #: include/classes/api/services/CItemGeneral.php:332
-#: include/classes/api/services/CItem.php:757
+#: include/classes/api/services/CItem.php:760
 #: include/classes/api/services/CItemPrototype.php:917
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
@@ -12272,16 +12272,16 @@ msgstr ""
 #: include/classes/api/services/CService.php:1012
 #: include/classes/api/services/CTask.php:427
 #: include/classes/api/services/CTask.php:474
-#: include/classes/api/services/CTemplate.php:846
+#: include/classes/api/services/CTemplate.php:847
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:961
-#: include/classes/api/services/CTrigger.php:645
-#: include/classes/api/services/CTrigger.php:692
-#: include/classes/api/services/CTrigger.php:726
-#: include/classes/api/services/CTrigger.php:819
+#: include/classes/api/services/CTrigger.php:653
+#: include/classes/api/services/CTrigger.php:700
+#: include/classes/api/services/CTrigger.php:734
+#: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
 #: include/classes/api/services/CTriggerPrototype.php:700
 #: include/classes/api/services/CTriggerPrototype.php:718
@@ -12427,7 +12427,7 @@ msgstr ""
 msgid "Not all results are displayed. Please provide more specific search criteria."
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:1041
+#: include/classes/api/services/CTrigger.php:1049
 #: include/classes/api/services/CTriggerPrototype.php:859
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
@@ -14198,8 +14198,8 @@ msgstr ""
 msgid "Recovery expression"
 msgstr ""
 
-#: include/forms.inc.php:1895 include/forms.inc.php:1901
-#: include/forms.inc.php:1910
+#: include/forms.inc.php:1898 include/forms.inc.php:1904
+#: include/forms.inc.php:1913
 msgid "Recovery expression syntax error."
 msgstr ""
 
@@ -14338,7 +14338,7 @@ msgstr "Remote commando"
 #: app/views/popup.media.php:45 app/views/popup.media.php:110
 #: include/classes/widgets/CWidgetHelper.php:490
 #: include/classes/widgets/CWidgetHelper.php:534 include/forms.inc.php:1454
-#: include/forms.inc.php:1983 include/views/configuration.action.edit.php:94
+#: include/forms.inc.php:1986 include/views/configuration.action.edit.php:94
 #: include/views/configuration.action.edit.php:268
 #: include/views/configuration.action.edit.php:296
 #: include/views/configuration.action.edit.php:382
@@ -15737,7 +15737,7 @@ msgstr ""
 msgid "Show"
 msgstr "Toon"
 
-#: app/views/monitoring.latest.view.php:110
+#: app/views/monitoring.latest.view.php:111
 #: app/views/monitoring.problem.view.php:333
 msgid "Show details"
 msgstr "Toon details"
@@ -16585,16 +16585,16 @@ msgstr ""
 msgid "Template"
 msgstr "Template"
 
-#: include/classes/api/services/CHost.php:1109
-#: include/classes/api/services/CTemplate.php:486
+#: include/classes/api/services/CHost.php:1118
+#: include/classes/api/services/CTemplate.php:487
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:1546
-#: include/classes/api/services/CTemplate.php:420
-#: include/classes/api/services/CTemplate.php:1088
+#: include/classes/api/services/CTemplate.php:421
+#: include/classes/api/services/CTemplate.php:1089
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr ""
@@ -16658,17 +16658,17 @@ msgstr ""
 msgid "Template value"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2136
-#: include/classes/api/services/CHost.php:2381
-#: include/classes/api/services/CTemplate.php:1143
+#: include/classes/api/services/CHost.php:2145
+#: include/classes/api/services/CHost.php:2390
+#: include/classes/api/services/CTemplate.php:1144
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2142
-#: include/classes/api/services/CHost.php:2389
-#: include/classes/api/services/CTemplate.php:509
-#: include/classes/api/services/CTemplate.php:1108
+#: include/classes/api/services/CHost.php:2151
+#: include/classes/api/services/CHost.php:2398
+#: include/classes/api/services/CTemplate.php:510
+#: include/classes/api/services/CTemplate.php:1109
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr ""
@@ -17238,7 +17238,7 @@ msgstr ""
 msgid "Trigger added"
 msgstr "Trigger toegevoegd"
 
-#: include/classes/api/services/CTrigger.php:1084
+#: include/classes/api/services/CTrigger.php:1092
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -17455,7 +17455,7 @@ msgstr "Dinsdag"
 msgid "Turkish (tr_TR)"
 msgstr ""
 
-#: include/classes/api/services/CItem.php:1008
+#: include/classes/api/services/CItem.php:1011
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Twee items (\"%1$s\" en \"%2$s\") kunnen niet beiden het host inventory veld \"%3$s\" vullen, dit zal conflicteren."
@@ -17631,11 +17631,11 @@ msgstr "URLs"
 msgid "Ukrainian (uk_UA)"
 msgstr "Oekraïens (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:192
+#: include/classes/core/CConfigFile.php:196
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:202
+#: include/classes/core/CConfigFile.php:205
 msgid "Unable to create the configuration file."
 msgstr ""
 
@@ -17646,7 +17646,7 @@ msgstr ""
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:198
+#: include/classes/core/CConfigFile.php:201
 msgid "Unable to overwrite the existing configuration file."
 msgstr ""
 
@@ -17971,7 +17971,7 @@ msgstr ""
 msgid "Update problem"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1355
+#: include/classes/api/services/CHost.php:1364
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr ""
@@ -18768,7 +18768,7 @@ msgstr ""
 msgid "Visible name"
 msgstr "Zichbare naam"
 
-#: include/classes/api/services/CHost.php:2287
+#: include/classes/api/services/CHost.php:2296
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Zichbare naam mag niet leeg zijn als de hostnaam leeg is."
 
@@ -18999,8 +18999,8 @@ msgstr ""
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1967
-#: include/classes/api/services/CHost.php:2165
+#: include/classes/api/services/CHost.php:1976
+#: include/classes/api/services/CHost.php:2174
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr ""
@@ -19220,8 +19220,8 @@ msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:75
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:947
-#: include/classes/api/services/CHost.php:1012
+#: include/classes/api/services/CHost.php:956
+#: include/classes/api/services/CHost.php:1021
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:528
@@ -19236,11 +19236,11 @@ msgstr ""
 #: include/classes/api/services/CScript.php:560
 #: include/classes/api/services/CTask.php:44
 #: include/classes/api/services/CTask.php:244
-#: include/classes/api/services/CTemplate.php:449
-#: include/classes/api/services/CTemplate.php:605
-#: include/classes/api/services/CTemplate.php:641
-#: include/classes/api/services/CTemplate.php:1080
-#: include/classes/api/services/CTemplate.php:1186
+#: include/classes/api/services/CTemplate.php:450
+#: include/classes/api/services/CTemplate.php:606
+#: include/classes/api/services/CTemplate.php:642
+#: include/classes/api/services/CTemplate.php:1081
+#: include/classes/api/services/CTemplate.php:1187
 #: include/classes/api/services/CUserMacro.php:252
 #: include/classes/api/services/CUserMacro.php:352
 #: include/classes/api/services/CUserMacro.php:447
@@ -19561,7 +19561,7 @@ msgstr ""
 msgid "an empty string is expected"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1904
+#: include/classes/api/services/CHost.php:1913
 #: include/classes/validators/CApiInputValidator.php:1019
 msgid "an even number of hexadecimal characters is expected"
 msgstr ""
@@ -19689,8 +19689,8 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:540
 #: include/classes/api/services/CEvent.php:812
-#: include/classes/api/services/CHost.php:1892
-#: include/classes/api/services/CHost.php:1898
+#: include/classes/api/services/CHost.php:1901
+#: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CItemGeneral.php:454
 #: include/classes/api/services/CItemGeneral.php:481
 #: include/classes/api/services/CItemGeneral.php:487
@@ -20279,7 +20279,7 @@ msgstr "min"
 msgid "min() - Minimum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1910
+#: include/classes/api/services/CHost.php:1919
 #: include/classes/validators/CApiInputValidator.php:1013
 #, c-format
 msgid "minimum length is %1$s characters"
@@ -20529,10 +20529,10 @@ msgid "short description"
 msgstr "korte beschrijving"
 
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CHost.php:1917
-#: include/classes/api/services/CHost.php:1923
+#: include/classes/api/services/CHost.php:1926
 #: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:1938
+#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1947
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:468
@@ -20596,7 +20596,7 @@ msgstr ""
 #: app/views/monitoring.problem.view.php:252
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/widgets/CWidgetHelper.php:475
-#: include/classes/widgets/CWidgetHelper.php:522 include/forms.inc.php:1976
+#: include/classes/widgets/CWidgetHelper.php:522 include/forms.inc.php:1979
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.maintenance.edit.php:176
 #: include/views/configuration.template.list.php:47
@@ -20629,10 +20629,10 @@ msgstr "template ID \"%1$s\" is %2$s keer verwerkt"
 #: include/classes/api/services/CDiscoveryRule.php:1604
 #: include/classes/api/services/CDiscoveryRule.php:1961
 #: include/classes/api/services/CDiscoveryRule.php:1969
-#: include/classes/api/services/CHost.php:2001
-#: include/classes/api/services/CHost.php:2195
+#: include/classes/api/services/CHost.php:2010
+#: include/classes/api/services/CHost.php:2204
 #: include/classes/api/services/CHttpTest.php:742
-#: include/classes/api/services/CTemplate.php:430
+#: include/classes/api/services/CTemplate.php:431
 #: include/classes/validators/CApiInputValidator.php:942
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
@@ -20754,8 +20754,8 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:761
 #: include/classes/api/services/CEvent.php:870
-#: include/classes/api/services/CHost.php:1872
-#: include/classes/api/services/CHost.php:1878
+#: include/classes/api/services/CHost.php:1881
+#: include/classes/api/services/CHost.php:1887
 #: include/classes/api/services/CItemGeneral.php:1253
 #: include/classes/api/services/CItemGeneral.php:1579
 #: include/classes/api/services/CItemGeneral.php:1605
@@ -20795,7 +20795,7 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:530
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
-#: include/forms.inc.php:1981
+#: include/forms.inc.php:1984
 #: include/views/configuration.host.discovery.edit.php:129
 #: include/views/configuration.host.discovery.edit.php:225
 #: include/views/configuration.host.list.php:70
@@ -20862,9 +20862,9 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1687
 #: include/classes/api/services/CDiscoveryRule.php:1708
 #: include/classes/api/services/CEvent.php:772
-#: include/classes/api/services/CHost.php:1022
-#: include/classes/api/services/CHost.php:2057
-#: include/classes/api/services/CHost.php:2212
+#: include/classes/api/services/CHost.php:1031
+#: include/classes/api/services/CHost.php:2066
+#: include/classes/api/services/CHost.php:2221
 #: include/classes/api/services/CMapElement.php:86
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681

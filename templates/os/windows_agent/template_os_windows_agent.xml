@@ -1325,7 +1325,7 @@ return JSON.stringify({"data": output})</params>
          </macros>
          <screens>
             <screen>
-               <name>Netowrk interfaces</name>
+               <name>Network interfaces</name>
                <hsize>1</hsize>
                <vsize>1</vsize>
                <screen_items>
