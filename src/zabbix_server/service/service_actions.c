@@ -38,36 +38,52 @@ static int	condition_match_service_name(const zbx_service_action_condition_t *co
 	return  zbx_strmatch_condition(update->service->name, condition->value, condition->op);
 }
 
+static int	match_tags(const zbx_vector_ptr_t *tags, const char *name, const char *value, unsigned char op)
+{
+	int	i, ret = FAIL, expected_ret;
+
+	if (CONDITION_OPERATOR_EQUAL == op || CONDITION_OPERATOR_LIKE == op)
+	{
+		expected_ret = SUCCEED;
+		ret = FAIL;
+	}
+	else
+	{
+		expected_ret = FAIL;
+		ret = SUCCEED;
+	}
+
+	for (i = 0; i < tags->values_num; i++)
+	{
+		zbx_service_tag_t	*tag = (zbx_service_tag_t *)tags->values[i];
+
+		if (NULL != value)
+		{
+			if (0 == strcmp(tag->name, name))
+				ret = zbx_strmatch_condition(tag->value, value, op);
+			else
+				continue;
+		}
+		else
+			ret = zbx_strmatch_condition(tag->name, name, op);
+
+		if (expected_ret == ret)
+			return ret;
+	}
+
+	return ret;
+}
+
 static int	condition_match_service_tag(const zbx_service_action_condition_t *condition,
 		const zbx_service_update_t *update)
 {
-	int	i;
-
-	for (i = 0; i < update->service->tags.values_num; i++)
-	{
-		zbx_service_tag_t	*tag = (zbx_service_tag_t *)update->service->tags.values[i];
-
-		if (0 == strcmp(tag->name, condition->value))
-			return SUCCEED;
-	}
-
-	return FAIL;
+	return match_tags(&update->service->tags, condition->value, NULL, condition->op);
 }
 
 static int	condition_match_service_tag_value(const zbx_service_action_condition_t *condition,
 		const zbx_service_update_t *update)
 {
-	int	i;
-
-	for (i = 0; i < update->service->tags.values_num; i++)
-	{
-		zbx_service_tag_t	*tag = (zbx_service_tag_t *)update->service->tags.values[i];
-
-		if (0 == strcmp(tag->name, condition->value2) && 0 == strcmp(tag->value, condition->value))
-			return SUCCEED;
-	}
-
-	return FAIL;
+	return match_tags(&update->service->tags, condition->value2, condition->value, condition->op);
 }
 
 static const char	*service_update_match_condition(const zbx_service_update_t *update,
