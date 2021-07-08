@@ -1518,6 +1518,14 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: db_manage_service_events                                         *
+ *                                                                            *
+ * Purpose: generate and process service events in response to service        *
+ *          updates                                                           *
+ *                                                                            *
+ ******************************************************************************/
 static void	db_manage_service_events(zbx_service_manager_t *manager, zbx_hashset_t *service_updates)
 {
 	zbx_hashset_iter_t	iter;
@@ -1958,11 +1966,15 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_action_condition_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
+	memset(&service_manager->config, 0, sizeof(service_manager->config));
+
 }
 
 static void	service_manager_free(zbx_service_manager_t *service_manager)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_config_clean(&service_manager->config);
 
 	zbx_hashset_destroy(&service_manager->service_problems_index);
 	zbx_hashset_destroy(&service_manager->services_links);
@@ -1997,6 +2009,31 @@ static void	dump_events(zbx_hashset_t *events)
 			const zbx_tag_t	*tag = (const zbx_tag_t *)event->tags.values[i];
 
 			zabbix_log(LOG_LEVEL_TRACE, "  tag:'%s' value:'%s'", tag->tag, tag->value);
+		}
+	}
+}
+
+static void	dump_actions(zbx_hashset_t *actions)
+{
+	zbx_hashset_iter_t		iter;
+	zbx_service_action_t		*action;
+	zbx_service_action_condition_t	*condition;
+
+	zbx_hashset_iter_reset(actions, &iter);
+	while (NULL != (action = (zbx_service_action_t *)zbx_hashset_iter_next(&iter)))
+	{
+		int	i;
+
+		zabbix_log(LOG_LEVEL_TRACE, "  actionid:" ZBX_FS_UI64 " evaltype:%d formula:%s", action->actionid,
+						action->evaltype, action->formula);
+
+		for (i = 0; i < action->conditions.values_num; i++)
+		{
+			condition = (zbx_service_action_condition_t *)action->conditions.values[i];
+
+			zabbix_log(LOG_LEVEL_TRACE, "    conditionid:" ZBX_FS_UI64 " type:%d op:%d value:%s value2:%s",
+					condition->conditionid, condition->conditiontype, condition->op,
+					condition->value, condition->value2);
 		}
 	}
 }
@@ -2040,6 +2077,8 @@ static void	service_manager_trace(zbx_service_manager_t *service_manager)
 			service_manager->actions.num_slots);
 	zabbix_log(LOG_LEVEL_TRACE, "action conditions: %d (%d slots)", service_manager->action_conditions.num_data,
 			service_manager->action_conditions.num_slots);
+
+	dump_actions(&service_manager->actions);
 }
 
 static void	recalculate_services(zbx_service_manager_t *service_manager)
@@ -2204,6 +2243,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				sync_actions(&service_manager, revision);
 				sync_action_conditions(&service_manager, revision);
 
+				zbx_config_clean(&service_manager.config);
 				zbx_config_get(&service_manager.config, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
 
 				/* load service problems once during startup */

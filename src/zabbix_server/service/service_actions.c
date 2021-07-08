@@ -21,6 +21,13 @@
 #include "log.h"
 #include "service_actions.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Function: condition_match_service                                          *
+ *                                                                            *
+ * Purpose: match service update by service id                                *
+ *                                                                            *
+ ******************************************************************************/
 static int	condition_match_service(const zbx_service_action_condition_t *condition,
 		const zbx_service_update_t *update)
 {
@@ -32,12 +39,38 @@ static int	condition_match_service(const zbx_service_action_condition_t *conditi
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: condition_match_service_name                                     *
+ *                                                                            *
+ * Purpose: match service update by service name                              *
+ *                                                                            *
+ ******************************************************************************/
 static int	condition_match_service_name(const zbx_service_action_condition_t *condition,
 		const zbx_service_update_t *update)
 {
 	return  zbx_strmatch_condition(update->service->name, condition->value, condition->op);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: match_tags                                                       *
+ *                                                                            *
+ * Purpose: match tag/tag+value using the specified operator                  *
+ *                                                                            *
+ * Parameters: tags  - [IN] the tags to match                                 *
+ *             name  - [IN] the target tag name                               *
+ *             value - [IN] the target tag value (NULL if only tag name are   *
+ *                          being matched                                     *
+ *             op    - [IN] the matching operator (CONDITION_OPERATOR_*)      *
+ *                                                                            *
+ * Return value: SUCCEED - the tags matches                                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: When matching tag+value the operator is using only to match      *
+ *           value - the tag name will be always matched as 'equal'           *
+ *                                                                            *
+ ******************************************************************************/
 static int	match_tags(const zbx_vector_ptr_t *tags, const char *name, const char *value, unsigned char op)
 {
 	int	i, ret = FAIL, expected_ret;
@@ -74,18 +107,39 @@ static int	match_tags(const zbx_vector_ptr_t *tags, const char *name, const char
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: condition_match_service_tag                                      *
+ *                                                                            *
+ * Purpose: match service update by service tag name                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	condition_match_service_tag(const zbx_service_action_condition_t *condition,
 		const zbx_service_update_t *update)
 {
 	return match_tags(&update->service->tags, condition->value, NULL, condition->op);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: condition_match_service_tag_value                                *
+ *                                                                            *
+ * Purpose: match service update by service tag and its value                 *
+ *                                                                            *
+ ******************************************************************************/
 static int	condition_match_service_tag_value(const zbx_service_action_condition_t *condition,
 		const zbx_service_update_t *update)
 {
 	return match_tags(&update->service->tags, condition->value2, condition->value, condition->op);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: service_update_match_condition                                   *
+ *                                                                            *
+ * Purpose: match service update by the specified condition                   *
+ *                                                                            *
+ ******************************************************************************/
 static const char	*service_update_match_condition(const zbx_service_update_t *update,
 		const zbx_service_action_condition_t *condition)
 {
@@ -113,6 +167,13 @@ static const char	*service_update_match_condition(const zbx_service_update_t *up
 	return SUCCEED == ret ? "1" : "0";
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: service_update_match_action                                      *
+ *                                                                            *
+ * Purpose: match service update against the specified action                 *
+ *                                                                            *
+ ******************************************************************************/
 static int	service_update_match_action(const zbx_service_update_t *update, const zbx_service_action_t *action)
 {
 	int		pos = 0, last_pos = 0, index;
@@ -172,6 +233,18 @@ static int	service_update_match_action(const zbx_service_update_t *update, const
 	return SUCCEED == zbx_double_compare(res, 0) ? FAIL : SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: service_update_process_actions                                   *
+ *                                                                            *
+ * Purpose: match service update against service actions                      *
+ *                                                                            *
+ * Parameters: update    - [IN] the service update generated when service     *
+ *                              state changes                                 *
+ *             actions   - [IN] the service actions                           *
+ *             actionids - [OUT] the matched action identifiers               *
+ *                                                                            *
+ ******************************************************************************/
 void	service_update_process_actions(const zbx_service_update_t *update, zbx_hashset_t *actions,
 		zbx_vector_uint64_t *actionids)
 {
