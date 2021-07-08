@@ -482,9 +482,27 @@ class CUserMacro extends CApiService {
 	public function create(array $hostmacros) {
 		$this->validateCreate($hostmacros);
 
+		$this->createReal($hostmacros);
+
+		if ($tpl_hostmacros = $this->getMacrosToInherit($hostmacros)) {
+			$this->inherit($tpl_hostmacros);
+		}
+
+		return ['hostmacroids' => array_column($hostmacros, 'hostmacroid')];
+	}
+
+	/**
+	 * Inserts hostmacros records into the database.
+	 *
+	 * @param array $hostmacros
+	 */
+	private function createReal(array &$hostmacros): void {
 		$hostmacroids = DB::insert('hostmacro', $hostmacros);
 
-		return ['hostmacroids' => $hostmacroids];
+		foreach ($hostmacros as $index => &$hostmacro) {
+			$hostmacro['hostmacroid'] = $hostmacroids[$index];
+		}
+		unset($hostmacro);
 	}
 
 	/**
@@ -512,7 +530,19 @@ class CUserMacro extends CApiService {
 			'preservekeys' => true
 		]);
 
-		if (count($hostmacros) != count($db_hostmacros)) {
+		$inherited_macros_exists = false;
+
+		if ($db_hostmacros) {
+			$host_prototypes = DB::select('hosts', [
+				'output' => ['hostid', 'templateid'],
+				'hostids' => array_unique(array_column($db_hostmacros, 'hostid')),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			]);
+
+			$inherited_macros_exists = (bool) array_diff(array_column($host_prototypes, 'templateid', 'hostid'), ['0']);
+		}
+
+		if (count($hostmacros) != count($db_hostmacros) || $inherited_macros_exists) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
@@ -641,6 +671,22 @@ class CUserMacro extends CApiService {
 	public function update($hostmacros) {
 		$this->validateUpdate($hostmacros, $db_hostmacros);
 
+		$this->updateReal($hostmacros, $db_hostmacros);
+
+		if ($tpl_hostmacros = $this->getMacrosToInherit($hostmacros, $db_hostmacros)) {
+			$this->inherit($tpl_hostmacros);
+		}
+
+		return ['hostmacroids' => array_column($hostmacros, 'hostmacroid')];
+	}
+
+	/**
+	 * Updates hostmacros records in the database.
+	 *
+	 * @param array $hostmacros
+	 * @param array $db_hostmacros
+	 */
+	private function updateReal(array $hostmacros, array $db_hostmacros) {
 		$upd_hostmacros = [];
 
 		foreach ($hostmacros as $hostmacro) {
@@ -659,16 +705,15 @@ class CUserMacro extends CApiService {
 		if ($upd_hostmacros) {
 			DB::update('hostmacro', $upd_hostmacros);
 		}
-
-		return ['hostmacroids' => array_column($hostmacros, 'hostmacroid')];
 	}
 
 	/**
 	 * @param array $hostmacroids
+	 * @param array $db_hostmacros
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array &$hostmacroids) {
+	protected function validateDelete(array &$hostmacroids, array &$db_hostmacros = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostmacroids, '/', $error)) {
@@ -676,13 +721,25 @@ class CUserMacro extends CApiService {
 		}
 
 		$db_hostmacros = $this->get([
-			'output' => [],
+			'output' => ['hostmacroid', 'hostid', 'macro'],
 			'hostmacroids' => $hostmacroids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		if (count($hostmacroids) != count($db_hostmacros)) {
+		$inherited_macros_exists = false;
+
+		if ($db_hostmacros) {
+			$host_prototypes = DB::select('hosts', [
+				'output' => ['hostid', 'templateid'],
+				'hostids' => array_unique(array_column($db_hostmacros, 'hostid')),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			]);
+
+			$inherited_macros_exists = (bool) array_diff(array_column($host_prototypes, 'templateid', 'hostid'), ['0']);
+		}
+
+		if (count($hostmacroids) != count($db_hostmacros) || $inherited_macros_exists) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
@@ -695,9 +752,13 @@ class CUserMacro extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $hostmacroids) {
-		$this->validateDelete($hostmacroids);
+		$this->validateDelete($hostmacroids, $db_hostmacros);
 
 		DB::delete('hostmacro', ['hostmacroid' => $hostmacroids]);
+
+		if ($tpl_hostmacros = $this->getMacrosToInherit($db_hostmacros)) {
+			$this->inherit($tpl_hostmacros, true);
+		}
 
 		return ['hostmacroids' => $hostmacroids];
 	}
@@ -736,11 +797,188 @@ class CUserMacro extends CApiService {
 		$count += API::HostPrototype()->get([
 			'countOutput' => true,
 			'hostids' => $hostids,
-			'editable' => true
+			'editable' => true,
+			'inherited' => false
 		]);
 
 		if ($count != count($hostids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Forms the array of hostmacros, which are support the inheritance, from the passed hostmacros array.
+	 *
+	 * @param array      $hostmacros
+	 * @param string     $hostmacros[]['hostmacroid']
+	 * @param string     $hostmacros[]['hostid']
+	 * @param string     $hostmacros[]['macro']                  (optional)
+	 * @param string     $hostmacros[]['value']                  (optional)
+	 * @param string     $hostmacros[]['description']            (optional)
+	 * @param int        $hostmacros[]['type']                   (optional)
+	 * @param array|null $db_hostmacros                          Used to set the old macro name in case when it was
+	 *                                                           updated.
+	 * @param string     $db_hostmacros[<hostmacroid>]['macro']
+	 *
+	 * @return array
+	 */
+	private function getMacrosToInherit(array $hostmacros, array $db_hostmacros = null): array {
+		$query = DBselect(
+			'SELECT hd.hostid'.
+			' FROM host_discovery hd,items i,hosts h'.
+			' WHERE hd.parent_itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND h.status='.HOST_STATUS_TEMPLATE.
+				' AND '.dbConditionId('hd.hostid', array_unique(array_column($hostmacros, 'hostid')))
+		);
+
+		$templated_host_prototypeids = DBfetchColumn($query, 'hostid');
+
+		if (!$templated_host_prototypeids) {
+			return [];
+		}
+
+		foreach ($hostmacros as $index => &$hostmacro) {
+			if (!in_array($hostmacro['hostid'], $templated_host_prototypeids)) {
+				unset($hostmacros[$index]);
+
+				continue;
+			}
+
+			if ($db_hostmacros) {
+				$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
+				$hostmacro += array_intersect_key($db_hostmacro, array_flip(['macro']));
+
+				if ($hostmacro['macro'] !== $db_hostmacro['macro']) {
+					$hostmacro['macro_old'] = $db_hostmacro['macro'];
+				}
+			}
+		}
+		unset($hostmacro);
+
+		return $hostmacros;
+	}
+
+	/**
+	 * Prepares and returns an array of child hostmacros, inherited from hostmacros $tpl_hostmacros on the all hosts.
+	 *
+	 * @param array  $tpl_hostmacros
+	 * @param string $tpl_hostmacros[]['hostmacroid']
+	 * @param string $tpl_hostmacros[]['hostid']
+	 * @param string $tpl_hostmacros[]['macro']
+	 * @param string $tpl_hostmacros[]['value']        (optional)
+	 * @param string $tpl_hostmacros[]['description']  (optional)
+	 * @param int    $tpl_hostmacros[]['type']         (optional)
+	 * @param string $tpl_hostmacros[]['macro_old']    (optional)
+	 * @param array  $ins_hostmacros
+	 * @param array  $upd_hostmacros
+	 * @param array  $db_hostmacros
+	 */
+	private function prepareInheritedObjects(array $tpl_hostmacros, array &$ins_hostmacros = null,
+			array &$upd_hostmacros = null, array &$db_hostmacros = null): void {
+		$ins_hostmacros = [];
+		$upd_hostmacros = [];
+		$db_hostmacros = [];
+
+		$templateids_hostids = [];
+		$hostids = [];
+
+		$options = [
+			'output' => ['hostid', 'templateid'],
+			'filter' => ['templateid' => array_unique(array_column($tpl_hostmacros, 'hostid'))]
+		];
+		$chd_hosts = DBselect(DB::makeSql('hosts', $options));
+
+		while ($chd_host = DBfetch($chd_hosts)) {
+			$templateids_hostids[$chd_host['templateid']][] = $chd_host['hostid'];
+			$hostids[] = $chd_host['hostid'];
+		}
+
+		if (!$templateids_hostids) {
+			return;
+		}
+
+		$macros = [];
+		foreach ($tpl_hostmacros as $tpl_hostmacro) {
+			if (array_key_exists('macro_old', $tpl_hostmacro)) {
+				$macros[$tpl_hostmacro['macro_old']] = true;
+			}
+			else {
+				$macros[$tpl_hostmacro['macro']] = true;
+			}
+		}
+
+		$chd_hostmacros_all = DB::select('hostmacro', [
+			'output' => ['hostid', 'macro', 'type', 'value', 'description'],
+			'filter' => ['hostid' => $hostids, 'macro' => array_keys($macros)],
+			'preservekeys' => true
+		]);
+
+		$host_macros = array_fill_keys($hostids, []);
+
+		foreach ($chd_hostmacros_all as $hostmacroid => $hostmacro) {
+			$host_macros[$hostmacro['hostid']][$hostmacro['macro']] = $hostmacroid;
+		}
+
+		foreach ($tpl_hostmacros as $tpl_hostmacro) {
+			$templateid = $tpl_hostmacro['hostid'];
+
+			foreach ($templateids_hostids[$templateid] as $hostid) {
+				if (array_key_exists('macro_old', $tpl_hostmacro)) {
+					$hostmacroid = $host_macros[$hostid][$tpl_hostmacro['macro_old']];
+
+					$upd_hostmacros[] = ['hostmacroid' => $hostmacroid, 'hostid' => $hostid] + $tpl_hostmacro;
+					$db_hostmacros[$hostmacroid] = $chd_hostmacros_all[$hostmacroid];
+
+					unset($chd_hostmacros_all[$hostmacroid], $host_macros[$hostid][$tpl_hostmacro['macro_old']]);
+
+				} elseif (array_key_exists($tpl_hostmacro['macro'], $host_macros[$hostid])) {
+					$hostmacroid = $host_macros[$hostid][$tpl_hostmacro['macro']];
+
+					$upd_hostmacros[] = ['hostmacroid' => $hostmacroid, 'hostid' => $hostid] + $tpl_hostmacro;
+					$db_hostmacros[$hostmacroid] = $chd_hostmacros_all[$hostmacroid];
+
+					unset($chd_hostmacros_all[$hostmacroid], $host_macros[$hostid][$tpl_hostmacro['macro']]);
+				}
+				else {
+					$ins_hostmacros[] = ['hostid' => $hostid] + $tpl_hostmacro;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Updates the macros for the children of host prototypes and propagates the inheritance to the child host
+	 * prototypes.
+	 *
+	 * @param array  $tpl_hostmacros
+	 * @param string $tpl_hostmacros[]['hostmacroid']
+	 * @param string $tpl_hostmacros[]['hostid']
+	 * @param string $tpl_hostmacros[]['macro']
+	 * @param string $tpl_hostmacros[]['value']        (optional)
+	 * @param string $tpl_hostmacros[]['description']  (optional)
+	 * @param int    $tpl_hostmacros[]['type']         (optional)
+	 * @param string $tpl_hostmacros[]['macro_old']    (optional)
+	 * @param bool   $is_delete                        Whether the passed hostmacros are intended to delete.
+	 */
+	private function inherit(array $tpl_hostmacros, bool $is_delete = false): void {
+		$this->prepareInheritedObjects($tpl_hostmacros, $ins_hostmacros, $upd_hostmacros, $db_hostmacros);
+
+		if ($ins_hostmacros) {
+			$this->createReal($ins_hostmacros);
+		}
+
+		if ($upd_hostmacros) {
+			if ($is_delete) {
+				DB::delete('hostmacro', ['hostmacroid' => array_column($upd_hostmacros, 'hostmacroid')]);
+			}
+			else {
+				$this->updateReal($upd_hostmacros, $db_hostmacros);
+			}
+		}
+
+		if ($ins_hostmacros || $upd_hostmacros) {
+			$this->inherit(array_merge($ins_hostmacros, $upd_hostmacros), $is_delete);
 		}
 	}
 
