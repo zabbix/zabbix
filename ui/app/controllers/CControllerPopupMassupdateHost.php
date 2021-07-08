@@ -475,7 +475,8 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 			}
 			else {
-				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
+				$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
+					->toString();
 			}
 
 			$this->setResponse(
