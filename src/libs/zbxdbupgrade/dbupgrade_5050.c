@@ -300,7 +300,7 @@ static int	DBpatch_5050016(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_int64_t	roleid;
+		zbx_uint64_t	roleid;
 		int ui_def_access = -1, act_def_access = -1, ui_conf_services = -1;
 
 		ZBX_STR2UINT64(roleid, row[0]);
