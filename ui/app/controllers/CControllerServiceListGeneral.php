@@ -25,6 +25,7 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	private const FILTER_DEFAULT_NAME = '';
 	private const FILTER_DEFAULT_STATUS = SERVICE_STATUS_ANY;
+	private const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_ANY;
 	private const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
 
 	protected $is_filtered = false;
@@ -85,6 +86,10 @@ abstract class CControllerServiceListGeneral extends CController {
 				PROFILE_TYPE_INT
 			);
 
+			CProfile::update('web.service.filter.tag_source',
+				$this->getInput('filter_tag_source', self::FILTER_DEFAULT_TAG_SOURCE), PROFILE_TYPE_INT
+			);
+
 			CProfile::update('web.service.filter.evaltype',
 				$this->getInput('filter_evaltype', self::FILTER_DEFAULT_EVALTYPE), PROFILE_TYPE_INT
 			);
@@ -105,6 +110,7 @@ abstract class CControllerServiceListGeneral extends CController {
 		elseif ($filter_rst) {
 			CProfile::delete('web.service.filter_name');
 			CProfile::delete('web.service.filter_status');
+			CProfile::delete('web.service.filter.tag_source');
 			CProfile::deleteIdx('web.service.filter.evaltype');
 			CProfile::deleteIdx('web.service.filter.tags.tag');
 			CProfile::deleteIdx('web.service.filter.tags.value');
@@ -117,6 +123,7 @@ abstract class CControllerServiceListGeneral extends CController {
 			'serviceid' => CProfile::get('web.service.serviceid', self::WITHOUT_PARENTS_SERVICEID),
 			'name' => CProfile::get('web.service.filter_name', self::FILTER_DEFAULT_NAME),
 			'status' => CProfile::get('web.service.filter_status', self::FILTER_DEFAULT_STATUS),
+			'tag_source' => CProfile::get('web.service.filter.tag_source', self::FILTER_DEFAULT_TAG_SOURCE),
 			'evaltype' => CProfile::get('web.service.filter.evaltype', self::FILTER_DEFAULT_EVALTYPE),
 			'tags' => []
 		];

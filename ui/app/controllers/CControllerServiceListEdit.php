@@ -31,6 +31,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'path' => 'array',
 			'filter_name' => 'string',
 			'filter_status' => 'in '.SERVICE_STATUS_ANY.','.SERVICE_STATUS_OK.','.SERVICE_STATUS_PROBLEM,
+			'filter_tag_source' => 'in '.implode(',', [ZBX_SERVICE_FILTER_TAGS_ANY, ZBX_SERVICE_FILTER_TAGS_SERVICE, ZBX_SERVICE_FILTER_TAGS_PROBLEM]),
 			'filter_evaltype' => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' => 'array',
 			'filter_set' => 'in 1',
@@ -83,6 +84,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 				->setArgument('action', 'service.list.edit.refresh')
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
+				->setArgument('filter_tag_source', $filter['tag_source'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
 				->setArgument('filter_tags', $filter['tags'])
 				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)

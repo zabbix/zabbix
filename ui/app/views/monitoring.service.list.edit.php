@@ -141,14 +141,20 @@ $filter->addFilterTab(_('Filter'), [
 		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 		->addItem([
 			new CLabel(_('Tags')),
-			new CFormField(
+			new CFormField([
+				(new CRadioButtonList('filter_tag_source', (int) $data['filter']['tag_source']))
+					->addValue(_('Any'), ZBX_SERVICE_FILTER_TAGS_ANY)
+					->addValue(_('Service'), ZBX_SERVICE_FILTER_TAGS_SERVICE)
+					->addValue(_('Problem'), ZBX_SERVICE_FILTER_TAGS_PROBLEM)
+					->setModern(true)
+					->addStyle('margin-bottom: 10px;'),
 				CTagFilterFieldHelper::getTagFilterField([
 					'evaltype' => $data['filter']['evaltype'],
 					'tags' => $data['filter']['tags'] ?: [
 						['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 					]
 				])
-			)
+			])
 		])
 ]);
 
