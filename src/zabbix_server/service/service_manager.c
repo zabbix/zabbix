@@ -1540,7 +1540,7 @@ static void	db_manage_service_events(zbx_service_manager_t *manager, zbx_hashset
 	while (NULL != (update = (zbx_service_update_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (update->old_status == update->service->status)
- 			continue;
+			continue;
 
 		if (TRIGGER_SEVERITY_NOT_CLASSIFIED != update->service->status)
 		{
