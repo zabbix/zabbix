@@ -22,17 +22,20 @@
 
 extern char			*CONFIG_HOSTNAMES;
 extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
+extern char			*CONFIG_HOST_METADATA;
 
 static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	AGENT_VERSION(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_agent[] =
-/*	KEY			FLAG		FUNCTION	TEST PARAMETERS */
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"agent.hostname",	0,		AGENT_HOSTNAME,	NULL},
-	{"agent.ping",		0,		AGENT_PING,	NULL},
-	{"agent.version",	0,		AGENT_VERSION,	NULL},
+	{"agent.hostname",	0,		AGENT_HOSTNAME,		NULL},
+	{"agent.hostmetadata",	0,		AGENT_HOSTMETADATA,	NULL},
+	{"agent.ping",		0,		AGENT_PING,		NULL},
+	{"agent.version",	0,		AGENT_VERSION,		NULL},
 	{NULL}
 };
 
@@ -50,6 +53,15 @@ static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 		SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOSTNAME));
+
+	return SYSINFO_RET_OK;
+}
+
+static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	ZBX_UNUSED(request);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(CONFIG_HOST_METADATA)));
 
 	return SYSINFO_RET_OK;
 }

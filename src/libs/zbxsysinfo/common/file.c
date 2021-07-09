@@ -1062,3 +1062,37 @@ err:
 	return ret;
 }
 #endif
+
+int	VFS_FILE_PERMISSIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		*filename;
+	int		ret = SYSINFO_RET_FAIL;
+	zbx_stat_t	st;
+
+	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		goto err;
+	}
+
+	filename = get_rparam(request, 0);
+
+	if (NULL == filename || '\0' == *filename)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		goto err;
+	}
+
+	if (SUCCEED != zbx_stat(filename, &st))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain file information."));
+		goto err;
+	}
+
+	SET_STR_RESULT(result, zbx_dsprintf(NULL, "%x%x%x%x", ((S_ISUID | S_ISGID | S_ISVTX) & st.st_mode) >> 9,
+			(S_IRWXU & st.st_mode) >> 6, (S_IRWXG & st.st_mode) >> 3, S_IRWXO & st.st_mode));
+
+	ret = SYSINFO_RET_OK;
+err:
+	return ret;
+}

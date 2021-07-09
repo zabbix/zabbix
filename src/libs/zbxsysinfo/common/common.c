@@ -74,6 +74,7 @@ ZBX_METRIC	parameters_common[] =
 	{"vfs.file.md5sum",	CF_HAVEPARAMS,	VFS_FILE_MD5SUM,	VFS_TEST_FILE},
 	{"vfs.file.cksum",	CF_HAVEPARAMS,	VFS_FILE_CKSUM,		VFS_TEST_FILE},
 	{"vfs.file.owner",	CF_HAVEPARAMS,	VFS_FILE_OWNER,		VFS_TEST_FILE ",user,name"},
+	{"vfs.file.permissions",CF_HAVEPARAMS,	VFS_FILE_PERMISSIONS,	VFS_TEST_FILE},
 
 	{"vfs.dir.size",	CF_HAVEPARAMS,	VFS_DIR_SIZE,		VFS_TEST_DIR},
 	{"vfs.dir.count",	CF_HAVEPARAMS,	VFS_DIR_COUNT,		VFS_TEST_DIR},
