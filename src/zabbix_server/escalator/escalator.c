@@ -1338,7 +1338,16 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	}
 
 	mediatypeid = 0;
-	priority = EVENT_SOURCE_TRIGGERS == event->source ? event->trigger.priority : TRIGGER_SEVERITY_NOT_CLASSIFIED;
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		priority = event->trigger.priority;
+	}
+	else if (EVENT_SOURCE_SERVICE == event->source)
+	{
+		priority = NULL == service_alarm ? event->severity : service_alarm->value;
+	}
+	else
+		priority = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 
 	while (NULL != (row = DBfetch(result)))
 	{
