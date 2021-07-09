@@ -22,8 +22,8 @@
 
 typedef struct
 {
-	char	*field_name;
-	size_t	max_len;
+	const char	*field_name;
+	size_t		max_len;
 }
 zbx_field_len_t;
 
