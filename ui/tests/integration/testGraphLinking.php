@@ -208,7 +208,6 @@ class testGraphLinking extends CIntegrationTest {
 	}
 
 	public function checkGraphsCreate() {
-
 		$response = $this->call('host.get', ['filter' => ['host' => self::HOST_NAME]]);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('host', $response['result'][0]);
@@ -294,7 +293,7 @@ class testGraphLinking extends CIntegrationTest {
 	*
 	* @required-components server
 	*/
-	public function testGraphLinking_checkMe() {
+	public function testGraphLinking_checkGraphsCreate() {
 
 		$this->reloadConfigurationCache();
 
