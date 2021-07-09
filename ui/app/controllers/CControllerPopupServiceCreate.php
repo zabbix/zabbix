@@ -25,27 +25,23 @@ class CControllerPopupServiceCreate extends CController {
 		$fields = [
 			'name' =>				'required|db services.name|not_empty',
 			'parent_serviceids' =>	'array_db services.serviceid',
-			'algorithm' =>			'db services.algorithm|in '.implode(',', [SERVICE_ALGORITHM_NONE, SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN]),
-			'triggerid' =>			'db services.triggerid',
+			'algorithm' =>			'required|db services.algorithm|in '.implode(',', [SERVICE_ALGORITHM_NONE, SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN]),
+			'problem_tags' =>		'array',
 			'sortorder' =>			'required|db services.sortorder|ge 0|le 999',
 			'showsla' =>			'db services.showsla|in '.SERVICE_SHOW_SLA_OFF.','.SERVICE_SHOW_SLA_ON,
 			'goodsla' =>			'string',
 			'times' =>				'array',
 			'tags' =>				'array',
-			'child_serviceids' =>	'array_db services.serviceid',
-			'form_refresh' =>		'int32'
+			'child_serviceids' =>	'array_db services.serviceid'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
 			);
 		}
 
@@ -59,42 +55,51 @@ class CControllerPopupServiceCreate extends CController {
 
 	protected function doAction(): void {
 		$service = [
-			'showsla' => SERVICE_SHOW_SLA_OFF
+			'showsla' => SERVICE_SHOW_SLA_OFF,
+			'tags' => [],
+			'problem_tags' => [],
+			'parents' => [],
+			'children' => [],
+			'times' => $this->getInput('times', [])
 		];
 
-		$this->getInputs($service, ['name', 'algorithm', 'triggerid', 'sortorder', 'showsla', 'goodsla']);
-
-		foreach ($this->getInput('parent_serviceids', []) as $parent_serviceid) {
-			$service['parents'][] = ['serviceid' => $parent_serviceid];
-		}
-
-		if ($this->hasInput('times')) {
-			$service['times'] = $this->getInput('times');
-		}
+		$this->getInputs($service, ['name', 'algorithm', 'sortorder', 'showsla', 'goodsla']);
 
 		foreach ($this->getInput('tags', []) as $tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {
 				continue;
 			}
+
 			$service['tags'][] = $tag;
 		}
 
-		foreach ($this->getInput('child_serviceids', []) as $child_serviceid) {
-			$service['children'][] = ['serviceid' => $child_serviceid];
+		foreach ($this->getInput('problem_tags', []) as $problem_tag) {
+			if ($problem_tag['tag'] === '' && $problem_tag['value'] === '') {
+				continue;
+			}
+
+			$service['problem_tags'][] = $problem_tag;
+		}
+
+		foreach ($this->getInput('parent_serviceids', []) as $serviceid) {
+			$service['parents'][] = ['serviceid' => $serviceid];
+		}
+
+		foreach ($this->getInput('child_serviceids', []) as $serviceid) {
+			$service['children'][] = ['serviceid' => $serviceid];
 		}
 
 		$result = API::Service()->create($service);
 
 		if ($result) {
-			$output['title'] = _('Service created');
-			$messages = CMessageHelper::getMessages();
+			$output = ['title' => _('Service created')];
 
-			if ($messages) {
+			if ($messages = CMessageHelper::getMessages()) {
 				$output['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
-			$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
+			$output = ['errors' => makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString()];
 		}
 
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());

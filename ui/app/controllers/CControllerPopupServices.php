@@ -27,8 +27,9 @@ class CControllerPopupServices extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'title' =>			'string|required',
-			'filter_name' =>	'string'
+			'title' =>				'string|required',
+			'filter_name' =>		'string',
+			'exclude_serviceids' =>	'array_db services.serviceid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -49,20 +50,27 @@ class CControllerPopupServices extends CController {
 	}
 
 	protected function doAction() {
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+		$exclude_serviceids = $this->getInput('exclude_serviceids', []);
+
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + count($exclude_serviceids);
 
 		$services = API::Service()->get([
-			'output' => ['serviceid', 'name', 'algorithm', 'triggerid'],
-			'selectTrigger' => ['description'],
+			'output' => ['serviceid', 'name', 'algorithm'],
+			'selectProblemTags' => ['tag', 'value'],
 			'search' => ['name' => $this->hasInput('filter_name') ? $this->getInput('filter_name') : null],
-			'limit' => $limit
+			'limit' => $limit,
+			'preservekeys' => true
 		]);
+
+		$services = array_diff_key($services, array_flip($exclude_serviceids));
+		$services = array_slice($services, 0, $limit);
 
 		$data = [
 			'title' => $this->getInput('title'),
 			'filter' => [
 				'name' => $this->getInput('filter_name', '')
 			],
+			'exclude_serviceids' => $exclude_serviceids,
 			'services' => $services,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

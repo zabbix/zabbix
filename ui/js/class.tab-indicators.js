@@ -34,8 +34,6 @@ const TAB_INDICATOR_UPDATE_EVENT = 'tab-indicator-update';
 class TabIndicators {
 
 	constructor() {
-		console.log('tabin');
-
 		try {
 			this.form = this.getForm();
 			this.activateIndicators();

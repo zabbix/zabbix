@@ -52,10 +52,11 @@ class CControllerPopupServiceEdit extends CController {
 
 		if ($this->hasInput('serviceid')) {
 			$this->service = API::Service()->get([
-				'output' => ['serviceid', 'name', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder'],
+				'output' => ['serviceid', 'name', 'algorithm', 'showsla', 'goodsla', 'sortorder'],
 				'selectParents' => ['serviceid', 'name'],
-				'selectChildren' => ['serviceid', 'name', 'triggerid'],
+				'selectChildren' => ['serviceid', 'name', 'algorithm'],
 				'selectTags' => ['tag', 'value'],
+				'selectProblemTags' => ['tag', 'operator', 'value'],
 				'selectTimes' => ['type', 'ts_from', 'ts_to', 'note'],
 				'serviceids' => $this->getInput('serviceid')
 			]);
@@ -65,53 +66,27 @@ class CControllerPopupServiceEdit extends CController {
 			}
 
 			$this->service = $this->service[0];
-
-			CArrayHelper::sort($this->service['parents'], ['name']);
-			CArrayHelper::sort($this->service['parents'], ['name']);
-			CArrayHelper::sort($this->service['children'], ['name']);
-			CArrayHelper::sort($this->service['times'], ['type', 'ts_from', 'ts_to']);
 		}
 
 		return true;
 	}
 
 	protected function doAction(): void {
-		$trigger_descriptions = [];
-
 		if ($this->service !== null) {
-			$triggerids = [];
+			CArrayHelper::sort($this->service['parents'], ['name']);
+			$this->service['parents'] = array_values($this->service['parents']);
 
-			if ($this->service['triggerid'] != 0) {
-				$triggerids[$this->service['triggerid']] = true;
-			}
+			CArrayHelper::sort($this->service['children'], ['name']);
+			$this->service['children'] = array_values($this->service['children']);
 
-			foreach ($this->service['children'] as $service) {
-				if ($service['triggerid'] != 0) {
-					$triggerids[$service['triggerid']] = true;
-				}
-			}
+			CArrayHelper::sort($this->service['tags'], ['tag', 'value']);
+			$this->service['tags'] = array_values($this->service['tags']);
 
-			if ($triggerids) {
-				$triggerids = array_keys($triggerids);
+			CArrayHelper::sort($this->service['problem_tags'], ['tag', 'value', 'operator']);
+			$this->service['problem_tags'] = array_values($this->service['problem_tags']);
 
-				$triggers = API::Trigger()->get([
-					'output' => ['description'],
-					'selectHosts' => ['name'],
-					'expandDescription' => true,
-					'triggerids' => $triggerids,
-					'preservekeys' => true
-				]);
-
-				foreach ($triggerids as $triggerid) {
-					if (array_key_exists($triggerid, $triggers)) {
-						$trigger_descriptions[$triggerid] = $triggers[$triggerid]['hosts'][0]['name'].NAME_DELIMITER.
-							$triggers[$triggerid]['description'];
-					}
-					else {
-						$trigger_descriptions[$triggerid] = _('Inaccessible trigger');
-					}
-				}
-			}
+			CArrayHelper::sort($this->service['times'], ['type', 'ts_from', 'ts_to']);
+			$this->service['times'] = array_values($this->service['times']);
 		}
 
 		if ($this->service !== null) {
@@ -127,17 +102,37 @@ class CControllerPopupServiceEdit extends CController {
 			$parents = [];
 		}
 
+		$children_problem_tags_html = [];
+
+		if ($this->service !== null) {
+			$children_serviceids = array_column($this->service['children'], 'serviceid');
+
+			$children = API::Service()->get([
+				'output' => [],
+				'selectProblemTags' => ['tag', 'value'],
+				'serviceids' => $children_serviceids,
+				'preservekeys' => true
+			]);
+
+			foreach ($children_serviceids as $serviceid) {
+				$children_problem_tags_html[$serviceid] = array_key_exists($serviceid, $children)
+					? implode('', CServiceHelper::makeProblemTagsHtml($children[$serviceid]['problem_tags']))
+					: '';
+			}
+		}
+
 		$defaults = DB::getDefaults('services');
 
 		$data = [
 			'title' => _('Service'),
 			'serviceid' => $this->service !== null ? $this->service['serviceid'] : null,
+			'form_action' => $this->service !== null ? 'popup.service.update' : 'popup.service.create',
 			'form' => [
 				'name' => $this->service !== null ? $this->service['name'] : $defaults['name'],
 				'parents' => $parents,
 				'children' => $this->service !== null ? $this->service['children'] : [],
-				'algorithm' => $this->service !== null ? $this->service['algorithm'] : $defaults['algorithm'],
-				'triggerid' => $this->service !== null ? $this->service['triggerid'] : 0,
+				'children_problem_tags_html' => $children_problem_tags_html,
+				'algorithm' => $this->service !== null ? $this->service['algorithm'] : SERVICE_ALGORITHM_MAX,
 				'sortorder' => $this->service !== null ? $this->service['sortorder'] : $defaults['sortorder'],
 				'showsla' => $this->service !== null ? $this->service['showsla'] : $defaults['showsla'],
 				'goodsla' => $this->service !== null ? $this->service['goodsla'] : $defaults['goodsla'],
@@ -145,7 +140,9 @@ class CControllerPopupServiceEdit extends CController {
 				'tags' => ($this->service !== null && $this->service['tags'])
 					? $this->service['tags']
 					: [['tag' => '', 'value' => '']],
-				'trigger_descriptions' => $trigger_descriptions
+				'problem_tags' => ($this->service !== null && $this->service['problem_tags'])
+					? $this->service['problem_tags']
+					: [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_EQUAL]]
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

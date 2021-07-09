@@ -26,12 +26,14 @@
 $form = (new CForm())
 	->setId('service-form')
 	->setName('service-form')
-	->addVar('action', $data['serviceid'] === null ? 'popup.service.create' : 'popup.service.update')
+	->addVar('action', $data['form_action'])
 	->addVar('serviceid', $data['serviceid'])
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
 $form->addItem((new CInput('submit'))->addStyle('display: none;'));
+
+// Service tab.
 
 $parent_services = (new CMultiSelect([
 	'name' => 'parent_serviceids[]',
@@ -65,31 +67,45 @@ $service_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Trigger'), 'trigger'),
-		new CFormField([
-			[
-				(new CTextBox('trigger',
-					$data['form']['triggerid'] != 0
-						? $data['form']['trigger_descriptions'][$data['form']['triggerid']]
-						: '',
-					true
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-				new CVar('triggerid', $data['form']['triggerid'])
-			],
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('trigger-button', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('PopUp("popup.generic",'.json_encode([
-					'srctbl' => 'triggers',
-					'srcfld1' => 'triggerid',
-					'srcfld2' => 'description',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'triggerid',
-					'dstfld2' => 'trigger',
-					'real_hosts' => '1',
-					'with_triggers' => '1'
-				]).', null, this);')
-		])
+		(new CLabel(_('Problem tags')))->setId('problem_tags_label'),
+		(new CFormField())
+			->setId('problem_tags_field')
+			->addItem([
+				(new CTable())
+					->setId('problem_tags')
+					->addStyle('width: auto;')
+					->addRow(
+						(new CCol(
+							(new CSimpleButton(_('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('element-table-add')
+						))->setColSpan(4)
+					),
+				(new CScriptTemplate('problem-tag-row-tmpl'))
+					->addItem(
+						(new CRow([
+							(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
+								DB::getFieldLength('service_problem_tag', 'tag')
+							))
+								->setAttribute('placeholder', _('tag'))
+								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+							(new CSelect('problem_tags[#{rowNum}][operator]'))
+								->addOptions(CSelect::createOptionsFromArray([
+									TAG_OPERATOR_EQUAL => _('Equals'),
+									TAG_OPERATOR_LIKE => _('Contains')
+								]))
+								->setValue(TAG_OPERATOR_EQUAL),
+							(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
+								DB::getFieldLength('service_problem_tag', 'value')
+							))
+								->setAttribute('placeholder', _('value'))
+								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+							(new CSimpleButton(_('Remove')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('element-table-remove')
+						]))->addClass('form_row')
+					)
+			])
 	])
 	->addItem([
 		(new CLabel(_('Sort order (0->999)'), 'sortorder'))->setAsteriskMark(),
@@ -99,6 +115,8 @@ $service_tab = (new CFormGrid())
 				->setAriaRequired()
 		)
 	]);
+
+// SLA tab.
 
 $times = (new CTable())
 	->setId('times')
@@ -140,10 +158,25 @@ $sla_tab = (new CFormGrid())
 		])
 	]);
 
+// Tags tab.
+
+$tags_tab = new CPartial('configuration.tags.tab', [
+	'source' => 'service',
+	'tags' => $data['form']['tags'],
+	'readonly' => false
+]);
+
+// Child services tab.
+
 $child_services = (new CTable())
 	->setId('children')
 	->setHeader(
-		(new CRowHeader([_('Service'), _('Trigger'), _('Action')]))->addClass(ZBX_STYLE_GREY)
+		(new CRowHeader([
+			_('Service'),
+			_('Status calculation'),
+			_('Problem tags'),
+			_('Action')
+		]))->addClass(ZBX_STYLE_GREY)
 	)
 	->addItem(
 		(new CTag('tfoot', true))
@@ -152,7 +185,7 @@ $child_services = (new CTable())
 					(new CSimpleButton(_('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('js-add')
-				))->setColSpan(3)
+				))->setColSpan(4)
 			)
 	);
 
@@ -167,36 +200,30 @@ $child_services_tab = (new CFormGrid())
 		])
 	]);
 
-$tags_tab = new CPartial('configuration.tags.tab', [
-	'source' => 'service',
-	'tags' => $data['form']['tags'],
-	'readonly' => false
-]);
-
 $tabs = (new CTabView())
 	->setSelected(0)
 	->addTab('service-tab', _('Service'), $service_tab)
 	->addTab('sla-tab', _('SLA'), $sla_tab)
-	->addTab('child-services-tab', _('Child services'), $child_services_tab, TAB_INDICATOR_CHILD_SERVICES)
-	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS);
+	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
+	->addTab('child-services-tab', _('Child services'), $child_services_tab, TAB_INDICATOR_CHILD_SERVICES);
+
+// Output.
 
 $form->addItem($tabs);
-
-$script_inline = getPagePostJs();
-$script_inline .= $this->readJsFile('popup.service.edit.js.php');
 
 $output = [
 	'header' => $data['title'],
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => $data['serviceid'] === null ? _('Add') : _('Update'),
+			'title' => $data['serviceid'] !== null ? _('Update') : _('Add'),
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'service_edit_popup.submit();'
 		]
 	],
-	'script_inline' => $script_inline
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.service.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
