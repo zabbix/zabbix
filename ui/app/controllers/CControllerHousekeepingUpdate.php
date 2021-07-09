@@ -31,8 +31,6 @@ class CControllerHousekeepingUpdate extends CController {
 			'hk_history_mode'		=> 'db config.hk_history_mode',
 			'hk_sessions'			=> 'db config.hk_sessions|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
 			'hk_sessions_mode'		=> 'db config.hk_sessions_mode|in 1',
-			'hk_audit'				=> 'db config.hk_audit|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
-			'hk_audit_mode'			=> 'db config.hk_audit_mode|in 1',
 			'hk_services'			=> 'db config.hk_services|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
 			'hk_services_mode'		=> 'db config.hk_services_mode|in 1',
 			'hk_events_autoreg'		=> 'db config.hk_events_autoreg|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
@@ -49,14 +47,14 @@ class CControllerHousekeepingUpdate extends CController {
 		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'housekeeping.edit')
-						->getUrl()
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'housekeeping.edit')
+							->getUrl()
 					);
 					$response->setFormData($this->getInputAll() + [
 						'hk_events_mode' => '0',
 						'hk_services_mode' => '0',
-						'hk_audit_mode' => '0',
 						'hk_sessions_mode' => '0',
 						'hk_history_mode' => '0',
 						'hk_history_global' => '0',
@@ -84,7 +82,6 @@ class CControllerHousekeepingUpdate extends CController {
 		$hk = [
 			CHousekeepingHelper::HK_EVENTS_MODE => $this->getInput('hk_events_mode', 0),
 			CHousekeepingHelper::HK_SERVICES_MODE => $this->getInput('hk_services_mode', 0),
-			CHousekeepingHelper::HK_AUDIT_MODE => $this->getInput('hk_audit_mode', 0),
 			CHousekeepingHelper::HK_SESSIONS_MODE => $this->getInput('hk_sessions_mode', 0),
 			CHousekeepingHelper::HK_HISTORY_MODE => $this->getInput('hk_history_mode', 0),
 			CHousekeepingHelper::HK_HISTORY_GLOBAL => $this->getInput('hk_history_global', 0),
@@ -110,10 +107,6 @@ class CControllerHousekeepingUpdate extends CController {
 			$hk[CHousekeepingHelper::HK_SERVICES] = $this->getInput('hk_services');
 		}
 
-		if ($hk[CHousekeepingHelper::HK_AUDIT_MODE] == 1) {
-			$hk[CHousekeepingHelper::HK_AUDIT] = $this->getInput('hk_audit');
-		}
-
 		if ($hk[CHousekeepingHelper::HK_SESSIONS_MODE] == 1) {
 			$hk[CHousekeepingHelper::HK_SESSIONS] = $this->getInput('hk_sessions');
 		}
@@ -128,8 +121,8 @@ class CControllerHousekeepingUpdate extends CController {
 
 		$result = API::Housekeeping()->update($hk);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'housekeeping.edit')
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
 		);
 
 		if ($result) {
