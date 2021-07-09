@@ -115,7 +115,7 @@ class CDataHelper extends CAPIHelper {
 	 * @return array
 	 */
 	public static function createHosts($params) {
-		return static::executeHostTemplateCreation($params, 'host');
+		return static::createHostTemplate($params, 'host');
 	}
 
 	/**
@@ -126,7 +126,7 @@ class CDataHelper extends CAPIHelper {
 	 * @return array
 	 */
 	public static function createTemplates($params) {
-		return static::executeHostTemplateCreation($params, 'template');
+		return static::createHostTemplate($params, 'template');
 	}
 
 	/**
@@ -137,7 +137,7 @@ class CDataHelper extends CAPIHelper {
 	 *
 	 * @return array
 	 */
-	public static function executeHostTemplateCreation($params, $object) {
+	public static function createHostTemplate($params, $object) {
 		$items = [];
 		$discoveryrules = [];
 		foreach ($params as &$param) {

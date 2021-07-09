@@ -111,10 +111,7 @@ trait TableTrait {
 			return;
 		}
 
-		$rows = $table->findRows($column, $data);
-		foreach ($rows as $row) {
-			$row->select();
-		}
+		$table->findRows($column, $data)->select();
 	}
 
 	/**

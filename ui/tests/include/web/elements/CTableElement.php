@@ -178,21 +178,22 @@ class CTableElement extends CElement {
 	/**
 	 * Find rows by column value or by criteria in function.
 	 *
-	 * @param array $param   column name or function
-	 * @param mixed $data    row data
+	 * @param callable $param		column name or function
+	 * @param mixed $data			row data
 	 *
 	 * @return CElementCollection
 	 */
 	public function findRows($param, $data = []) {
+		$rows = [];
+
 		if (is_callable($param)) {
 			foreach ($this->getRows() as $i => $row) {
 				if (call_user_func($param, $row)) {
-					$result[$i] = $row;
+					$rows[$i] = $row;
 				}
 			}
 		}
 		else {
-			$rows = [];
 			if (!is_array($data)) {
 				$data = [$data];
 			}
@@ -202,11 +203,9 @@ class CTableElement extends CElement {
 					$rows[] = $row;
 				}
 			}
-
-			$result = new CElementCollection($rows, CTableRowElement::class);
 		}
 
-		return $result;
+		return new CElementCollection($rows, CTableRowElement::class);
 	}
 
 	/**
