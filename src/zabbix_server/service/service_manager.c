@@ -1402,6 +1402,33 @@ static void	its_itservice_update_status(zbx_service_t *itservice, const zbx_time
 	}
 }
 
+static char	*service_get_event_name(zbx_service_manager_t *manager, const char *name, int status)
+{
+	const char	*severity;
+
+
+	switch (status)
+	{
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			severity = "OK";
+			break;
+		case TRIGGER_SEVERITY_INFORMATION:
+		case TRIGGER_SEVERITY_WARNING:
+		case TRIGGER_SEVERITY_AVERAGE:
+		case TRIGGER_SEVERITY_HIGH:
+		case TRIGGER_SEVERITY_DISASTER:
+			severity = manager->config.severity_name[status];
+			break;
+		default:
+			severity = "unknown";
+	}
+
+	if (NULL != name)
+		return zbx_dsprintf(NULL, "Status of service \"%s\" changed to %s", name, severity);
+	else
+		return zbx_dsprintf(NULL, "Status of unknown service changed to %s", severity);
+}
+
 static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_vector_ptr_t *updates)
 {
 	const zbx_service_update_t	*update;
@@ -1409,9 +1436,7 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 	zbx_db_insert_t			db_insert_events, db_insert_problem, db_insert_event_tag, db_insert_problem_tag,
 					db_insert_escalations;
 	zbx_uint64_t			eventid;
-	char				*name = NULL;
-	const char			*severity;
-	size_t				name_alloc = 0, name_offset = 0;
+	char				*name;
 	zbx_vector_uint64_t		*actionids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() updates:%d", __func__, updates->values_num);
@@ -1451,13 +1476,7 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 
 		update = (const zbx_service_update_t *)updates->values[i];
 
-		if (0 <= update->service->status && TRIGGER_SEVERITY_COUNT > update->service->status)
-			severity = manager->config.severity_name[update->service->status];
-		else
-			severity = "unknown";
-
-		zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "Status of service \"%s\" changed to %s",
-				update->service->name, severity);
+		name = service_get_event_name(manager, update->service->name, update->service->status);
 
 		zbx_db_insert_add_values(&db_insert_events, eventid, EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE,
 				update->service->serviceid, update->ts.sec, SERVICE_VALUE_PROBLEM, update->ts.ns, name,
@@ -1482,7 +1501,7 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 		}
 
 		eventid++;
-		name_offset = 0;
+		zbx_free(name);
 	}
 
 	zbx_free(name);
@@ -1510,6 +1529,137 @@ out:
 		zbx_vector_uint64_destroy(&actionids[i]);
 
 	zbx_free(actionids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_vector_ptr_t *updates)
+{
+	int				i, j, index;
+	const zbx_service_update_t	*update;
+	zbx_vector_uint64_t		serviceids;
+	zbx_vector_uint64_pair_t	problem_service, recovery;
+	DB_ROW				row;
+	DB_RESULT			result;
+	char				*sql = NULL, *name;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t			eventid;
+	zbx_db_insert_t			db_insert_events, db_insert_recovery;
+	zbx_uint64_pair_t		pair;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() updates:%d", __func__, updates->values_num);
+
+	zbx_vector_uint64_create(&serviceids);
+	zbx_vector_uint64_pair_create(&problem_service);
+	zbx_vector_uint64_pair_create(&recovery);
+
+	for (i = 0; i < updates->values_num; i++)
+	{
+		update = (const zbx_service_update_t *)updates->values[i];
+		zbx_vector_uint64_append(&serviceids, update->service->serviceid);
+	}
+
+	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select eventid,objectid from problem"
+			" where source=%d"
+				" and object=%d"
+				" and",
+			EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", serviceids.values, serviceids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and r_eventid is null");
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(pair.first, row[0]);
+		ZBX_DBROW2UINT64(pair.second, row[1]);
+		zbx_vector_uint64_pair_append(&problem_service, pair);
+	}
+
+	DBfree_result(result);
+
+	if (0 == problem_service.values_num)
+		goto out;
+
+	/* insert recovery events */
+
+	zbx_db_insert_prepare(&db_insert_events, "events", "eventid", "source", "object", "objectid", "clock", "value",
+			"ns", "name", "severity", NULL);
+
+	eventid = DBget_maxid_num("events", problem_service.values_num);
+
+	for (i = 0; i < problem_service.values_num; i++)
+	{
+		zbx_timespec_t	ts;
+
+		for (j = 0; j < updates->values_num; j++)
+		{
+			update = (zbx_service_update_t *)updates->values[j];
+
+			if (problem_service.values[i].second == update->service->serviceid)
+			{
+				name = service_get_event_name(manager, update->service->name,
+						TRIGGER_SEVERITY_NOT_CLASSIFIED);
+				ts = update->ts;
+				break;
+			}
+		}
+
+		if (j == updates->values_num)
+		{
+			zbx_timespec(&ts);
+			name = service_get_event_name(manager, NULL, TRIGGER_SEVERITY_NOT_CLASSIFIED);
+		}
+
+		zbx_db_insert_add_values(&db_insert_events, eventid, EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE,
+				problem_service.values[i].second, ts.sec, SERVICE_VALUE_OK, ts.ns, name,
+				TRIGGER_SEVERITY_NOT_CLASSIFIED);
+
+		zbx_free(name);
+
+		pair.first = problem_service.values[i].first;
+		pair.second = eventid++;
+		zbx_vector_uint64_pair_append(&recovery, pair);
+	}
+
+	zbx_db_insert_execute(&db_insert_events);
+	zbx_db_insert_clean(&db_insert_events);
+
+	/* update problems, escalations and link problems with recovery events */
+
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	zbx_db_insert_prepare(&db_insert_recovery, "event_recovery", "eventid", "r_eventid", NULL);
+
+	for (i = 0; i < recovery.values_num; i++)
+	{
+		zbx_db_insert_add_values(&db_insert_recovery, recovery.values[i].first, recovery.values[i].second);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update problem set r_eventid=" ZBX_FS_UI64
+				" where eventid=" ZBX_FS_UI64 ";\n", recovery.values[i].second, recovery.values[i].first);
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update escalations set r_eventid=" ZBX_FS_UI64
+				" where eventid=" ZBX_FS_UI64 ";\n", recovery.values[i].second, recovery.values[i].first);
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_db_insert_execute(&db_insert_recovery);
+	zbx_db_insert_clean(&db_insert_recovery);
+out:
+	zbx_free(sql);
+	zbx_vector_uint64_pair_destroy(&recovery);
+	zbx_vector_uint64_pair_destroy(&problem_service);
+	zbx_vector_uint64_destroy(&serviceids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1552,7 +1702,10 @@ static void	db_manage_service_events(zbx_service_manager_t *manager, zbx_hashset
 	if (0 != events_create.values_num)
 		db_create_service_events(manager, &events_create);
 
-	// TODO: handle events_resolve, and events_update
+	if (0 != events_resolve.values_num)
+		db_resolve_service_events(manager, &events_resolve);
+
+	/* TODO: handle events_update */
 
 	zbx_vector_ptr_destroy(&events_update);
 	zbx_vector_ptr_destroy(&events_resolve);
