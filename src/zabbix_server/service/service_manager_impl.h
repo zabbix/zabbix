@@ -48,12 +48,29 @@ typedef struct
 }
 zbx_service_t;
 
+/* status update queue items */
+typedef struct
+{
+	/* the update source id */
+	zbx_uint64_t	sourceid;
+	/* the servicealarmid that was assigned when flushing alarms */
+	zbx_uint64_t	servicealarmid;
+	/* the new status */
+	int		status;
+	/* timestamp */
+	int		clock;
+}
+zbx_status_update_t;
+
 /* service update queue items */
 typedef struct
 {
 	const zbx_service_t	*service;
 	int			old_status;
 	zbx_timespec_t		ts;
+
+	/* the last status update source */
+	zbx_status_update_t	*alarm;
 }
 zbx_service_update_t;
 

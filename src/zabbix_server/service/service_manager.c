@@ -1071,18 +1071,6 @@ static void	service_problems_index_clean(void *data)
 	zbx_vector_ptr_destroy(&d->services);
 }
 
-/* status update queue items */
-typedef struct
-{
-	/* the update source id */
-	zbx_uint64_t	sourceid;
-	/* the new status */
-	int		status;
-	/* timestamp */
-	int		clock;
-}
-zbx_status_update_t;
-
 /******************************************************************************
  *                                                                            *
  * Function: its_updates_append                                               *
@@ -1094,8 +1082,10 @@ zbx_status_update_t;
  *             status    - [IN] the update status                             *
  *             clock     - [IN] the update timestamp                          *
  *                                                                            *
+ * Return value: The created status update.                                   *
+ *                                                                            *
  ******************************************************************************/
-static void	its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid, int status, int clock)
+static zbx_status_update_t	*its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid, int status, int clock)
 {
 	zbx_status_update_t	*update;
 
@@ -1106,9 +1096,12 @@ static void	its_updates_append(zbx_vector_ptr_t *updates, zbx_uint64_t sourceid,
 	update->clock = clock;
 
 	zbx_vector_ptr_append(updates, update);
+
+	return update;
 }
 
-static void	update_service(zbx_hashset_t *service_updates, const zbx_service_t *service, const zbx_timespec_t *ts)
+static zbx_service_update_t	*update_service(zbx_hashset_t *service_updates, zbx_service_t *service, int status,
+		const zbx_timespec_t *ts)
 {
 	zbx_service_update_t	update_local = {.service = service}, *update;
 
@@ -1120,6 +1113,9 @@ static void	update_service(zbx_hashset_t *service_updates, const zbx_service_t *
 	}
 
 	update->ts = *ts;
+	service->status = status;
+
+	return update;
 }
 
 /******************************************************************************
@@ -1161,7 +1157,7 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		alarmid;
 	zbx_hashset_iter_t	iter;
-	zbx_service_update_t	*itservice;
+	zbx_service_update_t	*update;
 	zbx_vector_uint64_t	serviceids;
 
 	/* get a list of service status updates that must be written to database */
@@ -1169,10 +1165,10 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 	zbx_vector_uint64_create(&serviceids);
 
 	zbx_hashset_iter_reset(service_updates, &iter);
-	while (NULL != (itservice = (zbx_service_update_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (update = (zbx_service_update_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (itservice->old_status != itservice->service->status)
-			its_updates_append(&updates, itservice->service->serviceid, itservice->service->status, 0);
+		if (update->old_status != update->service->status)
+			its_updates_append(&updates, update->service->serviceid, update->service->status, 0);
 	}
 
 	/* write service status changes into database */
@@ -1184,13 +1180,13 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 
 		for (i = 0; i < updates.values_num; i++)
 		{
-			zbx_status_update_t	*update = (zbx_status_update_t *)updates.values[i];
+			zbx_status_update_t	*status_update = (zbx_status_update_t *)updates.values[i];
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update services"
 					" set status=%d"
 					" where serviceid=" ZBX_FS_UI64 ";\n",
-					update->status, update->sourceid);
+					status_update->status, status_update->sourceid);
 
 			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 				goto out;
@@ -1226,9 +1222,9 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 
 	for (i = 0; i < alarms->values_num; i++)
 	{
-		zbx_status_update_t	*update = (zbx_status_update_t *)alarms->values[i];
+		zbx_status_update_t	*status_update = (zbx_status_update_t *)alarms->values[i];
 
-		zbx_vector_uint64_append(&serviceids, update->sourceid);
+		zbx_vector_uint64_append(&serviceids, status_update->sourceid);
 	}
 
 	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1248,16 +1244,17 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 
 		for (i = 0; i < alarms->values_num; i++)
 		{
-			zbx_status_update_t	*update = (zbx_status_update_t *)alarms->values[i];
+			zbx_status_update_t	*status_update = (zbx_status_update_t *)alarms->values[i];
 
-			if (FAIL == zbx_vector_uint64_bsearch(&serviceids, update->sourceid,
+			if (FAIL == zbx_vector_uint64_bsearch(&serviceids, status_update->sourceid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
 				continue;
 			}
 
-			zbx_db_insert_add_values(&db_insert, alarmid++, update->sourceid, update->status,
-					update->clock);
+			status_update->servicealarmid = alarmid++;
+			zbx_db_insert_add_values(&db_insert, status_update->servicealarmid, status_update->sourceid,
+					status_update->status, 	status_update->clock);
 		}
 
 		ret = zbx_db_insert_execute(&db_insert);
@@ -1382,10 +1379,10 @@ static void	its_itservice_update_status(zbx_service_t *itservice, const zbx_time
 
 	if (itservice->status != status)
 	{
-		update_service(service_updates, itservice, ts);
-		itservice->status = status;
+		zbx_service_update_t	*update;
 
-		its_updates_append(alarms, itservice->serviceid, status, ts->sec);
+		update = update_service(service_updates, itservice, status, ts);
+		update->alarm = its_updates_append(alarms, itservice->serviceid, status, ts->sec);
 
 		/* update parent services */
 		for (i = 0; i < itservice->parents.values_num; i++)
@@ -1444,7 +1441,7 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 
 	// TODO: servicealarmid?
 	zbx_db_insert_prepare(&db_insert_escalations, "escalations", "escalationid", "actionid", "eventid", "serviceid",
-			NULL);
+			"servicealarmid", NULL);
 
 	eventid = DBget_maxid_num("events", events_num);
 
@@ -1482,7 +1479,7 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 		for (j = 0; j < actionids[i].values_num; j++)
 		{
 			zbx_db_insert_add_values(&db_insert_escalations, __UINT64_C(0), actionids[i].values[j], eventid,
-					update->service->serviceid);
+					update->service->serviceid, update->alarm->servicealarmid);
 		}
 
 		eventid++;
@@ -1689,10 +1686,10 @@ static void	db_update_services(zbx_service_manager_t *manager)
 
 		if (service->status != status)
 		{
-			update_service(&service_updates, service, &ts);
-			service->status = status;
+			zbx_service_update_t	*update;
 
-			its_updates_append(&alarms, service->serviceid, service->status, ts.sec);
+			update = update_service(&service_updates, service, status, &ts);
+			update->alarm = its_updates_append(&alarms, service->serviceid, service->status, ts.sec);
 
 			/* update parent services */
 			for (i = 0; i < service->parents.values_num; i++)
