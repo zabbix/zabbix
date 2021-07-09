@@ -1,9 +1,21 @@
 Changes for 5.4.3rc1
 
 New features:
+.........T [ZBXNEXT-5925] added template "Systemd by Zabbix agent 2" (ychukina)
+.........T [ZBXNEXT-6660] added template for f5 BIG-IP (abakaldin)
 .........T [ZBXNEXT-6729] added template "GridGain by JMX" (ychukina)
 
 Bug fixes:
+....I..... [ZBX-19498] fixed 'subject' being too long when {TRIGGER.NAME} is converted to {EVENT.RECOVERY.NAME} (dgoloscapov, wiper)
+........S. [ZBX-19481] fixed alerting problem while being in maintenance (dgoloscapov)
+A......... [ZBX-19536] fixed host.get with selectTags = ['tag'] call attempting to retrieve tag value(s) as well (jfreibergs)
+..F.....S. [ZBX-19081] fixed "plain text" widget height calculation when importing screen (miks)
+.......PS. [ZBX-19624] fixed incorrect vmware hv ip detection (MVekslers)
+...G...... [ZBX-19476] fixed support of short form ipv6 in ListenIP field for Zabbix agent 2 (MVekslers)
+..F....... [ZBX-19490] fixed sorting of inherited web scenario tags (Ivo)
+..F....... [ZBX-18640] fixed filter deletion when time selector tab is open on monitoring problem page (gcalenko)
+.........T [ZBX-19592] revamped trigger illogical expressions (afayantsev)
+.......PS. [ZBX-19428] fixed high CPU usage and preprocessing workers exiting with timeout when starting numerous poller, trapper and discoverer processes (vso)
 .........T [ZBX-19622] moved cisco templates one level higher (afayantsev)
 .......P.. [ZBX-19500] added avoiding of configuration cache update during ongoing transaction on proxy (dgoloscapov)
 .........T [ZBX-19588] fixed typo in metric name in Template SAN NetApp FAS3220 SNMP (abiba)
