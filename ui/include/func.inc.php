@@ -1582,11 +1582,11 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
  *
  * @param string      $class                  CSS class of the message box. Possible values:
  *                                            ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
- * @param array       $messages
- * @param string      $messages[]['message']
- * @param string|null $title
- * @param bool        $show_close_box
- * @param bool        $show_details
+ * @param array       $messages               An array of messages.
+ * @param string      $messages[]['message']  Message text.
+ * @param string|null $title                  (optional) Message box title.
+ * @param bool        $show_close_box         (optional) Show or hide close button in error message box.
+ * @param bool        $show_details           (optional) Show or hide message details.
  *
  * @return CTag
  */
@@ -1721,8 +1721,8 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 		$has_warnings = false;
 
 		foreach ($messages as $message) {
-			$has_errors = $has_errors || ($message['type'] === 'error');
-			$has_warnings = $has_warnings || ($message['type'] === 'warning');
+			$has_errors = ($has_errors || ($message['type'] === 'error'));
+			$has_warnings = ($has_warnings || ($message['type'] === 'warning'));
 		}
 
 		if ($has_errors) {
