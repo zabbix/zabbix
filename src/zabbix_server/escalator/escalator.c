@@ -2477,6 +2477,20 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			}
 		}
 
+		if (0 != escalation->servicealarmid)
+		{
+			service_alarm_local.service_alarmid = escalation->servicealarmid;
+			if (FAIL == (index = zbx_vector_service_alarm_bsearch(&service_alarms,
+					service_alarm_local, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				error = zbx_dsprintf(error, "service alarm id:" ZBX_FS_UI64 " deleted.",
+						escalation->servicealarmid);
+				state = ZBX_ESCALATION_CANCEL;
+			}
+			else
+				service_alarm = &service_alarms.values[index];
+		}
+
 		if (FAIL == (index = zbx_vector_ptr_bsearch(&events, &escalation->eventid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
@@ -2491,6 +2505,11 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 					EVENT_OBJECT_TRIGGER == event->object && 0 == event->trigger.triggerid)
 			{
 				error = zbx_dsprintf(error, "trigger id:" ZBX_FS_UI64 " deleted.", event->objectid);
+				state = ZBX_ESCALATION_CANCEL;
+			}
+			else if (EVENT_SOURCE_SERVICE == event->source && 0 == event->service.serviceid)
+			{
+				error = zbx_dsprintf(error, "service id:" ZBX_FS_UI64 " deleted.", event->objectid);
 				state = ZBX_ESCALATION_CANCEL;
 			}
 		}
@@ -2516,20 +2535,6 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		}
 		else
 			r_event = NULL;
-
-		if (0 != escalation->servicealarmid)
-		{
-			service_alarm_local.service_alarmid = escalation->servicealarmid;
-			if (FAIL == (index = zbx_vector_service_alarm_bsearch(&service_alarms,
-					service_alarm_local, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				error = zbx_dsprintf(error, "service alarm id:" ZBX_FS_UI64 " deleted.",
-						escalation->servicealarmid);
-				state = ZBX_ESCALATION_CANCEL;
-			}
-			else
-				service_alarm = &service_alarms.values[index];
-		}
 
 		/* Handle escalation taking into account status of items, triggers, hosts, */
 		/* maintenance and trigger dependencies.                                   */

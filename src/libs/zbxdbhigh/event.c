@@ -80,6 +80,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
 
 		event->trigger.triggerid = 0;
+		event->service.serviceid = 0;
 
 		if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source ||
 				EVENT_SOURCE_SERVICE == event->source)

@@ -1540,6 +1540,9 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_UPDATE_MESSAGE	MVAR_EVENT_UPDATE "MESSAGE}"
 #define MVAR_EVENT_UPDATE_TIME		MVAR_EVENT_UPDATE "TIME}"
 #define MVAR_EVENT_UPDATE_STATUS	MVAR_EVENT_UPDATE "STATUS}"
+#define MVAR_EVENT_UPDATE_NSEVERITY	MVAR_EVENT_UPDATE "NSERVERITY}"
+#define MVAR_EVENT_UPDATE_SEVERITY	MVAR_EVENT_UPDATE "SERVERITY}"
+#define MVAR_EVENT_SERVICE_NAME		MVAR_EVENT "SERVICE.NAME}"
 
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
@@ -2095,6 +2098,41 @@ static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
 	zbx_json_free(&json);
 }
 
+static void	get_event_tag_by_name(const char *macro, const DB_EVENT *event, char **replace_to)
+{
+	char	*name;
+
+	if (SUCCEED == zbx_str_extract(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX),
+			strlen(macro) - ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX) - 1, &name))
+	{
+		if (0 < event->tags.values_num)
+		{
+			int			i;
+			zbx_tag_t		*tag;
+			zbx_vector_ptr_t	ptr_tags;
+
+			zbx_vector_ptr_create(&ptr_tags);
+			zbx_vector_ptr_append_array(&ptr_tags, event->tags.values,
+					event->tags.values_num);
+			zbx_vector_ptr_sort(&ptr_tags, compare_tags);
+
+			for (i = 0; i < ptr_tags.values_num; i++)
+			{
+				tag = (zbx_tag_t *)ptr_tags.values[i];
+
+				if (0 == strcmp(name, tag->tag))
+				{
+					*replace_to = zbx_strdup(*replace_to, tag->value);
+					break;
+				}
+			}
+
+			zbx_vector_ptr_destroy(&ptr_tags);
+		}
+
+		zbx_free(name);
+	}
+}
 /******************************************************************************
  *                                                                            *
  * Function: get_recovery_event_value                                         *
@@ -2209,14 +2247,6 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 		{
 			*replace_to = zbx_strdup(*replace_to, event->acknowledged ? "Yes" : "No");
 		}
-		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
-		{
-			get_event_tags(event, replace_to);
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_TAGSJSON))
-		{
-			get_event_tags_json(event, replace_to);
-		}
 		else if (0 == strcmp(macro, MVAR_EVENT_NSEVERITY))
 		{
 			*replace_to = zbx_dsprintf(*replace_to, "%d", (int)event->severity);
@@ -2226,40 +2256,41 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 			if (FAIL == get_trigger_severity_name(event->severity, replace_to))
 				*replace_to = zbx_strdup(*replace_to, "unknown");
 		}
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
+		{
+			get_event_tags(event, replace_to);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGSJSON))
+		{
+			get_event_tags_json(event, replace_to);
+		}
 		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
 		{
-			char	*name;
-
-			if (SUCCEED == zbx_str_extract(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX),
-					strlen(macro) - ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX) - 1, &name))
-			{
-				if (0 < event->tags.values_num)
-				{
-					int			i;
-					zbx_tag_t       	*tag;
-					zbx_vector_ptr_t	ptr_tags;
-
-					zbx_vector_ptr_create(&ptr_tags);
-					zbx_vector_ptr_append_array(&ptr_tags, event->tags.values,
-							event->tags.values_num);
-					zbx_vector_ptr_sort(&ptr_tags, compare_tags);
-
-					for (i = 0; i < ptr_tags.values_num; i++)
-					{
-						tag = (zbx_tag_t *)ptr_tags.values[i];
-
-						if (0 == strcmp(name, tag->tag))
-						{
-							*replace_to = zbx_strdup(*replace_to, tag->value);
-							break;
-						}
-					}
-
-					zbx_vector_ptr_destroy(&ptr_tags);
-				}
-
-				zbx_free(name);
-			}
+			get_event_tag_by_name(macro, event, replace_to);
+		}
+	}
+	else if (EVENT_SOURCE_SERVICE == event->source)
+	{
+		if (0 == strcmp(macro, MVAR_EVENT_NSEVERITY))
+		{
+			*replace_to = zbx_dsprintf(*replace_to, "%d", (int)event->severity);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_SEVERITY))
+		{
+			if (FAIL == get_trigger_severity_name(event->severity, replace_to))
+				*replace_to = zbx_strdup(*replace_to, "unknown");
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
+		{
+			get_event_tags(event, replace_to);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGSJSON))
+		{
+			get_event_tags_json(event, replace_to);
+		}
+		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
+		{
+			get_event_tag_by_name(macro, event, replace_to);
 		}
 	}
 }
@@ -3940,6 +3971,96 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->sendto);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_SUBJECT))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->subject);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->message);
+				}
+			}
+			else if (EVENT_SOURCE_SERVICE == c_event->source)
+			{
+				if (ZBX_TOKEN_USER_MACRO == token.type)
+				{
+					if (NULL == dc_host)
+						DCget_user_macro(NULL, 0, m, &replace_to);
+					else
+						DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
+
+					pos = token.loc.r;
+				}
+				else if (NULL != actionid &&
+						0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
+				{
+					ret = get_action_value(m, *actionid, &replace_to);
+				}
+				else if (0 == indexed_macro && 0 == strcmp(m, MVAR_TIME))
+				{
+					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
+				}
+				else if (0 == strcmp(m, MVAR_DATE))
+				{
+					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
+				}
+				else if (NULL != actionid && 0 == strcmp(m, MVAR_ESC_HISTORY))
+				{
+					get_escalation_history(*actionid, event, r_event, &replace_to, userid, tz);
+				}
+				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
+				{
+					if (NULL != r_event)
+						get_recovery_event_value(m, r_event, &replace_to, tz);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
+				{
+					get_current_event_value(m, c_event, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, event->name);
+				}
+				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
+				{
+					get_event_value(m, event, &replace_to, userid, r_event, tz);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_TIME))
+				{
+					if (NULL != service_alarm)
+					{
+						replace_to = zbx_strdup(replace_to, zbx_time2str(service_alarm->clock,
+								tz));
+					}
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_DATE))
+				{
+					if (NULL != service_alarm)
+					{
+						replace_to = zbx_strdup(replace_to, zbx_date2str(service_alarm->clock,
+								tz));
+					}
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_NSEVERITY))
+				{
+					replace_to = zbx_dsprintf(replace_to, "%d", (int)service_alarm->value);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_SEVERITY))
+				{
+					if (FAIL == get_trigger_severity_name(service_alarm->value, &replace_to))
+						replace_to = zbx_strdup(replace_to, "unknown");
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_SERVICE_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, event->service.name);
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
