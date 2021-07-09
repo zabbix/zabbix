@@ -1581,7 +1581,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @param array $update_macros  Array with macros objects.
 	 */
-	protected function updateMacros(array $update_macros) {
+	protected function updateMacros(array $update_macros): void {
 		$ins_hostmacros = [];
 		$upd_hostmacros = [];
 
@@ -1590,7 +1590,7 @@ class CHostPrototype extends CHostBase {
 			'filter' => ['hostid' => array_keys($update_macros)],
 			'preservekeys' => true
 		]);
-		$host_macros = array_fill_keys(array_column($db_hostmacros, 'hostid'), []);
+		$host_macros = array_fill_keys(array_keys($update_macros), []);
 
 		foreach ($db_hostmacros as $hostmacroid => $db_hostmacro) {
 			$host_macros[$db_hostmacro['hostid']][$db_hostmacro['macro']] = $hostmacroid;
@@ -1598,8 +1598,7 @@ class CHostPrototype extends CHostBase {
 
 		foreach ($update_macros as $hostid => $hostmacros) {
 			foreach ($hostmacros as $hostmacro) {
-				if (array_key_exists($hostid, $host_macros)
-						&& array_key_exists($hostmacro['macro'], $host_macros[$hostid])) {
+				if (array_key_exists($hostmacro['macro'], $host_macros[$hostid])) {
 					$hostmacroid = $host_macros[$hostid][$hostmacro['macro']];
 
 					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $hostmacro, $db_hostmacro);
