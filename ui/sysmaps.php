@@ -253,9 +253,9 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 	if ($result) {
 		unset($_REQUEST['form']);
 
-		foreach ($maps as $map) {
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $map['sysmapid'], $map['name'], null, null, null);
-		}
+		// foreach ($maps as $map) {
+		// 	add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $map['sysmapid'], $map['name'], null, null, null);
+		// }
 	}
 
 	$result = DBend($result);
