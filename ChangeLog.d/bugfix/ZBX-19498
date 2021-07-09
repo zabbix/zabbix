@@ -1,1 +1,0 @@
-....I..... [ZBX-19498] fixed 'subject' being too long when {TRIGGER.NAME} is converted to {EVENT.RECOVERY.NAME} (dgoloscapov, wiper)
