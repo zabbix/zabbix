@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../common/testFormTags.php';
 
 /**
  * @dataSource EntitiesTags
- * @on-before prepareCopyData
+ * @onBefore prepareCopyData
  * @backup triggers
  */
 class testFormTagsTrigger extends testFormTags {

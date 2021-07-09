@@ -105,27 +105,25 @@ class testFormTagsWeb extends testFormTags {
 	 *
 	 * @dataProvider getTagsInheritanceData
 	 */
-//	TODO: uncomment after fix ZBX-19490
-//	public function testFormTagsWeb_InheritedTemplateTags($data) {
-//		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
-//		$this->link = 'httpconf.php?filter_set=1&filter_hostids[0]='.$templateid.'&context=template';
-//		$this->saved_link = 'httpconf.php?form=update&hostid='.$templateid.'&context=template&httptestid=';
-//		$this->checkInheritedTags($data, 'web scenario', 'Template');
-//	}
+	public function testFormTagsWeb_InheritedTemplateTags($data) {
+		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
+		$this->link = 'httpconf.php?filter_set=1&filter_hostids[0]='.$templateid.'&context=template';
+		$this->saved_link = 'httpconf.php?form=update&hostid='.$templateid.'&context=template&httptestid=';
+		$this->checkInheritedTags($data, 'web scenario', 'Template');
+	}
 
 	/**
 	 * Test tags of inherited web scenario from template on host.
 	 *
 	 * @dataProvider getTagsInheritanceData
 	 */
-//	TODO: uncomment after fix ZBX-19490
-//	public function testFormTagsWeb_InheritedElementTags($data) {
-//		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
-//		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
-//		$this->link = 'httpconf.php?filter_set=1&context=template&filter_hostids[0]='.$templateid;
-//		$this->saved_link = 'httpconf.php?form=update&hostid='.$templateid.'&context=template&httptestid=';
-//		$host_link = 'httpconf.php?filter_set=1&context=host&filter_hostids[0]='.$hostid;
-//
-//		$this->checkInheritedElementTags($data, 'web scenario', $host_link);
-//	}
+	public function testFormTagsWeb_InheritedElementTags($data) {
+		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
+		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
+		$this->link = 'httpconf.php?filter_set=1&context=template&filter_hostids[0]='.$templateid;
+		$this->saved_link = 'httpconf.php?form=update&hostid='.$templateid.'&context=template&httptestid=';
+		$host_link = 'httpconf.php?filter_set=1&context=host&filter_hostids[0]='.$hostid;
+
+		$this->checkInheritedElementTags($data, 'web scenario', $host_link);
+	}
 }
