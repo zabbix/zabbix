@@ -908,7 +908,7 @@ class CUserMacro extends CApiService {
 			}
 		}
 
-		$chd_hostmacros_all = DB::select('hostmacro', [
+		$chd_hostmacros = DB::select('hostmacro', [
 			'output' => ['hostid', 'macro', 'type', 'value', 'description'],
 			'filter' => ['hostid' => $hostids, 'macro' => array_keys($macros)],
 			'preservekeys' => true
@@ -916,7 +916,7 @@ class CUserMacro extends CApiService {
 
 		$host_macros = array_fill_keys($hostids, []);
 
-		foreach ($chd_hostmacros_all as $hostmacroid => $hostmacro) {
+		foreach ($chd_hostmacros as $hostmacroid => $hostmacro) {
 			$host_macros[$hostmacro['hostid']][$hostmacro['macro']] = $hostmacroid;
 		}
 
@@ -928,17 +928,17 @@ class CUserMacro extends CApiService {
 					$hostmacroid = $host_macros[$hostid][$tpl_hostmacro['macro_old']];
 
 					$upd_hostmacros[] = ['hostmacroid' => $hostmacroid, 'hostid' => $hostid] + $tpl_hostmacro;
-					$db_hostmacros[$hostmacroid] = $chd_hostmacros_all[$hostmacroid];
+					$db_hostmacros[$hostmacroid] = $chd_hostmacros[$hostmacroid];
 
-					unset($chd_hostmacros_all[$hostmacroid], $host_macros[$hostid][$tpl_hostmacro['macro_old']]);
+					unset($chd_hostmacros[$hostmacroid], $host_macros[$hostid][$tpl_hostmacro['macro_old']]);
 
 				} elseif (array_key_exists($tpl_hostmacro['macro'], $host_macros[$hostid])) {
 					$hostmacroid = $host_macros[$hostid][$tpl_hostmacro['macro']];
 
 					$upd_hostmacros[] = ['hostmacroid' => $hostmacroid, 'hostid' => $hostid] + $tpl_hostmacro;
-					$db_hostmacros[$hostmacroid] = $chd_hostmacros_all[$hostmacroid];
+					$db_hostmacros[$hostmacroid] = $chd_hostmacros[$hostmacroid];
 
-					unset($chd_hostmacros_all[$hostmacroid], $host_macros[$hostid][$tpl_hostmacro['macro']]);
+					unset($chd_hostmacros[$hostmacroid], $host_macros[$hostid][$tpl_hostmacro['macro']]);
 				}
 				else {
 					$ins_hostmacros[] = ['hostid' => $hostid] + $tpl_hostmacro;
