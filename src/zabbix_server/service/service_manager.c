@@ -1439,7 +1439,6 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
 	zbx_db_insert_prepare(&db_insert_problem_tag, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
 
-	// TODO: servicealarmid?
 	zbx_db_insert_prepare(&db_insert_escalations, "escalations", "escalationid", "actionid", "eventid", "serviceid",
 			"servicealarmid", NULL);
 
