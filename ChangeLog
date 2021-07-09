@@ -1006,9 +1006,17 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.14rc1
 
 New features:
+.........T [ZBXNEXT-5925] added template "Systemd by Zabbix agent 2" (ychukina)
+.........T [ZBXNEXT-6660] added template for f5 BIG-IP (abakaldin)
 .........T [ZBXNEXT-6729] added template "GridGain by JMX" (ychukina)
 
 Bug fixes:
+....I..... [ZBX-19498] fixed 'subject' being too long when {TRIGGER.NAME} is converted to {EVENT.RECOVERY.NAME} (dgoloscapov, wiper)
+A......... [ZBX-19536] fixed host.get with selectTags = ['tag'] call attempting to retrieve tag value(s) as well (jfreibergs)
+...G...... [ZBX-19476] fixed support of short form ipv6 in ListenIP field for Zabbix agent 2 (MVekslers)
+........S. [ZBX-19481] fixed alerting problem while being in maintenance (dgoloscapov)
+.........T [ZBX-19562] fixed descriptions of some keys in "Server HP iLO SNMP", removed the "Oracle by ODBC" and "Asterisk by HTTP" templates (abakaldin)
+.......PS. [ZBX-19428] fixed high CPU usage and preprocessing workers exiting with timeout when starting numerous poller, trapper and discoverer processes (vso)
 .........T [ZBX-19622] moved cisco templates one level higher (afayantsev)
 .........T [ZBX-19588] fixed typo in metric name in Template SAN NetApp FAS3220 SNMP (abiba)
 .........T [ZBX-19230] fixed typo in Windows template (abakaldin)
