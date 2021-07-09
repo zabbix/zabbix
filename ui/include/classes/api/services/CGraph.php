@@ -298,6 +298,9 @@ class CGraph extends CGraphGeneral {
 				}
 			}
 			else {
+				// Graphs share table with graph prototypes. Therefore remove graph unrelated fields.
+				unset($graph['discover']);
+
 				$result[$graph['graphid']] = $graph;
 			}
 		}
@@ -385,7 +388,8 @@ class CGraph extends CGraphGeneral {
 				'output' => API_OUTPUT_EXTEND,
 				'selectGraphItems' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
-				'hostids' => $chdHost['hostid']
+				'hostids' => $chdHost['hostid'],
+				'nopermissions' => true
 			]);
 
 			if ($chdGraph = reset($chdGraphs)) {

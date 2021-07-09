@@ -3963,13 +3963,10 @@ z-select[disabled] button,
       width: 22px;
       height: 22px;
       content: ""; }
-  .menu-popup .menu-popup-item-disabled {
-    display: block;
-    height: 24px;
-    line-height: 24px;
-    color: #768d99;
-    border: 0;
-    cursor: default; }
+    .menu-popup .menu-popup-item.disabled {
+      background-color: transparent;
+      color: #768d99;
+      opacity: 1; }
   .menu-popup h3 {
     height: 24px;
     line-height: 24px; }
@@ -5062,11 +5059,6 @@ span.is-loading {
 
 .overlay-dialogue.modal .overlay-dialogue-body.is-loading {
   overflow: hidden; }
-  .overlay-dialogue.modal .overlay-dialogue-body.is-loading:before {
-    top: 42px;
-    right: 1px;
-    bottom: 42px;
-    left: 1px; }
 
 .menu-popup-preloader,
 .hintbox-preloader {

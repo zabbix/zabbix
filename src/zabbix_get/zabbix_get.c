@@ -34,11 +34,11 @@ const char	*progname = NULL;
 const char	title_message[] = "zabbix_get";
 const char	syslog_app_name[] = "zabbix_get";
 const char	*usage_message[] = {
-	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "-k item-key", NULL,
+	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "[-t timeout]", "-k item-key", NULL,
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "--tls-connect cert", "--tls-ca-file CA-file",
-	"[--tls-crl-file CRL-file]", "[--tls-agent-cert-issuer cert-issuer]", "[--tls-agent-cert-subject cert-subject]",
-	"--tls-cert-file cert-file", "--tls-key-file key-file",
+	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "[-t timeout]", "--tls-connect cert",
+	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-agent-cert-issuer cert-issuer]",
+	"[--tls-agent-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
 #endif
@@ -46,7 +46,7 @@ const char	*usage_message[] = {
 	"[--tls-cipher cipher-string]",
 #endif
 	"-k item-key", NULL,
-	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "--tls-connect psk",
+	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "[-t timeout]", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
 	"[--tls-cipher13 cipher-string]",
@@ -63,6 +63,13 @@ const char	*usage_message[] = {
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_GET;
 
+#define CONFIG_GET_TIMEOUT_MIN		1
+#define CONFIG_GET_TIMEOUT_MAX		30
+#define CONFIG_GET_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_GET_TIMEOUT_MIN)
+#define CONFIG_GET_TIMEOUT_MAX_STR	ZBX_STR(CONFIG_GET_TIMEOUT_MAX)
+
+static int	CONFIG_GET_TIMEOUT = CONFIG_GET_TIMEOUT_MAX;
+
 const char	*help_message[] = {
 	"Get data from Zabbix agent.",
 	"",
@@ -71,6 +78,10 @@ const char	*help_message[] = {
 	"  -p --port port-number      Specify port number of agent running on the host",
 	"                             (default: " ZBX_DEFAULT_AGENT_PORT_STR ")",
 	"  -I --source-address IP-address   Specify source IP address",
+	"",
+	"  -t --timeout seconds       Specify timeout. Valid range: " CONFIG_GET_TIMEOUT_MIN_STR "-"
+			CONFIG_GET_TIMEOUT_MAX_STR " seconds",
+	"                             (default: " CONFIG_GET_TIMEOUT_MAX_STR " seconds)",
 	"",
 	"  -k --key item-key          Specify key of the item to retrieve value for",
 	"",
@@ -182,6 +193,7 @@ struct zbx_option	longopts[] =
 	{"port",			1,	NULL,	'p'},
 	{"key",				1,	NULL,	'k'},
 	{"source-address",		1,	NULL,	'I'},
+	{"timeout",			1,	NULL,	't'},
 	{"help",			0,	NULL,	'h'},
 	{"version",			0,	NULL,	'V'},
 	{"tls-connect",			1,	NULL,	'1'},
@@ -199,7 +211,7 @@ struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "s:p:k:I:hV";
+static char	shortopts[] = "s:p:k:I:t:hV";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -274,7 +286,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 			return FAIL;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT,
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, CONFIG_GET_TIMEOUT,
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&s, key)))
@@ -366,6 +378,16 @@ int	main(int argc, char **argv)
 			case 'I':
 				if (NULL == source_ip)
 					source_ip = zbx_strdup(NULL, zbx_optarg);
+				break;
+			case 't':
+				if (FAIL == is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_GET_TIMEOUT,
+						sizeof(CONFIG_GET_TIMEOUT), CONFIG_GET_TIMEOUT_MIN,
+						CONFIG_GET_TIMEOUT_MAX))
+				{
+					zbx_error("Invalid timeout, valid range %d:%d seconds", CONFIG_GET_TIMEOUT_MIN,
+							CONFIG_GET_TIMEOUT_MAX);
+					exit(EXIT_FAILURE);
+				}
 				break;
 			case 'h':
 				help();

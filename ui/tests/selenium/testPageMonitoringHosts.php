@@ -1010,7 +1010,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->assertTrue($popup->hasItems($data['titles']));
 		foreach ($data['disabled'] as $disabled) {
 			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
-					$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+					$disabled.'" and @class="menu-popup-item disabled"]')->one()->isPresent());
 		}
 	}
 
@@ -1023,7 +1023,7 @@ class testPageMonitoringHosts extends CWebTest {
 	/**
 	 * @backup hosts
 	 *
-	 * @on-before-once prepareUpdateData
+	 * @onBeforeOnce prepareUpdateData
 	 */
 	public function testPageMonitoringHosts_TableSorting() {
 		// Sort by name and status.

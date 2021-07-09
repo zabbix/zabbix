@@ -786,7 +786,7 @@ zabbix_export:
           triggers:
             -
               uuid: 618a3e3c82dc4ccba82477afdd100a98
-              expression: '(last(/Oracle by ODBC/oracle.instance_hostname,#1)<>last(/Oracle by ODBC/oracle.instance_hostname,#2))=1 and length(last(/Oracle by ODBC/oracle.instance_hostname))>0'
+              expression: 'last(/Oracle by ODBC/oracle.instance_hostname,#1)<>last(/Oracle by ODBC/oracle.instance_hostname,#2) and length(last(/Oracle by ODBC/oracle.instance_hostname))>0'
               name: 'Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})'
               priority: INFO
               description: 'Oracle DB Instance hostname has changed. Ack to close.'
@@ -815,7 +815,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2fe53d1d931e4eb38fef10a3171c1665
-              expression: '(last(/Oracle by ODBC/oracle.instance_name,#1)<>last(/Oracle by ODBC/oracle.instance_name,#2))=1 and length(last(/Oracle by ODBC/oracle.instance_name))>0'
+              expression: 'last(/Oracle by ODBC/oracle.instance_name,#1)<>last(/Oracle by ODBC/oracle.instance_name,#2) and length(last(/Oracle by ODBC/oracle.instance_name))>0'
               name: 'Oracle: Instance name has changed (new name received: {ITEM.VALUE})'
               priority: INFO
               description: 'Oracle DB Instance name has changed. Ack to close.'
@@ -1722,7 +1722,7 @@ zabbix_export:
           triggers:
             -
               uuid: a5dd4fe627c44afebdfe7beeefc4ec3d
-              expression: '(last(/Oracle by ODBC/oracle.version,#1)<>last(/Oracle by ODBC/oracle.version,#2))=1 and length(last(/Oracle by ODBC/oracle.version))>0'
+              expression: 'last(/Oracle by ODBC/oracle.version,#1)<>last(/Oracle by ODBC/oracle.version,#2) and length(last(/Oracle by ODBC/oracle.version))>0'
               name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'Oracle DB version has changed. Ack to close.'
@@ -2045,7 +2045,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9bf80a9372ef4b3898fd5a4f0c3cec7c
-                  expression: '(last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#2))=1'
+                  expression: 'last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#2)'
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle DB open status has changed. Ack to close.'
@@ -2088,7 +2088,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: fb5ccc917a8344d7945b8867a1982d6b
-                  expression: '(last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#2))=1'
+                  expression: 'last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#2)'
                   name: 'Oracle Database ''{#DBNAME}'': Role has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle DB role has changed. Ack to close.'
@@ -2151,7 +2151,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3dbb9379f8024924b197037acfbbdac4
-                  expression: '(last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#2))=1'
+                  expression: 'last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#2)'
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle DB open status has changed. Ack to close.'
@@ -2272,7 +2272,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 05c2af5a765842a1a70f2f67355db1b3
-                  expression: '(last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#2))=1'
+                  expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#2)'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle tablespace status has changed. Ack to close.'

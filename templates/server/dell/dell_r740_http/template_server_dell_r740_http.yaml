@@ -1,0 +1,2069 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-06-18T08:43:35Z'
+  groups:
+    -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      uuid: 3f707f39c32a4b6e8b214c38a260f6f9
+      template: 'DELL PowerEdge R740 by HTTP'
+      name: 'DELL PowerEdge R740 by HTTP'
+      description: |
+        Template for DELL PowerEdge R740 servers with iDRAC 8/9 firmware 4.32 and later and Redfish API enabled.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      items:
+        -
+          uuid: a3fec404e09245e1bcfedc69be24201b
+          name: 'Dell R740: Firmware version'
+          type: DEPENDENT
+          key: dell.server.hw.firmware
+          delay: '0'
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'This attribute defines the firmware version of a remote access card.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.firmware
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: dell.server.system.get
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 520e12fd48354982a1180e6a354b87e8
+              expression: 'last(/DELL PowerEdge R740 by HTTP/dell.server.hw.firmware,#1)<>last(/DELL PowerEdge R740 by HTTP/dell.server.hw.firmware,#2) and length(last(/DELL PowerEdge R740 by HTTP/dell.server.hw.firmware))>0'
+              name: 'Dell R740: Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 4dc37ed556bc4b1eaa9f6dda13f92b69
+          name: 'Dell R740: Hardware model name'
+          type: DEPENDENT
+          key: dell.server.hw.model
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'This attribute defines the model name of the system.'
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.model
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: dell.server.system.get
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: dedcc98a60f14af3b86abcd6f2f3d0dd
+          name: 'Dell R740: Hardware serial number'
+          type: DEPENDENT
+          key: dell.server.hw.serialnumber
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'This attribute defines the service tag of the system.'
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.serialnumber
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: dell.server.system.get
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: e3efa58c32b044d18675046006c69167
+              expression: 'last(/DELL PowerEdge R740 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R740 by HTTP/dell.server.hw.serialnumber,#2) and length(last(/DELL PowerEdge R740 by HTTP/dell.server.hw.serialnumber))>0'
+              name: 'Dell R740: Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: de8e4b6e40494ad99ce592dc884ef4e2
+          name: 'Dell R740: Overall system health status'
+          type: DEPENDENT
+          key: dell.server.status
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.status
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: dell.server.system.get
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 53eb2e16dc2b4b81806c826771da9e78
+              expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.status,,"like","Critical")=1'
+              name: 'Dell R740: Server is in a critical state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Please check the device for faults.'
+            -
+              uuid: bce115852baf4fd5a3ddb3245b768eab
+              expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.status,,"like","Warning")=1'
+              name: 'Dell R740: Server is in warning state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Please check the device for warnings.'
+              dependencies:
+                -
+                  name: 'Dell R740: Server is in a critical state'
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.status,,"like","Critical")=1'
+        -
+          uuid: cac6e14aa5d34d4e90747ab19da6a53f
+          name: 'Dell R740: Get system'
+          type: HTTP_AGENT
+          key: dell.server.system.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$API.USER}'
+          password: '{$API.PASSWORD}'
+          description: 'Returns the metrics of a system.'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function request(url) {
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  
+                      try {
+                          response = api_request.get(url);
+                      } catch (error) {
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                      }
+                  
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
+                  
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
+                          if (response !== null) {
+                              if (typeof response.message === 'string') {
+                                  message += ': ' + response.message;
+                              }
+                          }
+                  
+                          throw message + ' Check debug log for more information.';
+                      }
+                  
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                              response = null;
+                          }
+                      }
+                  
+                      return {
+                          status: api_request.getStatus(),
+                          body: response
+                      };
+                  }
+                  
+                  function getField(object, field, def) {
+                      var names = field.split('.');
+                      var name = names.shift();
+                  
+                      while (typeof name !== 'undefined') {
+                          if (typeof object === undefined || typeof object[name] === 'undefined') {
+                              return def;
+                          }
+                  
+                          object = object[name];
+                          name = names.shift();
+                      }
+                  
+                      return object;
+                  }
+                  
+                  try {
+                      system = JSON.parse(value);
+                  }
+                  catch (error) {
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                      system = null;
+                  }
+                  
+                  var params = {
+                      url: '{$API.URL}',
+                      user: '{$API.USER}',
+                      password: '{$API.PASSWORD}'
+                  };
+                  var result = {
+                      model: '',
+                      serialnumber: '',
+                      status: '',
+                      firmware: ''
+                  };
+                  
+                  var index = params.url.indexOf('://');
+                  index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+                  if (index !== -1) {
+                      params.url = params.url.substring(0, index);
+                  }
+                  
+                  result.model = getField(system, 'Model', '');
+                  result.serialnumber = getField(system, 'Oem.Dell.DellSystem.ChassisServiceTag', '');
+                  result.status = getField(system, 'Status.Health', '');
+                  
+                  response = request(params.url + '/redfish/v1/Managers/iDRAC.Embedded.1');
+                  result.firmware = getField(response.body, 'FirmwareVersion', '');
+                  
+                  return JSON.stringify(result);
+                  
+          url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix raw items'
+        -
+          uuid: b622113d9f1d4fd5a7ce594831c7ef79
+          name: 'Dell R740: Redfish API'
+          type: SIMPLE
+          key: 'net.tcp.service[https]'
+          history: 7d
+          description: |
+            The availability of Redfish API on the server.
+            Possible values:
+              0 unavailable
+              1 available
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 7da220a774f147b789c7b24d182c617e
+              expression: 'last(/DELL PowerEdge R740 by HTTP/net.tcp.service[https])=0'
+              name: 'Dell R740: Redfish API service is unavailable'
+              priority: HIGH
+              description: 'The service is unavailable or does not accept TCP connections.'
+      discovery_rules:
+        -
+          uuid: c302f1ed021e4b64b76b947d805dcd9b
+          name: 'Array controller cache discovery'
+          type: HTTP_AGENT
+          key: array.cache.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$API.USER}'
+          password: '{$API.PASSWORD}'
+          description: 'Discovery of a cache of disk array controllers.'
+          item_prototypes:
+            -
+              uuid: ae0ea3e4743e4606b1df4b966523d21d
+              name: 'Dell R740: {#BATTERY_NAME} Status'
+              type: HTTP_AGENT
+              key: 'dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              authtype: BASIC
+              username: '{$API.USER}'
+              password: '{$API.PASSWORD}'
+              description: 'The status of the job. Possible values: OK, Warning, Critical.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Oem.Dell.DellControllerBattery.PrimaryStatus
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              url: '{$API.URL}{#ODATA}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
+              trigger_prototypes:
+                -
+                  uuid: c2b65e66222d49ed9f068217a164a6ef
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1'
+                  name: 'Dell R740: {#BATTERY_NAME} is in a critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: ebe5e46ada29484da840f1eb70a9e43c
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Warning")=1'
+                  name: 'Dell R740: {#BATTERY_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#BATTERY_NAME} is in a critical state'
+                      expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1'
+          url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function request(url) {
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  
+                      try {
+                          response = api_request.get(url);
+                      } catch (error) {
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                      }
+                  
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
+                  
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
+                          if (response !== null) {
+                              if (typeof response.message === 'string') {
+                                  message += ': ' + response.message;
+                              }
+                          }
+                  
+                          throw message + ' Check debug log for more information.';
+                      }
+                  
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                              response = null;
+                          }
+                      }
+                  
+                      return {
+                          status: api_request.getStatus(),
+                          body: response
+                      };
+                  }
+                  
+                  function getField(object, field, def) {
+                      var names = field.split('.');
+                      var name = names.shift();
+                  
+                      while (typeof name !== 'undefined') {
+                          if (typeof object === undefined || typeof object[name] === 'undefined') {
+                              return def;
+                          }
+                  
+                          object = object[name];
+                          name = names.shift();
+                      }
+                  
+                      return object;
+                  }
+                  
+                  try {
+                      storages = JSON.parse(value);
+                  }
+                  catch (error) {
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                      storages = null;
+                  }
+                  
+                  var params = {
+                      url: '{$API.URL}',
+                      user: '{$API.USER}',
+                      password: '{$API.PASSWORD}'
+                  };
+                  var result = [];
+                  
+                  var index = params.url.indexOf('://');
+                  index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+                  if (index !== -1) {
+                      params.url = params.url.substring(0, index);
+                  }
+                  
+                  if (storages.Members instanceof Array) {
+                      storages.Members.forEach(function (storage) {
+                          if (typeof storage["@odata.id"] === 'string') {
+                              response = request(params.url + storage["@odata.id"]);
+                              controller = response.body;
+                              if (getField(controller, 'Id', '').search('RAID') > -1) {
+                                  result.push({
+                                      '{#BATTERY_NAME}': getField(response.body, 'Oem.Dell.DellControllerBattery.Name', ''),
+                                      '{#ODATA}': controller["@odata.id"]
+                                  });
+                              }
+                          }
+                      });
+                  }
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: fd788d5909de4e7f95f81b03e74bdc67
+          name: 'Array controller discovery'
+          type: HTTP_AGENT
+          key: array.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$API.USER}'
+          password: '{$API.PASSWORD}'
+          description: 'Discovery of disk array controllers.'
+          item_prototypes:
+            -
+              uuid: 0a7ddd247a1942f3b5d192e324566fa4
+              name: 'Dell R740: {#CNTLR_NAME} in slot {#SLOT} Status'
+              type: HTTP_AGENT
+              key: 'dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              authtype: BASIC
+              username: '{$API.USER}'
+              password: '{$API.PASSWORD}'
+              description: 'The status of the job. Possible values: OK, Warning, Critical.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Status.Health
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              url: '{$API.URL}{#ODATA}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
+              trigger_prototypes:
+                -
+                  uuid: b95c92e679ec4f54a83d48f416d2f384
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1'
+                  name: 'Dell R740: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: 1251507dfe0c4b5287121436b1869205
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Warning")=1'
+                  name: 'Dell R740: {#CNTLR_NAME} in slot {#SLOT} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
+                      expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1'
+          url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function request(url) {
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  
+                      try {
+                          response = api_request.get(url);
+                      } catch (error) {
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                      }
+                  
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
+                  
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
+                          if (response !== null) {
+                              if (typeof response.message === 'string') {
+                                  message += ': ' + response.message;
+                              }
+                          }
+                  
+                          throw message + ' Check debug log for more information.';
+                      }
+                  
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                              response = null;
+                          }
+                      }
+                  
+                      return {
+                          status: api_request.getStatus(),
+                          body: response
+                      };
+                  }
+                  
+                  function getField(object, field, def) {
+                      var names = field.split('.');
+                      var name = names.shift();
+                  
+                      while (typeof name !== 'undefined') {
+                          if (typeof object === undefined || typeof object[name] === 'undefined') {
+                              return def;
+                          }
+                  
+                          object = object[name];
+                          name = names.shift();
+                      }
+                  
+                      return object;
+                  }
+                  
+                  try {
+                      storages = JSON.parse(value);
+                  }
+                  catch (error) {
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                      storages = null;
+                  }
+                  
+                  var params = {
+                      url: '{$API.URL}',
+                      user: '{$API.USER}',
+                      password: '{$API.PASSWORD}'
+                  };
+                  var result = [];
+                  
+                  var index = params.url.indexOf('://');
+                  index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+                  if (index !== -1) {
+                      params.url = params.url.substring(0, index);
+                  }
+                  
+                  if (storages.Members instanceof Array) {
+                      storages.Members.forEach(function (storage) {
+                          if (typeof storage["@odata.id"] === 'string') {
+                              response = request(params.url + storage["@odata.id"]);
+                              controller = response.body;
+                              if (getField(controller, 'Id', '').search('RAID') > -1) {
+                                  result.push({
+                                      '{#CNTLR_NAME}': getField(response.body, 'Name', ''),
+                                      '{#SLOT}': getField(response.body, 'Oem.Dell.DellController.PCISlot', ''),
+                                      '{#ODATA}': controller["@odata.id"]
+                                  });
+                              }
+                          }
+                      });
+                  }
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 4d153e64d8d2438aa646003b82d969ea
+          name: 'FAN discovery'
+          type: HTTP_AGENT
+          key: fan.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$API.USER}'
+          password: '{$API.PASSWORD}'
+          description: 'Discovery of FAN sensors.'
+          item_prototypes:
+            -
+              uuid: 64cbab04c8794c70a576e09cc1765281
+              name: 'Dell R740: {#SENSOR_NAME} Get sensor'
+              type: HTTP_AGENT
+              key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              authtype: BASIC
+              username: '{$API.USER}'
+              password: '{$API.PASSWORD}'
+              description: 'Returns the metrics of a sensor.'
+              url: '{$API.URL}{#ODATA}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
+            -
+              uuid: 60d2040a401c47d9b69029a219cb9462
+              name: 'Dell R740: {#SENSOR_NAME} Speed'
+              type: DEPENDENT
+              key: 'dell.server.sensor.fan.speed[{#SENSOR_NAME}]'
+              delay: '0'
+              history: 7d
+              units: rpm
+              description: 'The sensor value.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Reading
+              master_item:
+                key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+            -
+              uuid: 9dc84d5ddd3b4d78b3e507c1814f4a36
+              name: 'Dell R740: {#SENSOR_NAME} Status'
+              type: DEPENDENT
+              key: 'dell.server.sensor.fan.status[{#SENSOR_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The status of the job. Possible values: OK, Warning, Critical.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Status.Health
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Fans
+              trigger_prototypes:
+                -
+                  uuid: 17598a47dfdc41558ab171a306c06685
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  name: 'Dell R740: {#SENSOR_NAME} is in a critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: ab2cfb7eeb8b439f8149814c986e2d46
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Warning")=1'
+                  name: 'Dell R740: {#SENSOR_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#SENSOR_NAME} is in a critical state'
+                      expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1'
+          url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function request(url) {
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  
+                      try {
+                          response = api_request.get(url);
+                      } catch (error) {
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                      }
+                  
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
+                  
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
+                          if (response !== null) {
+                              if (typeof response.message === 'string') {
+                                  message += ': ' + response.message;
+                              }
+                          }
+                  
+                          throw message + ' Check debug log for more information.';
+                      }
+                  
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                              response = null;
+                          }
+                      }
+                  
+                      return {
+                          status: api_request.getStatus(),
+                          body: response
+                      };
+                  }
+                  
+                  try {
+                      sensors = JSON.parse(value);
+                  }
+                  catch (error) {
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                      sensors = null;
+                  }
+                  
+                  var params = {
+                      url: '{$API.URL}',
+                      user: '{$API.USER}',
+                      password: '{$API.PASSWORD}'
+                  };
+                  var result = [];
+                  
+                  var index = params.url.indexOf('://');
+                  index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+                  if (index !== -1) {
+                      params.url = params.url.substring(0, index);
+                  }
+                  
+                  if (sensors.Members instanceof Array) {
+                      sensors.Members.forEach(function (sensor) {
+                          if (typeof sensor["@odata.id"] === 'string') {
+                              response = request(params.url + sensor["@odata.id"]);
+                              if (response.body.ReadingType === 'Rotational') {
+                                  if (typeof response.body.Name === 'string') {
+                                      result.push({ '{#SENSOR_NAME}': response.body.Name, '{#ODATA}': sensor["@odata.id"] });
+                                  }
+                              }
+                          }
+                      });
+                  }
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: d89dfd284b8b45e488ec923ab1a14c9b
+          name: 'Network interface discovery'
+          type: HTTP_AGENT
+          key: net.if.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$API.USER}'
+          password: '{$API.PASSWORD}'
+          description: 'The NetworkInterface schema describes links to the NetworkAdapter and represents the functionality available to the containing system.'
+          item_prototypes:
+            -
+              uuid: 4de0b436cb05479b9cb06c6fd3c80c30
+              name: 'Dell R740: {#IFNAME} Get interface'
+              type: HTTP_AGENT
+              key: 'dell.server.net.if.get[{#IFNAME}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              authtype: BASIC
+              username: '{$API.USER}'
+              password: '{$API.PASSWORD}'
+              description: 'Returns the metrics of a network interface.'
+              url: '{$API.URL}{#ODATA}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
+            -
+              uuid: fa4bb348dec44c77b899b3530433c0a4
+              name: 'Dell R740: {#IFNAME} Status'
+              type: DEPENDENT
+              key: 'dell.server.net.if.health[{#IFNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The status of the job. Possible values: OK, Warning, Critical.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Status.Health
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.net.if.get[{#IFNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Network interfaces'
+              trigger_prototypes:
+                -
+                  uuid: 9a08ad3f597549f0841678ba572669c4
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1'
+                  name: 'Dell R740: {#IFNAME} is in a critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: d7f205844d7a4ed3a34405aa184faa1d
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Warning")=1'
+                  name: 'Dell R740: {#IFNAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#IFNAME} is in a critical state'
+                      expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1'
+            -
+              uuid: 9ff8f42adeba42b190977c17e84724d0
+              name: 'Dell R740: {#IFNAME} Speed'
+              type: DEPENDENT
+              key: 'dell.server.net.if.speed[{#IFNAME}]'
+              delay: '0'
+              history: 7d
+              units: '!Mbps'
+              description: 'Network port current link speed.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.CurrentLinkSpeedMbps
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.net.if.get[{#IFNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Network interfaces'
+            -
+              uuid: 0e1f393e8d7c4d1b8310d4ff412a2038
+              name: 'Dell R740: {#IFNAME} State'
+              type: DEPENDENT
+              key: 'dell.server.net.if.state[{#IFNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Status.State
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.net.if.get[{#IFNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Network interfaces'
+            -
+              uuid: cd7710d6215642c1a3c7407f2e36ce54
+              name: 'Dell R740: {#IFNAME} Link status'
+              type: DEPENDENT
+              key: 'dell.server.net.if.status[{#IFNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The status of the link between this port and its link partner. Possible values: Down, Up, null.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.LinkStatus
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.net.if.get[{#IFNAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Network interfaces'
+              trigger_prototypes:
+                -
+                  uuid: 6372dcbe18034e92b89c7e2503a378cb
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (find(/DELL PowerEdge R740 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")="Down" and last(/DELL PowerEdge R740 by HTTP/dell.server.net.if.status[{#IFNAME}],#1)<>last(/DELL PowerEdge R740 by HTTP/dell.server.net.if.status[{#IFNAME}],#2))'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")<>"Down" or {$IFCONTROL:"{#IFNAME}"}=0'
+                  name: 'Dell R740: {#IFNAME} Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+          url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function request(url) {
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  
+                      try {
+                          response = api_request.get(url);
+                      } catch (error) {
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                      }
+                  
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
+                  
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
+                          if (response !== null) {
+                              if (typeof response.message === 'string') {
+                                  message += ': ' + response.message;
+                              }
+                          }
+                  
+                          throw message + ' Check debug log for more information.';
+                      }
+                  
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                              response = null;
+                          }
+                      }
+                  
+                      return {
+                          status: api_request.getStatus(),
+                          body: response
+                      };
+                  }
+                  
+                  function getField(object, field, def) {
+                      var names = field.split('.');
+                      var name = names.shift();
+                  
+                      while (typeof name !== 'undefined') {
+                          if (typeof object === undefined || typeof object[name] === 'undefined') {
+                              return def;
+                          }
+                  
+                          object = object[name];
+                          name = names.shift();
+                      }
+                  
+                      return object;
+                  }
+                  
+                  try {
+                      adapters = JSON.parse(value);
+                  }
+                  catch (error) {
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                      adapters = null;
+                  }
+                  
+                  var params = {
+                      url: '{$API.URL}',
+                      user: '{$API.USER}',
+                      password: '{$API.PASSWORD}'
+                  };
+                  var result = [];
+                  
+                  var index = params.url.indexOf('://');
+                  index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+                  if (index !== -1) {
+                      params.url = params.url.substring(0, index);
+                  }
+                  
+                  if (adapters.Members instanceof Array) {
+                      adapters.Members.forEach(function (adapter) {
+                          if (typeof adapter["@odata.id"] === 'string') {
+                              response = request(params.url + adapter["@odata.id"] + "/NetworkPorts");
+                              ports = response.body;
+                              if (ports.Members instanceof Array) {
+                                  ports.Members.forEach(function (port) {
+                                      if (typeof port["@odata.id"] === 'string') {
+                                          response = request(params.url + port["@odata.id"]);
+                                          result.push({ '{#IFNAME}': getField(response.body, 'Id', ''), '{#ODATA}': port["@odata.id"] });
+                                      }
+                                  });
+                              }
+                          }
+                      });
+                  }
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 54c404636c9c4ed1897dbc1d17e6814c
+          name: 'Physical disk discovery'
+          type: HTTP_AGENT
+          key: physicaldisk.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$API.USER}'
+          password: '{$API.PASSWORD}'
+          description: 'Discovery of physical disks.'
+          item_prototypes:
+            -
+              uuid: 467f52946fd940c798c2008b31233d12
+              name: 'Dell R740: {#DISK_NAME} Get disk'
+              type: HTTP_AGENT
+              key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              authtype: BASIC
+              username: '{$API.USER}'
+              password: '{$API.PASSWORD}'
+              description: 'Returns the metrics of a physical disk.'
+              url: '{$API.URL}{#ODATA}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
+            -
+              uuid: e3192cd20f22474da4633e4490263fe0
+              name: 'Dell R740: {#DISK_NAME} Media type'
+              type: DEPENDENT
+              key: 'dell.server.hw.physicaldisk.media_type[{#DISK_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The type of media contained in this drive. Possible values: HDD, SSD, SMR, null.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.MediaType
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: 9f1f10f849354710beae460913f74904
+              name: 'Dell R740: {#DISK_NAME} Model name'
+              type: DEPENDENT
+              key: 'dell.server.hw.physicaldisk.model[{#DISK_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The model number of the drive.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Model
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: 7c2345256bf644fca96c8e6e21dfef05
+              name: 'Dell R740: {#DISK_NAME} Serial number'
+              type: DEPENDENT
+              key: 'dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The serial number of this drive.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.SerialNumber
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: f1c78511b2ec49c29bf1e31d05826b98
+                  expression: 'last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0'
+                  name: 'Dell R740: {#DISK_NAME} has been replaced (new serial number received)'
+                  priority: INFO
+                  description: '{#DISK_NAME} serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              uuid: 63f8f9da0eda4dc7a4149566c45c469a
+              name: 'Dell R740: {#DISK_NAME} Size'
+              type: DEPENDENT
+              key: 'dell.server.hw.physicaldisk.size[{#DISK_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: 0d
+              units: B
+              description: 'The size, in bytes, of this drive.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.CapacityBytes
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+            -
+              uuid: c5f2b3a8b47d45a887ea2e17f18b860d
+              name: 'Dell R740: {#DISK_NAME} Status'
+              type: DEPENDENT
+              key: 'dell.server.hw.physicaldisk.status[{#DISK_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The status of the job. Possible values: OK, Warning, Critical.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Status.Health
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Physical disks'
+              trigger_prototypes:
+                -
+                  uuid: c8a872dca90e4d6aaa5422726779acbd
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1'
+                  name: 'Dell R740: {#DISK_NAME} is in a critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: aafddfabfc9c4866b60c8e2a9b267c85
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Warning")=1'
+                  name: 'Dell R740: {#DISK_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#DISK_NAME} is in a critical state'
+                      expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1'
+          url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function request(url) {
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  
+                      try {
+                          response = api_request.get(url);
+                      } catch (error) {
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                      }
+                  
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
+                  
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
+                          if (response !== null) {
+                              if (typeof response.message === 'string') {
+                                  message += ': ' + response.message;
+                              }
+                          }
+                  
+                          throw message + ' Check debug log for more information.';
+                      }
+                  
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                              response = null;
+                          }
+                      }
+                  
+                      return {
+                          status: api_request.getStatus(),
+                          body: response
+                      };
+                  }
+                  
+                  function getField(object, field, def) {
+                      var names = field.split('.');
+                      var name = names.shift();
+                  
+                      while (typeof name !== 'undefined') {
+                          if (typeof object === undefined || typeof object[name] === 'undefined') {
+                              return def;
+                          }
+                  
+                          object = object[name];
+                          name = names.shift();
+                      }
+                  
+                      return object;
+                  }
+                  
+                  try {
+                      storages = JSON.parse(value);
+                  }
+                  catch (error) {
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                      storages = null;
+                  }
+                  
+                  var params = {
+                      url: '{$API.URL}',
+                      user: '{$API.USER}',
+                      password: '{$API.PASSWORD}'
+                  };
+                  var result = [];
+                  
+                  var index = params.url.indexOf('://');
+                  index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+                  if (index !== -1) {
+                      params.url = params.url.substring(0, index);
+                  }
+                  
+                  if (storages.Members instanceof Array) {
+                      storages.Members.forEach(function (storage) {
+                          if (typeof storage["@odata.id"] === 'string') {
+                              response = request(params.url + storage["@odata.id"]);
+                              drives = response.body;
+                              if (drives.Drives instanceof Array) {
+                                  drives.Drives.forEach(function (drive) {
+                                      if (typeof drive["@odata.id"] === 'string') {
+                                          response = request(params.url + drive["@odata.id"]);
+                                          result.push({ '{#DISK_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': drive["@odata.id"] });
+                                      }
+                                  });
+                              }
+                          }
+                      });
+                  }
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 3e036732b2a342bc87c618d0d00524e5
+          name: 'PSU discovery'
+          type: HTTP_AGENT
+          key: psu.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$API.USER}'
+          password: '{$API.PASSWORD}'
+          description: 'Discovery of PSU sensors.'
+          item_prototypes:
+            -
+              uuid: da11f4b9a14044ba9e4d498582f8424f
+              name: 'Dell R740: {#SENSOR_NAME} Get sensor'
+              type: HTTP_AGENT
+              key: 'dell.server.sensor.psu.get[{#SENSOR_NAME}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              authtype: BASIC
+              username: '{$API.USER}'
+              password: '{$API.PASSWORD}'
+              description: 'Returns the metrics of a sensor.'
+              url: '{$API.URL}{#ODATA}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
+            -
+              uuid: 97d10c59c9df4873bb46d5f0cf95de0a
+              name: 'Dell R740: {#SENSOR_NAME} Status'
+              type: DEPENDENT
+              key: 'dell.server.sensor.psu.status[{#SENSOR_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The status of the job. Possible values: OK, Warning, Critical.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Status.Health
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.sensor.psu.get[{#SENSOR_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Power supply'
+              trigger_prototypes:
+                -
+                  uuid: 0ad250b5037247ab971a266319989ec4
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  name: 'Dell R740: {#SENSOR_NAME} is in a critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: 6ca3f32810a04df2bed7e64df008451f
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Warning")=1'
+                  name: 'Dell R740: {#SENSOR_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#SENSOR_NAME} is in a critical state'
+                      expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1'
+          url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function request(url) {
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  
+                      try {
+                          response = api_request.get(url);
+                      } catch (error) {
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                      }
+                  
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
+                  
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
+                          if (response !== null) {
+                              if (typeof response.message === 'string') {
+                                  message += ': ' + response.message;
+                              }
+                          }
+                  
+                          throw message + ' Check debug log for more information.';
+                      }
+                  
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                              response = null;
+                          }
+                      }
+                  
+                      return {
+                          status: api_request.getStatus(),
+                          body: response
+                      };
+                  }
+                  
+                  function getField(object, field, def) {
+                      var names = field.split('.');
+                      var name = names.shift();
+                  
+                      while (typeof name !== 'undefined') {
+                          if (typeof object === undefined || typeof object[name] === 'undefined') {
+                              return def;
+                          }
+                  
+                          object = object[name];
+                          name = names.shift();
+                      }
+                  
+                      return object;
+                  }
+                  
+                  try {
+                      sensors = JSON.parse(value);
+                  }
+                  catch (error) {
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                      sensors = null;
+                  }
+                  
+                  var params = {
+                      url: '{$API.URL}',
+                      user: '{$API.USER}',
+                      password: '{$API.PASSWORD}'
+                  };
+                  var result = [];
+                  
+                  var index = params.url.indexOf('://');
+                  index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+                  if (index !== -1) {
+                      params.url = params.url.substring(0, index);
+                  }
+                  
+                  if (sensors.Members instanceof Array) {
+                      sensors.Members.forEach(function (sensor) {
+                          if (typeof sensor["@odata.id"] === 'string') {
+                              response = request(params.url + sensor["@odata.id"]);
+                              if (getField(response.body, 'ReadingType', '') === 'Voltage') {
+                                  result.push({ '{#SENSOR_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': sensor["@odata.id"] });
+                              }
+                          }
+                      });
+                  }
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: ecc5f7d61f5c437dab3fd3ebd6b54065
+          name: 'Temperature discovery'
+          type: HTTP_AGENT
+          key: temp.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$API.USER}'
+          password: '{$API.PASSWORD}'
+          description: 'Discovery of temperature sensors.'
+          item_prototypes:
+            -
+              uuid: c987c12f67234b08809c7316adc087d6
+              name: 'Dell R740: {#SENSOR_NAME} Get sensor'
+              type: HTTP_AGENT
+              key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              authtype: BASIC
+              username: '{$API.USER}'
+              password: '{$API.PASSWORD}'
+              description: 'Returns the metrics of a sensor.'
+              url: '{$API.URL}{#ODATA}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
+            -
+              uuid: 850ed07a6b2d43bbbe6df4cfde47832f
+              name: 'Dell R740: {#SENSOR_NAME} Status'
+              type: DEPENDENT
+              key: 'dell.server.sensor.temp.status[{#SENSOR_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The status of the job. Possible values: OK, Warning, Critical.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Status.Health
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 32134fb04cb3457abc98803d79007ea4
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  name: 'Dell R740: {#SENSOR_NAME} is in a critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: f16bf4a4d5e140f7a6c1ea9112752710
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Warning")=1'
+                  name: 'Dell R740: {#SENSOR_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#SENSOR_NAME} is in a critical state'
+                      expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1'
+            -
+              uuid: db13798bbf784d39a00e523cc933685c
+              name: 'Dell R740: {#SENSOR_NAME} Value'
+              type: DEPENDENT
+              key: 'dell.server.sensor.temp.value[{#SENSOR_NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: 'The sensor value.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Reading
+              master_item:
+                key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+          url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function request(url) {
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  
+                      try {
+                          response = api_request.get(url);
+                      } catch (error) {
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                      }
+                  
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
+                  
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
+                          if (response !== null) {
+                              if (typeof response.message === 'string') {
+                                  message += ': ' + response.message;
+                              }
+                          }
+                  
+                          throw message + ' Check debug log for more information.';
+                      }
+                  
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                              response = null;
+                          }
+                      }
+                  
+                      return {
+                          status: api_request.getStatus(),
+                          body: response
+                      };
+                  }
+                  
+                  function getField(object, field, def) {
+                      var names = field.split('.');
+                      var name = names.shift();
+                  
+                      while (typeof name !== 'undefined') {
+                          if (typeof object === undefined || typeof object[name] === 'undefined') {
+                              return def;
+                          }
+                  
+                          object = object[name];
+                          name = names.shift();
+                      }
+                  
+                      return object;
+                  }
+                  
+                  try {
+                      sensors = JSON.parse(value);
+                  }
+                  catch (error) {
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                      sensors = null;
+                  }
+                  
+                  var params = {
+                      url: '{$API.URL}',
+                      user: '{$API.USER}',
+                      password: '{$API.PASSWORD}'
+                  };
+                  var result = [];
+                  
+                  var index = params.url.indexOf('://');
+                  index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+                  if (index !== -1) {
+                      params.url = params.url.substring(0, index);
+                  }
+                  
+                  if (sensors.Members instanceof Array) {
+                      sensors.Members.forEach(function (sensor) {
+                          if (typeof sensor["@odata.id"] === 'string') {
+                              response = request(params.url + sensor["@odata.id"]);
+                              if (getField(response.body, 'ReadingType', '') === 'Temperature') {
+                                  result.push({ '{#SENSOR_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': sensor["@odata.id"] });
+                              }
+                          }
+                      });
+                  }
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 75fbb5acaca1471a95e81a2d4317e2f8
+          name: 'Virtual disk discovery'
+          type: HTTP_AGENT
+          key: virtualdisk.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$API.USER}'
+          password: '{$API.PASSWORD}'
+          description: 'Discovery of virtual disks.'
+          item_prototypes:
+            -
+              uuid: d56b76fd767a4d71a279711f0a9ff6ae
+              name: 'Dell R740: {#DISK_NAME} Get disk'
+              type: HTTP_AGENT
+              key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              authtype: BASIC
+              username: '{$API.USER}'
+              password: '{$API.PASSWORD}'
+              description: 'Returns the metrics of a virtual disk.'
+              url: '{$API.URL}{#ODATA}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Zabbix raw items'
+            -
+              uuid: e4a484a80c714e56be916d48056d5fb7
+              name: 'Dell R740: {#DISK_NAME} RAID status'
+              type: DEPENDENT
+              key: 'dell.server.hw.virtualdisk.raidstatus[{#DISK_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'This property represents the RAID specific status. Possible values: Blocked, Degraded, Failed, Foreign, Offline, Online, Ready, Unknown, null.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Oem.Dell.DellVirtualDisk.RaidStatus
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: 6bb29c04737a47cdafdc491a89e590c6
+              name: 'Dell R740: {#DISK_NAME} Read policy'
+              type: DEPENDENT
+              key: 'dell.server.hw.virtualdisk.readpolicy[{#DISK_NAME}]'
+              delay: '0'
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'Indicates the read cache policy setting for the Volume. Possible values: ReadAhead, AdaptiveReadAhead, Off.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Oem.Dell.DellVirtualDisk.ReadCachePolicy
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: b2b9444b7a544f61bbdc4ba8f954d5f9
+              name: 'Dell R740: {#DISK_NAME} Size'
+              type: DEPENDENT
+              key: 'dell.server.hw.virtualdisk.size[{#DISK_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: 0d
+              units: B
+              description: 'The size in bytes of this Volume.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.CapacityBytes
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: a661f20d119743bd814111d54e3bfb2f
+              name: 'Dell R740: {#DISK_NAME} Current state'
+              type: DEPENDENT
+              key: 'dell.server.hw.virtualdisk.state[{#DISK_NAME}]'
+              delay: '0'
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Status.State
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+            -
+              uuid: a822bc4d25734b6da03376b2de72c033
+              name: 'Dell R740: {#DISK_NAME} Status'
+              type: DEPENDENT
+              key: 'dell.server.hw.virtualdisk.status[{#DISK_NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The status of the job. Possible values: OK, Warning, Critical.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Status.Health
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+              trigger_prototypes:
+                -
+                  uuid: 61f1fea5489a436790791636b3797837
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1'
+                  name: 'Dell R740: {#DISK_NAME} is in a critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults.'
+                -
+                  uuid: 13929a816d8c4cb6abc24c681a154205
+                  expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Warning")=1'
+                  name: 'Dell R740: {#DISK_NAME} is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings.'
+                  dependencies:
+                    -
+                      name: 'Dell R740: {#DISK_NAME} is in a critical state'
+                      expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1'
+            -
+              uuid: f2d6a2c3178e42f69e67de65239e3a59
+              name: 'Dell R740: {#DISK_NAME} Write policy'
+              type: DEPENDENT
+              key: 'dell.server.hw.virtualdisk.writepolicy[{#DISK_NAME}]'
+              delay: '0'
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'Indicates the write cache policy setting for the Volume. Possible values: WriteThrough, ProtectedWriteBack, UnprotectedWriteBack.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Oem.Dell.DellVirtualDisk.WriteCachePolicy
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Virtual disks'
+          url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function request(url) {
+                      api_request = new HttpRequest();
+                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  
+                      try {
+                          response = api_request.get(url);
+                      } catch (error) {
+                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                      }
+                  
+                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                          api_request.getStatus() + '\n' + response);
+                  
+                      if (api_request.getStatus() !== 200) {
+                          var message = 'Request failed with status code ' + api_request.getStatus();
+                          if (response !== null) {
+                              if (typeof response.message === 'string') {
+                                  message += ': ' + response.message;
+                              }
+                          }
+                  
+                          throw message + ' Check debug log for more information.';
+                      }
+                  
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                              response = null;
+                          }
+                      }
+                  
+                      return {
+                          status: api_request.getStatus(),
+                          body: response
+                      };
+                  }
+                  
+                  function getField(object, field, def) {
+                      var names = field.split('.');
+                      var name = names.shift();
+                  
+                      while (typeof name !== 'undefined') {
+                          if (typeof object === undefined || typeof object[name] === 'undefined') {
+                              return def;
+                          }
+                  
+                          object = object[name];
+                          name = names.shift();
+                      }
+                  
+                      return object;
+                  }
+                  
+                  try {
+                      storages = JSON.parse(value);
+                  }
+                  catch (error) {
+                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                      storages = null;
+                  }
+                  
+                  var params = {
+                      url: '{$API.URL}',
+                      user: '{$API.USER}',
+                      password: '{$API.PASSWORD}'
+                  };
+                  var result = [];
+                  
+                  var index = params.url.indexOf('://');
+                  index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
+                  if (index !== -1) {
+                      params.url = params.url.substring(0, index);
+                  }
+                  
+                  if (storages.Members instanceof Array) {
+                      storages.Members.forEach(function (storage) {
+                          if (typeof storage["@odata.id"] === 'string') {
+                              response = request(params.url + storage["@odata.id"] + "/Volumes");
+                              volumes = response.body;
+                              if (volumes.Members instanceof Array) {
+                                  volumes.Members.forEach(function (volume) {
+                                      if (typeof volume["@odata.id"] === 'string') {
+                                          response = request(params.url + volume["@odata.id"]);
+                                          result.push({ '{#DISK_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': volume["@odata.id"] });
+                                      }
+                                  });
+                              }
+                          }
+                      });
+                  }
+                  
+                  return JSON.stringify(result);
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      macros:
+        -
+          macro: '{$API.PASSWORD}'
+          value: '<Put your password here>'
+          description: 'The Dell iDRAC user password.'
+        -
+          macro: '{$API.URL}'
+          value: '<Put your URL here>'
+          description: 'The Dell iDRAC Redfish API URL in the format `<scheme>://<host>:<port>`.'
+        -
+          macro: '{$API.USER}'
+          value: '<Put your username here>'
+          description: 'The Dell iDRAC username.'
+        -
+          macro: '{$IFCONTROL}'
+          value: '1'
+          description: 'Link status trigger will be fired only for interfaces that have the context macro equaled 1.'
+      valuemaps:
+        -
+          uuid: 182f54d53eab4a2ea6025dfc028a6892
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

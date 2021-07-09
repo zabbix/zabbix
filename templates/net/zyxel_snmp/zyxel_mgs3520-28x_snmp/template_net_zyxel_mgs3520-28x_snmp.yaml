@@ -133,7 +133,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3785991565b948c2a1e1a2a140c42df4
-              expression: '(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion,#2))=1 and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion))>0'
+              expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion,#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion))>0'
               name: 'ZYXEL MGS3520-28x: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -297,7 +297,7 @@ zabbix_export:
           triggers:
             -
               uuid: e953886c5a464fc18bb1e221d801901c
-              expression: '(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#2))=1 and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber))>0'
+              expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber))>0'
               name: 'ZYXEL MGS3520-28x: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -660,7 +660,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: abb9d47ee9624d6f9805e6eedd5532c5
-                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link down'
@@ -1126,7 +1126,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b9c3894fed8140c684be7c1fe2bbca8d
-                  expression: '(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'

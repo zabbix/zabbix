@@ -133,7 +133,7 @@ zabbix_export:
           triggers:
             -
               uuid: 182e8b14935445268c096a3e4fdb5795
-              expression: '(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fwversion,#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fwversion,#2))=1 and length(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fwversion))>0'
+              expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fwversion,#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fwversion,#2) and length(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.fwversion))>0'
               name: 'ZYXEL MES3500-24S: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -297,7 +297,7 @@ zabbix_export:
           triggers:
             -
               uuid: 90268ffbf33049d6adc6ed96badd67ec
-              expression: '(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.serialnumber,#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.serialnumber,#2))=1 and length(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.serialnumber))>0'
+              expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.serialnumber,#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.serialnumber,#2) and length(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.serialnumber))>0'
               name: 'ZYXEL MES3500-24S: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -660,7 +660,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 60f1b7c76a6b410db3f3a2ae40c3b74c
-                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL MES3500-24S: Port {#SNMPINDEX}: Link down'
@@ -1126,7 +1126,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f6533a3fe07c4f0290e7758ac4183a1f
-                  expression: '(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-24S SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL MES3500-24S: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'

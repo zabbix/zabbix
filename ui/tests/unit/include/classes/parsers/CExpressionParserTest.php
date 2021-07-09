@@ -73,9 +73,12 @@ class CExpressionParserTest extends TestCase {
 			['-1.5T', null, CParser::PARSE_SUCCESS],
 
 			['{TRIGGER.VALUE}', null, CParser::PARSE_SUCCESS],
-			['{$USERMACRO}', null, CParser::PARSE_SUCCESS],
+			['{$USERMACRO}', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['{$USERMACRO}', ['error' => 'incorrect expression starting from "{$USERMACRO}"', 'match' => ''], CParser::PARSE_FAIL],
+
 			['{TRIGGER.VALUE}=1', null, CParser::PARSE_SUCCESS],
-			['{$USERMACRO}=1', null, CParser::PARSE_SUCCESS],
+			['{$USERMACRO}=1', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['{$USERMACRO}=1', ['error' => 'incorrect expression starting from "{$USERMACRO}=1"', 'match' => ''], CParser::PARSE_FAIL],
 
 			['(/host)', null, CParser::PARSE_FAIL],
 			['(/host/key)', null, CParser::PARSE_FAIL],
@@ -86,11 +89,16 @@ class CExpressionParserTest extends TestCase {
 			['last(/host/key) and + {TRIGGER.VALUE}', ['error' => 'incorrect expression starting from "+ {TRIGGER.VALUE}"', 'match' => 'last(/host/key)'], CParser::PARSE_SUCCESS_CONT],
 			['last(/host/key) and - {TRIGGER.VALUE}', null, CParser::PARSE_SUCCESS],
 
-			['last(/host/key) and {$USERMACRO}', null, CParser::PARSE_SUCCESS],
-			['last(/host/key)and {$USERMACRO}', null, CParser::PARSE_SUCCESS_CONT],
-			['last(/host/key) and{$USERMACRO}', null, CParser::PARSE_SUCCESS_CONT],
-			['last(/host/key) and + {$USERMACRO}', null, CParser::PARSE_SUCCESS_CONT],
-			['last(/host/key) and - {$USERMACRO}', null, CParser::PARSE_SUCCESS],
+			['last(/host/key) and {$USERMACRO}', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['last(/host/key) and {$USERMACRO}', ['error' => 'incorrect expression starting from "{$USERMACRO}"', 'match' => 'last(/host/key)'], CParser::PARSE_SUCCESS_CONT],
+			['last(/host/key)and {$USERMACRO}', null, CParser::PARSE_SUCCESS_CONT, ['usermacros' => true]],
+			['last(/host/key)and {$USERMACRO}', ['error' => 'incorrect expression starting from "and {$USERMACRO}"', 'match' => 'last(/host/key)'], CParser::PARSE_SUCCESS_CONT],
+			['last(/host/key) and{$USERMACRO}', null, CParser::PARSE_SUCCESS_CONT, ['usermacros' => true]],
+			['last(/host/key) and{$USERMACRO}', ['error' => 'incorrect expression starting from "{$USERMACRO}"', 'match' => 'last(/host/key)'], CParser::PARSE_SUCCESS_CONT],
+			['last(/host/key) and + {$USERMACRO}', null, CParser::PARSE_SUCCESS_CONT, ['usermacros' => true]],
+			['last(/host/key) and + {$USERMACRO}', ['error' => 'incorrect expression starting from "+ {$USERMACRO}"', 'match' => 'last(/host/key)'], CParser::PARSE_SUCCESS_CONT],
+			['last(/host/key) and - {$USERMACRO}', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['last(/host/key) and - {$USERMACRO}', ['error' => 'incorrect expression starting from "{$USERMACRO}"', 'match' => 'last(/host/key)'], CParser::PARSE_SUCCESS_CONT],
 
 			// basic "not" support
 			['not 1', null, CParser::PARSE_SUCCESS],
@@ -103,11 +111,16 @@ class CExpressionParserTest extends TestCase {
 			['not -{TRIGGER.VALUE}', null, CParser::PARSE_SUCCESS],
 			['not (-{TRIGGER.VALUE})', null, CParser::PARSE_SUCCESS],
 			['not -({TRIGGER.VALUE})', null, CParser::PARSE_SUCCESS],
-			['not {$USERMACRO}', null, CParser::PARSE_SUCCESS],
-			['not ({$USERMACRO})', null, CParser::PARSE_SUCCESS],
-			['not -{$USERMACRO}', null, CParser::PARSE_SUCCESS],
-			['not (-{$USERMACRO})', null, CParser::PARSE_SUCCESS],
-			['not -({$USERMACRO})', null, CParser::PARSE_SUCCESS],
+			['not {$USERMACRO}', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['not {$USERMACRO}', ['error' => 'incorrect expression starting from "{$USERMACRO}"', 'match' => ''], CParser::PARSE_FAIL],
+			['not ({$USERMACRO})', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['not ({$USERMACRO})', ['error' => 'incorrect expression starting from "{$USERMACRO})"', 'match' => ''], CParser::PARSE_FAIL],
+			['not -{$USERMACRO}', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['not -{$USERMACRO}', ['error' => 'incorrect expression starting from "{$USERMACRO}"', 'match' => ''], CParser::PARSE_FAIL],
+			['not (-{$USERMACRO})', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['not (-{$USERMACRO})', ['error' => 'incorrect expression starting from "{$USERMACRO})"', 'match' => ''], CParser::PARSE_FAIL],
+			['not -({$USERMACRO})', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['not -({$USERMACRO})', ['error' => 'incorrect expression starting from "{$USERMACRO})"', 'match' => ''], CParser::PARSE_FAIL],
 			['not last(/host/key)', null, CParser::PARSE_SUCCESS],
 			['not (last(/host/key))', null, CParser::PARSE_SUCCESS],
 			['not -last(/host/key)', null, CParser::PARSE_SUCCESS],
@@ -124,11 +137,14 @@ class CExpressionParserTest extends TestCase {
 			['not-{TRIGGER.VALUE}', null, CParser::PARSE_FAIL],
 			['not(-{TRIGGER.VALUE})', null, CParser::PARSE_SUCCESS],
 			['not-({TRIGGER.VALUE})', null, CParser::PARSE_FAIL],
-			['not{$USERMACRO}', null, CParser::PARSE_FAIL],
-			['not({$USERMACRO})', null, CParser::PARSE_SUCCESS],
-			['not-{$USERMACRO}', null, CParser::PARSE_FAIL],
-			['not(-{$USERMACRO})', null, CParser::PARSE_SUCCESS],
-			['not-({$USERMACRO})', null, CParser::PARSE_FAIL],
+
+			['not{$USERMACRO}', null, CParser::PARSE_FAIL, ['usermacros' => true]],
+			['not({$USERMACRO})', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['not({$USERMACRO})', ['error' => 'incorrect expression starting from "{$USERMACRO})"', 'match' => ''], CParser::PARSE_FAIL],
+			['not-{$USERMACRO}', null, CParser::PARSE_FAIL, ['usermacros' => true]],
+			['not(-{$USERMACRO})', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['not(-{$USERMACRO})', ['error' => 'incorrect expression starting from "{$USERMACRO})"', 'match' => ''], CParser::PARSE_FAIL],
+			['not-({$USERMACRO})', null, CParser::PARSE_FAIL, ['usermacros' => true]],
 			['not(last(/host/key))', null, CParser::PARSE_SUCCESS],
 			['not(-last(/host/key))', null, CParser::PARSE_SUCCESS],
 			['not-(last(/host/key))', null, CParser::PARSE_FAIL],
@@ -1866,7 +1882,8 @@ class CExpressionParserTest extends TestCase {
 			['last(/host/key,0)<>0', null, CParser::PARSE_SUCCESS],
 
 			['(nodata(/hostA/keyA, "300s")=0) oror (last(/hostB/keyB,123)=0)', null, CParser::PARSE_SUCCESS_CONT],
-			['(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE} and {$USERMACRO1}+(-{$USERMACRO2})+-{$USERMACRO3}*-12K+12.5m', null, CParser::PARSE_SUCCESS],
+			['(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE} and {$USERMACRO1}+(-{$USERMACRO2})+-{$USERMACRO3}*-12K+12.5m', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
+			['(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE} and {$USERMACRO1}+(-{$USERMACRO2})+-{$USERMACRO3}*-12K+12.5m', ['error' => 'incorrect expression starting from "{$USERMACRO1}+(-{$USERMACRO2})+-{$USERMACRO3}*-12K+12.5m"', 'match' => '(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE}'], CParser::PARSE_SUCCESS_CONT],
 			['last(/host/key,1.23)', null, CParser::PARSE_FAIL],
 			['last(/host/key,1.23s)', null, CParser::PARSE_FAIL],
 			['date()', null, CParser::PARSE_SUCCESS],
@@ -2130,7 +2147,8 @@ class CExpressionParserTest extends TestCase {
 			// collapsed trigger expressions
 			['func(/host/key)', null, CParser::PARSE_FAIL, ['collapsed_expression' => true]],
 			['{123}', null, CParser::PARSE_SUCCESS, ['collapsed_expression' => true]],
-			['{123} = {$MACRO}', null, CParser::PARSE_SUCCESS, ['collapsed_expression' => true]],
+			['{123} = {$MACRO}', null, CParser::PARSE_SUCCESS, ['collapsed_expression' => true, 'usermacros' => true]],
+			['{123} = {$MACRO}', null, CParser::PARSE_SUCCESS_CONT, ['collapsed_expression' => true]],
 			['{123} = {#MACRO}', null, CParser::PARSE_SUCCESS, ['collapsed_expression' => true, 'lldmacros' => true]],
 			['{123} = {#MACRO}', null, CParser::PARSE_SUCCESS_CONT, ['collapsed_expression' => true]],
 
@@ -2173,7 +2191,8 @@ class CExpressionParserTest extends TestCase {
 			['last(/'.'/*) = 1', null, CParser::PARSE_FAIL, ['empty_host' => true]],
 			['last(/'.'/*) = 1', null, CParser::PARSE_SUCCESS, ['calculated' => true, 'empty_host' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*?[group = "Zabbix servers" and (tag = "tag1" or tag = "tag2")]) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
-			['last(/*/agent.ping) = 1 or last(/host2/*?[group = "Zabbix servers" and (tag = {$MACRO} or tag = "tag2")]) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
+			['last(/*/agent.ping) = 1 or last(/host2/*?[group = "Zabbix servers" and (tag = {$MACRO} or tag = "tag2")]) = 1 or last(/*/*)', null, CParser::PARSE_SUCCESS, ['usermacros' => true, 'calculated' => true]],
+			['last(/*/agent.ping) = 1 or last(/host2/*?[group = "Zabbix servers" and (tag = {$MACRO} or tag = "tag2")]) = 1 or last(/*/*)', ['error' => 'incorrect expression starting from "last(/host2/*?[group = "Zabbix servers" and (tag = {$MACRO} or tag = "tag2")]) = 1 or last(/*/*)"', 'match' => 'last(/*/agent.ping) = 1'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
 			['last(/host2/*?[group = "Zabbix servers" and (tag = {#MACRO} or tag = "tag2")]) = 1', null, CParser::PARSE_FAIL, ['calculated' => true]],
 			['last(/host2/*?[group = "Zabbix servers" and (tag = {#MACRO} or tag = {{#MACRO}.func()})]) = 1', null, CParser::PARSE_SUCCESS, ['lldmacros' => true, 'calculated' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', ['error' => 'incorrect expression starting from "last(/{HOST.HOST}/key)"', 'match' => 'last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
@@ -2710,7 +2729,7 @@ class CExpressionParserTest extends TestCase {
 						]
 					]
 				],
-				['collapsed_expression' => true]
+				['usermacros' => true, 'collapsed_expression' => true]
 			]
 		];
 	}

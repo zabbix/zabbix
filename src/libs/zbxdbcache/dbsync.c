@@ -3248,6 +3248,7 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 		if (ZBX_DBSYNC_ROW_NONE != tag)
 			dbsync_add_row(sync, rowid, tag, dbrow);
 	}
+	DBfree_result(result);
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->item_tags, &iter);
 	while (NULL != (item_tag = (zbx_dc_item_tag_t *)zbx_hashset_iter_next(&iter)))
@@ -3257,7 +3258,6 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
 
 	return SUCCEED;
 }

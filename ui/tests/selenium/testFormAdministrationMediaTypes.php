@@ -350,16 +350,25 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'Email',
 					'name' => 'Email with zero attempt',
 					'attempts' => 0,
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Email',
-					'name' => 'Email with eleven attempts',
-					'attempts' => 11,
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "10".'
+					'name' => 'Email with empty attempt',
+					'attempts' => '',
+					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Email',
+					'name' => 'Email with 101 attempts',
+					'attempts' => 101,
+					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			[
@@ -368,7 +377,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'name' => 'Email attempts with symbols',
 					'type' => 'Email',
 					'attempts' => 'æų',
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "10".',
+					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".',
 					'jenkins' => true
 				]
 			],
@@ -378,7 +387,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'name' => 'Email attempts with symbols',
 					'type' => 'Email',
 					'attempts' => '☺',
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "10".',
+					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".',
 					'jenkins' => true
 				]
 			],
@@ -387,27 +396,36 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Email',
-					'name' => 'Email with 61s in interval',
-					'interval' => '61s',
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'name' => 'Email with 3601s in interval',
+					'interval' => '3601s',
+					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Email',
-					'name' => 'Email with 61 in interval',
-					'interval' => '61',
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'name' => 'Email with 3601 in interval',
+					'interval' => '3601',
+					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Email',
-					'name' => 'Email with 2m in inerval',
-					'interval' => '2m',
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'name' => 'Email with 61m in interval',
+					'interval' => '61m',
+					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Email',
+					'name' => 'Email with 2h in inerval',
+					'interval' => '2h',
+					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
@@ -416,7 +434,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'Email',
 					'name' => 'Email with symbols in interval',
 					'interval' => '1msms',
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
@@ -425,16 +443,25 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'Email',
 					'name' => 'Email with symbols in interval',
 					'interval' => '☺',
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Email',
-					'name' => 'Email with invalid interval',
+					'name' => 'Email with -1s interval',
 					'interval' => '-1s',
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "60".'
+					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Email',
+					'name' => 'Email with -1 interval',
+					'interval' => -1,
+					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			// maxsessions validation
@@ -456,7 +483,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'name' => 'Email with one concurrent sessions',
 					'sessions' => 'One',
 					'attempts' => 10,
-					'interval' => '1m',
+					'interval' => '60m',
 					'dbCheck' => true
 				]
 			],
@@ -474,10 +501,60 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Email',
-					'name' => 'Email with custom concurrent sessions',
+					'name' => 'Email with 0h intrval',
+					'sessions' => 'Unlimited',
+					'attempts' => 1,
+					'interval' => '0h'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Email',
+					'name' => 'Email with 0d interval',
+					'sessions' => 'Unlimited',
+					'attempts' => 1,
+					'interval' => '0d'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Email',
+					'name' => 'Email with 100 attempts',
+					'sessions' => 'Unlimited',
+					'attempts' => 100,
+					'interval' => 3600
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Email',
+					'name' => 'Email with 3600s interval',
+					'sessions' => 'Unlimited',
+					'attempts' => 100,
+					'interval' => '3600s'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Email',
+					'name' => 'Email with 0s interval',
+					'sessions' => 'Unlimited',
+					'attempts' => 1,
+					'interval' => '0s'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Email',
+					'name' => 'Email with 1h interval',
 					'sessions' => 'Custom',
 					'maxsessions' => 100,
-					'interval' => '60s'
+					'interval' => '1h'
 				]
 			],
 			[
@@ -489,7 +566,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'sessions' => 'Custom',
 					'maxsessions' => 'abc',
 					'attempts' => 10,
-					'interval' => '60s',
+					'interval' => '60m',
 					'dbCheck' => true
 				]
 			],
