@@ -297,7 +297,7 @@ class CProxy extends CApiService {
 
 		$db_proxies = $this->get([
 			'output' => ['proxyid', 'hostid', 'host', 'status', 'tls_connect', 'tls_accept', 'tls_issuer',
-				'tls_subject'
+				'tls_subject', 'description', 'proxy_address'
 			],
 			'proxyids' => $proxyids,
 			'editable' => true,
