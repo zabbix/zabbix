@@ -75,7 +75,7 @@ foreach ($data['services'] as $service) {
 		(new CCol(
 			(new CLink($service['name']))->addClass('js-name')
 		))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(serviceAlgorithm($service['algorithm'])))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol(CServiceHelper::getAlgorithmNames()[$service['algorithm']]))->addClass(ZBX_STYLE_NOWRAP),
 		new CCol($problem_tags)
 	]);
 }

@@ -21,6 +21,14 @@
 
 class CServiceHelper {
 
+	public static function getAlgorithmNames() {
+		return [
+			SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
+			SERVICE_ALGORITHM_MIN => _('Problem, if all children have problems'),
+			SERVICE_ALGORITHM_NONE => _('Do not calculate')
+		];
+	}
+
 	public static function makeProblemTagsHtml(array $problem_tags): array {
 		$all_elements = [];
 

@@ -63,7 +63,7 @@ $service_tab = (new CFormGrid())
 				->setId('algorithm')
 				->setFocusableElementId('algorithm_focusable')
 				->setValue($data['form']['algorithm'])
-				->addOptions(CSelect::createOptionsFromArray(serviceAlgorithm()))
+				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getAlgorithmNames()))
 		)
 	])
 	->addItem([

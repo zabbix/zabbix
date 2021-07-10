@@ -180,7 +180,6 @@ switch ($data['popup_type']) {
 	case 'roles':
 	case 'api_methods':
 	case 'dashboard':
-	case 'services':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -646,7 +645,7 @@ if ($data['multiselect'] && $form !== null) {
 
 // Types require results returned as array.
 $types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'proxies', 'items',
-	'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods', 'valuemaps', 'dashboard', 'services'
+	'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods', 'valuemaps', 'dashboard'
 ];
 
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {

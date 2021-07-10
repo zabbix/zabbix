@@ -25,11 +25,7 @@
 ?>
 
 window.service_edit_popup = {
-	algorithm_names: <?= json_encode([
-		SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
-		SERVICE_ALGORITHM_MIN => _('Problem, if all children have problems'),
-		SERVICE_ALGORITHM_NONE => _('Do not calculate')
-	], JSON_FORCE_OBJECT) ?>,
+	algorithm_names: <?= json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT) ?>,
 
 	serviceid: null,
 	overlay: null,
