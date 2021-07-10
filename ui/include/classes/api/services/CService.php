@@ -81,10 +81,10 @@ class CService extends CApiService {
 			'selectChildren' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder']), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'selectProblemTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'operator', 'value']), 'default' => null],
-			'selectTimes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['ts_from', 'ts_to', 'type', 'note']), 'default' => null],
+			'selectTimes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['type', 'ts_from', 'ts_to', 'note']), 'default' => null],
 			'selectAlarms' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['clock', 'value']), 'default' => null],
 			// sort and limit
-			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['sortorder', 'name']), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
@@ -98,7 +98,7 @@ class CService extends CApiService {
 
 		$db_services = [];
 
-		$sql = $this->createSelectQuery($this->tableName(), $options);
+		$sql = $this->createSelectQuery('services', $options);
 		$resource = DBselect($sql, $options['limit']);
 
 		while ($row = DBfetch($resource)) {
@@ -341,7 +341,7 @@ class CService extends CApiService {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['parentids'] !== null) {
-			$sqlParts['left_table'] = ['table' => $this->tableName, 'alias' => $this->tableAlias];
+			$sqlParts['left_table'] = ['table' => 'services', 'alias' => 's'];
 			$sqlParts['left_join'][] = [
 				'table' => 'services_links',
 				'alias' => 'slp',
@@ -351,7 +351,7 @@ class CService extends CApiService {
 		}
 
 		if ($options['childids'] !== null) {
-			$sqlParts['left_table'] = ['table' => $this->tableName, 'alias' => $this->tableAlias];
+			$sqlParts['left_table'] = ['table' => 'services', 'alias' => 's'];
 			$sqlParts['left_join'][] = [
 				'table' => 'services_links',
 				'alias' => 'slc',
@@ -419,15 +419,23 @@ class CService extends CApiService {
 		}
 
 		if ($options['selectTags'] !== null) {
-			$tags = API::getApiService()->select('service_tag', [
-				'output' => ($options['selectTags'] === API_OUTPUT_COUNT)
-					? ['servicetagid', 'serviceid']
-					: $this->outputExtend($options['selectTags'], ['servicetagid', 'serviceid']),
+			if ($options['selectTags'] === API_OUTPUT_COUNT) {
+				$output = ['servicetagid', 'serviceid'];
+			}
+			elseif ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$output = ['servicetagid', 'serviceid', 'tag', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['servicetagid', 'serviceid'], $options['selectTags']));
+			}
+
+			$tags = DB::select('service_tag', [
+				'output' => $output,
 				'filter' => ['serviceid' => $serviceids],
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($tags, 'serviceid', 'servicetagid');
-			$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid'], ['selectTags']);
+			$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid'], $options['selectTags']);
 			$result = $relation_map->mapMany($result, $tags, 'tags');
 
 			if ($options['selectTags'] === API_OUTPUT_COUNT) {
@@ -439,16 +447,26 @@ class CService extends CApiService {
 		}
 
 		if ($options['selectProblemTags'] !== null) {
-			$problem_tags = API::getApiService()->select('service_problem_tag', [
-				'output' => ($options['selectProblemTags'] === API_OUTPUT_COUNT)
-					? ['service_problem_tagid', 'serviceid']
-					: $this->outputExtend($options['selectProblemTags'], ['service_problem_tagid', 'serviceid']),
+			if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
+				$output = ['service_problem_tagid', 'serviceid'];
+			}
+			elseif ($options['selectProblemTags'] === API_OUTPUT_EXTEND) {
+				$output = ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['service_problem_tagid', 'serviceid'],
+					$options['selectProblemTags']
+				));
+			}
+
+			$problem_tags = DB::select('service_problem_tag', [
+				'output' => $output,
 				'filter' => ['serviceid' => $serviceids],
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($problem_tags, 'serviceid', 'service_problem_tagid');
 			$problem_tags = $this->unsetExtraFields($problem_tags, ['service_problem_tagid', 'serviceid'],
-				['selectProblemTags']
+				$options['selectProblemTags']
 			);
 			$result = $relation_map->mapMany($result, $problem_tags, 'problem_tags');
 
@@ -461,8 +479,18 @@ class CService extends CApiService {
 		}
 
 		if ($options['selectTimes'] !== null) {
-			$times = API::getApiService()->select('services_times', [
-				'output' => $this->outputExtend($options['selectTimes'], ['timeid', 'serviceid']),
+			if ($options['selectTimes'] === API_OUTPUT_COUNT) {
+				$output = ['timeid', 'serviceid'];
+			}
+			elseif ($options['selectTimes'] === API_OUTPUT_EXTEND) {
+				$output = ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'];
+			}
+			else {
+				$output = array_unique(array_merge(['timeid', 'serviceid'], $options['selectTimes']));
+			}
+
+			$times = DB::select('services_times', [
+				'output' => $output,
 				'filter' => ['serviceid' => $serviceids],
 				'preservekeys' => true
 			]);
@@ -472,8 +500,18 @@ class CService extends CApiService {
 		}
 
 		if ($options['selectAlarms'] !== null) {
-			$alarms = API::getApiService()->select('service_alarms', [
-				'output' => $this->outputExtend($options['selectAlarms'], ['servicealarmid', 'serviceid']),
+			if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
+				$output = ['servicealarmid', 'serviceid'];
+			}
+			elseif ($options['selectAlarms'] === API_OUTPUT_EXTEND) {
+				$output = ['servicealarmid', 'serviceid', 'clock', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['servicealarmid', 'serviceid'], $options['selectAlarms']));
+			}
+
+			$alarms = DB::select('service_alarms', [
+				'output' => $output,
 				'filter' => ['serviceid' => $serviceids],
 				'preservekeys' => true
 			]);
