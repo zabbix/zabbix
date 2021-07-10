@@ -28,7 +28,7 @@ class CControllerPopupServiceCreate extends CController {
 			'algorithm' =>			'required|db services.algorithm|in '.implode(',', [SERVICE_ALGORITHM_NONE, SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN]),
 			'problem_tags' =>		'array',
 			'sortorder' =>			'required|db services.sortorder|ge 0|le 999',
-			'showsla' =>			'db services.showsla|in '.SERVICE_SHOW_SLA_OFF.','.SERVICE_SHOW_SLA_ON,
+			'showsla' =>			'in 1',
 			'goodsla' =>			'string',
 			'times' =>				'array',
 			'tags' =>				'array',
@@ -55,7 +55,7 @@ class CControllerPopupServiceCreate extends CController {
 
 	protected function doAction(): void {
 		$service = [
-			'showsla' => SERVICE_SHOW_SLA_OFF,
+			'showsla' => $this->hasInput('showsla') ? SERVICE_SHOW_SLA_ON : SERVICE_SHOW_SLA_OFF,
 			'tags' => [],
 			'problem_tags' => [],
 			'parents' => [],
@@ -63,7 +63,7 @@ class CControllerPopupServiceCreate extends CController {
 			'times' => $this->getInput('times', [])
 		];
 
-		$this->getInputs($service, ['name', 'algorithm', 'sortorder', 'showsla', 'goodsla']);
+		$this->getInputs($service, ['name', 'algorithm', 'sortorder', 'goodsla']);
 
 		foreach ($this->getInput('tags', []) as $tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {
@@ -73,12 +73,14 @@ class CControllerPopupServiceCreate extends CController {
 			$service['tags'][] = $tag;
 		}
 
-		foreach ($this->getInput('problem_tags', []) as $problem_tag) {
-			if ($problem_tag['tag'] === '' && $problem_tag['value'] === '') {
-				continue;
-			}
+		if ($service['algorithm'] != SERVICE_ALGORITHM_NONE) {
+			foreach ($this->getInput('problem_tags', []) as $problem_tag) {
+				if ($problem_tag['tag'] === '' && $problem_tag['value'] === '') {
+					continue;
+				}
 
-			$service['problem_tags'][] = $problem_tag;
+				$service['problem_tags'][] = $problem_tag;
+			}
 		}
 
 		foreach ($this->getInput('parent_serviceids', []) as $serviceid) {

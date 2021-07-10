@@ -195,10 +195,11 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkProblemTagAndChildrenExclusivity($services);
+		$this->checkAlgorithmDependencies($services);
 		$this->checkParents($services);
 		$this->checkChildren($services);
 		$this->checkCircularReferences($services);
+		$this->checkTimes($services);
 	}
 
 	/**
@@ -300,10 +301,11 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkProblemTagAndChildrenExclusivity($services, $db_services);
+		$this->checkAlgorithmDependencies($services, $db_services);
 		$this->checkParents($services);
 		$this->checkChildren($services);
 		$this->checkCircularReferences($services, $db_services);
+		$this->checkTimes($services);
 	}
 
 	/**
@@ -489,8 +491,16 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkProblemTagAndChildrenExclusivity(array $services, array $db_services = null): void {
+	private function checkAlgorithmDependencies(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
+			$name = array_key_exists('name', $service)
+				? $service['name']
+				: $db_services[$service['serviceid']]['name'];
+
+			$algorithm = array_key_exists('algorithm', $service)
+				? $service['algorithm']
+				: $db_services[$service['serviceid']]['algorithm'];
+
 			if (array_key_exists('problem_tags', $service)) {
 				$has_problem_tags = count($service['problem_tags']) > 0;
 			}
@@ -499,6 +509,26 @@ class CService extends CApiService {
 			}
 			else {
 				$has_problem_tags = false;
+			}
+
+			if ($algorithm == SERVICE_ALGORITHM_NONE) {
+				$showsla = array_key_exists('showsla', $service)
+					? $service['showsla']
+					: $db_services[$service['serviceid']]['showsla'];
+
+				if ($showsla == SERVICE_SHOW_SLA_ON) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Service "%1$s" cannot show SLA for the selected status calculation algorithm.', $name)
+					);
+				}
+
+				if ($has_problem_tags) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Service "%1$s" cannot have problem tags with the selected status calculation algorithm.',
+							$name
+						)
+					);
+				}
 			}
 
 			if (array_key_exists('children', $service)) {
@@ -512,10 +542,6 @@ class CService extends CApiService {
 			}
 
 			if ($has_problem_tags && $has_children) {
-				$name = array_key_exists('name', $service)
-					? $service['name']
-					: $db_services[$service['serviceid']]['name'];
-
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Service "%1$s" cannot have problem tags and children at the same time.', $name)
 				);
@@ -695,6 +721,25 @@ class CService extends CApiService {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param array $services
+	 *
+	 * @throws APIException
+	 */
+	private function checkTimes(array $services): void {
+		foreach ($services as $service) {
+			if (!array_key_exists('times', $service)) {
+				continue;
+			}
+
+			foreach ($service['times'] as $time) {
+				if ($time['ts_from'] >= $time['ts_to']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Service start time must be less than end time.'));
+				}
+			}
+		}
 	}
 
 	/**

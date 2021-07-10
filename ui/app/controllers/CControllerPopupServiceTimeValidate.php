@@ -70,11 +70,6 @@ class CControllerPopupServiceTimeValidate extends CController {
 
 					if ($this->hasInput('from') && $parser->parse($this->getInput('from')) == CParser::PARSE_SUCCESS) {
 						$this->ts_from = $parser->getDateTime(true)->getTimestamp();
-
-						if (!validateUnixTime($this->ts_from)) {
-							error(_('Incorrect service start time.'));
-							$ret = false;
-						}
 					}
 					else {
 						error(_('Incorrect service start time.'));
@@ -83,11 +78,6 @@ class CControllerPopupServiceTimeValidate extends CController {
 
 					if ($this->hasInput('till') && $parser->parse($this->getInput('till')) == CParser::PARSE_SUCCESS) {
 						$this->ts_to = $parser->getDateTime(true)->getTimestamp();
-
-						if (!validateUnixTime($this->ts_to)) {
-							error(_('Incorrect service end time.'));
-							$ret = false;
-						}
 					}
 					else {
 						error(_('Incorrect service end time.'));
