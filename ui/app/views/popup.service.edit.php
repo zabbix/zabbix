@@ -71,40 +71,48 @@ $service_tab = (new CFormGrid())
 		(new CFormField())
 			->setId('problem_tags_field')
 			->addItem([
-				(new CTable())
-					->setId('problem_tags')
-					->addStyle('width: auto;')
-					->addRow(
-						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-add')
-						))->setColSpan(4)
-					),
-				(new CScriptTemplate('problem-tag-row-tmpl'))
-					->addItem(
-						(new CRow([
-							(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
-								DB::getFieldLength('service_problem_tag', 'tag')
-							))
-								->setAttribute('placeholder', _('tag'))
-								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-							(new CSelect('problem_tags[#{rowNum}][operator]'))
-								->addOptions(CSelect::createOptionsFromArray([
-									TAG_OPERATOR_EQUAL => _('Equals'),
-									TAG_OPERATOR_LIKE => _('Contains')
-								]))
-								->setValue(TAG_OPERATOR_EQUAL),
-							(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
-								DB::getFieldLength('service_problem_tag', 'value')
-							))
-								->setAttribute('placeholder', _('value'))
-								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-remove')
-						]))->addClass('form_row')
-					)
+				(new CDiv())
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->addItem([
+						(new CTable())
+							->setId('problem_tags')
+							->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+							->setHeader(
+								(new CRowHeader([_('Name'), _('Operation'), _('Value'), _('Action')]))
+									->addClass(ZBX_STYLE_GREY)
+							)
+							->setFooter(
+								(new CCol(
+									(new CSimpleButton(_('Add')))
+										->addClass(ZBX_STYLE_BTN_LINK)
+										->addClass('element-table-add')
+								))
+							),
+						(new CScriptTemplate('problem-tag-row-tmpl'))
+							->addItem(
+								(new CRow([
+									(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
+										DB::getFieldLength('service_problem_tag', 'tag')
+									))
+										->setAttribute('placeholder', _('tag'))
+										->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+									(new CSelect('problem_tags[#{rowNum}][operator]'))
+										->addOptions(CSelect::createOptionsFromArray([
+											TAG_OPERATOR_EQUAL => _('Equals'),
+											TAG_OPERATOR_LIKE => _('Contains')
+										]))
+										->setValue(TAG_OPERATOR_EQUAL),
+									(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
+										DB::getFieldLength('service_problem_tag', 'value')
+									))
+										->setAttribute('placeholder', _('value'))
+										->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+									(new CSimpleButton(_('Remove')))
+										->addClass(ZBX_STYLE_BTN_LINK)
+										->addClass('element-table-remove')
+								]))->addClass('form_row')
+							)
+					])
 			])
 	])
 	->addItem([
@@ -160,11 +168,24 @@ $sla_tab = (new CFormGrid())
 
 // Tags tab.
 
-$tags_tab = new CPartial('configuration.tags.tab', [
-	'source' => 'service',
-	'tags' => $data['form']['tags'],
-	'readonly' => false
-]);
+$tags_tab = (new CFormGrid())
+	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
+	->addItem([
+		new CLabel(_('Tags')),
+		new CFormField(
+			(new CDiv())
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				->addItem([
+					renderTagTable($data['form']['tags'])
+						->setId('tags')
+						->setHeader((new CRowHeader([_('Name'), _('Value'), _('Action')]))->addClass(ZBX_STYLE_GREY)),
+					(new CScriptTemplate('tag-row-tmpl'))
+						->addItem(renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]))
+
+				])
+		)
+	]);
 
 // Child services tab.
 

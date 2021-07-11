@@ -63,6 +63,15 @@ window.service_edit_popup = {
 			});
 		}
 
+		const $tags = jQuery(document.getElementById('tags'));
+
+		$tags.dynamicRows({template: '#tag-row-tmpl'});
+		$tags.on('click', '.element-table-add', () => {
+			$tags
+				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+				.textareaFlexible();
+		});
+
 		const $tabs = $('#tabs');
 
 		$tabs.tabs();
