@@ -3014,9 +3014,8 @@ $form-icon-btn: (
 		}
 
 		.overlay-dialogue-controls {
-			display: flex;
-			justify-content: flex-end;
-			padding: 0 10px 10px;
+			text-align: right;
+			padding: 0 0 10px;
 
 			z-select {
 				text-align: left;

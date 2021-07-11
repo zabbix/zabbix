@@ -59,24 +59,20 @@ $services = (new CTableInfo())
 	]);
 
 foreach ($data['services'] as $service) {
-	$problem_tags = CServiceHelper::makeProblemTagsHtml($service['problem_tags']);
-
-	$problem_tags_html = implode('', array_map(function ($element): string {
-		return (clone $element)->toString();
-	}, $problem_tags));
-
 	$services->addRow([
 		new CCol([
 			(new CCheckBox('serviceid', $service['serviceid']))->removeId(),
 			(new CVar('name', $service['name']))->removeId(),
 			(new CVar('algorithm', $service['algorithm']))->removeId(),
-			(new CVar('problem_tags_html', $problem_tags_html))->removeId()
+			(new CVar('problem_tags_html',
+				CServiceHelper::makeProblemTags($service['problem_tags'])->toString()
+			))->removeId()
 		]),
 		(new CCol(
 			(new CLink($service['name']))->addClass('js-name')
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol(CServiceHelper::getAlgorithmNames()[$service['algorithm']]))->addClass(ZBX_STYLE_NOWRAP),
-		new CCol($problem_tags)
+		new CCol(CServiceHelper::makeProblemTags($service['problem_tags']))
 	]);
 }
 

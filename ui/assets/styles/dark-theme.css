@@ -4198,9 +4198,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
         margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
-      display: flex;
-      justify-content: flex-end;
-      padding: 0 10px 10px; }
+      text-align: right;
+      padding: 0 0 10px; }
       .overlay-dialogue.modal .overlay-dialogue-controls z-select {
         text-align: left;
         padding: inherit; }

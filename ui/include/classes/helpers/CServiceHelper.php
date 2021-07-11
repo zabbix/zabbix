@@ -21,7 +21,7 @@
 
 class CServiceHelper {
 
-	public static function getAlgorithmNames() {
+	public static function getAlgorithmNames(): array {
 		return [
 			SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
 			SERVICE_ALGORITHM_MIN => _('Problem, if all children have problems'),
@@ -29,7 +29,7 @@ class CServiceHelper {
 		];
 	}
 
-	public static function makeProblemTagsHtml(array $problem_tags): array {
+	public static function makeProblemTags(array $problem_tags): CSpan {
 		$all_elements = [];
 
 		foreach ($problem_tags as $problem_tag) {
@@ -43,7 +43,7 @@ class CServiceHelper {
 		}
 
 		if (count($all_elements) <= ZBX_TAG_COUNT_DEFAULT) {
-			return $all_elements;
+			return new CSpan($all_elements);
 		}
 
 		$inline_elements = [];
@@ -60,6 +60,6 @@ class CServiceHelper {
 					->setHint($all_elements, ZBX_STYLE_HINTBOX_WRAP)
 			);
 
-		return $inline_elements;
+		return new CSpan($inline_elements);
 	}
 }
