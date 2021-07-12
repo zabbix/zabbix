@@ -39,7 +39,7 @@ class testTimezone extends CWebTest {
 	 * Change zabbix timezone from GUI and check that system time displayed correctly according to timezone.
 	 */
 	public function testTimezone_Gui() {
-		$this->page->userLogin('Admin', 'zabbix');
+		$this->page->login();
 		$this->setTimezone('System', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$etc_time = $this->getProblemTime('Trigger for tag permissions Oracle');
@@ -95,7 +95,7 @@ class testTimezone extends CWebTest {
 	 */
 	public function testTimezone_UserSettings($data) {
 		// Set system timezone.
-		$this->page->userLogin('Admin', 'zabbix');
+		$this->page->login();
 		$this->setTimezone('System', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
@@ -187,7 +187,7 @@ class testTimezone extends CWebTest {
 	 * to choosed timezone.
 	 */
 	public function testTimezone_CreateUsers($data) {
-		$this->page->userLogin('Admin', 'zabbix');
+		$this->page->login();
 		$this->setTimezone('System', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
