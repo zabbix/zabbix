@@ -94,14 +94,6 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['auditlogs'] as $auditlog) {
-	$details = [];
-
-	foreach ($auditlog['details'] as $detail) {
-		$details[] = [$detail['table_name'].'.'.$detail['field_name'].': '.$detail['oldvalue'].
-			' => '.$detail['newvalue'], BR()
-		];
-	}
-
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $auditlog['clock']),
 		$data['users'][$auditlog['userid']],
@@ -114,7 +106,7 @@ foreach ($data['auditlogs'] as $auditlog) {
 			: _('Unknown action'),
 		$auditlog['resourceid'],
 		$auditlog['resourcename'],
-		$details ? $details : $auditlog['note']
+		$auditlog['details']
 	]);
 }
 

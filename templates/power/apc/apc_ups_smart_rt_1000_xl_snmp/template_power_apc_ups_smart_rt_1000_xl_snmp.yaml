@@ -648,7 +648,7 @@ zabbix_export:
           triggers:
             -
               uuid: 31bb0ff1ea334cd59d9f8b8f489611ef
-              expression: '(last(/APC Smart-UPS RT 1000 XL SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS RT 1000 XL SNMP/system.name[sysName.0],#2))=1 and length(last(/APC Smart-UPS RT 1000 XL SNMP/system.name[sysName.0]))>0'
+              expression: 'last(/APC Smart-UPS RT 1000 XL SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS RT 1000 XL SNMP/system.name[sysName.0],#2) and length(last(/APC Smart-UPS RT 1000 XL SNMP/system.name[sysName.0]))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'

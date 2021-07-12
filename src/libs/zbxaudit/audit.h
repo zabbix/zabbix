@@ -23,9 +23,9 @@
 #include "common.h"
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
-		char *script_command_orig, zbx_uint64_t hostid, char *hostname, zbx_uint64_t eventid,
-		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *clientip, const char *output,
-		const char *error);
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error);
 
 void	zbx_audit_init(void);
 void	zbx_audit_flush(void);

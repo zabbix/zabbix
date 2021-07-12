@@ -805,6 +805,7 @@ typedef struct
 	zbx_uint64_t	userid;
 	zbx_user_type_t	type;
 	zbx_uint64_t	roleid;
+	char		*username;
 }
 zbx_user_t;
 
@@ -1327,6 +1328,7 @@ int	zbx_get_file_time(const char *path, zbx_file_time_t *time);
 void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
+char	*zbx_fgets(char *buffer, int size, FILE *fp);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 
@@ -1644,10 +1646,6 @@ char	*zbx_create_token(zbx_uint64_t seed);
 
 int	zbx_str_extract(const char *text, size_t len, char **value);
 
-/* audit logging mode */
-#define AUDIT_LOGGING_DISABLED	0
-#define AUDIT_LOGGING_ENABLED	1
-
 typedef enum
 {
 	ZBX_TIME_UNIT_UNKNOWN,
@@ -1690,6 +1688,10 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
+
+/* audit logging mode */
+#define ZBX_AUDIT_LOGGING_DISABLED	0
+#define ZBX_AUDIT_LOGGING_ENABLED	1
 
 /* includes terminating '\0' */
 #define CUID_LEN	26

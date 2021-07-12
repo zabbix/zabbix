@@ -1066,18 +1066,10 @@ INSERT INTO triggers (triggerid,expression,description,url,status,value,priority
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99519,'{99948}=0','testFormTriggerPrototype2','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99520,'{99949}=0','testFormTriggerPrototype3','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99521,'{99950}=0','testFormTriggerPrototype4','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99522,'{99951}=0','Trigger prototype with tags for updating','',0,0,0,0,'','',NULL,0,0,2);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99523,'{99952}=0','Trigger prototype with tags for cloning','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99947,23804,99518,'last','$,#1');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99948,23804,99519,'last','$,#2');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99949,23804,99520,'last','$,#4');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99950,23804,99521,'last','$,#1');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99951,23804,99522,'last','$,#2');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99952,23804,99523,'last','$,#3');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (200, 99522, 'action', 'update');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (201, 99522, 'tag', 'trigger_prototype');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (202, 99523, 'action', 'clode');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (203, 99523, 'tag', 'trigger_prototype');
 
 -- testFormGraphPrototype.LayoutCheck and testFormGraphPrototype.SimpleUpdate
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (600000,'testFormGraphPrototype1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
@@ -2090,69 +2082,6 @@ INSERT INTO triggers (triggerid, description, expression, status, value, priorit
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100070, 99097, 100069, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (100069, 100068);
 
--- host/template level tags tests
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (311, 40001, 'action', 'simple');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (312, 40001, 'tag', 'HOST');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (313, 40001, 'test', 'test_tag');
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99092, 'Host with tags for cloning', 'Host with tags for cloning', 0, '');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (10900, 99092, 1, 1, 1, '127.0.0.1', '10051');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99944, 99092, 4);
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (307, 99092, 'action', 'clone');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (310, 99092, 'tag', 'host');
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99109, 'Host with tags for updating', 'Host with tags for updating', 0, '');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (10901, 99109, 1, 1, 1, '127.0.0.1', '10051');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99961, 99109, 4);
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (308, 99109, 'action', 'update');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (309, 99109, 'tag', 'host');
-
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (319, 40000, 'action', 'simple');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (321, 40000, 'test', 'test_tag');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (408, 40000, 'tag', 'TEMPLATE');
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99127, 'A template with tags for cloning', 'A template with tags for cloning', 3, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99979, 99127, 4);
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (315, 99127, 'action', 'clone');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (316, 99127, 'tag', 'template');
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99128, 'A template with tags for updating', 'A template with tags for updating', 3, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99980, 99128, 4);
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (317, 99128, 'action', 'update');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (318, 99128, 'tag', 'template');
-
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (452, 14003, 'test', 'test_tag');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (453, 14003, 'action', 'simple');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (454, 14003, 'tag', 'TRIGGER');
-
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100113, '{100114}=0', 'Trigger with tags for cloning', '');
-INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100114, 99102, 100113, 'last', '$,#1');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (186, 100113, 'action', 'clone');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (187, 100113, 'tag', 'trigger');
-
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100112, '{100113}=0', 'Trigger with tags for updating', '');
-INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100113, 99102, 100112, 'last', '$,#2');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (184, 100112, 'action', 'update');
-INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (185, 100112, 'tag', 'trigger');
-
-INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99116, 2, 99109, 'Item with tags for updating', 'tags.update', '', '', '', '');
-INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99004, 99116, 'action', 'update');
-INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99005, 99116, 'without value', '');
-
-INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99117, 2, 99109, 'Item with tags for cloning', 'tags.cloning', '', '', '', '');
-INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99006, 99117, 'action', 'clone');
-INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99007, 99117, 'without value', '');
-
-INSERT INTO items (itemid, type, hostid, name, key_, params, flags, description, posts, headers) VALUES (99118, 2, 40001, 'Item prototype with tags for updating', 'prototype.tags.update', '', 2, '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15090, 99118, 133800);
-INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99008, 99118, 'action', 'update');
-INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99009, 99118, 'without value prototype', '');
-
-INSERT INTO items (itemid, type, hostid, name, key_, params, flags, description, posts, headers) VALUES (99119, 2, 40001, 'Item prototype with tags for cloning', 'prototype.tags.cloning', '', 2,  '', '', '');
-INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15091, 99119, 133800);
-INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99010, 99119, 'action', 'clone');
-INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99011, 99119, 'without value prototype', '');
-
 -- testFormAdministrationMediaTypes
 INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, description) VALUES (100, 1, 'Test script', 'Selenium test script', 1, '', '');
 
@@ -2813,21 +2742,9 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VAL
 -- testFormAdministrationGeneralMacros
 INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
 
--- tags in host prototypes
+-- testPageHostPrototypes
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (450, 90002, 'host_proto_tag_1', 'value1');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (451, 90002, 'host_proto_tag_2', 'value2');
-
-INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99450, '{#HOST} prototype with tags for cloning', '{#HOST} prototype with tags for cloning', 0, '', 2);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99450, 90001);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223000, 99450, '', 4, NULL);
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (452, 99450, 'action', 'clone');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (453, 99450, 'tag', 'host_prototype');
-
-INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99451, '{#HOST} prototype with tags for updating', '{#HOST} prototype with tags for updating', 0, '', 2);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99451, 90001);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223001, 99451, '', 4, NULL);
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (454, 99451, 'action', 'update');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (455, 99451, 'tag', 'host_prototype');
 
 -- testFormAdministrationScripts
 INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (200, 5, 'Script for Update', 'test', 2, NULL, NULL, 'update description', 2);

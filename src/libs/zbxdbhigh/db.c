@@ -3544,7 +3544,7 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	sessionid_esc = DBdyn_escape_string(sessionid);
 
 	if (NULL == (result = DBselect(
-			"select u.userid,u.roleid,r.type"
+			"select u.userid,u.roleid,u.name,r.type"
 				" from sessions s,users u,role r"
 			" where s.userid=u.userid"
 				" and s.sessionid='%s'"
@@ -3560,7 +3560,8 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 
 	ZBX_STR2UINT64(user->userid, row[0]);
 	ZBX_STR2UINT64(user->roleid, row[1]);
-	user->type = atoi(row[2]);
+	user->username = zbx_strdup(NULL, row[2]);
+	user->type = atoi(row[3]);
 
 	ret = SUCCEED;
 out:

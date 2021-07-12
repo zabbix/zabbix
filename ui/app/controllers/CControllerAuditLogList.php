@@ -93,10 +93,9 @@ class CControllerAuditLogList extends CController {
 		}
 
 		$params = [
-			'output' => ['auditid', 'userid', 'clock', 'action', 'resourcetype', 'note', 'ip', 'resourceid',
-				'resourcename'
+			'output' => ['auditid', 'userid', 'clock', 'action', 'resourcetype', 'ip', 'resourceid',
+				'resourcename', 'details'
 			],
-			'selectDetails' => ['table_name', 'field_name', 'oldvalue', 'newvalue'],
 			'filter' => $filter,
 			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN,

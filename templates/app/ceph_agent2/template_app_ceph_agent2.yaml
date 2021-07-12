@@ -57,7 +57,7 @@ zabbix_export:
           triggers:
             -
               uuid: 716f166b3943443aba70a4faed882ffb
-              expression: '(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2))=1 and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0'
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0'
               name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Ceph version has changed. Ack to close.'
@@ -399,7 +399,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Miniumum apply latency of OSDs'
+          description: 'Minimum apply latency of OSDs'
           preprocessing:
             -
               type: JSONPATH

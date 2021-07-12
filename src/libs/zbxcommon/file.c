@@ -164,6 +164,20 @@ int	zbx_get_file_time(const char *path, zbx_file_time_t *time)
 
 	return SUCCEED;
 }
+
+char	*zbx_fgets(char *buffer, int size, FILE *fp)
+{
+	char	*s;
+
+	do
+	{
+		errno = 0;
+		s = fgets(buffer, size, fp);
+	}
+	while (EINTR == errno && NULL == s);
+
+	return s;
+}
 #else	/* _WINDOWS */
 static	int	get_file_time_stat(const char *path, zbx_file_time_t *time)
 {

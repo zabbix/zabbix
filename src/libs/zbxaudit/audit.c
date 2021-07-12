@@ -53,9 +53,9 @@ static	void add_uint64_json(struct zbx_json *json, const char *key, const uint64
  *                                                                            *
  ******************************************************************************/
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
-		char *script_command_orig, zbx_uint64_t hostid, char *hostname, zbx_uint64_t eventid,
-		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *clientip, const char *output,
-		const char *error)
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error)
 {
 	int	ret = SUCCEED;
 	char	auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
@@ -68,7 +68,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDIT_LOGGING_ENABLED);
 
-	if (AUDIT_LOGGING_ENABLED != cfg.audit_logging_enabled)
+	if (ZBX_AUDIT_LOGGING_ENABLED != cfg.audit_logging_enabled)
 		goto out;
 
 	zbx_new_cuid(auditid_cuid);
@@ -106,10 +106,11 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zbx_json_close(&details_json);
 
-	if (ZBX_DB_OK > DBexecute("insert into auditlog (auditid,userid,clock,action,ip,resourceid,resourcename,"
-			"resourcetype,recordsetid,details) values ('%s'," ZBX_FS_UI64 ",%d,'%d','%s'," ZBX_FS_UI64
-			",'%s',%d,'%s','%s' )", auditid_cuid, userid, (int)time(NULL), AUDIT_ACTION_EXECUTE, clientip,
-			hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid, details_json.buffer))
+	if (ZBX_DB_OK > DBexecute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
+			"resourcename,resourcetype,recordsetid,details) values ('%s'," ZBX_FS_UI64 ",'%s',%d,'%d','%s',"
+			ZBX_FS_UI64 ",'%s',%d,'%s','%s' )", auditid_cuid, userid, username, (int)time(NULL),
+			AUDIT_ACTION_EXECUTE, clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid,
+			details_json.buffer))
 	{
 		ret = FAIL;
 	}

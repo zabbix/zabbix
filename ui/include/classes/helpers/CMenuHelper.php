@@ -233,6 +233,8 @@ class CMenuHelper {
 							->setAction('autoreg.edit'),
 						(new CMenuItem(_('Housekeeping')))
 							->setAction('housekeeping.edit'),
+						(new CMenuItem(_('Audit log')))
+							->setAction('audit.settings.edit'),
 						(new CMenuItem(_('Images')))
 							->setAction('image.list')
 							->setAliases(['image.edit']),

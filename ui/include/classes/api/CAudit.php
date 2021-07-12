@@ -183,6 +183,10 @@ class CAudit {
 			return;
 		}
 
+		if (CSettingsHelper::get(CSettingsHelper::AUDIT_LOGGING_ENABLED) != 1) {
+			return;
+		}
+
 		$auditid = generateCuid();
 		$recordsetid = generateCuid();
 

@@ -1134,7 +1134,7 @@ zabbix_export:
           triggers:
             -
               uuid: 071532526e8842f8935bf9373a85b7da
-              expression: '(last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2))=1 and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
+              expression: 'last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -1200,7 +1200,7 @@ zabbix_export:
           triggers:
             -
               uuid: fc45ac0cfc7641f2a52b95830df3e880
-              expression: '(last(/Linux generic by Zabbix agent active/system.sw.os,#1)<>last(/Linux generic by Zabbix agent active/system.sw.os,#2))=1 and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0'
+              expression: 'last(/Linux generic by Zabbix agent active/system.sw.os,#1)<>last(/Linux generic by Zabbix agent active/system.sw.os,#2) and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -1208,7 +1208,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
-                  expression: '(last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2))=1 and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
+                  expression: 'last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
         -
           uuid: 42df39b3317a4bd6908686a491fd3d18
           name: 'Software installed'
@@ -1300,17 +1300,17 @@ zabbix_export:
           triggers:
             -
               uuid: a49d7ca808c345ec8ef516fdc3b0d5ff
-              expression: '(last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#1)<>last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#2))>0'
+              expression: 'last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#1)<>last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#2)'
               name: '/etc/passwd has been changed'
               priority: INFO
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Operating system description has changed'
-                  expression: '(last(/Linux generic by Zabbix agent active/system.sw.os,#1)<>last(/Linux generic by Zabbix agent active/system.sw.os,#2))=1 and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0'
+                  expression: 'last(/Linux generic by Zabbix agent active/system.sw.os,#1)<>last(/Linux generic by Zabbix agent active/system.sw.os,#2) and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0'
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
-                  expression: '(last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2))=1 and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
+                  expression: 'last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
       macros:
         -
           macro: '{$KERNEL.MAXFILES.MIN}'
@@ -1637,7 +1637,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: acaf449feee44624995b9c3d0673cedc
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}: Link down'
@@ -1696,7 +1696,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
                   recovery_expression: 'last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: b0b3cce08e924447845859391bdf9045
@@ -1715,7 +1715,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
                   recovery_expression: 'last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
           graph_prototypes:
             -

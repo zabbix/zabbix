@@ -89,7 +89,7 @@ zabbix_export:
           triggers:
             -
               uuid: b2bf06198d5840c6905ea6cf6d9e443c
-              expression: '(last(/IBM IMM SNMP/system.hw.serialnumber,#1)<>last(/IBM IMM SNMP/system.hw.serialnumber,#2))=1 and length(last(/IBM IMM SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/IBM IMM SNMP/system.hw.serialnumber,#1)<>last(/IBM IMM SNMP/system.hw.serialnumber,#2) and length(last(/IBM IMM SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
