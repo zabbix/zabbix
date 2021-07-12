@@ -71,28 +71,28 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 				'mappings' => [
 					[
 						'type' => '0',
-						'value' => '10',
-						'newvalue' => 'default value'
-					],
-					[
-						'type' => '1',
-						'value' => '11',
-						'newvalue' => 'greater or equals 11'
-					],
-					[
-						'type' => '2',
-						'value' => '12',
-						'newvalue' => 'less or equals 12'
-					],
-					[
-						'type' => '3',
-						'value' => '13-16',
-						'newvalue' => 'from 13 to 16'
+						'value' => '1010101010101010101010101010101',
+						'newvalue' => 'default value1010101010101010101010101010101'
 					],
 					[
 						'type' => '4',
-						'value' => '42',
+						'value' => '424242424242424242424242424242424242424242424242',
 						'newvalue' => 'Answer to the Ultimate Question of Life, Universe and Everything'
+					],
+					[
+						'type' => '3',
+						'value' => '123458945-987653341',
+						'newvalue' => 'from 123458945 to 987653341'
+					],
+					[
+						'type' => '1',
+						'value' => '12',
+						'newvalue' => 'greater or equals 12'
+					],
+					[
+						'type' => '2',
+						'value' => '11',
+						'newvalue' => 'less or equals 11'
 					],
 					[
 						'type' => '5',
