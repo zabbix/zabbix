@@ -2218,14 +2218,15 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_rootcause(zbx_ipc_message_t *message, zbx_service_manager_t *service_manager)
+static void	process_rootcause(zbx_ipc_message_t *message, zbx_service_manager_t *service_manager,
+		zbx_ipc_client_t *client)
 {
 	zbx_vector_uint64_t	serviceids;
 
 	zbx_vector_uint64_create(&serviceids);
 
 	zbx_service_deserialize_ids(message->data, message->size, &serviceids);
-
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, NULL, 0);
 	zbx_vector_uint64_destroy(&serviceids);
 }
 
@@ -2617,7 +2618,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					problems_delete_num += events.values_num;
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE:
-					process_rootcause(message, &service_manager);
+
+					process_rootcause(message, &service_manager, client);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
