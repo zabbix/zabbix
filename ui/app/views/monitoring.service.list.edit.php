@@ -138,19 +138,15 @@ $filter->addFilterTab(_('Filter'), [
 			)
 		])
 		->addItem([
-			new CLabel(_('Only services without children'), 'filter-without-children'),
+			new CLabel(_('Only services without children'), 'filter_without_children'),
 			new CFormField(
-				(new CCheckBox('filter_without_children'))
-					->setChecked($data['filter']['without_children'])
-					->setId('filter-without-children')
+				(new CCheckBox('filter_without_children'))->setChecked($data['filter']['without_children'])
 			)
 		])
 		->addItem([
-			new CLabel(_('Only services without problem tags'), 'filter-without-problem-tags'),
+			new CLabel(_('Only services without problem tags'), 'filter_without_problem_tags'),
 			new CFormField(
-				(new CCheckBox('filter_without_problem_tags'))
-					->setChecked($data['filter']['without_problem_tags'])
-					->setId('filter-without-problem-tags')
+				(new CCheckBox('filter_without_problem_tags'))->setChecked($data['filter']['without_problem_tags'])
 			)
 		]),
 	(new CFormGrid())
