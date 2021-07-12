@@ -26,6 +26,10 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  */
 class testTimezone extends CWebTest {
 
+	public function testTimezone_1() {
+		$this->page->login();
+	}
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
