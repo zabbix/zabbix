@@ -1429,6 +1429,16 @@ static char	*service_get_event_name(zbx_service_manager_t *manager, const char *
 		return zbx_dsprintf(NULL, "Status of unknown service changed to %s", severity);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: db_create_service_events                                         *
+ *                                                                            *
+ * Purpose: create service events based on service updates                    *
+ *                                                                            *
+ * Parameters: manager - [IN] the service manager                             *
+ *             updates - [IN] the service updates                             *
+ *                                                                            *
+ ******************************************************************************/
 static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_vector_ptr_t *updates)
 {
 	const zbx_service_update_t	*update;
@@ -1504,8 +1514,6 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 		zbx_free(name);
 	}
 
-	zbx_free(name);
-
 	zbx_db_insert_execute(&db_insert_events);
 	zbx_db_insert_clean(&db_insert_events);
 
@@ -1549,14 +1557,66 @@ static const zbx_service_update_t	*get_update_by_serviceid(const zbx_vector_ptr_
 	return NULL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: db_get_service_problems                                          *
+ *                                                                            *
+ * Purpose: get open problems for the specified services                      *
+ *                                                                            *
+ * Parameters: manager         - [IN] the service manager                     *
+ *             problem_service - [IN] a vector of eventid, serviceid pairs    *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_get_service_problems(zbx_vector_uint64_t *serviceids, zbx_vector_uint64_pair_t *problem_service)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zbx_vector_uint64_sort(serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select eventid,objectid from problem"
+			" where source=%d"
+				" and object=%d"
+				" and",
+			EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", serviceids->values, serviceids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and r_eventid is null");
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_pair_t	pair;
+
+		ZBX_DBROW2UINT64(pair.first, row[0]);
+		ZBX_DBROW2UINT64(pair.second, row[1]);
+		zbx_vector_uint64_pair_append(problem_service, pair);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_resolve_service_events                                        *
+ *                                                                            *
+ * Purpose: resolve service events based on service updates                   *
+ *                                                                            *
+ * Parameters: manager - [IN] the service manager                             *
+ *             updates - [IN] the service updates                             *
+ *                                                                            *
+ ******************************************************************************/
 static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_vector_ptr_t *updates)
 {
 	int				i;
 	const zbx_service_update_t	*update;
 	zbx_vector_uint64_t		serviceids;
 	zbx_vector_uint64_pair_t	problem_service, recovery;
-	DB_ROW				row;
-	DB_RESULT			result;
 	char				*sql = NULL, *name;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			eventid;
@@ -1575,27 +1635,7 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 		zbx_vector_uint64_append(&serviceids, update->service->serviceid);
 	}
 
-	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select eventid,objectid from problem"
-			" where source=%d"
-				" and object=%d"
-				" and",
-			EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", serviceids.values, serviceids.values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and r_eventid is null");
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_DBROW2UINT64(pair.first, row[0]);
-		ZBX_DBROW2UINT64(pair.second, row[1]);
-		zbx_vector_uint64_pair_append(&problem_service, pair);
-	}
-
-	DBfree_result(result);
+	db_get_service_problems(&serviceids, &problem_service);
 
 	if (0 == problem_service.values_num)
 		goto out;
@@ -1672,51 +1712,102 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	compare_uint64_pair_second(const void *d1, const void *d2)
+{
+	const zbx_uint64_pair_t	*p1 = (zbx_uint64_pair_t *)d1;
+	const zbx_uint64_pair_t	*p2 = (zbx_uint64_pair_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->second, p2->second);
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_update_service_events                                         *
+ *                                                                            *
+ * Purpose: create update escalations based on service updates                *
+ *                                                                            *
+ * Parameters: manager - [IN] the service manager                             *
+ *             updates - [IN] the service updates                             *
+ *                                                                            *
+ ******************************************************************************/
 static void	db_update_service_events(zbx_service_manager_t *manager, const zbx_vector_ptr_t *updates)
 {
-	int				i;
 	const zbx_service_update_t	*update;
-	zbx_vector_uint64_t		serviceids;
-	DB_ROW				row;
-	DB_RESULT			result;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t			serviceid;
-	zbx_db_insert_t			db_insert;
+	int				i, j, escalations_num = 0;
+	zbx_db_insert_t			db_insert_escalations;
+	zbx_vector_uint64_t		*actionids, serviceids;
+	zbx_vector_uint64_pair_t	problem_service;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() updates:%d", __func__, updates->values_num);
 
 	zbx_vector_uint64_create(&serviceids);
+	zbx_vector_uint64_pair_create(&problem_service);
 
-	zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "eventid", "serviceid",
+	actionids = zbx_malloc(NULL, sizeof(zbx_vector_uint64_t) * updates->values_num);
+
+	/* Update actions should be processed on the original update that created event.   */
+	/* However service properties checked by action conditions (id, name, tags) either */
+	/* cannot be changed or the change cannot be tracked. So until new conditions are  */
+	/* added the current update can be used instead.                                   */
+	for (i = 0; i < updates->values_num; i++)
+	{
+		zbx_vector_uint64_create(&actionids[i]);
+		update = (const zbx_service_update_t *)updates->values[i];
+		service_update_process_actions(update, &manager->actions, &actionids[i]);
+
+		if (0 != actionids[i].values_num)
+		{
+			escalations_num += actionids[i].values_num;
+			zbx_vector_uint64_append(&serviceids, update->service->serviceid);
+		}
+	}
+
+	if (0 == escalations_num)
+		goto out;
+
+	db_get_service_problems(&serviceids, &problem_service);
+
+	if (0 == problem_service.values_num)
+		goto out;
+
+	zbx_db_insert_prepare(&db_insert_escalations, "escalations", "escalationid", "actionid", "eventid", "serviceid",
 			"servicealarmid", NULL);
 
 	for (i = 0; i < updates->values_num; i++)
 	{
+		int			index;
+		zbx_uint64_pair_t	pair;
+
+		if (0 == actionids[i].values_num)
+			continue;
+
 		update = (const zbx_service_update_t *)updates->values[i];
-		zbx_vector_uint64_append(&serviceids, update->service->serviceid);
+		pair.second = update->service->serviceid;
+
+		if (FAIL == (index = zbx_vector_uint64_pair_search(&problem_service, pair, compare_uint64_pair_second)))
+			continue;
+
+		for (j = 0; j < actionids[i].values_num; j++)
+		{
+			zbx_db_insert_add_values(&db_insert_escalations, __UINT64_C(0), actionids[i].values[j],
+					problem_service.values[index].first, update->service->serviceid,
+					update->alarm->servicealarmid);
+		}
+
 	}
 
-	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_db_insert_autoincrement(&db_insert_escalations, "escalationid");
+	zbx_db_insert_execute(&db_insert_escalations);
+	zbx_db_insert_clean(&db_insert_escalations);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select eventid,objectid from problem"
-			" where source=%d"
-				" and object=%d"
-				" and",
-			EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", serviceids.values, serviceids.values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and r_eventid is null");
+out:
+	for (i = 0; i < updates->values_num; i++)
+		zbx_vector_uint64_destroy(&actionids[i]);
 
-	result = DBselect("%s", sql);
+	zbx_free(actionids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-	}
-
-	DBfree_result(result);
-
-	zbx_free(sql);
+	zbx_vector_uint64_pair_destroy(&problem_service);
 	zbx_vector_uint64_destroy(&serviceids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1765,8 +1856,6 @@ static void	db_manage_service_events(zbx_service_manager_t *manager, zbx_hashset
 
 	if (0 != events_update.values_num)
 		db_update_service_events(manager, &events_update);
-
-	/* TODO: handle events_update */
 
 	zbx_vector_ptr_destroy(&events_update);
 	zbx_vector_ptr_destroy(&events_resolve);

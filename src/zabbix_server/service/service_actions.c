@@ -184,6 +184,8 @@ static int	service_update_match_action(const zbx_service_update_t *update, const
 	zbx_uint64_t	id;
 	double		res;
 
+	if (0 == action->conditions.values_num)
+		return SUCCEED;
 
 	for (; SUCCEED == zbx_token_find(action->formula, pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
 	{
