@@ -302,11 +302,12 @@ foreach ($data['services'] as $serviceid => $service) {
 	->show();
 
 (new CScriptTag('
-	initializeView(
-		'.json_encode($data['path'] ?: null).',
-		'.json_encode($data['service'] !== null ? $data['service']['serviceid'] : null).',
-		null
-	);
-'))
+	service_list.init('.
+		json_encode([
+			'path' => $data['path'] ?: null,
+			'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null
+		]).
+	');'
+))
 	->setOnDocumentReady()
 	->show();

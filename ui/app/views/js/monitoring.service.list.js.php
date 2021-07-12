@@ -29,15 +29,29 @@
 </script>
 
 <script>
-	function initializeView(path, serviceid, page) {
+	const service_list = {
+		path: null,
+		serviceid: null,
+		refresh_url: null,
+		refresh_interval: null,
+		is_refresh_paused: false,
+		is_refresh_pending: false,
+		page: null,
 
-		const init = () => {
-			initViewModeSwitcher();
-			initTagFilter();
-			initActionButtons();
-		}
+		init({path, serviceid, refresh_url, refresh_interval, page = null}) {
+			this.path = path;
+			this.serviceid = serviceid;
+			this.refresh_url = refresh_url;
+			this.refresh_interval = refresh_interval;
+			this.page = page;
 
-		const initViewModeSwitcher = () => {
+			this.initViewModeSwitcher();
+			this.initTagFilter();
+			this.initActionButtons();
+			this.initRefresh();
+		},
+
+		initViewModeSwitcher() {
 			for (const element of document.getElementsByName('list_mode')) {
 				if (!element.checked) {
 					element.addEventListener('click', (e) => {
@@ -48,25 +62,25 @@
 							: 'service.list.edit'
 						);
 
-						if (path !== null) {
-							url.setArgument('path', path);
+						if (this.path !== null) {
+							url.setArgument('path', this.path);
 						}
 
-						if (serviceid !== null) {
-							url.setArgument('serviceid', serviceid);
+						if (this.serviceid !== null) {
+							url.setArgument('serviceid', this.serviceid);
 						}
 
-						if (page !== null) {
-							url.setArgument('page', page);
+						if (this.page !== null) {
+							url.setArgument('page', this.page);
 						}
 
 						redirect(url.getUrl());
 					});
 				}
 			}
-		}
+		},
 
-		const initTagFilter = () => {
+		initTagFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -77,9 +91,9 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
 				new CTagFilterItem(row);
 			});
-		}
+		},
 
-		const initActionButtons = () => {
+		initActionButtons() {
 			for (const element of document.querySelectorAll('.js-create-service, .js-add-child-service')) {
 				let popup_options = {};
 
@@ -94,26 +108,85 @@
 				});
 			}
 
-			for (const element of document.querySelectorAll('.js-edit-service')) {
-				element.addEventListener('click', (e) => {
-					PopUp('popup.service.edit', {serviceid: element.dataset.serviceid}, 'service_edit', e.target);
-				});
-			}
-
-			for (const element of document.querySelectorAll('.js-remove-service')) {
-				element.addEventListener('click', (e) => {
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-edit-service')) {
+					PopUp('popup.service.edit', {serviceid: e.target.dataset.serviceid}, 'service_edit', e.target);
+				}
+				else if (e.target.classList.contains('js-remove-service')) {
 					if (window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
 						const url_delete = new Curl('zabbix.php', false);
 
 						url_delete.setArgument('action', 'service.delete');
-						url_delete.setArgument('serviceids', [element.dataset.serviceid]);
+						url_delete.setArgument('serviceids', [e.target.dataset.serviceid]);
 
 						redirect(url_delete.getUrl(), 'post', 'sid', true, true);
 					}
-				});
-			}
-		}
+				}
+			});
+		},
 
-		init();
-	}
+		initRefresh() {
+			setTimeout(() => this.refresh(), this.refresh_interval);
+		},
+
+		pauseRefresh() {
+			this.is_refresh_paused = true;
+		},
+
+		resumeRefresh() {
+			this.is_refresh_paused = false;
+		},
+
+		refresh() {
+			if (this.is_refresh_paused || this.is_refresh_pending) {
+				return;
+			}
+
+			const service_list = document.getElementById('service-list');
+
+			if (service_list.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0) {
+				return;
+			}
+
+			clearMessages();
+
+			this.is_refresh_pending = true;
+
+			service_list.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
+
+			fetch(this.refresh_url)
+				.then((response) => response.json())
+				.then((response) => {
+					if ('errors' in response) {
+						throw {html_string: response.errors};
+					}
+
+					if ('messages' in response) {
+						addMessage(response.messages);
+					}
+
+					service_list.outerHTML = response.body;
+				})
+				.catch((error) => {
+					let message_box;
+
+					if (typeof error === 'object' && 'html_string' in error) {
+						message_box =
+							new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild;
+					}
+					else {
+						const error = <?= json_encode(_('Unexpected server error.')) ?>;
+
+						message_box = makeMessageBox('bad', [], error, true, false)[0];
+					}
+
+					addMessage(message_box);
+
+					service_list.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+				})
+				.finally(() => {
+					this.is_refresh_pending = false;
+				});
+		}
+	};
 </script>

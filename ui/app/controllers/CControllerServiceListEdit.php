@@ -105,9 +105,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		$db_serviceids = $this->prepareData($filter);
 
 		$page_num = $this->getInput('page', 1);
-		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP,
-			$data['view_curl']
-		);
+		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $view_url);
 		CPagerHelper::savePage('service.list.edit', $page_num);
 		$data['page'] =  $page_num > 1 ? $page_num : null;
 

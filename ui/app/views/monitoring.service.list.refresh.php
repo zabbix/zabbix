@@ -23,7 +23,17 @@
  * @var CView $this
  */
 
-(new CWidget())
-	->setTitle(_('Services'))
-	->addItem($this->data['tree']->getHTML())
-	->show();
+$output = [
+	'body' => (new CPartial('monitoring.service.list', $data))->getOutput()
+];
+
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
+}
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);

@@ -21,14 +21,14 @@
 
 abstract class CControllerServiceListGeneral extends CController {
 
-	private const WITHOUT_PARENTS_SERVICEID = 0;
+	protected const WITHOUT_PARENTS_SERVICEID = 0;
 
-	private const FILTER_DEFAULT_NAME = '';
-	private const FILTER_DEFAULT_STATUS = SERVICE_STATUS_ANY;
-	private const FILTER_DEFAULT_WITHOUT_CHILDREN = false;
-	private const FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS = false;
-	private const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_SERVICE;
-	private const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
+	protected const FILTER_DEFAULT_NAME = '';
+	protected const FILTER_DEFAULT_STATUS = SERVICE_STATUS_ANY;
+	protected const FILTER_DEFAULT_WITHOUT_CHILDREN = false;
+	protected const FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS = false;
+	protected const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_SERVICE;
+	protected const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
 
 	protected $is_filtered = false;
 
@@ -153,16 +153,16 @@ abstract class CControllerServiceListGeneral extends CController {
 			];
 		}
 
-		if ($filter['name'] != self::FILTER_DEFAULT_NAME
-				|| $filter['status'] != self::FILTER_DEFAULT_STATUS
-				|| $filter['without_children'] != self::FILTER_DEFAULT_WITHOUT_CHILDREN
-				|| $filter['without_problem_tags'] != self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS
-				|| $filter['evaltype'] != self::FILTER_DEFAULT_EVALTYPE
-				|| $filter['tags']) {
-			$this->is_filtered = true;
-		}
-
 		return $filter;
+	}
+
+	protected function isDefaultFilter(array $filter): bool {
+		return ($filter['name'] == self::FILTER_DEFAULT_NAME
+			&& $filter['status'] == self::FILTER_DEFAULT_STATUS
+			&& $filter['without_children'] == self::FILTER_DEFAULT_WITHOUT_CHILDREN
+			&& $filter['without_problem_tags'] == self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS
+			&& !$filter['tags']
+		);
 	}
 
 	/**
