@@ -627,14 +627,6 @@ class CHost extends CHostGeneral {
 	public function create($hosts) {
 		$this->validateCreate($hosts);
 
-		foreach ($hosts as &$host) {
-			// If visible name is not given or empty it should be set to host name.
-			if (!array_key_exists('name', $host) || trim($host['name']) === '') {
-				$host['name'] = $host['host'];
-			}
-		}
-		unset($host);
-
 		$hosts_groups = [];
 		$hosts_tags = [];
 		$hosts_interfaces = [];
@@ -646,7 +638,7 @@ class CHost extends CHostGeneral {
 		foreach ($hosts as $index => &$host) {
 			$host['hostid'] = $hostids[$index];
 
-			foreach (zbx_toArray($host['groups']) as $group) {
+			foreach ($host['groups'] as $group) {
 				$hosts_groups[] = [
 					'hostid' => $host['hostid'],
 					'groupid' => $group['groupid']
@@ -1884,7 +1876,7 @@ class CHost extends CHostGeneral {
 			}
 
 			// If visible name is not given or empty it should be set to host name. Required for duplicate checks.
-			if (!array_key_exists('name', $host) || !trim($host['name'])) {
+			if (!array_key_exists('name', $host) || trim($host['name']) === '') {
 				$host['name'] = $host['host'];
 			}
 
