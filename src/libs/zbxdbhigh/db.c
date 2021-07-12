@@ -659,8 +659,12 @@ static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx
 
 	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
 		length = ZBX_SIZE_T_MAX;
+	else if (ZBX_TYPE_CUID == field->type)
+		length = CUID_LEN;
 	else
 		length = field->length;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "GAMMA 999: length: %lu", length);
 
 #if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
 	return zbx_db_dyn_escape_string(src, get_string_field_size(field->type), length, flag);
@@ -2819,6 +2823,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
+
 		ZBX_FIELD		*field = (ZBX_FIELD *)self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
 
@@ -2885,6 +2890,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 				value->str = va_arg(args, char *);
+				zabbix_log(LOG_LEVEL_INFORMATION, "GGGGGGGGGGGGG, value->str: ->%s<-", value->str);
 				break;
 			case ZBX_TYPE_INT:
 				value->i32 = va_arg(args, int);
@@ -2905,6 +2911,8 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 	}
 
 	va_end(args);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "huevos 00");
 
 	zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
 
@@ -2980,7 +2988,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
 		zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
 	}
-
+	zabbix_log(LOG_LEVEL_INFORMATION, "SQL COMMAND: ->%s<-", sql_command);
 #ifdef HAVE_MYSQL
 	/* MySQL workaround - explicitly add missing text fields with '' default value */
 	for (field = (const ZBX_FIELD *)self->table->fields; NULL != field->name; field++)
@@ -2991,6 +2999,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
+			case ZBX_TYPE_CUID:
 				if (FAIL != zbx_vector_ptr_search(&self->fields, (void *)field,
 						ZBX_DEFAULT_PTR_COMPARE_FUNC))
 				{
@@ -2999,7 +3008,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 
 				zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ',');
 				zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
-
+				zabbix_log(LOG_LEVEL_INFORMATION, "doing this2");
 				zbx_strcpy_alloc(&sql_values, &sql_values_alloc, &sql_values_offset, ",''");
 				break;
 		}
@@ -3100,6 +3109,8 @@ retry_oracle:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					zabbix_log(LOG_LEVEL_INFORMATION, "NEXT SQL: ->%s<-", sql);
+					zabbix_log(LOG_LEVEL_INFORMATION, "NEXT value->str: ->%s<-", value->str);
 					break;
 				case ZBX_TYPE_INT:
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d", value->i32);
@@ -3119,7 +3130,9 @@ retry_oracle:
 					THIS_SHOULD_NEVER_HAPPEN;
 					exit(EXIT_FAILURE);
 			}
+
 		}
+			zabbix_log(LOG_LEVEL_INFORMATION, "NEXT SQL TOTAL: ->%s<-", sql);
 #	ifdef HAVE_MYSQL
 		if (NULL != sql_values)
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_values);

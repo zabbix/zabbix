@@ -1648,9 +1648,6 @@ int	zbx_str_extract(const char *text, size_t len, char **value);
 #define AUDIT_LOGGING_DISABLED	0
 #define AUDIT_LOGGING_ENABLED	1
 
-#define AUDIT_ACTION_EXECUTE	7
-#define AUDIT_RESOURCE_SCRIPT	25
-
 typedef enum
 {
 	ZBX_TIME_UNIT_UNKNOWN,
@@ -1698,9 +1695,15 @@ int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #define CUID_LEN	26
 void	zbx_new_cuid(char *cuid);
 
-#define AUDIT_RESOURCE_SCRIPT		25
+#define AUDIT_RESOURCE_HOST	4
+#define AUDIT_RESOURCE_SCRIPT	25
 
-#define AUDIT_ACTION_EXECUTE		7
+#define AUDIT_ACTION_ADD	0
+#define AUDIT_ACTION_UPDATE	1
+#define AUDIT_ACTION_DELETE	2
+#define AUDIT_ACTION_EXECUTE	7
+
+#define AUDIT_DETAILS_ACTION_ADD	"Added"
 
 /* report scheduling */
 

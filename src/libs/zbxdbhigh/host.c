@@ -25,6 +25,7 @@
 #include "zbxserver.h"
 #include "template.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
+#include "../../libs/zbxaudit/audit.h"
 
 static char	*get_template_names(const zbx_vector_uint64_t *templateids)
 {
@@ -5871,6 +5872,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s','%s',%d)",
 		interfaceid, hostid, (int)main_, (int)type, (int)useip, ip_esc, dns_esc, (int)port);
 
+	zbx_audit_host_add_interfaces(hostid, interfaceid, main_, type, useip, ip_esc, dns_esc, port);
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 out:
@@ -5901,7 +5903,7 @@ out:
 void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version, const unsigned char bulk,
 		const char *community, const char *securityname, const unsigned char securitylevel,
 		const char *authpassphrase, const char *privpassphrase, const unsigned char authprotocol,
-		const unsigned char privprotocol, const char *contextname)
+		const unsigned char privprotocol, const char *contextname, const zbx_uint64_t hostid)
 {
 	char		*community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc, *contextname_esc;
 	DB_RESULT	result;
@@ -5996,6 +5998,10 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
 			interfaceid);
 	}
+
+	zbx_audit_host_update_snmp_interfaces(hostid, version, bulk, community_esc, securityname_esc, securitylevel,
+			authpassphrase_esc, privpassphrase_esc, authprotocol, privprotocol, contextname_esc,
+			interfaceid);
 
 	zbx_free(community_esc);
 	zbx_free(securityname_esc);

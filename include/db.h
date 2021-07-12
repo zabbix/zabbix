@@ -662,7 +662,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version, const unsigned char bulk,
 		const char *community, const char *securityname, const unsigned char securitylevel,
 		const char *authpassphrase, const char *privpassphrase, const unsigned char authprotocol,
-		const unsigned char privprotocol, const char *contextname);
+		const unsigned char privprotocol, const char *contextname, const zbx_uint64_t hostid);
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 
