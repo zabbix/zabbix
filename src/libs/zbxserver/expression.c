@@ -4060,7 +4060,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_SERVICE_NAME))
 				{
-					replace_to = zbx_strdup(replace_to, event->service.name);
+					replace_to = zbx_strdup(replace_to, event->service->name);
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{

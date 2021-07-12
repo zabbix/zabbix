@@ -41,12 +41,11 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 	DB_ROW			row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_t	tagged_eventids, triggerids, serviceids;
+	zbx_vector_uint64_t	tagged_eventids, triggerids;
 	int			i, index;
 
 	zbx_vector_uint64_create(&tagged_eventids);
 	zbx_vector_uint64_create(&triggerids);
-	zbx_vector_uint64_create(&serviceids);
 
 	zbx_vector_uint64_sort(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -80,7 +79,6 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
 
 		event->trigger.triggerid = 0;
-		event->service.serviceid = 0;
 
 		if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source ||
 				EVENT_SOURCE_SERVICE == event->source)
@@ -91,9 +89,6 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 		if (EVENT_OBJECT_TRIGGER == event->object)
 			zbx_vector_uint64_append(&triggerids, event->objectid);
-
-		if (EVENT_SOURCE_SERVICE == event->source)
-			zbx_vector_uint64_append(&serviceids, event->objectid);
 
 		zbx_vector_ptr_append(events, event);
 	}
@@ -212,49 +207,10 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		DBfree_result(result);
 	}
 
-	if (0 != serviceids.values_num)	/* EVENT_SOURCE_SERVICE */
-	{
-		zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		sql_offset = 0;
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "serviceid", serviceids.values,
-				serviceids.values_num);
-
-		result = DBselect(
-				"select serviceid,name"
-				" from services"
-				" where%s",
-				sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			zbx_uint64_t	serviceid;
-
-			ZBX_STR2UINT64(serviceid, row[0]);
-
-			for (i = 0; i < events->values_num; i++)
-			{
-				DB_EVENT	*event = (DB_EVENT *)events->values[i];
-
-				if (EVENT_SOURCE_SERVICE != event->source)
-					continue;
-
-				if (serviceid == event->objectid)
-				{
-					event->service.serviceid = serviceid;
-					event->service.name = zbx_strdup(NULL, row[1]);
-				}
-			}
-		}
-		DBfree_result(result);
-	}
-
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&tagged_eventids);
 	zbx_vector_uint64_destroy(&triggerids);
-	zbx_vector_uint64_destroy(&serviceids);
 }
 
 /******************************************************************************
