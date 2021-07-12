@@ -778,7 +778,7 @@ class testFormTags extends CWebTest {
 			$indices = $table->findRows(function ($row) {
 				return $row->getColumn('Name')->getText() === $this->clone_name;
 			});
-			foreach (array_keys($indices) as $index) {
+			foreach (array_keys($indices->asArray()) as $index) {
 				$table->getRow($index)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
 				$form->invalidate();
 				$form->selectTab('Tags');
