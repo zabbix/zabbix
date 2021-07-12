@@ -30,6 +30,15 @@ class testTimezone extends CWebTest {
 		$this->page->login();
 	}
 
+	public function testTimezone_2() {
+		$users_db_table = CDBHelper::getAll('SELECT * FROM users WHERE userid=1');
+		echo (json_encode($users_db_table, JSON_PRETTY_PRINT));
+
+		$sessions_db_table = CDBHelper::getAll('SELECT * FROM sessions WHERE userid=1');
+		echo (json_encode($sessions_db_table, JSON_PRETTY_PRINT));
+	}
+
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -43,7 +52,7 @@ class testTimezone extends CWebTest {
 	 * Change zabbix timezone from GUI and check that system time displayed correctly according to timezone.
 	 */
 	public function testTimezone_Gui() {
-		$this->page->login();
+		$this->page->userLogin('Admin', 'zabbix');
 		$this->setTimezone('System', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$etc_time = $this->getProblemTime('Trigger for tag permissions Oracle');
@@ -99,7 +108,7 @@ class testTimezone extends CWebTest {
 	 */
 	public function testTimezone_UserSettings($data) {
 		// Set system timezone.
-		$this->page->login();
+		$this->page->userLogin('Admin', 'zabbix');
 		$this->setTimezone('System', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
@@ -191,7 +200,7 @@ class testTimezone extends CWebTest {
 	 * to choosed timezone.
 	 */
 	public function testTimezone_CreateUsers($data) {
-		$this->page->login();
+		$this->page->userLogin('Admin', 'zabbix');
 		$this->setTimezone('System', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
