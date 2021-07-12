@@ -36,6 +36,17 @@ window.service_edit_popup = {
 		this.overlay = overlays_stack.getById('service_edit');
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
+		// Setup Tabs.
+
+		const $tabs = $('#tabs');
+
+		$tabs.tabs();
+		$tabs.on('tabsactivate', () => {
+			$tabs.resize();
+		});
+
+		// Add custom Select button for Parent services.
+
 		const template = document.createElement('template');
 
 		template.innerHTML = `
@@ -54,6 +65,7 @@ window.service_edit_popup = {
 
 		document.getElementById('parent_serviceids_').parentElement.appendChild(muiltiselect_button_wrap);
 
+		// Fill-in current Child services.
 		for (const service of children) {
 			this.addChild({
 				serviceid: service.serviceid,
@@ -62,6 +74,8 @@ window.service_edit_popup = {
 				problem_tags_html: children_problem_tags_html[service.serviceid]
 			});
 		}
+
+		// Setup Tags.
 
 		const $tags = jQuery(document.getElementById('tags'));
 
@@ -72,12 +86,7 @@ window.service_edit_popup = {
 				.textareaFlexible();
 		});
 
-		const $tabs = $('#tabs');
-
-		$tabs.tabs();
-		$tabs.on('tabsactivate', () => {
-			$tabs.resize();
-		});
+		// Update form field state according to the form data.
 
 		for (const id of ['algorithm', 'showsla']) {
 			document
@@ -87,11 +96,13 @@ window.service_edit_popup = {
 
 		this.update();
 
+		// Setup Problem tags.
 		jQuery(document.getElementById('problem_tags')).dynamicRows({
 			template: '#problem-tag-row-tmpl',
 			rows: problem_tags
 		});
 
+		// Setup Service times.
 		document
 			.getElementById('times')
 			.addEventListener('click', (e) => {
@@ -106,6 +117,7 @@ window.service_edit_popup = {
 				}
 			});
 
+		// Setup Child services.
 		document
 			.getElementById('children')
 			.addEventListener('click', (e) => {
