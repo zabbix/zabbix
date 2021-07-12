@@ -579,11 +579,17 @@ class CPage {
 		}
 
 		$this->logout();
+		file_put_contents(PHPUNIT_SCREENSHOT_DIR.'1'.time().'.png', $this->takeScreenshot());
 		$this->open('index.php');
+		file_put_contents(PHPUNIT_SCREENSHOT_DIR.'2'.time().'.png', $this->takeScreenshot());
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
+		file_put_contents(PHPUNIT_SCREENSHOT_DIR.'3'.time().'.png', $this->takeScreenshot());
 		$this->query('id:password')->one()->fill($password);
+		file_put_contents(PHPUNIT_SCREENSHOT_DIR.'4'.time().'.png', $this->takeScreenshot());
 		$this->query('id:enter')->one()->click();
+		file_put_contents(PHPUNIT_SCREENSHOT_DIR.'5'.time().'.png', $this->takeScreenshot());
 		$this->waitUntilReady();
+		file_put_contents(PHPUNIT_SCREENSHOT_DIR.'6'.time().'.png', $this->takeScreenshot());
 	}
 
 	/**

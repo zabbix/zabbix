@@ -27,10 +27,6 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 class testTimezone extends CWebTest {
 
 	public function testTimezone_1() {
-		$this->page->login();
-	}
-
-	public function testTimezone_2() {
 		$users_db_table = CDBHelper::getAll('SELECT * FROM users WHERE userid=1');
 		echo (json_encode($users_db_table, JSON_PRETTY_PRINT));
 
