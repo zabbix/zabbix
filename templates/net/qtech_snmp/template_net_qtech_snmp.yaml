@@ -124,7 +124,7 @@ zabbix_export:
           triggers:
             -
               uuid: e4682afd0cc547eea9605452b7df79f4
-              expression: '(last(/QTech QSW SNMP/system.hw.firmware,#1)<>last(/QTech QSW SNMP/system.hw.firmware,#2))=1 and length(last(/QTech QSW SNMP/system.hw.firmware))>0'
+              expression: 'last(/QTech QSW SNMP/system.hw.firmware,#1)<>last(/QTech QSW SNMP/system.hw.firmware,#2) and length(last(/QTech QSW SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -175,7 +175,7 @@ zabbix_export:
           triggers:
             -
               uuid: 83db3bd248994482a92ba86e5d3ae5ab
-              expression: '(last(/QTech QSW SNMP/system.hw.serialnumber,#1)<>last(/QTech QSW SNMP/system.hw.serialnumber,#2))=1 and length(last(/QTech QSW SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/QTech QSW SNMP/system.hw.serialnumber,#1)<>last(/QTech QSW SNMP/system.hw.serialnumber,#2) and length(last(/QTech QSW SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -224,7 +224,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6431f9a46fcb4a42ab3e04c8289bd07d
-              expression: '(last(/QTech QSW SNMP/system.sw.os[sysSoftwareVersion.0],#1)<>last(/QTech QSW SNMP/system.sw.os[sysSoftwareVersion.0],#2))=1 and length(last(/QTech QSW SNMP/system.sw.os[sysSoftwareVersion.0]))>0'
+              expression: 'last(/QTech QSW SNMP/system.sw.os[sysSoftwareVersion.0],#1)<>last(/QTech QSW SNMP/system.sw.os[sysSoftwareVersion.0],#2) and length(last(/QTech QSW SNMP/system.sw.os[sysSoftwareVersion.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'

@@ -280,7 +280,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_HV_IP(nicType, addr)									\
 	ZBX_XPATH_PROP_NAME("config.virtualNicManagerInfo.netConfig")					\
 		"/*[local-name()='VirtualNicManagerNetConfig'][*[local-name()='nicType'][text()='"	\
-		nicType "']]//*[local-name()='ip']/*[local-name()='" addr "']"
+		nicType "']]/*[local-name()='candidateVnic'][*[local-name()='key']"			\
+		"=../*[local-name()='selectedVnic']]//*[local-name()='ip']/*[local-name()='" addr "']"
 #define ZBX_XPATH_HV_IPV4(nicType)	ZBX_XPATH_HV_IP(nicType, "ipAddress")
 #define ZBX_XPATH_HV_IPV6(nicType)	ZBX_XPATH_HV_IP(nicType, "ipV6Config")				\
 		"/*[local-name()='ipV6Address']/*[local-name()='ipAddress']"
@@ -5777,7 +5778,12 @@ static int	vmware_service_process_perf_entity_data(zbx_vmware_perf_data_t *perfd
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		value = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i], "*[local-name()='value'][last()]");
+		if (NULL == (value = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i],
+				"*[local-name()='value'][text() != '-1'][last()]")))
+		{
+			value = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i], "*[local-name()='value'][last()]");
+		}
+
 		instance = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i], "*[local-name()='id']"
 				"/*[local-name()='instance']");
 		counter = zbx_xml_read_node_value(xdoc, nodeset->nodeTab[i], "*[local-name()='id']"
@@ -5793,7 +5799,7 @@ static int	vmware_service_process_perf_entity_data(zbx_vmware_perf_data_t *perfd
 			if (0 == strcmp(value, "-1") || SUCCEED != is_uint64(value, &perfvalue->value))
 			{
 				perfvalue->value = ZBX_MAX_UINT64;
-				zabbix_log(LOG_LEVEL_TRACE, "PerfCounter was skipped. type:%s object id:%s "
+				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter inaccessible. type:%s object id:%s "
 						"counter id:" ZBX_FS_UI64 " instance:%s value:%s", perfdata->type,
 						perfdata->id, perfvalue->counterid, perfvalue->instance, value);
 			}
@@ -6032,7 +6038,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 						st_str);
 			}
 
-			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>1</ns0:maxSample>");
+			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>2</ns0:maxSample>");
 
 			for (j = start_counter; j < entity->counters.values_num && counters_num < counters_max; j++)
 			{

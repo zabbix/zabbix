@@ -1067,7 +1067,7 @@ zabbix_export:
           triggers:
             -
               uuid: dfd9500636824ebf9d51d93650d62613
-              expression: '(last(/ClickHouse by HTTP/clickhouse.system.settings,#1)<>last(/ClickHouse by HTTP/clickhouse.system.settings,#2))=1 and length(last(/ClickHouse by HTTP/clickhouse.system.settings))>0'
+              expression: 'last(/ClickHouse by HTTP/clickhouse.system.settings,#1)<>last(/ClickHouse by HTTP/clickhouse.system.settings,#2) and length(last(/ClickHouse by HTTP/clickhouse.system.settings))>0'
               name: 'ClickHouse: Configuration has been changed'
               priority: INFO
               description: 'ClickHouse configuration has been changed. Ack to close.'
@@ -1173,7 +1173,7 @@ zabbix_export:
           triggers:
             -
               uuid: 244dcf8dc8584e1686585160c261ef85
-              expression: '(last(/ClickHouse by HTTP/clickhouse.version,#1)<>last(/ClickHouse by HTTP/clickhouse.version,#2))=1 and length(last(/ClickHouse by HTTP/clickhouse.version))>0'
+              expression: 'last(/ClickHouse by HTTP/clickhouse.version,#1)<>last(/ClickHouse by HTTP/clickhouse.version,#2) and length(last(/ClickHouse by HTTP/clickhouse.version))>0'
               name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'ClickHouse version has changed. Ack to close.'

@@ -580,7 +580,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4100a7125272484c81c4f599eff82793
-              expression: '(last(/Cisco Inventory SNMP/system.hw.serialnumber,#1)<>last(/Cisco Inventory SNMP/system.hw.serialnumber,#2))=1 and length(last(/Cisco Inventory SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Cisco Inventory SNMP/system.hw.serialnumber,#1)<>last(/Cisco Inventory SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Inventory SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -614,7 +614,7 @@ zabbix_export:
           triggers:
             -
               uuid: e417e0edd4eb417d99816dd9cf4f20e9
-              expression: '(last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0],#2))=1 and length(last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0]))>0'
+              expression: 'last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -662,7 +662,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ff15aaac7c4947b6a07a38dec4d1466d
-                  expression: '(last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'

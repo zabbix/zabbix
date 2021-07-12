@@ -352,7 +352,7 @@ class CIntegrationTest extends CAPITest {
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
-		throw new Exception('Failed to wait for component "'.$component.'" to start.');
+		throw new Exception('Failed to wait for component "'.$component.'" to start. pid path:' .  self::getPidPath($component) . " and pid is: " . $pid);
 	}
 
 	/**
@@ -609,7 +609,13 @@ class CIntegrationTest extends CAPITest {
 			$component = $this->getActiveComponent();
 		}
 
-		$result = $this->getClient($component)->sendDataValues($type, $values);
+		$client = $this->getClient($component);
+		$result = $client->sendDataValues($type, $values);
+
+		// Check that data was sent successfully.
+		$this->assertTrue(($result !== false),
+			sprintf('Component "%s" failed to receive data: %s', $component, $client->getError())
+		);
 
 		// Check that discovery data was sent.
 		$this->assertTrue(array_key_exists('processed', $result), 'Result doesn\'t contain "processed" count.');
@@ -889,6 +895,11 @@ class CIntegrationTest extends CAPITest {
 			$description = 'line "'.$lines.'"';
 		}
 
-		throw new Exception('Failed to wait for '.$description.' to be present in '.$component.' log file.');
+		$c = CLogHelper::readLog($this->getLogPath($component), false);
+		$c2 = CLogHelper::readLog($this->getLogPath(self::COMPONENT_AGENT), false);
+
+		throw new Exception('Failed to wait for '.$description.' to be present in '.$component .
+				'log file path:'.self::getLogPath($component).' and server log file contents: ' .
+				$c  . "\n and agent log file contents: " . $c2);
 	}
 }

@@ -424,7 +424,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d1683e2fcdda45969ff451e43ae696c2
-                  expression: '(last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#1)<>last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#2))=1'
+                  expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#1)<>last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#2)'
                   name: 'Sharepoint: Sharepoint object is changed'
                   opdata: '{#SHAREPOINT.LLD.FULL_PATH}'
                   priority: INFO
