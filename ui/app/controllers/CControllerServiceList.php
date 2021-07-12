@@ -118,4 +118,10 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$response->setTitle(_('Services'));
 		$this->setResponse($response);
 	}
+
+	protected function updateFilter(): void {
+		parent::updateFilter();
+
+		CProfile::delete('web.service.filter.tag_source');
+	}
 }

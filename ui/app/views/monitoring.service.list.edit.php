@@ -255,7 +255,10 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addItem(
 					(new CSimpleButton(_('Create service')))
 						->addClass('js-create-service')
-						->setAttribute('data-serviceid', $data['service']['serviceid'])
+						->setAttribute('data-serviceid', $data['service'] !== null
+							? $data['service']['serviceid']
+							: null
+						)
 				)
 				->addItem(
 					(new CRadioButtonList('list_mode', ZBX_LIST_MODE_EDIT))
@@ -289,7 +292,7 @@ foreach ($data['services'] as $serviceid => $service) {
 (new CScriptTag('
 	initializeView(
 		'.json_encode($data['path'] ?: null).',
-		'.json_encode($data['service']['serviceid']).',
+		'.json_encode($data['service'] !== null ? $data['service']['serviceid'] : null).',
 		null
 	);
 '))

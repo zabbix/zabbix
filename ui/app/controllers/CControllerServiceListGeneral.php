@@ -25,7 +25,7 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	private const FILTER_DEFAULT_NAME = '';
 	private const FILTER_DEFAULT_STATUS = SERVICE_STATUS_ANY;
-	private const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_ANY;
+	private const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_SERVICE;
 	private const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
 
 	protected $is_filtered = false;
@@ -270,7 +270,7 @@ abstract class CControllerServiceListGeneral extends CController {
 			$filter_status = null;
 		}
 
-		$db_services = API::Service()->get([
+		$options = [
 			'output' => [],
 			'selectParents' => ($filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID && !$this->is_filtered)
 				? null
@@ -283,11 +283,25 @@ abstract class CControllerServiceListGeneral extends CController {
 				'status' => $filter_status
 			],
 			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
 			'sortfield' => ['sortorder', 'name'],
 			'sortorder' => ZBX_SORT_UP,
 			'preservekeys' => true
-		]);
+		];
+
+		$db_services = [];
+
+		if ($filter['tags']) {
+			if (in_array($filter['tag_source'], [ZBX_SERVICE_FILTER_TAGS_ANY, ZBX_SERVICE_FILTER_TAGS_SERVICE])) {
+				$db_services += API::Service()->get($options + ['tags' => $filter['tags']]);
+			}
+
+			if (in_array($filter['tag_source'], [ZBX_SERVICE_FILTER_TAGS_ANY, ZBX_SERVICE_FILTER_TAGS_PROBLEM])) {
+				$db_services += API::Service()->get($options + ['problem_tags' => $filter['tags']]);
+			}
+		}
+		else {
+			$db_services += API::Service()->get($options);
+		}
 
 		if (!$db_services || !$this->is_filtered || $filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID) {
 			return array_keys($db_services);
