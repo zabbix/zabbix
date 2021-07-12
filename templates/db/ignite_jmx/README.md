@@ -19,7 +19,7 @@ This template was tested on:
 
 This template works with standalone and cluster instances. Metrics are collected by JMX. All metrics are discoverable.
 
-1. Enable and configure JMX access to Apache Ignite. See documentation for [instructions](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html). Current JMX tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name. You can configure Cache and Data Region metrics which you want using [officcial guide](https://ignite.apache.org/docs/latest/monitoring-metrics/configuring-metrics).
+1. Enable and configure JMX access to Apache Ignite. See documentation for [instructions](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html). Current JMX tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name. You can configure Cache and Data Region metrics which you want using [official guide](https://ignite.apache.org/docs/latest/monitoring-metrics/configuring-metrics).
 2. Set the user name and password in host macros {$IGNITE.USER} and {$IGNITE.PASSWORD}.
 
 ## Zabbix configuration

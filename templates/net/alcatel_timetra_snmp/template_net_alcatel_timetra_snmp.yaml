@@ -109,7 +109,7 @@ zabbix_export:
           triggers:
             -
               uuid: dd5dc3541a3d402c98a60b25d9e48dd6
-              expression: '(last(/Alcatel Timetra TiMOS SNMP/system.sw.os[sysDescr.0],#1)<>last(/Alcatel Timetra TiMOS SNMP/system.sw.os[sysDescr.0],#2))=1 and length(last(/Alcatel Timetra TiMOS SNMP/system.sw.os[sysDescr.0]))>0'
+              expression: 'last(/Alcatel Timetra TiMOS SNMP/system.sw.os[sysDescr.0],#1)<>last(/Alcatel Timetra TiMOS SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.sw.os[sysDescr.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -227,7 +227,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ccdcfdbe1a6243949857c764aed9c9ea
-                  expression: '(last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#2))=1 and length(last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'

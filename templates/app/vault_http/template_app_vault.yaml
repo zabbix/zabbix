@@ -631,7 +631,7 @@ zabbix_export:
           triggers:
             -
               uuid: ee9a561165b847c2a0719a767e5c4fe9
-              expression: '(last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2))=1 and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0'
+              expression: 'last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2) and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0'
               name: 'Vault: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Vault version has changed. Ack to close.'

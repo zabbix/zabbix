@@ -143,7 +143,7 @@ zabbix_export:
           triggers:
             -
               uuid: ecde6db248674039a30874f29e704e65
-              expression: '(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion,#2))=1 and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion))>0'
+              expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion,#2) and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.fwversion))>0'
               name: 'ZYXEL GS-4012F: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -286,7 +286,7 @@ zabbix_export:
           triggers:
             -
               uuid: ae941404115d4b10809bce603528ceaa
-              expression: '(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#2))=1 and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber))>0'
+              expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber,#2) and length(last(/ZYXEL GS-4012F SNMP/zyxel.4012f.serialnumber))>0'
               name: 'ZYXEL GS-4012F: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -649,7 +649,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9c332411a6db46acaab2b49ccabd2970
-                  expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL GS-4012F SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Link down'
