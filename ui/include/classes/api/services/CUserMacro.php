@@ -908,6 +908,10 @@ class CUserMacro extends CApiService {
 		foreach ($tpl_hostmacros as $tpl_hostmacro) {
 			$templateid = $tpl_hostmacro['hostid'];
 
+			if (!array_key_exists($templateid, $templateids_hostids)) {
+				continue;
+			}
+
 			foreach ($templateids_hostids[$templateid] as $hostid) {
 				if (array_key_exists('macro_old', $tpl_hostmacro)) {
 					$hostmacroid = $host_macros[$hostid][$tpl_hostmacro['macro_old']];
