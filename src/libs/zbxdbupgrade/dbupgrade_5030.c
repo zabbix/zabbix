@@ -7406,38 +7406,6 @@ out:
 #undef ZBX_FLAG_DISCOVERY_RULE
 #undef ZBX_FLAG_DISCOVERY_PROTOTYPE
 
-static int	DBpatch_5030202(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("update config set default_lang='en_US' where default_lang='en_GB'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_5030203(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("update users set lang='en_US' where lang='en_GB'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_5030204(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	const ZBX_FIELD	field = {"default_lang", "en_US", NULL, NULL, 5, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBset_default("config", &field);
-}
-
 #endif
 
 DBPATCH_START(5030)
@@ -7643,8 +7611,5 @@ DBPATCH_ADD(5030198, 0, 1)
 DBPATCH_ADD(5030199, 0, 1)
 DBPATCH_ADD(5030200, 0, 1)
 DBPATCH_ADD(5030201, 0, 1)
-DBPATCH_ADD(5030202, 0, 1)
-DBPATCH_ADD(5030203, 0, 1)
-DBPATCH_ADD(5030204, 0, 1)
 
 DBPATCH_END()
