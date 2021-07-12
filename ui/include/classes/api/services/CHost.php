@@ -1840,7 +1840,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array $hosts) {
+	protected function validateCreate(array &$hosts) {
 		$hosts = zbx_toArray($hosts);
 
 		if (!$hosts) {
