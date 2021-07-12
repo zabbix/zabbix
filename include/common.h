@@ -805,6 +805,7 @@ typedef struct
 	zbx_uint64_t	userid;
 	zbx_user_type_t	type;
 	zbx_uint64_t	roleid;
+	char		*username;
 }
 zbx_user_t;
 
@@ -1644,13 +1645,6 @@ char	*zbx_create_token(zbx_uint64_t seed);
 
 int	zbx_str_extract(const char *text, size_t len, char **value);
 
-/* audit logging mode */
-#define AUDIT_LOGGING_DISABLED	0
-#define AUDIT_LOGGING_ENABLED	1
-
-#define AUDIT_ACTION_EXECUTE	7
-#define AUDIT_RESOURCE_SCRIPT	25
-
 typedef enum
 {
 	ZBX_TIME_UNIT_UNKNOWN,
@@ -1693,6 +1687,10 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
+
+/* audit logging mode */
+#define ZBX_AUDIT_LOGGING_DISABLED	0
+#define ZBX_AUDIT_LOGGING_ENABLED	1
 
 /* includes terminating '\0' */
 #define CUID_LEN	26

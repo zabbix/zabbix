@@ -502,7 +502,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			perror = error;
 
 		ret = zbx_auditlog_global_script(script.type, script.execute_on, script.command_orig, host.hostid,
-				host.name, eventid, host.proxy_hostid, user->userid, clientip, poutput, perror);
+				host.name, eventid, host.proxy_hostid, user->userid, user->username, clientip, poutput,
+				perror);
 	}
 fail:
 	if (SUCCEED != ret)
