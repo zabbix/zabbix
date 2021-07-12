@@ -386,7 +386,7 @@ zabbix_export:
         -
           uuid: b98d2328694f44598f2177b3f93d4b90
           name: 'PostgreSQL: Cache hit'
-          key: 'pgsql.cache.hit["{$PG.URI}"]'
+          key: 'pgsql.cache.hit["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           value_type: FLOAT
           units: '%'
@@ -1075,7 +1075,7 @@ zabbix_export:
         -
           uuid: 0377fe6f2f8d4539b649c636ab012415
           name: 'PostgreSQL: Age of oldest xid'
-          key: 'pgsql.oldest.xid["{$PG.URI}","{$PG.USER}"]'
+          key: 'pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           value_type: FLOAT
           description: 'Age of oldest xid.'
@@ -1086,7 +1086,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2a5c11571d9d46f093ed9081f9d51504
-              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.URI}","{$PG.USER}"]) > 18000000'
+              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000'
               name: 'PostgreSQL: Oldest xid is too big'
               priority: AVERAGE
         -

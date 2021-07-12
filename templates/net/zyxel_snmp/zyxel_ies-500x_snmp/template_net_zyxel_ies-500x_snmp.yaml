@@ -857,7 +857,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8afcc973a7e94a0782a057205cc1b8ed
-                  expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Link down'
@@ -1327,7 +1327,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 71a10836f3094184bba728a0cf4d005a
-                  expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL IES-500x: Port {#SNMPINDEX}: Link down'
@@ -1681,7 +1681,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1b163693dc87407db836021da67bdccc
-                  expression: '(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: DSL modem code has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1733,7 +1733,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 44f7087bcb524593a419887c199fb613
-                  expression: '(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Driver has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1764,7 +1764,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6de6e5adadf04a79813ed7778b454043
-                  expression: '(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Firmware has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1795,7 +1795,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 42969016e9c846a8954ebf95d2ff0ffc
-                  expression: '(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID}: Hardware version has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1867,7 +1867,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0994c0ab8b004dc280d1a036e7043cc0
-                  expression: '(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-500x: Slot {#ZYXEL.SLOT.ID} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Slot {#ZYXEL.SLOT.ID} serial number has changed. Ack to close'

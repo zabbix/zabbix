@@ -49,7 +49,7 @@ zabbix_export:
           triggers:
             -
               uuid: e816b86474e6471eb48cbda563dfddd6
-              expression: '(last(/Dell iDRAC SNMP/system.hw.firmware,#1)<>last(/Dell iDRAC SNMP/system.hw.firmware,#2))=1 and length(last(/Dell iDRAC SNMP/system.hw.firmware))>0'
+              expression: 'last(/Dell iDRAC SNMP/system.hw.firmware,#1)<>last(/Dell iDRAC SNMP/system.hw.firmware,#2) and length(last(/Dell iDRAC SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -104,7 +104,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6f5b00a889804fbeb41c4246b29bd5f1
-              expression: '(last(/Dell iDRAC SNMP/system.hw.serialnumber,#1)<>last(/Dell iDRAC SNMP/system.hw.serialnumber,#2))=1 and length(last(/Dell iDRAC SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Dell iDRAC SNMP/system.hw.serialnumber,#1)<>last(/Dell iDRAC SNMP/system.hw.serialnumber,#2) and length(last(/Dell iDRAC SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -186,7 +186,7 @@ zabbix_export:
           triggers:
             -
               uuid: fba72cbc4f12495b9f35d0f77a9330b8
-              expression: '(last(/Dell iDRAC SNMP/system.sw.os[systemOSName],#1)<>last(/Dell iDRAC SNMP/system.sw.os[systemOSName],#2))=1 and length(last(/Dell iDRAC SNMP/system.sw.os[systemOSName]))>0'
+              expression: 'last(/Dell iDRAC SNMP/system.sw.os[systemOSName],#1)<>last(/Dell iDRAC SNMP/system.sw.os[systemOSName],#2) and length(last(/Dell iDRAC SNMP/system.sw.os[systemOSName]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -495,7 +495,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: eb26b6915b9f4ce6983566df9ee4db96
-                  expression: '(last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2))=1 and length(last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
                   name: '{#DISK_NAME}: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'

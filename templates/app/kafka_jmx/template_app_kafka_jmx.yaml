@@ -681,7 +681,7 @@ zabbix_export:
           triggers:
             -
               uuid: 92ecd7eb1eae49d9886ecac7b8f2084a
-              expression: '(last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#1)<>last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#2))=1 and length(last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"]))>0'
+              expression: 'last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#1)<>last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"],#2) and length(last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","version"]))>0'
               name: 'Kafka: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Kafka version has changed. Ack to close.'
@@ -1137,7 +1137,7 @@ zabbix_export:
           units: ms
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
-          description: 'Latency in millseconds for ZooKeeper requests from broker.'
+          description: 'Latency in milliseconds for ZooKeeper requests from broker.'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
