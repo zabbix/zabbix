@@ -81,6 +81,7 @@ class CUserMacro extends CApiService {
 			'globalmacroids'			=> null,
 			'templateids'				=> null,
 			'globalmacro'				=> null,
+			'inherited'					=> null,
 			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
@@ -137,6 +138,7 @@ class CUserMacro extends CApiService {
 			$options['selectGroups'] = null;
 			$options['selectTemplates'] = null;
 			$options['selectHosts'] = null;
+			$options['inherited'] = null;
 		}
 
 		// globalmacroids
@@ -149,6 +151,13 @@ class CUserMacro extends CApiService {
 		if (!is_null($options['hostmacroids'])) {
 			zbx_value2array($options['hostmacroids']);
 			$sqlParts['where'][] = dbConditionInt('hm.hostmacroid', $options['hostmacroids']);
+		}
+
+		// inherited
+		if (!is_null($options['inherited'])) {
+			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['where'][] = $options['inherited'] ? 'h.templateid IS NOT NULL' : 'h.templateid IS NULL';
+			$sqlParts['where']['hmh'] = 'hm.hostid=h.hostid';
 		}
 
 		// groupids
@@ -527,22 +536,11 @@ class CUserMacro extends CApiService {
 			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'description'],
 			'hostmacroids' => array_column($hostmacros, 'hostmacroid'),
 			'editable' => true,
+			'inherited' => false,
 			'preservekeys' => true
 		]);
 
-		$inherited_macros_exists = false;
-
-		if ($db_hostmacros) {
-			$host_prototypes = DB::select('hosts', [
-				'output' => ['hostid', 'templateid'],
-				'hostids' => array_unique(array_column($db_hostmacros, 'hostid')),
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE]
-			]);
-
-			$inherited_macros_exists = (bool) array_diff(array_column($host_prototypes, 'templateid', 'hostid'), ['0']);
-		}
-
-		if (count($hostmacros) != count($db_hostmacros) || $inherited_macros_exists) {
+		if (count($hostmacros) != count($db_hostmacros)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
@@ -724,22 +722,11 @@ class CUserMacro extends CApiService {
 			'output' => ['hostmacroid', 'hostid', 'macro'],
 			'hostmacroids' => $hostmacroids,
 			'editable' => true,
+			'inherited' => false,
 			'preservekeys' => true
 		]);
 
-		$inherited_macros_exists = false;
-
-		if ($db_hostmacros) {
-			$host_prototypes = DB::select('hosts', [
-				'output' => ['hostid', 'templateid'],
-				'hostids' => array_unique(array_column($db_hostmacros, 'hostid')),
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE]
-			]);
-
-			$inherited_macros_exists = (bool) array_diff(array_column($host_prototypes, 'templateid', 'hostid'), ['0']);
-		}
-
-		if (count($hostmacroids) != count($db_hostmacros) || $inherited_macros_exists) {
+		if (count($hostmacroids) != count($db_hostmacros)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
@@ -823,16 +810,14 @@ class CUserMacro extends CApiService {
 	 * @return array
 	 */
 	private function getMacrosToInherit(array $hostmacros, array $db_hostmacros = null): array {
-		$query = DBselect(
+		$templated_host_prototypeids = DBfetchColumn(DBselect(
 			'SELECT hd.hostid'.
 			' FROM host_discovery hd,items i,hosts h'.
 			' WHERE hd.parent_itemid=i.itemid'.
 				' AND i.hostid=h.hostid'.
 				' AND h.status='.HOST_STATUS_TEMPLATE.
 				' AND '.dbConditionId('hd.hostid', array_unique(array_column($hostmacros, 'hostid')))
-		);
-
-		$templated_host_prototypeids = DBfetchColumn($query, 'hostid');
+		), 'hostid');
 
 		if (!$templated_host_prototypeids) {
 			return [];
