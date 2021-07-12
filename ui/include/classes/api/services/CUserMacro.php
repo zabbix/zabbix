@@ -947,11 +947,7 @@ class CUserMacro extends CApiService {
 	 * @param bool   $is_delete                        Whether the passed hostmacros are intended to delete.
 	 */
 	private function inherit(array $tpl_hostmacros, bool $is_delete = false): void {
-	SDII($tpl_hostmacros, 'inherit');
 		$this->prepareInheritedObjects($tpl_hostmacros, $ins_hostmacros, $upd_hostmacros, $db_hostmacros);
-	SDII($ins_hostmacros);
-	SDII($upd_hostmacros);
-	SDII($db_hostmacros);
 
 		if ($ins_hostmacros) {
 			$this->createReal($ins_hostmacros);

@@ -58,14 +58,6 @@ $fields = [
 ];
 check_fields($fields);
 
-SDII(API::UserMacro()->update([
-['hostmacroid' => 2591, 'macro' => '{$T.HP2}', 'value' => 't.hp2', 'type' => 0, 'description' => 'descr t.hp2'],
-['hostmacroid' => 2592, 'macro' => '{$T.HP3}', 'value' => 't.hp3', 'type' => 0, 'description' => 'descr t.hp3'],
-['hostmacroid' => 2597, 'macro' => '{$H.HP2}', 'value' => 't.hp2', 'type' => 0, 'description' => 'descr t.hp2'],
-['hostmacroid' => 2598, 'macro' => '{$H.HP3}', 'value' => 't.hp3', 'type' => 0, 'description' => 'descr t.hp3'],
-['hostmacroid' => 2599, 'macro' => '{$H.HP1}', 'value' => 't.hp1', 'type' => 0, 'description' => 'descr t.hp1']
-]));
-
 /*
  * Form actions
  */
