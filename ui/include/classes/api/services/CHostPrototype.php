@@ -730,7 +730,7 @@ class CHostPrototype extends CHostBase {
 			'preservekeys' => true
 		]);
 
-		// Remove host prototypes which doesn't belong to templates, so they cannot be inherited.
+		// Remove host prototypes which don't belong to templates, so they cannot be inherited.
 		$host_prototypes = array_filter($host_prototypes, function ($host_prototype) use ($discoveryRules) {
 			return array_key_exists($host_prototype['ruleid'], $discoveryRules);
 		});
