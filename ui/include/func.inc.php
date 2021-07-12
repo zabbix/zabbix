@@ -2625,7 +2625,8 @@ function generateCuid(): string {
 		return ord($char);
 	}, str_split(gethostname()))) + strlen(gethostname()) + $BASE;
 
-	$fingerprint = $pad(getmypid(), $BLOCK_SIZE / 2) . $pad($hostname_num, $BLOCK_SIZE / 2);
+	$pid = substr($pad(getmypid(), $BLOCK_SIZE), -2);
+	$fingerprint = $pid . $pad($hostname_num, $BLOCK_SIZE / 2);
 
 	$counter = $pad($CUID_COUNTER++, $BLOCK_SIZE);
 
