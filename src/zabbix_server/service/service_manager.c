@@ -1691,8 +1691,9 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 				" where eventid=" ZBX_FS_UI64 ";\n", recovery.values[i].second, recovery.values[i].first);
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update escalations set r_eventid=" ZBX_FS_UI64
-				" where eventid=" ZBX_FS_UI64 ";\n", recovery.values[i].second, recovery.values[i].first);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update escalations set r_eventid=" ZBX_FS_UI64 ","
+				"nextcheck=0 where eventid=" ZBX_FS_UI64 ";\n", recovery.values[i].second,
+				recovery.values[i].first);
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
