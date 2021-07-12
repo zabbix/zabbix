@@ -112,7 +112,9 @@ class CService extends CApiService {
 
 		if ($db_services) {
 			$db_services = $this->addRelatedObjects($options, $db_services);
-			$db_services = $this->unsetExtraFields($db_services, ['serviceid'], $options['output']);
+			$db_services = $this->unsetExtraFields($db_services, ['serviceid', 'sortorder', 'name'],
+				$options['output']
+			);
 
 			if (!$options['preservekeys']) {
 				$db_services = array_values($db_services);
@@ -372,7 +374,7 @@ class CService extends CApiService {
 				'service_problem_tag', 'serviceid'
 			);
 		}
-		elseif ($options['without_problem_tags'] !== null) {
+		elseif ($options['without_problem_tags']) {
 			$sqlParts['left_table'] = ['table' => 'services', 'alias' => 's'];
 			$sqlParts['left_join'][] = [
 				'table' => 'service_problem_tag',
@@ -1020,7 +1022,7 @@ class CService extends CApiService {
 		foreach (array_keys($serviceids) as $serviceid) {
 			foreach ($services[$serviceid]['children'] as $child) {
 				if (array_key_exists($serviceid, $del_children)
-					&& array_key_exists($child['serviceid'], $del_children[$serviceid])) {
+						&& array_key_exists($child['serviceid'], $del_children[$serviceid])) {
 					unset($del_children[$serviceid][$child['serviceid']]);
 				}
 				else {
