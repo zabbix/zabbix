@@ -60,6 +60,7 @@ class CService extends CApiService {
 				'value' =>					['type' => API_STRING_UTF8],
 				'operator' =>				['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])]
 			]],
+			'without_problem_tags' =>	['type' => API_FLAG, 'default' => false],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'serviceid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -370,6 +371,15 @@ class CService extends CApiService {
 			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['problem_tags'], $options['evaltype'], 's',
 				'service_problem_tag', 'serviceid'
 			);
+		}
+		elseif ($options['without_problem_tags'] !== null) {
+			$sqlParts['left_table'] = ['table' => 'services', 'alias' => 's'];
+			$sqlParts['left_join'][] = [
+				'table' => 'service_problem_tag',
+				'alias' => 'spt',
+				'using' => 'serviceid',
+			];
+			$sqlParts['where'][] = dbConditionId('spt.service_problem_tagid', [0]);
 		}
 
 		return $sqlParts;
