@@ -22,6 +22,9 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @backup config, users
+ */
 class testFormUserProfile extends CLegacyWebTest {
 
 	public function testFormUserProfile_SimpleUpdate() {
