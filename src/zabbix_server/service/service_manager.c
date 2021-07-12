@@ -1465,7 +1465,7 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 	zbx_db_insert_prepare(&db_insert_problem_tag, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
 
 	zbx_db_insert_prepare(&db_insert_escalations, "escalations", "escalationid", "actionid", "eventid", "serviceid",
-			"servicealarmid", NULL);
+			NULL);
 
 	eventid = DBget_maxid_num("events", events_num);
 
@@ -1497,7 +1497,7 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 		for (j = 0; j < actionids[i].values_num; j++)
 		{
 			zbx_db_insert_add_values(&db_insert_escalations, __UINT64_C(0), actionids[i].values[j], eventid,
-					update->service->serviceid, update->alarm->servicealarmid);
+					update->service->serviceid);
 		}
 
 		eventid++;
@@ -1533,9 +1533,25 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static const zbx_service_update_t	*get_update_by_serviceid(const zbx_vector_ptr_t *updates, zbx_uint64_t serviceid)
+{
+	int				i;
+	const zbx_service_update_t	*update;
+
+	for (i = 0; i < updates->values_num; i++)
+	{
+		update = (zbx_service_update_t *)updates->values[i];
+
+		if (update->service->serviceid == serviceid)
+			return update;
+	}
+
+	return NULL;
+}
+
 static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_vector_ptr_t *updates)
 {
-	int				i, j, index;
+	int				i;
 	const zbx_service_update_t	*update;
 	zbx_vector_uint64_t		serviceids;
 	zbx_vector_uint64_pair_t	problem_service, recovery;
@@ -1595,20 +1611,12 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 	{
 		zbx_timespec_t	ts;
 
-		for (j = 0; j < updates->values_num; j++)
+		if (NULL != (update = get_update_by_serviceid(updates, problem_service.values[i].second)))
 		{
-			update = (zbx_service_update_t *)updates->values[j];
-
-			if (problem_service.values[i].second == update->service->serviceid)
-			{
-				name = service_get_event_name(manager, update->service->name,
-						TRIGGER_SEVERITY_NOT_CLASSIFIED);
-				ts = update->ts;
-				break;
-			}
+			name = service_get_event_name(manager, update->service->name, TRIGGER_SEVERITY_NOT_CLASSIFIED);
+			ts = update->ts;
 		}
-
-		if (j == updates->values_num)
+		else
 		{
 			zbx_timespec(&ts);
 			name = service_get_event_name(manager, NULL, TRIGGER_SEVERITY_NOT_CLASSIFIED);
@@ -1664,6 +1672,56 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	db_update_service_events(zbx_service_manager_t *manager, const zbx_vector_ptr_t *updates)
+{
+	int				i;
+	const zbx_service_update_t	*update;
+	zbx_vector_uint64_t		serviceids;
+	DB_ROW				row;
+	DB_RESULT			result;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t			serviceid;
+	zbx_db_insert_t			db_insert;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() updates:%d", __func__, updates->values_num);
+
+	zbx_vector_uint64_create(&serviceids);
+
+	zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "eventid", "serviceid",
+			"servicealarmid", NULL);
+
+	for (i = 0; i < updates->values_num; i++)
+	{
+		update = (const zbx_service_update_t *)updates->values[i];
+		zbx_vector_uint64_append(&serviceids, update->service->serviceid);
+	}
+
+	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select eventid,objectid from problem"
+			" where source=%d"
+				" and object=%d"
+				" and",
+			EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", serviceids.values, serviceids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and r_eventid is null");
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+	}
+
+	DBfree_result(result);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&serviceids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: db_manage_service_events                                         *
@@ -1704,6 +1762,9 @@ static void	db_manage_service_events(zbx_service_manager_t *manager, zbx_hashset
 
 	if (0 != events_resolve.values_num)
 		db_resolve_service_events(manager, &events_resolve);
+
+	if (0 != events_update.values_num)
+		db_update_service_events(manager, &events_update);
 
 	/* TODO: handle events_update */
 
