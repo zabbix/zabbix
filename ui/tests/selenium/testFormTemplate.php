@@ -239,6 +239,16 @@ class testFormTemplate extends CLegacyWebTest {
 		$cloned_template_name = 'Cloned template';
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
+
+		// Check if template name present on page, if not, check on next page.
+		for ($i = 0; $i < 3; $i++) {
+			if ($this->query('link', $this->template_clone)->one(false)->isValid() === true) {
+				break;
+			}
+			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
+		}
+
 		$this->zbxTestAssertElementPresentId('filter_name');
 		$this->zbxTestDoubleClickLinkText($this->template_clone, 'template_name');
 		$this->zbxTestClickWait('clone');
