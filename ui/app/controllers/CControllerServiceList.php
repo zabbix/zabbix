@@ -122,6 +122,8 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 	protected function updateFilter(): void {
 		parent::updateFilter();
 
+		CProfile::delete('web.service.filter.without_children');
+		CProfile::delete('web.service.filter.without_problem_tags');
 		CProfile::delete('web.service.filter.tag_source');
 	}
 }

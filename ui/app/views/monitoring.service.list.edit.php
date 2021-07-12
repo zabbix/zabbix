@@ -136,6 +136,22 @@ $filter->addFilterTab(_('Filter'), [
 					->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
 					->setModern(true)
 			)
+		])
+		->addItem([
+			new CLabel(_('Only services without children'), 'filter-without-children'),
+			new CFormField(
+				(new CCheckBox('filter_without_children'))
+					->setChecked($data['filter']['without_children'])
+					->setId('filter-without-children')
+			)
+		])
+		->addItem([
+			new CLabel(_('Only services without problem tags'), 'filter-without-problem-tags'),
+			new CFormField(
+				(new CCheckBox('filter_without_problem_tags'))
+					->setChecked($data['filter']['without_problem_tags'])
+					->setId('filter-without-problem-tags')
+			)
 		]),
 	(new CFormGrid())
 		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)

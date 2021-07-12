@@ -25,6 +25,8 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	private const FILTER_DEFAULT_NAME = '';
 	private const FILTER_DEFAULT_STATUS = SERVICE_STATUS_ANY;
+	private const FILTER_DEFAULT_WITHOUT_CHILDREN = 0;
+	private const FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS = 0;
 	private const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_SERVICE;
 	private const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
 
@@ -78,11 +80,20 @@ abstract class CControllerServiceListGeneral extends CController {
 		}
 
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.service.filter_name', $this->getInput('filter_name', self::FILTER_DEFAULT_NAME),
+			CProfile::update('web.service.filter.name', $this->getInput('filter_name', self::FILTER_DEFAULT_NAME),
 				PROFILE_TYPE_STR
 			);
 
-			CProfile::update('web.service.filter_status', $this->getInput('filter_status', self::FILTER_DEFAULT_STATUS),
+			CProfile::update('web.service.filter.status', $this->getInput('filter_status', self::FILTER_DEFAULT_STATUS),
+				PROFILE_TYPE_INT
+			);
+
+			CProfile::update('web.service.filter.without_children',
+				$this->getInput('filter_without_children', self::FILTER_DEFAULT_WITHOUT_CHILDREN), PROFILE_TYPE_INT
+			);
+
+			CProfile::update('web.service.filter.without_problem_tags',
+				$this->getInput('filter_without_problem_tags', self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS),
 				PROFILE_TYPE_INT
 			);
 
@@ -108,8 +119,10 @@ abstract class CControllerServiceListGeneral extends CController {
 			CProfile::updateArray('web.service.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 		}
 		elseif ($filter_rst) {
-			CProfile::delete('web.service.filter_name');
-			CProfile::delete('web.service.filter_status');
+			CProfile::delete('web.service.filter.name');
+			CProfile::delete('web.service.filter.status');
+			CProfile::delete('web.service.filter.without_children');
+			CProfile::delete('web.service.filter.without_problem_tags');
 			CProfile::delete('web.service.filter.tag_source');
 			CProfile::deleteIdx('web.service.filter.evaltype');
 			CProfile::deleteIdx('web.service.filter.tags.tag');
@@ -121,8 +134,10 @@ abstract class CControllerServiceListGeneral extends CController {
 	protected function getFilter(): array {
 		$filter = [
 			'serviceid' => CProfile::get('web.service.serviceid', self::WITHOUT_PARENTS_SERVICEID),
-			'name' => CProfile::get('web.service.filter_name', self::FILTER_DEFAULT_NAME),
-			'status' => CProfile::get('web.service.filter_status', self::FILTER_DEFAULT_STATUS),
+			'name' => CProfile::get('web.service.filter.name', self::FILTER_DEFAULT_NAME),
+			'status' => CProfile::get('web.service.filter.status', self::FILTER_DEFAULT_STATUS),
+			'without_children' => CProfile::get('web.service.filter.without_children', self::FILTER_DEFAULT_WITHOUT_CHILDREN),
+			'without_problem_tags' => CProfile::get('web.service.filter.without_problem_tags', self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS),
 			'tag_source' => CProfile::get('web.service.filter.tag_source', self::FILTER_DEFAULT_TAG_SOURCE),
 			'evaltype' => CProfile::get('web.service.filter.evaltype', self::FILTER_DEFAULT_EVALTYPE),
 			'tags' => []
@@ -138,6 +153,8 @@ abstract class CControllerServiceListGeneral extends CController {
 
 		if ($filter['name'] != self::FILTER_DEFAULT_NAME
 				|| $filter['status'] != self::FILTER_DEFAULT_STATUS
+				|| $filter['without_children'] != self::FILTER_DEFAULT_WITHOUT_CHILDREN
+				|| $filter['without_problem_tags'] != self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS
 				|| $filter['evaltype'] != self::FILTER_DEFAULT_EVALTYPE
 				|| $filter['tags']) {
 			$this->is_filtered = true;
