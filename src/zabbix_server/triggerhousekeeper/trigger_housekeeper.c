@@ -43,7 +43,7 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 	int		i;
 
 	for (i = 0; i < eventids->values_num; i++)
-		zbx_service_serialize_eventid(&data, &data_alloc, &data_offset, eventids->values[i]);
+		zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventids->values[i]);
 
 	if (NULL == data)
 		return;

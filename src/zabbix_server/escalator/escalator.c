@@ -35,6 +35,8 @@
 #include "comms.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
+#include "zbxservice.h"
+#include "service_protocol.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
@@ -2380,6 +2382,26 @@ static void	add_ack_escalation_r_eventids(zbx_vector_ptr_t *escalations, zbx_vec
 	zbx_vector_uint64_destroy(&r_eventids);
 }
 
+static void	get_services_by_serviceids(const zbx_vector_uint64_t *serviceids)
+{
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
+	int			i;
+	zbx_ipc_message_t	response;
+
+	for (i = 0; i < serviceids->values_num; i++)
+		zbx_service_serialize_id(&data, &data_alloc, &data_offset, serviceids->values[i]);
+
+	if (NULL == data)
+		return;
+
+	zbx_ipc_message_init(&response);
+	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, data_offset, &response);
+	zbx_ipc_message_clean(&response);
+
+	zbx_free(data);
+}
+
 static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_service_t *services)
 {
 	DB_RESULT		result;
@@ -2427,6 +2449,8 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 		}
 		DBfree_result(result);
 	}
+
+	get_services_by_serviceids(&serviceids);
 
 	zbx_free(sql);
 
@@ -2598,11 +2622,6 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 				else
 					event->service = &services.values[index];
 			}
-		}
-
-		if (EVENT_SOURCE_SERVICE == event->source)
-		{
-
 		}
 
 		if (0 != escalation->r_eventid)

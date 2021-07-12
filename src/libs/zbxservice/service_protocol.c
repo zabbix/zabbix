@@ -205,13 +205,12 @@ void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_
 	}
 }
 
-void	zbx_service_serialize_eventid(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		zbx_uint64_t eventid)
+void	zbx_service_serialize_id(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t id)
 {
 	zbx_uint32_t	data_len = 0;
 	unsigned char	*ptr;
 
-	zbx_serialize_prepare_value(data_len, eventid);
+	zbx_serialize_prepare_value(data_len, id);
 
 	if (NULL != *data)
 	{
@@ -227,10 +226,10 @@ void	zbx_service_serialize_eventid(unsigned char **data, size_t *data_alloc, siz
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
 
-	(void)zbx_serialize_value(ptr, eventid);
+	(void)zbx_serialize_value(ptr, id);
 }
 
-void	zbx_service_deserialize_eventids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *eventids)
+void	zbx_service_deserialize_ids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *eventids)
 {
 	const unsigned char	*end = data + size;
 
