@@ -28,35 +28,39 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-func getFileInfo(info *fs.FileInfo, name string) (fileinfo *fileInfo, err error) {
+func getFileInfo(info *fs.FileInfo, path string) (fileinfo *fileInfo, err error) {
 	var fi fileInfo
 
-	sd, err := windows.GetNamedSecurityInfo(name, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
+	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s information: %s", name, err)
+		return nil, fmt.Errorf("Cannot obtain %s information: %s", path, err)
 	}
 	if !sd.IsValid() {
-		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor", name)
+		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor", path)
 	}
 	sdOwner, _, err := sd.Owner()
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s owner information: %s", name, err)
+		return nil, fmt.Errorf("Cannot obtain %s owner information: %s", path, err)
 	}
 	if !sdOwner.IsValid() {
-		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor owner", name)
+		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor owner", path)
 	}
 
 	sid := sdOwner.String()
 	fi.SID = &sid
 	account, domain, _, err := sdOwner.LookupAccount("")
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s owner name information: %s", name, err)
+		return nil, fmt.Errorf("Cannot obtain %s owner name information: %s", path, err)
 	}
 	fi.User = domain + "\\" + account
 
 	wFileSys := (*info).Sys().(*syscall.Win32FileAttributeData)
 	fi.Time.Access = jsTimeLoc(time.Unix(0, wFileSys.LastAccessTime.Nanoseconds()))
-	fi.Time.Change = jsTimeLoc(time.Unix(0, wFileSys.CreationTime.Nanoseconds()))
+	if utn, err := getFileChange(path); err != nil {
+		return nil, fmt.Errorf("Cannot obtain %s change time information: %s", path, err)
+	} else {
+		fi.Time.Change = jsTimeLoc(time.Unix(0, utn))
+	}
 
 	return &fi, nil
 }
