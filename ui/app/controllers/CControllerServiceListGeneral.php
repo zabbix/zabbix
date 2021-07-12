@@ -25,8 +25,8 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	private const FILTER_DEFAULT_NAME = '';
 	private const FILTER_DEFAULT_STATUS = SERVICE_STATUS_ANY;
-	private const FILTER_DEFAULT_WITHOUT_CHILDREN = 0;
-	private const FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS = 0;
+	private const FILTER_DEFAULT_WITHOUT_CHILDREN = false;
+	private const FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS = false;
 	private const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_SERVICE;
 	private const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
 
@@ -49,7 +49,6 @@ abstract class CControllerServiceListGeneral extends CController {
 				]));
 
 				return;
-
 			}
 
 			$this->service = reset($db_service);
@@ -88,13 +87,12 @@ abstract class CControllerServiceListGeneral extends CController {
 				PROFILE_TYPE_INT
 			);
 
-			CProfile::update('web.service.filter.without_children',
-				$this->getInput('filter_without_children', self::FILTER_DEFAULT_WITHOUT_CHILDREN), PROFILE_TYPE_INT
+			CProfile::update('web.service.filter.without_children', $this->hasInput('filter_without_children') ? 1 : 0,
+				PROFILE_TYPE_INT
 			);
 
 			CProfile::update('web.service.filter.without_problem_tags',
-				$this->getInput('filter_without_problem_tags', self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS),
-				PROFILE_TYPE_INT
+				$this->hasInput('filter_without_problem_tags') ? 1 : 0, PROFILE_TYPE_INT
 			);
 
 			CProfile::update('web.service.filter.tag_source',
@@ -136,8 +134,12 @@ abstract class CControllerServiceListGeneral extends CController {
 			'serviceid' => CProfile::get('web.service.serviceid', self::WITHOUT_PARENTS_SERVICEID),
 			'name' => CProfile::get('web.service.filter.name', self::FILTER_DEFAULT_NAME),
 			'status' => CProfile::get('web.service.filter.status', self::FILTER_DEFAULT_STATUS),
-			'without_children' => CProfile::get('web.service.filter.without_children', self::FILTER_DEFAULT_WITHOUT_CHILDREN),
-			'without_problem_tags' => CProfile::get('web.service.filter.without_problem_tags', self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS),
+			'without_children' => (bool) CProfile::get('web.service.filter.without_children',
+				self::FILTER_DEFAULT_WITHOUT_CHILDREN ? 1 : 0
+			),
+			'without_problem_tags' => (bool) CProfile::get('web.service.filter.without_problem_tags',
+				self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS ? 1 : 0
+			),
 			'tag_source' => CProfile::get('web.service.filter.tag_source', self::FILTER_DEFAULT_TAG_SOURCE),
 			'evaltype' => CProfile::get('web.service.filter.evaltype', self::FILTER_DEFAULT_EVALTYPE),
 			'tags' => []
@@ -293,6 +295,8 @@ abstract class CControllerServiceListGeneral extends CController {
 				? null
 				: ['serviceid'],
 			'parentids' => !$this->is_filtered ? $filter['serviceid'] : null,
+			'childids' => $filter['without_children'] ? 0 : null,
+			'without_problem_tags' => $filter['without_problem_tags'],
 			'search' => ($filter['name'] === '')
 				? null
 				: ['name' => $filter['name']],
@@ -312,7 +316,10 @@ abstract class CControllerServiceListGeneral extends CController {
 				$db_services += API::Service()->get($options + ['tags' => $filter['tags']]);
 			}
 
-			if (in_array($filter['tag_source'], [ZBX_SERVICE_FILTER_TAGS_ANY, ZBX_SERVICE_FILTER_TAGS_PROBLEM])) {
+			if (!$filter['without_problem_tags']
+					&& ($filter['tag_source'] == ZBX_SERVICE_FILTER_TAGS_ANY
+						|| $filter['tag_source'] == ZBX_SERVICE_FILTER_TAGS_PROBLEM
+					)) {
 				$db_services += API::Service()->get($options + ['problem_tags' => $filter['tags']]);
 			}
 		}

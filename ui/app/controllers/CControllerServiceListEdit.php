@@ -72,8 +72,8 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			$view_url
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
-				->setArgument('filter_without_children', $filter['without_children'])
-				->setArgument('filter_without_problem_tags', $filter['without_problem_tags'])
+				->setArgument('filter_without_children', $filter['without_children'] ? 1 : null)
+				->setArgument('filter_without_problem_tags', $filter['without_problem_tags'] ? 1 : null)
 				->setArgument('filter_tag_source', $filter['tag_source'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
 				->setArgument('filter_tags', $filter['tags']);
@@ -90,8 +90,8 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 				->setArgument('action', 'service.list.edit.refresh')
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
-				->setArgument('filter_without_children', $filter['without_children'])
-				->setArgument('filter_without_problem_tags', $filter['without_problem_tags'])
+				->setArgument('filter_without_children', $filter['without_children'] ? 1 : null)
+				->setArgument('filter_without_problem_tags', $filter['without_problem_tags'] ? 1 : null)
 				->setArgument('filter_tag_source', $filter['tag_source'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
 				->setArgument('filter_tags', $filter['tags'])
