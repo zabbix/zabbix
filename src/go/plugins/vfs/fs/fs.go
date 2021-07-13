@@ -49,8 +49,8 @@ type FsStats struct {
 type FsInfo struct {
 	FsName     *string  `json:"{#FSNAME},omitempty"`
 	FsType     *string  `json:"{#FSTYPE},omitempty"`
-	DriveType  *string  `json:"{#FSDRIVETYPE},omitempty"`
 	DriveLabel *string  `json:"{#FSLABEL},omitempty"`
+	DriveType  *string  `json:"{#FSDRIVETYPE},omitempty"`
 	Bytes      *FsStats `json:"bytes,omitempty"`
 	Inodes     *FsStats `json:"inodes,omitempty"`
 }
@@ -58,8 +58,8 @@ type FsInfo struct {
 type FsInfoNew struct {
 	FsName     *string  `json:"fsname,omitempty"`
 	FsType     *string  `json:"fstype,omitempty"`
-	DriveType  *string  `json:"fsdrivetype,omitempty"`
 	DriveLabel *string  `json:"fslabel,omitempty"`
+	DriveType  *string  `json:"fsdrivetype,omitempty"`
 	Bytes      *FsStats `json:"bytes,omitempty"`
 	Inodes     *FsStats `json:"inodes,omitempty"`
 }
