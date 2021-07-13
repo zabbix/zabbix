@@ -1878,7 +1878,6 @@ static void	db_manage_service_events(zbx_service_manager_t *manager, zbx_hashset
 	zbx_vector_ptr_destroy(&events_update);
 	zbx_vector_ptr_destroy(&events_resolve);
 	zbx_vector_ptr_destroy(&events_create);
-
 }
 
 static zbx_hash_t	service_update_hash_func(const void *d)
@@ -2034,7 +2033,8 @@ static void	db_update_services(zbx_service_manager_t *manager)
 		DBbegin();
 		its_write_status_and_alarms(&alarms, &service_updates, &service_problems_new, &service_problemids);
 
-		db_manage_service_events(manager, &service_updates);
+		if (0 != manager->actions.num_data)
+			db_manage_service_events(manager, &service_updates);
 	}
 	while (ZBX_DB_DOWN == DBcommit());
 
