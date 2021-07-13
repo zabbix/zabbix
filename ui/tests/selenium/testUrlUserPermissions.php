@@ -168,8 +168,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'srv_status.php',
-				'title' =>	'Services [refreshed every 30 sec.]',
+				'url' => 'zabbix.php?action=service.list',
+				'title' =>	'Services',
 				'header' =>	'Services',
 				'users' => [
 					'guest' => true,
@@ -467,8 +467,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'services.php',
-				'title' =>	'Configuration of services',
+				'url' => 'zabbix.php?action=service.list',
+				'title' =>	'Services',
 				'header' => 'Services',
 				'users' => [
 					'guest' => false,
