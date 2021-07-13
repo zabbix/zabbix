@@ -77,7 +77,7 @@ window.service_edit_popup = {
 
 		// Setup Tags.
 
-		const $tags = jQuery(document.getElementById('tags'));
+		const $tags = jQuery(document.getElementById('tags-table'));
 
 		$tags.dynamicRows({template: '#tag-row-tmpl'});
 		$tags.on('click', '.element-table-add', () => {

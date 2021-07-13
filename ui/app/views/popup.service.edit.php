@@ -178,7 +178,7 @@ $tags_tab = (new CFormGrid())
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 				->addItem([
 					renderTagTable($data['form']['tags'])
-						->setId('tags')
+						->setId('tags-table')
 						->setHeader((new CRowHeader([_('Name'), _('Value'), _('Action')]))->addClass(ZBX_STYLE_GREY)),
 					(new CScriptTemplate('tag-row-tmpl'))
 						->addItem(renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]))
@@ -224,7 +224,7 @@ $child_services_tab = (new CFormGrid())
 $tabs = (new CTabView())
 	->setSelected(0)
 	->addTab('service-tab', _('Service'), $service_tab)
-	->addTab('sla-tab', _('SLA'), $sla_tab)
+	->addTab('sla-tab', _('SLA'), $sla_tab, TAB_INDICATOR_SLA)
 	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('child-services-tab', _('Child services'), $child_services_tab, TAB_INDICATOR_CHILD_SERVICES);
 
