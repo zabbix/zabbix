@@ -42,6 +42,25 @@ static	void add_uint64_json(struct zbx_json *json, const char *key, const uint64
 	zbx_json_close(json);
 }
 
+static void	update_str_json(struct zbx_json *json, const char *key, const char *val_old, const char *val_new)
+{
+	zbx_json_addarray(json, key);
+	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, NULL, val_old, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, NULL, val_new, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(json);
+}
+
+static	void update_uint64_json(struct zbx_json *json, const char *key, const uint64_t val_old, const uint64_t val_new)
+{
+	zbx_json_addarray(json, key);
+	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(json, NULL, val_old);
+	zbx_json_adduint64(json, NULL, val_new);
+	zbx_json_close(json);
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Function: auditlog_global_script                                           *
@@ -249,6 +268,45 @@ void	zbx_audit_update_json_add_uint64(const zbx_uint64_t id, const char *key, co
 	add_uint64_json(&((*found_audit_entry)->details_json), key, value);
 }
 
+void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
+		const char *value_new)
+{
+	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
+	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
+
+	local_audit_entry.id = id;
+
+	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
+			&(local_audit_entry_x));
+
+	if (NULL == found_audit_entry)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	update_str_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
+}
+
+void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, const uint64_t value_old,
+		const uint64_t value_new)
+{
+	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
+	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
+
+	local_audit_entry.id = id;
+
+	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
+			&(local_audit_entry_x));
+	if (NULL == found_audit_entry)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	update_uint64_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
+}
+
 void	zbx_audit_host_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid, zbx_uint64_t main_,
 		zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns, zbx_uint64_t port)
 {
@@ -271,36 +329,38 @@ void	zbx_audit_host_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid
 	zbx_audit_update_json_add_uint64(hostid, audit_key_port, port);
 }
 
+#define PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(...)				\
+	char	audit_key_version[AUDIT_DETAILS_KEY_LEN], audit_key_bulk[AUDIT_DETAILS_KEY_LEN],			\
+		audit_key_community[AUDIT_DETAILS_KEY_LEN], audit_key_securityname[AUDIT_DETAILS_KEY_LEN],		\
+		audit_key_securitylevel[AUDIT_DETAILS_KEY_LEN], audit_key_authpassphrase[AUDIT_DETAILS_KEY_LEN],	\
+		audit_key_privpassphrase[AUDIT_DETAILS_KEY_LEN], audit_key_authprotocol[AUDIT_DETAILS_KEY_LEN],		\
+		audit_key_privprotocol[AUDIT_DETAILS_KEY_LEN], audit_key_contextname[AUDIT_DETAILS_KEY_LEN];		\
+															\
+	zbx_snprintf(audit_key_version,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.version", interfaceid);	\
+	zbx_snprintf(audit_key_bulk,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.bulk", interfaceid);		\
+	zbx_snprintf(audit_key_community, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.community", interfaceid);\
+	zbx_snprintf(audit_key_securityname,    AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.securityname",	\
+			interfaceid);											\
+	zbx_snprintf(audit_key_securitylevel,   AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.securitylevel",	\
+			interfaceid);											\
+	zbx_snprintf(audit_key_authpassphrase,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.authpassphrase",	\
+			interfaceid);											\
+	zbx_snprintf(audit_key_privpassphrase,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.privpassphrase",	\
+			interfaceid);											\
+	zbx_snprintf(audit_key_authprotocol,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.authprotocol",	\
+			interfaceid);											\
+	zbx_snprintf(audit_key_privprotocol,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.privprotocol",	\
+			interfaceid);											\
+	zbx_snprintf(audit_key_contextname,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.contextname",		\
+			interfaceid);											\
 
-void	zbx_audit_host_update_snmp_interfaces(zbx_uint64_t hostid, zbx_uint64_t version, zbx_uint64_t bulk,
+
+void	zbx_audit_host_update_json_add_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version, zbx_uint64_t bulk,
 		const char *community, const char *securityname, zbx_uint64_t securitylevel, const char *authpassphrase,
 		const char *privpassphrase, zbx_uint64_t authprotocol, zbx_uint64_t privprotocol,
 		const char *contextname, zbx_uint64_t interfaceid)
 {
-	char	audit_key_version[AUDIT_DETAILS_KEY_LEN], audit_key_bulk[AUDIT_DETAILS_KEY_LEN],
-		audit_key_community[AUDIT_DETAILS_KEY_LEN], audit_key_securityname[AUDIT_DETAILS_KEY_LEN],
-		audit_key_securitylevel[AUDIT_DETAILS_KEY_LEN], audit_key_authpassphrase[AUDIT_DETAILS_KEY_LEN],
-		audit_key_privpassphrase[AUDIT_DETAILS_KEY_LEN], audit_key_authprotocol[AUDIT_DETAILS_KEY_LEN],
-		audit_key_privprotocol[AUDIT_DETAILS_KEY_LEN], audit_key_contextname[AUDIT_DETAILS_KEY_LEN];
-
-	zbx_snprintf(audit_key_version,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.version", interfaceid);
-	zbx_snprintf(audit_key_bulk,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.bulk", interfaceid);
-	zbx_snprintf(audit_key_community, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.community", interfaceid);
-	zbx_snprintf(audit_key_securityname,    AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.securityname",
-			interfaceid);
-	zbx_snprintf(audit_key_securitylevel,   AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.securitylevel",
-			interfaceid);
-	zbx_snprintf(audit_key_authpassphrase,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.authpassphrase",
-			interfaceid);
-	zbx_snprintf(audit_key_privpassphrase,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.privpassphrase",
-			interfaceid);
-	zbx_snprintf(audit_key_authprotocol,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.authprotocol",
-			interfaceid);
-	zbx_snprintf(audit_key_privprotocol,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.privprotocol",
-			interfaceid);
-	zbx_snprintf(audit_key_contextname,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.contextname",
-			interfaceid);
-
+PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP()
 	zbx_audit_update_json_add_uint64(hostid, audit_key_version, version);
 	zbx_audit_update_json_add_uint64(hostid, audit_key_bulk, bulk);
 	zbx_audit_update_json_add_string(hostid, audit_key_community, community);
@@ -311,6 +371,28 @@ void	zbx_audit_host_update_snmp_interfaces(zbx_uint64_t hostid, zbx_uint64_t ver
 	zbx_audit_update_json_add_uint64(hostid, audit_key_authprotocol, authprotocol);
 	zbx_audit_update_json_add_uint64(hostid, audit_key_privprotocol, privprotocol);
 	zbx_audit_update_json_add_string(hostid, audit_key_contextname, contextname);
+}
+
+void	zbx_audit_host_update_json_update_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version_old,
+		zbx_uint64_t version_new, zbx_uint64_t bulk_old,  zbx_uint64_t bulk_new, const char *community_old,
+		const char *community_new, const char *securityname_old, const char *securityname_new,
+		zbx_uint64_t securitylevel_old, zbx_uint64_t securitylevel_new, const char *authpassphrase_old,
+		const char *authpassphrase_new, const char *privpassphrase_old, const char *privpassphrase_new,
+		zbx_uint64_t authprotocol_old, zbx_uint64_t authprotocol_new, zbx_uint64_t privprotocol_old,
+		zbx_uint64_t privprotocol_new, const char *contextname_old, const char *contextname_new,
+		zbx_uint64_t interfaceid)
+{
+PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP()
+	zbx_audit_update_json_update_uint64(hostid, audit_key_version, version_old, version_new);
+	zbx_audit_update_json_update_uint64(hostid, audit_key_bulk, bulk_old, bulk_new);
+	zbx_audit_update_json_update_string(hostid, audit_key_community, community_old, community_new);
+	zbx_audit_update_json_update_string(hostid, audit_key_securityname, securityname_old, securityname_new);
+	zbx_audit_update_json_update_uint64(hostid, audit_key_securitylevel, securitylevel_old, securitylevel_new);
+	zbx_audit_update_json_update_string(hostid, audit_key_authpassphrase, authpassphrase_old, authpassphrase_new);
+	zbx_audit_update_json_update_string(hostid, audit_key_privpassphrase, privpassphrase_old, privpassphrase_new);
+	zbx_audit_update_json_update_uint64(hostid, audit_key_authprotocol, authprotocol_old, authprotocol_new);
+	zbx_audit_update_json_update_uint64(hostid, audit_key_privprotocol, privprotocol_old, privprotocol_new);
+	zbx_audit_update_json_update_string(hostid, audit_key_contextname, contextname_old,  contextname_new);
 }
 
 void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, int tls_connect, int tls_accept,

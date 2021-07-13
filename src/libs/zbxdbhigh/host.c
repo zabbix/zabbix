@@ -4914,8 +4914,11 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 		const unsigned char privprotocol, const char *contextname, const zbx_uint64_t hostid)
 {
 	char		*community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc, *contextname_esc;
+	unsigned char	db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
 	DB_RESULT	result;
 	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
 			"select version,bulk,community,securityname,securitylevel,authpassphrase,privpassphrase,"
@@ -4926,8 +4929,6 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		unsigned char	db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
-
 		ZBX_STR2UCHAR(db_version, row[0]);
 
 		if (version != db_version)
@@ -4986,6 +4987,11 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 				" (" ZBX_FS_UI64 ",%d,%d,'%s','%s',%d,'%s','%s',%d,%d,'%s')",
 			interfaceid, (int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc);
+
+		zbx_audit_host_update_json_add_snmp_interface(hostid, version, bulk, community_esc, securityname_esc,
+				securitylevel, authpassphrase_esc, privpassphrase_esc, authprotocol, privprotocol,
+				contextname_esc, interfaceid);
+
 	}
 	else
 	{
@@ -5005,11 +5011,21 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 			(int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
 			interfaceid);
+
+		zbx_audit_host_update_json_update_snmp_interface(hostid,
+				db_version, version,
+				db_bulk, bulk,
+				row[2], community_esc,
+				row[3], securityname_esc,
+				db_securitylevel, securitylevel,
+				row[5], authpassphrase_esc,
+				row[6], privpassphrase_esc,
+				db_authprotocol, authprotocol,
+				db_privprotocol, privprotocol,
+				row[9], contextname_esc,
+				interfaceid);
 	}
 
-	zbx_audit_host_update_snmp_interfaces(hostid, version, bulk, community_esc, securityname_esc, securitylevel,
-			authpassphrase_esc, privpassphrase_esc, authprotocol, privprotocol, contextname_esc,
-			interfaceid);
 
 	zbx_free(community_esc);
 	zbx_free(securityname_esc);
@@ -5018,6 +5034,7 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 	zbx_free(contextname_esc);
 out:
 	DBfree_result(result);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, interfaceid);
 }
 
 /******************************************************************************
