@@ -94,6 +94,19 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 				->setArgument('filter_tags', $filter['tags'])
 				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
 				->getUrl(),
+			'mode_url' => (new CUrl('zabbix.php'))
+				->setArgument('action', 'service.list.edit')
+				->setArgument('path', $path ?: null)
+				->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null)
+				->setArgument('filter_name', $filter['name'])
+				->setArgument('filter_status', $filter['status'])
+				->setArgument('filter_without_children', self::FILTER_DEFAULT_WITHOUT_CHILDREN)
+				->setArgument('filter_without_problem_tags', self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS)
+				->setArgument('filter_tag_source', self::FILTER_DEFAULT_TAG_SOURCE)
+				->setArgument('filter_evaltype', $filter['evaltype'])
+				->setArgument('filter_tags', $filter['tags'])
+				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
+				->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'service' => $this->service

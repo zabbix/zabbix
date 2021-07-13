@@ -207,8 +207,7 @@ $filter->addFilterTab(_('Filter'), [
 (new CScriptTag('
 	service_list.init('.
 		json_encode([
-			'path' => $data['path'] ?: null,
-			'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
+			'mode_url' => $data['mode_url'],
 			'refresh_url' => $data['refresh_url'],
 			'refresh_interval' => $data['refresh_interval']
 		]).
