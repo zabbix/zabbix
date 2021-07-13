@@ -182,9 +182,11 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 (new CScriptTag('
 	service_list.init('.
 		json_encode([
-			'mode_url' => $data['mode_url'],
+			'path' => $data['path'] ?: null,
+			'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
 			'refresh_url' => $data['refresh_url'],
-			'refresh_interval' => $data['refresh_interval']
+			'refresh_interval' => $data['refresh_interval'],
+			'page' => $data['page']
 		]).
 	');'
 ))
