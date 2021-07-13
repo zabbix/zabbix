@@ -107,7 +107,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			->removeArgument('filter_tag_source');
 
 		$refresh_curl = (clone $paging_curl)
-			->setArgument('action', 'service.list.refresh')
+			->setArgument('action', 'service.list.edit.refresh')
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
 
 		$data = [
