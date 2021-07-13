@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup config, users
@@ -35,6 +36,13 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
+	 * Id of user that created for future updating.
+	 *
+	 * @var integer
+	 */
+	protected static $userid;
+
+	/**
 	 * Check authentication form fields layout.
 	 */
 	public function testPasswordComplexity_Layout() {
@@ -42,6 +50,13 @@ class testPasswordComplexity extends CWebTest {
 		$this->page->assertTitle('Configuration of authentication');
 		$form = $this->query('name:form_auth')->asForm()->one();
 
+		// Check that Default authentication is selected by default.
+		$this->assertEquals('Internal', $form->getField('Default authentication')->asSegmentedRadio()->getSelected());
+
+		// Check that 'Password policy' header presents.
+		$this->assertTrue($form->query('xpath://h4[text()="Password policy"]')->exists());
+
+		// Check default texts in hint-boxes.
 		// Summon first hint-box.
 		$form->query('xpath://label[text()="Password must contain"]//span')->one()->click();
 		$contain_hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
@@ -67,7 +82,7 @@ class testPasswordComplexity extends CWebTest {
 				"\nmust not be one of common or context-specific passwords";
 		$this->assertEquals($expected_easy_password_text, $easy_password_hint->one()->getText());
 
-		// Close the second hit-box.
+		// Close the second hint-box.
 		$easy_password_hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 		$easy_password_hint->waitUntilNotPresent();
 	}
@@ -133,9 +148,11 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
+	 * Check authentication form fields validation.
+	 *
 	 * @dataProvider getFormValidationData
 	 *
-	 * Check authentication form fields validation.
+	 * @backupOnce config
 	 */
 	public function testPasswordComplexity_FormValidation($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -472,11 +489,58 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getUserPasswordData
-	 *
 	 * Check user creation with password complexity rules.
+	 *
+	 * @backupOnce config
+	 *
+	 * @dataProvider getUserPasswordData
 	 */
 	public function testPasswordComplexity_CreateUserPassword($data) {
+		$this->checkPasswordComplexity($data);
+	}
+
+	/**
+	 * Add user for updating.
+	 */
+	public function prepareUserData() {
+		CDataHelper::setSessionId(null);
+
+		$response = CDataHelper::call('user.create', [
+			[
+				'username' => 'update-user',
+				'passwd' => 'iamrobot',
+				'roleid' => 1,
+				'usrgrps' => [
+					[
+						'usrgrpid' => '7'
+					]
+				]
+			]
+		]);
+
+		$this->assertArrayHasKey('userids', $response);
+		self::$userid = $response['userids'][0];
+	}
+
+	/**
+	 * Check user update with password complexity rules.
+	 *
+	 * @onBeforeOnce prepareUserData
+	 *
+	 * @dataProvider getUserPasswordData
+	 */
+	public function testPasswordComplexity_UpdateUserPassword($data) {
+		$update = true;
+		$this->checkPasswordComplexity($data, $update);
+	}
+
+	/**
+	 * Check password complexity rules for user creation or update.
+	 *
+	 * @param array      $data       data provider
+	 * @param boolean    $update     false if create, true if update
+	 */
+	private function checkPasswordComplexity($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash('SELECT * FROM users');
 		}
@@ -487,57 +551,77 @@ class testPasswordComplexity extends CWebTest {
 			$auth_form->fill($data['auth_fields']);
 			$auth_form->submit();
 			$this->page->waitUntilReady();
-			// Uncomment this when ZBXNEXT-4029 (12) subissue is fixed.
+			// Uncomment this when ZBX-19669 is fixed.
 //			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 			$this->assertEquals($data['db_passwd_check_rules'],
 				CDBHelper::getValue('SELECT passwd_check_rules FROM config'));
 		}
 		else {
+			// If auth fields were not changed check default config in db.
 			$this->assertEquals([['passwd_min_length' => 8, 'passwd_check_rules' => 8]],
 					CDBHelper::getAll('SELECT passwd_min_length, passwd_check_rules FROM config')
 			);
 		}
 
+		if ($update) {
+			$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$userid);
+			$this->query('button:Change password')->waitUntilClickable()->one()->click();
+			$this->query('id:password1')->waitUntilPresent()->one();
+			$this->query('id:password2')->waitUntilPresent()->one();
+		}
+		else {
+			$this->page->login()->open('zabbix.php?action=user.edit');
+		}
+
 		// Check user password creation accordingly to complexity settings.
-		$this->page->login()->open('zabbix.php?action=user.edit');
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
-		$username = 'username'.time();
-		$user_form->fill([
-			'Username' => $username,
-			'Groups' => ['Zabbix administrators'],
-			'Password' => $data['Password'],
-			'Password (once again)' => $data['Password']
-		]);
+		$username = $update ? 'update-user' : 'username'.time();
+
+		if ($update === false){
+			$user_form->fill([
+				'Username' => $username,
+				'Groups' => ['Zabbix administrators']
+			]);
+		}
 
 		if (array_key_exists('hint', $data)) {
-			// Summon hint-box.
+			// Summon hint-box and assert text accordigly to password complexity settings, then close hint-box.
 			$user_form->query('xpath://label[text()="Password"]//span')->one()->click();
 			$hint = $user_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
-
-			// Assert text in hint-box.
 			$this->assertEquals($data['hint'], $hint->one()->getText());
-
-			// Close hint-box.
 			$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 			$hint->waitUntilNotPresent();
 		}
 		else {
-			$this->assertFalse($user_form->query('xpath://div[@class="overlay-dialogue"]')->exists());
+			// If password can be 1 symbol long and doesn't have any complexity rules hint is not shown at all.
+			$this->assertFalse($user_form->query('xpath://label[text()="Password"]//span')->exists());
 		}
 
-		$user_form->selectTab('Permissions');
-		$user_form->fill(['Role' => 'User role']);
+		$user_form->fill([
+			'Password' => $data['Password'],
+			'Password (once again)' => $data['Password']
+		]);
+
+		if ($update === false){
+			$user_form->selectTab('Permissions');
+			$user_form->fill(['Role' => 'User role']);
+		}
+
 		$user_form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot add user', $data['error']);
+			$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'add').' user', $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM users'));
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, 'User added');
+			$this->assertMessage(TEST_GOOD, 'User '.($update ? 'updated' : 'added'));
 
 			// Check user saved in db.
-			$this->assertEquals(1,CDBHelper::getCount('SELECT * FROM users WHERE username ='.zbx_dbstr($username)));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM users WHERE username ='.zbx_dbstr($username)));
+
+			// Check success login with new password.
+			$this->page->userLogin($username, $data['Password']);
+			$this->assertTrue($this->query('xpath://a[@title="'.$username.'" and text()="User settings"]')->exists());
 		}
 	}
 }
