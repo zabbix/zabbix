@@ -133,6 +133,9 @@ abstract class CGraphGeneral extends CApiService {
 			$this->inherit($graph);
 		}
 
+		$audit_resource = ($this instanceof CGraph) ? AUDIT_RESOURCE_GRAPH : AUDIT_RESOURCE_GRAPH_PROTOTYPE;
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, $audit_resource, $graphs, $dbGraphs);
+
 		return ['graphids' => $graphIds];
 	}
 
@@ -163,13 +166,17 @@ abstract class CGraphGeneral extends CApiService {
 
 		$this->validateCreate($graphs);
 
-		foreach ($graphs as $graph) {
+		foreach ($graphs as &$graph) {
 			$graph['graphid'] = $this->createReal($graph);
 
 			$this->inherit($graph);
 
 			$graphids[] = $graph['graphid'];
 		}
+		unset($graph);
+
+		$audit_resource = $this instanceof CGraph ? AUDIT_RESOURCE_GRAPH : AUDIT_RESOURCE_GRAPH_PROTOTYPE;
+		$this->addAuditBulk(AUDIT_ACTION_ADD, $audit_resource, $graphs);
 
 		return ['graphids' => $graphids];
 	}

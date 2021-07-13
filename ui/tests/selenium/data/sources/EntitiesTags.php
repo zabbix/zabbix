@@ -362,7 +362,7 @@ class EntitiesTags {
 				'name' => 'Item prototype: {#KEY}',
 				'key_' => 'itemprototype_trap[{#KEY}]',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			[
 				'hostid' => $hosts['hostids']['Host for tags testing'],
@@ -416,7 +416,7 @@ class EntitiesTags {
 				'name' => 'Template item prototype: {#KEY}',
 				'key_' => 'template.itemprototype_trap[{#KEY}]',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			[
 				'hostid' => $templates['templateids']['Template for tags testing'],
