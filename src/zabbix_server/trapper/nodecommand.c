@@ -551,6 +551,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): data:%s ", __func__, data);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_user_init(&user);
 
 	/* check who is connecting, get user details, check access rights */
 
@@ -662,6 +663,7 @@ finish:
 	zbx_json_free(&j);
 	zbx_free(result);
 	zbx_free(debug);
+	zbx_user_free(&user);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

@@ -65,11 +65,9 @@ zbx_db_version_t;
 #ifdef HAVE_ORACLE
 #	define ZBX_TYPE_INT_STR		"number(10)"
 #	define ZBX_TYPE_CHAR_STR	"nvarchar2"
-#	define ZBX_TYPE_FIXED_CHAR_STR	"nchar2"
 #else
 #	define ZBX_TYPE_INT_STR		"integer"
 #	define ZBX_TYPE_CHAR_STR	"varchar"
-#	define ZBX_TYPE_FIXED_CHAR_STR	"char"
 #endif
 
 #if defined(HAVE_MYSQL)
@@ -127,8 +125,7 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
 			break;
 		case ZBX_TYPE_CUID:
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%hu)", ZBX_TYPE_FIXED_CHAR_STR,
-					CUID_LEN - 1);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%hu)", ZBX_TYPE_CHAR_STR, CUID_LEN - 1);
 			break;
 		default:
 			assert(0);
