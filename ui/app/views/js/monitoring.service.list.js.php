@@ -137,35 +137,21 @@
 				.then((response) => response.json())
 				.then((response) => {
 					if ('errors' in response) {
-						throw {html_string: response.errors};
-					}
-
-					if ('messages' in response) {
-						addMessage(response.messages);
-					}
-
-					service_list.outerHTML = response.body;
-
-					chkbxRange.init();
-				})
-				.catch((error) => {
-					let message_box;
-
-					if (typeof error === 'object' && 'html_string' in error) {
-						message_box =
-							new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild;
+						addMessage(response.errors);
 					}
 					else {
-						const error = <?= json_encode(_('Unexpected server error.')) ?>;
+						if ('messages' in response) {
+							addMessage(response.messages);
+						}
 
-						message_box = makeMessageBox('bad', [], error, true, false)[0];
+						service_list.outerHTML = response.body;
+
+						chkbxRange.init();
 					}
-
-					addMessage(message_box);
-
-					service_list.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
 				})
 				.finally(() => {
+					service_list.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+
 					this.is_refresh_pending = false;
 				});
 		}
