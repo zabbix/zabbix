@@ -29,9 +29,9 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 		$fields = [
 			'serviceid' =>			'db services.serviceid',
 			'path' =>				'array',
-			'filter_name' =>		'required|string',
-			'filter_status' =>		'required|in '.SERVICE_STATUS_ANY.','.SERVICE_STATUS_OK.','.SERVICE_STATUS_PROBLEM,
-			'filter_evaltype' =>	'required|in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_name' =>		'string',
+			'filter_status' =>		'in '.implode(',', [SERVICE_STATUS_ANY, SERVICE_STATUS_OK, SERVICE_STATUS_PROBLEM]),
+			'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>		'array',
 			'page' =>				'ge 1'
 		];
@@ -60,14 +60,20 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 
 		$filter = [
 			'serviceid' => $this->service !== null ? $this->service['serviceid'] : self::WITHOUT_PARENTS_SERVICEID,
-			'name' => $this->getInput('filter_name'),
-			'status' => $this->getInput('filter_status'),
+			'name' => $this->getInput('filter_name', self::FILTER_DEFAULT_NAME),
+			'status' => $this->getInput('filter_status', self::FILTER_DEFAULT_STATUS),
 			'without_children' => self::FILTER_DEFAULT_WITHOUT_CHILDREN,
 			'without_problem_tags' => self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS,
 			'tag_source' => self::FILTER_DEFAULT_TAG_SOURCE,
-			'evaltype' => $this->getInput('filter_evaltype'),
-			'tags' => $this->getInput('filter_tags', [])
+			'evaltype' => $this->getInput('filter_evaltype', self::FILTER_DEFAULT_EVALTYPE),
+			'tags' => []
 		];
+
+		foreach ($this->getInput('filter_tags', []) as $tag) {
+			if (array_key_exists('tag', $tag) && $tag['tag'] !== '') {
+				$filter['tags'][] = $tag;
+			}
+		}
 
 		$is_filtered = !$this->isDefaultFilter($filter);
 
@@ -75,7 +81,10 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 			'path' => $path,
 			'is_filtered' => $is_filtered,
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
-			'service' => $this->service
+			'service' => $this->service,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		];
 
 		$db_serviceids = $this->prepareData($filter);
@@ -83,11 +92,15 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 		$paging_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list')
 			->setArgument('path', $path ?: null)
-			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null)
-			->setArgument('filter_name', $filter['name'])
-			->setArgument('filter_status', $filter['status'])
-			->setArgument('filter_evaltype', $filter['evaltype'])
-			->setArgument('filter_tags', $filter['tags']);
+			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null);
+
+		if ($is_filtered) {
+			$paging_curl
+				->setArgument('filter_name', $filter['name'])
+				->setArgument('filter_status', $filter['status'])
+				->setArgument('filter_evaltype', $filter['evaltype'])
+				->setArgument('filter_tags', $filter['tags']);
+		}
 
 		$page_num = $this->getInput('page', 1);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
@@ -104,8 +117,6 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 		]);
 
 		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
-
-		$data['user']['debug_mode'] = $this->getDebugMode();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));

@@ -30,20 +30,18 @@
 
 <script>
 	const service_list = {
-		path: null,
 		serviceid: null,
+		mode_switch_url: null,
 		refresh_url: null,
 		refresh_interval: null,
 		is_refresh_paused: false,
 		is_refresh_pending: false,
-		page: null,
 
-		init({path, serviceid, refresh_url, refresh_interval, page = null}) {
-			this.path = path;
+		init({serviceid, mode_switch_url, refresh_url, refresh_interval}) {
 			this.serviceid = serviceid;
+			this.mode_switch_url = mode_switch_url;
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
-			this.page = page;
 
 			this.initViewModeSwitcher();
 			this.initTagFilter();
@@ -54,27 +52,8 @@
 		initViewModeSwitcher() {
 			for (const element of document.getElementsByName('list_mode')) {
 				if (!element.checked) {
-					element.addEventListener('click', (e) => {
-						const url = new Curl('zabbix.php', false);
-
-						url.setArgument('action', (e.target.value == <?= ZBX_LIST_MODE_VIEW ?>)
-							? 'service.list'
-							: 'service.list.edit'
-						);
-
-						if (this.path !== null) {
-							url.setArgument('path', this.path);
-						}
-
-						if (this.serviceid !== null) {
-							url.setArgument('serviceid', this.serviceid);
-						}
-
-						if (this.page !== null) {
-							url.setArgument('page', this.page);
-						}
-
-						redirect(url.getUrl());
+					element.addEventListener('click', () => {
+						location.href = this.mode_switch_url;
 					});
 				}
 			}
@@ -97,7 +76,7 @@
 			for (const element of document.querySelectorAll('.js-create-service, .js-add-child-service')) {
 				let popup_options = {};
 
-				if (element.dataset.serviceid !== 'undefined') {
+				if (element.dataset.serviceid !== null) {
 					popup_options = {
 						parent_serviceids: [element.dataset.serviceid]
 					};
