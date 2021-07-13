@@ -137,7 +137,7 @@ exit:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
+static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids, zbx_config_t *cfg)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -190,7 +190,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 		for (i = 0; i < groupids->values_num; i++)
 		{
 			zbx_db_insert_add_values(&db_insert, hostgroupid, hostid, groupids->values[i]);
-			zbx_audit_host_add_groups(AUDIT_DETAILS_ACTION_ADD, hostid, groupids->values[i]);
+			zbx_audit_host_add_groups(cfg, AUDIT_DETAILS_ACTION_ADD, hostid, groupids->values[i]);
 			hostgroupid++;
 		}
 
@@ -216,7 +216,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, int *status)
+static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, int *status, zbx_config_t *cfg)
 {
 	DB_RESULT		result;
 	DB_RESULT		result2;
@@ -227,7 +227,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
 	unsigned char		svc_type, interface_type;
-	zbx_config_t		cfg;
 	zbx_db_insert_t		db_insert;
 	size_t			out_alloc = 0, out_offset = 0;
 
@@ -235,15 +234,13 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 
 	zbx_vector_uint64_create(&groupids);
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID | ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE);
-
-	if (ZBX_DISCOVERY_GROUPID_UNDEFINED == cfg.discovery_groupid)
+	if (ZBX_DISCOVERY_GROUPID_UNDEFINED == cfg->discovery_groupid)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host: group for discovered hosts is not defined");
 		goto clean;
 	}
 
-	zbx_vector_uint64_append(&groupids, cfg.discovery_groupid);
+	zbx_vector_uint64_append(&groupids, cfg->discovery_groupid);
 
 	if (EVENT_OBJECT_DHOST == event->object || EVENT_OBJECT_DSERVICE == event->object)
 	{
@@ -454,26 +451,26 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 
 				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER ALPHA");
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, host_visible_unique);
-				zbx_audit_update_json_add_uint64(hostid, "host.proxy_hostid", proxy_hostid);
-				zbx_audit_update_json_add_string(hostid, "host.host", host_unique);
+				zbx_audit_host_create_entry(cfg, AUDIT_ACTION_ADD, hostid, host_visible_unique);
+				zbx_audit_host_update_json_add_proxy_hostid_and_hostname(cfg, hostid, proxy_hostid,
+						host_unique);
 
-				if (HOST_INVENTORY_DISABLED != cfg.default_inventory_mode)
-					DBadd_host_inventory(hostid, cfg.default_inventory_mode);
+				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
+					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
 
-				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
+				interfaceid = DBadd_interface(cfg, hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
 
 				zbx_free(host_unique);
 				zbx_free(host_visible_unique);
 
-				add_discovered_host_groups(hostid, &groupids);
+				add_discovered_host_groups(hostid, &groupids, cfg);
 			}
 			else
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER BETA");
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, *hostname);
-				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
+				zbx_audit_host_create_entry(cfg, AUDIT_ACTION_UPDATE, hostid, *hostname);
+				interfaceid = DBadd_interface(cfg, hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
 			}
 
@@ -491,7 +488,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 				else if (SVC_SNMPv3 == svc_type)
 					version = ZBX_IF_SNMP_VERSION_3;
 
-				DBadd_interface_snmp(interfaceid, version, SNMP_BULK_ENABLED, row[9], row[10],
+				DBadd_interface_snmp(cfg, interfaceid, version, SNMP_BULK_ENABLED, row[9], row[10],
 						securitylevel, row[12], row[13], authprotocol, privprotocol, row[16],
 						hostid);
 			}
@@ -584,36 +581,36 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid",
 							"host", "name", "tls_connect", "tls_accept",
 							"tls_psk_identity", "tls_psk", NULL);
-					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, row[1], row[1],
+					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, *hostname, *hostname,
 						tls_accepted, tls_accepted, psk_identity, psk);
 
-					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, row[1]);
-					zbx_audit_update_json_add_uint64(hostid, "host.proxy_hostid", proxy_hostid);
-					zbx_audit_update_json_add_string(hostid, "host.host", row[1]);
-
-					zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_accepted, tls_accepted,
-							psk_identity, psk);
+					zbx_audit_host_create_entry(cfg, AUDIT_ACTION_ADD, hostid, *hostname);
+					zbx_audit_host_update_json_add_proxy_hostid_and_hostname(cfg, hostid,
+							proxy_hostid, *hostname);
+					zbx_audit_host_update_json_add_tls_and_psk(cfg, hostid, tls_accepted,
+							tls_accepted, psk_identity, psk);
 				}
 				else
 				{
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host",
 							"name", NULL);
 
-					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, row[1]);
-					zbx_audit_update_json_add_uint64(hostid, "host.proxy_hostid", proxy_hostid);
-					zbx_audit_update_json_add_string(hostid, "host.host", row[1]);
-					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, row[1], row[1]);
+					zbx_audit_host_create_entry(cfg, AUDIT_ACTION_ADD, hostid, *hostname);
+					zbx_audit_host_update_json_add_proxy_hostid_and_hostname(cfg, hostid,
+							proxy_hostid, *hostname);
+					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, *hostname,
+							*hostname);
 				}
 
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
-				if (HOST_INVENTORY_DISABLED != cfg.default_inventory_mode)
-					DBadd_host_inventory(hostid, cfg.default_inventory_mode);
+				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
+					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
 
-				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
+				DBadd_interface(cfg, hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 
-				add_discovered_host_groups(hostid, &groupids);
+				add_discovered_host_groups(hostid, &groupids, cfg);
 			}
 			else
 			{
@@ -622,7 +619,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 				*hostname = zbx_strdup(NULL, row2[2]);
 				*status = atoi(row2[3]);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, *hostname);
+				zbx_audit_host_create_entry(cfg, AUDIT_ACTION_UPDATE, hostid, *hostname);
 
 				if (host_proxy_hostid != proxy_hostid)
 				{
@@ -633,7 +630,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 					zbx_audit_update_json_add_uint64(hostid, "host.proxy_hostid", proxy_hostid);
 				}
 
-				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
+				DBadd_interface(cfg, hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 			}
 
 			DBfree_result(result2);
@@ -643,7 +640,7 @@ out:
 		DBfree_result(result);
 	}
 clean:
-	zbx_config_clean(&cfg);
+	zbx_config_clean(cfg);
 
 	zbx_vector_uint64_destroy(&groupids);
 
@@ -688,18 +685,17 @@ static int	is_discovery_or_autoregistration(const DB_EVENT *event)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_host_add(const DB_EVENT *event)
+void	op_host_add(const DB_EVENT *event, zbx_config_t	*cfg)
 {
-	char	*hostname = NULL;
-	int	status;
+	char		*hostname = NULL;
+	int		status;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	zbx_audit_init();
-	add_discovered_host(event, &hostname, &status);
-	zbx_audit_flush();
+	add_discovered_host(event, &hostname, &status, cfg);
 	zbx_free(hostname);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -714,7 +710,7 @@ out:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_host_del(const DB_EVENT *event)
+void	op_host_del(const DB_EVENT *event, zbx_config_t *cfg)
 {
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostid;
@@ -728,14 +724,12 @@ void	op_host_del(const DB_EVENT *event)
 	if (0 == (hostid = select_discovered_host(event, &hostname)))
 		goto out;
 
-	zbx_audit_init();
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_append(&hostids, hostid);
 	DBdelete_hosts_with_prototypes(&hostids);
 	zbx_vector_uint64_destroy(&hostids);
 
-	zbx_audit_host_del(hostid, hostname);
-	zbx_audit_flush();
+	zbx_audit_host_del(cfg, hostid, hostname);
 out:
 	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -750,33 +744,41 @@ out:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	op_host_enable(const DB_EVENT *event)
+void	op_host_enable(const DB_EVENT *event, zbx_config_t *cfg)
 {
 	zbx_uint64_t	hostid;
 	char		*hostname = NULL;
 	int		status;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	zbx_audit_init();
+	if (0 == (hostid = add_discovered_host(event, &hostname, &status, cfg)))
+		goto out;
 
-	if (0 == (hostid = add_discovered_host(event, &hostname, &status)))
-		goto out_audit_flush;
+	result = DBselect("select status from hosts where hostid=" ZBX_FS_UI64, hostid);
 
-	DBexecute("	update hosts"
-			" set status=%d"
-			" where hostid=" ZBX_FS_UI64,
-			HOST_STATUS_MONITORED,
-			hostid);
+	if (NULL == (row = DBfetch(result)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
+	}
 
-	zbx_audit_update_json_add_uint64(hostid, "host.status", HOST_STATUS_MONITORED);
-out_audit_flush:
-	zbx_audit_flush();
-	zbx_free(hostname);
+	if (HOST_STATUS_MONITORED != atoi(row[0]))
+	{
+		DBexecute("	update hosts"
+				" set status=%d"
+				" where hostid=" ZBX_FS_UI64,
+				HOST_STATUS_MONITORED, hostid);
+
+		zbx_audit_host_update_json_update_host_status(cfg, hostid, atoi(row[0]), HOST_STATUS_MONITORED);
+	}
 out:
+	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -789,34 +791,42 @@ out:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	op_host_disable(const DB_EVENT *event)
+void	op_host_disable(const DB_EVENT *event, zbx_config_t *cfg)
 {
 	zbx_uint64_t	hostid;
 	char		*hostname = NULL;
 	int		status;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	zbx_audit_init();
+	if (0 == (hostid = add_discovered_host(event, &hostname, &status, cfg)))
+		goto out;
 
-	if (0 == (hostid = add_discovered_host(event, &hostname, &status)))
-		goto out_audit_flush;
+	result = DBselect("select status from hosts where hostid=" ZBX_FS_UI64, hostid);
 
-	DBexecute(
-			"update hosts"
-			" set status=%d"
-			" where hostid=" ZBX_FS_UI64,
-			HOST_STATUS_NOT_MONITORED,
-			hostid);
+	if (NULL == (row = DBfetch(result)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
+	}
 
-	zbx_audit_update_json_add_uint64(hostid, "host.status", HOST_STATUS_NOT_MONITORED);
-out_audit_flush:
-	zbx_audit_flush();
-	zbx_free(hostname);
+	if (HOST_STATUS_NOT_MONITORED != atoi(row[0]))
+	{
+		DBexecute(
+				"update hosts"
+				" set status=%d"
+				" where hostid=" ZBX_FS_UI64,
+				HOST_STATUS_NOT_MONITORED,
+				hostid);
+		zbx_audit_host_update_json_update_host_status(cfg, hostid, atoi(row[0]), HOST_STATUS_NOT_MONITORED);
+	}
 out:
+	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -834,7 +844,7 @@ out:
  *           setting manual or automatic host inventory mode is supported.    *
  *                                                                            *
  ******************************************************************************/
-void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
+void	op_host_inventory_mode(const DB_EVENT *event, zbx_config_t *cfg, int inventory_mode)
 {
 	zbx_uint64_t	hostid;
 	char		*hostname = NULL;
@@ -845,16 +855,12 @@ void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	zbx_audit_init();
-
-	if (0 == (hostid = add_discovered_host(event, &hostname, &status)))
-		goto out_audit_flush;
+	if (0 == (hostid = add_discovered_host(event, &hostname, &status, cfg)))
+		goto out;
 
 	DBset_host_inventory(hostid, inventory_mode);
-out_audit_flush:
-	zbx_audit_flush();
-	zbx_free(hostname);
 out:
+	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -870,10 +876,10 @@ out:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_groups_add(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
+void	op_groups_add(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids)
 {
 	zbx_uint64_t	hostid;
-	char		*hostname;
+	char		*hostname = NULL;
 	int		status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -881,16 +887,12 @@ void	op_groups_add(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	zbx_audit_init();
+	if (0 == (hostid = add_discovered_host(event, &hostname, &status, cfg)))
+		goto out;
 
-	if (0 == (hostid = add_discovered_host(event, &hostname, &status)))
-		goto out_audit_flush;
-
-	add_discovered_host_groups(hostid, groupids);
-out_audit_flush:
-	zbx_audit_flush();
-	zbx_free(hostname);
+	add_discovered_host_groups(hostid, groupids, cfg);
 out:
+	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -906,7 +908,7 @@ out:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
+void	op_groups_del(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids)
 {
 	DB_RESULT	result;
 	zbx_uint64_t	hostid;
@@ -914,6 +916,8 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 	size_t		sql_alloc = 256, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ZBX_UNUSED(cfg);
 
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
@@ -971,7 +975,7 @@ out:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
+void	op_template_add(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids)
 {
 	zbx_uint64_t	hostid;
 	char		*hostname = NULL, *error = NULL;
@@ -982,20 +986,16 @@ void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	zbx_audit_init();
-
-	if (0 == (hostid = add_discovered_host(event, &hostname, &status)))
-		goto out_audit_flush;
+	if (0 == (hostid = add_discovered_host(event, &hostname, &status, cfg)))
+		goto out;
 
 	if (SUCCEED != DBcopy_template_elements(hostid, lnk_templateids, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s", error);
 		zbx_free(error);
 	}
-out_audit_flush:
-	zbx_audit_flush();
-	zbx_free(hostname);
 out:
+	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -1011,7 +1011,7 @@ out:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
+void	op_template_del(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *del_templateids)
 {
 	zbx_uint64_t	hostid;
 	char		*error, *hostname = NULL;

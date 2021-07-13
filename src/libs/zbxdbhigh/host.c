@@ -4769,8 +4769,8 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
-		const char *dns, unsigned short port, zbx_conn_flags_t flags)
+zbx_uint64_t	DBadd_interface(zbx_config_t *cfg, zbx_uint64_t hostid, unsigned char type, unsigned char useip,
+		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -4831,6 +4831,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 			{
 				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cuseip=%d", delim, useip);
 				delim = ',';
+				zbx_audit_host_update_json_update_interface_useip(cfg, hostid, interfaceid, db_useip,
+						useip);
 			}
 
 			if (ZBX_CONN_IP == flags && 0 != strcmp(db_ip, ip))
@@ -4839,6 +4841,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cip='%s'", delim, ip_esc);
 				zbx_free(ip_esc);
 				delim = ',';
+				zbx_audit_host_update_json_update_interface_ip(cfg, hostid, interfaceid, db_ip, ip);
 			}
 
 			if (ZBX_CONN_DNS == flags && 0 != strcmp(db_dns, dns))
@@ -4848,10 +4851,15 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 						dns_esc);
 				zbx_free(dns_esc);
 				delim = ',';
+				zbx_audit_host_update_json_update_interface_dns(cfg, hostid, interfaceid, db_dns, dns);
 			}
 
 			if (FAIL == is_ushort(row[4], &db_port) || db_port != port)
+			{
 				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cport=%u", delim, port);
+				zbx_audit_host_update_json_update_interface_port(cfg, hostid, interfaceid, db_port,
+						port);
+			}
 
 			if (0 != update_alloc)
 			{
@@ -4880,7 +4888,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s','%s',%d)",
 		interfaceid, hostid, (int)main_, (int)type, (int)useip, ip_esc, dns_esc, (int)port);
 
-	zbx_audit_host_add_interfaces(hostid, interfaceid, main_, type, useip, ip_esc, dns_esc, port);
+	zbx_audit_host_update_json_add_interfaces(cfg, hostid, interfaceid, main_, type, useip, ip_esc, dns_esc, port);
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 out:
@@ -4908,10 +4916,11 @@ out:
  *             contextname    - [IN] snmp v3 context name                     *
  *                                                                            *
  ******************************************************************************/
-void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version, const unsigned char bulk,
-		const char *community, const char *securityname, const unsigned char securitylevel,
-		const char *authpassphrase, const char *privpassphrase, const unsigned char authprotocol,
-		const unsigned char privprotocol, const char *contextname, const zbx_uint64_t hostid)
+void	DBadd_interface_snmp(zbx_config_t *cfg, const zbx_uint64_t interfaceid, const unsigned char version,
+		const unsigned char bulk, const char *community, const char *securityname,
+		const unsigned char securitylevel, const char *authpassphrase, const char *privpassphrase,
+		const unsigned char authprotocol, const unsigned char privprotocol, const char *contextname,
+		const zbx_uint64_t hostid)
 {
 	char		*community_esc, *securityname_esc, *authpassphrase_esc, *privpassphrase_esc, *contextname_esc;
 	unsigned char	db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
@@ -4988,9 +4997,9 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 			interfaceid, (int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc);
 
-		zbx_audit_host_update_json_add_snmp_interface(hostid, version, bulk, community_esc, securityname_esc,
-				securitylevel, authpassphrase_esc, privpassphrase_esc, authprotocol, privprotocol,
-				contextname_esc, interfaceid);
+		zbx_audit_host_update_json_add_snmp_interface(cfg, hostid, version, bulk, community_esc,
+				securityname_esc, securitylevel, authpassphrase_esc, privpassphrase_esc, authprotocol,
+				privprotocol, contextname_esc, interfaceid);
 
 	}
 	else
@@ -5012,20 +5021,11 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
 			interfaceid);
 
-		zbx_audit_host_update_json_update_snmp_interface(hostid,
-				db_version, version,
-				db_bulk, bulk,
-				row[2], community_esc,
-				row[3], securityname_esc,
-				db_securitylevel, securitylevel,
-				row[5], authpassphrase_esc,
-				row[6], privpassphrase_esc,
-				db_authprotocol, authprotocol,
-				db_privprotocol, privprotocol,
-				row[9], contextname_esc,
-				interfaceid);
+		zbx_audit_host_update_json_update_snmp_interface(cfg, hostid, db_version, version, db_bulk, bulk,
+				row[2], community_esc, row[3], securityname_esc, db_securitylevel, securitylevel,
+				row[5], authpassphrase_esc, row[6], privpassphrase_esc, db_authprotocol, authprotocol,
+				db_privprotocol, privprotocol, row[9], contextname_esc, interfaceid);
 	}
-
 
 	zbx_free(community_esc);
 	zbx_free(securityname_esc);
@@ -5263,17 +5263,22 @@ void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	zbx_config_t	cfg;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDIT_LOGGING_ENABLED);
 
 	result = DBselect("select inventory_mode from host_inventory where hostid=" ZBX_FS_UI64, hostid);
 
 	if (NULL == (row = DBfetch(result)))
 	{
 		DBadd_host_inventory(hostid, inventory_mode);
+		zbx_audit_host_update_json_add_inventory_mode(&cfg, hostid, inventory_mode);
 	}
 	else if (inventory_mode != atoi(row[0]))
 	{
 		DBexecute("update host_inventory set inventory_mode=%d where hostid=" ZBX_FS_UI64, inventory_mode,
 				hostid);
+		zbx_audit_host_update_json_update_inventory_mode(&cfg, hostid, atoi(row[0]), inventory_mode);
 	}
 
 	DBfree_result(result);

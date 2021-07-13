@@ -42,6 +42,14 @@ static	void add_uint64_json(struct zbx_json *json, const char *key, const uint64
 	zbx_json_close(json);
 }
 
+static	void add_int_json(struct zbx_json *json, const char *key, int val)
+{
+	zbx_json_addarray(json, key);
+	zbx_json_addstring(json, NULL, "add", ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(json, NULL, val);
+	zbx_json_close(json);
+}
+
 static void	update_str_json(struct zbx_json *json, const char *key, const char *val_old, const char *val_new)
 {
 	zbx_json_addarray(json, key);
@@ -51,7 +59,7 @@ static void	update_str_json(struct zbx_json *json, const char *key, const char *
 	zbx_json_close(json);
 }
 
-static	void update_uint64_json(struct zbx_json *json, const char *key, const uint64_t val_old, const uint64_t val_new)
+static	void update_uint64_json(struct zbx_json *json, const char *key, uint64_t val_old, uint64_t val_new)
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
@@ -59,6 +67,19 @@ static	void update_uint64_json(struct zbx_json *json, const char *key, const uin
 	zbx_json_adduint64(json, NULL, val_new);
 	zbx_json_close(json);
 }
+
+static	void update_int_json(struct zbx_json *json, const char *key, int val_old, int val_new)
+{
+	zbx_json_addarray(json, key);
+	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(json, NULL, val_old);
+	zbx_json_addint64(json, NULL, val_new);
+	zbx_json_close(json);
+}
+
+#define IS_AUDIT_ON(...)						\
+	if (ZBX_AUDIT_LOGGING_ENABLED != cfg->audit_logging_enabled)	\
+		return							\
 
 
 /******************************************************************************
@@ -170,10 +191,12 @@ static int	zbx_audit_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-static void	zbx_audit_clean(void)
+static void	zbx_audit_clean(zbx_config_t *cfg)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
+
+	IS_AUDIT_ON();
 
 	zbx_hashset_iter_reset(&zbx_audit, &iter);
 
@@ -187,48 +210,54 @@ static void	zbx_audit_clean(void)
 	zbx_hashset_destroy(&zbx_audit);
 }
 
-void	zbx_audit_init(void)
+void	zbx_audit_init(zbx_config_t *cfg)
 {
+	IS_AUDIT_ON();
 #define AUDIT_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&zbx_audit, AUDIT_HASHSET_DEF_SIZE, zbx_audit_hash_func, zbx_audit_compare_func);
 #undef AUDIT_HASHSET_DEF_SIZE
 }
 
-void	zbx_audit_flush(void)
+void	zbx_audit_flush(zbx_config_t *cfg)
 {
 	char			audit_cuid[CUID_LEN], recsetid_cuid[CUID_LEN];
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 	zbx_db_insert_t		db_insert_audit;
 
+	IS_AUDIT_ON();
+
 	zbx_new_cuid(recsetid_cuid);
 	zbx_hashset_iter_reset(&zbx_audit, &iter);
 
-	zbx_db_insert_prepare(&db_insert_audit, "auditlog", "auditid", "userid", "clock", "action", "ip",
+	zbx_db_insert_prepare(&db_insert_audit, "auditlog", "auditid", "userid", "username", "clock", "action", "ip",
 			"resourceid","resourcename","resourcetype","recordsetid","details", NULL);
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_new_cuid(audit_cuid);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER BUFFER: ->%s<-", (*audit_entry)->details_json.buffer);
-
 		if (AUDIT_ACTION_UPDATE != (*audit_entry)->audit_action ||
 				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
 			zbx_json_close(&((*audit_entry)->details_json));
-			zabbix_log(LOG_LEVEL_INFORMATION, "AAAAAAA: ->%s<-", audit_cuid);
-			zbx_db_insert_add_values(&db_insert_audit, audit_cuid, USER_TYPE_SUPER_ADMIN,
-					(int)time(NULL), (*audit_entry)->audit_action, "", (*audit_entry)->id,
+#define AUDIT_USERID	"0"
+#define AUDIT_USERNAME	""
+#define AUDIT_IP	""
+			zbx_db_insert_add_values(&db_insert_audit, audit_cuid, AUDIT_USERID, AUDIT_USERNAME,
+					(int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP, (*audit_entry)->id,
 					(*audit_entry)->name, (*audit_entry)->resource_type,
 					recsetid_cuid, (*audit_entry)->details_json.buffer);
+#undef AUDIT_USERID
+#undef AUDIT_USERNAME
+#undef AUDIT_IP
 		}
 	}
 
 	zbx_db_insert_execute(&db_insert_audit);
 	zbx_db_insert_clean(&db_insert_audit);
 
-	zbx_audit_clean();
+	zbx_audit_clean(cfg);
 }
 
 void	zbx_audit_update_json_add_string(const zbx_uint64_t id, const char *key, const char *value)
@@ -250,7 +279,7 @@ void	zbx_audit_update_json_add_string(const zbx_uint64_t id, const char *key, co
 	add_str_json(&((*found_audit_entry)->details_json), key, value);
 }
 
-void	zbx_audit_update_json_add_uint64(const zbx_uint64_t id, const char *key, const uint64_t value)
+void	zbx_audit_update_json_add_uint64(const zbx_uint64_t id, const char *key, uint64_t value)
 {
 	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
@@ -266,6 +295,24 @@ void	zbx_audit_update_json_add_uint64(const zbx_uint64_t id, const char *key, co
 	}
 
 	add_uint64_json(&((*found_audit_entry)->details_json), key, value);
+}
+
+void	zbx_audit_update_json_add_int(const zbx_uint64_t id, const char *key, int value)
+{
+	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
+	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
+
+	local_audit_entry.id = id;
+
+	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
+			&(local_audit_entry_x));
+	if (NULL == found_audit_entry)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	add_int_json(&((*found_audit_entry)->details_json), key, value);
 }
 
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
@@ -288,8 +335,8 @@ void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key,
 	update_str_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
-void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, const uint64_t value_old,
-		const uint64_t value_new)
+void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, uint64_t value_old,
+		uint64_t value_new)
 {
 	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
@@ -307,12 +354,33 @@ void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key,
 	update_uint64_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
-void	zbx_audit_host_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid, zbx_uint64_t main_,
-		zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns, zbx_uint64_t port)
+void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const char *key, int value_old,
+		int value_new)
+{
+	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
+	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
+
+	local_audit_entry.id = id;
+
+	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
+			&(local_audit_entry_x));
+	if (NULL == found_audit_entry)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	update_int_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
+}
+
+void	zbx_audit_host_update_json_add_interfaces(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+		zbx_uint64_t main_, zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns,
+		zbx_uint64_t port)
 {
 	char	audit_key_main[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN],
 		audit_key_useip[AUDIT_DETAILS_KEY_LEN], audit_key_ip[AUDIT_DETAILS_KEY_LEN],
 		audit_key_dns[AUDIT_DETAILS_KEY_LEN], audit_key_port[AUDIT_DETAILS_KEY_LEN];
+	IS_AUDIT_ON();
 
 	zbx_snprintf(audit_key_main,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].main", interfaceid);
 	zbx_snprintf(audit_key_type,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].type", interfaceid);
@@ -329,12 +397,57 @@ void	zbx_audit_host_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid
 	zbx_audit_update_json_add_uint64(hostid, audit_key_port, port);
 }
 
+void	zbx_audit_host_update_json_update_interface_useip(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+		zbx_uint64_t useip_old, zbx_uint64_t useip_new)
+{
+	char	audit_key_useip[AUDIT_DETAILS_KEY_LEN];
+
+	IS_AUDIT_ON();
+
+	zbx_snprintf(audit_key_useip, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].useip", interfaceid);
+	zbx_audit_update_json_update_uint64(hostid, audit_key_useip, useip_old, useip_new);
+}
+
+void	zbx_audit_host_update_json_update_interface_ip(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+		const char *ip_old, const char *ip_new)
+{
+	char	audit_key_ip[AUDIT_DETAILS_KEY_LEN];
+
+	IS_AUDIT_ON();
+
+	zbx_snprintf(audit_key_ip, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].ip", interfaceid);
+	zbx_audit_update_json_update_string(hostid, audit_key_ip, ip_old, ip_new);
+}
+
+void	zbx_audit_host_update_json_update_interface_dns(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+		const char *dns_old, const char *dns_new)
+{
+	char	audit_key_dns[AUDIT_DETAILS_KEY_LEN];
+
+	IS_AUDIT_ON();
+
+	zbx_snprintf(audit_key_dns, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].dns", interfaceid);
+	zbx_audit_update_json_update_string(hostid, audit_key_dns, dns_old, dns_new);
+}
+
+void	zbx_audit_host_update_json_update_interface_port(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+		zbx_uint64_t port_old, zbx_uint64_t port_new)
+{
+	char	audit_key_port[AUDIT_DETAILS_KEY_LEN];
+
+	IS_AUDIT_ON();
+
+	zbx_snprintf(audit_key_port, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].port", interfaceid);
+	zbx_audit_update_json_update_uint64(hostid, audit_key_port, port_old, port_new);
+}
+
 #define PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(...)				\
 	char	audit_key_version[AUDIT_DETAILS_KEY_LEN], audit_key_bulk[AUDIT_DETAILS_KEY_LEN],			\
 		audit_key_community[AUDIT_DETAILS_KEY_LEN], audit_key_securityname[AUDIT_DETAILS_KEY_LEN],		\
 		audit_key_securitylevel[AUDIT_DETAILS_KEY_LEN], audit_key_authpassphrase[AUDIT_DETAILS_KEY_LEN],	\
 		audit_key_privpassphrase[AUDIT_DETAILS_KEY_LEN], audit_key_authprotocol[AUDIT_DETAILS_KEY_LEN],		\
 		audit_key_privprotocol[AUDIT_DETAILS_KEY_LEN], audit_key_contextname[AUDIT_DETAILS_KEY_LEN];		\
+	IS_AUDIT_ON();													\
 															\
 	zbx_snprintf(audit_key_version,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.version", interfaceid);	\
 	zbx_snprintf(audit_key_bulk,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.bulk", interfaceid);		\
@@ -355,7 +468,7 @@ void	zbx_audit_host_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid
 			interfaceid);											\
 
 
-void	zbx_audit_host_update_json_add_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version, zbx_uint64_t bulk,
+void	zbx_audit_host_update_json_add_snmp_interface(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t version, zbx_uint64_t bulk,
 		const char *community, const char *securityname, zbx_uint64_t securitylevel, const char *authpassphrase,
 		const char *privpassphrase, zbx_uint64_t authprotocol, zbx_uint64_t privprotocol,
 		const char *contextname, zbx_uint64_t interfaceid)
@@ -373,7 +486,7 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP()
 	zbx_audit_update_json_add_string(hostid, audit_key_contextname, contextname);
 }
 
-void	zbx_audit_host_update_json_update_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version_old,
+void	zbx_audit_host_update_json_update_snmp_interface(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t version_old,
 		zbx_uint64_t version_new, zbx_uint64_t bulk_old,  zbx_uint64_t bulk_new, const char *community_old,
 		const char *community_new, const char *securityname_old, const char *securityname_new,
 		zbx_uint64_t securitylevel_old, zbx_uint64_t securitylevel_new, const char *authpassphrase_old,
@@ -395,41 +508,92 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP()
 	zbx_audit_update_json_update_string(hostid, audit_key_contextname, contextname_old,  contextname_new);
 }
 
-void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, int tls_connect, int tls_accept,
-		const char *psk_identity, const char *psk)
+void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_config_t *cfg, zbx_uint64_t hostid,
+		zbx_uint64_t proxy_hostid, const char *hostname)
 {
-	zbx_audit_update_json_add_uint64(hostid, "host.tls_connect", (zbx_uint64_t)tls_connect);
-	zbx_audit_update_json_add_uint64(hostid, "host.tls_accept", (zbx_uint64_t)tls_accept);
+	IS_AUDIT_ON();
+
+	zbx_audit_update_json_add_uint64(hostid, "host.proxy_hostid", proxy_hostid);
+	zbx_audit_update_json_add_string(hostid, "host.host", hostname);
+}
+
+void	zbx_audit_host_update_json_add_tls_and_psk(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t tls_connect,
+		zbx_uint64_t tls_accept, const char *psk_identity, const char *psk)
+{
+	IS_AUDIT_ON();
+
+	zbx_audit_update_json_add_uint64(hostid, "host.tls_connect", tls_connect);
+	zbx_audit_update_json_add_uint64(hostid, "host.tls_accept", tls_accept);
 	zbx_audit_update_json_add_string(hostid, "host.psk_identity", psk_identity);
 	zbx_audit_update_json_add_string(hostid, "host.psk", psk);
 }
 
-void	zbx_audit_host_create_entry(int audit_action, zbx_uint64_t hostid, const char *name)
+void	zbx_audit_host_update_json_add_inventory_mode(zbx_config_t *cfg, zbx_uint64_t hostid, int inventory_mode)
 {
-	zbx_audit_entry_t	*local_audit_host_entry;
+	IS_AUDIT_ON();
 
-	local_audit_host_entry = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
-	local_audit_host_entry->id = hostid;
-	local_audit_host_entry->name = zbx_strdup(NULL, name);
-	local_audit_host_entry->audit_action = audit_action;
-	local_audit_host_entry->resource_type = AUDIT_RESOURCE_HOST;
-	zbx_json_initarray(&(local_audit_host_entry->details_json), ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addobject(&(local_audit_host_entry->details_json), NULL);
-	zbx_hashset_insert(&zbx_audit, &local_audit_host_entry, sizeof(local_audit_host_entry));
+	zbx_audit_update_json_add_int(hostid, "host.inventory_mode", inventory_mode);
 }
 
-void	zbx_audit_host_add_groups(const char *audit_details_action, zbx_uint64_t hostid, zbx_uint64_t groupid)
+void	zbx_audit_host_update_json_update_inventory_mode(zbx_config_t *cfg, zbx_uint64_t hostid, int inventory_mode_old,
+		int inventory_mode_new)
+{
+	IS_AUDIT_ON();
+
+	zbx_audit_update_json_update_int(hostid, "host.inventory_mode", inventory_mode_old, inventory_mode_new);
+}
+
+void	zbx_audit_host_update_json_update_host_status(zbx_config_t *cfg, zbx_uint64_t hostid, int host_status_old,
+		int host_status_new)
+{
+	IS_AUDIT_ON();
+
+	zbx_audit_update_json_update_int(hostid, "host.status", host_status_old, host_status_new);
+}
+
+void	zbx_audit_host_create_entry(zbx_config_t *cfg, int audit_action, zbx_uint64_t hostid, const char *name)
+{
+	zbx_audit_entry_t	local_audit_host_entry, **found_audit_host_entry;
+	zbx_audit_entry_t	*local_audit_host_entry_x = &local_audit_host_entry;
+
+	IS_AUDIT_ON();
+
+	local_audit_host_entry.id = hostid;
+
+	found_audit_host_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
+			&(local_audit_host_entry_x));
+	if (NULL == found_audit_host_entry)
+	{
+		zbx_audit_entry_t	*local_audit_host_entry_insert;
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER AUDIT INSERT: id: %lu",hostid);
+
+		local_audit_host_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
+		local_audit_host_entry_insert->id = hostid;
+		local_audit_host_entry_insert->name = zbx_strdup(NULL, name);
+		local_audit_host_entry_insert->audit_action = audit_action;
+		local_audit_host_entry_insert->resource_type = AUDIT_RESOURCE_HOST;
+		zbx_json_initarray(&(local_audit_host_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		zbx_json_addobject(&(local_audit_host_entry_insert->details_json), NULL);
+		zbx_hashset_insert(&zbx_audit, &local_audit_host_entry_insert, sizeof(local_audit_host_entry));
+	}
+}
+
+void	zbx_audit_host_add_groups(zbx_config_t *cfg, const char *audit_details_action, zbx_uint64_t hostid, zbx_uint64_t groupid)
 {
 	char	audit_key_groupid[AUDIT_DETAILS_KEY_LEN];
+
+	IS_AUDIT_ON();
 
 	zbx_snprintf(audit_key_groupid, AUDIT_DETAILS_KEY_LEN, "host.groups[%lu]", groupid);
 	zbx_audit_update_json_add_string(hostid, audit_key_groupid, audit_details_action);
 }
 
-void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname)
+void	zbx_audit_host_del(zbx_config_t *cfg, zbx_uint64_t hostid, const char *hostname)
 {
 	char		recsetid_cuid[CUID_LEN];
 
+	IS_AUDIT_ON();
+
 	zbx_new_cuid(recsetid_cuid);
-	zbx_audit_host_create_entry(AUDIT_ACTION_DELETE, hostid, hostname);
+	zbx_audit_host_create_entry(cfg, AUDIT_ACTION_DELETE, hostid, hostname);
 }
