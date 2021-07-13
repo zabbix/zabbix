@@ -76,7 +76,7 @@
 			for (const element of document.querySelectorAll('.js-create-service, .js-add-child-service')) {
 				let popup_options = {};
 
-				if (element.dataset.serviceid !== null) {
+				if (element.dataset.serviceid !== undefined) {
 					popup_options = {
 						parent_serviceids: [element.dataset.serviceid]
 					};
