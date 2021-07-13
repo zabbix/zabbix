@@ -1613,14 +1613,14 @@ static void	db_get_service_problems(zbx_vector_uint64_t *serviceids, zbx_vector_
  ******************************************************************************/
 static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_vector_ptr_t *updates)
 {
-	int				i;
+	int				i, j;
 	const zbx_service_update_t	*update;
 	zbx_vector_uint64_t		serviceids;
 	zbx_vector_uint64_pair_t	problem_service, recovery;
 	char				*sql = NULL, *name;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			eventid;
-	zbx_db_insert_t			db_insert_events, db_insert_recovery;
+	zbx_db_insert_t			db_insert_events, db_insert_event_tag, db_insert_recovery;
 	zbx_uint64_pair_t		pair;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() updates:%d", __func__, updates->values_num);
@@ -1645,6 +1645,8 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 	zbx_db_insert_prepare(&db_insert_events, "events", "eventid", "source", "object", "objectid", "clock", "value",
 			"ns", "name", "severity", NULL);
 
+	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+
 	eventid = DBget_maxid_num("events", problem_service.values_num);
 
 	for (i = 0; i < problem_service.values_num; i++)
@@ -1666,6 +1668,17 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 				problem_service.values[i].second, ts.sec, SERVICE_VALUE_OK, ts.ns, name,
 				TRIGGER_SEVERITY_NOT_CLASSIFIED);
 
+		if (NULL != update)
+		{
+			for (j = 0; j < update->service->tags.values_num; j++)
+			{
+				zbx_service_tag_t	*tag = (zbx_service_tag_t *)update->service->tags.values[j];
+
+				zbx_db_insert_add_values(&db_insert_event_tag, __UINT64_C(0), eventid, tag->name,
+						tag->value);
+			}
+		}
+
 		zbx_free(name);
 
 		pair.first = problem_service.values[i].first;
@@ -1675,6 +1688,10 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 
 	zbx_db_insert_execute(&db_insert_events);
 	zbx_db_insert_clean(&db_insert_events);
+
+	zbx_db_insert_autoincrement(&db_insert_event_tag, "eventtagid");
+	zbx_db_insert_execute(&db_insert_event_tag);
+	zbx_db_insert_clean(&db_insert_event_tag);
 
 	/* update problems, escalations and link problems with recovery events */
 
@@ -1692,8 +1709,8 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update escalations set r_eventid=" ZBX_FS_UI64 ","
-				"nextcheck=0 where eventid=" ZBX_FS_UI64 ";\n", recovery.values[i].second,
-				recovery.values[i].first);
+				"nextcheck=0 where eventid=" ZBX_FS_UI64 " and servicealarmid is null;\n",
+				recovery.values[i].second, recovery.values[i].first);
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
