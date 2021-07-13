@@ -28,38 +28,4 @@ class CServiceHelper {
 			SERVICE_ALGORITHM_NONE => _('Do not calculate')
 		];
 	}
-
-	public static function makeProblemTags(array $problem_tags): CSpan {
-		$all_elements = [];
-
-		foreach ($problem_tags as $problem_tag) {
-			$title = $problem_tag['value'] === ''
-				? $problem_tag['tag']
-				: $problem_tag['tag'].': '.$problem_tag['value'];
-
-			$all_elements[] = (new CSpan($title))
-				->addClass(ZBX_STYLE_TAG)
-				->setHint($title);
-		}
-
-		if (count($all_elements) <= ZBX_TAG_COUNT_DEFAULT) {
-			return new CSpan($all_elements);
-		}
-
-		$inline_elements = [];
-
-		for ($i = 0; $i < ZBX_TAG_COUNT_DEFAULT; $i++) {
-			$inline_elements[] = clone $all_elements[$i];
-		}
-
-		$inline_elements[] = (new CSpan())
-			->addClass(ZBX_STYLE_REL_CONTAINER)
-			->addItem(
-				(new CButton(null))
-					->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-					->setHint($all_elements, ZBX_STYLE_HINTBOX_WRAP)
-			);
-
-		return new CSpan($inline_elements);
-	}
 }

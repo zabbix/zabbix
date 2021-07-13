@@ -114,10 +114,17 @@ class CControllerPopupServiceEdit extends CController {
 				'preservekeys' => true
 			]);
 
-			foreach ($children_serviceids as $serviceid) {
-				$children_problem_tags_html[$serviceid] = array_key_exists($serviceid, $children)
-					? CServiceHelper::makeProblemTags($children[$serviceid]['problem_tags'])->toString()
-					: '';
+			$problem_tags = [];
+
+			foreach ($children as $serviceid => $service) {
+				$problem_tags[] = [
+					'serviceid' => $serviceid,
+					'tags' => $service['problem_tags']
+				];
+			}
+
+			foreach (makeTags($problem_tags, true, 'serviceid') as $serviceid => $tags) {
+				$children_problem_tags_html[$serviceid] = implode('', $tags);
 			}
 		}
 

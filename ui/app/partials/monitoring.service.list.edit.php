@@ -95,7 +95,7 @@ foreach ($data['services'] as $serviceid => $service) {
 			: (new CCol(getSeverityName($service['status'])))->addClass(getSeverityStyle($service['status'])),
 		'',
 		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
-		array_key_exists($serviceid, $data['tags']) ? $data['tags'][$serviceid] : 'tags',
+		$data['tags'][$serviceid],
 		(new CCol([
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_ADD)

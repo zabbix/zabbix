@@ -64,15 +64,13 @@ foreach ($data['services'] as $service) {
 			(new CCheckBox('serviceid', $service['serviceid']))->removeId(),
 			(new CVar('name', $service['name']))->removeId(),
 			(new CVar('algorithm', $service['algorithm']))->removeId(),
-			(new CVar('problem_tags_html',
-				CServiceHelper::makeProblemTags($service['problem_tags'])->toString()
-			))->removeId()
+			(new CVar('problem_tags_html', $data['problem_tags_html'][$service['serviceid']]))->removeId()
 		]),
 		(new CCol(
 			(new CLink($service['name']))->addClass('js-name')
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol(CServiceHelper::getAlgorithmNames()[$service['algorithm']]))->addClass(ZBX_STYLE_NOWRAP),
-		new CCol(CServiceHelper::makeProblemTags($service['problem_tags']))
+		new CCol($data['problem_tags'][$service['serviceid']])
 	]);
 }
 

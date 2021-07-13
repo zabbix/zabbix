@@ -65,6 +65,19 @@ class CControllerPopupServices extends CController {
 		$services = array_diff_key($services, array_flip($exclude_serviceids));
 		$services = array_slice($services, 0, $limit);
 
+		$problem_tags = [];
+
+		foreach ($services as $service) {
+			$problem_tags[] = [
+				'serviceid' => $service['serviceid'],
+				'tags' => $service['problem_tags']
+			];
+		}
+
+		foreach (makeTags($problem_tags, true, 'serviceid') as $serviceid => $tags) {
+			$problem_tags_html[$serviceid] = implode('', $tags);
+		}
+
 		$data = [
 			'title' => $this->getInput('title'),
 			'filter' => [
@@ -72,6 +85,8 @@ class CControllerPopupServices extends CController {
 			],
 			'exclude_serviceids' => $exclude_serviceids,
 			'services' => $services,
+			'problem_tags' => makeTags($problem_tags, true, 'serviceid'),
+			'problem_tags_html' => $problem_tags_html,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
