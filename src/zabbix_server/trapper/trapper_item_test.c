@@ -434,7 +434,6 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zbx_free(error);
-		zbx_user_free(&user);
 		goto out;
 	}
 
@@ -457,7 +456,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zbx_free(info);
 	zbx_json_free(&json);
-	zbx_user_free(&user);
 out:
+	zbx_user_free(&user);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
