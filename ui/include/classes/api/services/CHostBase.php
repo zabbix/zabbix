@@ -537,8 +537,14 @@ abstract class CHostBase extends CApiService {
 					$db_hostmacro = $db_host['macros'][$hostmacro['hostmacroid']];
 					$hostmacro += array_intersect_key($db_hostmacro, array_flip(['macro', 'type']));
 
-					if ($hostmacro['type'] != $db_hostmacro['type'] && $db_hostmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
-						$hostmacro += ['value' => ''];
+					if ($hostmacro['type'] != $db_hostmacro['type']) {
+						if ($db_hostmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
+							$hostmacro += ['value' => ''];
+						}
+
+						if ($hostmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
+							$hostmacro += ['value' => $db_hostmacro['value']];
+						}
 					}
 
 					// Populating new host macro objects for correct inheritance.

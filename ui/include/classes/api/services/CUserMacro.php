@@ -358,8 +358,14 @@ class CUserMacro extends CApiService {
 		foreach ($globalmacros as $index => &$globalmacro) {
 			$db_globalmacro = $db_globalmacros[$globalmacro['globalmacroid']];
 
-			if ($globalmacro['type'] != $db_globalmacro['type'] && $db_globalmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
-				$globalmacro += ['value' => ''];
+			if ($globalmacro['type'] != $db_globalmacro['type']) {
+				if ($db_globalmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$globalmacro += ['value' => ''];
+				}
+
+				if ($globalmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
+					$globalmacro += ['value' => $db_globalmacro['value']];
+				}
 			}
 
 			if (array_key_exists('value', $globalmacro) && $globalmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
@@ -560,8 +566,14 @@ class CUserMacro extends CApiService {
 		foreach ($hostmacros as $index => &$hostmacro) {
 			$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
 
-			if ($hostmacro['type'] != $db_hostmacro['type'] && $db_hostmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
-				$hostmacro += ['value' => ''];
+			if ($hostmacro['type'] != $db_hostmacro['type']) {
+				if ($db_hostmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$hostmacro += ['value' => ''];
+				}
+
+				if ($hostmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
+					$hostmacro += ['value' => $db_hostmacro['value']];
+				}
 			}
 
 			if (array_key_exists('value', $hostmacro) && $hostmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
