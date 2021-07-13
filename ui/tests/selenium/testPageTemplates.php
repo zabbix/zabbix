@@ -227,9 +227,9 @@ class testPageTemplates extends CLegacyWebTest {
 					'evaluation_type' => 'And/Or',
 					'tags' => [
 						['name' => 'action', 'operator' => 'Equals']
-				]
 					]
 				]
+			]
 		];
 	}
 
@@ -249,7 +249,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.
-			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
+		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();

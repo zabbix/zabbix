@@ -329,7 +329,7 @@ class EntitiesTags {
 				'name' => 'Template item prototype: {#KEY}',
 				'key_' => 'template.itemprototype_trap[{#KEY}]',
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			]
 		]);
 

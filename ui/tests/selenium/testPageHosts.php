@@ -373,7 +373,7 @@ class testPageHosts extends CLegacyWebTest {
 					'result' => [
 						['Name' => 'Host for tags filtering', 'Templates' => 'Template for tags filtering'],
 						['Name' => 'Host for tags filtering - clone', 'Templates' => ''],
-						['Name' => 'Host for tags filtering - update', 'Templates' => ''],
+						['Name' => 'Host for tags filtering - update', 'Templates' => '']
 					]
 				]
 			],
