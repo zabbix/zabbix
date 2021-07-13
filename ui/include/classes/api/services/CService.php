@@ -153,17 +153,17 @@ class CService extends CApiService {
 		$this->validateCreate($services);
 
 		// save the services
-		$serviceIds = DB::insert($this->tableName(), $services);
+		$serviceids = DB::insert($this->tableName(), $services);
 
 		$dependencies = [];
 		$serviceTimes = [];
-		foreach ($services as $key => $service) {
-			$serviceId = $serviceIds[$key];
+		foreach ($services as $key => &$service) {
+			$service['serviceid'] = $serviceids[$key];
 
 			// save dependencies
 			if (!empty($service['dependencies'])) {
 				foreach ($service['dependencies'] as $dependency) {
-					$dependency['serviceid'] = $serviceId;
+					$dependency['serviceid'] = $service['serviceid'];
 					$dependencies[] = $dependency;
 				}
 			}
@@ -172,7 +172,7 @@ class CService extends CApiService {
 			if (!empty($service['parentid'])) {
 				$dependencies[] = [
 					'serviceid' => $service['parentid'],
-					'dependsOnServiceid' => $serviceId,
+					'dependsOnServiceid' => $service['serviceid'],
 					'soft' => 0
 				];
 			}
@@ -180,11 +180,12 @@ class CService extends CApiService {
 			// save service times
 			if (isset($service['times'])) {
 				foreach ($service['times'] as $serviceTime) {
-					$serviceTime['serviceid'] = $serviceId;
+					$serviceTime['serviceid'] = $service['serviceid'];
 					$serviceTimes[] = $serviceTime;
 				}
 			}
 		}
+		unset($service);
 
 		if ($dependencies) {
 			$this->addDependencies($dependencies);
@@ -196,48 +197,52 @@ class CService extends CApiService {
 
 		updateItServices();
 
-		return ['serviceids' => $serviceIds];
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_IT_SERVICE, $services);
+
+		return ['serviceids' => array_column($services, 'serviceid')];
 	}
 
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $services
+	 * @param array $db_services
+	 *
+	 * @throws APIException if the input is invalid
 	 */
-	public function validateUpdate(array $services) {
+	public function validateUpdate(array $services, array $db_services) {
 		foreach ($services as $service) {
 			if (empty($service['serviceid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
 		}
 
-		$this->checkServicePermissions(zbx_objectValues($services, 'serviceid'));
+		$this->checkServicePermissions(array_column($services, 'serviceid'));
 
-		$services = $this->extendObjects($this->tableName(), $services, ['name']);
+		$services = $this->extendFromObjects(zbx_toHash($services, 'serviceid'), $db_services, ['name']);
+
 		foreach ($services as $service) {
 			$this->checkName($service);
 
-			if (isset($service['algorithm'])) {
+			if (array_key_exists('algorithm', $service)) {
 				$this->checkAlgorithm($service);
 			}
-			if (isset($service['showsla'])) {
+			if (array_key_exists('showsla', $service)) {
 				$this->checkShowSla($service);
 			}
-			if (isset($service['goodsla'])) {
+			if (array_key_exists('goodsla', $service)) {
 				$this->checkGoodSla($service);
 			}
-			if (isset($service['sortorder'])) {
+			if (array_key_exists('sortorder', $service)) {
 				$this->checkSortOrder($service);
 			}
-			if (isset($service['triggerid'])) {
+			if (array_key_exists('triggerid', $service)) {
 				$this->checkTriggerId($service);
 			}
-			if (isset($service['status'])) {
+			if (array_key_exists('status', $service)) {
 				$this->checkStatus($service);
 			}
-			if (isset($service['parentid'])) {
+			if (array_key_exists('parentid', $service)) {
 				$this->checkParentId($service);
 			}
 
@@ -259,7 +264,14 @@ class CService extends CApiService {
 	 */
 	public function update(array $services) {
 		$services = zbx_toArray($services);
-		$this->validateUpdate($services);
+
+		$db_services = $this->get([
+			'output' => ['serviceid', 'name', 'triggerid', 'algorithm', 'parentid', 'showsla', 'goodsla', 'sortorder'],
+			'serviceids' => array_column($services, 'serviceid'),
+			'preservekeys' => true
+		]);
+
+		$this->validateUpdate($services, $db_services);
 
 		// save the services
 		foreach ($services as $service) {
@@ -330,40 +342,45 @@ class CService extends CApiService {
 
 		updateItServices();
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IT_SERVICE, $services, $db_services);
+
 		return ['serviceids' => zbx_objectValues($services, 'serviceid')];
 	}
 
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @throws APIException if the input is invalid
+	 * @param array $serviceids
+	 * @param array $db_services
 	 *
-	 * @param array $serviceIds
+	 * @throws APIException if the input is invalid
 	 */
-	public function validateDelete($serviceIds) {
-		if (!$serviceIds) {
+	public function validateDelete(array $serviceids, array &$db_services = null) {
+		if (!$serviceids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkServicePermissions($serviceIds);
-		$this->checkThatServicesDontHaveChildren($serviceIds);
+		$this->checkServicePermissions($serviceids, $db_services);
+		$this->checkThatServicesDontHaveChildren($serviceids);
 	}
 
 	/**
 	 * Delete services.
 	 *
-	 * @param array $serviceIds
+	 * @param array $serviceids
 	 *
 	 * @return array
 	 */
-	public function delete(array $serviceIds) {
-		$this->validateDelete($serviceIds);
+	public function delete(array $serviceids) {
+		$this->validateDelete($serviceids, $db_services);
 
-		DB::delete($this->tableName(), ['serviceid' => $serviceIds]);
+		DB::delete($this->tableName(), ['serviceid' => $serviceids]);
 
 		updateItServices();
 
-		return ['serviceids' => $serviceIds];
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, $db_services);
+
+		return ['serviceids' => $serviceids];
 	}
 
 	/**
@@ -435,67 +452,67 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException if the given input is invalid
 	 *
-	 * @param array $serviceIds
+	 * @param array $serviceids
 	 */
-	protected function validateDeleteDependencies(array $serviceIds) {
-		if (!$serviceIds) {
+	protected function validateDeleteDependencies(array $serviceids) {
+		if (!$serviceids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkServicePermissions($serviceIds);
+		$this->checkServicePermissions($serviceids);
 	}
 
 	/**
 	 * Deletes all dependencies for the given services.
 	 *
-	 * @param array $serviceIds
+	 * @param array $serviceids
 	 *
 	 * @return boolean
 	 */
-	public function deleteDependencies($serviceIds) {
-		$serviceIds = zbx_toArray($serviceIds);
-		$this->validateDeleteDependencies($serviceIds);
+	public function deleteDependencies($serviceids) {
+		$serviceids = zbx_toArray($serviceids);
+		$this->validateDeleteDependencies($serviceids);
 
 		DB::delete('services_links', [
-			'serviceupid' =>  $serviceIds
+			'serviceupid' =>  $serviceids
 		]);
 
-		return ['serviceids' => $serviceIds];
+		return ['serviceids' => $serviceids];
 	}
 
 	/**
 	 * Validates the input for the addTimes() method.
 	 *
-	 * @throws APIException if the given input is invalid
+	 * @param array $service_times
 	 *
-	 * @param array $serviceTimes
+	 * @throws APIException if the given input is invalid
 	 */
-	public function validateAddTimes(array $serviceTimes) {
-		foreach ($serviceTimes as $serviceTime) {
-			$this->checkTime($serviceTime);
+	public function validateAddTimes(array $service_times) {
+		foreach ($service_times as $service_time) {
+			$this->checkTime($service_time);
 
-			$this->checkUnsupportedFields('services_times', $serviceTime,
-				_s('Wrong fields for time for service "%1$s".', $serviceTime['serviceid'])
+			$this->checkUnsupportedFields('services_times', $service_time,
+				_s('Wrong fields for time for service "%1$s".', $service_time['serviceid'])
 			);
 		}
 
-		$this->checkServicePermissions(array_unique(zbx_objectValues($serviceTimes, 'serviceid')));
+		$this->checkServicePermissions(array_column($service_times, 'serviceid'));
 	}
 
 	/**
 	 * Adds the given service times.
 	 *
-	 * @param array $serviceTimes an array of service times
+	 * @param array $service_times an array of service times
 	 *
 	 * @return array
 	 */
-	public function addTimes(array $serviceTimes) {
-		$serviceTimes = zbx_toArray($serviceTimes);
-		$this->validateAddTimes($serviceTimes);
+	public function addTimes(array $service_times) {
+		$service_times = zbx_toArray($service_times);
+		$this->validateAddTimes($service_times);
 
-		DB::insert('services_times', $serviceTimes);
+		DB::insert('services_times', $service_times);
 
-		return ['serviceids' => zbx_objectValues($serviceTimes, 'serviceid')];
+		return ['serviceids' => array_column($service_times, 'serviceid')];
 	}
 
 	/**
@@ -503,14 +520,14 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException if the given input is invalid
 	 *
-	 * @param array $serviceIds
+	 * @param array $serviceids
 	 */
-	protected function validateDeleteTimes(array $serviceIds) {
-		if (!$serviceIds) {
+	protected function validateDeleteTimes(array $serviceids) {
+		if (!$serviceids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkServicePermissions($serviceIds);
+		$this->checkServicePermissions($serviceids);
 	}
 
 	/**
@@ -1006,20 +1023,22 @@ class CService extends CApiService {
 	/**
 	 * Checks that all of the given services are readable.
 	 *
-	 * @throws APIException if at least one of the services doesn't exist
-	 *
 	 * @param array $serviceids
+	 * @param array $db_services
+	 *
+	 * @throws APIException if at least one of the services doesn't exist
 	 */
-	protected function checkServicePermissions(array $serviceids) {
+	protected function checkServicePermissions(array $serviceids, array &$db_services = null) {
 		if ($serviceids) {
-			$serviceids = array_unique($serviceids);
+			$serviceids = array_keys(array_flip($serviceids));
 
-			$count = $this->get([
-				'countOutput' => true,
-				'serviceids' => $serviceids
+			$db_services = $this->get([
+				'output' => ['serviceid', 'name'],
+				'serviceids' => $serviceids,
+				'preservekeys' => true
 			]);
 
-			if ($count != count($serviceids)) {
+			if (count($db_services) != count($serviceids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
@@ -1030,15 +1049,15 @@ class CService extends CApiService {
 	/**
 	 * Checks that none of the given services have any children.
 	 *
-	 * @throws APIException if at least one of the services has a child service
+	 * @param array $serviceids
 	 *
-	 * @param array $serviceIds
+	 * @throws APIException if at least one of the services has a child service
 	 */
-	protected function checkThatServicesDontHaveChildren(array $serviceIds) {
+	protected function checkThatServicesDontHaveChildren(array $serviceids) {
 		$child = API::getApiService()->select('services_links', [
 			'output' => ['serviceupid'],
 			'filter' => [
-				'serviceupid' => $serviceIds,
+				'serviceupid' => $serviceids,
 				'soft' => 0
 			],
 			'limit' => 1

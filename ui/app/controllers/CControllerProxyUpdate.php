@@ -99,12 +99,6 @@ class CControllerProxyUpdate extends CController {
 
 		$result = API::Proxy()->update($proxy);
 
-		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_PROXY,
-				'['.$this->getInput('host', '').'] ['.reset($result['proxyids']).']'
-			);
-		}
-
 		$result = DBend($result);
 
 		if ($result) {
