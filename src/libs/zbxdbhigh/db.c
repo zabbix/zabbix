@@ -3623,6 +3623,16 @@ out:
 	return ret;
 }
 
+void	zbx_user_init(zbx_user_t *user)
+{
+	user->username = NULL;
+}
+
+void	zbx_user_free(zbx_user_t *user)
+{
+	zbx_free(user->username);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_db_mock_field_init                                           *

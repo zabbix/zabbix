@@ -770,6 +770,8 @@ ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *)
 void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
+void	zbx_user_init(zbx_user_t *user);
+void	zbx_user_free(zbx_user_t *user);
 
 typedef struct
 {

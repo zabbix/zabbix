@@ -91,7 +91,7 @@ static int	DBpatch_5050006(void)
 
 static int	DBpatch_5050007(void)
 {
-	const ZBX_FIELD	field = {"audit_logging_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"audit_logging_enabled", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
