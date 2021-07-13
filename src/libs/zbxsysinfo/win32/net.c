@@ -638,9 +638,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_free(utf8_descr);
 
 		guid = zbx_ifrow_get_guid_str(&ifrow);
-		if (NULL != guid)
-			zbx_json_addstring(&j, "{#IFGUID}", guid, ZBX_JSON_TYPE_STRING);
-
+		zbx_json_addstring(&j, "{#IFGUID}", ZBX_NULL2EMPTY_STR(guid), ZBX_JSON_TYPE_STRING);
 		zbx_free(guid);
 
 		zbx_json_close(&j);
