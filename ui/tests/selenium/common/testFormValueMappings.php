@@ -64,7 +64,7 @@ class testFormValueMappings extends CWebTest {
 		]
 	];
 
-	private static $PREVIOUS_VALUEMAP_NAME = 'Valuemap for update 1';
+	private static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
 
 	/**
 	 * Function that checks the layout of the Value mappings tab in Host or Template configuration forms.
@@ -161,8 +161,7 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'default value'
 						]
 					],
-					'trim' => true,
-					'update valuemap' => self::$PREVIOUS_VALUEMAP_NAME
+					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
 			// Successful creation/update of value mapping with multiple mappings and type equals.
@@ -199,7 +198,23 @@ class testFormValueMappings extends CWebTest {
 						]
 					],
 					'trim' => true,
-					'update valuemap' => self::$PREVIOUS_VALUEMAP_NAME
+					'update valuemap' => self::$previous_valuemap_name
+				]
+			],
+			// Successful creation/update of value mapping with multiple mappings and type equals.
+			[
+				[
+					'name' => 'Equals without value',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'equals',
+							'value' => '',
+							'newvalue' => 'no value'
+						]
+					],
+					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
 			// Mapping type - is greater than or equals.
@@ -240,7 +255,7 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'greater or equals -30.30'
 						]
 					],
-					'update valuemap' => self::$PREVIOUS_VALUEMAP_NAME
+					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
 			// Mapping type - is less than or equals.
@@ -281,7 +296,7 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'less or equals -30.30'
 						]
 					],
-					'update valuemap' => self::$PREVIOUS_VALUEMAP_NAME
+					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
 			// Mapping type - in range.
@@ -327,7 +342,7 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'from .00001 to .00002'
 						]
 					],
-					'update valuemap' => self::$PREVIOUS_VALUEMAP_NAME
+					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
 			// Mapping type - regex.
@@ -353,7 +368,7 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'Answer to the Ultimate Question of Life, Universe and Everything'
 						]
 					],
-					'update valuemap' => self::$PREVIOUS_VALUEMAP_NAME
+					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
 			// Mapping type - equals with range.
@@ -374,7 +389,7 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'same mapping'
 						]
 					],
-					'update valuemap' => self::$PREVIOUS_VALUEMAP_NAME
+					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
 			// Mapping type - all available types.
@@ -414,7 +429,7 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'default value'
 						]
 					],
-					'update valuemap' => self::$PREVIOUS_VALUEMAP_NAME,
+					'update valuemap' => self::$previous_valuemap_name,
 					'screenshot_id' => 'ValuemapScreenshot1'
 				]
 			],
@@ -674,38 +689,6 @@ class testFormValueMappings extends CWebTest {
 					'error_details' => 'Incorrect value for field "Value": cannot be empty.'
 				]
 			],
-			// Empty value for - in range, greater, less, regex.
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'error message for empty value field',
-					'mappings' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'type' => 'in range',
-							'value' => '',
-							'newvalue' => 'empty value'
-						],
-						[
-							'type' => 'is less than or equals',
-							'value' => '',
-							'newvalue' => 'empty value'
-						],
-						[
-							'type' => 'is greater than or equals',
-							'value' => '',
-							'newvalue' => 'empty value'
-						],
-						[
-							'type' => 'regexp',
-							'value' => '',
-							'newvalue' => 'empty value'
-						]
-					],
-					'error_details' => 'Incorrect value for field "Value": cannot be empty.'
-				]
-			],
 			// 2 empty values for - equals.
 			[
 				[
@@ -726,6 +709,107 @@ class testFormValueMappings extends CWebTest {
 						]
 					],
 					'error_details' => 'Incorrect value for field "Value": value () already exists.'
+				]
+			],
+			// Empty mapping for - in range.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message for empty mapping field',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'in range',
+							'value' => '1-10',
+							'newvalue' => ''
+						]
+					],
+					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
+				]
+			],
+			// Empty mapping for - less.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message for empty mapping field',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'is less than or equals',
+							'value' => '11',
+							'newvalue' => ''
+						]
+					],
+					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
+				]
+			],
+			// Empty mapping for - greater.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message for empty mapping field',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'is greater than or equals',
+							'value' => '12',
+							'newvalue' => ''
+						]
+					],
+					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
+				]
+			],
+			// Empty mapping for - regex.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message for empty mapping field',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'regexp',
+							'value' => 'regexp',
+							'newvalue' => ''
+						]
+					],
+					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
+				]
+			],
+			// Empty mapping for - equals.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message for empty mapping field',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'equals',
+							'value' => 'equals',
+							'newvalue' => ''
+						]
+					],
+					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
+				]
+			],
+			// Empty mapping for - default.
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'error message for empty mapping field',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'default',
+							'newvalue' => ''
+						]
+					],
+					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
 				]
 			]
 		];
@@ -748,9 +832,9 @@ class testFormValueMappings extends CWebTest {
 
 		// Add a new value mapping or open the value mapping to be updated.
 		$this->query(($action === 'create')
-			? 'name:valuemap_add'
-			: 'link:'.CTestArrayHelper::get($data, 'update valuemap', self::UPDATE_VALUEMAP2)
-		)->one()->click();
+            ? 'name:valuemap_add'
+            : 'link:'.(array_key_exists('update valuemap', $data) ? self::$previous_valuemap_name : self::UPDATE_VALUEMAP2
+        ))->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
@@ -779,17 +863,14 @@ class testFormValueMappings extends CWebTest {
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_GOOD, ucfirst($source).' updated');
 
+			if ($action === 'update') {
+				self::$previous_valuemap_name = $data['name'];
+			}
+
 			// Check all mappings that belong to the created value mapping.
 			$this->openValueMappingTab($source, false);
 			$this->query('link', $data['name'])->one()->click();
 			$this->checkMappings($data);
-			if ($action === 'update') {
-				$dialog->query('xpath:.//input[@id="name"]')->one()->fill('Valuemap for update 1');
-				$dialog->submit();
-				COverlayDialogElement::ensureNotPresent();
-				$this->query('button:Update')->waitUntilClickable()->one()->click();
-				self::$PREVIOUS_VALUEMAP_NAME = $data['name'];
-			}
 
 			// Check the screenshot of the whole value mappings tab.
 			if (CTestArrayHelper::get($data, 'screenshot_id')) {
