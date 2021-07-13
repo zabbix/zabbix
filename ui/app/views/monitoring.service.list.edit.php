@@ -50,7 +50,7 @@ if (count($data['breadcrumbs']) > 1) {
 $filter = (new CFilter())
 	->addVar('action', 'service.list.edit')
 	->addVar('serviceid', $data['service'] !== null ? $data['service']['serviceid'] : null)
-	->setResetUrl($data['view_curl'])
+	->setResetUrl($data['reset_curl'])
 	->setProfile('web.service.filter')
 	->setActiveTab($data['active_tab']);
 
@@ -140,13 +140,17 @@ $filter->addFilterTab(_('Filter'), [
 		->addItem([
 			new CLabel(_('Only services without children'), 'filter_without_children'),
 			new CFormField(
-				(new CCheckBox('filter_without_children'))->setChecked($data['filter']['without_children'])
+				(new CCheckBox('filter_without_children'))
+					->setUncheckedValue(0)
+					->setChecked($data['filter']['without_children'])
 			)
 		])
 		->addItem([
 			new CLabel(_('Only services without problem tags'), 'filter_without_problem_tags'),
 			new CFormField(
-				(new CCheckBox('filter_without_problem_tags'))->setChecked($data['filter']['without_problem_tags'])
+				(new CCheckBox('filter_without_problem_tags'))
+					->setUncheckedValue(0)
+					->setChecked($data['filter']['without_problem_tags'])
 			)
 		]),
 	(new CFormGrid())
