@@ -1575,7 +1575,7 @@ class CApiInputValidator {
 	 * Regular expression validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_GLOBAL_REGEX
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
