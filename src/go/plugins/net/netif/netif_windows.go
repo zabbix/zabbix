@@ -151,17 +151,17 @@ func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (re
 	return value, nil
 }
 
-func (p *Plugin) getDevDiscovery() (devices []msgIfDiscoveryWin, err error) {
+func (p *Plugin) getDevDiscovery() (devices []msgIfDiscovery, err error) {
 	var table *win32.MIB_IF_TABLE2
 	if table, err = win32.GetIfTable2(); err != nil {
 		return
 	}
 	defer win32.FreeMibTable(table)
 
-	devices = make([]msgIfDiscoveryWin, 0, table.NumEntries)
+	devices = make([]msgIfDiscovery, 0, table.NumEntries)
 	rows := (*win32.RGMIB_IF_ROW2)(unsafe.Pointer(&table.Table[0]))[:table.NumEntries:table.NumEntries]
 	for i := range rows {
-		devices = append(devices, msgIfDiscoveryWin{windows.UTF16ToString(rows[i].Description[:]), p.getGuidString(rows[i].InterfaceGuid)})
+		devices = append(devices, msgIfDiscovery{windows.UTF16ToString(rows[i].Description[:]), &p.getGuidString(rows[i].InterfaceGuid)})
 	}
 	return
 }
@@ -244,7 +244,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if len(params) > 0 {
 			return nil, errors.New(errorParametersNotAllowed)
 		}
-		var devices []msgIfDiscoveryWin
+		var devices []msgIfDiscovery
 		if devices, err = p.getDevDiscovery(); err != nil {
 			return
 		}
