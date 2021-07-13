@@ -61,13 +61,13 @@ func lineCounter(fileName string) (result interface{}, err error) {
 		return nil, fmt.Errorf("Invalid first parameter: %s", err)
 	}
 	defer file.Close()
-	buf := make([]byte, 32*1024)
-	count := 0
+	buf := make([]byte, 64*1024)
+	var count int64 = 0
 	lineSep := []byte{'\n'}
 
 	for {
 		c, err := file.Read(buf)
-		count += bytes.Count(buf[:c], lineSep)
+		count += int64(bytes.Count(buf[:c], lineSep))
 
 		switch {
 		case err == io.EOF:
