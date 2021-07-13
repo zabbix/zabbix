@@ -20,6 +20,8 @@
 
 
 class CAudit {
+	private CONST AUIDTLOG_ENABLE = 1;
+
 	/**
 	 * Supported resources list, every record contains:
 	 * resource id field name
@@ -186,11 +188,10 @@ class CAudit {
 			return;
 		}
 
-		if (CSettingsHelper::get(CSettingsHelper::AUDIT_LOGGING_ENABLED) != 1) {
+		if (CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) != self::AUIDTLOG_ENABLE) {
 			return;
 		}
 
-		$auditid = generateCuid();
 		$recordsetid = generateCuid();
 
 		list($field_name_resourceid, $field_name_resourcename) = self::$supported_type[$resourcetype];
@@ -220,8 +221,8 @@ class CAudit {
 			}
 
 			$auditlog[] = [
-				'auditid' => $auditid,
 				'userid' => $userid,
+				'username' => CWebUser::$data['username'],
 				'clock' => $clock,
 				'ip' => $ip,
 				'action' => $action,
@@ -234,7 +235,7 @@ class CAudit {
 		}
 
 		if ($auditlog) {
-			DB::insertBatch('auditlog', $auditlog, false);
+			DB::insertBatch('auditlog', $auditlog);
 		}
 	}
 }

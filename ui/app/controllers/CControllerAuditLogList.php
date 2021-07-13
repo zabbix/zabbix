@@ -93,7 +93,7 @@ class CControllerAuditLogList extends CController {
 		}
 
 		$params = [
-			'output' => ['auditid', 'userid', 'clock', 'action', 'resourcetype', 'ip', 'resourceid',
+			'output' => ['auditid', 'userid', 'username', 'clock', 'action', 'resourcetype', 'ip', 'resourceid',
 				'resourcename', 'details'
 			],
 			'filter' => $filter,

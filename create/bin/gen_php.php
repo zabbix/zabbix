@@ -68,7 +68,7 @@ function parse_schema($path) {
 						$length = 2048;
 						break;
 					case 't_cuid':
-						$type = 'DB::FIELD_TYPE_CHAR';
+						$type = 'DB::FIELD_TYPE_CUID';
 						$length = 25;
 						break;
 				}

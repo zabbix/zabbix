@@ -1379,6 +1379,7 @@ define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
 define('API_NUMERIC_RANGES',		41);
 define('API_UUID',					42);
+define('API_CUID',					43);
 
 // flags
 define('API_REQUIRED',					0x0001);

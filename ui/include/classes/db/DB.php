@@ -39,6 +39,7 @@ class DB {
 	const FIELD_TYPE_BLOB = 'blob';
 	const FIELD_TYPE_TEXT = 'text';
 	const FIELD_TYPE_NCLOB = 'nclob';
+	const FIELD_TYPE_CUID = 'cuid';
 
 	private static $schema = null;
 
@@ -381,6 +382,7 @@ class DB {
 			}
 			else {
 				switch ($tableSchema['fields'][$field]['type']) {
+					case self::FIELD_TYPE_CUID:
 					case self::FIELD_TYPE_CHAR:
 						$length = mb_strlen($values[$field]);
 
@@ -572,16 +574,25 @@ class DB {
 		$table_schema = self::getSchema($table);
 
 		if ($getids) {
-			$id = self::reserveIds($table, count($values));
+			if ($table_schema['fields'][$table_schema['key']]['type'] != DB::FIELD_TYPE_CUID) {
+				$id = self::reserveIds($table, count($values));
+			}
 		}
 
 		$mandatory_fields = self::getMandatoryFields($table_schema);
 
 		foreach ($values as $key => &$row) {
 			if ($getids) {
-				$resultIds[$key] = $id;
-				$row[$table_schema['key']] = $id;
-				$id = bcadd($id, 1, 0);
+				if ($table_schema['fields'][$table_schema['key']]['type'] != DB::FIELD_TYPE_CUID) {
+					$resultIds[$key] = $id;
+					$row[$table_schema['key']] = $id;
+					$id = bcadd($id, 1, 0);
+				}
+				else {
+					$id = generateCuid();
+					$resultIds[$key] = $id;
+					$row[$table_schema['key']] = $id;
+				}
 			}
 
 			$row += $mandatory_fields;
