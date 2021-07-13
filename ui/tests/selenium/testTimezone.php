@@ -26,15 +26,6 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  */
 class testTimezone extends CWebTest {
 
-	public function testTimezone_1() {
-		$users_db_table = CDBHelper::getAll('SELECT * FROM users WHERE userid=1');
-		echo (json_encode($users_db_table, JSON_PRETTY_PRINT));
-
-		$sessions_db_table = CDBHelper::getAll('SELECT * FROM sessions WHERE userid=1');
-		echo (json_encode($sessions_db_table, JSON_PRETTY_PRINT));
-	}
-
-
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
