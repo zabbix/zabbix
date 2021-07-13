@@ -23,11 +23,12 @@
  * @var CPartial $this
  */
 
+$form = (new CForm())
+	->setId('service-list')
+	->setName('service-list');
+
 if ($data['is_filtered']) {
-	$path = $data['path'];
-	if ($data['service'] !== null) {
-		$path[] = $data['service']['serviceid'];
-	}
+	$path = null;
 
 	$header = [
 		(new CColHeader(_('Parent services')))->addStyle('width: 15%'),
@@ -35,7 +36,10 @@ if ($data['is_filtered']) {
 	];
 }
 else {
-	$path = null;
+	$path = $data['path'];
+	if ($data['service'] !== null) {
+		$path[] = $data['service']['serviceid'];
+	}
 
 	$header = [
 		(new CColHeader(_('Name')))->addStyle('width: 25%')
@@ -55,19 +59,17 @@ foreach ($data['services'] as $serviceid => $service) {
 
 	if ($data['is_filtered']) {
 		$parents = [];
-		$count = 0;
-		while ($parent = array_shift($service['parents'])) {
-			$parents[] = (new CLink($parent['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'service.list')
-				->setArgument('serviceid', $parent['serviceid'])
-			))->setAttribute('data-serviceid', $parent['serviceid']);
 
-			$count++;
-			if ($count >= $data['max_in_table'] || !$service['parents']) {
-				break;
+		foreach (array_slice($service['parents'], 0, $data['max_in_table']) as $i => $parent) {
+			if ($i > 0) {
+				$parents[] = ', ';
 			}
 
-			$parents[] = ', ';
+			$parents[] = (new CLink($parent['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list')
+					->setArgument('serviceid', $parent['serviceid'])
+			))->setAttribute('data-serviceid', $parent['serviceid']);
 		}
 
 		$row[] = $parents;
@@ -76,10 +78,11 @@ foreach ($data['services'] as $serviceid => $service) {
 	$table->addRow(new CRow(array_merge($row, [
 		($service['children'] > 0)
 			? [
-				(new CLink($service['name'], (new CUrl('zabbix.php'))
-					->setArgument('action', 'service.list')
-					->setArgument('path', $path)
-					->setArgument('serviceid', $serviceid)
+				(new CLink($service['name'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'service.list')
+						->setArgument('path', $path)
+						->setArgument('serviceid', $serviceid)
 				))->setAttribute('data-serviceid', $serviceid),
 				CViewHelper::showNum($service['children'])
 			]
@@ -93,7 +96,6 @@ foreach ($data['services'] as $serviceid => $service) {
 	])));
 }
 
-(new CForm())
-	->setId('service-list')
+$form
 	->addItem([$table, $data['paging']])
 	->show();

@@ -62,19 +62,17 @@ foreach ($data['services'] as $serviceid => $service) {
 
 	if ($data['is_filtered']) {
 		$parents = [];
-		$count = 0;
-		while ($parent = array_shift($service['parents'])) {
-			$parents[] = (new CLink($parent['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'service.list')
-				->setArgument('serviceid', $parent['serviceid'])
-			))->setAttribute('data-serviceid', $parent['serviceid']);
 
-			$count++;
-			if ($count >= $data['max_in_table'] || !$service['parents']) {
-				break;
+		foreach (array_slice($service['parents'], 0, $data['max_in_table']) as $i => $parent) {
+			if ($i > 0) {
+				$parents[] = ', ';
 			}
 
-			$parents[] = ', ';
+			$parents[] = (new CLink($parent['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list')
+					->setArgument('serviceid', $parent['serviceid'])
+			))->setAttribute('data-serviceid', $parent['serviceid']);
 		}
 
 		$row[] = $parents;
@@ -83,10 +81,11 @@ foreach ($data['services'] as $serviceid => $service) {
 	$table->addRow(new CRow(array_merge($row, [
 		($service['children'] > 0)
 			? [
-				(new CLink($service['name'], (new CUrl('zabbix.php'))
-					->setArgument('action', 'service.list.edit')
-					->setArgument('path', $path)
-					->setArgument('serviceid', $serviceid)
+				(new CLink($service['name'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'service.list.edit')
+						->setArgument('path', $path)
+						->setArgument('serviceid', $serviceid)
 				))->setAttribute('data-serviceid', $serviceid),
 				CViewHelper::showNum($service['children'])
 			]
@@ -114,18 +113,16 @@ foreach ($data['services'] as $serviceid => $service) {
 	])));
 }
 
+$action_buttons = new CActionButtonList('action', 'serviceids', [
+	'popup.massupdate.service' => [
+		'content' => (new CButton('', _('Mass update')))
+			->removeAttribute('id')
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->onClick('openMassupdatePopup(this, "popup.massupdate.service");')
+	],
+	'service.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected services?')]
+]);
+
 $form
-	->addItem([
-		$table,
-		$data['paging'],
-		new CActionButtonList('action', 'serviceids', [
-			'popup.massupdate.service' => [
-				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.service');")
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
-			],
-			'service.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected services?')]
-		])
-	])
+	->addItem([$table, $data['paging'], $action_buttons])
 	->show();
