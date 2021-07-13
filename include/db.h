@@ -341,8 +341,10 @@ DB_TRIGGER;
 
 typedef struct
 {
-	zbx_uint64_t	serviceid;
-	char		*name;
+	zbx_uint64_t		serviceid;
+	char			*name;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_ptr_t	events;
 }
 DB_SERVICE;
 

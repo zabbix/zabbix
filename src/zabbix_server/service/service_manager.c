@@ -2218,15 +2218,58 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_rootcause(zbx_ipc_message_t *message, zbx_service_manager_t *service_manager,
+static	void	get_service_rootcause(zbx_service_t *service, zbx_vector_uint64_t *eventids)
+{
+	int	i;
+
+	for (i = 0; i < service->service_problems.values_num; i++)
+	{
+		zbx_service_problem_t	*service_problem;
+
+		service_problem = (zbx_service_problem_t *)service->service_problems.values[i];
+		zbx_vector_uint64_append(eventids, service_problem->eventid);
+	}
+
+	for (i = 0; i < service->children.values_num; i++)
+	{
+		zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
+
+		get_service_rootcause(child, eventids);
+	}
+}
+static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_manager_t *service_manager,
 		zbx_ipc_client_t *client)
 {
-	zbx_vector_uint64_t	serviceids;
+	zbx_vector_uint64_t	serviceids, eventids;
+	int			i;
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
 
 	zbx_vector_uint64_create(&serviceids);
+	zbx_vector_uint64_create(&eventids);
 
 	zbx_service_deserialize_ids(message->data, message->size, &serviceids);
-	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, NULL, 0);
+
+	for (i = 0; i < serviceids.values_num; i++)
+	{
+		zbx_service_t	*service, service_local = {.serviceid = serviceids.values[i]};
+
+		if (NULL == (service = zbx_hashset_search(&service_manager->services, &service_local)))
+			continue;
+
+		get_service_rootcause(service, &eventids);
+
+		if (0 == eventids.values_num)
+			continue;
+
+		zbx_service_serialize_rootcause(&data, &data_alloc, &data_offset, serviceids.values[i], &eventids);
+		zbx_vector_uint64_clear(&eventids);
+	}
+
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, data_offset);
+
+	zbx_free(data);
+	zbx_vector_uint64_destroy(&eventids);
 	zbx_vector_uint64_destroy(&serviceids);
 }
 

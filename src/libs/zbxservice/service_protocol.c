@@ -241,3 +241,73 @@ void	zbx_service_deserialize_ids(const unsigned char *data, zbx_uint32_t size, z
 		zbx_vector_uint64_append(eventids, eventid);
 	}
 }
+
+void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		zbx_uint64_t serviceid, const zbx_vector_uint64_t *eventids)
+{
+	zbx_uint32_t	data_len = 0;
+	int		i;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, serviceid);
+	zbx_serialize_prepare_value(data_len, eventids->values_num);
+
+	for (i = 0; i < eventids->values_num; i++)
+		zbx_serialize_prepare_value(data_len, eventids->values[i]);
+
+	if (NULL != *data)
+	{
+		while (data_len > *data_alloc - *data_offset)
+		{
+			*data_alloc *= 2;
+			*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
+		}
+	}
+	else
+		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+
+	ptr = *data + *data_offset;
+	*data_offset += data_len;
+
+	ptr += zbx_serialize_value(ptr, serviceid);
+	ptr += zbx_serialize_value(ptr, eventids->values_num);
+
+	for (i = 0; i < eventids->values_num; i++)
+		ptr += zbx_serialize_value(ptr, eventids->values[i]);
+}
+
+void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_service_t *services)
+{
+	const unsigned char	*end = data + size;
+
+	while (data < end)
+	{
+		DB_SERVICE	*service, service_local;
+		int		values_num, i;
+
+		data += zbx_deserialize_value(data, &service_local.serviceid);
+		data += zbx_deserialize_value(data, &values_num);
+
+		if (FAIL == (i = zbx_vector_service_bsearch(services, service_local, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			service = NULL;
+		else
+			service = &services->values[i];
+
+		if (0 == values_num)
+			continue;
+
+		if (NULL != service)
+			zbx_vector_uint64_reserve(&service->eventids, values_num);
+
+		for (i = 0; i < values_num; i++)
+		{
+			zbx_uint64_t	eventid;
+
+			data += zbx_deserialize_value(data, &eventid);
+
+			if (NULL != service)
+				zbx_vector_uint64_append(&service->eventids, eventid);
+		}
+	}
+}

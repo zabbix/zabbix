@@ -25,6 +25,8 @@
 #include "db.h"
 #include "zbxipcservice.h"
 
+ZBX_VECTOR_DECL(service, DB_SERVICE)
+
 #define ZBX_IPC_SERVICE_SERVICE			"service"
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS	1
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS	2

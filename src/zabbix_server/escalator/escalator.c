@@ -83,9 +83,6 @@ zbx_tag_filter_t;
 ZBX_VECTOR_DECL(service_alarm, zbx_service_alarm_t)
 ZBX_VECTOR_IMPL(service_alarm, zbx_service_alarm_t)
 
-ZBX_VECTOR_DECL(service, DB_SERVICE)
-ZBX_VECTOR_IMPL(service, DB_SERVICE)
-
 typedef enum
 {
 	ZBX_VC_UPDATE_STATS,
@@ -2382,7 +2379,7 @@ static void	add_ack_escalation_r_eventids(zbx_vector_ptr_t *escalations, zbx_vec
 	zbx_vector_uint64_destroy(&r_eventids);
 }
 
-static void	get_services_by_serviceids(const zbx_vector_uint64_t *serviceids)
+static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceids, zbx_vector_service_t *services)
 {
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
@@ -2397,21 +2394,24 @@ static void	get_services_by_serviceids(const zbx_vector_uint64_t *serviceids)
 
 	zbx_ipc_message_init(&response);
 	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, data_offset, &response);
+	zbx_service_deserialize_rootcause(response.data, response.size, services);
 	zbx_ipc_message_clean(&response);
 
 	zbx_free(data);
 }
 
-static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_service_t *services)
+static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_service_t *services,
+		zbx_vector_ptr_t *events)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_t	serviceids;
-	int			i, index;
+	zbx_vector_uint64_t	serviceids, eventids;
+	int			i, j, index;
 
 	zbx_vector_uint64_create(&serviceids);
+	zbx_vector_uint64_create(&eventids);
 
 	for (i = 0; i < escalations->values_num; i++)
 	{
@@ -2435,7 +2435,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 		result = DBselect(
 				"select serviceid,name"
 				" from services"
-				" where%s",
+				" where%s order by serviceid",
 				sql);
 
 		while (NULL != (row = DBfetch(result)))
@@ -2444,16 +2444,48 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 			ZBX_STR2UINT64(service.serviceid, row[0]);
 			service.name = zbx_strdup(NULL, row[1]);
+			zbx_vector_uint64_create(&service.eventids);
+			zbx_vector_ptr_create(&service.events);
 
 			zbx_vector_service_append(services, service);
 		}
 		DBfree_result(result);
 	}
 
-	get_services_by_serviceids(&serviceids);
-
 	zbx_free(sql);
 
+	get_services_rootcause_eventids(&serviceids, services);
+
+	for (i = 0; i < services->values_num; i++)
+	{
+		DB_SERVICE	*service = &services->values[i];
+
+		for (j = 0; j < service->eventids.values_num; j++)
+			zbx_vector_uint64_append(&eventids, service->eventids.values[j]);
+	}
+
+	if (0 != eventids.values_num)
+	{
+		zbx_db_get_events_by_eventids(&eventids, events);
+
+		for (i = 0; i < services->values_num; i++)
+		{
+			DB_SERVICE	*service = &services->values[i];
+
+			for (j = 0; j < service->eventids.values_num; j++)
+			{
+				if (FAIL == (index = zbx_vector_ptr_bsearch(events, &service->eventids.values[j],
+						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+				{
+					continue;
+				}
+
+				zbx_vector_ptr_append(&service->events, (DB_EVENT *)events->values[index]);
+			}
+		}
+	}
+
+	zbx_vector_uint64_destroy(&eventids);
 	zbx_vector_uint64_destroy(&serviceids);
 }
 
@@ -2520,7 +2552,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 {
 	int				i, ret;
 	zbx_vector_uint64_t		escalationids;
-	zbx_vector_ptr_t		diffs, actions, events;
+	zbx_vector_ptr_t		diffs, actions, events, events_rootcause;
 	zbx_escalation_diff_t		*diff;
 	zbx_vector_uint64_pair_t	event_pairs;
 	zbx_vector_service_alarm_t	service_alarms;
@@ -2535,13 +2567,14 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	zbx_vector_uint64_pair_create(&event_pairs);
 	zbx_vector_service_alarm_create(&service_alarms);
 	zbx_vector_service_create(&services);
+	zbx_vector_ptr_create(&events_rootcause);
 
 	add_ack_escalation_r_eventids(escalations, eventids, &event_pairs);
 
 	get_db_actions_info(actionids, &actions);
 	zbx_db_get_events_by_eventids(eventids, &events);
 	get_db_service_alarms(escalations, &service_alarms);
-	db_get_services(escalations, &services);
+	db_get_services(escalations, &services, &events_rootcause);
 
 	for (i = 0; i < escalations->values_num; i++)
 	{
@@ -2830,11 +2863,18 @@ out:
 	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
 	zbx_vector_ptr_destroy(&events);
 
+	zbx_vector_ptr_clear_ext(&events_rootcause, (zbx_clean_func_t)zbx_db_free_event);
+	zbx_vector_ptr_destroy(&events_rootcause);
+
 	zbx_vector_uint64_pair_destroy(&event_pairs);
 	zbx_vector_service_alarm_destroy(&service_alarms);
 
 	for (i = 0; i < services.values_num; i++)
+	{
 		zbx_free(services.values[i].name);
+		zbx_vector_ptr_destroy(&services.values[i].events);
+		zbx_vector_uint64_destroy(&services.values[i].eventids);
+	}
 
 	zbx_vector_service_destroy(&services);
 

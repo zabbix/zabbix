@@ -1542,7 +1542,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_UPDATE_STATUS	MVAR_EVENT_UPDATE "STATUS}"
 #define MVAR_EVENT_UPDATE_NSEVERITY	MVAR_EVENT_UPDATE "NSERVERITY}"
 #define MVAR_EVENT_UPDATE_SEVERITY	MVAR_EVENT_UPDATE "SERVERITY}"
-#define MVAR_EVENT_SERVICE_NAME		MVAR_EVENT "SERVICE.NAME}"
 
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
@@ -1584,6 +1583,9 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ITEM_LOG_SEVERITY		MVAR_ITEM_LOG "SEVERITY}"
 #define MVAR_ITEM_LOG_NSEVERITY		MVAR_ITEM_LOG "NSEVERITY}"
 #define MVAR_ITEM_LOG_EVENTID		MVAR_ITEM_LOG "EVENTID}"
+
+#define MVAR_SERVICE_NAME			"{SERVICE.NAME}"
+#define MVAR_SERVICE_ROOTCAUSE			"{SERVICE.ROOTCAUSE}"
 
 #define MVAR_TRIGGER_DESCRIPTION		"{TRIGGER.DESCRIPTION}"
 #define MVAR_TRIGGER_COMMENT			"{TRIGGER.COMMENT}"		/* deprecated */
@@ -2292,6 +2294,37 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 		{
 			get_event_tag_by_name(macro, event, replace_to);
 		}
+	}
+}
+
+static void	get_rootcause(const DB_SERVICE *service, char **replace_to)
+{
+	int	i;
+	char	*d = "";
+
+	for (i = 0; i < service->events.values_num; i++)
+	{
+		DB_EVENT	*event;
+		char		*host = NULL, *severity = NULL, *tags = NULL;
+
+		event = (DB_EVENT *)service->events.values[i];
+
+		if (FAIL == DBget_trigger_value(&event->trigger, &host, 1, ZBX_REQUEST_HOST_HOST))
+			goto next;
+
+		if (FAIL == get_trigger_severity_name(event->severity, &severity))
+			goto next;
+
+		get_event_tags(event, &tags);
+
+		*replace_to = zbx_strdcatf(*replace_to, "%sHost: \"%s\" Problem name: \"%s\" Severity: \"%s\""
+				" Age: %s Problem tags: \"%s\"", d, host, event->name, severity,
+				zbx_age2str(time(NULL) - event->clock), tags);
+		d = "\n";
+next:
+		zbx_free(host);
+		zbx_free(severity);
+		zbx_free(tags);
 	}
 }
 
@@ -4058,7 +4091,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					if (FAIL == get_trigger_severity_name(service_alarm->value, &replace_to))
 						replace_to = zbx_strdup(replace_to, "unknown");
 				}
-				else if (0 == strcmp(m, MVAR_EVENT_SERVICE_NAME))
+				else if (0 == strcmp(m, MVAR_SERVICE_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->service->name);
 				}
@@ -4076,6 +4109,10 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
+				}
+				else if (0 == strcmp(m, MVAR_SERVICE_ROOTCAUSE))
+				{
+					get_rootcause(event->service, &replace_to);
 				}
 			}
 		}
