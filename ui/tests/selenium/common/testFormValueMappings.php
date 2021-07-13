@@ -160,8 +160,7 @@ class testFormValueMappings extends CWebTest {
 							'type' => 'default',
 							'newvalue' => 'default value'
 						]
-					],
-					'update valuemap' => self::$previous_valuemap_name
+					]
 				]
 			],
 			// Successful creation/update of value mapping with multiple mappings and type equals.
@@ -197,8 +196,47 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => '  not shown on screenshot   '
 						]
 					],
-					'trim' => true,
-					'update valuemap' => self::$previous_valuemap_name
+					'trim' => true
+				]
+			],
+			// Successful creation/update of value mapping with all available types.
+			[
+				[
+					'name' => 'all types together',
+					'mappings' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'type' => 'equals',
+							'value' => '10',
+							'newvalue' => 'default value'
+						],
+						[
+							'type' => 'is greater than or equals',
+							'value' => '11',
+							'newvalue' => 'greater or equals 11'
+						],
+						[
+							'type' => 'is less than or equals',
+							'value' => '12',
+							'newvalue' => 'less or equals 12'
+						],
+						[
+							'type' => 'in range',
+							'value' => '13-16',
+							'newvalue' => 'from 13 to 16'
+						],
+						[
+							'type' => 'regexp',
+							'value' => '42',
+							'newvalue' => 'Answer to the Ultimate Question of Life, Universe and Everything'
+						],
+						[
+							'type' => 'default',
+							'newvalue' => 'default value'
+						]
+					],
+					'screenshot_id' => 'ValuemapScreenshot1'
 				]
 			],
 			// Successful creation/update of value mapping with empty value field.
@@ -213,8 +251,7 @@ class testFormValueMappings extends CWebTest {
 							'value' => '',
 							'newvalue' => 'no value'
 						]
-					],
-					'update valuemap' => self::$previous_valuemap_name
+					]
 				]
 			],
 			// Successful creation/update of value mapping with type - is greater than or equals.
@@ -254,8 +291,7 @@ class testFormValueMappings extends CWebTest {
 							'value' => '-30.30',
 							'newvalue' => 'greater or equals -30.30'
 						]
-					],
-					'update valuemap' => self::$previous_valuemap_name
+					]
 				]
 			],
 			// Successful creation/update of value mapping with type - is less than or equals.
@@ -295,8 +331,7 @@ class testFormValueMappings extends CWebTest {
 							'value' => '-30.30',
 							'newvalue' => 'less or equals -30.30'
 						]
-					],
-					'update valuemap' => self::$previous_valuemap_name
+					]
 				]
 			],
 			// Successful creation/update of value mapping with type - in range.
@@ -341,8 +376,7 @@ class testFormValueMappings extends CWebTest {
 							'value' => '.00001-.00002',
 							'newvalue' => 'from .00001 to .00002'
 						]
-					],
-					'update valuemap' => self::$previous_valuemap_name
+					]
 				]
 			],
 			// Successful creation/update of value mapping with type - regex.
@@ -367,8 +401,7 @@ class testFormValueMappings extends CWebTest {
 							'value' => '42',
 							'newvalue' => 'Answer to the Ultimate Question of Life, Universe and Everything'
 						]
-					],
-					'update valuemap' => self::$previous_valuemap_name
+					]
 				]
 			],
 			// Successful creation/update for value mapping with same value and types - in range, equals.
@@ -388,49 +421,7 @@ class testFormValueMappings extends CWebTest {
 							'value' => '1-10',
 							'newvalue' => 'same mapping'
 						]
-					],
-					'update valuemap' => self::$previous_valuemap_name
-				]
-			],
-			// Successful creation/update of value mapping with all available types.
-			[
-				[
-					'name' => 'all types together',
-					'mappings' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'type' => 'equals',
-							'value' => '10',
-							'newvalue' => 'default value'
-						],
-						[
-							'type' => 'is greater than or equals',
-							'value' => '11',
-							'newvalue' => 'greater or equals 11'
-						],
-						[
-							'type' => 'is less than or equals',
-							'value' => '12',
-							'newvalue' => 'less or equals 12'
-						],
-						[
-							'type' => 'in range',
-							'value' => '13-16',
-							'newvalue' => 'from 13 to 16'
-						],
-						[
-							'type' => 'regexp',
-							'value' => '42',
-							'newvalue' => 'Answer to the Ultimate Question of Life, Universe and Everything'
-						],
-						[
-							'type' => 'default',
-							'newvalue' => 'default value'
-						]
-					],
-					'update valuemap' => self::$previous_valuemap_name,
-					'screenshot_id' => 'ValuemapScreenshot1'
+					]
 				]
 			],
 			// Value mapping with duplicate name.
@@ -823,7 +814,8 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $action	Action to be performed with value mappings.
 	 */
 	public function checkAction($data, $source, $action) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		if ($expected === TEST_BAD) {
 			$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid';
 			$old_hash = CDBHelper::getHash($sql);
 		}
@@ -833,7 +825,7 @@ class testFormValueMappings extends CWebTest {
 		// Add a new value mapping or open the value mapping to be updated.
 		$this->query(($action === 'create')
 			? 'name:valuemap_add'
-			: 'link:'.(array_key_exists('update valuemap', $data) ? self::$previous_valuemap_name : self::UPDATE_VALUEMAP2
+			: 'link:'.($expected === TEST_GOOD ? self::$previous_valuemap_name : self::UPDATE_VALUEMAP2
 		))->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
@@ -853,7 +845,7 @@ class testFormValueMappings extends CWebTest {
 		}
 		$dialog->submit();
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error_details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
