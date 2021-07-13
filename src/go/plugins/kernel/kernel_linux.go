@@ -22,7 +22,6 @@ package kernel
 import (
 	"bufio"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -30,10 +29,6 @@ import (
 // getFirstNum  - get first number from file
 func getFirstNum(key string) (max uint64, err error) {
 	fileName := "/proc"
-	if os.Getenv("HOST_PROC") != "" { // Docker environment
-		fileName = os.Getenv("HOST_PROC")
-	}
-
 	switch key {
 	case "kernel.maxproc":
 		fileName += "/sys/kernel/pid_max"
