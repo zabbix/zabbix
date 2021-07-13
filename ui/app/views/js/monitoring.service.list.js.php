@@ -126,7 +126,7 @@
 		},
 
 		initRefresh() {
-			setTimeout(() => this.refresh(), this.refresh_interval);
+			setInterval(() => this.refresh(), this.refresh_interval);
 		},
 
 		pauseRefresh() {
@@ -166,6 +166,8 @@
 					}
 
 					service_list.outerHTML = response.body;
+
+					chkbxRange.init();
 				})
 				.catch((error) => {
 					let message_box;

@@ -26,7 +26,6 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 	}
 
 	protected function checkInput(): bool {
-		sleep(3);
 		$fields = [
 			'serviceid' =>			'db services.serviceid',
 			'path' =>				'array',

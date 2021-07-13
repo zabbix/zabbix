@@ -30,7 +30,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'serviceid' =>			'db services.serviceid',
 			'path' =>				'array',
 			'filter_name' =>		'string',
-			'filter_status' =>		'in '.SERVICE_STATUS_ANY.','.SERVICE_STATUS_OK.','.SERVICE_STATUS_PROBLEM,
+			'filter_status' =>		'in '.implode(',', [SERVICE_STATUS_ANY, SERVICE_STATUS_OK, SERVICE_STATUS_PROBLEM]),
 			'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>		'array',
 			'filter_set' =>			'in 1',

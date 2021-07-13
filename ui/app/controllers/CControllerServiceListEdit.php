@@ -27,18 +27,18 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'serviceid' => 'db services.serviceid',
-			'path' => 'array',
-			'filter_name' => 'string',
-			'filter_status' => 'in '.SERVICE_STATUS_ANY.','.SERVICE_STATUS_OK.','.SERVICE_STATUS_PROBLEM,
-			'filter_without_children' => 'in 1',
-			'filter_without_problem_tags' => 'in 1',
-			'filter_tag_source' => 'in '.implode(',', [ZBX_SERVICE_FILTER_TAGS_ANY, ZBX_SERVICE_FILTER_TAGS_SERVICE, ZBX_SERVICE_FILTER_TAGS_PROBLEM]),
-			'filter_evaltype' => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
-			'filter_tags' => 'array',
-			'filter_set' => 'in 1',
-			'filter_rst' => 'in 1',
-			'page' => 'ge 1',
+			'serviceid' =>						'db services.serviceid',
+			'path' =>							'array',
+			'filter_name' =>					'string',
+			'filter_status' =>					'in '.implode(',', [SERVICE_STATUS_ANY, SERVICE_STATUS_OK, SERVICE_STATUS_PROBLEM]),
+			'filter_without_children' =>		'in 1',
+			'filter_without_problem_tags' =>	'in 1',
+			'filter_tag_source' =>				'in '.implode(',', [ZBX_SERVICE_FILTER_TAGS_ANY, ZBX_SERVICE_FILTER_TAGS_SERVICE, ZBX_SERVICE_FILTER_TAGS_PROBLEM]),
+			'filter_evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_tags' =>					'array',
+			'filter_set' =>						'in 1',
+			'filter_rst' =>						'in 1',
+			'page' =>							'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -62,14 +62,15 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		$this->updateFilter();
 		$filter = $this->getFilter();
+		$is_filtered = !$this->isDefaultFilter($filter);
 
-		$view_url = (new CUrl('zabbix.php'))
+		$view_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list.edit')
 			->setArgument('path', $path ?: null)
 			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null);
 
-		if ($this->is_filtered) {
-			$view_url
+		if ($is_filtered) {
+			$view_curl
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
 				->setArgument('filter_without_children', $filter['without_children'] ? 1 : null)
@@ -83,11 +84,13 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'path' => $path,
 			'breadcrumbs' => $this->getBreadcrumbs($path),
 			'filter' => $filter,
-			'is_filtered' => $this->is_filtered,
+			'is_filtered' => $is_filtered,
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
-			'view_curl' => $view_url,
+			'view_curl' => $view_curl,
 			'refresh_url' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'service.list.edit.refresh')
+				->setArgument('path', $path ?: null)
+				->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null)
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
 				->setArgument('filter_without_children', $filter['without_children'] ? 1 : null)
@@ -105,13 +108,12 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		$db_serviceids = $this->prepareData($filter);
 
 		$page_num = $this->getInput('page', 1);
-		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $view_url);
+		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $view_curl);
 		CPagerHelper::savePage('service.list.edit', $page_num);
-		$data['page'] =  $page_num > 1 ? $page_num : null;
 
 		$data['services'] = API::Service()->get([
 			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla'],
-			'selectParents' => $this->is_filtered ? ['serviceid', 'name'] : null,
+			'selectParents' => $is_filtered ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
 			'serviceids' => $db_serviceids,
