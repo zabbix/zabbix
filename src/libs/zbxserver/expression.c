@@ -1540,8 +1540,8 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_UPDATE_MESSAGE	MVAR_EVENT_UPDATE "MESSAGE}"
 #define MVAR_EVENT_UPDATE_TIME		MVAR_EVENT_UPDATE "TIME}"
 #define MVAR_EVENT_UPDATE_STATUS	MVAR_EVENT_UPDATE "STATUS}"
-#define MVAR_EVENT_UPDATE_NSEVERITY	MVAR_EVENT_UPDATE "NSERVERITY}"
-#define MVAR_EVENT_UPDATE_SEVERITY	MVAR_EVENT_UPDATE "SERVERITY}"
+#define MVAR_EVENT_UPDATE_NSEVERITY	MVAR_EVENT_UPDATE "NSEVERITY}"
+#define MVAR_EVENT_UPDATE_SEVERITY	MVAR_EVENT_UPDATE "SEVERITY}"
 
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
@@ -4054,6 +4054,39 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to, tz);
 				}
+
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_NSEVERITY))
+				{
+					if (NULL != service_alarm)
+						replace_to = zbx_dsprintf(replace_to, "%d", (int)service_alarm->value);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_SEVERITY))
+				{
+					if (NULL != service_alarm)
+					{
+						if (FAIL == get_trigger_severity_name(service_alarm->value,
+								&replace_to))
+						{
+							replace_to = zbx_strdup(replace_to, "unknown");
+						}
+					}
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_DATE))
+				{
+					if (NULL != service_alarm)
+					{
+						replace_to = zbx_strdup(replace_to, zbx_date2str(service_alarm->clock,
+								tz));
+					}
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_TIME))
+				{
+					if (NULL != service_alarm)
+					{
+						replace_to = zbx_strdup(replace_to, zbx_time2str(service_alarm->clock,
+								tz));
+					}
+				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
 					get_current_event_value(m, c_event, &replace_to);
@@ -4066,34 +4099,14 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					get_event_value(m, event, &replace_to, userid, r_event, tz);
 				}
-				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_TIME))
-				{
-					if (NULL != service_alarm)
-					{
-						replace_to = zbx_strdup(replace_to, zbx_time2str(service_alarm->clock,
-								tz));
-					}
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_DATE))
-				{
-					if (NULL != service_alarm)
-					{
-						replace_to = zbx_strdup(replace_to, zbx_date2str(service_alarm->clock,
-								tz));
-					}
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_NSEVERITY))
-				{
-					replace_to = zbx_dsprintf(replace_to, "%d", (int)service_alarm->value);
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_SEVERITY))
-				{
-					if (FAIL == get_trigger_severity_name(service_alarm->value, &replace_to))
-						replace_to = zbx_strdup(replace_to, "unknown");
-				}
+
 				else if (0 == strcmp(m, MVAR_SERVICE_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->service->name);
+				}
+				else if (0 == strcmp(m, MVAR_SERVICE_ROOTCAUSE))
+				{
+					get_rootcause(event->service, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
@@ -4109,10 +4122,6 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
-				}
-				else if (0 == strcmp(m, MVAR_SERVICE_ROOTCAUSE))
-				{
-					get_rootcause(event->service, &replace_to);
 				}
 			}
 		}
