@@ -85,22 +85,23 @@ trait TableTrait {
 	 * @param array   $rows        data array to be match with result in table
 	 * @param string  $field       table column name
 	 */
-	public function assertTableDataColumn($rows = [], $field = 'Name') {
+	public function assertTableDataColumn($rows = [], $field = 'Name', $selector = 'class:list-table') {
 		$data = [];
 		foreach ($rows as $row) {
 			$data[] = [$field => $row];
 		}
 
-		$this->assertTableData($data);
+		$this->assertTableData($data, $selector);
 	}
 
 	/**
 	 * Select table rows.
 	 *
-	 * @param mixed $data		rows to be selected
-	 * @param string $selector	table selector
+	 * @param mixed $data			rows to be selected
+	 * @param string $column		column name
+	 * @param string $selector		table selector
 	 */
-	public function selectTableRows($data = [], $selector = 'class:list-table') {
+	public function selectTableRows($data = [], $column = 'Name', $selector = 'class:list-table') {
 		$table = $this->query($selector)->asTable()->one();
 
 		if (!$data) {
@@ -110,7 +111,7 @@ trait TableTrait {
 			return;
 		}
 
-		$table->findRows($data)->select();
+		$table->findRows($column, $data)->select();
 	}
 
 	/**
@@ -126,5 +127,19 @@ trait TableTrait {
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
 				$this->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
+	}
+
+	/**
+	 * Get data from chosen column.
+	 *
+	 * @param string $column		Column name, where value should be checked
+	 */
+	private function getTableResult($column) {
+		$table = $this->query('class:list-table')->asTable()->one();
+		$result = [];
+		foreach ($table->getRows() as $row) {
+			$result[] = $row->getColumn($column)->getText();
+		}
+		return $result;
 	}
 }

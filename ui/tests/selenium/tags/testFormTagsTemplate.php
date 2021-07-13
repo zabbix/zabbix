@@ -18,15 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormTags.php';
+require_once dirname(__FILE__).'/../common/testFormTags.php';
 
 /**
+ * @dataSource EntitiesTags
  * @backup hosts
  */
 class testFormTagsTemplate extends testFormTags {
 
-	public $update_name = 'A template with tags for updating';
-	public $clone_name = 'A template with tags for cloning';
+	public $update_name = '2 template with tags for updating';
+	public $clone_name = '1 template with tags for cloning';
 	public $link = 'templates.php';
 	public $saved_link = 'templates.php?form=update&templateid=';
 
@@ -34,7 +35,6 @@ class testFormTagsTemplate extends testFormTags {
 	 * Test creating of Template with tags
 	 *
 	 * @dataProvider getCreateData
-	 *
 	 */
 	public function testFormTagsTemplate_Create($data) {
 		$this->checkTagsCreate($data, 'template');

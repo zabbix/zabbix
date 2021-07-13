@@ -22,6 +22,9 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/FilterTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
+/**
+ * @dataSource TagFilter
+ */
 class testPageTemplates extends CLegacyWebTest {
 
 	public $templateName = 'Template OS Linux by Zabbix agent';
@@ -38,7 +41,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Host groups')->select('Templates');
+		$filter->getField('Host groups')->select('Templates/Operating systems');
 		$filter->submit();
 		$this->zbxTestTextPresent($this->templateName);
 
@@ -58,8 +61,8 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allTemplates
-	*/
+	 * @dataProvider allTemplates
+	 */
 	public function testPageTemplates_SimpleUpdate($template) {
 		$host = $template['host'];
 		$name = $template['name'];
@@ -163,7 +166,7 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
 					'expected_templates' => [
-						'Form test template'
+						'Template for tags filtering'
 					]
 				]
 			],
@@ -175,9 +178,9 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
 					'expected_templates' => [
-						'A template with tags for cloning',
-						'A template with tags for updating',
-						'Form test template'
+						'Template for tags filtering',
+						'Template for tags filtering - clone',
+						'Template for tags filtering - update'
 					]
 				]
 			],
@@ -189,9 +192,9 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
-						'A template with tags for cloning',
-						'A template with tags for updating',
-						'Form test template'
+						'Template for tags filtering',
+						'Template for tags filtering - clone',
+						'Template for tags filtering - update'
 					]
 				]
 			],
@@ -202,7 +205,7 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
-						'Form test template'
+						'Template for tags filtering'
 					]
 				]
 			],
@@ -213,9 +216,9 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'action', 'operator' => 'Contains']
 					],
 					'expected_templates' => [
-						'A template with tags for cloning',
-						'A template with tags for updating',
-						'Form test template'
+						'Template for tags filtering',
+						'Template for tags filtering - clone',
+						'Template for tags filtering - update'
 					]
 				]
 			],
@@ -224,9 +227,9 @@ class testPageTemplates extends CLegacyWebTest {
 					'evaluation_type' => 'And/Or',
 					'tags' => [
 						['name' => 'action', 'operator' => 'Equals']
+				]
 					]
 				]
-			]
 		];
 	}
 
@@ -246,7 +249,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.
-		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
+			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();
