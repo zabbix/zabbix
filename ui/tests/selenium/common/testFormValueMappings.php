@@ -201,7 +201,7 @@ class testFormValueMappings extends CWebTest {
 					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
-			// Successful creation/update of value mapping with multiple mappings and type equals.
+			// Successful creation/update of value mapping with empty value field.
 			[
 				[
 					'name' => 'Equals without value',
@@ -217,7 +217,7 @@ class testFormValueMappings extends CWebTest {
 					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
-			// Mapping type - is greater than or equals.
+			// Successful creation/update of value mapping with type - is greater than or equals.
 			[
 				[
 					'name' => 'greater than or equals',
@@ -258,7 +258,7 @@ class testFormValueMappings extends CWebTest {
 					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
-			// Mapping type - is less than or equals.
+			// Successful creation/update of value mapping with type - is less than or equals.
 			[
 				[
 					'name' => 'less than or equals',
@@ -299,7 +299,7 @@ class testFormValueMappings extends CWebTest {
 					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
-			// Mapping type - in range.
+			// Successful creation/update of value mapping with type - in range.
 			[
 				[
 					'name' => 'in range',
@@ -345,7 +345,7 @@ class testFormValueMappings extends CWebTest {
 					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
-			// Mapping type - regex.
+			// Successful creation/update of value mapping with type - regex.
 			[
 				[
 					'name' => 'regex',
@@ -371,7 +371,7 @@ class testFormValueMappings extends CWebTest {
 					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
-			// Mapping type - equals with range.
+			// Successful creation/update for value mapping with same value and types - in range, equals.
 			[
 				[
 					'name' => 'equals and inrange',
@@ -392,7 +392,7 @@ class testFormValueMappings extends CWebTest {
 					'update valuemap' => self::$previous_valuemap_name
 				]
 			],
-			// Mapping type - all available types.
+			// Successful creation/update of value mapping with all available types.
 			[
 				[
 					'name' => 'all types together',
@@ -711,7 +711,7 @@ class testFormValueMappings extends CWebTest {
 					'error_details' => 'Incorrect value for field "Value": value () already exists.'
 				]
 			],
-			// Empty mapping for - in range.
+			// Empty "Mapped to" field for type - in range.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -728,7 +728,7 @@ class testFormValueMappings extends CWebTest {
 					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
 				]
 			],
-			// Empty mapping for - less.
+			// Empty "Mapped to" field for type - less.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -745,7 +745,7 @@ class testFormValueMappings extends CWebTest {
 					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
 				]
 			],
-			// Empty mapping for - greater.
+			// Empty "Mapped to" field for type - greater.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -762,7 +762,7 @@ class testFormValueMappings extends CWebTest {
 					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
 				]
 			],
-			// Empty mapping for - regex.
+			// Empty "Mapped to" field for type - regex.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -779,7 +779,7 @@ class testFormValueMappings extends CWebTest {
 					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
 				]
 			],
-			// Empty mapping for - equals.
+			// Empty "Mapped to" field for type - equals.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -796,7 +796,7 @@ class testFormValueMappings extends CWebTest {
 					'error_details' => 'Incorrect value for field "Mapped to": cannot be empty.'
 				]
 			],
-			// Empty mapping for - default.
+			// Empty "Mapped to" field for type - default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -863,6 +863,7 @@ class testFormValueMappings extends CWebTest {
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_GOOD, ucfirst($source).' updated');
 
+			// Write valuemap name to variable to use it in next Update test case.
 			if ($action === 'update') {
 				self::$previous_valuemap_name = $data['name'];
 			}
