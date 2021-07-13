@@ -50,7 +50,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = (new CFilter())
 		->addVar('action', 'service.list')
 		->addVar('serviceid', $data['service'] !== null ? $data['service']['serviceid'] : null)
-		->setResetUrl($data['reset_curl'])
+		->setResetUrl($data['view_curl'])
 		->setProfile('web.service.filter')
 		->setActiveTab($data['active_tab']);
 

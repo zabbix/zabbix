@@ -106,6 +106,15 @@ class CFilter extends CDiv {
 		$this->reset_url = new CUrl();
 	}
 
+	public function setApplyUrl(CUrl $url): self {
+		$this->form->setAction((clone $url)
+			->setArgument('filter_set', 1)
+			->getUrl()
+		);
+
+		return $this;
+	}
+
 	public function setResetUrl(CUrl $url): self {
 		$this->reset_url = (clone $url)
 			->setArgument('filter_rst', 1)
