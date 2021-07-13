@@ -33,8 +33,6 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'filter_status' =>		'in '.implode(',', [SERVICE_STATUS_ANY, SERVICE_STATUS_OK, SERVICE_STATUS_PROBLEM]),
 			'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>		'array',
-			'filter_set' =>			'in 1',
-			'filter_rst' =>			'in 1',
 			'page' =>				'ge 1'
 		];
 
@@ -56,31 +54,36 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 
 		$path = $this->getPath();
 
-		$this->updateFilter();
-		$filter = $this->getFilter();
-		$is_filtered = !$this->isDefaultFilter($filter);
+		$filter = [
+			'serviceid' => $this->service !== null ? $this->service['serviceid'] : self::WITHOUT_PARENTS_SERVICEID,
+			'name' => $this->getInput('filter_name', self::FILTER_DEFAULT_NAME),
+			'status' => $this->getInput('filter_status', self::FILTER_DEFAULT_STATUS),
+			'without_children' => self::FILTER_DEFAULT_WITHOUT_CHILDREN,
+			'without_problem_tags' => self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS,
+			'tag_source' => self::FILTER_DEFAULT_TAG_SOURCE,
+			'evaltype' => $this->getInput('filter_evaltype', self::FILTER_DEFAULT_EVALTYPE),
+			'tags' => []
+		];
 
-		$view_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'service.list')
-			->setArgument('path', $path ?: null)
-			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null);
-
-		if ($is_filtered) {
-			$view_curl
-				->setArgument('filter_name', $filter['name'])
-				->setArgument('filter_status', $filter['status'])
-				->setArgument('filter_evaltype', $filter['evaltype'])
-				->setArgument('filter_tags', $filter['tags']);
+		foreach ($this->getInput('filter_tags', []) as $tag) {
+			if (array_key_exists('tag', $tag) && $tag['tag'] !== '') {
+				$filter['tags'][] = $tag;
+			}
 		}
+
+		$is_filtered = !$this->isDefaultFilter($filter);
 
 		$data = [
 			'can_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES),
 			'path' => $path,
-			'breadcrumbs' => $this->getBreadcrumbs($path),
+			'breadcrumbs' => $this->getBreadcrumbs($path, $is_filtered),
 			'filter' => $filter,
 			'is_filtered' => $is_filtered,
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
-			'view_curl' => $view_curl,
+			'reset_curl' => (new CUrl('zabbix.php'))
+				->setArgument('action', 'service.list')
+				->setArgument('path', $path ?: null)
+				->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null),
 			'refresh_url' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'service.list.refresh')
 				->setArgument('path', $path ?: null)
@@ -111,8 +114,21 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 
 		$db_serviceids = $this->prepareData($filter);
 
+		$paging_curl = (new CUrl('zabbix.php'))
+			->setArgument('action', 'service.list')
+			->setArgument('path', $path ?: null)
+			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null);
+
+		if ($is_filtered) {
+			$paging_curl
+				->setArgument('filter_name', $filter['name'])
+				->setArgument('filter_status', $filter['status'])
+				->setArgument('filter_evaltype', $filter['evaltype'])
+				->setArgument('filter_tags', $filter['tags']);
+		}
+
 		$page_num = $this->getInput('page', 1);
-		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $view_curl);
+		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 		CPagerHelper::savePage('service.list', $page_num);
 		$data['page'] = $page_num > 1 ? $page_num : null;
 
@@ -132,13 +148,5 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));
 		$this->setResponse($response);
-	}
-
-	protected function updateFilter(): void {
-		parent::updateFilter();
-
-		CProfile::delete('web.service.filter.without_children');
-		CProfile::delete('web.service.filter.without_problem_tags');
-		CProfile::delete('web.service.filter.tag_source');
 	}
 }

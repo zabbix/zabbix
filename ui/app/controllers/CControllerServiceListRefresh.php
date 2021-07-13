@@ -71,15 +71,6 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 
 		$is_filtered = !$this->isDefaultFilter($filter);
 
-		$view_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'service.list')
-			->setArgument('path', $path ?: null)
-			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null)
-			->setArgument('filter_name', $filter['name'])
-			->setArgument('filter_status', $filter['status'])
-			->setArgument('filter_evaltype', $filter['evaltype'])
-			->setArgument('filter_tags', $filter['tags']);
-
 		$data = [
 			'path' => $path,
 			'is_filtered' => $is_filtered,
@@ -89,8 +80,17 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 
 		$db_serviceids = $this->prepareData($filter);
 
+		$paging_curl = (new CUrl('zabbix.php'))
+			->setArgument('action', 'service.list')
+			->setArgument('path', $path ?: null)
+			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null)
+			->setArgument('filter_name', $filter['name'])
+			->setArgument('filter_status', $filter['status'])
+			->setArgument('filter_evaltype', $filter['evaltype'])
+			->setArgument('filter_tags', $filter['tags']);
+
 		$page_num = $this->getInput('page', 1);
-		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $view_curl);
+		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
 			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla'],
