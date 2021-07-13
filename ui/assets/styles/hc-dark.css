@@ -6327,16 +6327,20 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   min-width: unset;
   max-width: unset; }
 
-.modal-popup-static .table-forms-container, .modal-popup-static .browser-warning-container,
+.modal-popup-medium .table-forms-container, .modal-popup-medium .browser-warning-container,
+.modal-popup-static .table-forms-container,
+.modal-popup-static .browser-warning-container,
 .modal-popup-preprocessing .table-forms-container,
 .modal-popup-preprocessing .browser-warning-container {
   border: none; }
+.modal-popup-medium .ui-tabs-nav,
 .modal-popup-static .ui-tabs-nav,
 .modal-popup-preprocessing .ui-tabs-nav {
   position: sticky;
   top: 0;
   background: #070707;
   z-index: 3; }
+.modal-popup-medium .textarea-flexible,
 .modal-popup-static .textarea-flexible,
 .modal-popup-preprocessing .textarea-flexible {
   max-height: 200px;
