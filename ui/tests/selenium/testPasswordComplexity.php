@@ -85,6 +85,22 @@ class testPasswordComplexity extends CWebTest {
 		// Close the second hint-box.
 		$easy_password_hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 		$easy_password_hint->waitUntilNotPresent();
+
+		// Assert default values in form.
+		foreach ([
+			'Minimum password length' => '8',
+			'id:passwd_check_rules_case' => false,
+			'id:passwd_check_rules_digits' => false,
+			'id:passwd_check_rules_special' => false,
+			'id:passwd_check_rules_simple' => true
+		] as $field => $value) {
+			$this->assertEquals($value, $form->getField($field)->getValue());
+		}
+
+		// Check default values in DB.
+		$this->assertEquals([['passwd_min_length' => 8, 'passwd_check_rules' => 8]],
+				CDBHelper::getAll('SELECT passwd_min_length, passwd_check_rules FROM config')
+		);
 	}
 
 	public function getFormValidationData() {
@@ -140,8 +156,8 @@ class testPasswordComplexity extends CWebTest {
 			// Negative number will be converted to positive when focus-out.
 			[
 				[
-					'fields' => ['Minimum password length' => '-7'],
-					'db_passwd_min_length' => 7
+					'fields' => ['Minimum password length' => '-8'],
+					'db_passwd_min_length' => 8
 				]
 			]
 		];
@@ -151,8 +167,6 @@ class testPasswordComplexity extends CWebTest {
 	 * Check authentication form fields validation.
 	 *
 	 * @dataProvider getFormValidationData
-	 *
-	 * @backupOnce config
 	 */
 	public function testPasswordComplexity_FormValidation($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -185,6 +199,13 @@ class testPasswordComplexity extends CWebTest {
 			// Check default password complexity settings.
 			[
 				[
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
 					'db_passwd_check_rules' => 8,
 					'Password' => 'iamrobot',
 					'hint' => "Password requirements:".
@@ -485,13 +506,421 @@ class testPasswordComplexity extends CWebTest {
 						"\nmust contain at least one digit (0-9)"
 				]
 			],
+			[
+				[
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => true,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => false
+					],
+					'db_passwd_check_rules' => 2,
+					'Password' => '99009900',
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one digit (0-9)"
+				]
+			],
+			[
+				[
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => true,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => false
+					],
+					'db_passwd_check_rules' => 2,
+					'Password' => '12345678',
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one digit (0-9)"
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => true,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 10,
+					'Password' => '12345678',
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one digit (0-9)".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => 'Incorrect value for field "/1/passwd": must not be one of common or context-specific passwords.'
+				]
+			],
+			[
+				[
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => true,
+						'id:passwd_check_rules_special' => true,
+						'id:passwd_check_rules_simple' => false
+					],
+					'db_passwd_check_rules' => 6,
+					'Password' => 'secure_password1#():}',
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one digit (0-9)".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)"
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => true,
+						'id:passwd_check_rules_special' => true,
+						'id:passwd_check_rules_simple' => false
+					],
+					'db_passwd_check_rules' => 6,
+					'Password' => 'securepassword1',
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one digit (0-9)".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)",
+					'error' => 'Incorrect value for field "/1/passwd": must contain at least one special character.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => true,
+						'id:passwd_check_rules_special' => true,
+						'id:passwd_check_rules_simple' => false
+					],
+					'db_passwd_check_rules' => 6,
+					'Password' => 'securepassword#',
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one digit (0-9)".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)",
+					'error' => 'Incorrect value for field "/1/passwd": must contain at least one digit.'
+				]
+			],
+			[
+				[
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => true,
+						'id:passwd_check_rules_simple' => false
+					],
+					'db_passwd_check_rules' => 4,
+					'Password' => 'securepassword#',
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)"
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => true,
+						'id:passwd_check_rules_simple' => false
+					],
+					'db_passwd_check_rules' => 4,
+					'Password' => 'securepassword',
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)",
+					'error' => 'Incorrect value for field "/1/passwd": must contain at least one special character.'
+				]
+			],
+			[
+				[
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => true,
+						'id:passwd_check_rules_simple' => false
+					],
+					'db_passwd_check_rules' => 4,
+					'Password' => "( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)",
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)"
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => true,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 12,
+					'Password' => "zabbix",
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => 'Incorrect value for field "/1/passwd": must be at least 8 characters long.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => true,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 12,
+					'Password' => "zabbix",
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => 'Incorrect value for field "/1/passwd": must contain at least one special character.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => "zabbix",
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => 'Incorrect value for field "/1/passwd": must not be one of common or context-specific passwords.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => true,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 9,
+					'Password' => 'Admin',
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust contain at least one lowercase and one uppercase Latin letter (A-Z, a-z)".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => "Incorrect value for field \"/1/passwd\": must not be one of common or context-specific passwords."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => 'admin',
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => "Incorrect value for field \"/1/passwd\": must not be one of common or context-specific passwords."
+				]
+			]
+		];
+	}
+
+	public function getAdminPasswordData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => 'Admin',
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => "Incorrect value for field \"/1/passwd\": must not contain user's name, surname or username."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => 'admin',
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => "Incorrect value for field \"/1/passwd\": must not contain user's name, surname or username."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => 'admin1',
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => "Incorrect value for field \"/1/passwd\": must not contain user's name, surname or username."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '8',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => 'admin',
+					'hint' => "Password requirements:".
+						"\nmust be at least 8 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => "Incorrect value for field \"/1/passwd\": must be at least 8 characters long."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => 'zabbix',
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => "Incorrect value for field \"/1/passwd\": must not contain user's name, surname or username."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => 'password',
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => "Incorrect value for field \"/1/passwd\": must not be one of common or context-specific passwords."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => 'password',
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords",
+					'error' => "Incorrect value for field \"/1/passwd\": must not be one of common or context-specific passwords."
+				]
+			],
+			[
+				[
+					'auth_fields' => [
+						'Minimum password length' => '4',
+						'id:passwd_check_rules_case' => false,
+						'id:passwd_check_rules_digits' => false,
+						'id:passwd_check_rules_special' => false,
+						'id:passwd_check_rules_simple' => true
+					],
+					'db_passwd_check_rules' => 8,
+					'Password' => 'securepassword',
+					'hint' => "Password requirements:".
+						"\nmust be at least 4 characters long".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords"
+				]
+			]
 		];
 	}
 
 	/**
 	 * Check user creation with password complexity rules.
-	 *
-	 * @backupOnce config
 	 *
 	 * @dataProvider getUserPasswordData
 	 */
@@ -508,7 +937,7 @@ class testPasswordComplexity extends CWebTest {
 		$response = CDataHelper::call('user.create', [
 			[
 				'username' => 'update-user',
-				'passwd' => 'iamrobot',
+				'passwd' => 'Iamrobot1!',
 				'roleid' => 1,
 				'usrgrps' => [
 					[
@@ -535,6 +964,17 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
+	 * Check user creation with password complexity rules.
+	 *
+	 * @dataProvider getAdminPasswordData
+	 */
+	public function testPasswordComplexity_UpdateAdminPassword($data) {
+		self::$userid = 1;
+		$update = true;
+		$this->checkPasswordComplexity($data, $update);
+	}
+
+	/**
 	 * Check password complexity rules for user creation or update.
 	 *
 	 * @param array      $data       data provider
@@ -545,23 +985,15 @@ class testPasswordComplexity extends CWebTest {
 			$old_hash = CDBHelper::getHash('SELECT * FROM users');
 		}
 
-		if (array_key_exists('auth_fields', $data)) {
-			$this->page->login()->open('zabbix.php?action=authentication.edit');
-			$auth_form = $this->query('name:form_auth')->asForm()->waitUntilPresent()->one();
-			$auth_form->fill($data['auth_fields']);
-			$auth_form->submit();
-			$this->page->waitUntilReady();
-			// Uncomment this when ZBX-19669 is fixed.
-//			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-			$this->assertEquals($data['db_passwd_check_rules'],
-				CDBHelper::getValue('SELECT passwd_check_rules FROM config'));
-		}
-		else {
-			// If auth fields were not changed check default config in db.
-			$this->assertEquals([['passwd_min_length' => 8, 'passwd_check_rules' => 8]],
-					CDBHelper::getAll('SELECT passwd_min_length, passwd_check_rules FROM config')
-			);
-		}
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$auth_form = $this->query('name:form_auth')->asForm()->waitUntilPresent()->one();
+		$auth_form->fill($data['auth_fields']);
+		$auth_form->submit();
+		$this->page->waitUntilReady();
+		// Uncomment this when ZBX-19669 is fixed.
+//		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		$this->assertEquals($data['db_passwd_check_rules'],
+			CDBHelper::getValue('SELECT passwd_check_rules FROM config'));
 
 		if ($update) {
 			$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$userid);
@@ -575,7 +1007,9 @@ class testPasswordComplexity extends CWebTest {
 
 		// Check user password creation accordingly to complexity settings.
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
-		$username = $update ? 'update-user' : 'username'.time();
+		$username = (self::$userid === 1)
+			? 'Admin'
+			: ($update ? 'update-user' : 'username'.time());
 
 		if ($update === false){
 			$user_form->fill([
@@ -621,7 +1055,9 @@ class testPasswordComplexity extends CWebTest {
 
 			// Check success login with new password.
 			$this->page->userLogin($username, $data['Password']);
-			$this->assertTrue($this->query('xpath://a[@title="'.$username.'" and text()="User settings"]')->exists());
+			$this->assertTrue($this->query('xpath://a[@title="'.((self::$userid === 1) ? 'Admin (Zabbix Administrator)'
+					: $username).'" and text()="User settings"]')->exists()
+			);
 		}
 	}
 }
