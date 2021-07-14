@@ -39,8 +39,8 @@ $form = (new CForm())
 
 $audit_settings_tab = (new CFormList())
 	->addRow(
-		new CLabel(_('Enable audit logging'), 'audit_logging_enabled'),
-		(new CCheckBox('audit_logging_enabled'))->setChecked($data['audit_logging_enabled'] == 1)
+		new CLabel(_('Enable audit logging'), 'auditlog_enabled'),
+		(new CCheckBox('auditlog_enabled'))->setChecked($data['auditlog_enabled'] == 1)
 	)
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),

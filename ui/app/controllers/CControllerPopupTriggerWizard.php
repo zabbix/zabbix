@@ -216,15 +216,15 @@ class CControllerPopupTriggerWizard extends CController {
 						}
 					}
 
-					if ($result['triggerids']) {
-						DBstart();
+					// if ($result['triggerids']) {
+					// 	DBstart();
 
-						add_audit($audit_action, AUDIT_RESOURCE_TRIGGER,
-							_('Trigger').' ['.$triggerid.'] ['.$trigger['description'].']'
-						);
+					// 	add_audit($audit_action, AUDIT_RESOURCE_TRIGGER,
+					// 		_('Trigger').' ['.$triggerid.'] ['.$trigger['description'].']'
+					// 	);
 
-						DBend(true);
-					}
+					// 	DBend(true);
+					// }
 				}
 				else {
 					error(_s('Field "%1$s" is mandatory.', 'expressions'));

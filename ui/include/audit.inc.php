@@ -19,28 +19,28 @@
 **/
 
 
-function add_audit($action, $resourcetype, $note) {
-	if (mb_strlen($note) > 128) {
-		$note = mb_substr($note, 0, 125).'...';
-	}
+// function add_audit($action, $resourcetype, $note) {
+// 	if (mb_strlen($note) > 128) {
+// 		$note = mb_substr($note, 0, 125).'...';
+// 	}
 
-	$values = [
-		'userid' => CWebUser::$data['userid'],
-		'clock' => time(),
-		'ip' => substr(CWebUser::getIp(), 0, 39),
-		'action' => $action,
-		'resourcetype' => $resourcetype,
-		'note' => $note
-	];
+// 	$values = [
+// 		'userid' => CWebUser::$data['userid'],
+// 		'clock' => time(),
+// 		'ip' => substr(CWebUser::getIp(), 0, 39),
+// 		'action' => $action,
+// 		'resourcetype' => $resourcetype,
+// 		'note' => $note
+// 	];
 
-	try {
-		DB::insert('auditlog', [$values]);
-		return true;
-	}
-	catch (DBException $e) {
-		return false;
-	}
-}
+// 	try {
+// 		DB::insert('auditlog', [$values]);
+// 		return true;
+// 	}
+// 	catch (DBException $e) {
+// 		return false;
+// 	}
+// }
 
 // function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new) {
 // 	$values_diff = [];

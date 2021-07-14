@@ -19,14 +19,16 @@
 
 #include "log.h"
 #include "zbxjson.h"
-#include "db.h"
 #include "dbcache.h"
 
 #include "audit.h"
 
-#define	AUDIT_DETAILS_KEY_LEN	100
+#define	AUDIT_DETAILS_KEY_LEN		100
 
-static void	add_str_json(struct zbx_json *json, const char *key, const char *val)
+#define AUDIT_RESOURCE_HOST		4
+#define AUDIT_RESOURCE_SCRIPT		25
+
+static void add_str_json(struct zbx_json *json, const char *key, const char *val)
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, "add", ZBX_JSON_TYPE_STRING);
@@ -77,9 +79,9 @@ static	void update_int_json(struct zbx_json *json, const char *key, int val_old,
 	zbx_json_close(json);
 }
 
-#define IS_AUDIT_ON(...)						\
-	if (ZBX_AUDIT_LOGGING_ENABLED != cfg->audit_logging_enabled)	\
-		return							\
+#define IS_AUDIT_ON(...)					\
+	if (ZBX_AUDITLOG_ENABLED != cfg->auditlog_enabled)	\
+		return						\
 
 
 /******************************************************************************
@@ -106,9 +108,9 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDIT_LOGGING_ENABLED);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
 
-	if (ZBX_AUDIT_LOGGING_ENABLED != cfg.audit_logging_enabled)
+	if (ZBX_AUDITLOG_ENABLED != cfg.auditlog_enabled)
 		goto out;
 
 	zbx_new_cuid(auditid_cuid);

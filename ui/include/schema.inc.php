@@ -2749,7 +2749,7 @@ return [
 				'length' => 1024,
 				'default' => ''
 			],
-			'audit_logging_enabled' => [
+			'auditlog_enabled' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -5028,7 +5028,7 @@ return [
 		'fields' => [
 			'auditid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
+				'type' => DB::FIELD_TYPE_CUID,
 				'length' => 25
 			],
 			'userid' => [
@@ -5079,7 +5079,7 @@ return [
 			],
 			'recordsetid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
+				'type' => DB::FIELD_TYPE_CUID,
 				'length' => 25
 			],
 			'details' => [

@@ -603,7 +603,7 @@ static size_t	get_string_field_size(unsigned char type)
 			return 65535u;
 		case ZBX_TYPE_CUID:
 			return CUID_LEN - 1;
-	default:
+		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 	}

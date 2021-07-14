@@ -23,9 +23,9 @@ class CControllerAuditSettingsUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'audit_logging_enabled'	=> 'db config.audit_logging_enabled|in 1',
-			'hk_audit_mode'			=> 'db config.hk_audit_mode|in 1',
-			'hk_audit'				=> 'db config.hk_audit|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])
+			'auditlog_enabled'	=> 'db config.auditlog_enabled|in 1',
+			'hk_audit_mode'		=> 'db config.hk_audit_mode|in 1',
+			'hk_audit'			=> 'db config.hk_audit|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -39,7 +39,7 @@ class CControllerAuditSettingsUpdate extends CController {
 							->getUrl()
 					);
 					$response->setFormData($this->getInputAll() + [
-						'audit_logging_enabled' => '0',
+						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '0'
 					]);
 					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
@@ -65,7 +65,7 @@ class CControllerAuditSettingsUpdate extends CController {
 			$housekeeping[CHousekeepingHelper::HK_AUDIT] = $this->getInput('hk_audit');
 		}
 
-		$settings = [CSettingsHelper::AUDIT_LOGGING_ENABLED => $this->getInput('audit_logging_enabled', 0)];
+		$settings = [CSettingsHelper::AUDITLOG_ENABLED => $this->getInput('auditlog_enabled', 0)];
 
 		$result_housekeeping = API::Housekeeping()->update($housekeeping);
 		$result_settings = API::Settings()->update($settings);

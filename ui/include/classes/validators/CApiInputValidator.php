@@ -201,6 +201,9 @@ class CApiInputValidator {
 
 			case API_UUID:
 				return self::validateUuid($rule, $data, $path, $error);
+
+			case API_CUID:
+				return self::validateCuid($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -259,6 +262,7 @@ class CApiInputValidator {
 			case API_DATE:
 			case API_NUMERIC_RANGES:
 			case API_UUID:
+			case API_CUID:
 				return true;
 
 			case API_OBJECT:
@@ -2271,6 +2275,44 @@ class CApiInputValidator {
 		}
 
 		$data = strtolower($data);
+
+		return true;
+	}
+
+	/**
+	 * Cuid validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateCuid(array $rule, &$data, string $path, string &$error): bool {
+		$CUID_LENGTH = 25;
+
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+
+		if (substr($data, 0, 1) != 'c') {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('CUID is expected'));
+			return false;
+		}
+
+		if (strlen($data) != $CUID_LENGTH) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('must be %1$s characters long', $CUID_LENGTH));
+			return false;
+		}
 
 		return true;
 	}

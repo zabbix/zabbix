@@ -2802,7 +2802,7 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 			actionid);
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID | ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE |
-			ZBX_CONFIG_FLAGS_AUDIT_LOGGING_ENABLED);
+			ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
 	zbx_audit_init(&cfg);
 
 	while (NULL != (row = DBfetch(result)))

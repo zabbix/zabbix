@@ -20,6 +20,8 @@
 
 
 class CAudit {
+	private CONST AUIDTLOG_ENABLE = 1;
+
 	/**
 	 * Supported resources list, every record contains:
 	 * resource id field name
@@ -41,10 +43,13 @@ class CAudit {
 		AUDIT_RESOURCE_HOST_PROTOTYPE =>		['hostid', 'host', 'hosts'],
 		AUDIT_RESOURCE_HOUSEKEEPING =>			['configid', null, 'config'],
 		AUDIT_RESOURCE_ICON_MAP =>				['iconmapid', 'name', 'icon_map'],
+		AUDIT_RESOURCE_IMAGE =>					['imageid', 'name', 'images'],
+		AUDIT_RESOURCE_IT_SERVICE =>			['serviceid', 'name', 'services'],
 		AUDIT_RESOURCE_ITEM =>					['itemid', 'name', 'items'],
 		AUDIT_RESOURCE_ITEM_PROTOTYPE =>		['itemid', 'name', 'items'],
 		AUDIT_RESOURCE_MACRO =>					['globalmacroid', 'macro', 'globalmacro'],
 		AUDIT_RESOURCE_MAINTENANCE =>			['maintenanceid', 'name', 'maintenances'],
+		AUDIT_RESOURCE_MAP =>					['sysmapid', 'name', 'sysmaps'],
 		AUDIT_RESOURCE_MEDIA_TYPE =>			['mediatypeid', 'name', 'media_type'],
 		AUDIT_RESOURCE_MODULE =>				['moduleid', 'id', 'module'],
 		AUDIT_RESOURCE_PROXY =>					['proxyid', 'host', 'hosts'],
@@ -183,11 +188,10 @@ class CAudit {
 			return;
 		}
 
-		if (CSettingsHelper::get(CSettingsHelper::AUDIT_LOGGING_ENABLED) != 1) {
+		if (CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) != self::AUIDTLOG_ENABLE) {
 			return;
 		}
 
-		$auditid = generateCuid();
 		$recordsetid = generateCuid();
 
 		list($field_name_resourceid, $field_name_resourcename) = self::$supported_type[$resourcetype];
@@ -217,8 +221,8 @@ class CAudit {
 			}
 
 			$auditlog[] = [
-				'auditid' => $auditid,
 				'userid' => $userid,
+				'username' => CWebUser::$data['username'],
 				'clock' => $clock,
 				'ip' => $ip,
 				'action' => $action,
@@ -231,7 +235,7 @@ class CAudit {
 		}
 
 		if ($auditlog) {
-			DB::insertBatch('auditlog', $auditlog, false);
+			DB::insertBatch('auditlog', $auditlog);
 		}
 	}
 }

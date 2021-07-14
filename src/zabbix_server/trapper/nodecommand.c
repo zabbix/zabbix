@@ -501,9 +501,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		else
 			perror = error;
 
-		ret = zbx_auditlog_global_script(script.type, script.execute_on, script.command_orig, host.hostid,
-				host.name, eventid, host.proxy_hostid, user->userid, user->username, clientip, poutput,
-				perror);
+		if (SUCCEED == ret && SUCCEED != (ret = zbx_auditlog_global_script(script.type, script.execute_on,
+				script.command_orig, host.hostid, host.name, eventid, host.proxy_hostid,
+				user->userid, user->username, clientip, poutput, perror)))
+		{
+			zbx_strlcpy(error, "Script execution succeeded, but audit operation failed", sizeof(error));
+		}
 	}
 fail:
 	if (SUCCEED != ret)

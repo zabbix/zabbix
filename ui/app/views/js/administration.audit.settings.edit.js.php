@@ -55,9 +55,9 @@
 								.prev('.msg-bad')
 								.remove();
 
-							$('#audit_logging_enabled')
+							$('#auditlog_enabled')
 								.prop('checked',
-									<?= (DB::getDefault('config', 'audit_logging_enabled') == 1) ? 'true' : 'false' ?>
+									<?= (DB::getDefault('config', 'auditlog_enabled') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
 							$('#hk_audit_mode')

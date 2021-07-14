@@ -446,7 +446,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => [
 						'Host for tags filtering',
 						'Host for tags filtering - clone',
-						'Host for tags filtering - update',
+						'Host for tags filtering - update'
 					]
 				]
 			],
@@ -526,7 +526,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => [
 						'Host for tags filtering',
 						'Host for tags filtering - clone',
-						'Host for tags filtering - update',
+						'Host for tags filtering - update'
 					]
 				]
 			],

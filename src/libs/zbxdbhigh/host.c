@@ -5269,7 +5269,7 @@ void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 	DB_ROW		row;
 	zbx_config_t	cfg;
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDIT_LOGGING_ENABLED);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
 
 	result = DBselect("select inventory_mode from host_inventory where hostid=" ZBX_FS_UI64, hostid);
 

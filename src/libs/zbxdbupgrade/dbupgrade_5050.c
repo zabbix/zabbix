@@ -86,12 +86,15 @@ static int	DBpatch_5050006(void)
 	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog' and field_name='auditid'"))
 		return FAIL;
 
+	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog_details' and field_name='auditdetailid'"))
+		return FAIL;
+
 	return SUCCEED;
 }
 
 static int	DBpatch_5050007(void)
 {
-	const ZBX_FIELD	field = {"audit_logging_enabled", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"auditlog_enabled", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }

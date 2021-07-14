@@ -253,15 +253,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		if (hasRequest('graphid')) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH,
-				'Graph ID ['.$graph['graphid'].'] Graph ['.getRequest('name').']'
-			);
-		}
-		else {
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.getRequest('name').']');
-		}
-
 		unset($_REQUEST['form']);
 	}
 

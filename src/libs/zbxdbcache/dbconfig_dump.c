@@ -73,7 +73,7 @@ static void	DCdump_config(void)
 
 	zabbix_log(LOG_LEVEL_TRACE, "  default timezone '%s'", config->config->default_timezone);
 
-	zabbix_log(LOG_LEVEL_TRACE, "  audit_logging_enabled: %d", config->config->audit_logging_enabled);
+	zabbix_log(LOG_LEVEL_TRACE, "  auditlog_enabled: %d", config->config->auditlog_enabled);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
