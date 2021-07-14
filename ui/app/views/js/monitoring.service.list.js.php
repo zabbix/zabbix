@@ -73,23 +73,15 @@
 		},
 
 		initActionButtons() {
-			for (const element of document.querySelectorAll('.js-create-service, .js-add-child-service')) {
-				let popup_options = {};
-
-				if (element.dataset.serviceid !== undefined) {
-					popup_options = {
-						parent_serviceids: [element.dataset.serviceid]
-					};
-				}
-
-				element.addEventListener('click', (e) => {
-					PopUp('popup.service.edit', popup_options, 'service_edit', e.target);
-				});
-			}
-
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-service')) {
-					PopUp('popup.service.edit', {serviceid: e.target.dataset.serviceid}, 'service_edit', e.target);
+				if (e.target.classList.contains('js-create-service')) {
+					this.edit();
+				}
+				else if (e.target.classList.contains('js-add-child-service')) {
+					this.edit({parent_serviceids: [e.target.dataset.serviceid]});
+				}
+				else if (e.target.classList.contains('js-edit-service')) {
+					this.edit({serviceid: e.target.dataset.serviceid});
 				}
 				else if (e.target.classList.contains('js-remove-service')) {
 					if (window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
@@ -106,6 +98,22 @@
 
 		initRefresh() {
 			setInterval(() => this.refresh(), this.refresh_interval);
+		},
+
+		edit(options = {}) {
+			this.pauseRefresh();
+
+			PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
+
+			const overlay_close = (e, data) => {
+				if (data.dialogueid === 'service_edit') {
+					this.resumeRefresh();
+
+					jQuery.unsubscribe('overlay.close', overlay_close);
+				}
+			};
+
+			jQuery.subscribe('overlay.close', overlay_close);
 		},
 
 		pauseRefresh() {
@@ -127,8 +135,6 @@
 				return;
 			}
 
-			clearMessages();
-
 			this.is_refresh_pending = true;
 
 			service_list.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
@@ -136,6 +142,8 @@
 			fetch(this.refresh_url)
 				.then((response) => response.json())
 				.then((response) => {
+					clearMessages();
+
 					if ('errors' in response) {
 						addMessage(response.errors);
 					}
