@@ -32,6 +32,8 @@ class CService extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	private const AUDIT_RESOURCE = AUDIT_RESOURCE_IT_SERVICE;
+
 	protected $tableName = 'services';
 	protected $tableAlias = 's';
 	protected $sortColumns = ['sortorder', 'name'];
@@ -150,6 +152,13 @@ class CService extends CApiService {
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services,  __FUNCTION__);
 
+		foreach ($services as $serviceid => &$service) {
+			$service['serviceid'] = $serviceid;
+		}
+		unset($service);
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $services);
+
 		return ['serviceids' => $serviceids];
 	}
 
@@ -241,6 +250,8 @@ class CService extends CApiService {
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services, __FUNCTION__);
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $services, $db_services);
+
 		return ['serviceids' => array_column($services, 'serviceid')];
 	}
 
@@ -327,17 +338,19 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$count = $this->get([
-			'countOutput' => true,
+		$db_services = $this->get([
+			'output' => ['serviceid', 'name'],
 			'serviceids' => $serviceids,
 			'editable' => true
 		]);
 
-		if ($count != count($serviceids)) {
+		if (count($db_services) != count($serviceids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		DB::delete('services', ['serviceid' => $serviceids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, self::AUDIT_RESOURCE, $db_services);
 
 		return ['serviceids' => $serviceids];
 	}
