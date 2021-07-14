@@ -259,7 +259,7 @@ class CApiService {
 
 			// if an array of fields is passed, check if the field is present in the array
 			default:
-				return in_array($field, $output);
+				return is_array($output) ? in_array($field, $output) : false;
 		}
 	}
 
