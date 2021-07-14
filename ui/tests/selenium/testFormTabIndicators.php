@@ -854,19 +854,18 @@ class testFormTabIndicators extends CWebTest {
 		$child_services_tab->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
 
-		// Open Time tab and check count indicator.
+		// Open SLA tab and check count indicator.
 		$form->selectTab('SLA');
-		$tab_selector = $form->query('id:sla-tab')->one();
-		$this->assertTabIndicator($tab_selector, 0);
+		$tab_selector = $form->query('id:tab_sla-tab')->one();
+		$this->assertTabIndicator($tab_selector, false);
 
-		// Add a time period and check count indicator.
-		$form->getFieldContainer('Service times')->query('button:Add')->one()->click();
-		$form->getField('Period type')->select('One-time downtime');
-		$this->assertTabIndicator($tab_selector, 1);
+		// Add show sla and check status indicator.
+		$form->query('id:showsla')->one()->click();
+		$this->assertTabIndicator($tab_selector, true);
 
-		// Remove the added time period and check count indicator.
-		$form->getFieldContainer('Service times')->query('button:Remove')->one()->click();
-		$this->assertTabIndicator($tab_selector, 0);
+		// Remove the show sla  and check status indicator.
+		$form->query('id:showsla')->one()->click();
+		$this->assertTabIndicator($tab_selector, false);
 	}
 
 	/*
