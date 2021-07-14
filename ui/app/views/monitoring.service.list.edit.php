@@ -61,10 +61,12 @@ $filter = (new CFilter())
 if ($data['service'] !== null && !$data['is_filtered']) {
 	$parents = [];
 	while ($parent = array_shift($data['service']['parents'])) {
-		$parents[] = (new CLink($parent['name'], (new CUrl('zabbix.php'))
-			->setArgument('action', 'service.list.edit')
-			->setArgument('serviceid', $parent['serviceid'])
+		$parents[] = (new CLink($parent['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'service.list.edit')
+				->setArgument('serviceid', $parent['serviceid'])
 		))->setAttribute('data-serviceid', $parent['serviceid']);
+
 		$parents[] = CViewHelper::showNum($parent['children']);
 
 		if (!$data['service']['parents']) {

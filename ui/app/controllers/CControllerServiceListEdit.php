@@ -57,6 +57,14 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 	protected function doAction(): void {
 		parent::doAction();
 
+		$profile_serviceid = $this->service !== null
+			? $this->service['serviceid']
+			: (string) self::WITHOUT_PARENTS_SERVICEID;
+
+		$uncheck = $this->hasInput('uncheck') || CProfile::get('web.service.list.serviceid') !== $profile_serviceid;
+
+		CProfile::update('web.service.list.serviceid', $profile_serviceid, PROFILE_TYPE_ID);
+
 		$path = $this->getPath();
 
 		$filter = [
@@ -118,7 +126,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
 
 		$data = [
-			'uncheck' => $this->hasInput('uncheck'),
+			'uncheck' => $uncheck,
 			'path' => $path,
 			'breadcrumbs' => $this->getBreadcrumbs($path, $is_filtered),
 			'filter' => $filter,
