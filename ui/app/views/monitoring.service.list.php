@@ -90,7 +90,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 							->addClass(ZBX_STYLE_SERVICE_INFO)
 							->addClass($service_status_style_class)
 							->addItem([
-								(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME)
+								(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME),
+								(new CDiv())
 							])
 							->addItem([
 								(new CDiv(_('Parents')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
