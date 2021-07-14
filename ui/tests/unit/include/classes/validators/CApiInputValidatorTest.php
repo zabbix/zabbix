@@ -4077,19 +4077,19 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
 				'skr3d7iov0013ld1pbi9r18dg',
 				'/',
-				'Invalid parameter "/": CUID is expected.'
+				'Invalid parameter "/": an array is expected.'
 			],
 			[
 				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
 				'Ckr3d7iov0013ld1pbi9r18dg',
 				'/',
-				'Invalid parameter "/": CUID is expected.'
+				'Invalid parameter "/": an array is expected.'
 			],
 			[
 				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
 				'ckr3d7iov0013ld1pbi9r18d',
 				'/',
-				'Invalid parameter "/": must be 25 characters long.'
+				'Invalid parameter "/": an array is expected.'
 			],
 			[
 				['type' => API_CUIDS],
@@ -4147,19 +4147,19 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_CUID],
-				'Cr3d7iou000wld1pcx24d56a',
+				'Ckr3d7iou000wld1pcx24d56a',
 				'/',
 				'Invalid parameter "/": CUID is expected.'
 			],
 			[
 				['type' => API_CUID],
-				'cr3d7iou000wld1pcx24d56a2',
+				'ckr3d7iou000wld1pcx24d56a2',
 				'/',
 				'Invalid parameter "/": must be 25 characters long.'
 			],
 			[
 				['type' => API_CUID],
-				'cr3d7iou000wld1pcx24d56',
+				'ckr3d7iou000wld1pcx24d56',
 				'/',
 				'Invalid parameter "/": must be 25 characters long.'
 			],
