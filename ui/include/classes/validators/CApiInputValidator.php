@@ -202,6 +202,9 @@ class CApiInputValidator {
 			case API_UUID:
 				return self::validateUuid($rule, $data, $path, $error);
 
+			case API_CUIDS:
+				return self::validateCuids($rule, $data, $path, $error);
+
 			case API_CUID:
 				return self::validateCuid($rule, $data, $path, $error);
 		}
@@ -279,6 +282,7 @@ class CApiInputValidator {
 			case API_IDS:
 			case API_STRINGS_UTF8:
 			case API_INTS32:
+			case API_CUIDS:
 				return self::validateStringsUniqueness($rule, $data, $path, $error);
 
 			case API_OBJECTS:
@@ -2280,29 +2284,73 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Cuid validator.
+	 * Array of CUIDS validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
 	 *
 	 * @return bool
 	 */
-	private static function validateCuid(array $rule, &$data, string $path, string &$error): bool {
-		$CUID_LENGTH = 25;
-
+	private static function validateCuids(array $rule, &$data, string $path, ?string &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (($flags & API_NORMALIZE) && self::validateCuid([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && !$data) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		$data = array_values($data);
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateCuid([], $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
+
+		return true;
+	}
+
+	/**
+	 * CUID validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']  (optional) API_ALLOW_NULL, API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateCuid(array $rule, &$data, string $path, ?string &$error): bool {
+		$CUID_LENGTH = 25;
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
 
 		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
-
-		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
-			return true;
-		}
-
 
 		if (substr($data, 0, 1) != 'c') {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('CUID is expected'));

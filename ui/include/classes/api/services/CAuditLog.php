@@ -95,10 +95,10 @@ class CAuditLog extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
-			'auditids' =>				['type' => API_CUID, 'flags' => API_ALLOW_NULL | API_NORMALIZE,'default' => null],
+			'auditids' =>				['type' => API_CUIDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'userids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'auditid' =>				['type' => API_CUID, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'auditid' =>				['type' => API_CUIDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'action' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $actions)],
