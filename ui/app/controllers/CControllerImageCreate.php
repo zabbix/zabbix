@@ -116,8 +116,6 @@ class CControllerImageCreate extends CController {
 		]);
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$this->getInput('name').'] created');
-
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $this->getInput('imagetype'))

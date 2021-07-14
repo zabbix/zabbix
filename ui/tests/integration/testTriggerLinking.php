@@ -109,7 +109,7 @@ class testTriggerLinking extends CIntegrationTest {
 					'optemplate' =>
 					$templateids_for_api_call
 				]
-			],
+			]
 		]
 		);
 

@@ -148,7 +148,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 					CTagFilterFieldHelper::getTagFilterField([
 						'evaltype' => $data['filter']['evaltype'],
 						'tags' => $data['filter']['tags'] ?: [
-							['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
+							['tag' => '', 'value' => '', 'operator' => SERVICE_TAG_OPERATOR_LIKE]
 						]
 					])
 				)
