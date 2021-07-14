@@ -1067,6 +1067,9 @@ static int	housekeeping_events(int now)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &cfg.hk.events_discovery},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_AUTOREGISTRATION)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &cfg.hk.events_autoreg},
+		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_SERVICE)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_SERVICE)
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_service},
 		{NULL}
 	};
 
