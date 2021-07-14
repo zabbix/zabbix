@@ -4152,7 +4152,6 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					get_event_value(m, event, &replace_to, userid, r_event, tz);
 				}
-
 				else if (0 == strcmp(m, MVAR_SERVICE_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->service->name);
