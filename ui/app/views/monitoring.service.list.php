@@ -164,6 +164,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 						? (new CRadioButtonList('list_mode', ZBX_LIST_MODE_VIEW))
 							->addValue(_('View'), ZBX_LIST_MODE_VIEW)
 							->addValue(_('Edit'), ZBX_LIST_MODE_EDIT)
+							->disableAutocomplete()
 							->setModern(true)
 						: null
 				)

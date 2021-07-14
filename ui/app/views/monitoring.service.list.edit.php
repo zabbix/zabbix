@@ -197,6 +197,7 @@ $filter->addFilterTab(_('Filter'), [
 					(new CRadioButtonList('list_mode', ZBX_LIST_MODE_EDIT))
 						->addValue(_('View'), ZBX_LIST_MODE_VIEW)
 						->addValue(_('Edit'), ZBX_LIST_MODE_EDIT)
+						->disableAutocomplete()
 						->setModern(true)
 				)
 		))->setAttribute('aria-label', _('Content controls'))
