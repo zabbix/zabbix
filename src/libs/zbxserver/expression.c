@@ -2335,13 +2335,27 @@ static void	rootcause_free(zbx_rootcause_t *rootcause)
 	zbx_free(rootcause->tags);
 }
 
-static int	rootcause_compare_asc_func(const zbx_rootcause_t *d1, const zbx_rootcause_t *d2)
+/******************************************************************************
+ *                                                                            *
+ * Function: rootcause_compare                                                *
+ *                                                                            *
+ * Purpose: compare root cause to sort by highest severity and host name      *
+ *                                                                            *
+ ******************************************************************************/
+static int	rootcause_compare(const zbx_rootcause_t *d1, const zbx_rootcause_t *d2)
 {
 	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
 
 	return strcmp(d1->host, d2->host);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_rootcause                                                    *
+ *                                                                            *
+ * Purpose: get root cause of service being in problem state                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	get_rootcause(const DB_SERVICE *service, char **replace_to)
 {
 	int			i;
@@ -2375,7 +2389,7 @@ fail:
 			zbx_vector_rootcause_append(&rootcauses, rootcause);
 	}
 
-	zbx_vector_rootcause_sort(&rootcauses, (zbx_compare_func_t)rootcause_compare_asc_func);
+	zbx_vector_rootcause_sort(&rootcauses, (zbx_compare_func_t)rootcause_compare);
 
 	for (i = 0; i < rootcauses.values_num; i++)
 	{
