@@ -461,6 +461,7 @@ function getHttpTestTags(array $data): array {
 				'preservekeys' => true
 			])
 			: [];
+
 		$inherited_tags = [];
 
 		// Make list of template tags.
