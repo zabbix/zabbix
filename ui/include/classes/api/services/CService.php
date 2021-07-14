@@ -237,7 +237,6 @@ class CService extends CApiService {
 				];
 			}
 		}
-		unset($service);
 
 		if ($upd_services) {
 			DB::update('services', $upd_services);
