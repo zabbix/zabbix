@@ -179,7 +179,7 @@ $filter->addFilterTab(_('Filter'), [
 				CTagFilterFieldHelper::getTagFilterField([
 					'evaltype' => $data['filter']['evaltype'],
 					'tags' => $data['filter']['tags'] ?: [
-						['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
+						['tag' => '', 'value' => '', 'operator' => SERVICE_TAG_OPERATOR_LIKE]
 					]
 				])
 			])

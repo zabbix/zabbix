@@ -98,10 +98,10 @@ $service_tab = (new CFormGrid())
 										->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 									(new CSelect('problem_tags[#{rowNum}][operator]'))
 										->addOptions(CSelect::createOptionsFromArray([
-											TAG_OPERATOR_EQUAL => _('Equals'),
-											TAG_OPERATOR_LIKE => _('Contains')
+											SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
+											SERVICE_TAG_OPERATOR_LIKE => _('Contains')
 										]))
-										->setValue(TAG_OPERATOR_LIKE),
+										->setValue(SERVICE_TAG_OPERATOR_LIKE),
 									(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
 										DB::getFieldLength('service_problem_tag', 'value')
 									))

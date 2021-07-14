@@ -180,7 +180,7 @@ class CService extends CApiService {
 			]],
 			'problem_tags' =>	['type' => API_OBJECTS, 'uniq' => [['tag']], 'fields' => [
 				'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_problem_tag', 'tag')],
-				'operator' =>		['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
+				'operator' =>		['type' => API_INT32, 'in' => implode(',', [SERVICE_TAG_OPERATOR_EQUAL, SERVICE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
 				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_problem_tag', 'value'), 'default' => DB::getDefault('service_problem_tag', 'value')]
 			]],
 			'parents' =>		['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
@@ -275,7 +275,7 @@ class CService extends CApiService {
 			]],
 			'problem_tags' =>	['type' => API_OBJECTS, 'uniq' => [['tag']], 'fields' => [
 				'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_problem_tag', 'tag')],
-				'operator' =>		['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
+				'operator' =>		['type' => API_INT32, 'in' => implode(',', [SERVICE_TAG_OPERATOR_EQUAL, SERVICE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
 				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_problem_tag', 'value'), 'default' => DB::getDefault('service_problem_tag', 'value')]
 			]],
 			'parents' =>		['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
