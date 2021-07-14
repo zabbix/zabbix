@@ -24,6 +24,8 @@
  */
 class CApiInputValidator {
 
+	private const CUID_LENGTH = 25;
+
 	/**
 	 * Base validation function.
 	 *
@@ -2287,7 +2289,7 @@ class CApiInputValidator {
 	 * Array of CUIDS validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
+	 * @param int    $rule['flags']  (optional) API_ALLOW_NULL, API_NORMALIZE
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -2311,11 +2313,6 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (($flags & API_NOT_EMPTY) && !$data) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
-			return false;
-		}
-
 		$data = array_values($data);
 
 		foreach ($data as $index => &$value) {
@@ -2333,7 +2330,6 @@ class CApiInputValidator {
 	 * CUID validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_ALLOW_NULL, API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -2341,24 +2337,17 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateCuid(array $rule, &$data, string $path, ?string &$error): bool {
-		$CUID_LENGTH = 25;
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (($flags & API_ALLOW_NULL) && $data === null) {
-			return true;
-		}
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
 			return false;
 		}
 
-		if (substr($data, 0, 1) != 'c') {
+		if (strlen($data) != self::CUID_LENGTH) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('must be %1$s characters long', self::CUID_LENGTH));
+			return false;
+		}
+
+		if ($data[0] !== 'c') {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('CUID is expected'));
-			return false;
-		}
-
-		if (strlen($data) != $CUID_LENGTH) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('must be %1$s characters long', $CUID_LENGTH));
 			return false;
 		}
 
