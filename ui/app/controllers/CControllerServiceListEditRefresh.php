@@ -115,6 +115,11 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 				->setArgument('filter_tags', $filter['tags']);
 		}
 
+		$data['back_url'] = (clone $paging_curl)
+			->setArgument('action', 'service.list.edit')
+			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
+			->getUrl();
+
 		$page_num = $this->getInput('page', 1);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 

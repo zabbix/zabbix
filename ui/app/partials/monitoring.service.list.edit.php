@@ -25,7 +25,8 @@
 
 $form = (new CForm())
 	->setId('service-list')
-	->setName('service-list');
+	->setName('service-list')
+	->addVar('back_url', $data['back_url']);
 
 $header = [
 	(new CColHeader(
@@ -115,13 +116,12 @@ foreach ($data['services'] as $serviceid => $service) {
 
 $action_buttons = new CActionButtonList('action', 'serviceids', [
 	'popup.massupdate.service' => [
-		'content' => (new CButton('', _('Mass update')))
-			->removeAttribute('id')
+		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->onClick('openMassupdatePopup(this, "popup.massupdate.service");')
+			->addClass('js-massupdate-service')
 	],
 	'service.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected services?')]
-]);
+], 'service');
 
 $form
 	->addItem([$table, $data['paging'], $action_buttons])

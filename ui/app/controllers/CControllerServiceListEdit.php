@@ -27,6 +27,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 	protected function checkInput(): bool {
 		$fields = [
+			'uncheck' =>						'in 1',
 			'serviceid' =>						'db services.serviceid',
 			'path' =>							'array',
 			'filter_name' =>					'string',
@@ -108,11 +109,16 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			->removeArgument('filter_without_problem_tags')
 			->removeArgument('filter_tag_source');
 
+		$back_curl = (clone $paging_curl)
+			->setArgument('action', 'service.list.edit')
+			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
+
 		$refresh_curl = (clone $paging_curl)
 			->setArgument('action', 'service.list.edit.refresh')
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
 
 		$data = [
+			'uncheck' => $this->hasInput('uncheck'),
 			'path' => $path,
 			'breadcrumbs' => $this->getBreadcrumbs($path, $is_filtered),
 			'filter' => $filter,
@@ -120,6 +126,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
 			'reset_curl' => $reset_curl,
 			'view_mode_url' => $view_mode_curl->getUrl(),
+			'back_url' => $back_curl->getUrl(),
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),

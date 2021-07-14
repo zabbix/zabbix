@@ -24,6 +24,10 @@
  * @var array $data
  */
 
+if ($data['uncheck']) {
+	uncheckTableRows('service');
+}
+
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.calendar.js');
@@ -207,7 +211,7 @@ $filter->addFilterTab(_('Filter'), [
 	)
 	->addItem($filter)
 	->addItem(new CPartial('monitoring.service.list.edit', array_intersect_key($data, array_flip([
-		'path', 'is_filtered', 'max_in_table', 'service', 'services', 'tags', 'paging'
+		'path', 'is_filtered', 'max_in_table', 'service', 'services', 'tags', 'paging', 'back_url'
 	]))))
 	->show();
 
@@ -217,7 +221,8 @@ $filter->addFilterTab(_('Filter'), [
 			'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
 			'mode_switch_url' => $data['view_mode_url'],
 			'refresh_url' => $data['refresh_url'],
-			'refresh_interval' => $data['refresh_interval']
+			'refresh_interval' => $data['refresh_interval'],
+			'back_url' => $data['back_url']
 		]).
 	');'
 ))

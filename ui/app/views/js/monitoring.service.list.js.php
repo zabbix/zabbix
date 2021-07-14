@@ -34,14 +34,16 @@
 		mode_switch_url: null,
 		refresh_url: null,
 		refresh_interval: null,
+		back_url: null,
 		is_refresh_paused: false,
 		is_refresh_pending: false,
 
-		init({serviceid, mode_switch_url, refresh_url, refresh_interval}) {
+		init({serviceid, mode_switch_url, refresh_url, refresh_interval, back_url = null}) {
 			this.serviceid = serviceid;
 			this.mode_switch_url = mode_switch_url;
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
+			this.back_url = back_url;
 
 			this.initViewModeSwitcher();
 			this.initTagFilter();
@@ -85,19 +87,24 @@
 				}
 				else if (e.target.classList.contains('js-remove-service')) {
 					if (window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
-						const url_delete = new Curl('zabbix.php', false);
+						const curl = new Curl('zabbix.php', false);
 
-						url_delete.setArgument('action', 'service.delete');
-						url_delete.setArgument('serviceids', [e.target.dataset.serviceid]);
+						curl.setArgument('action', 'service.delete');
+						curl.setArgument('serviceids', [e.target.dataset.serviceid]);
 
-						redirect(url_delete.getUrl(), 'post', 'sid', true, true);
+						redirect(curl.getUrl(), 'post', 'sid', true, true);
 					}
+				}
+				else if (e.target.classList.contains('js-massupdate-service')) {
+					openMassupdatePopup(e.target, 'popup.massupdate.service', {location_url: this.back_url});
 				}
 			});
 		},
 
 		initRefresh() {
-			setInterval(() => this.refresh(), this.refresh_interval);
+			if (this.refresh_interval > 0) {
+				setInterval(() => this.refresh(), this.refresh_interval);
+			}
 		},
 
 		edit(options = {}) {

@@ -29,19 +29,17 @@ class CControllerPopupMassupdateService extends CController {
 			'update' =>				'in 1',
 			'visible' =>			'array',
 			'tags' =>				'array',
-			'mass_update_tags' =>	'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE])
+			'mass_update_tags' =>	'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
+			'location_url' => 		'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
 			);
 		}
 
@@ -150,9 +148,7 @@ class CControllerPopupMassupdateService extends CController {
 			if ($result) {
 				$output = ['title' => _('Services updated')];
 
-				$messages = CMessageHelper::getMessages();
-
-				if ($messages) {
+				if ($messages = CMessageHelper::getMessages()) {
 					$output['messages'] = array_column($messages, 'message');
 				}
 			}
@@ -175,9 +171,7 @@ class CControllerPopupMassupdateService extends CController {
 					'debug_mode' => $this->getDebugMode()
 				],
 				'ids' => $this->getInput('ids'),
-				'location_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'service.list.edit')
-					->getUrl()
+				'location_url' => $this->getInput('location_url')
 			];
 
 			$this->setResponse(new CControllerResponseData($data));

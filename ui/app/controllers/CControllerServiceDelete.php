@@ -23,7 +23,8 @@ class CControllerServiceDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'serviceids' => 'required|array_db services.serviceid'
+			'serviceids' =>	'required|array_db services.serviceid',
+			'back_url' =>	'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -54,22 +55,16 @@ class CControllerServiceDelete extends CController {
 
 		$result = API::Service()->delete($serviceids);
 
-		$response = new CControllerResponseRedirect(
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'service.list')
-				->setArgument('page', CPagerHelper::loadPage('service.list', null))
-		);
-
 		$deleted = count($serviceids);
+
+		$response = new CControllerResponseRedirect($this->getInput('back_url'));
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_n('Service deleted', 'Services deleted', $deleted));
 		}
 		else {
-			CMessageHelper::setErrorTitle(
-				_n('Cannot delete service', 'Cannot delete services', $deleted)
-			);
+			CMessageHelper::setErrorTitle(_n('Cannot delete service', 'Cannot delete services', $deleted));
 		}
 
 		$this->setResponse($response);
