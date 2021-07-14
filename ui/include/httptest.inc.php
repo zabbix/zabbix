@@ -451,7 +451,6 @@ function userAgents() {
  */
 function getHttpTestTags(array $data): array {
 	$tags = array_key_exists('tags', $data) ? $data['tags'] : [];
-	$inherited_tags = [];
 
 	if ($data['show_inherited_tags']) {
 		$db_templates = $data['templates']
@@ -462,6 +461,7 @@ function getHttpTestTags(array $data): array {
 				'preservekeys' => true
 			])
 			: [];
+		$inherited_tags = [];
 
 		// Make list of template tags.
 		foreach ($data['templates'] as $templateid => $template) {
@@ -469,11 +469,6 @@ function getHttpTestTags(array $data): array {
 				foreach ($db_templates[$templateid]['tags'] as $tag) {
 					if (array_key_exists($tag['tag'], $inherited_tags)
 							&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-
-						if (!array_key_exists('parent_templates', $inherited_tags[$tag['tag']][$tag['value']])) {
-							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] = [];
-						}
-
 						$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
 							$templateid => $template
 						];
