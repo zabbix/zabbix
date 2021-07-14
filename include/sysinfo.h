@@ -360,6 +360,20 @@ zbx_mpoint_t;
 #define ZBX_SYSINFO_TAG_PFREE			"pfree"
 #define ZBX_SYSINFO_TAG_PUSED			"pused"
 
+#define ZBX_SYSINFO_FILE_TAG_TYPE		"type"
+#define ZBX_SYSINFO_FILE_TAG_USER		"user"
+#define ZBX_SYSINFO_FILE_TAG_GROUP		"group"
+#define ZBX_SYSINFO_FILE_TAG_PERMISSIONS	"permissions"
+#define ZBX_SYSINFO_FILE_TAG_SID		"SID"
+#define ZBX_SYSINFO_FILE_TAG_UID		"uid"
+#define ZBX_SYSINFO_FILE_TAG_GID		"gid"
+#define ZBX_SYSINFO_FILE_TAG_SIZE		"size"
+#define ZBX_SYSINFO_FILE_TAG_TIME		"time"
+#define ZBX_SYSINFO_FILE_TAG_TIMESTAMP		"timestamp"
+#define ZBX_SYSINFO_FILE_TAG_TIME_ACCESS	"access"
+#define ZBX_SYSINFO_FILE_TAG_TIME_MODIFY	"modify"
+#define ZBX_SYSINFO_FILE_TAG_TIME_CHANGE	"change"
+
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 

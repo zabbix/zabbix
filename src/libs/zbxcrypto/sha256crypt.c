@@ -18,24 +18,10 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #endif
 #include <errno.h>
 #include <limits.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
 #include <sys/types.h>
-
-
-/* Structure to save state of computation between the single steps.  */
-struct sha256_ctx
-{
-	uint32_t H[8];
-
-	uint32_t total[2];
-	uint32_t buflen;
-	char buffer[128];	/* NB: always correctly aligned for uint32_t.  */
-};
-
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 # define SWAP(n) \
@@ -75,7 +61,7 @@ static const uint32_t K[64] =
 /* Process LEN bytes of BUFFER, accumulating context into CTX.
 It is assumed that LEN % 64 == 0.  */
 static void
-sha256_process_block (const void *buffer, size_t len, struct sha256_ctx *ctx)
+sha256_process_block (const void *buffer, size_t len, sha256_ctx *ctx)
 {
 	const uint32_t *words = buffer;
 	size_t nwords = len / sizeof (uint32_t);
@@ -177,8 +163,8 @@ cyclic rotation.  Hope the C compiler is smart enough.  */
 
 /* Initialize structure containing state of computation.
 (FIPS 180-2:5.3.2)  */
-static void
-sha256_init_ctx (struct sha256_ctx *ctx)
+void
+zbx_sha256_init_ctx (sha256_ctx *ctx)
 {
 	ctx->H[0] = 0x6a09e667;
 	ctx->H[1] = 0xbb67ae85;
@@ -199,8 +185,8 @@ prolog according to the standard and write the result to RESBUF.
 
 IMPORTANT: On some systems it is required that RESBUF is correctly
 aligned for a 32 bits value.  */
-static void *
-sha256_finish_ctx (struct sha256_ctx *ctx, void *resbuf)
+void *
+zbx_sha256_finish_ctx (sha256_ctx *ctx, void *resbuf)
 {
 	/* Take yet unprocessed bytes into account.  */
 	uint32_t bytes = ctx->buflen;
@@ -231,8 +217,8 @@ sha256_finish_ctx (struct sha256_ctx *ctx, void *resbuf)
 }
 
 
-static void
-sha256_process_bytes (const void *buffer, size_t len, struct sha256_ctx *ctx)
+void
+zbx_sha256_process_bytes (const void *buffer, size_t len, sha256_ctx *ctx)
 {
 	/* When we already have some bits in our internal buffer concatenate
 	both inputs first.  */
@@ -302,9 +288,10 @@ compilers don't.  */
 
 void	zbx_sha256_hash(const char *in, char *out)
 {
-	struct	sha256_ctx ctx;
-	sha256_init_ctx (&ctx);
-	sha256_process_bytes (in, strlen (in), &ctx);
-	sha256_finish_ctx (&ctx, out);
+	sha256_ctx ctx;
+
+	zbx_sha256_init_ctx (&ctx);
+	zbx_sha256_process_bytes (in, strlen (in), &ctx);
+	zbx_sha256_finish_ctx (&ctx, out);
 }
 

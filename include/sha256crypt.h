@@ -20,8 +20,23 @@
 #ifndef ZABBIX_SHA256CRYPT_H
 #define ZABBIX_SHA256CRYPT_H
 
+#include "common.h"
+
 #define ZBX_SHA256_DIGEST_SIZE	32
 
+/* Structure to save state of computation between the single steps.  */
+typedef struct
+{
+	uint32_t H[8];
+
+	uint32_t total[2];
+	uint32_t buflen;
+	char buffer[128];	/* NB: always correctly aligned for uint32_t.  */
+} sha256_ctx;
+
+void	zbx_sha256_init_ctx (sha256_ctx *ctx);
+void	zbx_sha256_process_bytes(const void *buffer, size_t len, sha256_ctx *ctx);
+void	*zbx_sha256_finish_ctx (sha256_ctx *ctx, void *resbuf);
 void	zbx_sha256_hash(const char *in, char *out);
 
 #endif /* ZABBIX_SHA256CRYPT_H */
