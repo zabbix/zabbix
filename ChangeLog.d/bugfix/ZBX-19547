@@ -1,1 +1,1 @@
-A.F....... [ZBX-19547] fixed inherited tags in Web Scenario for Host showing template tags; hid tags from other templates on linked template's Web Scenario (jfreibergs)
+..F....... [ZBX-19547] fixed displaying of web scenarios' inherited tags (jfreibergs)
