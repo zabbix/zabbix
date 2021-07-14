@@ -149,7 +149,7 @@ class CControllerPopupServiceEdit extends CController {
 					: [['tag' => '', 'value' => '']],
 				'problem_tags' => ($this->service !== null && $this->service['problem_tags'])
 					? $this->service['problem_tags']
-					: [['tag' => '', 'operator' => TAG_OPERATOR_EQUAL, 'value' => '']]
+					: [['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']]
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
