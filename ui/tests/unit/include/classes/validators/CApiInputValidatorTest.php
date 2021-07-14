@@ -2177,6 +2177,12 @@ class CApiInputValidatorTest extends TestCase {
 				'{$MACRO: "context"}'
 			],
 			[
+				['type' => API_USER_MACRO],
+				'',
+				'/1/macro',
+				'Invalid parameter "/1/macro": cannot be empty.'
+			],
+			[
 				['type' => API_USER_MACRO, 'length' => 18],
 				'{$MACRO: "context"}',
 				'/1/macro',
