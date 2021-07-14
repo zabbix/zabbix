@@ -198,6 +198,7 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$this->checkGoodSla($services);
 		$this->checkAlgorithmDependencies($services);
 		$this->checkParents($services);
 		$this->checkChildren($services);
@@ -304,6 +305,7 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$this->checkGoodSla($services, $db_services);
 		$this->checkAlgorithmDependencies($services, $db_services);
 		$this->checkParents($services);
 		$this->checkChildren($services);
@@ -533,6 +535,27 @@ class CService extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array      $services
+	 * @param array|null $db_services
+	 *
+	 * @throws APIException
+	 */
+	private function checkGoodSla(array $services, array $db_services = null): void {
+		foreach ($services as $service) {
+			$name = array_key_exists('name', $service)
+				? $service['name']
+				: $db_services[$service['serviceid']]['name'];
+
+			if (array_key_exists('goodsla', $service)
+					&& round($service['goodsla'], 4) != $service['goodsla']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Service "%1$s" must have no more than 4 digits after the decimal point.', $name)
+				);
+			}
+		}
 	}
 
 	/**
