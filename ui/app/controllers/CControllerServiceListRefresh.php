@@ -70,9 +70,11 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 		];
 
 		foreach ($this->getInput('filter_tags', []) as $tag) {
-			if (array_key_exists('tag', $tag) && $tag['tag'] !== '') {
-				$filter['tags'][] = $tag;
+			if (!array_key_exists('tag', $tag) || !array_key_exists('value', $tag)
+				|| ($tag['tag'] === '' && $tag['value'] === '')) {
+				continue;
 			}
+			$filter['tags'][] = $tag;
 		}
 
 		$is_filtered = !$this->isDefaultFilter($filter);
