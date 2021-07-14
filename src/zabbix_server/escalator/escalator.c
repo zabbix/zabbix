@@ -1128,7 +1128,12 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		/* get host details */
 
-		if (0 != host.hostid)	/* target is from "Host" list or "Host group" list */
+		if (EVENT_SOURCE_SERVICE == event->source)
+		{
+			/* service event cannot have target, force execution on Zabbix server */
+			script.execute_on = ZBX_SCRIPT_EXECUTE_ON_SERVER;
+		}
+		else if (0 != host.hostid)	/* target is from "Host" list or "Host group" list */
 		{
 			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
