@@ -3879,13 +3879,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   background: transparent url("../img/icon-sprite.svg?20200407") no-repeat -42px -834px; }
 
 .icon-wzrd-action {
-  background: transparent url("../img/icon-sprite.svg?20200407") no-repeat -6px -617px;
-  margin-top: -16px; }
+  background: transparent url("../img/icon-sprite.svg?20200407") no-repeat -6px -617px; }
 
 .icon-cal, .icon-wzrd-action {
   border: 0;
+  margin: -4px 0;
+  vertical-align: middle;
   cursor: pointer;
-  position: absolute;
   opacity: .75;
   transition: opacity .2s ease-out; }
   .icon-cal:hover, .icon-wzrd-action:hover, .icon-cal:focus, .icon-wzrd-action:focus, .icon-cal:active, .icon-wzrd-action:active {
@@ -4452,6 +4452,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .calendar-footer .btn-grey {
     float: left;
     margin-top: 0; }
+
+.calendar-control input {
+  vertical-align: middle; }
 
 .notif {
   width: 250px; }
