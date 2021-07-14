@@ -90,7 +90,13 @@ if ($data['service'] !== null && !$data['is_filtered']) {
 						->addClass(ZBX_STYLE_SERVICE_INFO)
 						->addClass($service_status_style_class)
 						->addItem([
-							(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME)
+							(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME),
+							(new CDiv(
+								(new CButton(null))
+									->addClass(ZBX_STYLE_BTN_EDIT)
+									->addClass('js-edit-service')
+									->setAttribute('data-serviceid', $data['service']['serviceid'])
+							))->addClass(ZBX_STYLE_SERVICE_ACTIONS)
 						])
 						->addItem([
 							(new CDiv(_('Parents')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),

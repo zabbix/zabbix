@@ -1903,6 +1903,7 @@ define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');
 define('ZBX_STYLE_SELECTED', 'selected');
 define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
 define('ZBX_STYLE_SERVER_NAME', 'server-name');
+define('ZBX_STYLE_SERVICE_ACTIONS', 'service-actions');
 define('ZBX_STYLE_SERVICE_INFO', 'service-info');
 define('ZBX_STYLE_SERVICE_INFO_LABEL', 'service-info-label');
 define('ZBX_STYLE_SERVICE_INFO_VALUE', 'service-info-value');
