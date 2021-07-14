@@ -1595,13 +1595,8 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($data !== '' && $data[0] === '@') {
-			if ($flags & API_ALLOW_GLOBAL_REGEX) {
-				return true;
-			}
-
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid regular expression'));
-			return false;
+		if (($flags & API_ALLOW_GLOBAL_REGEX) && $data !== '' && $data[0] === '@') {
+			return true;
 		}
 
 		if (@preg_match('/'.str_replace('/', '\/', $data).'/', '') === false) {
