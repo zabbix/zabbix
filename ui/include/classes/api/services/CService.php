@@ -225,7 +225,6 @@ class CService extends CApiService {
 	public function update(array $services): array {
 		$this->validateUpdate($services, $db_services);
 
-<<<<<<< HEAD
 		$upd_services = [];
 
 		foreach ($services as $service) {
@@ -237,40 +236,6 @@ class CService extends CApiService {
 					'where' => ['serviceid' => $service['serviceid']]
 				];
 			}
-=======
-		// save the services
-		$serviceids = DB::insert($this->tableName(), $services);
-
-		$dependencies = [];
-		$serviceTimes = [];
-		foreach ($services as $key => &$service) {
-			$service['serviceid'] = $serviceids[$key];
-
-			// save dependencies
-			if (!empty($service['dependencies'])) {
-				foreach ($service['dependencies'] as $dependency) {
-					$dependency['serviceid'] = $service['serviceid'];
-					$dependencies[] = $dependency;
-				}
-			}
-
-			// save parent service
-			if (!empty($service['parentid'])) {
-				$dependencies[] = [
-					'serviceid' => $service['parentid'],
-					'dependsOnServiceid' => $service['serviceid'],
-					'soft' => 0
-				];
-			}
-
-			// save service times
-			if (isset($service['times'])) {
-				foreach ($service['times'] as $serviceTime) {
-					$serviceTime['serviceid'] = $service['serviceid'];
-					$serviceTimes[] = $serviceTime;
-				}
-			}
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 		}
 		unset($service);
 
@@ -286,17 +251,12 @@ class CService extends CApiService {
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services, __FUNCTION__);
 
-<<<<<<< HEAD
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $services, $db_services);
-=======
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_IT_SERVICE, $services);
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 
 		return ['serviceids' => array_column($services, 'serviceid')];
 	}
 
 	/**
-<<<<<<< HEAD
 	 * @param array      $services
 	 * @param array|null $db_services
 	 *
@@ -352,50 +312,6 @@ class CService extends CApiService {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-=======
-	 * Validates the input parameters for the update() method.
-	 *
-	 * @param array $services
-	 * @param array $db_services
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	public function validateUpdate(array $services, array $db_services) {
-		foreach ($services as $service) {
-			if (empty($service['serviceid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-			}
-		}
-
-		$this->checkServicePermissions(array_column($services, 'serviceid'));
-
-		$services = $this->extendFromObjects(zbx_toHash($services, 'serviceid'), $db_services, ['name']);
-
-		foreach ($services as $service) {
-			$this->checkName($service);
-
-			if (array_key_exists('algorithm', $service)) {
-				$this->checkAlgorithm($service);
-			}
-			if (array_key_exists('showsla', $service)) {
-				$this->checkShowSla($service);
-			}
-			if (array_key_exists('goodsla', $service)) {
-				$this->checkGoodSla($service);
-			}
-			if (array_key_exists('sortorder', $service)) {
-				$this->checkSortOrder($service);
-			}
-			if (array_key_exists('triggerid', $service)) {
-				$this->checkTriggerId($service);
-			}
-			if (array_key_exists('status', $service)) {
-				$this->checkStatus($service);
-			}
-			if (array_key_exists('parentid', $service)) {
-				$this->checkParentId($service);
-			}
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 
 		if (count($db_services) != count($services)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -416,21 +332,8 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-<<<<<<< HEAD
 	public function delete(array $serviceids): array {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-=======
-	public function update(array $services) {
-		$services = zbx_toArray($services);
-
-		$db_services = $this->get([
-			'output' => ['serviceid', 'name', 'triggerid', 'algorithm', 'parentid', 'showsla', 'goodsla', 'sortorder'],
-			'serviceids' => array_column($services, 'serviceid'),
-			'preservekeys' => true
-		]);
-
-		$this->validateUpdate($services, $db_services);
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 
 		if (!CApiInputValidator::validate($api_input_rules, $serviceids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -645,7 +548,6 @@ class CService extends CApiService {
 			$result = $relation_map->mapMany($result, $alarms, 'alarms');
 		}
 
-<<<<<<< HEAD
 		return $result;
 	}
 
@@ -673,38 +575,9 @@ class CService extends CApiService {
 	/**
 	 * @param array      $services
 	 * @param array|null $db_services
-=======
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IT_SERVICE, $services, $db_services);
-
-		return ['serviceids' => zbx_objectValues($services, 'serviceid')];
-	}
-
-	/**
-	 * Validates the input parameters for the delete() method.
-	 *
-	 * @param array $serviceids
-	 * @param array $db_services
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	public function validateDelete(array $serviceids, array &$db_services = null) {
-		if (!$serviceids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$this->checkServicePermissions($serviceids, $db_services);
-		$this->checkThatServicesDontHaveChildren($serviceids);
-	}
-
-	/**
-	 * Delete services.
-	 *
-	 * @param array $serviceids
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 	 *
 	 * @throws APIException
 	 */
-<<<<<<< HEAD
 	private function checkAlgorithmDependencies(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
 			$name = array_key_exists('name', $service)
@@ -744,12 +617,6 @@ class CService extends CApiService {
 					);
 				}
 			}
-=======
-	public function delete(array $serviceids) {
-		$this->validateDelete($serviceids, $db_services);
-
-		DB::delete($this->tableName(), ['serviceid' => $serviceids]);
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 
 			if (array_key_exists('children', $service)) {
 				$has_children = count($service['children']) > 0;
@@ -761,18 +628,12 @@ class CService extends CApiService {
 				$has_children = false;
 			}
 
-<<<<<<< HEAD
 			if ($has_problem_tags && $has_children) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Service "%1$s" cannot have problem tags and children at the same time.', $name)
 				);
 			}
 		}
-=======
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, $db_services);
-
-		return ['serviceids' => $serviceids];
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 	}
 
 	/**
@@ -830,7 +691,6 @@ class CService extends CApiService {
 			}
 		}
 
-<<<<<<< HEAD
 		if (!$child_serviceids) {
 			return;
 		}
@@ -844,28 +704,12 @@ class CService extends CApiService {
 		if ($count != count($child_serviceids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
-=======
-	/**
-	 * Validates the input for the deleteDependencies() method.
-	 *
-	 * @throws APIException if the given input is invalid
-	 *
-	 * @param array $serviceids
-	 */
-	protected function validateDeleteDependencies(array $serviceids) {
-		if (!$serviceids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$this->checkServicePermissions($serviceids);
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 	}
 
 	/**
 	 * @param array      $services
 	 * @param array|null $db_services
 	 *
-<<<<<<< HEAD
 	 * @throws APIException
 	 */
 	private function checkCircularReferences(array $services, array $db_services = null): void {
@@ -951,72 +795,6 @@ class CService extends CApiService {
 							$next_references[$serviceid][$parent_serviceid] = true;
 						}
 					}
-=======
-	 * @param array $serviceids
-	 *
-	 * @return boolean
-	 */
-	public function deleteDependencies($serviceids) {
-		$serviceids = zbx_toArray($serviceids);
-		$this->validateDeleteDependencies($serviceids);
-
-		DB::delete('services_links', [
-			'serviceupid' =>  $serviceids
-		]);
-
-		return ['serviceids' => $serviceids];
-	}
-
-	/**
-	 * Validates the input for the addTimes() method.
-	 *
-	 * @param array $service_times
-	 *
-	 * @throws APIException if the given input is invalid
-	 */
-	public function validateAddTimes(array $service_times) {
-		foreach ($service_times as $service_time) {
-			$this->checkTime($service_time);
-
-			$this->checkUnsupportedFields('services_times', $service_time,
-				_s('Wrong fields for time for service "%1$s".', $service_time['serviceid'])
-			);
-		}
-
-		$this->checkServicePermissions(array_column($service_times, 'serviceid'));
-	}
-
-	/**
-	 * Adds the given service times.
-	 *
-	 * @param array $service_times an array of service times
-	 *
-	 * @return array
-	 */
-	public function addTimes(array $service_times) {
-		$service_times = zbx_toArray($service_times);
-		$this->validateAddTimes($service_times);
-
-		DB::insert('services_times', $service_times);
-
-		return ['serviceids' => array_column($service_times, 'serviceid')];
-	}
-
-	/**
-	 * Validates the input for the deleteTimes() method.
-	 *
-	 * @throws APIException if the given input is invalid
-	 *
-	 * @param array $serviceids
-	 */
-	protected function validateDeleteTimes(array $serviceids) {
-		if (!$serviceids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$this->checkServicePermissions($serviceids);
-	}
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 
 					if (array_key_exists($child_serviceid, $db_parents)) {
 						foreach (array_keys($db_parents[$child_serviceid]) as $serviceid) {
@@ -1640,607 +1418,4 @@ class CService extends CApiService {
 
 		return $rs;
 	}
-<<<<<<< HEAD
-=======
-
-	/**
-	 * Returns an array of dependencies that are children of the given services. Performs permission checks.
-	 *
-	 * @param array $parentServiceIds
-	 * @param $output
-	 *
-	 * @return array    an array of service links sorted by "sortorder" in ascending order
-	 */
-	protected function fetchChildDependencies(array $parentServiceIds, $output) {
-		$sqlParts = API::getApiService()->createSelectQueryParts('services_links', 'sl', [
-			'output' => $output,
-			'filter' => ['serviceupid' => $parentServiceIds]
-		]);
-
-		// sort by sortorder
-		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
-		$sqlParts['where'][] = 'sl.servicedownid='.$this->fieldId('serviceid');
-		$sqlParts = $this->addQueryOrder($this->fieldId('sortorder'), $sqlParts);
-		$sqlParts = $this->addQueryOrder($this->fieldId('serviceid'), $sqlParts);
-
-		// add permission filter
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts = $this->addPermissionFilter($sqlParts);
-		}
-
-		$sql = self::createSelectQueryFromParts($sqlParts);
-
-		return DBfetchArray(DBselect($sql));
-	}
-
-	/**
-	 * Returns an array of dependencies from the parent services to the given services.
-	 * Performs permission checks.
-	 *
-	 * @param array $childServiceIds
-	 * @param $output
-	 * @param boolean $soft             if set to true, will return only soft-linked dependencies
-	 *
-	 * @return array    an array of service links sorted by "sortorder" in ascending order
-	 */
-	protected function fetchParentDependencies(array $childServiceIds, $output, $soft = null) {
-		$sqlParts = API::getApiService()->createSelectQueryParts('services_links', 'sl', [
-			'output' => $output,
-			'filter' => ['servicedownid' => $childServiceIds]
-		]);
-
-		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
-		$sqlParts['where'][] = 'sl.serviceupid='.$this->fieldId('serviceid');
-		if ($soft !== null) {
-			$sqlParts['where'][] = 'sl.soft='.($soft ? 1 : 0);
-		}
-		$sqlParts = $this->addQueryOrder($this->fieldId('sortorder'), $sqlParts);
-		$sqlParts = $this->addQueryOrder($this->fieldId('serviceid'), $sqlParts);
-
-		// add permission filter
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts = $this->addPermissionFilter($sqlParts);
-		}
-
-		$sql = self::createSelectQueryFromParts($sqlParts);
-
-		return DBfetchArray(DBselect($sql));
-	}
-
-	/**
-	 * Returns true if status calculation is enabled for the given service.
-	 *
-	 * @param array $service
-	 *
-	 * @return bool
-	 */
-	protected function isStatusEnabled(array $service) {
-		return ($service['algorithm'] != SERVICE_ALGORITHM_NONE);
-	}
-
-	/**
-	 * Validates the "name" field.
-	 *
-	 * @throws APIException if the name is missing
-	 *
-	 * @param array $service
-	 */
-	protected function checkName(array $service) {
-		if (!isset($service['name']) || zbx_empty($service['name'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty name.'));
-		}
-	}
-
-	/**
-	 * Validates the "algorithm" field. Assumes the "name" field is valid.
-	 *
-	 * @throws APIException if the name is missing or invalid
-	 *
-	 * @param array $service
-	 */
-	protected function checkAlgorithm(array $service) {
-		if (!isset($service['algorithm']) || !serviceAlgorithm($service['algorithm'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect algorithm for service "%1$s".', $service['name']));
-		}
-	}
-
-	/**
-	 * Validates the "showsla" field. Assumes the "name" field is valid.
-	 *
-	 * @throws APIException if the name is missing or is not a boolean value
-	 *
-	 * @param array $service
-	 */
-	protected function checkShowSla(array $service) {
-		$showSlaValues = [
-			SERVICE_SHOW_SLA_OFF => true,
-			SERVICE_SHOW_SLA_ON => true
-		];
-		if (!isset($service['showsla']) || !isset($showSlaValues[$service['showsla']])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect calculate SLA value for service "%1$s".', $service['name']));
-		}
-	}
-
-	/**
-	 * Validates the "showsla" field. Assumes the "name" field is valid.
-	 *
-	 * @throws APIException if the value is missing, or is out of bounds
-	 *
-	 * @param array $service
-	 */
-	protected function checkGoodSla(array $service) {
-		if ((!empty($service['showsla']) && empty($service['goodsla']))
-				|| (isset($service['goodsla'])
-					&& (!is_numeric($service['goodsla']) || $service['goodsla'] < 0 || $service['goodsla'] > 100))) {
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect acceptable SLA for service "%1$s".', $service['name']));
-		}
-	}
-
-	/**
-	 * Validates the "sortorder" field. Assumes the "name" field is valid.
-	 *
-	 * @throws APIException if the value is missing, or is out of bounds
-	 *
-	 * @param array $service
-	 */
-	protected function checkSortOrder(array $service) {
-		if (!isset($service['sortorder']) || !zbx_is_int($service['sortorder'])
-			|| $service['sortorder'] < 0 || $service['sortorder'] > 999) {
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect sort order for service "%1$s".', $service['name']));
-		}
-	}
-
-	/**
-	 * Validates the "triggerid" field. Assumes the "name" field is valid.
-	 *
-	 * @throws APIException if the value is incorrect
-	 *
-	 * @param array $service
-	 */
-	protected function checkTriggerId(array $service) {
-		if (!empty($service['triggerid']) && !zbx_is_int($service['triggerid'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect trigger ID for service "%1$s".', $service['name']));
-		}
-	}
-
-	/**
-	 * Validates the "parentid" field. Assumes the "name" field is valid.
-	 *
-	 * @throws APIException if the value is incorrect
-	 *
-	 * @param array $service
-	 */
-	protected function checkParentId(array $service) {
-		if (!empty($service['parentid']) && !zbx_is_int($service['parentid'])) {
-			if (isset($service['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parent for service "%1$s".', $service['name']));
-			}
-			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parent service.'));
-			}
-		}
-
-		if (isset($service['serviceid']) && idcmp($service['serviceid'], $service['parentid'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Service cannot be parent and child at the same time.'));
-		}
-	}
-
-	/**
-	 * Validates the "status" field. Assumes the "name" field is valid.
-	 *
-	 * @throws APIException if the value is incorrect
-	 *
-	 * @param array $service
-	 */
-	protected function checkStatus(array $service) {
-		if (!empty($service['status']) && !zbx_is_int($service['status'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect status for service "%1$s".', $service['name']));
-		}
-	}
-
-	/**
-	 * Checks that the user has read access to the given triggers.
-	 *
-	 * @throws APIException if the user doesn't have permission to access any of the triggers
-	 *
-	 * @param array $services
-	 */
-	protected function checkTriggerPermissions(array $services) {
-		$triggerids = [];
-		foreach ($services as $service) {
-			if (!empty($service['triggerid'])) {
-				$triggerids[$service['triggerid']] = true;
-			}
-		}
-
-		if ($triggerids) {
-			$count = API::Trigger()->get([
-				'countOutput' => true,
-				'triggerids' => array_keys($triggerids)
-			]);
-
-			if ($count != count($triggerids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-	}
-
-	/**
-	 * Checks that all of the given services are readable.
-	 *
-	 * @param array $serviceids
-	 * @param array $db_services
-	 *
-	 * @throws APIException if at least one of the services doesn't exist
-	 */
-	protected function checkServicePermissions(array $serviceids, array &$db_services = null) {
-		if ($serviceids) {
-			$serviceids = array_keys(array_flip($serviceids));
-
-			$db_services = $this->get([
-				'output' => ['serviceid', 'name'],
-				'serviceids' => $serviceids,
-				'preservekeys' => true
-			]);
-
-			if (count($db_services) != count($serviceids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-	}
-
-	/**
-	 * Checks that none of the given services have any children.
-	 *
-	 * @param array $serviceids
-	 *
-	 * @throws APIException if at least one of the services has a child service
-	 */
-	protected function checkThatServicesDontHaveChildren(array $serviceids) {
-		$child = API::getApiService()->select('services_links', [
-			'output' => ['serviceupid'],
-			'filter' => [
-				'serviceupid' => $serviceids,
-				'soft' => 0
-			],
-			'limit' => 1
-		]);
-		$child = reset($child);
-		if ($child) {
-			$service = API::getApiService()->select($this->tableName(), [
-				'output' => ['name'],
-				'serviceids' => $child['serviceupid'],
-				'limit' => 1
-			]);
-			$service = reset($service);
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_s('Service "%1$s" cannot be deleted, because it is dependent on another service.', $service['name'])
-			);
-		}
-	}
-
-	/**
-	 * Checks that the given dependency is valid.
-	 *
-	 * @throws APIException if the dependency is invalid
-	 *
-	 * @param array $dependency
-	 */
-	protected function checkDependency(array $dependency) {
-		if (idcmp($dependency['serviceid'], $dependency['dependsOnServiceid'])) {
-			$service = API::getApiService()->select($this->tableName(), [
-				'output' => ['name'],
-				'serviceids' => $dependency['serviceid']
-			]);
-			$service = reset($service);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Service "%1$s" cannot be dependent on itself.', $service['name']));
-		}
-
-		// check 'soft' field value
-		if (!isset($dependency['soft']) || !in_array((int) $dependency['soft'], [0, 1], true)) {
-			$service = API::getApiService()->select($this->tableName(), [
-				'output' => ['name'],
-				'serviceids' => $dependency['serviceid']
-			]);
-			$service = reset($service);
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect "soft" field value for dependency for service "%1$s".', $service['name'])
-			);
-		}
-	}
-
-	/**
-	 * Checks that that none of the given services are hard linked to a different service.
-	 * Assumes the dependencies are valid.
-	 *
-	 * @throws APIException if at a least one service is hard linked to another service
-	 *
-	 * @param array $dependencies
-	 */
-	protected function checkForHardlinkedDependencies(array $dependencies) {
-		// only check hard dependencies
-		$hardDepServiceIds = [];
-		foreach ($dependencies as $dependency) {
-			if (!$dependency['soft']) {
-				$hardDepServiceIds[] = $dependency['dependsOnServiceid'];
-			}
-		}
-
-		if ($hardDepServiceIds) {
-			// look for at least one hardlinked service among the given
-			$hardDepServiceIds = array_unique($hardDepServiceIds);
-			$dep = API::getApiService()->select('services_links', [
-				'output' => ['servicedownid'],
-				'filter' => [
-					'soft' => 0,
-					'servicedownid' => $hardDepServiceIds
-				],
-				'limit' => 1
-			]);
-			if ($dep) {
-				$dep = reset($dep);
-				$service = API::getApiService()->select($this->tableName(), [
-					'output' => ['name'],
-					'serviceids' => $dep['servicedownid']
-				]);
-				$service = reset($service);
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Service "%1$s" is already hardlinked to a different service.', $service['name'])
-				);
-			}
-		}
-	}
-
-	/**
-	 * Checks that none of the parent services are linked to a trigger. Assumes the dependencies are valid.
-	 *
-	 * @throws APIException if at least one of the parent services is linked to a trigger
-	 *
-	 * @param array $dependencies
-	 */
-	protected function checkThatParentsDontHaveTriggers(array $dependencies) {
-		$parentServiceIds = array_unique(zbx_objectValues($dependencies, 'serviceid'));
-		if ($parentServiceIds) {
-			$query = DBselect(
-				'SELECT s.triggerid,s.name'.
-					' FROM services s '.
-					' WHERE '.dbConditionInt('s.serviceid', $parentServiceIds).
-					' AND s.triggerid IS NOT NULL', 1);
-			if ($parentService = DBfetch($query)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Service "%1$s" cannot be linked to a trigger and have children at the same time.', $parentService['name']));
-			}
-		}
-	}
-
-	/**
-	 * Checks that dependencies will not create cycles in service dependencies.
-	 *
-	 * @throws APIException if at least one cycle is possible
-	 *
-	 * @param array $depsToValid	dependency list to be validated
-	 */
-	protected function checkForCircularityInDependencies($depsToValid) {
-		$dbDeps = API::getApiService()->select('services_links', [
-			'output' => ['serviceupid', 'servicedownid']
-		]);
-
-		// create existing dependency acyclic graph
-		$arr = [];
-		foreach ($dbDeps as $dbDep) {
-			if (!isset($arr[$dbDep['serviceupid']])) {
-				$arr[$dbDep['serviceupid']] = [];
-			}
-			$arr[$dbDep['serviceupid']][$dbDep['servicedownid']] = $dbDep['servicedownid'];
-		}
-
-		// check for circularity and add dependencies to the graph
-		foreach ($depsToValid as $dep) {
-			$this->DFCircularitySearch($dep['serviceid'], $dep['dependsOnServiceid'], $arr);
-			$arr[$dep['serviceid']][$dep['dependsOnServiceid']] = $dep['dependsOnServiceid'];
-		}
-
-	}
-
-	/**
-	 * Depth First Search recursive function to find circularity and rise exception.
-	 *
-	 * @throws APIException if cycle is possible
-	 *
-	 * @param int $id	dependency from id
-	 * @param int $depId	dependency to id
-	 * @param ref $arr	reference to graph structure. Structure is associative array with keys as "from id"
-	 *			and values as arrays with keys and values as "to id".
-	 */
-	protected function dfCircularitySearch($id, $depId, &$arr) {
-		if ($id == $depId) {
-			// cycle found
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Services form a circular dependency.'));
-		}
-		if (isset($arr[$depId])) {
-			foreach ($arr[$depId] as $dep) {
-				$this->DFCircularitySearch($id, $dep, $arr);
-			}
-		}
-	}
-
-	/**
-	 * Checks that the given service time is valid.
-	 *
-	 * @throws APIException if the service time is invalid
-	 *
-	 * @param array $serviceTime
-	 */
-	protected function checkTime(array $serviceTime) {
-		if (empty($serviceTime['serviceid'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-		}
-
-		checkServiceTime($serviceTime);
-	}
-
-	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
-			if (is_array($options['filter']) && array_key_exists('triggerid', $options['filter'])) {
-				$accessibleTriggers = API::Trigger()->get([
-					'output' => ['triggerid'],
-					'triggerids' => $options['filter']['triggerid']
-				]);
-				$options['filter']['triggerid'] = zbx_objectValues($accessibleTriggers, 'triggerid');
-			}
-			// otherwise return services with either no triggers, or any trigger accessible to the current user
-			else {
-				$sqlParts = $this->addPermissionFilter($sqlParts);
-			}
-		}
-
-		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		// parentids
-		if ($options['parentids'] !== null) {
-			$sqlParts['from'][] = 'services_links slp';
-			$sqlParts['where'][] = $this->fieldId('serviceid').'=slp.servicedownid AND slp.soft=0';
-			$sqlParts['where'][] = dbConditionInt('slp.serviceupid', (array) $options['parentids']);
-		}
-		// childids
-		if ($options['childids'] !== null) {
-			$sqlParts['from'][] = 'services_links slc';
-			$sqlParts['where'][] = $this->fieldId('serviceid').'=slc.serviceupid AND slc.soft=0';
-			$sqlParts['where'][] = dbConditionInt('slc.servicedownid', (array) $options['childids']);
-		}
-
-		return $sqlParts;
-	}
-
-	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
-
-		$serviceIds = array_keys($result);
-
-		// selectDependencies
-		if ($options['selectDependencies'] !== null && $options['selectDependencies'] != API_OUTPUT_COUNT) {
-			$dependencies = $this->fetchChildDependencies($serviceIds,
-				$this->outputExtend($options['selectDependencies'], ['serviceupid', 'linkid'])
-			);
-			$dependencies = zbx_toHash($dependencies, 'linkid');
-			$relationMap = $this->createRelationMap($dependencies, 'serviceupid', 'linkid');
-
-			$dependencies = $this->unsetExtraFields($dependencies, ['serviceupid', 'linkid'], $options['selectDependencies']);
-			$result = $relationMap->mapMany($result, $dependencies, 'dependencies');
-		}
-
-		// selectParentDependencies
-		if ($options['selectParentDependencies'] !== null && $options['selectParentDependencies'] != API_OUTPUT_COUNT) {
-			$dependencies = $this->fetchParentDependencies($serviceIds,
-				$this->outputExtend($options['selectParentDependencies'], ['servicedownid', 'linkid'])
-			);
-			$dependencies = zbx_toHash($dependencies, 'linkid');
-			$relationMap = $this->createRelationMap($dependencies, 'servicedownid', 'linkid');
-
-			$dependencies = $this->unsetExtraFields($dependencies, ['servicedownid', 'linkid'],
-				$options['selectParentDependencies']
-			);
-			$result = $relationMap->mapMany($result, $dependencies, 'parentDependencies');
-		}
-
-		// selectParent
-		if ($options['selectParent'] !== null && $options['selectParent'] != API_OUTPUT_COUNT) {
-			$dependencies = $this->fetchParentDependencies($serviceIds, ['servicedownid', 'serviceupid'], false);
-			$relationMap = $this->createRelationMap($dependencies, 'servicedownid', 'serviceupid');
-			$parents = $this->get([
-				'output' => $options['selectParent'],
-				'serviceids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapOne($result, $parents, 'parent');
-		}
-
-		// selectTimes
-		if ($options['selectTimes'] !== null && $options['selectTimes'] != API_OUTPUT_COUNT) {
-			$serviceTimes = API::getApiService()->select('services_times', [
-				'output' => $this->outputExtend($options['selectTimes'], ['serviceid', 'timeid']),
-				'filter' => ['serviceid' => $serviceIds],
-				'preservekeys' => true
-			]);
-			$relationMap = $this->createRelationMap($serviceTimes, 'serviceid', 'timeid');
-
-			$serviceTimes = $this->unsetExtraFields($serviceTimes, ['serviceid', 'timeid'], $options['selectTimes']);
-			$result = $relationMap->mapMany($result, $serviceTimes, 'times');
-		}
-
-		// selectAlarms
-		if ($options['selectAlarms'] !== null && $options['selectAlarms'] != API_OUTPUT_COUNT) {
-			$serviceAlarms = API::getApiService()->select('service_alarms', [
-				'output' => $this->outputExtend($options['selectAlarms'], ['serviceid', 'servicealarmid']),
-				'filter' => ['serviceid' => $serviceIds],
-				'preservekeys' => true
-			]);
-			$relationMap = $this->createRelationMap($serviceAlarms, 'serviceid', 'servicealarmid');
-
-			$serviceAlarms = $this->unsetExtraFields($serviceAlarms, ['serviceid', 'servicealarmid'],
-				$options['selectAlarms']
-			);
-			$result = $relationMap->mapMany($result, $serviceAlarms, 'alarms');
-		}
-
-		// selectTrigger
-		if ($options['selectTrigger'] !== null && $options['selectTrigger'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'serviceid', 'triggerid');
-			$triggers = API::getApiService()->select('triggers', [
-				'output' => $options['selectTrigger'],
-				'triggerids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapOne($result, $triggers, 'trigger');
-		}
-
-		return $result;
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if (!$options['countOutput']) {
-			if ($options['selectTrigger'] !== null) {
-				$sqlParts = $this->addQuerySelect($this->fieldId('triggerid'), $sqlParts);
-			}
-		}
-
-		return $sqlParts;
-	}
-
-	/**
-	 * Add permission filter SQL query part
-	 *
-	 * @param array $sqlParts
-	 *
-	 * @return string
-	 */
-	protected function addPermissionFilter($sqlParts) {
-		$userGroups = getUserGroupsByUserId(self::$userData['userid']);
-
-		$sqlParts['where'][] = '(EXISTS ('.
-									'SELECT NULL'.
-									' FROM functions f,items i,hosts_groups hgg'.
-									' JOIN rights r'.
-										' ON r.id=hgg.groupid'.
-										' AND '.dbConditionInt('r.groupid', $userGroups).
-									' WHERE s.triggerid=f.triggerid'.
-										' AND f.itemid=i.itemid'.
-										' AND i.hostid=hgg.hostid'.
-									' GROUP BY f.triggerid'.
-									' HAVING MIN(r.permission)>'.PERM_DENY.
-									')'.
-								' OR s.triggerid IS NULL)';
-
-		return $sqlParts;
-	}
->>>>>>> f7ff6b10458221dd1bff0e88f90ac7c148f76ed2
 }
