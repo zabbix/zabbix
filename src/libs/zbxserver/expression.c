@@ -2119,6 +2119,17 @@ static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
 	zbx_json_free(&json);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_event_tag_by_name                                            *
+ *                                                                            *
+ * Purpose: get event tag value by name                                       *
+ *                                                                            *
+ * Parameters: macro      - [IN] the macro                                    *
+ *             event      - [IN] event                                        *
+ *             replace_to - [OUT] replacement string                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	get_event_tag_by_name(const char *macro, const DB_EVENT *event, char **replace_to)
 {
 	char	*name;
@@ -2154,6 +2165,7 @@ static void	get_event_tag_by_name(const char *macro, const DB_EVENT *event, char
 		zbx_free(name);
 	}
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: get_recovery_event_value                                         *
