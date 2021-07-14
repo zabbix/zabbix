@@ -30,8 +30,6 @@ abstract class CControllerServiceListGeneral extends CController {
 	protected const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_SERVICE;
 	protected const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
 
-	protected $is_filtered = false;
-
 	protected $service;
 
 	protected function doAction(): void {
@@ -178,13 +176,14 @@ abstract class CControllerServiceListGeneral extends CController {
 	}
 
 	/**
-	 * @param array $filter
+	 * @param array  $filter
+	 * @param bool   $is_filtered
 	 *
 	 * @return array
 	 *
 	 * @throws APIException
 	 */
-	protected function prepareData(array $filter): array {
+	protected function prepareData(array $filter, bool $is_filtered): array {
 		if ($filter['status'] == SERVICE_STATUS_OK) {
 			$filter_status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
@@ -197,10 +196,10 @@ abstract class CControllerServiceListGeneral extends CController {
 
 		$options = [
 			'output' => [],
-			'selectParents' => ($filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID && !$this->is_filtered)
+			'selectParents' => ($filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID && !$is_filtered)
 				? null
 				: ['serviceid'],
-			'parentids' => !$this->is_filtered ? $filter['serviceid'] : null,
+			'parentids' => !$is_filtered ? $filter['serviceid'] : null,
 			'childids' => $filter['without_children'] ? 0 : null,
 			'without_problem_tags' => $filter['without_problem_tags'],
 			'search' => ($filter['name'] === '')
@@ -233,7 +232,7 @@ abstract class CControllerServiceListGeneral extends CController {
 			$db_services += API::Service()->get($options);
 		}
 
-		if (!$db_services || !$this->is_filtered || $filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID) {
+		if (!$db_services || !$is_filtered || $filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID) {
 			return array_keys($db_services);
 		}
 

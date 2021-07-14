@@ -126,7 +126,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'service' => $this->service
 		];
 
-		$db_serviceids = $this->prepareData($filter);
+		$db_serviceids = $this->prepareData($filter, $is_filtered);
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('service.list.edit', $page_num);

@@ -89,7 +89,7 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 			]
 		];
 
-		$db_serviceids = $this->prepareData($filter);
+		$db_serviceids = $this->prepareData($filter, $is_filtered);
 
 		$paging_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list')
