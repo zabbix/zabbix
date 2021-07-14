@@ -19,10 +19,13 @@
 
 #include "log.h"
 #include "zbxjson.h"
-#include "db.h"
 #include "dbcache.h"
 
 #include "audit.h"
+
+#define AUDIT_RESOURCE_SCRIPT		25
+
+#define AUDIT_ACTION_EXECUTE		7
 
 static void add_str_json(struct zbx_json *json, const char *key, const char *val)
 {
@@ -56,9 +59,9 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDIT_LOGGING_ENABLED);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
 
-	if (ZBX_AUDIT_LOGGING_ENABLED != cfg.audit_logging_enabled)
+	if (ZBX_AUDITLOG_ENABLED != cfg.auditlog_enabled)
 		goto out;
 
 	zbx_new_cuid(auditid_cuid);

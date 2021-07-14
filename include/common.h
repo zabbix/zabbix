@@ -1690,16 +1690,12 @@ int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
 
 /* audit logging mode */
-#define ZBX_AUDIT_LOGGING_DISABLED	0
-#define ZBX_AUDIT_LOGGING_ENABLED	1
+#define ZBX_AUDITLOG_DISABLED	0
+#define ZBX_AUDITLOG_ENABLED	1
 
 /* includes terminating '\0' */
 #define CUID_LEN	26
 void	zbx_new_cuid(char *cuid);
-
-#define AUDIT_RESOURCE_SCRIPT		25
-
-#define AUDIT_ACTION_EXECUTE		7
 
 /* report scheduling */
 

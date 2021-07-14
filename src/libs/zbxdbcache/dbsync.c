@@ -519,7 +519,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"hk_services,hk_audit_mode,hk_audit,hk_sessions_mode,hk_sessions,"
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
 				"hk_trends_global,hk_trends,default_inventory_mode,db_extension,autoreg_tls_accept,"
-				"compression_status,compress_older,instanceid,default_timezone,audit_logging_enabled"
+				"compression_status,compress_older,instanceid,default_timezone,auditlog_enabled"
 			" from config"
 			" order by configid")))	/* if you change number of columns in DBselect(), */
 						/* adjust SELECTED_CONFIG_FIELD_COUNT */
