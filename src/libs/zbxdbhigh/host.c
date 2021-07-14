@@ -4926,6 +4926,7 @@ void	DBadd_interface_snmp(zbx_config_t *cfg, const zbx_uint64_t interfaceid, con
 	unsigned char	db_version, db_bulk, db_securitylevel, db_authprotocol, db_privprotocol;
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		break_loop = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4941,41 +4942,44 @@ void	DBadd_interface_snmp(zbx_config_t *cfg, const zbx_uint64_t interfaceid, con
 		ZBX_STR2UCHAR(db_version, row[0]);
 
 		if (version != db_version)
-			break;
+			break_loop = 1;
 
 		ZBX_STR2UCHAR(db_bulk, row[1]);
 
 		if (bulk != db_bulk)
-			break;
+			break_loop = 1;
 
 		if (0 != strcmp(community, row[2]))
-			break;
+			break_loop = 1;
 
 		if (0 != strcmp(securityname, row[3]))
-			break;
+			break_loop = 1;
 
 		ZBX_STR2UCHAR(db_securitylevel, row[4]);
 
 		if (securitylevel != db_securitylevel)
-			break;
+			break_loop = 1;
 
 		if (0 != strcmp(authpassphrase, row[5]))
-			break;
+			break_loop = 1;
 
 		if (0 != strcmp(privpassphrase, row[6]))
-			break;
+			break_loop = 1;
 
 		ZBX_STR2UCHAR(db_authprotocol, row[7]);
 
 		if (authprotocol != db_authprotocol)
-			break;
+			break_loop = 1;
 
 		ZBX_STR2UCHAR(db_privprotocol, row[8]);
 
 		if (privprotocol != db_privprotocol)
-			break;
+			break_loop = 1;
 
 		if (0 != strcmp(contextname, row[9]))
+			break_loop = 1;
+
+		if (1 == break_loop)
 			break;
 
 		goto out;
