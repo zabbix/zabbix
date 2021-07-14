@@ -219,7 +219,7 @@ class CMultifieldTableElement extends CTableElement {
 	 *
 	 * @return array
 	 */
-	protected function getRowControls($row, $headers = null) {
+	public function getRowControls($row, $headers = null) {
 		$controls = [];
 
 		if ($headers === null) {

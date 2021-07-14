@@ -326,7 +326,7 @@ class testFormTabIndicators extends CWebTest {
 								]
 							],
 							'field_type' => 'overlay_dialogue',
-							'count' => 6
+							'count' => 4
 						]
 					]
 				]
@@ -363,7 +363,7 @@ class testFormTabIndicators extends CWebTest {
 								]
 							],
 							'field_type' => 'overlay_dialogue',
-							'count' => 6
+							'count' => 4
 						]
 					]
 				]
