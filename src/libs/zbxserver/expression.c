@@ -2130,12 +2130,11 @@ static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
  *             replace_to - [OUT] replacement string                          *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_tag_by_name(const char *macro, const DB_EVENT *event, char **replace_to)
+static void	get_event_tag_by_name(const char *text, const DB_EVENT *event, char **replace_to)
 {
 	char	*name;
 
-	if (SUCCEED == zbx_str_extract(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX),
-			strlen(macro) - ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX) - 1, &name))
+	if (SUCCEED == zbx_str_extract(text, strlen(text) - 1, &name))
 	{
 		if (0 < event->tags.values_num)
 		{
@@ -2299,7 +2298,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 		}
 		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
 		{
-			get_event_tag_by_name(macro, event, replace_to);
+			get_event_tag_by_name(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX), event, replace_to);
 		}
 	}
 	else if (EVENT_SOURCE_SERVICE == event->source)
@@ -2323,7 +2322,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 		}
 		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
 		{
-			get_event_tag_by_name(macro, event, replace_to);
+			get_event_tag_by_name(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX), event, replace_to);
 		}
 	}
 }
@@ -4206,7 +4205,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				else if (0 == strncmp(m, MVAR_SERVICE_TAGS_PREFIX,
 						ZBX_CONST_STRLEN(MVAR_SERVICE_TAGS_PREFIX)))
 				{
-					get_event_tag_by_name(m, event, &replace_to);
+					get_event_tag_by_name(m + ZBX_CONST_STRLEN(MVAR_SERVICE_TAGS_PREFIX), event,
+							&replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
