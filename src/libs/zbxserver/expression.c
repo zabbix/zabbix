@@ -2328,6 +2328,13 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: rootcause_free                                                   *
+ *                                                                            *
+ * Purpose: free memory allocated for root cause                              *
+ *                                                                            *
+ ******************************************************************************/
 static void	rootcause_free(zbx_rootcause_t *rootcause)
 {
 	zbx_free(rootcause->host);
