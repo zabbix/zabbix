@@ -2186,19 +2186,19 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_USER_MACRO],
 				'{$MACRo}',
 				'/1/macro',
-				'Invalid parameter "/1/macro": a user macro is expected.'
+				'Invalid parameter "/1/macro": incorrect syntax near "o}".'
 			],
 			[
 				['type' => API_USER_MACRO],
 				'{$MACRO} ',
 				'/1/macro',
-				'Invalid parameter "/1/macro": a user macro is expected.'
+				'Invalid parameter "/1/macro": incorrect syntax near " ".'
 			],
 			[
 				['type' => API_USER_MACRO],
 				'{$MACRO: "context"',
 				'/1/macro',
-				'Invalid parameter "/1/macro": a user macro is expected.'
+				'Invalid parameter "/1/macro": unexpected end of macro.'
 			],
 			[
 				['type' => API_USER_MACRO],

@@ -111,7 +111,7 @@ class testFormMacrosTemplate extends testFormMacros {
 						]
 					],
 					'error_message' => 'Cannot add template',
-					'error_details' => 'Invalid parameter "/1/macros/1/macro": a user macro is expected.'
+					'error_details' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
 				]
 			],
 			[
@@ -306,7 +306,7 @@ class testFormMacrosTemplate extends testFormMacros {
 						]
 					],
 					'error_message' => 'Cannot update template',
-					'error_details' => 'Invalid parameter "/1/macros/1/macro": a user macro is expected.'
+					'error_details' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
 				]
 			],
 			[

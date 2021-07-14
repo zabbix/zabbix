@@ -321,63 +321,63 @@ class testUserMacro extends CAPITest {
 					'macro' => 'test',
 					'value' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+				'expected_error' => 'Invalid parameter "/1/macro": incorrect syntax near "test".'
 			],
 			[
 				'globalmacro' => [
 					'macro' => '{$globalmacro}',
 					'value' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+				'expected_error' => 'Invalid parameter "/1/macro": incorrect syntax near "globalmacro}".'
 			],
 			[
 				'globalmacro' => [
 					'macro' => '☺',
 					'value' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+				'expected_error' => 'Invalid parameter "/1/macro": incorrect syntax near "☺".'
 			],
 			[
 				'globalmacro' => [
 					'macro' => '{GlOBALMACRO}',
 					'value' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+				'expected_error' => 'Invalid parameter "/1/macro": incorrect syntax near "GlOBALMACRO}".'
 			],
 			[
 				'globalmacro' => [
 					'macro' => '{$GlOBALMACRO',
 					'value' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+				'expected_error' => 'Invalid parameter "/1/macro": incorrect syntax near "lOBALMACRO".'
 			],
 			[
 				'globalmacro' => [
 					'macro' => '{$GlOBALMACRO}}',
 					'value' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+				'expected_error' => 'Invalid parameter "/1/macro": incorrect syntax near "lOBALMACRO}}".'
 			],
 			[
 				'globalmacro' => [
 					'macro' => '{{$GlOBALMACRO}}',
 					'value' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+				'expected_error' => 'Invalid parameter "/1/macro": incorrect syntax near "{$GlOBALMACRO}}".'
 			],
 			[
 				'globalmacro' => [
 					'macro' => '{$УТФ8}',
 					'value' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+				'expected_error' => 'Invalid parameter "/1/macro": incorrect syntax near "УТФ8}".'
 			],
 			[
 				'globalmacro' => [
 					'macro' => '{$!@#$%^&*()-=<>}',
 					'value' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/1/macro": a user macro is expected.'
+				'expected_error' => 'Invalid parameter "/1/macro": incorrect syntax near "!@#$%^&*()-=<>}".'
 			],
 			[
 				'globalmacro' => [

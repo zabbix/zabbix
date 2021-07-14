@@ -115,7 +115,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						]
 					],
 					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/1/macro": a user macro is expected.'
+					'error_details' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
 				]
 			],
 			[
@@ -310,7 +310,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						]
 					],
 					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/1/macro": a user macro is expected.'
+					'error_details' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
 				]
 			],
 			[

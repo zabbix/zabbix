@@ -132,24 +132,24 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 	public static function wrongMacros() {
 		return [
-			['MACRO'],
-			['{'],
-			['{$'],
-			['{$MACRO'],
-			['}'],
-			['$}'],
-			['MACRO}'],
-			['$MACRO}'],
-			['{}'],
-			['{MACRO}'],
-			['}$MACRO{'],
-			['{$MACRO}}'],
-			['{{$MACRO}'],
-			['{{$MACRO}}'],
-			['{$}'],
-			['{$$}'],
-			['{$$MACRO}'],
-			['{$MACRO$}']
+			['MACRO', 'incorrect syntax near "MACRO"'],
+			['{', 'unexpected end of macro'],
+			['{$', 'unexpected end of macro'],
+			['{$MACRO', 'unexpected end of macro'],
+			['}', 'incorrect syntax near "}"'],
+			['$}', 'incorrect syntax near "$}"'],
+			['MACRO}', 'incorrect syntax near "MACRO}"'],
+			['$MACRO}', 'incorrect syntax near "$MACRO}"'],
+			['{}', 'incorrect syntax near "}"'],
+			['{MACRO}', 'incorrect syntax near "MACRO}"'],
+			['}$MACRO{', 'incorrect syntax near "}$MACRO{"'],
+			['{$MACRO}}', 'incorrect syntax near "}"'],
+			['{{$MACRO}', 'incorrect syntax near "{$MACRO}"'],
+			['{{$MACRO}}', 'incorrect syntax near "{$MACRO}}"'],
+			['{$}', 'incorrect syntax near "}"'],
+			['{$$}', 'incorrect syntax near "$}"'],
+			['{$$MACRO}', 'incorrect syntax near "$MACRO}"'],
+			['{$MACRO$}', 'incorrect syntax near "$}"']
 		];
 	}
 
@@ -236,7 +236,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	/**
 	 * @dataProvider wrongMacros
 	 */
-	public function testFormAdministrationGeneralMacros_CreateWrong($macro) {
+	public function testFormAdministrationGeneralMacros_CreateWrong(string $macro, string $error) {
 		$this->calculateHash();
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -252,7 +252,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid parameter "/1/macro": a user macro is expected.');
+		$this->zbxTestTextPresent('Invalid parameter "/1/macro": '.$error.'.');
 
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', $this->newValue);
@@ -384,7 +384,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	/**
 	 * @dataProvider wrongMacros
 	 */
-	public function testFormAdministrationGeneralMacros_UpdateWrong($macro) {
+	public function testFormAdministrationGeneralMacros_UpdateWrong(string $macro, string $error) {
 		$this->calculateHash();
 
 		$this->openGlobalMacros();
@@ -395,7 +395,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid parameter "/1/macro": a user macro is expected.');
+		$this->zbxTestTextPresent('Invalid parameter "/1/macro": '.$error.'.');
 
 		$this->zbxTestAssertElementValue('macros_0_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_0_value', $this->updValue);
