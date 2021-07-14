@@ -91,8 +91,9 @@
 
 						curl.setArgument('action', 'service.delete');
 						curl.setArgument('serviceids', [e.target.dataset.serviceid]);
+						curl.setArgument('back_url', this.back_url);
 
-						redirect(curl.getUrl(), 'post', 'sid', true, true);
+						redirect(curl.getUrl(), 'post');
 					}
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
