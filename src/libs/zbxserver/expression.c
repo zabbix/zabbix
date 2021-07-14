@@ -2200,7 +2200,7 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%s", r_event->name);
 	}
-	else if (EVENT_SOURCE_TRIGGERS == r_event->source)
+	else if (EVENT_SOURCE_TRIGGERS == r_event->source || EVENT_SOURCE_TRIGGERS == r_event->source)
 	{
 		if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TAGS))
 			get_event_tags(r_event, replace_to);

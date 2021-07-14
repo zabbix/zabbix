@@ -2697,7 +2697,6 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					problems_delete_num += events.values_num;
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE:
-
 					process_rootcause(message, &service_manager, client);
 					break;
 				default:

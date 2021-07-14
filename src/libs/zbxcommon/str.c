@@ -1709,7 +1709,7 @@ const char	*zbx_item_state_string(unsigned char state)
 
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value)
 {
-	if (EVENT_SOURCE_TRIGGERS == source)
+	if (EVENT_SOURCE_TRIGGERS == source || EVENT_SOURCE_SERVICE == source)
 	{
 		switch (value)
 		{
