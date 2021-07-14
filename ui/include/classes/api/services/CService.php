@@ -51,16 +51,21 @@ class CService extends CApiService {
 			'childids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'tags' =>					['type' => API_OBJECTS, 'default' => [], 'fields' => [
-				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'value' =>					['type' => API_STRING_UTF8],
 				'operator' =>				['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])]
 			]],
+			'problem_tags' =>			['type' => API_OBJECTS, 'default' => [], 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'value' =>					['type' => API_STRING_UTF8],
+				'operator' =>				['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])]
+			]],
+			'without_problem_tags' =>	['type' => API_FLAG, 'default' => false],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'serviceid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
-				'algorithm' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', array_keys(serviceAlgorithm()))],
-				'triggerid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'algorithm' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE])],
 				'showsla' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON])]
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
@@ -71,16 +76,16 @@ class CService extends CApiService {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder']), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectParents' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder']), 'default' => null],
-			'selectChildren' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder']), 'default' => null],
-			'selectTrigger' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
-			'selectTimes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['ts_from', 'ts_to', 'type', 'note']), 'default' => null],
+			'selectParents' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder']), 'default' => null],
+			'selectChildren' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder']), 'default' => null],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectProblemTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'operator', 'value']), 'default' => null],
+			'selectTimes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['type', 'ts_from', 'ts_to', 'note']), 'default' => null],
 			'selectAlarms' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['clock', 'value']), 'default' => null],
 			// sort and limit
-			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['sortorder', 'name']), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
@@ -94,7 +99,7 @@ class CService extends CApiService {
 
 		$db_services = [];
 
-		$sql = $this->createSelectQuery($this->tableName(), $options);
+		$sql = $this->createSelectQuery('services', $options);
 		$resource = DBselect($sql, $options['limit']);
 
 		while ($row = DBfetch($resource)) {
@@ -107,7 +112,9 @@ class CService extends CApiService {
 
 		if ($db_services) {
 			$db_services = $this->addRelatedObjects($options, $db_services);
-			$db_services = $this->unsetExtraFields($db_services, ['serviceid', 'triggerid'], $options['output']);
+			$db_services = $this->unsetExtraFields($db_services, ['serviceid', 'sortorder', 'name'],
+				$options['output']
+			);
 
 			if (!$options['preservekeys']) {
 				$db_services = array_values($db_services);
@@ -138,6 +145,7 @@ class CService extends CApiService {
 		$services = array_combine($serviceids, $services);
 
 		$this->updateTags($services, __FUNCTION__);
+		$this->updateProblemTags($services, __FUNCTION__);
 		$this->updateParents($services, __FUNCTION__);
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services,  __FUNCTION__);
@@ -152,33 +160,37 @@ class CService extends CApiService {
 	 */
 	private function validateCreate(array &$services): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
-			'algorithm' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', array_keys(serviceAlgorithm()))],
-			'triggerid' =>	['type' => API_ID],
-			'showsla' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON])],
-			'goodsla' =>	['type' => API_FLOAT, 'in' => '0:100'],
-			'sortorder' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:999'],
-			'tags' =>		['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_tag', 'tag')],
-				'value' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_tag', 'value'), 'default' => DB::getDefault('service_tag', 'value')]
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
+			'algorithm' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE])],
+			'showsla' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON])],
+			'goodsla' =>		['type' => API_FLOAT, 'in' => '0:100'],
+			'sortorder' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:999'],
+			'tags' =>			['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_tag', 'tag')],
+				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_tag', 'value'), 'default' => DB::getDefault('service_tag', 'value')]
 			]],
-			'parents' =>	['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
-				'serviceid' =>	['type' => API_ID]
+			'problem_tags' =>	['type' => API_OBJECTS, 'uniq' => [['tag']], 'fields' => [
+				'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_problem_tag', 'tag')],
+				'operator' =>		['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
+				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_problem_tag', 'value'), 'default' => DB::getDefault('service_problem_tag', 'value')]
 			]],
-			'children' =>	['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
-				'serviceid' =>	['type' => API_ID]
+			'parents' =>		['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
+				'serviceid' =>		['type' => API_ID]
 			]],
-			'times' =>		['type' => API_OBJECTS, 'uniq' => [['type', 'ts_from', 'ts_to']], 'fields' => [
-				'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_TIME_TYPE_UPTIME, SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_ONETIME_DOWNTIME])],
-				'ts_from' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_UPTIME])], 'type' => API_INT32, 'in' => '0:'.SEC_PER_WEEK],
-					['if' => ['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_ONETIME_DOWNTIME])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE]
+			'children' =>		['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
+				'serviceid' =>		['type' => API_ID]
+			]],
+			'times' =>			['type' => API_OBJECTS, 'uniq' => [['type', 'ts_from', 'ts_to']], 'fields' => [
+				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_TIME_TYPE_UPTIME, SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_ONETIME_DOWNTIME])],
+				'ts_from' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+					['if' =>			['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_UPTIME])], 'type' => API_INT32, 'in' => '0:'.SEC_PER_WEEK],
+					['if' =>			['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_ONETIME_DOWNTIME])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE]
 				]],
-				'ts_to' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_UPTIME])], 'type' => API_INT32, 'in' => '0:'.SEC_PER_WEEK],
-					['if' => ['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_ONETIME_DOWNTIME])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE]
+				'ts_to' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+					['if' =>			['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_UPTIME])], 'type' => API_INT32, 'in' => '0:'.SEC_PER_WEEK],
+					['if' =>			['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_ONETIME_DOWNTIME])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE]
 				]],
-				'note' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('services_times', 'note'), 'default' => DB::getDefault('services_times', 'note')]
+				'note' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('services_times', 'note'), 'default' => DB::getDefault('services_times', 'note')]
 			]]
 		]];
 
@@ -186,11 +198,12 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkTriggerAndChildrenExclusivity($services);
-		$this->checkTriggerPermissions($services);
+		$this->checkGoodSla($services);
+		$this->checkAlgorithmDependencies($services);
 		$this->checkParents($services);
 		$this->checkChildren($services);
 		$this->checkCircularReferences($services);
+		$this->checkTimes($services);
 	}
 
 	/**
@@ -223,6 +236,7 @@ class CService extends CApiService {
 		$services = array_column($services, null, 'serviceid');
 
 		$this->updateTags($services, __FUNCTION__);
+		$this->updateProblemTags($services, __FUNCTION__);
 		$this->updateParents($services, __FUNCTION__);
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services, __FUNCTION__);
@@ -238,34 +252,38 @@ class CService extends CApiService {
 	 */
 	private function validateUpdate(array &$services, array &$db_services = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['serviceid']], 'fields' => [
-			'serviceid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
-			'algorithm' =>	['type' => API_INT32, 'in' => implode(',', array_keys(serviceAlgorithm()))],
-			'triggerid' =>	['type' => API_ID],
-			'showsla' =>	['type' => API_INT32, 'in' => implode(',', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON])],
-			'goodsla' =>	['type' => API_FLOAT, 'in' => '0:100'],
-			'sortorder' =>	['type' => API_INT32, 'in' => '0:999'],
-			'tags' =>		['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_tag', 'tag')],
-				'value' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_tag', 'value'), 'default' => DB::getDefault('service_tag', 'value')]
+			'serviceid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
+			'algorithm' =>		['type' => API_INT32, 'in' => implode(',', [SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE])],
+			'showsla' =>		['type' => API_INT32, 'in' => implode(',', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON])],
+			'goodsla' =>		['type' => API_FLOAT, 'in' => '0:100'],
+			'sortorder' =>		['type' => API_INT32, 'in' => '0:999'],
+			'tags' =>			['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_tag', 'tag')],
+				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_tag', 'value'), 'default' => DB::getDefault('service_tag', 'value')]
 			]],
-			'parents' =>	['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
-				'serviceid' =>	['type' => API_ID]
+			'problem_tags' =>	['type' => API_OBJECTS, 'uniq' => [['tag']], 'fields' => [
+				'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_problem_tag', 'tag')],
+				'operator' =>		['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
+				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_problem_tag', 'value'), 'default' => DB::getDefault('service_problem_tag', 'value')]
 			]],
-			'children' =>	['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
-				'serviceid' =>	['type' => API_ID]
+			'parents' =>		['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
+				'serviceid' =>		['type' => API_ID]
 			]],
-			'times' =>		['type' => API_OBJECTS, 'uniq' => [['type', 'ts_from', 'ts_to']], 'fields' => [
+			'children' =>		['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
+				'serviceid' =>		['type' => API_ID]
+			]],
+			'times' =>			['type' => API_OBJECTS, 'uniq' => [['type', 'ts_from', 'ts_to']], 'fields' => [
 				'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_TIME_TYPE_UPTIME, SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_ONETIME_DOWNTIME])],
-				'ts_from' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_UPTIME])], 'type' => API_INT32, 'in' => '0:'.SEC_PER_WEEK],
-					['if' => ['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_ONETIME_DOWNTIME])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE]
+				'ts_from' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+					['if' =>			['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_UPTIME])], 'type' => API_INT32, 'in' => '0:'.SEC_PER_WEEK],
+					['if' =>			['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_ONETIME_DOWNTIME])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE]
 				]],
-				'ts_to' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-					['if' => ['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_UPTIME])], 'type' => API_INT32, 'in' => '0:'.SEC_PER_WEEK],
-					['if' => ['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_ONETIME_DOWNTIME])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE]
+				'ts_to' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+					['if' =>			['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_UPTIME])], 'type' => API_INT32, 'in' => '0:'.SEC_PER_WEEK],
+					['if' =>			['field' => 'type', 'in' => implode(',', [SERVICE_TIME_TYPE_ONETIME_DOWNTIME])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE]
 				]],
-				'note' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('services_times', 'note'), 'default' => DB::getDefault('services_times', 'note')]
+				'note' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('services_times', 'note'), 'default' => DB::getDefault('services_times', 'note')]
 			]]
 		]];
 
@@ -274,9 +292,10 @@ class CService extends CApiService {
 		}
 
 		$db_services = $this->get([
-			'output' => ['serviceid', 'name', 'status', 'algorithm', 'triggerid', 'showsla', 'goodsla', 'sortorder'],
+			'output' => ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder'],
 			'selectParents' => ['serviceid'],
 			'selectChildren' => ['serviceid'],
+			'selectProblemTags' => API_OUTPUT_COUNT,
 			'serviceids' => array_column($services, 'serviceid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -286,11 +305,12 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkTriggerAndChildrenExclusivity($services, $db_services);
-		$this->checkTriggerPermissions($services, $db_services);
+		$this->checkGoodSla($services, $db_services);
+		$this->checkAlgorithmDependencies($services, $db_services);
 		$this->checkParents($services);
 		$this->checkChildren($services);
 		$this->checkCircularReferences($services, $db_services);
+		$this->checkTimes($services);
 	}
 
 	/**
@@ -326,7 +346,7 @@ class CService extends CApiService {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['parentids'] !== null) {
-			$sqlParts['left_table'] = ['table' => $this->tableName, 'alias' => $this->tableAlias];
+			$sqlParts['left_table'] = ['table' => 'services', 'alias' => 's'];
 			$sqlParts['left_join'][] = [
 				'table' => 'services_links',
 				'alias' => 'slp',
@@ -336,7 +356,7 @@ class CService extends CApiService {
 		}
 
 		if ($options['childids'] !== null) {
-			$sqlParts['left_table'] = ['table' => $this->tableName, 'alias' => $this->tableAlias];
+			$sqlParts['left_table'] = ['table' => 'services', 'alias' => 's'];
 			$sqlParts['left_join'][] = [
 				'table' => 'services_links',
 				'alias' => 'slc',
@@ -351,16 +371,19 @@ class CService extends CApiService {
 			);
 		}
 
-		return $sqlParts;
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if (!$options['countOutput']) {
-			if ($options['selectTrigger'] !== null && $options['selectTrigger'] !== API_OUTPUT_COUNT) {
-				$sqlParts = $this->addQuerySelect($this->fieldId('triggerid'), $sqlParts);
-			}
+		if ($options['problem_tags']) {
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['problem_tags'], $options['evaltype'], 's',
+				'service_problem_tag', 'serviceid'
+			);
+		}
+		elseif ($options['without_problem_tags']) {
+			$sqlParts['left_table'] = ['table' => 'services', 'alias' => 's'];
+			$sqlParts['left_join'][] = [
+				'table' => 'service_problem_tag',
+				'alias' => 'spt',
+				'using' => 'serviceid',
+			];
+			$sqlParts['where'][] = dbConditionId('spt.service_problem_tagid', [0]);
 		}
 
 		return $sqlParts;
@@ -409,30 +432,79 @@ class CService extends CApiService {
 			}
 		}
 
-		if ($options['selectTrigger'] !== null) {
-			$relation_map = $this->createRelationMap($result, 'serviceid', 'triggerid');
-			$triggers = API::Trigger()->get([
-				'output' => $options['selectTrigger'],
-				'triggerids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relation_map->mapOne($result, $triggers, 'trigger');
-		}
-
 		if ($options['selectTags'] !== null) {
-			$tags = API::getApiService()->select('service_tag', [
-				'output' => $this->outputExtend($options['selectTags'], ['servicetagid', 'serviceid']),
+			if ($options['selectTags'] === API_OUTPUT_COUNT) {
+				$output = ['servicetagid', 'serviceid'];
+			}
+			elseif ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$output = ['servicetagid', 'serviceid', 'tag', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['servicetagid', 'serviceid'], $options['selectTags']));
+			}
+
+			$tags = DB::select('service_tag', [
+				'output' => $output,
 				'filter' => ['serviceid' => $serviceids],
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($tags, 'serviceid', 'servicetagid');
-			$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid'], ['selectTags']);
+			$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid'], $options['selectTags']);
 			$result = $relation_map->mapMany($result, $tags, 'tags');
+
+			if ($options['selectTags'] === API_OUTPUT_COUNT) {
+				foreach ($result as &$row) {
+					$row['tags'] = (string) count($row['tags']);
+				}
+				unset($row);
+			}
+		}
+
+		if ($options['selectProblemTags'] !== null) {
+			if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
+				$output = ['service_problem_tagid', 'serviceid'];
+			}
+			elseif ($options['selectProblemTags'] === API_OUTPUT_EXTEND) {
+				$output = ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['service_problem_tagid', 'serviceid'],
+					$options['selectProblemTags']
+				));
+			}
+
+			$problem_tags = DB::select('service_problem_tag', [
+				'output' => $output,
+				'filter' => ['serviceid' => $serviceids],
+				'preservekeys' => true
+			]);
+			$relation_map = $this->createRelationMap($problem_tags, 'serviceid', 'service_problem_tagid');
+			$problem_tags = $this->unsetExtraFields($problem_tags, ['service_problem_tagid', 'serviceid'],
+				$options['selectProblemTags']
+			);
+			$result = $relation_map->mapMany($result, $problem_tags, 'problem_tags');
+
+			if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
+				foreach ($result as &$row) {
+					$row['problem_tags'] = (string) count($row['problem_tags']);
+				}
+				unset($row);
+			}
 		}
 
 		if ($options['selectTimes'] !== null) {
-			$times = API::getApiService()->select('services_times', [
-				'output' => $this->outputExtend($options['selectTimes'], ['timeid', 'serviceid']),
+			if ($options['selectTimes'] === API_OUTPUT_COUNT) {
+				$output = ['timeid', 'serviceid'];
+			}
+			elseif ($options['selectTimes'] === API_OUTPUT_EXTEND) {
+				$output = ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'];
+			}
+			else {
+				$output = array_unique(array_merge(['timeid', 'serviceid'], $options['selectTimes']));
+			}
+
+			$times = DB::select('services_times', [
+				'output' => $output,
 				'filter' => ['serviceid' => $serviceids],
 				'preservekeys' => true
 			]);
@@ -442,8 +514,18 @@ class CService extends CApiService {
 		}
 
 		if ($options['selectAlarms'] !== null) {
-			$alarms = API::getApiService()->select('service_alarms', [
-				'output' => $this->outputExtend($options['selectAlarms'], ['servicealarmid', 'serviceid']),
+			if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
+				$output = ['servicealarmid', 'serviceid'];
+			}
+			elseif ($options['selectAlarms'] === API_OUTPUT_EXTEND) {
+				$output = ['servicealarmid', 'serviceid', 'clock', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['servicealarmid', 'serviceid'], $options['selectAlarms']));
+			}
+
+			$alarms = DB::select('service_alarms', [
+				'output' => $output,
 				'filter' => ['serviceid' => $serviceids],
 				'preservekeys' => true
 			]);
@@ -461,20 +543,16 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkTriggerAndChildrenExclusivity(array $services, array $db_services = null): void {
+	private function checkGoodSla(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
-			$has_trigger = array_key_exists('triggerid', $service) && $service['triggerid'] != 0;
+			$name = array_key_exists('name', $service)
+				? $service['name']
+				: $db_services[$service['serviceid']]['name'];
 
-			$has_children = (array_key_exists('children', $service) && $service['children'])
-				|| ($db_services !== null && count($db_services[$service['serviceid']]['children']) > 0);
-
-			if ($has_trigger && $has_children) {
-				$name = array_key_exists('name', $service)
-					? $service['name']
-					: $db_services[$service['serviceid']]['name'];
-
+			if (array_key_exists('goodsla', $service)
+					&& round($service['goodsla'], 4) != $service['goodsla']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Service "%1$s" cannot be linked to a trigger and have children at the same time.', $name)
+					_s('Service "%1$s" must have no more than 4 digits after the decimal point.', $name)
 				);
 			}
 		}
@@ -486,34 +564,61 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkTriggerPermissions(array $services, array $db_services = null): void {
-		$triggerids = [];
-
+	private function checkAlgorithmDependencies(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
-			if (!array_key_exists('triggerid', $service) || $service['triggerid'] == 0) {
-				continue;
+			$name = array_key_exists('name', $service)
+				? $service['name']
+				: $db_services[$service['serviceid']]['name'];
+
+			$algorithm = array_key_exists('algorithm', $service)
+				? $service['algorithm']
+				: $db_services[$service['serviceid']]['algorithm'];
+
+			if (array_key_exists('problem_tags', $service)) {
+				$has_problem_tags = count($service['problem_tags']) > 0;
+			}
+			elseif ($db_services !== null) {
+				$has_problem_tags = $db_services[$service['serviceid']]['problem_tags'] > 0;
+			}
+			else {
+				$has_problem_tags = false;
 			}
 
-			if ($db_services !== null) {
-				if ((string) $service['triggerid'] === (string) $db_services[$service['serviceid']]['triggerid']) {
-					continue;
+			if ($algorithm == SERVICE_ALGORITHM_NONE) {
+				$showsla = array_key_exists('showsla', $service)
+					? $service['showsla']
+					: $db_services[$service['serviceid']]['showsla'];
+
+				if ($showsla == SERVICE_SHOW_SLA_ON) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Service "%1$s" cannot show SLA for the selected status calculation algorithm.', $name)
+					);
+				}
+
+				if ($has_problem_tags) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Service "%1$s" cannot have problem tags with the selected status calculation algorithm.',
+							$name
+						)
+					);
 				}
 			}
 
-			$triggerids[$service['triggerid']] = true;
-		}
+			if (array_key_exists('children', $service)) {
+				$has_children = count($service['children']) > 0;
+			}
+			elseif ($db_services !== null) {
+				$has_children = count($db_services[$service['serviceid']]['children']) > 0;
+			}
+			else {
+				$has_children = false;
+			}
 
-		if (!$triggerids) {
-			return;
-		}
-
-		$count = API::Trigger()->get([
-			'countOutput' => true,
-			'triggerids' => array_keys($triggerids)
-		]);
-
-		if ($count != count($triggerids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			if ($has_problem_tags && $has_children) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Service "%1$s" cannot have problem tags and children at the same time.', $name)
+				);
+			}
 		}
 	}
 
@@ -536,7 +641,8 @@ class CService extends CApiService {
 		}
 
 		$db_parent_services = $this->get([
-			'output' => ['name', 'triggerid'],
+			'output' => ['name'],
+			'selectProblemTags' => API_OUTPUT_COUNT,
 			'serviceids' => $parent_serviceids,
 			'editable' => true,
 			'preservekeys' => true
@@ -547,9 +653,9 @@ class CService extends CApiService {
 		}
 
 		foreach ($db_parent_services as $db_parent_service) {
-			if ($db_parent_service['triggerid'] != 0) {
+			if ($db_parent_service['problem_tags'] > 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Service "%1$s" cannot be linked to a trigger and have children at the same time.',
+					_s('Service "%1$s" cannot have problem tags and children at the same time.',
 						$db_parent_service['name']
 					)
 				);
@@ -648,7 +754,7 @@ class CService extends CApiService {
 		}
 
 		while ($add_references) {
-			$db_links = API::getApiService()->select('services_links', [
+			$db_links = DB::select('services_links', [
 				'output' => ['serviceupid', 'servicedownid'],
 				'filter' => ['servicedownid' => array_keys($add_references)]
 			]);
@@ -691,6 +797,25 @@ class CService extends CApiService {
 	}
 
 	/**
+	 * @param array $services
+	 *
+	 * @throws APIException
+	 */
+	private function checkTimes(array $services): void {
+		foreach ($services as $service) {
+			if (!array_key_exists('times', $service)) {
+				continue;
+			}
+
+			foreach ($service['times'] as $time) {
+				if ($time['ts_from'] >= $time['ts_to']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Service start time must be less than end time.'));
+				}
+			}
+		}
+	}
+
+	/**
 	 * @param array  $services
 	 * @param string $method
 	 */
@@ -711,7 +836,7 @@ class CService extends CApiService {
 		$ins_tags = [];
 
 		if ($method === 'update') {
-			$db_tags = API::getApiService()->select('service_tag', [
+			$db_tags = DB::select('service_tag', [
 				'output' => ['servicetagid', 'serviceid', 'tag', 'value'],
 				'filter' => ['serviceid' => array_keys($serviceids)]
 			]);
@@ -757,6 +882,79 @@ class CService extends CApiService {
 	 * @param array  $services
 	 * @param string $method
 	 */
+	private function updateProblemTags(array $services, string $method): void {
+		$serviceids = [];
+
+		foreach ($services as $serviceid => $service) {
+			if (array_key_exists('problem_tags', $service)) {
+				$serviceids[$serviceid] = true;
+			}
+		}
+
+		if (!$serviceids) {
+			return;
+		}
+
+		$del_problem_tags = [];
+		$ins_problem_tags = [];
+
+		if ($method === 'update') {
+			$db_problem_tags = DB::select('service_problem_tag', [
+				'output' => ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'],
+				'filter' => ['serviceid' => array_keys($serviceids)]
+			]);
+
+			foreach ($db_problem_tags as $db_problem_tag) {
+				$del_problem_tags[$db_problem_tag['serviceid']][$db_problem_tag['tag']][$db_problem_tag['operator']]
+					[$db_problem_tag['value']] = $db_problem_tag['service_problem_tagid'];
+			}
+		}
+
+		foreach (array_keys($serviceids) as $serviceid) {
+			foreach ($services[$serviceid]['problem_tags'] as $problem_tag) {
+				if (array_key_exists($serviceid, $del_problem_tags)
+						&& array_key_exists($problem_tag['tag'], $del_problem_tags[$serviceid])
+						&& array_key_exists($problem_tag['operator'],
+							$del_problem_tags[$serviceid][$problem_tag['tag']]
+						)
+						&& array_key_exists($problem_tag['value'],
+							$del_problem_tags[$serviceid][$problem_tag['tag']][$problem_tag['operator']]
+						)) {
+					unset($del_problem_tags[$serviceid][$problem_tag['tag']][$problem_tag['operator']]
+						[$problem_tag['value']]
+					);
+				}
+				else {
+					$ins_problem_tags[] = ['serviceid' => $serviceid] + $problem_tag;
+				}
+			}
+		}
+
+		if ($del_problem_tags) {
+			$del_service_problem_tagids = [];
+
+			foreach ($del_problem_tags as $del_problem_tags) {
+				foreach ($del_problem_tags as $del_problem_tags) {
+					foreach ($del_problem_tags as $del_problem_tags) {
+						foreach ($del_problem_tags as $service_problem_tagid) {
+							$del_service_problem_tagids[$service_problem_tagid] = true;
+						}
+					}
+				}
+			}
+
+			DB::delete('service_problem_tag', ['service_problem_tagid' => array_keys($del_service_problem_tagids)]);
+		}
+
+		if ($ins_problem_tags) {
+			DB::insertBatch('service_problem_tag', $ins_problem_tags);
+		}
+	}
+
+	/**
+	 * @param array  $services
+	 * @param string $method
+	 */
 	private function updateParents(array $services, string $method): void {
 		$serviceids = [];
 
@@ -774,7 +972,7 @@ class CService extends CApiService {
 		$ins_parents = [];
 
 		if ($method === 'update') {
-			$db_parents = API::getApiService()->select('services_links', [
+			$db_parents = DB::select('services_links', [
 				'output' => ['linkid', 'serviceupid', 'servicedownid'],
 				'filter' => ['servicedownid' => array_keys($serviceids)]
 			]);
@@ -834,7 +1032,7 @@ class CService extends CApiService {
 		$ins_children = [];
 
 		if ($method === 'update') {
-			$db_children = API::getApiService()->select('services_links', [
+			$db_children = DB::select('services_links', [
 				'output' => ['linkid', 'serviceupid', 'servicedownid'],
 				'filter' => ['serviceupid' => array_keys($serviceids)]
 			]);
@@ -847,7 +1045,7 @@ class CService extends CApiService {
 		foreach (array_keys($serviceids) as $serviceid) {
 			foreach ($services[$serviceid]['children'] as $child) {
 				if (array_key_exists($serviceid, $del_children)
-					&& array_key_exists($child['serviceid'], $del_children[$serviceid])) {
+						&& array_key_exists($child['serviceid'], $del_children[$serviceid])) {
 					unset($del_children[$serviceid][$child['serviceid']]);
 				}
 				else {
@@ -895,7 +1093,7 @@ class CService extends CApiService {
 		$upd_times = [];
 
 		if ($method === 'update') {
-			$db_times = API::getApiService()->select('services_times', [
+			$db_times = DB::select('services_times', [
 				'output' => ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'],
 				'filter' => ['serviceid' => array_keys($serviceids)]
 			]);

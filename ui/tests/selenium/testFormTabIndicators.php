@@ -831,40 +831,41 @@ class testFormTabIndicators extends CWebTest {
 	 * @onBeforeOnce prepareServiceData
 	 */
 	public function testFormTabIndicators_CheckServiceIndicators() {
-		$this->page->login()->open('services.php?form=1&parentname=root')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=service.list.edit')->waitUntilReady();
 
 		// Check status indicator in Dependencies tab.
-		$form = $this->query('id:services-form')->asForm()->one();
-		$form->selectTab('Dependencies');
-		$tab_selector = $form->query('xpath:.//a[text()="Dependencies"]')->one();
+		$this->query('button:Create service')->one()->waitUntilClickable()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asForm()->one();
+		$form->selectTab('Child services');
+		$tab_selector = $form->query('xpath:.//a[text()="Child services"]')->one();
 		$this->assertTabIndicator($tab_selector, 0);
 
 		// Add service ependencies and check dependency count indicator.
-		$dependencies_field = $form->getFieldContainer('Depends on');
-		$dependencies_field->query('button:Add')->one()->click();
-		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
-		$overlay->query('id:all_services')->asCheckbox()->one()->check();
+		$child_services_tab = $form->query('id:child-services-tab')->one();
+		$child_services_tab->query('button:Add')->one()->click();
+		$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$overlay->query('id:serviceid_all')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
-		COverlayDialogElement::ensureNotPresent();
+		$overlay->waitUntilNotVisible();
 		$this->assertTabIndicator($tab_selector, 2);
 
 		// Remove all dependencies and check count indicator.
-		$dependencies_field->query('button:Remove')->all()->click();
+		$child_services_tab->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
 
-		// Open Time tab and check count indicator.
-		$form->selectTab('Time');
-		$tab_selector = $form->query('xpath:.//a[text()="Time"]')->one();
-		$this->assertTabIndicator($tab_selector, 0);
+		// Open SLA tab and check count indicator.
+		$form->selectTab('SLA');
+		$tab_selector = $form->query('id:tab_sla-tab')->one();
+		$this->assertTabIndicator($tab_selector, false);
 
-		// Add a time period and check count indicator.
-		$form->getField('Period type')->select('One-time downtime');
-		$form->getFieldContainer('New service time')->query('button:Add')->one()->click();
-		$this->assertTabIndicator($tab_selector, 1);
+		// Add show sla and check status indicator.
+		$form->query('id:showsla')->one()->click();
+		$this->assertTabIndicator($tab_selector, true);
 
-		// Remove the added time period and check count indicator.
-		$form->getFieldContainer('Service times')->query('button:Remove')->one()->click();
-		$this->assertTabIndicator($tab_selector, 0);
+		// Remove the show sla  and check status indicator.
+		$form->query('id:showsla')->one()->click();
+		$this->assertTabIndicator($tab_selector, false);
 	}
 
 	/*

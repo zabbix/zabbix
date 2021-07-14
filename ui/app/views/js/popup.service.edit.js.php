@@ -25,12 +25,27 @@
 ?>
 
 window.service_edit_popup = {
+	algorithm_names: <?= json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT) ?>,
+
+	serviceid: null,
 	overlay: null,
 	form: null,
 
-	init({children, trigger_descriptions}) {
+	init({serviceid, children, children_problem_tags_html, problem_tags}) {
+		this.serviceid = serviceid;
 		this.overlay = overlays_stack.getById('service_edit');
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+
+		// Setup Tabs.
+
+		const $tabs = $('#tabs');
+
+		$tabs.tabs();
+		$tabs.on('tabsactivate', () => {
+			$tabs.resize();
+		});
+
+		// Add custom Select button for Parent services.
 
 		const template = document.createElement('template');
 
@@ -50,20 +65,28 @@ window.service_edit_popup = {
 
 		document.getElementById('parent_serviceids_').parentElement.appendChild(muiltiselect_button_wrap);
 
+		// Fill-in current Child services.
 		for (const service of children) {
 			this.addChild({
 				serviceid: service.serviceid,
 				name: service.name,
-				trigger_description: service.triggerid != 0 ? trigger_descriptions[service.triggerid] : ''
+				algorithm: service.algorithm,
+				problem_tags_html: children_problem_tags_html[service.serviceid]
 			});
 		}
 
-		const $tabs = $('#tabs');
+		// Setup Tags.
 
-		$tabs.tabs();
-		$tabs.on('tabsactivate', () => {
-			$tabs.resize();
+		const $tags = jQuery(document.getElementById('tags-table'));
+
+		$tags.dynamicRows({template: '#tag-row-tmpl'});
+		$tags.on('click', '.element-table-add', () => {
+			$tags
+				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+				.textareaFlexible();
 		});
+
+		// Update form field state according to the form data.
 
 		for (const id of ['algorithm', 'showsla']) {
 			document
@@ -73,6 +96,13 @@ window.service_edit_popup = {
 
 		this.update();
 
+		// Setup Problem tags.
+		jQuery(document.getElementById('problem_tags')).dynamicRows({
+			template: '#problem-tag-row-tmpl',
+			rows: problem_tags
+		});
+
+		// Setup Service times.
 		document
 			.getElementById('times')
 			.addEventListener('click', (e) => {
@@ -87,6 +117,7 @@ window.service_edit_popup = {
 				}
 			});
 
+		// Setup Child services.
 		document
 			.getElementById('children')
 			.addEventListener('click', (e) => {
@@ -103,8 +134,9 @@ window.service_edit_popup = {
 		const status_enabled = document.getElementById('algorithm').value != <?= SERVICE_ALGORITHM_NONE ?>;
 		const showsla = document.getElementById('showsla').checked;
 
-		document.getElementById('trigger').disabled = !status_enabled;
-		document.getElementById('trigger-button').disabled = !status_enabled;
+		document.getElementById('problem_tags_label').style.display = status_enabled ? '' : 'none';
+		document.getElementById('problem_tags_field').style.display = status_enabled ? '' : 'none';
+
 		document.getElementById('showsla').disabled = !status_enabled;
 		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
 	},
@@ -136,7 +168,7 @@ window.service_edit_popup = {
 
 		const overlay = PopUp('popup.service.time.edit', popup_params, 'service_time_edit', document.activeElement);
 
-		overlay.$dialogue[0].addEventListener('submit', (e) => {
+		overlay.$dialogue[0].addEventListener('service-time-submit', (e) => {
 			const new_row = e.detail;
 
 			if (row !== null) {
@@ -165,7 +197,8 @@ window.service_edit_popup = {
 				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-name" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
 					<input type="hidden">
 				</td>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-trigger_descripition" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;"></td>
+				<td class="js-algorithm"></td>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-problem_tags_html"></td>
 				<td>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"></button>
 				</td>
@@ -180,7 +213,8 @@ window.service_edit_popup = {
 		input.name = input_name;
 		input.value = service.serviceid;
 
-		row.querySelector('.js-trigger_descripition').textContent = service.trigger_description;
+		row.querySelector('.js-algorithm').textContent = this.algorithm_names[service.algorithm];
+		row.querySelector('.js-problem_tags_html').innerHTML = service.problem_tags_html;
 		row.querySelector('.js-remove').textContent = <?= json_encode(_('Remove')); ?>;
 
 		document
@@ -189,11 +223,22 @@ window.service_edit_popup = {
 	},
 
 	selectChildren() {
-		const overlay = PopUp('popup.services', {title: <?= json_encode(_('Add child services')); ?>}, 'services',
-			document.activeElement
-		);
+		const exclude_serviceids = [];
 
-		overlay.$dialogue[0].addEventListener('submit', (e) => {
+		if (this.serviceid !== null) {
+			exclude_serviceids.push(this.serviceid);
+		}
+
+		for (const input of this.form.querySelectorAll('#children tbody input')) {
+			exclude_serviceids.push(input.value);
+		}
+
+		const overlay = PopUp('popup.services', {
+			title: <?= json_encode(_('Add child services')); ?>,
+			exclude_serviceids
+		}, 'services', document.activeElement);
+
+		overlay.$dialogue[0].addEventListener('services-submit', (e) => {
 			for (const service of e.detail) {
 				this.addChild(service);
 			}
@@ -201,11 +246,22 @@ window.service_edit_popup = {
 	},
 
 	selectParents() {
-		const overlay = PopUp('popup.services', {title: <?= json_encode(_('Add parent services')); ?>}, 'services',
-			document.activeElement
-		);
+		const exclude_serviceids = [];
 
-		overlay.$dialogue[0].addEventListener('submit', (e) => {
+		if (this.serviceid !== null) {
+			exclude_serviceids.push(this.serviceid);
+		}
+
+		for (const service of jQuery('#parent_serviceids_').multiSelect('getData')) {
+			exclude_serviceids.push(service.id);
+		}
+
+		const overlay = PopUp('popup.services', {
+			title: <?= json_encode(_('Add parent services')); ?>,
+			exclude_serviceids
+		}, 'services', document.activeElement);
+
+		overlay.$dialogue[0].addEventListener('services-submit', (e) => {
 			const data = [];
 
 			for (const service of e.detail) {
@@ -256,8 +312,8 @@ window.service_edit_popup = {
 				let message_box;
 
 				if (typeof error === 'object' && 'html_string' in error) {
-					message_box = new DOMParser().parseFromString(error.html_string, 'text/html').body.
-						firstElementChild;
+					message_box =
+						new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild;
 				}
 				else {
 					const error = <?= json_encode(_('Unexpected server error.')) ?>;
@@ -274,6 +330,8 @@ window.service_edit_popup = {
 };
 
 service_edit_popup.init(<?= json_encode([
+	'serviceid' => $data['serviceid'],
 	'children' => $data['form']['children'],
-	'trigger_descriptions' => $data['form']['trigger_descriptions']
+	'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
+	'problem_tags' => $data['form']['problem_tags']
 ]) ?>);

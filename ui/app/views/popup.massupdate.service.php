@@ -48,7 +48,9 @@ $tags_form_grid = (new CFormGrid())
 					->addStyle('margin-bottom: 5px;'),
 				renderTagTable([['tag' => '', 'value' => '']])
 					->setHeader([_('Name'), _('Value'), _('Action')])
-					->setId('tags-table')
+					->setId('tags-table'),
+				(new CScriptTemplate('tag-row-tmpl'))
+					->addItem(renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]))
 			]))
 				->setId('tags-div')
 				->addClass(ZBX_STYLE_TABLE_FORMS)
@@ -56,8 +58,6 @@ $tags_form_grid = (new CFormGrid())
 	]);
 
 $form->addItem($tags_form_grid);
-
-$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
 
 $output = [
 	'header' => $data['title'],
@@ -70,11 +70,10 @@ $output = [
 			'isSubmit' => true,
 			'action' => 'return submitPopup(overlay);'
 		]
-	]
+	],
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.massupdate.js.php')
 ];
-
-$output['script_inline'] = $this->readJsFile('popup.massupdate.js.php');
-$output['script_inline'] .= getPagePostJs();
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();

@@ -50,17 +50,19 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = (new CFilter())
 		->addVar('action', 'service.list')
 		->addVar('serviceid', $data['service'] !== null ? $data['service']['serviceid'] : null)
-		->setResetUrl($data['view_curl'])
+		->setResetUrl($data['reset_curl'])
 		->setProfile('web.service.filter')
 		->setActiveTab($data['active_tab']);
 
 	if ($data['service'] !== null && !$data['is_filtered']) {
 		$parents = [];
 		while ($parent = array_shift($data['service']['parents'])) {
-			$parents[] = (new CLink($parent['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'service.list')
-				->setArgument('serviceid', $parent['serviceid'])
-			))->setAttribute('data-serviceid', $parent['serviceid']);
+			$parents[] = (new CLink($parent['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list')
+					->setArgument('serviceid', $parent['serviceid'])
+				))->setAttribute('data-serviceid', $parent['serviceid']);
+
 			$parents[] = CViewHelper::showNum($parent['children']);
 
 			if (!$data['service']['parents']) {
@@ -90,7 +92,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 							->addClass(ZBX_STYLE_SERVICE_INFO)
 							->addClass($service_status_style_class)
 							->addItem([
-								(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME)
+								(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME),
+								(new CDiv())
 							])
 							->addItem([
 								(new CDiv(_('Parents')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
@@ -153,76 +156,6 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	]);
 }
 
-if ($data['is_filtered']) {
-	$path = $data['path'];
-	if ($data['service'] !== null) {
-		$path[] = $data['service']['serviceid'];
-	}
-
-	$header = [
-		(new CColHeader(_('Parent services')))->addStyle('width: 15%'),
-		(new CColHeader(_('Name')))->addStyle('width: 10%')
-	];
-}
-else {
-	$path = null;
-
-	$header = [
-		(new CColHeader(_('Name')))->addStyle('width: 25%')
-	];
-}
-
-$table = (new CTableInfo())
-	->setHeader(array_merge($header, [
-		(new CColHeader(_('Status')))->addStyle('width: 14%'),
-		(new CColHeader(_('Root cause')))->addStyle('width: 24%'),
-		(new CColHeader(_('SLA')))->addStyle('width: 14%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3)
-	]));
-
-foreach ($data['services'] as $serviceid => $service) {
-	$row = [];
-
-	if ($data['is_filtered']) {
-		$parents = [];
-		$count = 0;
-		while ($parent = array_shift($service['parents'])) {
-			$parents[] = (new CLink($parent['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'service.list')
-				->setArgument('serviceid', $parent['serviceid'])
-			))->setAttribute('data-serviceid', $parent['serviceid']);
-
-			$count++;
-			if ($count >= $data['max_in_table'] || !$service['parents']) {
-				break;
-			}
-
-			$parents[] = ', ';
-		}
-
-		$row[] = $parents;
-	}
-
-	$table->addRow(new CRow(array_merge($row, [
-		($service['children'] > 0)
-			? [
-				(new CLink($service['name'], (new CUrl('zabbix.php'))
-					->setArgument('action', 'service.list')
-					->setArgument('path', $path)
-					->setArgument('serviceid', $serviceid)
-				))->setAttribute('data-serviceid', $serviceid),
-				CViewHelper::showNum($service['children'])
-			]
-			: $service['name'],
-		in_array($service['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])
-			? (new CCol(_('OK')))->addClass(ZBX_STYLE_GREEN)
-			: (new CCol(getSeverityName($service['status'])))->addClass(getSeverityStyle($service['status'])),
-		'',
-		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
-		array_key_exists($serviceid, $data['tags']) ? $data['tags'][$serviceid] : ''
-	])));
-}
-
 (new CWidget())
 	->setTitle(_('Services'))
 	->setWebLayoutMode($web_layout_mode)
@@ -234,6 +167,7 @@ foreach ($data['services'] as $serviceid => $service) {
 						? (new CRadioButtonList('list_mode', ZBX_LIST_MODE_VIEW))
 							->addValue(_('View'), ZBX_LIST_MODE_VIEW)
 							->addValue(_('Edit'), ZBX_LIST_MODE_EDIT)
+							->disableAutocomplete()
 							->setModern(true)
 						: null
 				)
@@ -243,19 +177,21 @@ foreach ($data['services'] as $serviceid => $service) {
 	->setNavigation(
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
 	)
-	->addItem([
-		$filter,
-		$table,
-		$data['paging']
-	])
+	->addItem($filter)
+	->addItem(new CPartial('monitoring.service.list', array_intersect_key($data, array_flip([
+		'path', 'is_filtered', 'max_in_table', 'service', 'services', 'tags', 'paging'
+	]))))
 	->show();
 
 (new CScriptTag('
-	initializeView(
-		'.json_encode($data['path'] ?: null).',
-		'.json_encode($data['service'] !== null ? $data['service']['serviceid'] : null).',
-		'.json_encode($data['page']).'
-	);
-'))
+	service_list.init('.
+		json_encode([
+			'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
+			'mode_switch_url' => $data['edit_mode_url'],
+			'refresh_url' => $data['refresh_url'],
+			'refresh_interval' => $data['refresh_interval']
+		]).
+	');'
+))
 	->setOnDocumentReady()
 	->show();

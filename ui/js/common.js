@@ -971,8 +971,7 @@ Function.prototype.bindAsEventListener = function (context) {
 	};
 };
 
-function openMassupdatePopup(elem, popup_name) {
-	const data = {};
+function openMassupdatePopup(elem, popup_name, data = {}) {
 	const form = elem.closest('form');
 
 	data['ids'] = [...form.querySelectorAll('tbody input:checked')].map((input) => input.value);
@@ -995,5 +994,5 @@ function openMassupdatePopup(elem, popup_name) {
 			break;
 	}
 
-	return PopUp(popup_name, data, null, this);
+	return PopUp(popup_name, data, null, elem);
 }

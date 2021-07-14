@@ -29,44 +29,39 @@
 </script>
 
 <script>
-	function initializeView(path, serviceid, page) {
+	const service_list = {
+		serviceid: null,
+		mode_switch_url: null,
+		refresh_url: null,
+		refresh_interval: null,
+		back_url: null,
+		is_refresh_paused: false,
+		is_refresh_pending: false,
 
-		const init = () => {
-			initViewModeSwitcher();
-			initTagFilter();
-			initActionButtons();
-		}
+		init({serviceid, mode_switch_url, refresh_url, refresh_interval, back_url = null}) {
+			this.serviceid = serviceid;
+			this.mode_switch_url = mode_switch_url;
+			this.refresh_url = refresh_url;
+			this.refresh_interval = refresh_interval;
+			this.back_url = back_url;
 
-		const initViewModeSwitcher = () => {
+			this.initViewModeSwitcher();
+			this.initTagFilter();
+			this.initActionButtons();
+			this.initRefresh();
+		},
+
+		initViewModeSwitcher() {
 			for (const element of document.getElementsByName('list_mode')) {
 				if (!element.checked) {
-					element.addEventListener('click', (e) => {
-						const url = new Curl('zabbix.php', false);
-
-						url.setArgument('action', (e.target.value == <?= ZBX_LIST_MODE_VIEW ?>)
-							? 'service.list'
-							: 'service.list.edit'
-						);
-
-						if (path !== null) {
-							url.setArgument('path', path);
-						}
-
-						if (serviceid !== null) {
-							url.setArgument('serviceid', serviceid);
-						}
-
-						if (page !== null) {
-							url.setArgument('page', page);
-						}
-
-						redirect(url.getUrl());
+					element.addEventListener('click', () => {
+						location.href = this.mode_switch_url;
 					});
 				}
 			}
-		}
+		},
 
-		const initTagFilter = () => {
+		initTagFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -77,43 +72,104 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
 				new CTagFilterItem(row);
 			});
-		}
+		},
 
-		const initActionButtons = () => {
-			for (const element of document.querySelectorAll('.js-create-service, .js-add-child-service')) {
-				let popup_options = {};
-
-				if (element.dataset.serviceid !== 'undefined') {
-					popup_options = {
-						parent_serviceids: [element.dataset.serviceid]
-					};
+		initActionButtons() {
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-create-service')) {
+					this.edit();
 				}
-
-				element.addEventListener('click', (e) => {
-					PopUp('popup.service.edit', popup_options, 'service_edit', e.target);
-				});
-			}
-
-			for (const element of document.querySelectorAll('.js-edit-service')) {
-				element.addEventListener('click', (e) => {
-					PopUp('popup.service.edit', {serviceid: element.dataset.serviceid}, 'service_edit', e.target);
-				});
-			}
-
-			for (const element of document.querySelectorAll('.js-remove-service')) {
-				element.addEventListener('click', (e) => {
+				else if (e.target.classList.contains('js-add-child-service')) {
+					this.edit({parent_serviceids: [e.target.dataset.serviceid]});
+				}
+				else if (e.target.classList.contains('js-edit-service')) {
+					this.edit({serviceid: e.target.dataset.serviceid});
+				}
+				else if (e.target.classList.contains('js-remove-service')) {
 					if (window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
-						const url_delete = new Curl('zabbix.php', false);
+						const curl = new Curl('zabbix.php', false);
 
-						url_delete.setArgument('action', 'service.delete');
-						url_delete.setArgument('serviceids', [element.dataset.serviceid]);
+						curl.setArgument('action', 'service.delete');
+						curl.setArgument('serviceids', [e.target.dataset.serviceid]);
+						curl.setArgument('back_url', this.back_url);
 
-						redirect(url_delete.getUrl(), 'post', 'sid', true, true);
+						redirect(curl.getUrl(), 'post');
 					}
-				});
-			}
-		}
+				}
+				else if (e.target.classList.contains('js-massupdate-service')) {
+					openMassupdatePopup(e.target, 'popup.massupdate.service', {location_url: this.back_url});
+				}
+			});
+		},
 
-		init();
-	}
+		initRefresh() {
+			if (this.refresh_interval > 0) {
+				setInterval(() => this.refresh(), this.refresh_interval);
+			}
+		},
+
+		edit(options = {}) {
+			this.pauseRefresh();
+
+			PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
+
+			const overlay_close = (e, data) => {
+				if (data.dialogueid === 'service_edit') {
+					this.resumeRefresh();
+
+					jQuery.unsubscribe('overlay.close', overlay_close);
+				}
+			};
+
+			jQuery.subscribe('overlay.close', overlay_close);
+		},
+
+		pauseRefresh() {
+			this.is_refresh_paused = true;
+		},
+
+		resumeRefresh() {
+			this.is_refresh_paused = false;
+		},
+
+		refresh() {
+			if (this.is_refresh_paused || this.is_refresh_pending) {
+				return;
+			}
+
+			const service_list = document.getElementById('service-list');
+
+			if (service_list.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0) {
+				return;
+			}
+
+			this.is_refresh_pending = true;
+
+			service_list.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
+
+			fetch(this.refresh_url)
+				.then((response) => response.json())
+				.then((response) => {
+					if ('errors' in response) {
+						clearMessages();
+						addMessage(response.errors);
+					}
+					else {
+						if ('messages' in response) {
+							clearMessages();
+							addMessage(response.messages);
+						}
+
+						service_list.outerHTML = response.body;
+
+						chkbxRange.init();
+					}
+				})
+				.finally(() => {
+					service_list.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+
+					this.is_refresh_pending = false;
+				});
+		}
+	};
 </script>

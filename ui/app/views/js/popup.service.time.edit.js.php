@@ -69,7 +69,7 @@ window.service_time_edit_popup = {
 
 				overlayDialogueDestroy('service_time_edit');
 
-				this.dialogue.dispatchEvent(new CustomEvent('submit', {detail: response.body}));
+				this.dialogue.dispatchEvent(new CustomEvent('service-time-submit', {detail: response.body}));
 			})
 			.catch((error) => {
 				let message_box;

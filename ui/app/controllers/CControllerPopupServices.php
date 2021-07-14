@@ -27,8 +27,9 @@ class CControllerPopupServices extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'title' =>			'string|required',
-			'filter_name' =>	'string'
+			'title' =>				'string|required',
+			'filter_name' =>		'string',
+			'exclude_serviceids' =>	'array_db services.serviceid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -49,21 +50,43 @@ class CControllerPopupServices extends CController {
 	}
 
 	protected function doAction() {
+		$exclude_serviceids = $this->getInput('exclude_serviceids', []);
+
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 		$services = API::Service()->get([
-			'output' => ['serviceid', 'name', 'algorithm', 'triggerid'],
-			'selectTrigger' => ['description'],
+			'output' => ['serviceid', 'name', 'algorithm'],
+			'selectProblemTags' => ['tag', 'value'],
 			'search' => ['name' => $this->hasInput('filter_name') ? $this->getInput('filter_name') : null],
-			'limit' => $limit
+			'limit' => $limit + count($exclude_serviceids),
+			'preservekeys' => true
 		]);
+
+		$services = array_diff_key($services, array_flip($exclude_serviceids));
+		$services = array_slice($services, 0, $limit);
+
+		$problem_tags = [];
+
+		foreach ($services as $service) {
+			$problem_tags[] = [
+				'serviceid' => $service['serviceid'],
+				'tags' => $service['problem_tags']
+			];
+		}
+
+		foreach (makeTags($problem_tags, true, 'serviceid') as $serviceid => $tags) {
+			$problem_tags_html[$serviceid] = implode('', $tags);
+		}
 
 		$data = [
 			'title' => $this->getInput('title'),
 			'filter' => [
 				'name' => $this->getInput('filter_name', '')
 			],
+			'exclude_serviceids' => $exclude_serviceids,
 			'services' => $services,
+			'problem_tags' => makeTags($problem_tags, true, 'serviceid'),
+			'problem_tags_html' => $problem_tags_html,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

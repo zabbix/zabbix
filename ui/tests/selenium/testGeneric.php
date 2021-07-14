@@ -45,7 +45,7 @@ class testGeneric extends CLegacyWebTest {
 			['zabbix.php?action=charts.view',		'Custom graphs'],
 			['zabbix.php?action=map.view',			'Configuration of network maps'],
 			['zabbix.php?action=discovery.view',	'Status of discovery'],
-			['srv_status.php',						'Services [refreshed every 30 sec.]'],
+			['zabbix.php?action=service.list',						'Services'],
 
 			// inventory
 			['hostinventoriesoverview.php',	'Host inventory overview'],
@@ -77,7 +77,7 @@ class testGeneric extends CLegacyWebTest {
 
 			['sysmaps.php',							'Configuration of network maps'],
 			['zabbix.php?action=discovery.list',	'Configuration of discovery rules'],
-			['services.php',						'Configuration of services'],
+			['zabbix.php?action=service.list.edit',						'Services'],
 
 			// Administration
 			['zabbix.php?action=gui.edit',	'Configuration of GUI'],

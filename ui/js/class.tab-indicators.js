@@ -34,8 +34,6 @@ const TAB_INDICATOR_UPDATE_EVENT = 'tab-indicator-update';
 class TabIndicators {
 
 	constructor() {
-		console.log('tabin');
-
 		try {
 			this.form = this.getForm();
 			this.activateIndicators();
@@ -208,6 +206,8 @@ class TabIndicatorFactory {
 				return new HttpAuthTabIndicatorItem;
 			case 'Operations':
 				return new OperationsTabIndicatorItem;
+			case 'Sla':
+				return new SlaTabIndicatorItem;
 			case 'ChildServices':
 				return new ChildServicesTabIndicatorItem;
 			case 'Time':
@@ -943,6 +943,33 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 		if (target_node_ack) {
 			const observer_ack = new MutationObserver(observer_callback);
 			observer_ack.observe(target_node_ack, observer_options);
+		}
+	}
+}
+
+class SlaTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const element = document.querySelector('#showsla');
+
+		if (element !== null) {
+			return element.checked;
+		}
+
+		return false;
+	}
+
+	initObserver(element) {
+		const target_node = document.querySelector('#showsla');
+
+		if (target_node) {
+			target_node.addEventListener('click', () => {
+				this.addAttributes(element);
+			});
 		}
 	}
 }

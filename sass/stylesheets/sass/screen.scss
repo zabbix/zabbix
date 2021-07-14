@@ -2599,20 +2599,17 @@ $form-icon-btn: (
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
 		@extend %form-icon-btn;
-
-		@if $form-icon-btn == 'wzrd-action' {
-			margin-top: -16px;
-		}
 	}
 }
 
 %form-icon-btn {
 	border: 0;
+	margin: -4px 0;
+	vertical-align: middle;
 	cursor: pointer;
-	position: absolute;
-	@extend %button-icon-size;
 	opacity: .75;
 	transition: opacity .2s ease-out;
+	@extend %button-icon-size;
 
 	&:hover,
 	&:focus,
@@ -3014,9 +3011,8 @@ $form-icon-btn: (
 		}
 
 		.overlay-dialogue-controls {
-			display: flex;
-			justify-content: flex-end;
-			padding: 0 10px 10px;
+			text-align: right;
+			padding: 0 0 10px;
 
 			z-select {
 				text-align: left;
@@ -3494,6 +3490,12 @@ $form-icon-btn: (
 	.btn-grey {
 		float: left;
 		margin-top: 0;
+	}
+}
+
+.calendar-control {
+	input {
+		vertical-align: middle;
 	}
 }
 
@@ -6192,6 +6194,7 @@ z-select,
 	}
 }
 
+.modal-popup-medium,
 .modal-popup-static,
 .modal-popup-preprocessing {
 	.table-forms-container {

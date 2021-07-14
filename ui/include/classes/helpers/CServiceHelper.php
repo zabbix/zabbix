@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,21 +19,13 @@
 **/
 
 
-/**
- * @var CView $this
- */
+class CServiceHelper {
 
-$output = [
-	'body' => (new CPartial('monitoring.service.list', $data))->getOutput()
-];
-
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+	public static function getAlgorithmNames(): array {
+		return [
+			SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
+			SERVICE_ALGORITHM_MIN => _('Problem, if all children have problems'),
+			SERVICE_ALGORITHM_NONE => _('Do not calculate')
+		];
+	}
 }
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output);

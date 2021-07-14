@@ -39,12 +39,16 @@ window.services_popup = {
 		filter_form.addEventListener('submit', (e) => {
 			e.preventDefault();
 
-			PopUp('popup.services', {...getFormFields(this.form), ...getFormFields(filter_form)}, 'services', e.target);
+			PopUp('popup.services', getFormFields(filter_form), 'services', e.target);
 		}, {passive: false});
 
 		filter_form.addEventListener('reset', (e) => {
-			PopUp('popup.services', getFormFields(this.form), 'services', e.target);
-		});
+			e.preventDefault();
+
+			filter_form.elements.filter_name.value = '';
+
+			PopUp('popup.services', getFormFields(filter_form), 'services', e.target);
+		}, {passive: false});
 
 		this.form.addEventListener('click', (e) => {
 			if (e.target.matches('input[name="serviceid_all"]')) {
@@ -87,7 +91,7 @@ window.services_popup = {
 
 		overlayDialogueDestroy('services');
 
-		this.dialogue.dispatchEvent(new CustomEvent('submit', {detail: services}));
+		this.dialogue.dispatchEvent(new CustomEvent('services-submit', {detail: services}));
 	}
 };
 

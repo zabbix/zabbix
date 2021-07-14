@@ -693,6 +693,10 @@ define('SERVICE_STATUS_ANY', -1);
 define('SERVICE_STATUS_OK', 0);
 define('SERVICE_STATUS_PROBLEM', 1);
 
+define('ZBX_SERVICE_FILTER_TAGS_ANY',		0);
+define('ZBX_SERVICE_FILTER_TAGS_SERVICE',	1);
+define('ZBX_SERVICE_FILTER_TAGS_PROBLEM',	2);
+
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
 
@@ -1647,6 +1651,7 @@ define('TAB_INDICATOR_OVERRIDES', 'overrides');
 define('TAB_INDICATOR_STEPS', 'steps');
 define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
 define('TAB_INDICATOR_OPERATIONS', 'operations');
+define('TAB_INDICATOR_SLA', 'sla');
 define('TAB_INDICATOR_CHILD_SERVICES', 'child-services');
 define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
@@ -1898,6 +1903,7 @@ define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');
 define('ZBX_STYLE_SELECTED', 'selected');
 define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
 define('ZBX_STYLE_SERVER_NAME', 'server-name');
+define('ZBX_STYLE_SERVICE_ACTIONS', 'service-actions');
 define('ZBX_STYLE_SERVICE_INFO', 'service-info');
 define('ZBX_STYLE_SERVICE_INFO_LABEL', 'service-info-label');
 define('ZBX_STYLE_SERVICE_INFO_VALUE', 'service-info-value');

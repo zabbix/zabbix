@@ -25,12 +25,13 @@
 
 $form = (new CForm())
 	->cleanItems()
-	->setName('services-form')
-	->addVar('title', $data['title']);
+	->setName('services-form');
 
 $controls = (new CForm())
 	->cleanItems()
 	->setName('services_filter_form')
+	->addVar('title', $data['title'])
+	->addVar('exclude_serviceids', $data['exclude_serviceids'])
 	->addItem(
 		(new CList())
 			->addItem(new CLabel(_('Name'), 'services_filter_name'))
@@ -54,28 +55,22 @@ $services = (new CTableInfo())
 		(new CColHeader(new CCheckBox('serviceid_all')))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Name'),
 		_('Status calculation'),
-		_('Trigger')
+		_('Problem tags')
 	]);
 
 foreach ($data['services'] as $service) {
-	if ($service['triggerid'] != 0) {
-		$trigger_description = $service['trigger'] ? $service['trigger']['description'] : _('Inaccessible trigger');
-	}
-	else {
-		$trigger_description = '';
-	}
-
 	$services->addRow([
 		new CCol([
 			(new CCheckBox('serviceid', $service['serviceid']))->removeId(),
-			new CVar('name', $service['name']),
-			new CVar('trigger_description', $trigger_description)
+			(new CVar('name', $service['name']))->removeId(),
+			(new CVar('algorithm', $service['algorithm']))->removeId(),
+			(new CVar('problem_tags_html', $data['problem_tags_html'][$service['serviceid']]))->removeId()
 		]),
 		(new CCol(
 			(new CLink($service['name']))->addClass('js-name')
 		))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(serviceAlgorithm($service['algorithm'])))->addClass(ZBX_STYLE_NOWRAP),
-		(new CCol($trigger_description))->addClass(ZBX_STYLE_WORDBREAK)
+		(new CCol(CServiceHelper::getAlgorithmNames()[$service['algorithm']]))->addClass(ZBX_STYLE_NOWRAP),
+		new CCol($data['problem_tags'][$service['serviceid']])
 	]);
 }
 
