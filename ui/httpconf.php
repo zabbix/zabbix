@@ -729,7 +729,6 @@ if (isset($_REQUEST['form'])) {
 		$tags = getHttpTestTags([
 			'templates' => $parent_templates,
 			'hostid' => getRequest('hostid'),
-			'templated' => (bool) $db_httptest['templateid'],
 			'tags' => hasRequest('form_refresh') ? $tags : $db_httptest['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags']
 		]);
