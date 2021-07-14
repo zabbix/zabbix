@@ -26,6 +26,7 @@
 
 #include "valuecache.h"
 #include "macrofunc.h"
+#include "../zbxalgo/vectorimpl.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
 #	include <libxml/xpath.h>
@@ -38,6 +39,20 @@ typedef struct
 }
 zbx_libxml_error_t;
 #endif
+
+typedef struct
+{
+	char		*host;
+	char		*severity;
+	char		*tags;
+	char		*name;
+	int		clock;
+	unsigned char	nseverity;
+}
+zbx_rootcause_t;
+
+ZBX_VECTOR_DECL(rootcause, zbx_rootcause_t)
+ZBX_VECTOR_IMPL(rootcause, zbx_rootcause_t)
 
 #include "expression.h"
 
@@ -2297,35 +2312,69 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	}
 }
 
+static void	rootcause_free(zbx_rootcause_t *rootcause)
+{
+	zbx_free(rootcause->host);
+	zbx_free(rootcause->severity);
+	zbx_free(rootcause->tags);
+}
+
+static int	rootcause_compare_asc_func(const zbx_rootcause_t *d1, const zbx_rootcause_t *d2)
+{
+	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
+
+	return strcmp(d1->host, d2->host);
+}
+
 static void	get_rootcause(const DB_SERVICE *service, char **replace_to)
 {
-	int	i;
-	char	*d = "";
+	int			i;
+	char			*d = "";
+	zbx_vector_rootcause_t	rootcauses;
+
+	zbx_vector_rootcause_create(&rootcauses);
 
 	for (i = 0; i < service->events.values_num; i++)
 	{
-		DB_EVENT	*event;
-		char		*host = NULL, *severity = NULL, *tags = NULL;
+		DB_EVENT		*event;
+		zbx_rootcause_t		rootcause = {0};
+		int			ret;
 
 		event = (DB_EVENT *)service->events.values[i];
 
-		if (FAIL == DBget_trigger_value(&event->trigger, &host, 1, ZBX_REQUEST_HOST_HOST))
-			goto next;
+		if (FAIL == (ret = DBget_trigger_value(&event->trigger, &rootcause.host, 1, ZBX_REQUEST_HOST_HOST)))
+			goto fail;
 
-		if (FAIL == get_trigger_severity_name(event->severity, &severity))
-			goto next;
+		rootcause.nseverity = event->severity;
+		if (FAIL == (ret = get_trigger_severity_name(event->severity, &rootcause.severity)))
+			goto fail;
 
-		get_event_tags(event, &tags);
+		get_event_tags(event, &rootcause.tags);
+		rootcause.name = event->name;
+		rootcause.clock = event->clock;
+fail:
+		if (FAIL == ret)
+			rootcause_free(&rootcause);
+		else
+			zbx_vector_rootcause_append(&rootcauses, rootcause);
+	}
+
+	zbx_vector_rootcause_sort(&rootcauses, (zbx_compare_func_t)rootcause_compare_asc_func);
+
+	for (i = 0; i < rootcauses.values_num; i++)
+	{
+		zbx_rootcause_t	*rootcause = &rootcauses.values[i];
 
 		*replace_to = zbx_strdcatf(*replace_to, "%sHost: \"%s\" Problem name: \"%s\" Severity: \"%s\""
-				" Age: %s Problem tags: \"%s\"", d, host, event->name, severity,
-				zbx_age2str(time(NULL) - event->clock), tags);
+				" Age: %s Problem tags: \"%s\"", d, rootcause->host, rootcause->name,
+				rootcause->severity, zbx_age2str(time(NULL) - rootcause->clock), rootcause->tags);
 		d = "\n";
-next:
-		zbx_free(host);
-		zbx_free(severity);
-		zbx_free(tags);
 	}
+
+	for (i = 0; i < rootcauses.values_num; i++)
+		rootcause_free(&rootcauses.values[i]);
+
+	zbx_vector_rootcause_destroy(&rootcauses);
 }
 
 /******************************************************************************
