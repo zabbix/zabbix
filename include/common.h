@@ -376,8 +376,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_EVENT_TAG_VALUE		26
 #define CONDITION_TYPE_SERVICE			27
 #define CONDITION_TYPE_SERVICE_NAME		28
-#define CONDITION_TYPE_SERVICE_TAG		29
-#define CONDITION_TYPE_SERVICE_TAG_VALUE	30
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0

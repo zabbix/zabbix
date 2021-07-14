@@ -153,10 +153,10 @@ static const char	*service_update_match_condition(const zbx_service_update_t *up
 		case CONDITION_TYPE_SERVICE_NAME:
 			ret = condition_match_service_name(condition, update);
 			break;
-		case CONDITION_TYPE_SERVICE_TAG:
+		case CONDITION_TYPE_EVENT_TAG:
 			ret = condition_match_service_tag(condition, update);
 			break;
-		case CONDITION_TYPE_SERVICE_TAG_VALUE:
+		case CONDITION_TYPE_EVENT_TAG_VALUE:
 			ret = condition_match_service_tag_value(condition, update);
 			break;
 		default:
