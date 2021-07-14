@@ -1599,8 +1599,12 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ITEM_LOG_NSEVERITY		MVAR_ITEM_LOG "NSEVERITY}"
 #define MVAR_ITEM_LOG_EVENTID		MVAR_ITEM_LOG "EVENTID}"
 
-#define MVAR_SERVICE_NAME			"{SERVICE.NAME}"
-#define MVAR_SERVICE_ROOTCAUSE			"{SERVICE.ROOTCAUSE}"
+#define MVAR_SERVICE				"{SERVICE."
+#define MVAR_SERVICE_NAME			MVAR_SERVICE "NAME}"
+#define MVAR_SERVICE_ROOTCAUSE			MVAR_SERVICE "ROOTCAUSE}"
+#define MVAR_SERVICE_TAGS			MVAR_SERVICE "TAGS}"
+#define MVAR_SERVICE_TAGSJSON			MVAR_SERVICE "TAGSJSON}"
+#define MVAR_SERVICE_TAGS_PREFIX		MVAR_SERVICE "TAGS."
 
 #define MVAR_TRIGGER_DESCRIPTION		"{TRIGGER.DESCRIPTION}"
 #define MVAR_TRIGGER_COMMENT			"{TRIGGER.COMMENT}"		/* deprecated */
@@ -4156,6 +4160,19 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				else if (0 == strcmp(m, MVAR_SERVICE_ROOTCAUSE))
 				{
 					get_rootcause(event->service, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_SERVICE_TAGS))
+				{
+					get_event_tags(event, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_SERVICE_TAGSJSON))
+				{
+					get_event_tags_json(event, &replace_to);
+				}
+				else if (0 == strncmp(m, MVAR_SERVICE_TAGS_PREFIX,
+						ZBX_CONST_STRLEN(MVAR_SERVICE_TAGS_PREFIX)))
+				{
+					get_event_tag_by_name(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
