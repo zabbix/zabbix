@@ -142,13 +142,13 @@
 			fetch(this.refresh_url)
 				.then((response) => response.json())
 				.then((response) => {
-					clearMessages();
-
 					if ('errors' in response) {
+						clearMessages();
 						addMessage(response.errors);
 					}
 					else {
 						if ('messages' in response) {
+							clearMessages();
 							addMessage(response.messages);
 						}
 
