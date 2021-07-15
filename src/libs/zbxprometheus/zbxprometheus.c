@@ -410,17 +410,26 @@ static int	parse_label(const char *data, size_t pos, zbx_strloc_t *loc)
  ******************************************************************************/
 static int	parse_label_op(const char *data, size_t pos, zbx_strloc_t *loc)
 {
-	const char	*ptr = data + pos;
+	if ('=' == data[pos])
+	{
+		loc->l = pos;
 
-	if ('=' != *ptr)
-		return FAIL;
+		if ('~' == data[pos + 1])
+			loc->r = pos + 1; /* =~ */
+		else
+			loc->r = pos; /* = */
 
-	loc->l = loc->r = pos;
+		return SUCCEED;
+	}
+	else if ('!' == data[pos] && ('=' == data[pos + 1] || '~' == data[pos + 1]))
+	{
+		/* != or !~ */
+		loc->l = pos;
+		loc->r = pos + 1;
+		return SUCCEED;
+	}
 
-	if ('~' == ptr[1])
-		loc->r++;
-
-	return SUCCEED;
+	return FAIL;
 }
 
 /******************************************************************************
