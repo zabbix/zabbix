@@ -112,7 +112,6 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		$view_mode_curl = (clone $paging_curl)
 			->setArgument('action', 'service.list')
-			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
 			->removeArgument('filter_without_children')
 			->removeArgument('filter_without_problem_tags')
 			->removeArgument('filter_tag_source');
