@@ -367,6 +367,7 @@ typedef struct
 	unsigned char	autoreg_tls_accept;
 	char		*default_timezone;
 	int		auditlog_enabled;
+
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
 
