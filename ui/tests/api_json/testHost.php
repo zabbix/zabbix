@@ -196,29 +196,27 @@ class testHost extends CAPITest {
 		}
 	}
 
-	public static function host_output_field_presence() {
+	public static function dataHostFieldPresence() {
 		return [
-			[
+			'Check ouput=extend includes inventory_mode, excludes write-only properties' => [
 				'request' => [
-					'hostids' => 99013,
-					'output' => 'extend'
+					'output' => 'extend',
+					'hostids' => 99013
 				],
 				'expected_result' => [
 					'hostid' => '99013',
-					'host' => 'Host OS - Windows',
 					'inventory_mode' => '-1',
 					'tls_psk_identity' => null,
 					'tls_psk' => null
 				],
 			],
-			[
+			'Even listing write-only fields should not return them; inventory_mode (as a sample) absent if unspecified' => [
 				'request' => [
-					'hostids' => 99013,
-					'output' => ['host', 'tls_psk', 'tls_psk_identity']
+					'output' => ['host', 'tls_psk', 'tls_psk_identity'],
+					'hostids' => 99013
 				],
 				'expected_result' => [
 					'hostid' => '99013',
-					'host' => 'Host OS - Windows',
 					'inventory_mode' => null,
 					'tls_psk_identity' => null,
 					'tls_psk' => null
@@ -228,9 +226,9 @@ class testHost extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider host_output_field_presence
+	 * @dataProvider dataHostFieldPresence
 	 */
-	public function testHost_OutputFieldPresence($request, $expected_result) {
+	public function testHost_FieldPresenceAndExclusion($request, $expected_result) {
 		$result = $this->call('host.get', $request, null);
 
 		foreach($result['result'] as $host) {
