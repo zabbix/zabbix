@@ -71,7 +71,11 @@ class CWidgetHelper {
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 			->addItem(
-				(new CScriptTag('$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());'))
+				(new CScriptTag('$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());'.
+					'$("#widget-dialogue-form").on("focusout", \'[data-trim="1"]\', (e) =>
+						e.target.value = e.target.value.trim()
+					);'
+				))
 					->setOnDocumentReady()
 			);
 
