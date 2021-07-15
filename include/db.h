@@ -507,7 +507,7 @@ DB_ACKNOWLEDGE;
 typedef struct
 {
 	zbx_uint64_t	service_alarmid;
-	zbx_uint64_t	value;
+	int		value;
 	int		clock;
 }
 zbx_service_alarm_t;

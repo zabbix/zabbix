@@ -1399,7 +1399,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 	}
 	else if (EVENT_SOURCE_SERVICE == event->source)
 	{
-		priority = NULL == service_alarm ? event->severity : (int)service_alarm->value;
+		priority = NULL == service_alarm ? event->severity : service_alarm->value;
 	}
 	else
 		priority = TRIGGER_SEVERITY_NOT_CLASSIFIED;
@@ -2563,7 +2563,7 @@ static void	db_get_service_alarms(zbx_vector_service_alarm_t *service_alarms,
 
 		ZBX_STR2UINT64(service_alarm.service_alarmid, row[0]);
 		service_alarm.clock = atoi(row[1]);
-		ZBX_STR2UINT64(service_alarm.value, row[2]);
+		service_alarm.value = atoi(row[2]);
 
 		zbx_vector_service_alarm_append(service_alarms, service_alarm);
 	}
