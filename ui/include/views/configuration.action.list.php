@@ -25,6 +25,7 @@
 
 $submenu_source = [
 	EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
+	EVENT_SOURCE_SERVICE => _('Service actions'),
 	EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
 	EVENT_SOURCE_AUTOREGISTRATION => _('Autoregistration actions'),
 	EVENT_SOURCE_INTERNAL => _('Internal actions')
@@ -101,7 +102,9 @@ $actionTable = (new CTableInfo())
 
 if ($this->data['actions']) {
 	$actionConditionStringValues = actionConditionValueToString($this->data['actions']);
-	$actionOperationDescriptions = getActionOperationDescriptions($this->data['actions'], ACTION_OPERATION);
+	$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], $data['actions'],
+		ACTION_OPERATION
+	);
 
 	foreach ($this->data['actions'] as $aIdx => $action) {
 		$conditions = [];

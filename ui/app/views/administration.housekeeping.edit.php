@@ -55,6 +55,15 @@ $house_keeper_tab = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow(
+		(new CLabel(_('Service data storage period'), 'hk_events_service'))->setAsteriskMark(),
+		(new CTextBox('hk_events_service', $data['hk_events_service'], false,
+			DB::getFieldLength('config', 'hk_events_service')
+		))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setEnabled($data['hk_events_mode'] == 1)
+			->setAriaRequired()
+	)
+	->addRow(
 		(new CLabel(_('Internal data storage period'), 'hk_events_internal'))->setAsteriskMark(),
 		(new CTextBox('hk_events_internal', $data['hk_events_internal'], false,
 			DB::getFieldLength('config', 'hk_events_internal')

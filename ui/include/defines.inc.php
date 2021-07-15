@@ -20,7 +20,7 @@
 
 define('ZABBIX_VERSION',		'6.0.0alpha1');
 define('ZABBIX_API_VERSION',	'6.0.0');
-define('ZABBIX_EXPORT_VERSION',	'5.4');
+define('ZABBIX_EXPORT_VERSION',	'6.0');
 
 define('ZABBIX_DB_VERSION',		5050021);
 
@@ -288,6 +288,8 @@ define('CONDITION_TYPE_EVENT_TYPE',			23);
 define('CONDITION_TYPE_HOST_METADATA',		24);
 define('CONDITION_TYPE_EVENT_TAG',			25);
 define('CONDITION_TYPE_EVENT_TAG_VALUE',	26);
+define('CONDITION_TYPE_SERVICE',			27);
+define('CONDITION_TYPE_SERVICE_NAME',		28);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -1020,6 +1022,7 @@ define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
 define('EVENT_SOURCE_AUTOREGISTRATION',	2);
 define('EVENT_SOURCE_INTERNAL',			3);
+define('EVENT_SOURCE_SERVICE',			4);
 
 define('EVENT_OBJECT_TRIGGER',			0);
 define('EVENT_OBJECT_DHOST',			1);
@@ -1027,6 +1030,7 @@ define('EVENT_OBJECT_DSERVICE',			2);
 define('EVENT_OBJECT_AUTOREGHOST',		3);
 define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
+define('EVENT_OBJECT_SERVICE',			6);
 
 // Problem and event tag constants.
 define('TAG_EVAL_TYPE_AND_OR',		0);

@@ -58,6 +58,10 @@ class CAction extends CApiService {
 		EVENT_SOURCE_INTERNAL => [
 			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TEMPLATE, CONDITION_TYPE_EVENT_TYPE,
 			CONDITION_TYPE_EVENT_TAG, CONDITION_TYPE_EVENT_TAG_VALUE
+		],
+		EVENT_SOURCE_SERVICE => [
+			CONDITION_TYPE_SERVICE, CONDITION_TYPE_SERVICE_NAME, CONDITION_TYPE_EVENT_TAG,
+			CONDITION_TYPE_EVENT_TAG_VALUE
 		]
 	];
 
@@ -103,7 +107,9 @@ class CAction extends CApiService {
 		],
 		CONDITION_TYPE_EVENT_TAG_VALUE => [
 			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
-		]
+		],
+		CONDITION_TYPE_SERVICE => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_SERVICE_NAME => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]
 	];
 
 	/**
@@ -1588,10 +1594,8 @@ class CAction extends CApiService {
 	 * @param array  $conditions                     Conditions data array.
 	 * @param string $conditions[]['conditiontype']  Action condition type.
 	 * @param int    $conditions[]['operator']       Action condition operator.
-	 *
-	 * @return bool
 	 */
-	public function validateFilterConditionsIntegrity($name, $eventsource, array $conditions) {
+	public function validateFilterConditionsIntegrity($name, $eventsource, array $conditions): void {
 		foreach ($conditions as $condition) {
 			if (!in_array($condition['conditiontype'], $this->valid_condition_types[$eventsource])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1640,16 +1644,21 @@ class CAction extends CApiService {
 					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
 					OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY
 				],
-				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE]
+				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE],
+				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND]
 			],
 			ACTION_RECOVERY_OPERATION => [
 				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
 					OPERATION_TYPE_RECOVERY_MESSAGE
 				],
-				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_RECOVERY_MESSAGE]
+				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_RECOVERY_MESSAGE],
+				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
+					OPERATION_TYPE_RECOVERY_MESSAGE
+				]
 			],
 			ACTION_ACKNOWLEDGE_OPERATION => [
-				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]
+				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE],
+				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]
 			]
 		];
 
@@ -1757,6 +1766,10 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _(
 							'Specified script does not exist or you do not have rights on it for action operation command.'
 						));
+					}
+
+					if ($eventsource == EVENT_SOURCE_SERVICE) {
+						break;
 					}
 
 					$groupids = [];

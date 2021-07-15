@@ -39,7 +39,8 @@ $fields = [
 										],
 	'eventsource' =>					[T_ZBX_INT, O_OPT, null,
 											IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-												EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL
+												EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
+												EVENT_SOURCE_SERVICE
 											]),
 											null
 										],
@@ -315,7 +316,7 @@ elseif (hasRequest('add_recovery_operation') && hasRequest('new_recovery_operati
 }
 elseif (hasRequest('add_ack_operation') && $new_ack_operation) {
 	$new_ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
-	$new_ack_operation['eventsource'] = EVENT_SOURCE_TRIGGERS;
+	$new_ack_operation['eventsource'] = $eventsource;
 
 	if (API::Action()->validateOperationsIntegrity($new_ack_operation)) {
 		if (array_key_exists('id', $new_ack_operation)) {

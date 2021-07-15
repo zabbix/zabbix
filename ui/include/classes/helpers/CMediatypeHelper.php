@@ -24,13 +24,16 @@ class CMediatypeHelper {
 	/**
 	 * Message types.
 	 */
-	const MSG_TYPE_PROBLEM = 0;
-	const MSG_TYPE_RECOVERY = 1;
-	const MSG_TYPE_UPDATE = 2;
-	const MSG_TYPE_DISCOVERY = 3;
-	const MSG_TYPE_AUTOREG = 4;
-	const MSG_TYPE_INTERNAL = 5;
-	const MSG_TYPE_INTERNAL_RECOVERY = 6;
+	public const MSG_TYPE_PROBLEM = 0;
+	public const MSG_TYPE_RECOVERY = 1;
+	public const MSG_TYPE_UPDATE = 2;
+	public const MSG_TYPE_SERVICE = 3;
+	public const MSG_TYPE_SERVICE_RECOVERY = 4;
+	public const MSG_TYPE_SERVICE_UPDATE = 5;
+	public const MSG_TYPE_DISCOVERY = 6;
+	public const MSG_TYPE_AUTOREG = 7;
+	public const MSG_TYPE_INTERNAL = 8;
+	public const MSG_TYPE_INTERNAL_RECOVERY = 9;
 
 	/**
 	 * Returns an array of message templates.
@@ -85,6 +88,67 @@ class CMediatypeHelper {
 						"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
 						"{EVENT.UPDATE.MESSAGE}\n\n".
 						"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
+				]
+			],
+			self::MSG_TYPE_SERVICE => [
+				'eventsource' => EVENT_SOURCE_SERVICE,
+				'recovery' => ACTION_OPERATION,
+				'name' => _('Service'),
+				'template' => [
+					'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
+					'html' =>
+						'<b>Service problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br>'.
+						'<b>Service problem name:</b> {EVENT.NAME}<br>'.
+						'<b>Service:</b> {SERVICE.NAME}<br>'.
+						'<b>Severity:</b> {EVENT.SEVERITY}<br>'.
+						'<b>Original problem ID:</b> {EVENT.ID}<br><br>'.
+						'{SERVICE.ROOTCAUSE}',
+					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
+					'text' =>
+						"Service problem started at {EVENT.TIME} on {EVENT.DATE}\n".
+						"Service problem name: {EVENT.NAME}\n".
+						"Service: {SERVICE.NAME}\n".
+						"Severity: {EVENT.SEVERITY}\n".
+						"Original problem ID: {EVENT.ID}\n\n".
+						"{SERVICE.ROOTCAUSE}"
+				]
+			],
+			self::MSG_TYPE_SERVICE_RECOVERY => [
+				'eventsource' => EVENT_SOURCE_SERVICE,
+				'recovery' => ACTION_RECOVERY_OPERATION,
+				'name' => _('Service recovery'),
+				'template' => [
+					'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
+					'html' =>
+						'<b>Service "{SERVICE.NAME}" has been resolved</b> at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}<br>'.
+						'<b>Problem name:</b> {EVENT.NAME}<br>'.
+						'<b>Problem duration:</b> {EVENT.DURATION}<br>'.
+						'<b>Severity:</b> {EVENT.SEVERITY}<br>'.
+						'<b>Original problem ID:</b> {EVENT.ID}',
+					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
+					'text' =>
+						"Service \"{SERVICE.NAME}\" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
+						"Problem name: {EVENT.NAME}\n".
+						"Problem duration: {EVENT.DURATION}\n".
+						"Severity: {EVENT.SEVERITY}\n".
+						"Original problem ID: {EVENT.ID}"
+				]
+			],
+			self::MSG_TYPE_SERVICE_UPDATE => [
+				'eventsource' => EVENT_SOURCE_SERVICE,
+				'recovery' => ACTION_ACKNOWLEDGE_OPERATION,
+				'name' => _('Service update'),
+				'template' => [
+					'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
+					'html' =>
+						'<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br>'.
+						'<b>Current problem age</b> is {EVENT.AGE}.<br><br>'.
+						'{SERVICE.ROOTCAUSE}',
+					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
+					'text' =>
+						"Changed \"{SERVICE.NAME}\" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
+						"Current problem age is {EVENT.AGE}.\n\n".
+						"{SERVICE.ROOTCAUSE}"
 				]
 			],
 			self::MSG_TYPE_DISCOVERY => [

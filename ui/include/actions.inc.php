@@ -63,7 +63,9 @@ function condition_type2str($type) {
 		CONDITION_TYPE_EVENT_TYPE => _('Event type'),
 		CONDITION_TYPE_HOST_METADATA => _('Host metadata'),
 		CONDITION_TYPE_EVENT_TAG => _('Tag name'),
-		CONDITION_TYPE_EVENT_TAG_VALUE => _('Tag value')
+		CONDITION_TYPE_EVENT_TAG_VALUE => _('Tag value'),
+		CONDITION_TYPE_SERVICE => _('Service'),
+		CONDITION_TYPE_SERVICE_NAME => _('Service name')
 	];
 
 	return $types[$type];
@@ -106,6 +108,7 @@ function actionConditionValueToString(array $actions) {
 	$proxyIds = [];
 	$dRuleIds = [];
 	$dCheckIds = [];
+	$serviceids = [];
 
 	foreach ($actions as $i => $action) {
 		$result[$i] = [];
@@ -135,6 +138,10 @@ function actionConditionValueToString(array $actions) {
 					$proxyIds[$condition['value']] = $condition['value'];
 					break;
 
+				case CONDITION_TYPE_SERVICE:
+					$serviceids[$condition['value']] = $condition['value'];
+					break;
+
 				// return values as is for following condition types
 				case CONDITION_TYPE_TRIGGER_NAME:
 				case CONDITION_TYPE_HOST_METADATA:
@@ -146,6 +153,7 @@ function actionConditionValueToString(array $actions) {
 				case CONDITION_TYPE_DVALUE:
 				case CONDITION_TYPE_EVENT_TAG:
 				case CONDITION_TYPE_EVENT_TAG_VALUE:
+				case CONDITION_TYPE_SERVICE_NAME:
 					$result[$i][$j] = $condition['value'];
 					break;
 
@@ -191,6 +199,7 @@ function actionConditionValueToString(array $actions) {
 	$proxies = [];
 	$dRules = [];
 	$dChecks = [];
+	$services = [];
 
 	if ($groupIds) {
 		$groups = API::HostGroup()->get([
@@ -251,7 +260,15 @@ function actionConditionValueToString(array $actions) {
 		]);
 	}
 
-	if ($groups || $triggers || $hosts || $templates || $proxies || $dRules || $dChecks) {
+	if ($serviceids) {
+		$services = API::Service()->get([
+			'output' => ['name'],
+			'serviceids' => $serviceids,
+			'preservekeys' => true
+		]);
+	}
+
+	if ($groups || $triggers || $hosts || $templates || $proxies || $dRules || $dChecks || $services) {
 		foreach ($actions as $i => $action) {
 			foreach ($action['filter']['conditions'] as $j => $condition) {
 				$id = $condition['value'];
@@ -306,6 +323,12 @@ function actionConditionValueToString(array $actions) {
 							$result[$i][$j] = $drule['name'].NAME_DELIMITER.$dCheck;
 						}
 						break;
+
+					case CONDITION_TYPE_SERVICE:
+						if (isset($services[$id])) {
+							$result[$i][$j] = $services[$id]['name'];
+						}
+						break;
 				}
 			}
 		}
@@ -355,12 +378,13 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
  * Gathers media types, user groups, users, host groups, hosts and templates for actions and their operations, and
  * returns the HTML representation of action operation values according to action operation type.
  *
- * @param array $actions				Array of actions
- * @param int $type						Operations recovery type (ACTION_OPERATION or ACTION_RECOVERY_OPERATION)
+ * @param int   $eventsource  Action event source.
+ * @param array $actions      Array of actions.
+ * @param int   $type         Operations recovery type (ACTION_OPERATION or ACTION_RECOVERY_OPERATION).
  *
- * @return array						Returns an array of actions operation descriptions.
+ * @return array  Returns an array of actions operation descriptions.
  */
-function getActionOperationDescriptions(array $actions, $type) {
+function getActionOperationDescriptions(int $eventsource, array $actions, int $type): array {
 	$result = [];
 
 	$media_typeids = [];
@@ -607,6 +631,13 @@ function getActionOperationDescriptions(array $actions, $type) {
 					case OPERATION_TYPE_COMMAND:
 						$scriptid = $operation['opcommand']['scriptid'];
 
+						if ($eventsource == EVENT_SOURCE_SERVICE) {
+							$result[$i][$j][] = bold(_s('Run script "%1$s"', $scripts[$scriptid]['name']));
+							$result[$i][$j][] = BR();
+
+							break;
+						}
+
 						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 							$host_list = [];
 
@@ -776,6 +807,13 @@ function getActionOperationDescriptions(array $actions, $type) {
 					case OPERATION_TYPE_COMMAND:
 						$scriptid = $operation['opcommand']['scriptid'];
 
+						if ($eventsource == EVENT_SOURCE_SERVICE) {
+							$result[$i][$j][] = bold(_s('Run script "%1$s"', $scripts[$scriptid]['name']));
+							$result[$i][$j][] = BR();
+
+							break;
+						}
+
 						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 							$host_list = [];
 
@@ -876,6 +914,12 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_EVENT_TAG_VALUE,
 		CONDITION_TYPE_TEMPLATE
 	];
+	$conditions[EVENT_SOURCE_SERVICE] = [
+		CONDITION_TYPE_SERVICE,
+		CONDITION_TYPE_SERVICE_NAME,
+		CONDITION_TYPE_EVENT_TAG,
+		CONDITION_TYPE_EVENT_TAG_VALUE
+	];
 
 	if (isset($conditions[$eventsource])) {
 		return $conditions[$eventsource];
@@ -903,7 +947,7 @@ function get_opconditions_by_eventsource($eventsource) {
  * @return array
  */
 function getAllowedOperations($eventsource) {
-	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+	if ($eventsource == EVENT_SOURCE_TRIGGERS || $eventsource = EVENT_SOURCE_SERVICE) {
 		$operations = [
 			ACTION_OPERATION => [
 				OPERATION_TYPE_MESSAGE,
@@ -1004,7 +1048,7 @@ function operation_type2str($type) {
 }
 
 function sortOperations($eventsource, &$operations) {
-	if ($eventsource == EVENT_SOURCE_TRIGGERS || $eventsource == EVENT_SOURCE_INTERNAL) {
+	if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 		$esc_step_from = [];
 		$esc_step_to = [];
 		$esc_period = [];
@@ -1140,6 +1184,14 @@ function get_operators_by_conditiontype($conditiontype) {
 	$operators[CONDITION_TYPE_EVENT_TAG_VALUE] = [
 		CONDITION_OPERATOR_EQUAL,
 		CONDITION_OPERATOR_NOT_EQUAL,
+		CONDITION_OPERATOR_LIKE,
+		CONDITION_OPERATOR_NOT_LIKE
+	];
+	$operators[CONDITION_TYPE_SERVICE] = [
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	];
+	$operators[CONDITION_TYPE_SERVICE_NAME] = [
 		CONDITION_OPERATOR_LIKE,
 		CONDITION_OPERATOR_NOT_LIKE
 	];

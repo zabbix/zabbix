@@ -181,6 +181,11 @@ class CMenuHelper {
 								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
 								'actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS
 							),
+						(new CMenuItem(_('Service actions')))
+							->setUrl(
+								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_SERVICE),
+								'actionconf.php?eventsource='.EVENT_SOURCE_SERVICE
+							),
 						(new CMenuItem(_('Discovery actions')))
 							->setUrl(
 								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),

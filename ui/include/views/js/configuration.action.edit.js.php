@@ -1152,7 +1152,7 @@
 		 * @param {Node}   target          Popup opener the focus will be returned to.
 		 * @param {number} actionid        Current actionid.
 		 * @param {string} eventsource     One of: EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-		 *                                 EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL.
+		 *                                 EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE.
 		 * @param {string} recovery_phase  One of: ACTION_OPERATION, ACTION_RECOVERY_OPERATION,
 		 *                                 ACTION_ACKNOWLEDGE_OPERATION.
 		 * @param {object} operation       (optional) Current operation object.
