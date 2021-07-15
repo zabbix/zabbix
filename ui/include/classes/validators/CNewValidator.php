@@ -543,8 +543,7 @@ class CNewValidator {
 	}
 
 	private static function isCuid(string $value) {
-		$CUID_LENGTH = 25;
-		return substr($value, 0, 1) === 'c' && strlen($value) === $CUID_LENGTH;
+		return CCuid::isCuid($value) && CCuid::isCuidLength($value);
 	}
 
 	/**

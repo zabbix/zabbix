@@ -192,7 +192,7 @@ class CAudit {
 			return;
 		}
 
-		$recordsetid = generateCuid();
+		$recordsetid = CCuid::cuid();
 
 		list($field_name_resourceid, $field_name_resourcename) = self::$supported_type[$resourcetype];
 
