@@ -2803,7 +2803,7 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID | ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE |
 			ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
-	zbx_audit_init(&cfg);
+	zbx_audit_init(cfg.auditlog_enabled);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2821,7 +2821,7 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 				op_host_add(event, &cfg);
 				break;
 			case OPERATION_TYPE_HOST_REMOVE:
-				op_host_del(event, &cfg);
+				op_host_del(event);
 				break;
 			case OPERATION_TYPE_HOST_ENABLE:
 				op_host_enable(event, &cfg);
@@ -2895,7 +2895,7 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	{
 		zbx_vector_uint64_sort(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_groups_del(event, &cfg, &del_groupids);
+		op_groups_del(event, &del_groupids);
 	}
 
 	zbx_vector_uint64_destroy(&del_groupids);
@@ -2903,7 +2903,7 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	zbx_vector_uint64_destroy(&del_templateids);
 	zbx_vector_uint64_destroy(&lnk_templateids);
 
-	zbx_audit_flush(&cfg);
+	zbx_audit_flush();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

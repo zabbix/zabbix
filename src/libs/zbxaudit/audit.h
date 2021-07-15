@@ -34,8 +34,8 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
 		const char *output, const char *error);
 
-void	zbx_audit_init(zbx_config_t *cfg);
-void	zbx_audit_flush(zbx_config_t *cfg);
+void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_flush(void);
 void	zbx_audit_update_json_add_string(const zbx_uint64_t itemid, const char *key, const char *value);
 void	zbx_audit_update_json_add_uint64(const zbx_uint64_t itemid, const char *key, uint64_t value);
 void	zbx_audit_update_json_add_int(const zbx_uint64_t itemid, const char *key, int value);
@@ -44,22 +44,22 @@ void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key,
 void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, uint64_t value_old,
 		uint64_t value_new);
 void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const char *key, int value_old, int value_new);
-void	zbx_audit_host_update_json_add_interfaces(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t main_, zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns,
 		zbx_uint64_t port);
-void	zbx_audit_host_update_json_update_interface_useip(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_update_interface_useip(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t useip_old, zbx_uint64_t useip_new);
-void	zbx_audit_host_update_json_update_interface_ip(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_update_interface_ip(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		const char *ip_old, const char *ip_new);
-void	zbx_audit_host_update_json_update_interface_dns(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_update_interface_dns(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		const char *dns_old, const char *dns_new);
-void	zbx_audit_host_update_json_update_interface_port(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_update_interface_port(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t port_old, zbx_uint64_t port_new);
-void	zbx_audit_host_update_json_add_snmp_interface(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t version,
+void	zbx_audit_host_update_json_add_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version,
 		zbx_uint64_t bulk, const char *community, const char *securityname, zbx_uint64_t securitylevel,
 		const char *authpassphrase, const char *privpassphrase, zbx_uint64_t authprotocol,
 		zbx_uint64_t privprotocol, const char *contextname, zbx_uint64_t interfaceid);
-void	zbx_audit_host_update_json_update_snmp_interface(zbx_config_t *cfg, zbx_uint64_t hostid,
+void	zbx_audit_host_update_json_update_snmp_interface(zbx_uint64_t hostid,
 		zbx_uint64_t version_old, zbx_uint64_t version_new, zbx_uint64_t bulk_old,  zbx_uint64_t bulk_new,
 		const char *community_old, const char *community_new, const char *securityname_old,
 		const char *securityname_new, zbx_uint64_t securitylevel_old, zbx_uint64_t securitylevel_new,
@@ -67,17 +67,18 @@ void	zbx_audit_host_update_json_update_snmp_interface(zbx_config_t *cfg, zbx_uin
 		const char *privpassphrase_new, zbx_uint64_t authprotocol_old, zbx_uint64_t authprotocol_new,
 		zbx_uint64_t privprotocol_old, zbx_uint64_t privprotocol_new, const char *contextname_old,
 		const char *contextname_new, zbx_uint64_t interfaceid);
-void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_config_t *cfg, zbx_uint64_t hostid,
+void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_uint64_t hostid,
 		zbx_uint64_t proxy_hostid, const char *hostname);
-void	zbx_audit_host_update_json_add_tls_and_psk(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t tls_connect,
+void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, zbx_uint64_t tls_connect,
 		zbx_uint64_t tls_accept, const char *psk_identity, const char *psk);
-void	zbx_audit_host_update_json_add_inventory_mode(zbx_config_t *cfg, zbx_uint64_t hostid, int inventory_mode);
-void	zbx_audit_host_update_json_update_inventory_mode(zbx_config_t *cfg, zbx_uint64_t hostid, int inventory_mode_old,
+void	zbx_audit_host_update_json_add_inventory_mode(zbx_uint64_t hostid, int inventory_mode);
+void	zbx_audit_host_update_json_update_inventory_mode(zbx_uint64_t hostid, int inventory_mode_old,
 		int inventory_mode_new);
-void	zbx_audit_host_update_json_update_host_status(zbx_config_t *cfg, zbx_uint64_t hostid, int host_status_old,
+void	zbx_audit_host_update_json_update_host_status(zbx_uint64_t hostid, int host_status_old,
 		int host_status_new);
-void	zbx_audit_host_create_entry(zbx_config_t *cfg, int audit_action, zbx_uint64_t hostid, const char *name);
-void	zbx_audit_host_add_groups(zbx_config_t *cfg, const char *audit_details_action, zbx_uint64_t hostid,
+void	zbx_audit_host_create_entry(int audit_action, zbx_uint64_t hostid, const char *name);
+void	zbx_audit_host_add_groups(const char *audit_details_action, zbx_uint64_t hostid,
 		zbx_uint64_t groupid);
-void	zbx_audit_host_del(zbx_config_t *cfg, zbx_uint64_t hostid, const char *hostname);
+void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname);
+void	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids);
 #endif	/* ZABBIX_AUDIT_H */

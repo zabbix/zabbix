@@ -79,8 +79,12 @@ static	void update_int_json(struct zbx_json *json, const char *key, int val_old,
 	zbx_json_close(json);
 }
 
+/* #define IS_AUDIT_ON(...)					\ */
+/* 	if (ZBX_AUDITLOG_ENABLED != cfg->auditlog_enabled)	\ */
+/* 		return						\ */
+
 #define IS_AUDIT_ON(...)					\
-	if (ZBX_AUDITLOG_ENABLED != cfg->auditlog_enabled)	\
+	if (ZBX_AUDITLOG_ENABLED != audit_mode)			\
 		return						\
 
 
@@ -164,7 +168,8 @@ out:
 	return ret;
 }
 
-zbx_hashset_t zbx_audit;
+int		audit_mode;
+zbx_hashset_t	zbx_audit;
 
 typedef struct zbx_audit_entry
 {
@@ -193,7 +198,7 @@ static int	zbx_audit_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-static void	zbx_audit_clean(zbx_config_t *cfg)
+static void	zbx_audit_clean(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
@@ -212,15 +217,16 @@ static void	zbx_audit_clean(zbx_config_t *cfg)
 	zbx_hashset_destroy(&zbx_audit);
 }
 
-void	zbx_audit_init(zbx_config_t *cfg)
+void	zbx_audit_init(int audit_mode_set)
 {
+	audit_mode = audit_mode_set;
 	IS_AUDIT_ON();
 #define AUDIT_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&zbx_audit, AUDIT_HASHSET_DEF_SIZE, zbx_audit_hash_func, zbx_audit_compare_func);
 #undef AUDIT_HASHSET_DEF_SIZE
 }
 
-void	zbx_audit_flush(zbx_config_t *cfg)
+void	zbx_audit_flush(void)
 {
 	char			audit_cuid[CUID_LEN], recsetid_cuid[CUID_LEN];
 	zbx_hashset_iter_t	iter;
@@ -243,7 +249,7 @@ void	zbx_audit_flush(zbx_config_t *cfg)
 				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
 			zbx_json_close(&((*audit_entry)->details_json));
-#define AUDIT_USERID	"0"
+#define AUDIT_USERID	0
 #define AUDIT_USERNAME	""
 #define AUDIT_IP	""
 			zbx_db_insert_add_values(&db_insert_audit, audit_cuid, AUDIT_USERID, AUDIT_USERNAME,
@@ -259,7 +265,7 @@ void	zbx_audit_flush(zbx_config_t *cfg)
 	zbx_db_insert_execute(&db_insert_audit);
 	zbx_db_insert_clean(&db_insert_audit);
 
-	zbx_audit_clean(cfg);
+	zbx_audit_clean();
 }
 
 void	zbx_audit_update_json_add_string(const zbx_uint64_t id, const char *key, const char *value)
@@ -375,7 +381,7 @@ void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const char *key, in
 	update_int_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
-void	zbx_audit_host_update_json_add_interfaces(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t main_, zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns,
 		zbx_uint64_t port)
 {
@@ -399,7 +405,7 @@ void	zbx_audit_host_update_json_add_interfaces(zbx_config_t *cfg, zbx_uint64_t h
 	zbx_audit_update_json_add_uint64(hostid, audit_key_port, port);
 }
 
-void	zbx_audit_host_update_json_update_interface_useip(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_update_interface_useip(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t useip_old, zbx_uint64_t useip_new)
 {
 	char	audit_key_useip[AUDIT_DETAILS_KEY_LEN];
@@ -410,7 +416,7 @@ void	zbx_audit_host_update_json_update_interface_useip(zbx_config_t *cfg, zbx_ui
 	zbx_audit_update_json_update_uint64(hostid, audit_key_useip, useip_old, useip_new);
 }
 
-void	zbx_audit_host_update_json_update_interface_ip(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_update_interface_ip(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		const char *ip_old, const char *ip_new)
 {
 	char	audit_key_ip[AUDIT_DETAILS_KEY_LEN];
@@ -421,7 +427,7 @@ void	zbx_audit_host_update_json_update_interface_ip(zbx_config_t *cfg, zbx_uint6
 	zbx_audit_update_json_update_string(hostid, audit_key_ip, ip_old, ip_new);
 }
 
-void	zbx_audit_host_update_json_update_interface_dns(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_update_interface_dns(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		const char *dns_old, const char *dns_new)
 {
 	char	audit_key_dns[AUDIT_DETAILS_KEY_LEN];
@@ -432,7 +438,7 @@ void	zbx_audit_host_update_json_update_interface_dns(zbx_config_t *cfg, zbx_uint
 	zbx_audit_update_json_update_string(hostid, audit_key_dns, dns_old, dns_new);
 }
 
-void	zbx_audit_host_update_json_update_interface_port(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t interfaceid,
+void	zbx_audit_host_update_json_update_interface_port(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t port_old, zbx_uint64_t port_new)
 {
 	char	audit_key_port[AUDIT_DETAILS_KEY_LEN];
@@ -470,7 +476,7 @@ void	zbx_audit_host_update_json_update_interface_port(zbx_config_t *cfg, zbx_uin
 			interfaceid);											\
 
 
-void	zbx_audit_host_update_json_add_snmp_interface(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t version, zbx_uint64_t bulk,
+void	zbx_audit_host_update_json_add_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version, zbx_uint64_t bulk,
 		const char *community, const char *securityname, zbx_uint64_t securitylevel, const char *authpassphrase,
 		const char *privpassphrase, zbx_uint64_t authprotocol, zbx_uint64_t privprotocol,
 		const char *contextname, zbx_uint64_t interfaceid)
@@ -488,7 +494,7 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP()
 	zbx_audit_update_json_add_string(hostid, audit_key_contextname, contextname);
 }
 
-void	zbx_audit_host_update_json_update_snmp_interface(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t version_old,
+void	zbx_audit_host_update_json_update_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version_old,
 		zbx_uint64_t version_new, zbx_uint64_t bulk_old,  zbx_uint64_t bulk_new, const char *community_old,
 		const char *community_new, const char *securityname_old, const char *securityname_new,
 		zbx_uint64_t securitylevel_old, zbx_uint64_t securitylevel_new, const char *authpassphrase_old,
@@ -510,7 +516,7 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP()
 	zbx_audit_update_json_update_string(hostid, audit_key_contextname, contextname_old,  contextname_new);
 }
 
-void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_config_t *cfg, zbx_uint64_t hostid,
+void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_uint64_t hostid,
 		zbx_uint64_t proxy_hostid, const char *hostname)
 {
 	IS_AUDIT_ON();
@@ -519,7 +525,7 @@ void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_config_t *cfg,
 	zbx_audit_update_json_add_string(hostid, "host.host", hostname);
 }
 
-void	zbx_audit_host_update_json_add_tls_and_psk(zbx_config_t *cfg, zbx_uint64_t hostid, zbx_uint64_t tls_connect,
+void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, zbx_uint64_t tls_connect,
 		zbx_uint64_t tls_accept, const char *psk_identity, const char *psk)
 {
 	IS_AUDIT_ON();
@@ -530,14 +536,14 @@ void	zbx_audit_host_update_json_add_tls_and_psk(zbx_config_t *cfg, zbx_uint64_t 
 	zbx_audit_update_json_add_string(hostid, "host.psk", psk);
 }
 
-void	zbx_audit_host_update_json_add_inventory_mode(zbx_config_t *cfg, zbx_uint64_t hostid, int inventory_mode)
+void	zbx_audit_host_update_json_add_inventory_mode(zbx_uint64_t hostid, int inventory_mode)
 {
 	IS_AUDIT_ON();
 
 	zbx_audit_update_json_add_int(hostid, "host.inventory_mode", inventory_mode);
 }
 
-void	zbx_audit_host_update_json_update_inventory_mode(zbx_config_t *cfg, zbx_uint64_t hostid, int inventory_mode_old,
+void	zbx_audit_host_update_json_update_inventory_mode(zbx_uint64_t hostid, int inventory_mode_old,
 		int inventory_mode_new)
 {
 	IS_AUDIT_ON();
@@ -545,7 +551,7 @@ void	zbx_audit_host_update_json_update_inventory_mode(zbx_config_t *cfg, zbx_uin
 	zbx_audit_update_json_update_int(hostid, "host.inventory_mode", inventory_mode_old, inventory_mode_new);
 }
 
-void	zbx_audit_host_update_json_update_host_status(zbx_config_t *cfg, zbx_uint64_t hostid, int host_status_old,
+void	zbx_audit_host_update_json_update_host_status(zbx_uint64_t hostid, int host_status_old,
 		int host_status_new)
 {
 	IS_AUDIT_ON();
@@ -553,7 +559,7 @@ void	zbx_audit_host_update_json_update_host_status(zbx_config_t *cfg, zbx_uint64
 	zbx_audit_update_json_update_int(hostid, "host.status", host_status_old, host_status_new);
 }
 
-void	zbx_audit_host_create_entry(zbx_config_t *cfg, int audit_action, zbx_uint64_t hostid, const char *name)
+void	zbx_audit_host_create_entry(int audit_action, zbx_uint64_t hostid, const char *name)
 {
 	zbx_audit_entry_t	local_audit_host_entry, **found_audit_host_entry;
 	zbx_audit_entry_t	*local_audit_host_entry_x = &local_audit_host_entry;
@@ -580,7 +586,7 @@ void	zbx_audit_host_create_entry(zbx_config_t *cfg, int audit_action, zbx_uint64
 	}
 }
 
-void	zbx_audit_host_add_groups(zbx_config_t *cfg, const char *audit_details_action, zbx_uint64_t hostid, zbx_uint64_t groupid)
+void	zbx_audit_host_add_groups(const char *audit_details_action, zbx_uint64_t hostid, zbx_uint64_t groupid)
 {
 	char	audit_key_groupid[AUDIT_DETAILS_KEY_LEN];
 
@@ -590,12 +596,46 @@ void	zbx_audit_host_add_groups(zbx_config_t *cfg, const char *audit_details_acti
 	zbx_audit_update_json_add_string(hostid, audit_key_groupid, audit_details_action);
 }
 
-void	zbx_audit_host_del(zbx_config_t *cfg, zbx_uint64_t hostid, const char *hostname)
+void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname)
 {
-	char		recsetid_cuid[CUID_LEN];
-
 	IS_AUDIT_ON();
 
-	zbx_new_cuid(recsetid_cuid);
-	zbx_audit_host_create_entry(cfg, AUDIT_ACTION_DELETE, hostid, hostname);
+	zbx_audit_host_create_entry(AUDIT_ACTION_DELETE, hostid, hostname);
+}
+
+static void	zbx_audit_httptest_del(zbx_uint64_t httptestid, const char *httptestname)
+{
+	IS_AUDIT_ON();
+
+	zbx_audit_host_create_entry(AUDIT_ACTION_DELETE, httptestid, httptestname);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBselect_for_item                                                *
+ *                                                                            *
+ * Parameters: sql - [IN] sql statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id;
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+		zbx_vector_uint64_append(ids, id);
+		//ZBX_STR2UINT64(flags, row[2]);
+
+		zbx_audit_httptest_del(id, row[1]);
+
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
