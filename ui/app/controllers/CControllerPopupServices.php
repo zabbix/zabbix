@@ -74,6 +74,8 @@ class CControllerPopupServices extends CController {
 			];
 		}
 
+		$problem_tags_html = [];
+
 		foreach (makeTags($problem_tags, true, 'serviceid') as $serviceid => $tags) {
 			$problem_tags_html[$serviceid] = implode('', $tags);
 		}
