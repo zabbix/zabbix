@@ -39,7 +39,7 @@ class CCuid {
 		return self::$CUID_COUNTER++;
 	}
 
-	private static function getRandombBlock(): string {
+	private static function getRandomBlock(): string {
 		$rand = floor(mt_rand() / mt_getrandmax() * pow(self::BASE, self::BLOCK_SIZE));
 
 		return self::pad((string) $rand, self::BLOCK_SIZE);
@@ -69,7 +69,7 @@ class CCuid {
 
 	public static function cuid(): string {
 		return sprintf('%s%s%s%s%s%s', self::CUID_PREFIX, self::getTimestampBlock(), self::getCounterBlock(),
-			self::getFingerprintBlock(), self::getRandombBlock(), self::getRandombBlock()
+			self::getFingerprintBlock(), self::getRandomBlock(), self::getRandomBlock()
 		);
 	}
 
