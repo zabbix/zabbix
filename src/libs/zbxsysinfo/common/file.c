@@ -1453,13 +1453,6 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	/* timestamp */
-	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIMESTAMP);
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS, (zbx_uint64_t)file_time.access_time);
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY, (zbx_uint64_t)file_time.modification_time);
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE, (zbx_uint64_t)file_time.change_time);
-	zbx_json_close(&j);
-
 	/* time */
 	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIME);
 	tmp = get_print_time((time_t)file_time.access_time);
@@ -1471,6 +1464,13 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	tmp = get_print_time((time_t)file_time.change_time);
 	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE, tmp, ZBX_JSON_TYPE_STRING);
 	zbx_free(tmp);
+	zbx_json_close(&j);
+
+	/* timestamp */
+	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIMESTAMP);
+	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS, (zbx_uint64_t)file_time.access_time);
+	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY, (zbx_uint64_t)file_time.modification_time);
+	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE, (zbx_uint64_t)file_time.change_time);
 	zbx_json_close(&j);
 
 	zbx_json_close(&j);
