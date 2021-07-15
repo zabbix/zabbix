@@ -778,6 +778,7 @@ void	op_host_enable(const DB_EVENT *event, zbx_config_t *cfg)
 
 		zbx_audit_host_update_json_update_host_status(hostid, atoi(row[0]), HOST_STATUS_MONITORED);
 	}
+	DBfree_result(result);
 out:
 	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -822,8 +823,7 @@ void	op_host_disable(const DB_EVENT *event, zbx_config_t *cfg)
 				"update hosts"
 				" set status=%d"
 				" where hostid=" ZBX_FS_UI64,
-				HOST_STATUS_NOT_MONITORED,
-				hostid);
+				HOST_STATUS_NOT_MONITORED, hostid);
 		zbx_audit_host_update_json_update_host_status(hostid, atoi(row[0]), HOST_STATUS_NOT_MONITORED);
 	}
 	DBfree_result(result);
@@ -916,7 +916,6 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 	zbx_uint64_t	hostid;
 	char		*sql = NULL, *hostname = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
-	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -970,10 +969,7 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 		DBexecute("%s", sql);
 
-		for (i = 0; i < groupids->values_num; i++)
-		{
-			zbx_audit_hostgroup_update_json_detach(hostid, hostgroupids.values[i], groupids->values[i]);
-		}
+		zbx_audit_host_hostgroup_delete(hostid, hostname, &hostgroupids, groupids);
 
 		zbx_vector_uint64_destroy(&hostgroupids);
 	}

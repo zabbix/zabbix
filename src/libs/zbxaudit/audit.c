@@ -595,14 +595,22 @@ void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t ho
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, audit_key_groupid, groupid);
 }
 
-void	zbx_audit_hostgroup_update_json_detach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid)
+void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
+		zbx_vector_uint64_t *groupids)
 {
 	char	audit_key_groupid[AUDIT_DETAILS_KEY_LEN];
+	int	i;
 
 	IS_AUDIT_ON();
 
-	zbx_snprintf(audit_key_groupid, AUDIT_DETAILS_KEY_LEN, "host.groups[%lu]", hostgroupid);
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_DETACH, audit_key_groupid, groupid);
+	zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, hostname);
+
+	for (i = 0; i < groupids->values_num; i++)
+	{
+		zbx_snprintf(audit_key_groupid, AUDIT_DETAILS_KEY_LEN, "host.groups[%lu]", hostgroupids->values[i]);
+		zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_DETACH, audit_key_groupid,
+				groupids->values[i]);
+	}
 }
 
 void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname)
@@ -610,39 +618,4 @@ void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname)
 	IS_AUDIT_ON();
 
 	zbx_audit_host_create_entry(AUDIT_ACTION_DELETE, hostid, hostname);
-}
-
-static void	zbx_audit_httptest_del(zbx_uint64_t httptestid, const char *httptestname)
-{
-	IS_AUDIT_ON();
-
-	zbx_audit_host_create_entry(AUDIT_ACTION_DELETE, httptestid, httptestname);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBselect_for_item                                                *
- *                                                                            *
- * Parameters: sql - [IN] sql statement                                       *
- *             ids - [OUT] sorted list of selected uint64 values              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	id;
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(id, row[0]);
-		zbx_vector_uint64_append(ids, id);
-
-		zbx_audit_httptest_del(id, row[1]);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
