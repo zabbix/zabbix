@@ -198,26 +198,32 @@ class testHost extends CAPITest {
 
 	public static function dataHostFieldPresence() {
 		return [
-			'Check ouput=extend includes inventory_mode, excludes write-only properties' => [
+			'Check if {"ouput": "extend"} includes "inventory_mode" and excludes write-only properties' => [
 				'request' => [
 					'output' => 'extend',
-					'hostids' => 99013
+					'hostids' => ['99013']
 				],
 				'expected_result' => [
 					'hostid' => '99013',
 					'inventory_mode' => '-1',
+
+					// Write-only properties.
 					'tls_psk_identity' => null,
 					'tls_psk' => null
-				],
+				]
 			],
-			'Even listing write-only fields should not return them; inventory_mode (as a sample) absent if unspecified' => [
+			'Check if it is not possible to select write-only fields' => [
 				'request' => [
 					'output' => ['host', 'tls_psk', 'tls_psk_identity'],
-					'hostids' => 99013
+					'hostids' => ['99013']
 				],
 				'expected_result' => [
 					'hostid' => '99013',
+
+					// Sample of unspecified property.
 					'inventory_mode' => null,
+
+					// Write-only properties.
 					'tls_psk_identity' => null,
 					'tls_psk' => null
 				]
