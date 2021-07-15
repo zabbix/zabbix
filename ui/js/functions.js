@@ -479,7 +479,8 @@ function overlayDialogueDestroy(dialogueid) {
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
 
 		removeFromOverlaysStack(dialogueid);
-		jQuery.publish('overlay.close', {dialogueid: dialogueid});
+
+		overlay.$dialogue[0].dispatchEvent(new CustomEvent('overlay.close', {detail: {dialogueid}}));
 	}
 }
 

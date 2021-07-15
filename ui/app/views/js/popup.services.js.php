@@ -91,6 +91,6 @@ window.services_popup = {
 
 		overlayDialogueDestroy('services');
 
-		this.dialogue.dispatchEvent(new CustomEvent('services-submit', {detail: services}));
+		this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: services}));
 	}
 };

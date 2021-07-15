@@ -111,17 +111,19 @@
 		edit(options = {}) {
 			this.pauseRefresh();
 
-			PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
+			const overlay = PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
 
-			const overlay_close = (e, data) => {
-				if (data.dialogueid === 'service_edit') {
-					this.resumeRefresh();
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
 
-					jQuery.unsubscribe('overlay.close', overlay_close);
+				if (e.detail.messages !== null) {
+					postMessageDetails('success', e.detail.messages);
 				}
-			};
 
-			jQuery.subscribe('overlay.close', overlay_close);
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
 		},
 
 		pauseRefresh() {
