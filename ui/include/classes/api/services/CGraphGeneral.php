@@ -949,9 +949,8 @@ abstract class CGraphGeneral extends CApiService {
 
 		$db_hosts = DBselect(
 			'SELECT ht.templateid,ht.hostid'.
-			' FROM hosts_templates ht,hosts h'.
-			' WHERE ht.hostid=h.hostid'.
-				' AND '.dbConditionId('ht.templateid', $templateids).
+			' FROM hosts_templates ht'.
+			' WHERE '.dbConditionId('ht.templateid', $templateids).
 				$hostids_condition
 		);
 
@@ -1328,7 +1327,6 @@ abstract class CGraphGeneral extends CApiService {
 		$graphs = $this->get([
 			'output' => $output,
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
-			'selectHosts' => ['hostid'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);
