@@ -2473,8 +2473,6 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 		if (0 != escalation->serviceid)
 			zbx_vector_uint64_append(&serviceids, escalation->serviceid);
-		else
-			goto out;
 	}
 
 	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -2534,7 +2532,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 			}
 		}
 	}
-out:
+
 	zbx_vector_uint64_destroy(&eventids);
 	zbx_vector_uint64_destroy(&serviceids);
 }
@@ -2623,8 +2621,12 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 	get_db_actions_info(actionids, &actions);
 	zbx_db_get_events_by_eventids(eventids, &events);
-	get_db_service_alarms(escalations, &service_alarms);
-	db_get_services(escalations, &services, &events_rootcause);
+
+	if (0 != ((DB_ESCALATION *)escalations->values[0])->serviceid)
+	{
+		get_db_service_alarms(escalations, &service_alarms);
+		db_get_services(escalations, &services, &events_rootcause);
+	}
 
 	for (i = 0; i < escalations->values_num; i++)
 	{
@@ -2654,20 +2656,6 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			}
 		}
 
-		if (0 != escalation->servicealarmid)
-		{
-			service_alarm_local.service_alarmid = escalation->servicealarmid;
-			if (FAIL == (index = zbx_vector_service_alarm_bsearch(&service_alarms,
-					service_alarm_local, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				error = zbx_dsprintf(error, "service alarm id:" ZBX_FS_UI64 " deleted.",
-						escalation->servicealarmid);
-				state = ZBX_ESCALATION_CANCEL;
-			}
-			else
-				service_alarm = &service_alarms.values[index];
-		}
-
 		if (FAIL == (index = zbx_vector_ptr_bsearch(&events, &escalation->eventid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
@@ -2687,6 +2675,20 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			else if (EVENT_SOURCE_SERVICE == event->source)
 			{
 				service_local.serviceid = escalation->serviceid;
+
+				if (0 != escalation->servicealarmid)
+				{
+					service_alarm_local.service_alarmid = escalation->servicealarmid;
+					if (FAIL == (index = zbx_vector_service_alarm_bsearch(&service_alarms,
+							service_alarm_local, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						error = zbx_dsprintf(error, "service alarm id:" ZBX_FS_UI64 " deleted.",
+								escalation->servicealarmid);
+						state = ZBX_ESCALATION_CANCEL;
+					}
+					else
+						service_alarm = &service_alarms.values[index];
+				}
 
 				if (escalation->serviceid != event->objectid)
 				{
