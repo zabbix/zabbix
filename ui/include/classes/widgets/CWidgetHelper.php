@@ -72,9 +72,11 @@ class CWidgetHelper {
 			)
 			->addItem(
 				(new CScriptTag('$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());'.
-					'$("#widget-dialogue-form").on("focusout", \'[data-trim="1"]\', (e) =>
-						e.target.value = e.target.value.trim()
-					);'
+					'document.getElementById("widget-dialogue-form").addEventListener("focusout", (e) => {
+						if (e.target.matches(\'[data-trim="1"]\')) {
+							e.target.value = e.target.value.trim();
+						}
+					});'
 				))
 					->setOnDocumentReady()
 			);
