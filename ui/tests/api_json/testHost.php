@@ -188,8 +188,8 @@ class testHost extends CAPITest {
 	public function testHost_SelectTags($params, $expected_result) {
 		$result = $this->call('host.get', $params);
 
-		foreach($result['result'] as $host) {
-			foreach($expected_result as $field => $expected_value){
+		foreach ($result['result'] as $host) {
+			foreach ($expected_result as $field => $expected_value){
 				$this->assertArrayHasKey($field, $host, 'Field should be present.');
 				$this->assertEquals($host[$field], $expected_value, 'Returned value should match.');
 			}
@@ -231,8 +231,8 @@ class testHost extends CAPITest {
 	public function testHost_FieldPresenceAndExclusion($request, $expected_result) {
 		$result = $this->call('host.get', $request, null);
 
-		foreach($result['result'] as $host) {
-			foreach($expected_result as $key => $value) {
+		foreach ($result['result'] as $host) {
+			foreach ($expected_result as $key => $value) {
 				if ($value !== null) {
 					$this->assertArrayHasKey($key, $host, 'Key '.$key.' should be present in host output.');
 					$this->assertEquals($value, $host[$key], 'Value should match.');
