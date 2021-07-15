@@ -164,54 +164,6 @@ static void	auditlog_global_script(const zbx_script_t *script, zbx_uint64_t host
 	while (ZBX_DB_DOWN == DBcommit());
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_check_user_administration_permissions                        *
- *                                                                            *
- * Purpose: check if the user has specific or default access for              *
- *          administration actions                                            *
- *                                                                            *
- * Return value:  SUCCEED - the access is granted                             *
- *                FAIL    - the access is denied                              *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule)
-{
-	int		ret = FAIL;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
-
-	result = DBselect("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
-			" and (name='%s' or name='%s')", user->roleid, role_rule,
-			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (0 == strcmp(role_rule, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-			else
-				ret = FAIL;
-			break;
-		}
-		else if (0 == strcmp(ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, int *scope, zbx_uint64_t *usrgrpid,
 		zbx_uint64_t *groupid, char *error, size_t error_len)
 {

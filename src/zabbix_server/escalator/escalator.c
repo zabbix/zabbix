@@ -105,7 +105,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service,
 		int err_type, const char *tz);
 
-static int	get_user_type_and_timezone(zbx_uint64_t userid, char **user_timezone)
+static int	get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone)
 {
 	int		user_type = -1;
 	DB_RESULT	result;
@@ -113,13 +113,14 @@ static int	get_user_type_and_timezone(zbx_uint64_t userid, char **user_timezone)
 
 	*user_timezone = NULL;
 
-	result = DBselect("select r.type,u.timezone from users u,role r where u.roleid=r.roleid and"
+	result = DBselect("select r.type,u.roleid,u.timezone from users u,role r where u.roleid=r.roleid and"
 			" userid=" ZBX_FS_UI64, userid);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 	{
 		user_type = atoi(row[0]);
-		*user_timezone = zbx_strdup(NULL, row[1]);
+		ZBX_STR2UINT64(*roleid, row[1]);
+		*user_timezone = zbx_strdup(NULL, row[2]);
 	}
 
 	DBfree_result(result);
@@ -282,11 +283,11 @@ static int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event, ch
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_uint64_t	hostgroupids;
-	zbx_uint64_t		hostgroupid;
+	zbx_uint64_t		hostgroupid, roleid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (USER_TYPE_SUPER_ADMIN == get_user_type_and_timezone(userid, user_timezone))
+	if (USER_TYPE_SUPER_ADMIN == get_user_info(userid, &roleid, user_timezone))
 	{
 		perm = PERM_READ_WRITE;
 		goto out;
@@ -339,14 +340,14 @@ static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **
 	DB_ROW			row;
 	int			perm = PERM_DENY;
 	zbx_vector_uint64_t	hostgroupids;
-	zbx_uint64_t		hostgroupid;
+	zbx_uint64_t		hostgroupid, roleid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostgroupids);
 	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (USER_TYPE_SUPER_ADMIN == get_user_type_and_timezone(userid, user_timezone))
+	if (USER_TYPE_SUPER_ADMIN == get_user_info(userid, &roleid, user_timezone))
 	{
 		perm = PERM_READ_WRITE;
 		goto out;
@@ -372,6 +373,32 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
 
 	return perm;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_item_permission                                              *
+ *                                                                            *
+ * Purpose: Return user permissions for access to item                        *
+ *                                                                            *
+ * Return value: PERM_DENY - if host or user not found,                       *
+ *                   or permission otherwise                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_service_permission(zbx_uint64_t userid, char **user_timezone)
+{
+	zbx_user_t	user = {.userid = userid};
+
+	if (USER_TYPE_SUPER_ADMIN == (user.type = get_user_info(userid, &user.roleid, user_timezone)))
+		return PERM_READ_WRITE;
+
+	if (SUCCEED == zbx_check_user_administration_actions_permissions(&user,
+			ZBX_USER_ROLE_PERMISSION_UI_MONITORING_SERVICES))
+	{
+		return PERM_READ;
+	}
+
+	return PERM_DENY;
 }
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg, const char *subj,
@@ -591,6 +618,10 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 				if (PERM_READ > get_item_permission(userid, event->objectid, &user_timezone))
 					goto clean;
 				break;
+			case EVENT_OBJECT_SERVICE:
+				if (PERM_READ > get_service_permission(userid, &user_timezone))
+					goto clean;
+				break;
 			default:
 				user_timezone = get_user_timezone(userid);
 		}
@@ -689,6 +720,10 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 				if (PERM_READ > get_item_permission(userid, event->objectid, &user_timezone))
 					goto clean;
 				break;
+			case EVENT_OBJECT_SERVICE:
+				if (PERM_READ > get_service_permission(userid, &user_timezone))
+					goto clean;
+				break;
 			default:
 				user_timezone = get_user_timezone(userid);
 		}
@@ -774,6 +809,10 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 			case EVENT_OBJECT_ITEM:
 			case EVENT_OBJECT_LLDRULE:
 				if (PERM_READ > get_item_permission(userid, event->objectid, &user_timezone))
+					goto clean;
+				break;
+			case EVENT_OBJECT_SERVICE:
+				if (PERM_READ > get_service_permission(userid, &user_timezone))
 					goto clean;
 				break;
 			default:
