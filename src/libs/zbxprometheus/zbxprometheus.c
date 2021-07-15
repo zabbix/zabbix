@@ -268,17 +268,20 @@ static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *tex
  ******************************************************************************/
 static zbx_prometheus_condition_op_t	str_loc_op(const char *data, const zbx_strloc_t *loc)
 {
-	/* the operation has been already validated during parsing, */
-	/*so there are only three possibilities:                    */
-	/*   '=' - the only sinle character operation               */
-	/*   '==' - ends with '='                                   */
-	/*   '=~' - ends with '~'                                   */
-
-	if (loc->l == loc->r)
-		return ZBX_PROMETHEUS_CONDITION_OP_EQUAL;
-
-	if ('~' == data[loc->r])
-		return ZBX_PROMETHEUS_CONDITION_OP_REGEX;
+	if ('=' == data[loc->l])
+	{
+		if ('~' == data[loc->r])
+			return ZBX_PROMETHEUS_CONDITION_OP_REGEX;
+		else
+			return ZBX_PROMETHEUS_CONDITION_OP_EQUAL;
+	}
+	else if ('!' == data[loc->l])
+	{
+		if ('~' == data[loc->r])
+			return ZBX_PROMETHEUS_CONDITION_OP_REGEX_NOT_MATCHED;
+		else
+			return ZBX_PROMETHEUS_CONDITION_OP_NOT_EQUAL;
+	}
 
 	return ZBX_PROMETHEUS_CONDITION_OP_EQUAL_VALUE;
 }
