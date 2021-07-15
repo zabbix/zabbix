@@ -2473,36 +2473,34 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 		if (0 != escalation->serviceid)
 			zbx_vector_uint64_append(&serviceids, escalation->serviceid);
+		else
+			goto out;
 	}
 
-	if (0 != serviceids.values_num)
+	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "serviceid", serviceids.values,
+			serviceids.values_num);
+
+	result = DBselect(
+			"select serviceid,name"
+			" from services"
+			" where%s order by serviceid",
+			sql);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		DB_SERVICE	service;
 
-		sql_offset = 0;
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "serviceid", serviceids.values,
-				serviceids.values_num);
+		ZBX_STR2UINT64(service.serviceid, row[0]);
+		service.name = zbx_strdup(NULL, row[1]);
+		zbx_vector_uint64_create(&service.eventids);
+		zbx_vector_ptr_create(&service.events);
 
-		result = DBselect(
-				"select serviceid,name"
-				" from services"
-				" where%s order by serviceid",
-				sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			DB_SERVICE	service;
-
-			ZBX_STR2UINT64(service.serviceid, row[0]);
-			service.name = zbx_strdup(NULL, row[1]);
-			zbx_vector_uint64_create(&service.eventids);
-			zbx_vector_ptr_create(&service.events);
-
-			zbx_vector_service_append(services, service);
-		}
-		DBfree_result(result);
+		zbx_vector_service_append(services, service);
 	}
+	DBfree_result(result);
 
 	zbx_free(sql);
 
@@ -2536,7 +2534,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 			}
 		}
 	}
-
+out:
 	zbx_vector_uint64_destroy(&eventids);
 	zbx_vector_uint64_destroy(&serviceids);
 }
