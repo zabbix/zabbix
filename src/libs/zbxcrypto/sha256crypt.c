@@ -9,6 +9,8 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 /* Nothing to do in HP-UX */
 #elif _AIX
 /* Nothing to do in AIX */
+#elif defined(_WINDOWS) || defined(__MINGW32__)
+/* Nothing to do in Windows */
 #else
 	#if defined(DUK_F_OLD_SOLARIS)
 		#include <sys/isa_defs.h>
@@ -16,12 +18,15 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 		#include <machine/endian.h>
 	#endif
 #endif
-#include <errno.h>
-#include <limits.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/param.h>
-#include <sys/types.h>
+
+#if !(defined(_WINDOWS) || defined(__MINGW32__))
+	#include <errno.h>
+	#include <limits.h>
+	#include <stdio.h>
+	#include <string.h>
+	#include <sys/param.h>
+	#include <sys/types.h>
+#endif
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 # define SWAP(n) \

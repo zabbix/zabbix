@@ -29,9 +29,8 @@
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
 #include "sddl.h"
-#else
-#include "sha256crypt.h"
 #endif
+#include "sha256crypt.h"
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 
@@ -861,7 +860,6 @@ err:
 	return ret;
 }
 
-#if !(defined(_WINDOWS) || defined(__MINGW32__))
 static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 {
 	int		i, nr, f = -1, ret = SYSINFO_RET_FAIL;
@@ -925,15 +923,6 @@ err:
 
 	return ret;
 }
-#else
-static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
-{
-	ZBX_UNUSED(filename);
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "Item is not supported at Windows."));
-
-	return SYSINFO_RET_FAIL;
-}
-#endif
 
 /******************************************************************************
  *                                                                            *
