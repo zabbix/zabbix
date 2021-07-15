@@ -289,10 +289,10 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 		data += zbx_deserialize_value(data, &service_local.serviceid);
 		data += zbx_deserialize_value(data, &values_num);
 
-		if (FAIL == (i = zbx_vector_service_bsearch(services, service_local, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		if (FAIL == (i = zbx_vector_service_bsearch(services, &service_local, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			service = NULL;
 		else
-			service = &services->values[i];
+			service = services->values[i];
 
 		if (0 == values_num)
 			continue;

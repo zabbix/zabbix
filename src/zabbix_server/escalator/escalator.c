@@ -2492,12 +2492,13 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DB_SERVICE	service;
+		DB_SERVICE	*service;
 
-		ZBX_STR2UINT64(service.serviceid, row[0]);
-		service.name = zbx_strdup(NULL, row[1]);
-		zbx_vector_uint64_create(&service.eventids);
-		zbx_vector_ptr_create(&service.events);
+		service = zbx_malloc(NULL, sizeof(DB_SERVICE));
+		ZBX_STR2UINT64(service->serviceid, row[0]);
+		service->name = zbx_strdup(NULL, row[1]);
+		zbx_vector_uint64_create(&service->eventids);
+		zbx_vector_ptr_create(&service->events);
 
 		zbx_vector_service_append(services, service);
 	}
@@ -2509,7 +2510,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 	for (i = 0; i < services->values_num; i++)
 	{
-		DB_SERVICE	*service = &services->values[i];
+		DB_SERVICE	*service = services->values[i];
 
 		for (j = 0; j < service->eventids.values_num; j++)
 			zbx_vector_uint64_append(&eventids, service->eventids.values[j]);
@@ -2521,7 +2522,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 		for (i = 0; i < services->values_num; i++)
 		{
-			DB_SERVICE	*service = &services->values[i];
+			DB_SERVICE	*service = services->values[i];
 
 			for (j = 0; j < service->eventids.values_num; j++)
 			{
@@ -2596,6 +2597,14 @@ static void	get_db_service_alarms(zbx_vector_ptr_t *escalations, zbx_vector_serv
 	}
 
 	zbx_vector_uint64_destroy(&service_alarmids);
+}
+
+static void	service_clean(DB_SERVICE *service)
+{
+	zbx_free(service->name);
+	zbx_vector_ptr_destroy(&service->events);
+	zbx_vector_uint64_destroy(&service->eventids);
+	zbx_free(service);
 }
 
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *escalations,
@@ -2701,15 +2710,15 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 					state = ZBX_ESCALATION_CANCEL;
 					THIS_SHOULD_NEVER_HAPPEN;
 				}
-				else if (FAIL == (index = zbx_vector_service_bsearch(&services, service_local,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+				else if (FAIL == (index = zbx_vector_service_bsearch(&services, &service_local,
+						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 				{
 					error = zbx_dsprintf(error, "service id:" ZBX_FS_UI64 " deleted.",
 							escalation->serviceid);
 					state = ZBX_ESCALATION_CANCEL;
 				}
 				else
-					service = &services.values[index];
+					service = services.values[index];
 			}
 		}
 
@@ -2925,13 +2934,7 @@ out:
 	zbx_vector_uint64_pair_destroy(&event_pairs);
 	zbx_vector_service_alarm_destroy(&service_alarms);
 
-	for (i = 0; i < services.values_num; i++)
-	{
-		zbx_free(services.values[i].name);
-		zbx_vector_ptr_destroy(&services.values[i].events);
-		zbx_vector_uint64_destroy(&services.values[i].eventids);
-	}
-
+	zbx_vector_service_clear_ext(&services, service_clean);
 	zbx_vector_service_destroy(&services);
 
 	ret = escalationids.values_num; /* performance metric */
