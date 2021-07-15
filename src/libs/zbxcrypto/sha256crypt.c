@@ -291,17 +291,17 @@ compilers don't.  */
 	}
 }
 
-void	zbx_sha256_init (sha256_ctx *ctx)
+void	zbx_sha256_init(sha256_ctx *ctx)
 {
 	sha256_init_ctx(ctx);
 }
 
-void	*zbx_sha256_finish (sha256_ctx *ctx, void *resbuf)
+void	*zbx_sha256_finish(sha256_ctx *ctx, void *resbuf)
 {
 	return sha256_finish_ctx(ctx, resbuf);
 }
 
-void	zbx_sha256_process_bytes (const void *buffer, size_t len, sha256_ctx *ctx)
+void	zbx_sha256_process_bytes(const void *buffer, size_t len, sha256_ctx *ctx)
 {
 	sha256_process_bytes(buffer, len, ctx);
 }
