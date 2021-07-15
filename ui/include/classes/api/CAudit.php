@@ -20,7 +20,7 @@
 
 
 class CAudit {
-	private CONST AUIDTLOG_ENABLE = 1;
+	private CONST AUDITLOG_ENABLE = 1;
 
 	/**
 	 * Supported resources list, every record contains:
@@ -188,7 +188,7 @@ class CAudit {
 			return;
 		}
 
-		if (CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) != self::AUIDTLOG_ENABLE) {
+		if (CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) != self::AUDITLOG_ENABLE) {
 			return;
 		}
 
@@ -203,12 +203,12 @@ class CAudit {
 
 		foreach ($objects as $object) {
 			$resourceid = $object[$field_name_resourceid];
-			$diff = [];
+			$diff = '';
 
 			if ($action == AUDIT_ACTION_UPDATE) {
 				$object_old = $objects_old[$resourceid];
 
-				$diff[] = self::getDetailsArrayRecursive($object, $object_old, '', $resourcetype);
+				$diff = json_encode(self::getDetailsArrayRecursive($object, $object_old, '', $resourcetype));
 
 				$resourcename = ($field_name_resourcename !== null) ? $object_old[$field_name_resourcename] : '';
 			}
@@ -230,7 +230,7 @@ class CAudit {
 				'resourceid' => $resourceid,
 				'resourcename' => $resourcename,
 				'recordsetid' => $recordsetid,
-				'details' => json_encode($diff)
+				'details' => $diff
 			];
 		}
 

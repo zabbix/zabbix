@@ -43,7 +43,6 @@ class testPageReportsAudit extends CLegacyWebTest {
 		AUDIT_RESOURCE_DISCOVERY_RULE => 'Discovery rule',
 		AUDIT_RESOURCE_CORRELATION => 'Event correlation',
 		AUDIT_RESOURCE_GRAPH => 'Graph',
-		AUDIT_RESOURCE_GRAPH_ELEMENT => 'Graph element',
 		AUDIT_RESOURCE_GRAPH_PROTOTYPE => 'Graph prototype',
 		AUDIT_RESOURCE_HOST => 'Host',
 		AUDIT_RESOURCE_HOST_GROUP => 'Host group',

@@ -592,7 +592,14 @@ class CTemplate extends CHostGeneral {
 	public function update(array $templates) {
 		$templates = zbx_toArray($templates);
 
-		$this->validateUpdate($templates);
+		$db_templates = $this->get([
+			'output' => ['templateid', 'name', 'host', 'description'],
+			'templateids' => array_column($templates, 'templateid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$this->validateUpdate($templates, $db_templates);
 
 		$macros = [];
 		foreach ($templates as &$template) {
@@ -628,6 +635,8 @@ class CTemplate extends CHostGeneral {
 
 		$this->updateTags(array_column($templates, 'tags', 'templateid'));
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE, $templates, $db_templates);
+
 		return ['templateids' => zbx_objectValues($templates, 'templateid')];
 	}
 
@@ -638,16 +647,9 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $templates) {
-		$dbTemplates = $this->get([
-			'output' => ['templateid'],
-			'templateids' => zbx_objectValues($templates, 'templateid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
+	protected function validateUpdate(array $templates, array $db_templates) {
 		foreach ($templates as $index => $template) {
-			if (!isset($dbTemplates[$template['templateid']])) {
+			if (!isset($db_templates[$template['templateid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 

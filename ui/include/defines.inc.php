@@ -227,7 +227,6 @@ define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
 define('AUDIT_RESOURCE_HOST',				4);
 define('AUDIT_RESOURCE_ACTION',				5);
 define('AUDIT_RESOURCE_GRAPH',				6);
-define('AUDIT_RESOURCE_GRAPH_ELEMENT',		7);
 define('AUDIT_RESOURCE_USER_GROUP',			11);
 define('AUDIT_RESOURCE_TRIGGER',			13);
 define('AUDIT_RESOURCE_HOST_GROUP',			14);
@@ -1350,6 +1349,7 @@ define('API_STRINGS_UTF8',			11);
 define('API_INTS32',				12);
 define('API_FLOATS',				13);
 define('API_UINTS64',				14);
+define('API_CUIDS',					43);
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1379,7 +1379,7 @@ define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
 define('API_NUMERIC_RANGES',		41);
 define('API_UUID',					42);
-define('API_CUID',					43);
+define('API_CUID',					44);
 
 // flags
 define('API_REQUIRED',					0x0001);
