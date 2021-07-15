@@ -404,9 +404,6 @@ class CNewValidator {
 				// TODO: check length
 				return true;
 
-			case DB::FIELD_TYPE_CUID:
-				return self::isCuid($value);
-
 			default:
 				return false;
 		}
@@ -540,10 +537,6 @@ class CNewValidator {
 
 	private function isRgb($value) {
 		return is_string($value) && preg_match('/^[A-F0-9]{6}$/', $value);
-	}
-
-	private static function isCuid(string $value) {
-		return CCuid::isCuid($value) && CCuid::isCuidLength($value);
 	}
 
 	/**

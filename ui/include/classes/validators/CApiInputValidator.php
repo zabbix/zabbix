@@ -2340,11 +2340,13 @@ class CApiInputValidator {
 		}
 
 		if (!CCuid::isCuidLength($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('must be %1$s characters long', CCuid::CUID_LENGTH));
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('must be %1$s characters long', CCuid::CUID_LENGTH)
+			);
 			return false;
 		}
 
-		if (!Ccuid::isCuid($data)) {
+		if (!CCuid::isCuid($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('CUID is expected'));
 			return false;
 		}

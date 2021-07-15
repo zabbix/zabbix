@@ -1484,9 +1484,9 @@ class CUser extends CApiService {
 				'where' => ['userid' => $db_user['userid']]
 			]);
 
-			/* $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
-				$db_user['userip']
-			); */
+			// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
+			// 	$db_user['userip']
+			// );
 
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
 					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
