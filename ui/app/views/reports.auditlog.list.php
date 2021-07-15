@@ -96,7 +96,9 @@ $table = (new CTableInfo())
 foreach ($data['auditlogs'] as $auditlog) {
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $auditlog['clock']),
-		$data['users'][$auditlog['userid']],
+		array_key_exists($auditlog['userid'], $data['usernames'])
+			? new CTag('em', true, $data['usernames'][$auditlog['userid']])
+			: $data['users'][$auditlog['userid']],
 		$auditlog['ip'],
 		array_key_exists($auditlog['resourcetype'], $data['resources'])
 			? $data['resources'][$auditlog['resourcetype']]
