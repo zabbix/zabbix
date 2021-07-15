@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:49Z'
+  date: '2021-07-14T17:45:20Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -119,16 +119,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -143,16 +143,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -167,16 +167,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -191,16 +191,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -623,7 +623,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2f5aa644755c4d18a3eafc74bde2d3ad
-              expression: 'last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2) and length(last(/Windows generic by Zabbix agent active/system.hostname))>0'
+              expression: '(last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2))=1 and length(last(/Windows generic by Zabbix agent active/system.hostname))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -1134,7 +1134,9 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - 'return (value==''9223372036854775807'' ? 0 : value)'
+                    - |
+                      return (value=='9223372036854775807' ? 0 : value)
+                      
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1174,7 +1176,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d2af1fae64c940f2b2b923e159b836e6
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))=1)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
@@ -1230,7 +1232,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))=1)'
                   recovery_expression: 'last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: 3bdd014bdaf04f0885816cbf1da11309
@@ -1250,7 +1252,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))=1)'
                   recovery_expression: 'last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
             -
               uuid: e29c3aa283d74838b45040394a3eabe1
@@ -1269,7 +1271,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])<>2 and (last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#1)<>last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"],#2))=1)'
                   recovery_expression: 'last(/Windows network by Zabbix agent active/net.if.status["{#IFNAME}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
           graph_prototypes:
             -
@@ -1372,7 +1374,7 @@ zabbix_export:
       dashboards:
         -
           uuid: 1f4737b4a5364b35a8358dccedf6a492
-          name: 'Network interfaces'
+          name: 'Netowrk interfaces'
           pages:
             -
               widgets:
@@ -1383,16 +1385,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1809,15 +1811,15 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.NAME.NOT_MATCHES}'
-          value: '^RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc$'
+          value: '^(RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.STARTUPNAME.MATCHES}'
-          value: '^automatic|automatic delayed$'
+          value: '^(automatic|automatic delayed)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.STARTUPNAME.NOT_MATCHES}'
-          value: ^manual|disabled$
+          value: ^(manual|disabled)$
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
       valuemaps:
         -
@@ -1830,6 +1832,9 @@ zabbix_export:
             -
               value: '1'
               newvalue: Paused
+            -
+              value: '2'
+              newvalue: 'Start pending'
             -
               value: '3'
               newvalue: 'Pause pending'
@@ -1848,9 +1853,6 @@ zabbix_export:
             -
               value: '255'
               newvalue: 'No such service'
-            -
-              value: '2'
-              newvalue: 'Start pending'
   triggers:
     -
       uuid: dfba6b17ab94449181584c8a4410f50f
