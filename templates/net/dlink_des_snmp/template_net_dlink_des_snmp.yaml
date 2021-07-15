@@ -84,7 +84,7 @@ zabbix_export:
           triggers:
             -
               uuid: 40a2ad291ded4bf9bc72adc2b8653b98
-              expression: '(last(/D-Link DES_DGS Switch SNMP/system.hw.firmware,#1)<>last(/D-Link DES_DGS Switch SNMP/system.hw.firmware,#2))=1 and length(last(/D-Link DES_DGS Switch SNMP/system.hw.firmware))>0'
+              expression: 'last(/D-Link DES_DGS Switch SNMP/system.hw.firmware,#1)<>last(/D-Link DES_DGS Switch SNMP/system.hw.firmware,#2) and length(last(/D-Link DES_DGS Switch SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -141,7 +141,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3aa2e47f4b8145b8a5e4f67b0987ca2b
-              expression: '(last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber,#1)<>last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber,#2))=1 and length(last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber,#1)<>last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber,#2) and length(last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'

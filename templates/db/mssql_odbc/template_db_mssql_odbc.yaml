@@ -1730,7 +1730,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4ece2c9172714c68b8345834cc37d927
-              expression: '(last(/MSSQL by ODBC/mssql.version,#1)<>last(/MSSQL by ODBC/mssql.version,#2))=1 and length(last(/MSSQL by ODBC/mssql.version))>0'
+              expression: 'last(/MSSQL by ODBC/mssql.version,#1)<>last(/MSSQL by ODBC/mssql.version,#2) and length(last(/MSSQL by ODBC/mssql.version))>0'
               name: 'MSSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'MSSQL version has changed. Ack to close.'

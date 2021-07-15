@@ -144,7 +144,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5da304609e8c45d980c46579f6848f0a
-              expression: '(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#2))=1 and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion))>0'
+              expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion))>0'
               name: 'ZYXEL XGS-4728F: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -287,7 +287,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4df7c31c3079411baabd4ae66e580652
-              expression: '(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#2))=1 and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber))>0'
+              expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber))>0'
               name: 'ZYXEL XGS-4728F: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -685,7 +685,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3f3ce5111d47490382cb0c18e2d36f77
-                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Link down'
@@ -1144,7 +1144,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 632be557ffed439e98425eaa59361e50
-                  expression: '(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'

@@ -123,7 +123,7 @@ class testMassUpdateItems extends CWebTest{
 						'14_DB_Monitor'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent']
 					],
 					'details' => 'No interface found.'
 				]
@@ -428,7 +428,7 @@ class testMassUpdateItems extends CWebTest{
 									'period' => ''
 								]
 							]
-						],
+						]
 					],
 					'details' => 'Invalid interval "".'
 				]
@@ -585,7 +585,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL' => ['id' => 'url', 'value' => ''],
+						'URL' => ['id' => 'url', 'value' => '']
 					],
 					'details' => 'Invalid parameter "/url": cannot be empty.'
 				]
@@ -667,7 +667,7 @@ class testMassUpdateItems extends CWebTest{
 						'2_Item'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
+						'Type' => ['id' => 'type', 'value' => 'Dependent item']
 					],
 					'details' => 'Incorrect value for field "master_itemid": cannot be empty.'
 				]
@@ -1143,7 +1143,7 @@ class testMassUpdateItems extends CWebTest{
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Calculated'],
-						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)']
 					]
 				]
 			],
@@ -1155,7 +1155,7 @@ class testMassUpdateItems extends CWebTest{
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
-						'Master item' => ['id' => 'master_item', 'value' => '7_IPMI'],
+						'Master item' => ['id' => 'master_item', 'value' => '7_IPMI']
 					],
 					'expected_tags' => [
 						'15_Calculated' => [
@@ -2204,11 +2204,7 @@ class testMassUpdateItems extends CWebTest{
 
 		// Get item table.
 		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
-
-		// TODO: Change this when findRows() is improved in TableElement.
-		foreach ($data as $name) {
-			$table->findRow('Name', $name)->select();
-		}
+		$table->findRows('Name', $data)->select();
 
 		// Open mass update form.
 		$this->query('button:Mass update')->one()->click();

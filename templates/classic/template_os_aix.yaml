@@ -153,7 +153,7 @@ zabbix_export:
           triggers:
             -
               uuid: d1e70b7f465447a3ab575b3fd28755a1
-              expression: '(last(/AIX/system.hostname,#1)<>last(/AIX/system.hostname,#2))>0'
+              expression: 'last(/AIX/system.hostname,#1)<>last(/AIX/system.hostname,#2)'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -502,7 +502,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3a736e64211744aea480a60b2c48a036
-              expression: '(last(/AIX/system.uname,#1)<>last(/AIX/system.uname,#2))>0'
+              expression: 'last(/AIX/system.uname,#1)<>last(/AIX/system.uname,#2)'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -551,7 +551,7 @@ zabbix_export:
           triggers:
             -
               uuid: c75ee957fd6c43b2aba9919d5e1af4a1
-              expression: '(last(/AIX/vfs.file.cksum[/etc/passwd],#1)<>last(/AIX/vfs.file.cksum[/etc/passwd],#2))>0'
+              expression: 'last(/AIX/vfs.file.cksum[/etc/passwd],#1)<>last(/AIX/vfs.file.cksum[/etc/passwd],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -

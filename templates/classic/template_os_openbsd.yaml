@@ -276,7 +276,7 @@ zabbix_export:
           triggers:
             -
               uuid: d6927a9b74eb4cb8b15400baf784fc36
-              expression: '(last(/OpenBSD/system.hostname,#1)<>last(/OpenBSD/system.hostname,#2))>0'
+              expression: 'last(/OpenBSD/system.hostname,#1)<>last(/OpenBSD/system.hostname,#2)'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -351,7 +351,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3d3bcd54f24448c1a11746a4e75ea736
-              expression: '(last(/OpenBSD/system.uname,#1)<>last(/OpenBSD/system.uname,#2))>0'
+              expression: 'last(/OpenBSD/system.uname,#1)<>last(/OpenBSD/system.uname,#2)'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -400,7 +400,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9db4055df94d414d86938066ed05dbc5
-              expression: '(last(/OpenBSD/vfs.file.cksum[/etc/passwd],#1)<>last(/OpenBSD/vfs.file.cksum[/etc/passwd],#2))>0'
+              expression: 'last(/OpenBSD/vfs.file.cksum[/etc/passwd],#1)<>last(/OpenBSD/vfs.file.cksum[/etc/passwd],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -

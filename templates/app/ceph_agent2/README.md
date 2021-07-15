@@ -93,7 +93,7 @@ There are no template links in this template.
 |Ceph |Ceph: Ceph OSD avg PGs |<p>Average amount of PGs on OSDs</p> |DEPENDENT |ceph.osd_pgs.avg<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_pgs.avg`</p> |
 |Ceph |Ceph: Ceph OSD Apply latency Avg |<p>Average apply latency of OSDs</p> |DEPENDENT |ceph.osd_latency_apply.avg<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_apply.avg`</p> |
 |Ceph |Ceph: Ceph OSD Apply latency Max |<p>Maximum apply latency of OSDs</p> |DEPENDENT |ceph.osd_latency_apply.max<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_apply.max`</p> |
-|Ceph |Ceph: Ceph OSD Apply latency Min |<p>Miniumum apply latency of OSDs</p> |DEPENDENT |ceph.osd_latency_apply.min<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_apply.min`</p> |
+|Ceph |Ceph: Ceph OSD Apply latency Min |<p>Minimum apply latency of OSDs</p> |DEPENDENT |ceph.osd_latency_apply.min<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_apply.min`</p> |
 |Ceph |Ceph: Ceph OSD Commit latency Avg |<p>Average commit latency of OSDs</p> |DEPENDENT |ceph.osd_latency_commit.avg<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_commit.avg`</p> |
 |Ceph |Ceph: Ceph OSD Commit latency Max |<p>Maximum commit latency of OSDs</p> |DEPENDENT |ceph.osd_latency_commit.max<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_commit.max`</p> |
 |Ceph |Ceph: Ceph OSD Commit latency Min |<p>Minimum commit latency of OSDs</p> |DEPENDENT |ceph.osd_latency_commit.min<p>**Preprocessing**:</p><p>- JSONPATH: `$.osd_latency_commit.min`</p> |
