@@ -884,7 +884,7 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	zbx_sha256_init_ctx(&ctx);
+	zbx_sha256_init(&ctx);
 
 	while (0 < (nr = (int)read(f, buf, sizeof(buf))))
 	{
@@ -903,7 +903,7 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	zbx_sha256_finish_ctx(&ctx, hash_res);
+	zbx_sha256_finish(&ctx, hash_res);
 
 	for (i = 0 ; i < ZBX_SHA256_DIGEST_SIZE; i++)
 	{

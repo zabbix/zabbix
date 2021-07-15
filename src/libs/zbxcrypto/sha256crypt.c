@@ -163,8 +163,8 @@ cyclic rotation.  Hope the C compiler is smart enough.  */
 
 /* Initialize structure containing state of computation.
 (FIPS 180-2:5.3.2)  */
-void
-zbx_sha256_init_ctx (sha256_ctx *ctx)
+static void
+sha256_init_ctx (sha256_ctx *ctx)
 {
 	ctx->H[0] = 0x6a09e667;
 	ctx->H[1] = 0xbb67ae85;
@@ -185,8 +185,8 @@ prolog according to the standard and write the result to RESBUF.
 
 IMPORTANT: On some systems it is required that RESBUF is correctly
 aligned for a 32 bits value.  */
-void *
-zbx_sha256_finish_ctx (sha256_ctx *ctx, void *resbuf)
+static void *
+sha256_finish_ctx (sha256_ctx *ctx, void *resbuf)
 {
 	/* Take yet unprocessed bytes into account.  */
 	uint32_t bytes = ctx->buflen;
@@ -217,8 +217,8 @@ zbx_sha256_finish_ctx (sha256_ctx *ctx, void *resbuf)
 }
 
 
-void
-zbx_sha256_process_bytes (const void *buffer, size_t len, sha256_ctx *ctx)
+static void
+sha256_process_bytes (const void *buffer, size_t len, sha256_ctx *ctx)
 {
 	/* When we already have some bits in our internal buffer concatenate
 	both inputs first.  */
@@ -286,12 +286,27 @@ compilers don't.  */
 	}
 }
 
+void	zbx_sha256_init (sha256_ctx *ctx)
+{
+	sha256_init_ctx(ctx);
+}
+
+void	*zbx_sha256_finish (sha256_ctx *ctx, void *resbuf)
+{
+	return sha256_finish_ctx(ctx, resbuf);
+}
+
+void	zbx_sha256_process_bytes (const void *buffer, size_t len, sha256_ctx *ctx)
+{
+	sha256_process_bytes(buffer, len, ctx);
+}
+
 void	zbx_sha256_hash(const char *in, char *out)
 {
 	sha256_ctx ctx;
 
-	zbx_sha256_init_ctx (&ctx);
-	zbx_sha256_process_bytes (in, strlen (in), &ctx);
-	zbx_sha256_finish_ctx (&ctx, out);
+	sha256_init_ctx (&ctx);
+	sha256_process_bytes (in, strlen (in), &ctx);
+	sha256_finish_ctx (&ctx, out);
 }
 
