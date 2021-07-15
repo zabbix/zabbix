@@ -189,7 +189,7 @@ class testFormTrigger extends CLegacyWebTest {
 	public function testFormTrigger_CheckLayout($data) {
 
 		if (isset($data['template'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->zbxTestLogin('templates.php?page=2');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 

@@ -165,7 +165,7 @@ zabbix_export:
           triggers:
             -
               uuid: 819b379b51c34616820f86d21c703b27
-              expression: '(last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#1)<>last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#2))=1 and length(last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"]))>0'
+              expression: 'last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#1)<>last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#2) and length(last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"]))>0'
               name: 'Redis: Configuration has changed'
               priority: INFO
               description: 'Redis configuration has changed. Ack to close.'
@@ -761,7 +761,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6d213088211a4bb38ff97b59113dccd9
-              expression: '(last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#1)<>last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#2))=1'
+              expression: 'last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#1)<>last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#2)'
               recovery_mode: NONE
               name: 'Redis: Number of slaves has changed'
               priority: INFO
@@ -897,7 +897,7 @@ zabbix_export:
           triggers:
             -
               uuid: d24f7aabefb345e791b3bb276f30ac8c
-              expression: '(last(/Redis by Zabbix agent 2/redis.replication.role,#1)<>last(/Redis by Zabbix agent 2/redis.replication.role,#2))=1 and length(last(/Redis by Zabbix agent 2/redis.replication.role))>0'
+              expression: 'last(/Redis by Zabbix agent 2/redis.replication.role,#1)<>last(/Redis by Zabbix agent 2/redis.replication.role,#2) and length(last(/Redis by Zabbix agent 2/redis.replication.role))>0'
               recovery_mode: NONE
               name: 'Redis: Replication role has changed (new role: {ITEM.VALUE})'
               priority: WARNING
@@ -979,7 +979,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6e307546b26344deb83f2295c90e9a33
-              expression: '(last(/Redis by Zabbix agent 2/redis.server.redis_version,#1)<>last(/Redis by Zabbix agent 2/redis.server.redis_version,#2))=1 and length(last(/Redis by Zabbix agent 2/redis.server.redis_version))>0'
+              expression: 'last(/Redis by Zabbix agent 2/redis.server.redis_version,#1)<>last(/Redis by Zabbix agent 2/redis.server.redis_version,#2) and length(last(/Redis by Zabbix agent 2/redis.server.redis_version))>0'
               name: 'Redis: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Redis version has changed. Ack to close.'

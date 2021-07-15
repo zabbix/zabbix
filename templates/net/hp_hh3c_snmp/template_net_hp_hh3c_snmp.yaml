@@ -72,7 +72,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 17e0f72418f4432d852b5c39ddf675bd
-                  expression: '(last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#2))=1 and length(last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Firmware has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -121,7 +121,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d3633f4584344570a1c0570f0b082590
-                  expression: '(last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
@@ -169,7 +169,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9e6cccf7daec4405ac3bb1a27670fcee
-                  expression: '(last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2))=1 and length(last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Operating system description has changed'
                   priority: INFO
                   description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'

@@ -5906,7 +5906,8 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
 	zbx_token_t	tok;
 
 	if (SUCCEED == zbx_token_find(*data, (int)token->data.func_macro.macro.l, &tok,
-			ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) && tok.loc.r <= token->data.func_macro.macro.r)
+			ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) && ZBX_TOKEN_EXPRESSION_MACRO == tok.type &&
+			tok.loc.r <= token->data.func_macro.macro.r)
 	{
 		offset = (int)tok.loc.r;
 
