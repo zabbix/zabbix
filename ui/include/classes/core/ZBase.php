@@ -375,43 +375,14 @@ class ZBase {
 	 * @param string $user_data['lang']  Language.
 	 */
 	protected function initLocales(array $user_data) {
-		init_mbstrings();
+		$language = $user_data['lang'];
+		$message = setupLocale($language);
 
-		$defaultLocales = [
-			'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
-		];
-
-		if (function_exists('bindtextdomain')) {
-			// initializing gettext translations depending on language selected by user
-			$locales = zbx_locale_variants($user_data['lang']);
-			$locale_found = false;
-			foreach ($locales as $locale) {
-				// since LC_MESSAGES may be unavailable on some systems, try to set all of the locales
-				// and then revert some of them back
-				putenv('LC_ALL='.$locale);
-				putenv('LANG='.$locale);
-				putenv('LANGUAGE='.$locale);
-				setlocale(LC_TIME, $locale);
-
-				if (setlocale(LC_ALL, $locale)) {
-					$locale_found = true;
-					break;
-				}
-			}
-
-			if (!$locale_found && $user_data['lang'] != 'en_GB' && $user_data['lang'] != 'en_gb') {
-				error('Locale for language "'.$user_data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
-			}
-			bindtextdomain('frontend', 'locale');
-			bind_textdomain_codeset('frontend', 'UTF-8');
-			textdomain('frontend');
+		if ($message !== '' && strtolower($language) !== 'en_gb') {
+			error($message);
 		}
 
-		// reset the LC_NUMERIC locale so that PHP would always use a point instead of a comma for decimal numbers
-		setlocale(LC_NUMERIC, $defaultLocales);
-
-		// should be after locale initialization
-		require_once 'include/translateDefines.inc.php';
+		require_once $this->getRootDir().'/include/translateDefines.inc.php';
 	}
 
 	/**
