@@ -163,11 +163,9 @@ class testFormValueMappings extends CWebTest {
 					'screenshot id' => 'ValuemapScreenshot1'
 				]
 			],
-			// TODO: remove the "skip_for_update" flag when ZBX-19105 is fixed.
 			// Value mapping with duplicate name.
 			[
 				[
-					'skip_for_update' =>true,
 					'expected' => TEST_BAD,
 					'name' => '  Valuemap for delete  ',
 					'mappings' => [
@@ -313,11 +311,6 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $action	Action to be performed with value mappings.
 	 */
 	public function checkAction($data, $source, $action) {
-		// TODO: Remove the below condition once ZBX-19105 is fixed.
-		if (CTestArrayHelper::get($data, 'skip_for_update') && $action === 'update') {
-			return;
-		}
-
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid=v.valuemapid'.
 					' ORDER BY v.name, v.valuemapid, vm.sortorder';
