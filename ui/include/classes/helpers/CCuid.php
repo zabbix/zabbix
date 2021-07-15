@@ -29,14 +29,14 @@ class CCuid {
 	public const CUID_LENGTH = 25;
 	private const CUID_PREFIX = 'c';
 
-	private static int $CUID_COUNTER = 0;
+	private static int $cuid_counter = 0;
 
 	private static function pad(string $value, int $size): string {
 		return substr(str_pad(base_convert($value, self::DECIMAL, self::BASE), $size, '0', STR_PAD_LEFT), 0, $size);
 	}
 
 	private static function getCounter(): int {
-		return self::$CUID_COUNTER++;
+		return self::$cuid_counter++;
 	}
 
 	private static function getRandomBlock(): string {
