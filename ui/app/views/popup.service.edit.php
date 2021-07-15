@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -98,10 +98,10 @@ $service_tab = (new CFormGrid())
 										->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 									(new CSelect('problem_tags[#{rowNum}][operator]'))
 										->addOptions(CSelect::createOptionsFromArray([
-											TAG_OPERATOR_EQUAL => _('Equals'),
-											TAG_OPERATOR_LIKE => _('Contains')
+											SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
+											SERVICE_TAG_OPERATOR_LIKE => _('Contains')
 										]))
-										->setValue(TAG_OPERATOR_LIKE),
+										->setValue(SERVICE_TAG_OPERATOR_LIKE),
 									(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
 										DB::getFieldLength('service_problem_tag', 'value')
 									))
@@ -230,7 +230,18 @@ $tabs = (new CTabView())
 
 // Output.
 
-$form->addItem($tabs);
+$form
+	->addItem($tabs)
+	->addItem(
+		(new CScriptTag('
+			service_edit_popup.init('.json_encode([
+				'serviceid' => $data['serviceid'],
+				'children' => $data['form']['children'],
+				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
+				'problem_tags' => $data['form']['problem_tags']
+			]).');
+		'))->setOnDocumentReady()
+	);
 
 $output = [
 	'header' => $data['title'],

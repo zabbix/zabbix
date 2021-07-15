@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -31,6 +31,8 @@ class CService extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
+
+	private const AUDIT_RESOURCE = AUDIT_RESOURCE_IT_SERVICE;
 
 	protected $tableName = 'services';
 	protected $tableAlias = 's';
@@ -150,6 +152,13 @@ class CService extends CApiService {
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services,  __FUNCTION__);
 
+		foreach ($services as $serviceid => &$service) {
+			$service['serviceid'] = $serviceid;
+		}
+		unset($service);
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $services);
+
 		return ['serviceids' => $serviceids];
 	}
 
@@ -171,7 +180,7 @@ class CService extends CApiService {
 			]],
 			'problem_tags' =>	['type' => API_OBJECTS, 'uniq' => [['tag']], 'fields' => [
 				'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_problem_tag', 'tag')],
-				'operator' =>		['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
+				'operator' =>		['type' => API_INT32, 'in' => implode(',', [SERVICE_TAG_OPERATOR_EQUAL, SERVICE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
 				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_problem_tag', 'value'), 'default' => DB::getDefault('service_problem_tag', 'value')]
 			]],
 			'parents' =>		['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
@@ -241,6 +250,8 @@ class CService extends CApiService {
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services, __FUNCTION__);
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $services, $db_services);
+
 		return ['serviceids' => array_column($services, 'serviceid')];
 	}
 
@@ -264,7 +275,7 @@ class CService extends CApiService {
 			]],
 			'problem_tags' =>	['type' => API_OBJECTS, 'uniq' => [['tag']], 'fields' => [
 				'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_problem_tag', 'tag')],
-				'operator' =>		['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
+				'operator' =>		['type' => API_INT32, 'in' => implode(',', [SERVICE_TAG_OPERATOR_EQUAL, SERVICE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('service_problem_tag', 'operator')],
 				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_problem_tag', 'value'), 'default' => DB::getDefault('service_problem_tag', 'value')]
 			]],
 			'parents' =>		['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
@@ -327,22 +338,24 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$count = $this->get([
-			'countOutput' => true,
+		$db_services = $this->get([
+			'output' => ['serviceid', 'name'],
 			'serviceids' => $serviceids,
 			'editable' => true
 		]);
 
-		if ($count != count($serviceids)) {
+		if (count($db_services) != count($serviceids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		DB::delete('services', ['serviceid' => $serviceids]);
 
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, self::AUDIT_RESOURCE, $db_services);
+
 		return ['serviceids' => $serviceids];
 	}
 
-	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts): array {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['parentids'] !== null) {
@@ -389,7 +402,7 @@ class CService extends CApiService {
 		return $sqlParts;
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$serviceids = array_keys($result);

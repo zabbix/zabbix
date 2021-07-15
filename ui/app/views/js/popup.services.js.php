@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -94,5 +94,3 @@ window.services_popup = {
 		this.dialogue.dispatchEvent(new CustomEvent('services-submit', {detail: services}));
 	}
 };
-
-services_popup.init();

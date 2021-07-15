@@ -21,7 +21,7 @@
 
 class CControllerServiceDelete extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'serviceids' =>	'required|array_db services.serviceid',
 			'back_url' =>	'required|string'
@@ -36,7 +36,7 @@ class CControllerServiceDelete extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
 				|| !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES)) {
 			return false;
@@ -50,7 +50,7 @@ class CControllerServiceDelete extends CController {
 		return ($service_count == count($this->getInput('serviceids')));
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$serviceids = $this->getInput('serviceids');
 
 		$result = API::Service()->delete($serviceids);

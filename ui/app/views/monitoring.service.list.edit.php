@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -118,8 +118,7 @@ if ($data['service'] !== null && !$data['is_filtered']) {
 							(new CDiv(($data['service']['showsla'] == SERVICE_SHOW_SLA_ON)
 								? sprintf('%.4f', $data['service']['goodsla'])
 								: ''
-							))
-								->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 						])
 						->addItem([
 							(new CDiv(_('Tags')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
@@ -179,7 +178,7 @@ $filter->addFilterTab(_('Filter'), [
 				CTagFilterFieldHelper::getTagFilterField([
 					'evaltype' => $data['filter']['evaltype'],
 					'tags' => $data['filter']['tags'] ?: [
-						['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
+						['tag' => '', 'value' => '', 'operator' => SERVICE_TAG_OPERATOR_LIKE]
 					]
 				])
 			])
