@@ -27,7 +27,12 @@
 #define AUDIT_ACTION_DELETE		2
 #define AUDIT_ACTION_EXECUTE		7
 
-#define AUDIT_DETAILS_ACTION_ADD	"Added"
+//#define AUDIT_DETAILS_ACTION_ADD	"Added"
+//#define AUDIT_DETAILS_ACTION_DELETE	"Removed"
+
+#define AUDIT_DETAILS_ACTION_ADD	"add"
+#define AUDIT_DETAILS_ACTION_ATTACH	"Attach"
+#define AUDIT_DETAILS_ACTION_DETACH	"Detach"
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
@@ -36,9 +41,11 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 void	zbx_audit_init(int audit_mode_set);
 void	zbx_audit_flush(void);
-void	zbx_audit_update_json_add_string(const zbx_uint64_t itemid, const char *key, const char *value);
-void	zbx_audit_update_json_add_uint64(const zbx_uint64_t itemid, const char *key, uint64_t value);
-void	zbx_audit_update_json_add_int(const zbx_uint64_t itemid, const char *key, int value);
+void	zbx_audit_update_json_append_string(const zbx_uint64_t itemid, const char *audit_op, const char *key,
+		const char *value);
+void	zbx_audit_update_json_append_uint64(const zbx_uint64_t itemid, const char *audit_op, const char *key,
+		uint64_t value);
+void	zbx_audit_update_json_append_int(const zbx_uint64_t itemid, const char *audit_op, const char *key, int value);
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
 		const char *value_new);
 void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, uint64_t value_old,
@@ -77,8 +84,8 @@ void	zbx_audit_host_update_json_update_inventory_mode(zbx_uint64_t hostid, int i
 void	zbx_audit_host_update_json_update_host_status(zbx_uint64_t hostid, int host_status_old,
 		int host_status_new);
 void	zbx_audit_host_create_entry(int audit_action, zbx_uint64_t hostid, const char *name);
-void	zbx_audit_host_add_groups(const char *audit_details_action, zbx_uint64_t hostid,
-		zbx_uint64_t groupid);
+void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid);
+void	zbx_audit_hostgroup_update_json_detach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid);
 void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname);
 void	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids);
 #endif	/* ZABBIX_AUDIT_H */

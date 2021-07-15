@@ -190,7 +190,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 		for (i = 0; i < groupids->values_num; i++)
 		{
 			zbx_db_insert_add_values(&db_insert, hostgroupid, hostid, groupids->values[i]);
-			zbx_audit_host_add_groups(AUDIT_DETAILS_ACTION_ADD, hostid, groupids->values[i]);
+			zbx_audit_hostgroup_update_json_attach(hostid, hostgroupid, groupids->values[i]);
 			hostgroupid++;
 		}
 
@@ -627,7 +627,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 							" set proxy_hostid=%s"
 							" where hostid=" ZBX_FS_UI64,
 							DBsql_id_ins(proxy_hostid), hostid);
-					zbx_audit_update_json_add_uint64(hostid, "host.proxy_hostid", proxy_hostid);
+					zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD,
+							"host.proxy_hostid", proxy_hostid);
 				}
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
@@ -825,6 +826,7 @@ void	op_host_disable(const DB_EVENT *event, zbx_config_t *cfg)
 				hostid);
 		zbx_audit_host_update_json_update_host_status(hostid, atoi(row[0]), HOST_STATUS_NOT_MONITORED);
 	}
+	DBfree_result(result);
 out:
 	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -914,6 +916,7 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 	zbx_uint64_t	hostid;
 	char		*sql = NULL, *hostname = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -943,6 +946,20 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 	}
 	else
 	{
+		zbx_vector_uint64_t	hostgroupids;
+
+		zbx_vector_uint64_create(&hostgroupids);
+
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select hostgroupid"
+				" from hosts_groups"
+				" where hostid=" ZBX_FS_UI64
+					" and",
+				hostid);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+		DBselect_uint64(sql, &hostgroupids);
+
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"delete from hosts_groups"
@@ -952,6 +969,13 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 
 		DBexecute("%s", sql);
+
+		for (i = 0; i < groupids->values_num; i++)
+		{
+			zbx_audit_hostgroup_update_json_detach(hostid, hostgroupids.values[i], groupids->values[i]);
+		}
+
+		zbx_vector_uint64_destroy(&hostgroupids);
 	}
 	DBfree_result(result);
 
@@ -1009,7 +1033,7 @@ out:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_del(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *del_templateids)
+void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
 {
 	zbx_uint64_t	hostid;
 	char		*error, *hostname = NULL;
