@@ -118,8 +118,7 @@ if ($data['service'] !== null && !$data['is_filtered']) {
 							(new CDiv(($data['service']['showsla'] == SERVICE_SHOW_SLA_ON)
 								? sprintf('%.4f', $data['service']['goodsla'])
 								: ''
-							))
-								->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+							))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 						])
 						->addItem([
 							(new CDiv(_('Tags')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
