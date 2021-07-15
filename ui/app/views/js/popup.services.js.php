@@ -94,5 +94,3 @@ window.services_popup = {
 		this.dialogue.dispatchEvent(new CustomEvent('services-submit', {detail: services}));
 	}
 };
-
-services_popup.init();

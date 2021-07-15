@@ -74,7 +74,13 @@ foreach ($data['services'] as $service) {
 	]);
 }
 
-$form->addItem($services);
+$form
+	->addItem($services)
+	->addItem(
+		(new CScriptTag('
+			services_popup.init();
+		'))->setOnDocumentReady()
+	);
 
 $output = [
 	'header' => $data['title'],

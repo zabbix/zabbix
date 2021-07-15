@@ -328,10 +328,3 @@ window.service_edit_popup = {
 			});
 	}
 };
-
-service_edit_popup.init(<?= json_encode([
-	'serviceid' => $data['serviceid'],
-	'children' => $data['form']['children'],
-	'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
-	'problem_tags' => $data['form']['problem_tags']
-]) ?>);

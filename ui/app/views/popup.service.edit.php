@@ -230,7 +230,18 @@ $tabs = (new CTabView())
 
 // Output.
 
-$form->addItem($tabs);
+$form
+	->addItem($tabs)
+	->addItem(
+		(new CScriptTag('
+			service_edit_popup.init('.json_encode([
+				'serviceid' => $data['serviceid'],
+				'children' => $data['form']['children'],
+				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
+				'problem_tags' => $data['form']['problem_tags']
+			]).');
+		'))->setOnDocumentReady()
+	);
 
 $output = [
 	'header' => $data['title'],

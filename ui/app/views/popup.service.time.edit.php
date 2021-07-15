@@ -139,7 +139,13 @@ switch ($data['form']['type']) {
 		break;
 }
 
-$form->addItem($form_grid);
+$form
+	->addItem($form_grid)
+	->addItem(
+		(new CScriptTag('
+			service_time_edit_popup.init();
+		'))->setOnDocumentReady()
+	);
 
 $output = [
 	'header' => $data['title'],

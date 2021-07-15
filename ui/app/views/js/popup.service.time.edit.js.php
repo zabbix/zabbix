@@ -91,5 +91,3 @@ window.service_time_edit_popup = {
 			});
 	}
 };
-
-service_time_edit_popup.init();
