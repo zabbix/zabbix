@@ -975,6 +975,11 @@ static int	housekeeping_cleanup(void)
 				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE,
 						objectid, &more);
 			}
+			else if (0 == strcmp(row[2], "serviceid"))
+			{
+				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE,
+						objectid, &more);
+			}
 		}
 		else
 			deleted += hk_table_cleanup(row[1], row[2], objectid, &more);
