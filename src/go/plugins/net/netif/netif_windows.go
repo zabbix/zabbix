@@ -161,7 +161,8 @@ func (p *Plugin) getDevDiscovery() (devices []msgIfDiscovery, err error) {
 	devices = make([]msgIfDiscovery, 0, table.NumEntries)
 	rows := (*win32.RGMIB_IF_ROW2)(unsafe.Pointer(&table.Table[0]))[:table.NumEntries:table.NumEntries]
 	for i := range rows {
-		devices = append(devices, msgIfDiscovery{windows.UTF16ToString(rows[i].Description[:]), &p.getGuidString(rows[i].InterfaceGuid)})
+		guid := p.getGuidString(rows[i].InterfaceGuid)
+		devices = append(devices, msgIfDiscovery{windows.UTF16ToString(rows[i].Description[:]), &guid})
 	}
 	return
 }
