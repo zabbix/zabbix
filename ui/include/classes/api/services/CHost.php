@@ -491,7 +491,7 @@ class CHost extends CHostGeneral {
 		 * Cleaning the output from write-only properties.
 		 */
 		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = array_diff(['inventory_mode'] + array_keys(DB::getSchema($this->tableName())['fields']),
+			$options['output'] = array_diff(['hostid', 'inventory_mode'] + array_keys(DB::getSchema($this->tableName())['fields']),
 				['tls_psk_identity', 'tls_psk']
 			);
 		}

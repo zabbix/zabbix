@@ -200,25 +200,28 @@ class testHost extends CAPITest {
 		return [
 			[
 				'request' => [
+					'hostids' => 99013,
 					'output' => 'extend'
 				],
 				'expected_result' => [
-					'hostid' => true,
-					'inventory_mode' => true,
-					'tls_psk_identity' => false,
-					'tls_psk' => false
+					'hostid' => '99013',
+					'host' => 'Host OS - Windows',
+					'inventory_mode' => '-1',
+					'tls_psk_identity' => null,
+					'tls_psk' => null
 				],
 			],
 			[
 				'request' => [
+					'hostids' => 99013,
 					'output' => ['host', 'tls_psk', 'tls_psk_identity']
 				],
 				'expected_result' => [
-					'hostid' => true,
-					'host' => true,
-					'inventory_mode' => false,
-					'tls_psk_identity' => false,
-					'tls_psk' => false
+					'hostid' => '99013',
+					'host' => 'Host OS - Windows',
+					'inventory_mode' => null,
+					'tls_psk_identity' => null,
+					'tls_psk' => null
 				]
 			],
 		];
@@ -231,12 +234,13 @@ class testHost extends CAPITest {
 		$result = $this->call('host.get', $request, null);
 
 		foreach($result['result'] as $host) {
-			foreach($expected_result as $key => $present) {
-				if ($present) {
-					$this->assertArrayHasKey($key, $host, 'Key should be present in host output.');
+			foreach($expected_result as $key => $value) {
+				if ($value !== null) {
+					$this->assertArrayHasKey($key, $host, 'Key '.$key.' should be present in host output.');
+					$this->assertEquals($value, $host[$key], 'Value should match.');
 				}
 				else {
-					$this->assertArrayNotHasKey($key, $host, 'Key should NOT be present in host output');
+					$this->assertArrayNotHasKey($key, $host, 'Key '.$key.' should NOT be present in host output');
 				}
 			}
 		}
