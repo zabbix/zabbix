@@ -806,7 +806,10 @@ zbx_user_role_permission_t;
 
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
+
+#define ZBX_USER_ROLE_PERMISSION_UI_DEFAULT_ACCESS		"ui.default_access"
 #define ZBX_USER_ROLE_PERMISSION_UI_MONITORING_SERVICES		"ui.monitoring.services"
+
 /* user permissions */
 typedef enum
 {

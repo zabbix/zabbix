@@ -84,7 +84,8 @@ char	*get_user_timezone(zbx_uint64_t userid)
  *                FAIL    - the access is denied                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule)
+int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
+		const char *role_rule)
 {
 	int		ret = FAIL;
 	DB_RESULT	result;
@@ -94,7 +95,7 @@ int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, co
 
 	result = DBselect("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
 			" and (name='%s' or name='%s')", user->roleid, role_rule,
-			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS);
+			role_rule_default);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -106,7 +107,7 @@ int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, co
 				ret = FAIL;
 			break;
 		}
-		else if (0 == strcmp(ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS, row[1]))
+		else if (0 == strcmp(role_rule_default, row[1]))
 		{
 			if (ROLE_PERM_ALLOW == atoi(row[0]))
 				ret = SUCCEED;

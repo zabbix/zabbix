@@ -393,6 +393,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone)
 		return PERM_READ_WRITE;
 
 	if (SUCCEED == zbx_check_user_administration_actions_permissions(&user,
+			ZBX_USER_ROLE_PERMISSION_UI_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_UI_MONITORING_SERVICES))
 	{
 		return PERM_READ;
