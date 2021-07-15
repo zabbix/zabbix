@@ -1549,6 +1549,10 @@ static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operat
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __func__, operationid);
 
+	/* events with service events source can't have operation conditions */
+	if (EVENT_SOURCE_SERVICE == event->source)
+		goto succeed;
+
 	result = DBselect("select conditiontype,operator,value"
 				" from opconditions"
 				" where operationid=" ZBX_FS_UI64
@@ -1612,7 +1616,7 @@ static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operat
 		zbx_vector_uint64_destroy(&condition.eventids);
 	}
 	DBfree_result(result);
-
+succeed:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1669,8 +1673,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		if (0 == next_esc_period || next_esc_period > esc_period)
 			next_esc_period = esc_period;
 
-		if (EVENT_SOURCE_SERVICE == action->eventsource ||
-				SUCCEED == check_operation_conditions(event, operationid, (unsigned char)atoi(row[3])))
+		if (SUCCEED == check_operation_conditions(event, operationid, (unsigned char)atoi(row[3])))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
