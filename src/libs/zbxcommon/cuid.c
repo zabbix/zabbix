@@ -64,8 +64,8 @@ static char	base36_digit(size_t num)
 {
 	if (num <= 9)
 		return (char)(num + '0');
-	else
-		return (char)(num - 10 + 'a');
+
+	return (char)(num - 10 + 'a');
 }
 
 static void	str_rev(char *str)
@@ -165,21 +165,26 @@ static size_t	next(void)
  ******************************************************************************/
 void	zbx_new_cuid(char *cuid)
 {
-	char	rand_block_1[RAND_TMP_36_BASE_BUF_LEN + 1], rand_block_2[RAND_TMP_36_BASE_BUF_LEN + 1],
-		fingerprint[CUID_BLOCK_SIZE + 1], timestamp[CUID_TIMESTAMP_SIZE + 1], counter[CUID_BLOCK_SIZE+1],
-		pid_block[PID_TMP_36_BASE_BUF_LEN];
+	char		rand_block_1[RAND_TMP_36_BASE_BUF_LEN + 1], rand_block_2[RAND_TMP_36_BASE_BUF_LEN + 1],
+			fingerprint[CUID_BLOCK_SIZE + 1], timestamp[CUID_TIMESTAMP_SIZE + 1],
+			counter[CUID_BLOCK_SIZE+1], pid_block[PID_TMP_36_BASE_BUF_LEN];
 	struct timeval	current_time;
 
 	from_decimal(counter, CUID_BASE_36, next());
 	pad(counter, CUID_BLOCK_SIZE);
+
 	from_decimal(pid_block, CUID_BASE_36, (size_t)getpid());
 	pad(pid_block, CUID_PID_BLOCK_SIZE);
-	zbx_snprintf(fingerprint, sizeof(fingerprint), "%s%s", host_block, pid_block);
+
 	gettimeofday(&current_time, NULL);
 	from_decimal(timestamp, CUID_BASE_36, (size_t)(current_time.tv_sec * 1000 + current_time.tv_usec / 1000));
+
 	from_decimal(rand_block_1, CUID_BASE_36, (size_t)rand());
 	pad(rand_block_1, CUID_BLOCK_SIZE);
+
 	from_decimal(rand_block_2, CUID_BASE_36, (size_t)rand());
 	pad(rand_block_2, CUID_BLOCK_SIZE);
+
+	zbx_snprintf(fingerprint, sizeof(fingerprint), "%s%s", host_block, pid_block);
 	zbx_snprintf(cuid, CUID_LEN, "c%s%s%s%s%s", timestamp, counter, fingerprint, rand_block_1, rand_block_2);
 }

@@ -229,7 +229,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 */
 	public function testPageAdministrationMediaTypes_Disable($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->selectTableRows('Name', CTestArrayHelper::get($data, 'rows', []));
+		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
 
 		// Check number of all selected media types.
 		if (array_key_exists('select_all', $data)) {
@@ -273,7 +273,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 */
 	public function testPageAdministrationMediaTypes_Enable($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->selectTableRows('Name', CTestArrayHelper::get($data, 'rows', []));
+		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
 
 		if (array_key_exists('select_all', $data)) {
 			// Check number of all selected media types.
@@ -546,7 +546,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$old_hash = CDBHelper::getHash($sql);
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->selectTableRows('Name', CTestArrayHelper::get($data, 'rows', []));
+		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
 
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();

@@ -24,8 +24,6 @@
  */
 class CApiInputValidator {
 
-	private const CUID_LENGTH = 25;
-
 	/**
 	 * Base validation function.
 	 *
@@ -2341,12 +2339,14 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (strlen($data) != self::CUID_LENGTH) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('must be %1$s characters long', self::CUID_LENGTH));
+		if (!CCuid::isCuidLength($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('must be %1$s characters long', CCuid::CUID_LENGTH)
+			);
 			return false;
 		}
 
-		if ($data[0] !== 'c') {
+		if (!CCuid::isCuid($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('CUID is expected'));
 			return false;
 		}

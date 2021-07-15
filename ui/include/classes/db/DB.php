@@ -589,7 +589,7 @@ class DB {
 					$id = bcadd($id, 1, 0);
 				}
 				else {
-					$id = generateCuid();
+					$id = CCuid::cuid();
 					$resultIds[$key] = $id;
 					$row[$table_schema['key']] = $id;
 				}

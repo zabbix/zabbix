@@ -106,7 +106,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 	struct zbx_json	details_json;
 	zbx_config_t	cfg;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
 
@@ -159,7 +159,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zbx_json_free(&details_json);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

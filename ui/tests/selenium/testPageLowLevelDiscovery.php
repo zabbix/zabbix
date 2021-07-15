@@ -241,12 +241,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].$context);
 		// Enabe all LLDs, so Check now can be send successfully.
 		$this->massChangeStatus('Enable');
-		$this->selectTableRows('Name', $data['names'], $this->selector);
+		$this->selectTableRows($data['names'], 'Name', $this->selector);
 
 		if (CTestArrayHelper::get($data, 'disabled')) {
 			$this->query('button:Disable')->one()->click();
 			$this->page->acceptAlert();
-			$this->selectTableRows('Name', $data['names'], $this->selector);
+			$this->selectTableRows($data['names'], 'Name', $this->selector);
 		}
 
 		if (CTestArrayHelper::get($data, 'template', false)) {
@@ -590,7 +590,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
 		$form->submit();
-		$this->selectTableRows('Key', $data['keys'], $this->selector);
+		$this->selectTableRows($data['keys'], 'Key', $this->selector);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
