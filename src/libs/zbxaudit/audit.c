@@ -303,60 +303,37 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 	append_uint64_json(&((*found_audit_entry)->details_json), audit_op, key, value);
 }
 
+#define PREPARE_UPDATE_JSON_APPEND_OP(...)					\
+	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;		\
+	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;	\
+										\
+	local_audit_entry.id = id;						\
+										\
+	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,	\
+			&(local_audit_entry_x));				\
+	if (NULL == found_audit_entry)						\
+	{									\
+		THIS_SHOULD_NEVER_HAPPEN;					\
+		exit(EXIT_FAILURE);						\
+	}									\
+
 void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value)
 {
-	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
-	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
-
-	local_audit_entry.id = id;
-
-	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
-			&(local_audit_entry_x));
-	if (NULL == found_audit_entry)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-
+	PREPARE_UPDATE_JSON_APPEND_OP();
 	append_int_json(&((*found_audit_entry)->details_json), audit_op, key, value);
 }
 
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
 		const char *value_new)
 {
-	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
-	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
-
-	local_audit_entry.id = id;
-
-	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
-			&(local_audit_entry_x));
-
-	if (NULL == found_audit_entry)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-
+	PREPARE_UPDATE_JSON_APPEND_OP();
 	update_str_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, uint64_t value_old,
 		uint64_t value_new)
 {
-	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
-	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
-
-	local_audit_entry.id = id;
-
-	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
-			&(local_audit_entry_x));
-	if (NULL == found_audit_entry)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-
+	PREPARE_UPDATE_JSON_APPEND_OP();
 	update_uint64_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
@@ -474,7 +451,6 @@ void	zbx_audit_host_update_json_update_interface_port(zbx_uint64_t hostid, zbx_u
 			"host.interfaces[%lu].details.privprotocol", interfaceid);				\
 	zbx_snprintf(audit_key_contextname,  AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].details.contextname",	\
 			interfaceid);										\
-
 
 void	zbx_audit_host_update_json_add_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version, zbx_uint64_t bulk,
 		const char *community, const char *securityname, zbx_uint64_t securitylevel, const char *authpassphrase,
