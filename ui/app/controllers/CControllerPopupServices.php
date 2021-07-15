@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,11 +21,11 @@
 
 class CControllerPopupServices extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDvalidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'title' =>				'string|required',
 			'filter_name' =>		'string',
@@ -45,11 +45,11 @@ class CControllerPopupServices extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$exclude_serviceids = $this->getInput('exclude_serviceids', []);
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);

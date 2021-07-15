@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -355,7 +355,7 @@ class CService extends CApiService {
 		return ['serviceids' => $serviceids];
 	}
 
-	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts): array {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['parentids'] !== null) {
@@ -402,7 +402,7 @@ class CService extends CApiService {
 		return $sqlParts;
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$serviceids = array_keys($result);
