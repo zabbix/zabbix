@@ -46,7 +46,7 @@ func getFileInfo(info *fs.FileInfo, name string) (fileinfo *fileInfo, err error)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot obtain %s user information: %s", name, err)
 	}
-	fi.User = usr.Name
+	fi.User = usr.Username
 	fi.Uid = &stat.Uid
 
 	g := strconv.FormatUint(uint64(stat.Gid), 10)

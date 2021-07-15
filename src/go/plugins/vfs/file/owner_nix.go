@@ -24,6 +24,7 @@ package file
 import (
 	"errors"
 	"fmt"
+	"os"
 	"os/user"
 	"strconv"
 	"syscall"
@@ -52,7 +53,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		resulttype = params[2]
 	}
 
-	info, err := stdOs.Stat(params[0])
+	info, err := os.Lstat(params[0])
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +75,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("Cannot obtain %s user information: %s", params[0], err)
 		}
-		ret = usr.Name
+		ret = usr.Username
 	case "groupname":
 		g := strconv.FormatUint(uint64(stat.Gid), 10)
 		group, err := user.LookupGroupId(g)

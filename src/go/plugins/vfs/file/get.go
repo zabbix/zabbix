@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"os"
 	"time"
 )
 
@@ -53,12 +54,12 @@ type fiTimeStamp struct {
 
 type fileInfo struct {
 	Type        string      `json:"type,omitempty"`
-	User        string      `json:"user,omitempty"`
-	Group       *string     `json:"group,omitempty"`
 	Permissions *string     `json:"permissions,omitempty"`
 	Uid         *uint32     `json:"uid,omitempty"`
 	Gid         *uint32     `json:"gid,omitempty"`
 	SID         *string     `json:"SID,omitempty"`
+	User        string      `json:"user,omitempty"`
+	Group       *string     `json:"group,omitempty"`
 	Size        int64       `json:"size,omitempty"`
 	Time        fiTime      `json:"time,omitempty"`
 	Timestamp   fiTimeStamp `json:"timestamp,omitempty"`
@@ -74,7 +75,7 @@ func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 
 	var fi *fileInfo
 
-	info, err := stdOs.Stat(params[0])
+	info, err := os.Lstat(params[0])
 	if err != nil {
 		return nil, err
 	}
