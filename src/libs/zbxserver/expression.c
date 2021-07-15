@@ -4108,7 +4108,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 			}
-			else if (EVENT_SOURCE_SERVICE == c_event->source)
+			else if (0 == indexed_macro && EVENT_SOURCE_SERVICE == c_event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -4124,7 +4124,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
-				else if (0 == indexed_macro && 0 == strcmp(m, MVAR_TIME))
+				else if (0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
