@@ -1333,29 +1333,19 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @return bool
 	 */
-	public function syncTemplates($data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
+	public function syncTemplates(array $data): void {
+		$output = ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'templateid', 'show_work_period',
+			'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type',
+			'ymax_type', 'ymin_itemid', 'ymax_itemid'
+		];
 
-		$dbLinks = DBSelect(
-			'SELECT ht.hostid,ht.templateid'.
-			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionInt('ht.hostid', $data['hostids']).
-				' AND '.dbConditionInt('ht.templateid', $data['templateids'])
-		);
-		$linkage = [];
-		while ($link = DBfetch($dbLinks)) {
-			$linkage[$link['templateid']][$link['hostid']] = 1;
+		if ($this instanceof CGraphPrototype) {
+			$output[] = 'discover';
 		}
 
 		$graphs = $this->get([
-			'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'templateid',
-				'show_work_period', 'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left',
-				'percent_right', 'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid', 'flags', 'discover'
-			],
-			'selectGraphItems' => ['gitemid', 'graphid', 'itemid', 'drawtype', 'sortorder', 'color', 'yaxisside',
-				'calc_fnc', 'type'
-			],
+			'output' => $output,
+			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
 			'selectHosts' => ['hostid'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
@@ -1364,7 +1354,5 @@ abstract class CGraphGeneral extends CApiService {
 		if ($graphs) {
 			$this->inherit($graphs, $data['hostids']);
 		}
-
-		return true;
 	}
 }
