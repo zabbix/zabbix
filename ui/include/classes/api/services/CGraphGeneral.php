@@ -880,47 +880,31 @@ abstract class CGraphGeneral extends CApiService {
 
 		if ($hostids === null) {
 			/*
-			 * Since the graph of template can have items only of this template, it's enough to find template of the
-			 * graph by one of the graph items. Therefore we collect here only first items of graphs.
-			 */
-			$graphids_first_itemids = [];
-
-			foreach ($graphs as $graphid => $graph) {
-				$graphids_first_itemids[$graphid] = reset($graph['gitems'])['itemid'];
-			}
-
-			/*
 			 * From the passed graphs we are able to inherit only those, which are template graphs and templates of
-			 * which are linked at least to one host. There we try to find the graphs items which meet these conditions.
+			 * which are linked at least to one host. There we try to find the graphs which meet these conditions.
 			 */
-			$itemids_of_templates_linked_to_hosts = DBfetchColumn(
-				DBselect(
-					'SELECT DISTINCT i.itemid'.
-					' FROM items i,hosts h,hosts_templates ht'.
-					' WHERE i.hostid=h.hostid'.
-						' AND h.hostid=ht.templateid'.
-						' AND '.dbConditionId('i.itemid', $graphids_first_itemids).
-						' AND h.status='.HOST_STATUS_TEMPLATE
-				),
-				'itemid'
-			);
+			$graphids = DBfetchColumn(DBselect(
+				'SELECT DISTINCT gi.graphid'.
+				' FROM graphs_items gi,items i,hosts h,hosts_templates ht'.
+				' WHERE gi.itemid=i.itemid'.
+					' AND i.hostid=h.hostid'.
+					' AND h.hostid=ht.templateid'.
+					' AND '.dbConditionId('gi.graphid', array_keys($graphs)).
+					' AND h.status='.HOST_STATUS_TEMPLATE
+			), 'graphid');
 
-			// Based on the found items, we leave only graphs that is possible to inherit.
-			$graphs = array_intersect_key($graphs,
-				array_intersect($graphids_first_itemids, $itemids_of_templates_linked_to_hosts)
-			);
+			// Based on the found graphs, we leave only graphs that is possible to inherit.
+			$graphs = array_intersect_key($graphs, array_flip($graphids));
 
 			if (!$graphs) {
 				return;
 			}
 		}
 
-		$graphids = [];
 		$same_name_graphs = [];
 		$itemids = [];
 
 		foreach ($graphs as $graphid => $graph) {
-			$graphids[] = $graphid;
 			$same_name_graphs[$graph['name']][$graphid] = true;
 
 			if ($graph['ymin_itemid'] > 0) {
@@ -978,13 +962,11 @@ abstract class CGraphGeneral extends CApiService {
 
 		foreach ($same_name_graphs as $name => $_graphs) {
 			if (count($_graphs) > 1) {
-				$_graphids = [];
 				$_templateids =[];
 
 				foreach (array_keys($_graphs) as $graphid) {
 					$itemid = reset($graphs[$graphid]['gitems'])['itemid'];
 					$templateid = $itemids_templateids[$itemid];
-					$_graphids[] = $templateid;
 					$_templateids[] = $templateid;
 				}
 
@@ -1063,7 +1045,7 @@ abstract class CGraphGeneral extends CApiService {
 			'output' => ['graphid', 'name', 'templateid'],
 			'selectItems' => ['hostid'],
 			'hostids' => $hostids,
-			'filter' => ['templateid' => $graphids],
+			'filter' => ['templateid' => array_keys($graphs)],
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
