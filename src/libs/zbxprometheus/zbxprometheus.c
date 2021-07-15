@@ -900,6 +900,14 @@ static int	condition_match_key_value(const zbx_prometheus_condition_t *condition
 			if (NULL == zbx_regexp_match(value, condition->pattern, NULL))
 				return FAIL;
 			break;
+		case ZBX_PROMETHEUS_CONDITION_OP_NOT_EQUAL:
+			if (0 == strcmp(value, condition->pattern))
+				return FAIL;
+			break;
+		case ZBX_PROMETHEUS_CONDITION_OP_REGEX_NOT_MATCHED:
+			if (NULL != zbx_regexp_match(value, condition->pattern, NULL))
+				return FAIL;
+			break;
 		default:
 			return FAIL;
 	}
