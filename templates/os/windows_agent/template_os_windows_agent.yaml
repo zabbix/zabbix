@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-07-14T17:45:59Z'
+  date: '2021-07-15T08:29:33Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -894,12 +894,6 @@ zabbix_export:
               uuid: 2766be7a10d444be9893dcdfab75f3be
               expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
-              priority: AVERAGE
-              description: 'The system is running out of free memory.'
-            -
-              uuid: 74e18c39b9ca41ff8e7ffafc381af94b
-              expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
       macros:
@@ -1834,17 +1828,6 @@ zabbix_export:
       dependencies:
         -
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
-          expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
-    -
-      uuid: 76862722f6cb46c8956c51396143b239
-      expression: 'min(/Windows memory by Zabbix agent/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows memory by Zabbix agent/system.swap.size[,total])>0'
-      name: 'High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)'
-      opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
-      priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
-      dependencies:
-        -
-          name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
           expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
   graphs:
     -
