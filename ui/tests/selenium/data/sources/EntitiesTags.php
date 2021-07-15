@@ -125,7 +125,7 @@ class EntitiesTags {
 						'name' => 'Item for trigger cloning',
 						'key_' => 'tags.clone',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				],
 				'discoveryrules' => [

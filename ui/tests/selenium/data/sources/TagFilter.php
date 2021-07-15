@@ -112,7 +112,7 @@ class TagFilter {
 						'value' => 'host'
 					]
 				]
-			],
+			]
 		]);
 
 		// Create templates.
