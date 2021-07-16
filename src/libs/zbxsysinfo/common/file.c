@@ -1463,16 +1463,6 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	else if (0 != S_ISFIFO(buf.st_mode))
 		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "fifo", ZBX_JSON_TYPE_STRING);
 
-	/* permissions */
-	tmp = get_file_permissions(&buf);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_PERMISSIONS, tmp, ZBX_JSON_TYPE_STRING);
-
-	/* uid */
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_UID, (zbx_uint64_t)buf.st_uid);
-
-	/* gid */
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_GID, (zbx_uint64_t)buf.st_gid);
-
 	/* user */
 
 	if (NULL == (pwd = getpwuid(buf.st_uid)))
@@ -1492,6 +1482,16 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	}
 
 	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_GROUP, grp->gr_name, ZBX_JSON_TYPE_STRING);
+
+	/* permissions */
+	tmp = get_file_permissions(&buf);
+	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_PERMISSIONS, tmp, ZBX_JSON_TYPE_STRING);
+
+	/* uid */
+	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_UID, (zbx_uint64_t)buf.st_uid);
+
+	/* gid */
+	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_GID, (zbx_uint64_t)buf.st_gid);
 
 	/* size */
 	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_SIZE, (zbx_uint64_t)buf.st_size);
