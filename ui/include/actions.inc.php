@@ -460,7 +460,7 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 		else {
 			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
 				? 'recovery_operations'
-				: 'ack_operations';
+				: 'update_operations';
 
 			foreach ($action[$operations_key] as $j => $operation) {
 				$result[$i][$j] = [];
@@ -755,7 +755,7 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 		else {
 			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
 				? 'recovery_operations'
-				: 'ack_operations';
+				: 'update_operations';
 
 			foreach ($action[$operations_key] as $j => $operation) {
 				switch ($operation['operationtype']) {
@@ -958,7 +958,7 @@ function getAllowedOperations($eventsource) {
 				OPERATION_TYPE_COMMAND,
 				OPERATION_TYPE_RECOVERY_MESSAGE
 			],
-			ACTION_ACKNOWLEDGE_OPERATION => [
+			ACTION_UPDATE_OPERATION => [
 				OPERATION_TYPE_MESSAGE,
 				OPERATION_TYPE_COMMAND,
 				OPERATION_TYPE_ACK_MESSAGE

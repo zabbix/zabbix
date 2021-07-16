@@ -1285,7 +1285,7 @@ class CMediatype extends CApiService {
 			'message_templates' =>	['type' => API_OBJECTS, 'uniq' => [['eventsource', 'recovery']], 'fields' => [
 				'eventsource' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])],
 				'recovery' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS.','.EVENT_SOURCE_SERVICE], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_ACKNOWLEDGE_OPERATION])],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS.','.EVENT_SOURCE_SERVICE], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION])],
 											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION])], 'type' => API_INT32, 'in' => ACTION_OPERATION],
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION])]
 				]],

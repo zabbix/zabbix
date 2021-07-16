@@ -75,7 +75,7 @@ class CMediatypeHelper {
 			],
 			self::MSG_TYPE_UPDATE => [
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
-				'recovery' => ACTION_ACKNOWLEDGE_OPERATION,
+				'recovery' => ACTION_UPDATE_OPERATION,
 				'name' => _('Problem update'),
 				'template' => [
 					'subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
@@ -136,7 +136,7 @@ class CMediatypeHelper {
 			],
 			self::MSG_TYPE_SERVICE_UPDATE => [
 				'eventsource' => EVENT_SOURCE_SERVICE,
-				'recovery' => ACTION_ACKNOWLEDGE_OPERATION,
+				'recovery' => ACTION_UPDATE_OPERATION,
 				'name' => _('Service update'),
 				'template' => [
 					'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
