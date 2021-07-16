@@ -20,7 +20,6 @@
 
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup items
@@ -40,15 +39,6 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
 
 	use PreprocessingTrait;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public function getItemPreprocessingPrometheusData() {
 		return array_merge($this->getPrometheusData(), [
