@@ -1070,7 +1070,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
-					'description' => _('The average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+					'description' => _('The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
 				],
 				[
 					'key' => 'vmware.vm.storage.totalwritelatency[<url>,<uuid>,<instance>]',
