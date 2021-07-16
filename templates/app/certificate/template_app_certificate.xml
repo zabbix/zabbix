@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-16T08:54:46Z</date>
+   <date>2021-07-16T11:54:18Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -123,7 +123,7 @@ Template tooling version used: 0.38</description>
                <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
-               <value_type>CHAR</value_type>
+               <value_type>TEXT</value_type>
                <description>Last check result message.</description>
                <applications>
                   <application>
@@ -172,7 +172,7 @@ Template tooling version used: 0.38</description>
                      <dependencies>
                         <dependency>
                            <name>Cert: SSL certificate is invalid</name>
-                           <expression>{Template App Website certificate by Zabbix agent 2:cert.validation.str()} = "invalid"</expression>
+                           <expression>{Template App Website certificate by Zabbix agent 2:cert.validation.str("invalid")} = 1</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -328,7 +328,7 @@ Template tooling version used: 0.38</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{str()} = "invalid"</expression>
+                     <expression>{str("invalid")} = 1</expression>
                      <name>Cert: SSL certificate is invalid</name>
                      <priority>HIGH</priority>
                      <description>SSL certificate has expired or it is issued for another domain.</description>

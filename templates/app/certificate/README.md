@@ -66,7 +66,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Cert: SSL certificate is invalid |<p>SSL certificate has expired or it is issued for another domain.</p> |`{TEMPLATE_NAME:cert.validation.str()} = "invalid"` |HIGH | |
+|Cert: SSL certificate is invalid |<p>SSL certificate has expired or it is issued for another domain.</p> |`{TEMPLATE_NAME:cert.validation.str("invalid")} = 1` |HIGH | |
 |Cert: SSL certificate expires soon (less than {$CERT.NOTAFTER.MIN.WARN} days) |<p>The SSL certificate should be updated or it will become untrusted.</p> |`({TEMPLATE_NAME:cert.not_after.last()} - {TEMPLATE_NAME:cert.not_after.now()}) / 86400 < {$CERT.NOTAFTER.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Cert: SSL certificate is invalid</p> |
 |Cert: Fingerprint has changed (new version: {ITEM.VALUE}) |<p>Cert fingerprint has changed. If you did not update the certificate, it may be meant your certificate was hacked. Ack to close.</p> |`{TEMPLATE_NAME:cert.fingerprint.diff()}=1` |INFO |<p>Manual close: YES</p> |
 
