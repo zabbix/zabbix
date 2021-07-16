@@ -23,6 +23,7 @@
 extern char			*CONFIG_HOSTNAMES;
 extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 extern char			*CONFIG_HOST_METADATA;
+extern char			*CONFIG_HOST_METADATA_ITEM;
 
 static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -59,11 +60,29 @@ static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	char	**value;
+	int	ret = SYSINFO_RET_OK;
+
 	ZBX_UNUSED(request);
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(CONFIG_HOST_METADATA)));
+	if (NULL != CONFIG_HOST_METADATA)
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOST_METADATA));
+	}
+	else if (NULL != CONFIG_HOST_METADATA_ITEM)
+	{
+		if (SUCCEED != process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, result) ||
+				NULL == (value = GET_STR_RESULT(result)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get host metadata using item \"%s\"",
+					CONFIG_HOST_METADATA_ITEM));
+			ret = SYSINFO_RET_FAIL;
+		}
+	}
+	else
+		SET_STR_RESULT(result, zbx_strdup(NULL, ""));
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result)
