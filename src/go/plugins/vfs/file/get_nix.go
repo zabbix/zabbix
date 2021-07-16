@@ -30,6 +30,13 @@ import (
 	"time"
 )
 
+type userInfo struct {
+	Group       *string `json:"group"`
+	Permissions string  `json:"permissions"`
+	Uid         uint32  `json:"uid"`
+	Gid         uint32  `json:"gid"`
+}
+
 func getFileInfo(info *fs.FileInfo, name string) (fileinfo *fileInfo, err error) {
 	var fi fileInfo
 
@@ -39,26 +46,24 @@ func getFileInfo(info *fs.FileInfo, name string) (fileinfo *fileInfo, err error)
 	}
 
 	perm := fmt.Sprintf("%04o", stat.Mode&07777)
-	fi.Permissions = &perm
+	fi.Permissions = perm
 
 	u := strconv.FormatUint(uint64(stat.Uid), 10)
-	usr, err := user.LookupId(u)
-	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s user information: %s", name, err)
+	if usr, ok := user.LookupId(u); ok == nil {
+		fi.User = &usr.Username
 	}
-	fi.User = usr.Username
-	fi.Uid = &stat.Uid
+	fi.Uid = stat.Uid
 
 	g := strconv.FormatUint(uint64(stat.Gid), 10)
-	group, err := user.LookupGroupId(g)
-	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s group information: %s", name, err)
+	if group, ok := user.LookupGroupId(g); ok == nil {
+		fi.Group = &group.Name
 	}
-	fi.Group = &group.Name
-	fi.Gid = &stat.Gid
+	fi.Gid = stat.Gid
 
-	fi.Time.Access = jsTimeLoc(time.Unix(stat.Atim.Unix()))
-	fi.Time.Change = jsTimeLoc(time.Unix(stat.Ctim.Unix()))
+	a := jsTimeLoc(time.Unix(stat.Atim.Unix()))
+	fi.Time.Access = &a
+	c := jsTimeLoc(time.Unix(stat.Ctim.Unix()))
+	fi.Time.Change = &c
 
 	return &fi, nil
 }

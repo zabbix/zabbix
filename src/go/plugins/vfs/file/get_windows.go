@@ -21,14 +21,18 @@ package file
 
 import (
 	"fmt"
-	"io/fs"
+	"os"
 	"syscall"
 	"time"
 
 	"golang.org/x/sys/windows"
 )
 
-func getFileInfo(info *fs.FileInfo, path string) (fileinfo *fileInfo, err error) {
+type userInfo struct {
+	SID string `json:"SID"`
+}
+
+func getFileInfo(info *os.FileInfo, path string) (fileinfo *fileInfo, err error) {
 	var fi fileInfo
 
 	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
@@ -46,20 +50,21 @@ func getFileInfo(info *fs.FileInfo, path string) (fileinfo *fileInfo, err error)
 		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor owner", path)
 	}
 
-	sid := sdOwner.String()
-	fi.SID = &sid
-	account, domain, _, err := sdOwner.LookupAccount("")
-	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s owner name information: %s", path, err)
-	}
-	fi.User = domain + "\\" + account
+	fi.SID = sdOwner.String()
 
-	wFileSys := (*info).Sys().(*syscall.Win32FileAttributeData)
-	fi.Time.Access = jsTimeLoc(time.Unix(0, wFileSys.LastAccessTime.Nanoseconds()))
-	if utn, err := getFileChange(path); err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s change time information: %s", path, err)
-	} else {
-		fi.Time.Change = jsTimeLoc(time.Unix(0, utn))
+	if account, domain, _, ok := sdOwner.LookupAccount(""); ok == nil {
+		u := domain + "\\" + account
+		fi.User = &u
+	}
+
+	if wFileSys := (*info).Sys().(*syscall.Win32FileAttributeData); wFileSys != nil {
+		a := jsTimeLoc(time.Unix(0, wFileSys.LastAccessTime.Nanoseconds()))
+		fi.Time.Access = &a
+	}
+
+	if utn, ok := getFileChange(path); ok == nil {
+		c := jsTimeLoc(time.Unix(0, utn))
+		fi.Time.Change = &c
 	}
 
 	return &fi, nil

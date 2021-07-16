@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 	"time"
 )
@@ -41,28 +40,24 @@ func (t jsTimeUtc) MarshalJSON() ([]byte, error) {
 }
 
 type fiTime struct {
-	Access jsTimeLoc `json:"access,omitempty"`
-	Modify jsTimeLoc `json:"modify,omitempty"`
-	Change jsTimeLoc `json:"change,omitempty"`
+	Access *jsTimeLoc `json:"access"`
+	Modify jsTimeLoc  `json:"modify"`
+	Change *jsTimeLoc `json:"change"`
 }
 
 type fiTimeStamp struct {
-	Access jsTimeUtc `json:"access,omitempty"`
-	Modify jsTimeUtc `json:"modify,omitempty"`
-	Change jsTimeUtc `json:"change,omitempty"`
+	Access *jsTimeUtc `json:"access"`
+	Modify jsTimeUtc  `json:"modify"`
+	Change *jsTimeUtc `json:"change"`
 }
 
 type fileInfo struct {
-	Type        string      `json:"type,omitempty"`
-	Permissions *string     `json:"permissions,omitempty"`
-	Uid         *uint32     `json:"uid,omitempty"`
-	Gid         *uint32     `json:"gid,omitempty"`
-	SID         *string     `json:"SID,omitempty"`
-	User        string      `json:"user,omitempty"`
-	Group       *string     `json:"group,omitempty"`
-	Size        int64       `json:"size,omitempty"`
-	Time        fiTime      `json:"time,omitempty"`
-	Timestamp   fiTimeStamp `json:"timestamp,omitempty"`
+	Type string  `json:"type"`
+	User *string `json:"user"`
+	userInfo
+	Size      int64       `json:"size"`
+	Time      fiTime      `json:"time"`
+	Timestamp fiTimeStamp `json:"timestamp"`
 }
 
 func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
@@ -88,15 +83,15 @@ func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 		fi.Type = "file"
 	case mode.IsDir():
 		fi.Type = "dir"
-	case mode&fs.ModeSymlink != 0:
+	case mode&os.ModeSymlink != 0:
 		fi.Type = "sym"
-	case mode&fs.ModeSocket != 0:
+	case mode&os.ModeSocket != 0:
 		fi.Type = "sock"
-	case mode&fs.ModeDevice != 0:
+	case mode&os.ModeDevice != 0:
 		fi.Type = "bdev"
-	case mode&fs.ModeCharDevice != 0:
+	case mode&os.ModeCharDevice != 0:
 		fi.Type = "cdev"
-	case mode&fs.ModeNamedPipe != 0:
+	case mode&os.ModeNamedPipe != 0:
 		fi.Type = "fifo"
 	default:
 		return nil, fmt.Errorf("Cannot obtain %s type information", params[0])
@@ -106,9 +101,15 @@ func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 
 	fi.Time.Modify = jsTimeLoc(info.ModTime())
 
-	fi.Timestamp.Access = jsTimeUtc(fi.Time.Access)
-	fi.Timestamp.Change = jsTimeUtc(fi.Time.Change)
 	fi.Timestamp.Modify = jsTimeUtc(fi.Time.Modify)
+	if fi.Time.Access != nil {
+		a := jsTimeUtc(*fi.Time.Access)
+		fi.Timestamp.Access = &a
+	}
+	if fi.Time.Change != nil {
+		c := jsTimeUtc(*fi.Time.Change)
+		fi.Timestamp.Change = &c
+	}
 
 	var b []byte
 	if b, err = json.Marshal(&fi); err != nil {
