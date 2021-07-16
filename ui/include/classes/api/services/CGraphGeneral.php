@@ -938,17 +938,20 @@ abstract class CGraphGeneral extends CApiService {
 
 		$itemids = array_keys($itemids);
 
-		$itemids_templateids = [];
+		$graph_templateids = [];
 		$templateids = [];
 
-		$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionId('i.itemid', $itemids));
+		$db_graph_templates = DBselect(
+			'SELECT DISTINCT gi.graphid,i.hostid'.
+			' FROM graphs_items gi,items i'.
+			' WHERE gi.itemid=i.itemid'.
+				' AND '.dbConditionId('gi.graphid', array_keys($graphs))
+		);
 
-		while ($db_item = DBfetch($db_items)) {
-			$itemids_templateids[$db_item['itemid']] = $db_item['hostid'];
-			$templateids[$db_item['hostid']] = true;
+		while ($db_graph_template = DBfetch($db_graph_templates)) {
+			$graph_templateids[$db_graph_template['graphid']] = $db_graph_template['hostid'];
+			$templateids[$db_graph_template['hostid']] = true;
 		}
-
-		$templateids = array_keys($templateids);
 
 		$templateids_hosts = [];
 		$hostids_condition = ($hostids === null) ? '' : ' AND '.dbConditionId('ht.hostid', $hostids);
@@ -957,7 +960,7 @@ abstract class CGraphGeneral extends CApiService {
 		$db_host_templates = DBselect(
 			'SELECT ht.templateid,ht.hostid'.
 			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionId('ht.templateid', $templateids).
+			' WHERE '.dbConditionId('ht.templateid', array_keys($templateids)).
 				$hostids_condition
 		);
 
@@ -973,8 +976,7 @@ abstract class CGraphGeneral extends CApiService {
 				$_templateids = [];
 
 				foreach ($graphids as $graphid) {
-					$itemid = reset($graphs[$graphid]['gitems'])['itemid'];
-					$_templateids[] = $itemids_templateids[$itemid];
+					$_templateids[] = $graph_templateids[$graphid];
 				}
 
 				$_templateids_count = count($_templateids);
@@ -1131,8 +1133,7 @@ abstract class CGraphGeneral extends CApiService {
 			foreach ($graphs as $graphid => $graph) {
 				$graphids_names[$graphid] = $graph['name'];
 
-				$itemid = reset($graph['gitems'])['itemid'];
-				$templateid = $itemids_templateids[$itemid];
+				$templateid = $graph_templateids[$graphid];
 
 				if (!array_key_exists($graph['name'], $graphs_names_required_hosts)) {
 					$graphs_names_required_hosts[$graph['name']] = [];
@@ -1241,8 +1242,7 @@ abstract class CGraphGeneral extends CApiService {
 			}
 
 			foreach ($graphs as $graphid => $graph) {
-				$itemid = reset($graph['gitems'])['itemid'];
-				$templateid = $itemids_templateids[$itemid];
+				$templateid = $graph_templateids[$graphid];
 
 				$hosts_to_create_graph = array_diff_key($templateids_hosts[$templateid],
 					array_key_exists($graphid, $parent_graphids_updated_hosts)
