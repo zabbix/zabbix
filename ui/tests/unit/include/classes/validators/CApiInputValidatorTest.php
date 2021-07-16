@@ -4050,6 +4050,12 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/": an array is expected.'
 			],
 			[
+				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
+				'',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
 				['type' => API_CUIDS],
 				true,
 				'/',
@@ -4160,6 +4166,12 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_CUID],
 				'ckr3d7iou000wld1pcx24d56',
+				'/',
+				'Invalid parameter "/": must be 25 characters long.'
+			],
+			[
+				['type' => API_CUID],
+				'ckr3d7iou000wld1pcx24d56ā',
 				'/',
 				'Invalid parameter "/": must be 25 characters long.'
 			],

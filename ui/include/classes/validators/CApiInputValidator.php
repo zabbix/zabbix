@@ -2339,9 +2339,9 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (!CCuid::isCuidLength($data)) {
+		if (!CCuid::checkLength($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_s('must be %1$s characters long', CCuid::CUID_LENGTH)
+				_s('must be %1$s characters long', CCuid::LENGTH)
 			);
 			return false;
 		}
