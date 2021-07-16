@@ -942,19 +942,12 @@ abstract class CGraphGeneral extends CApiService {
 		$itemids_templateids = [];
 		$templateids = [];
 
-		$db_templates = DBselect(
-			'SELECT i.hostid AS templateid,i.itemid,i.key_'.
-			' FROM items i'.
-			' WHERE '.dbConditionId('i.itemid', $itemids)
-		);
+		$db_items = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.dbConditionId('i.itemid', $itemids));
 
-		$itemids = [];
-
-		while ($data = DBfetch($db_templates)) {
-			$items_templateids[$data['key_']][$data['itemid']] = $data['templateid'];
-			$itemids_templateids[$data['itemid']] = $data['templateid'];
-			$templateids[$data['templateid']] = true;
-			$itemids[] = $data['itemid'];
+		while ($db_item = DBfetch($db_items)) {
+			$items_templateids[$db_item['key_']][$db_item['itemid']] = $db_item['hostid'];
+			$itemids_templateids[$db_item['itemid']] = $db_item['hostid'];
+			$templateids[$db_item['hostid']] = true;
 		}
 
 		$templateids = array_keys($templateids);
@@ -963,17 +956,19 @@ abstract class CGraphGeneral extends CApiService {
 		$hostids_condition = ($hostids === null) ? '' : ' AND '.dbConditionId('ht.hostid', $hostids);
 		$hostids = [];
 
-		$db_hosts = DBselect(
+		$db_host_templates = DBselect(
 			'SELECT ht.templateid,ht.hostid'.
 			' FROM hosts_templates ht'.
 			' WHERE '.dbConditionId('ht.templateid', $templateids).
 				$hostids_condition
 		);
 
-		while ($data = DBfetch($db_hosts)) {
-			$templateids_hosts[$data['templateid']][$data['hostid']] = true;
-			$hostids[$data['hostid']] = true;
+		while ($db_host_template = DBfetch($db_host_templates)) {
+			$templateids_hosts[$db_host_template['templateid']][$db_host_template['hostid']] = true;
+			$hostids[$db_host_template['hostid']] = true;
 		}
+
+		$hostids = array_keys($hostids);
 
 		foreach ($same_name_graphs as $name => $graphids) {
 			if (count($graphids) > 1) {
@@ -1001,8 +996,6 @@ abstract class CGraphGeneral extends CApiService {
 				}
 			}
 		}
-
-		$hostids = array_keys($hostids);
 
 		$items_hostids = [];
 		$db_items = DBselect(
