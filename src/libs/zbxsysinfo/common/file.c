@@ -1009,6 +1009,12 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
+	if (NULL != ownertype && '\0' != *ownertype && 0 != strcmp(ownertype, "user"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto err;
+	}
+
 	if (INVALID_HANDLE_VALUE == (handle = CreateFile(wpath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL, NULL)))
 	{
@@ -1016,18 +1022,15 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (NULL != ownertype && '\0' != *ownertype && 0 != strcmp(ownertype, "user"))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto err;
-	}
-
 	if (ERROR_SUCCESS != GetSecurityInfo(handle, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &sid, NULL, NULL, NULL,
 			&sec))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain security information."));
+		CloseHandle(handle);
 		goto err;
 	}
+
+	CloseHandle(handle);
 
 	if (NULL != resulttype && 0 == strcmp(resulttype, "id"))
 	{
@@ -1308,8 +1311,11 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 			&sec))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain security information."));
+		CloseHandle(handle);
 		goto err;
 	}
+
+	CloseHandle(handle);
 
 	LookupAccountSid(NULL, sid, acc_name, (LPDWORD)&acc_sz, dmn_name, (LPDWORD)&dmn_sz, &acc_type);
 
