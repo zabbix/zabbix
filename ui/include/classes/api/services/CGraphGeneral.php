@@ -921,7 +921,7 @@ abstract class CGraphGeneral extends CApiService {
 		$itemids = [];
 
 		foreach ($graphs as $graphid => $graph) {
-			$same_name_graphs[$graph['name']][$graphid] = true;
+			$same_name_graphs[$graph['name']][] = $graphid;
 
 			if ($graph['ymin_itemid'] > 0) {
 				$itemids[$graph['ymin_itemid']] = true;
@@ -975,18 +975,18 @@ abstract class CGraphGeneral extends CApiService {
 			$hostids[$data['hostid']] = true;
 		}
 
-		foreach ($same_name_graphs as $name => $_graphs) {
-			if (count($_graphs) > 1) {
-				$_templateids =[];
+		foreach ($same_name_graphs as $name => $graphids) {
+			if (count($graphids) > 1) {
+				$_templateids = [];
 
-				foreach (array_keys($_graphs) as $graphid) {
+				foreach ($graphids as $graphid) {
 					$itemid = reset($graphs[$graphid]['gitems'])['itemid'];
-					$templateid = $itemids_templateids[$itemid];
-					$_templateids[] = $templateid;
+					$_templateids[] = $itemids_templateids[$itemid];
 				}
 
 				$_templateids_count = count($_templateids);
-				for ($i = 0; $i < ($_templateids_count - 1); $i++) {
+
+				for ($i = 0; $i < $_templateids_count - 1; $i++) {
 					for ($j = $i + 1; $j < $_templateids_count; $j++) {
 						$same_hosts = array_intersect_key($templateids_hosts[$_templateids[$i]],
 							$templateids_hosts[$_templateids[$j]]
