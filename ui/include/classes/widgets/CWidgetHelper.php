@@ -76,10 +76,12 @@ class CWidgetHelper {
 				(new CScriptTag('
 					$("z-select#type").on("change", updateWidgetConfigDialogue);
 
-					$("#widget_dialogue_form")
-						.on("change", \'[data-trim="1"]\', function () {
-							const $box = $(this);
-							$box.val($box.val().trim());
+					document
+						.getElementById("widget_dialogue_form")
+						.addEventListener("change", (e) => {
+							if (e.target.matches(\'[data-trim="1"]\')) {
+								e.target.value = e.target.value.trim();
+							}
 						});
 				'))->setOnDocumentReady()
 			);
