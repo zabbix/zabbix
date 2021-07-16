@@ -2612,7 +2612,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 {
 	int				i, ret;
 	zbx_vector_uint64_t		escalationids;
-	zbx_vector_ptr_t		diffs, actions, events, events_rootcause;
+	zbx_vector_ptr_t		diffs, actions, events;
 	zbx_escalation_diff_t		*diff;
 	zbx_vector_uint64_pair_t	event_pairs;
 	zbx_vector_service_alarm_t	service_alarms;
@@ -2627,7 +2627,6 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	zbx_vector_uint64_pair_create(&event_pairs);
 	zbx_vector_service_alarm_create(&service_alarms);
 	zbx_vector_service_create(&services);
-	zbx_vector_ptr_create(&events_rootcause);
 
 	add_ack_escalation_r_eventids(escalations, eventids, &event_pairs);
 
@@ -2636,8 +2635,10 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 	if (0 != ((DB_ESCALATION *)escalations->values[0])->serviceid)
 	{
+		db_get_services(escalations, &services, &events);	/* reuse events vector for service events */
+		zbx_vector_ptr_sort(&events, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
 		get_db_service_alarms(escalations, &service_alarms);
-		db_get_services(escalations, &services, &events_rootcause);
 	}
 
 	for (i = 0; i < escalations->values_num; i++)
@@ -2927,9 +2928,6 @@ out:
 
 	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
 	zbx_vector_ptr_destroy(&events);
-
-	zbx_vector_ptr_clear_ext(&events_rootcause, (zbx_clean_func_t)zbx_db_free_event);
-	zbx_vector_ptr_destroy(&events_rootcause);
 
 	zbx_vector_uint64_pair_destroy(&event_pairs);
 	zbx_vector_service_alarm_destroy(&service_alarms);
