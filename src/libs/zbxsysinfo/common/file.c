@@ -1116,7 +1116,7 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (SUCCEED != zbx_stat(filename, &st))
+	if (0 != lstat(filename, &st))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
