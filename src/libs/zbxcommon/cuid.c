@@ -146,7 +146,7 @@ static size_t	next(void)
 	counter_value++;
 	out = (size_t)counter_value;
 
-	if (counter_value > DISCRETE_VALUES)
+	if (counter_value >= DISCRETE_VALUES)
 		counter_value = 0;
 
 	return out;
