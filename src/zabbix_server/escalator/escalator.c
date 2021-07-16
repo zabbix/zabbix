@@ -2636,8 +2636,6 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	if (0 != ((DB_ESCALATION *)escalations->values[0])->serviceid)
 	{
 		db_get_services(escalations, &services, &events);	/* reuse events vector for service events */
-		zbx_vector_ptr_sort(&events, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
 		get_db_service_alarms(escalations, &service_alarms);
 	}
 
