@@ -867,6 +867,22 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
+	 * Returns visible host name. Can be used for error reporting.
+	 *
+	 * @static
+	 *
+	 * @param string|int $hostid
+	 *
+	 * @return string
+	 */
+	private static function getHostName($hostid): string {
+		return DB::select('hosts', [
+			'output' => ['name'],
+			'hostids' => $hostid
+		])[0]['name'];
+	}
+
+	/**
 	 * Updates the children of the graph on the given hosts and propagates the inheritance to the child hosts.
 	 *
 	 * @param array      $graphs   An array of graphs to inherit. Each graph must contain all graph properties including
@@ -977,16 +993,8 @@ abstract class CGraphGeneral extends CApiService {
 						);
 
 						if ($same_hosts) {
-							$hosts = API::Host()->get([
-								'output' => ['host'],
-								'hostids' => key($same_hosts),
-								'nopermissions' => true,
-								'preservekeys' => true,
-								'templated_hosts' => true
-							]);
-
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Graph "%1$s" already exists on "%2$s".', $name, $hosts[key($same_hosts)]['host'])
+								_s('Graph "%1$s" already exists on "%2$s".', $name, self::getHostName(key($same_hosts)))
 							);
 						}
 					}
@@ -1007,13 +1015,6 @@ abstract class CGraphGeneral extends CApiService {
 
 		while ($item = DBfetch($db_items)) {
 			$items_hostids[$item['key_']][$item['itemid']] = $item['hostid'];
-		}
-
-		$hosts_names = [];
-		$db_hosts = DBselect('SELECT h.hostid,h.host FROM hosts h WHERE '.dbConditionId('h.hostid', $hostids));
-
-		while ($host = DBfetch($db_hosts)) {
-			$hosts_names[$host['hostid']] = $host['host'];
 		}
 
 		/*
@@ -1125,7 +1126,7 @@ abstract class CGraphGeneral extends CApiService {
 								if ($duplicate_name_hostid) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
 										_s('Graph "%1$s" already exists on "%2$s".', $name,
-											$hosts_names[$duplicate_name_hostid]
+											self::getHostName($duplicate_name_hostid)
 										)
 									);
 								}
@@ -1190,7 +1191,7 @@ abstract class CGraphGeneral extends CApiService {
 					$hostid = reset($required_hostids);
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Graph "%1$s" already exists on "%2$s" (items are not identical).', $graph['name'],
-							$hosts_names[reset($required_hostids)]
+							self::getHostName(reset($required_hostids))
 						)
 					);
 				}
@@ -1202,8 +1203,8 @@ abstract class CGraphGeneral extends CApiService {
 
 				if ($graph['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Graph "%1$s" already exists on "%2$s" (inherited from another template).',
-						$graph['name'], $hosts_names[$hostid]
+						'Graph "%1$s" already exists on "%2$s" (inherited from another template).', $graph['name'],
+						self::getHostName($hostid)
 					));
 				}
 				elseif  ($graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
@@ -1224,7 +1225,7 @@ abstract class CGraphGeneral extends CApiService {
 						if ($index === false) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Graph "%1$s" already exists on "%2$s" (items are not identical).',
-									$parent_graph['name'], $hosts_names[$hostid]
+									$parent_graph['name'], self::getHostName($hostid)
 								)
 							);
 						}
@@ -1256,7 +1257,7 @@ abstract class CGraphGeneral extends CApiService {
 				else {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Graph "%1$s" already exists on "%2$s" (items are not identical).', $parent_graph['name'],
-							$hosts_names[$hostid]
+							self::getHostName($hostid)
 						)
 					);
 				}
