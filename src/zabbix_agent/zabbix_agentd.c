@@ -884,7 +884,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
-			PARM_OPT,	0,			__INT_MAX__},
+			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 

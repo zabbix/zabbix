@@ -836,7 +836,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
-			PARM_OPT,	0,			__INT_MAX__},
+			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 

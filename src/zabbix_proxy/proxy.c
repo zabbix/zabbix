@@ -837,7 +837,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartPreprocessors",		&CONFIG_PREPROCESSOR_FORKS,		TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
-			PARM_OPT,	0,			__INT_MAX__},
+			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 

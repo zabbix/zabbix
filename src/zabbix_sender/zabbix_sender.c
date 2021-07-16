@@ -857,7 +857,7 @@ static void	zbx_load_config(const char *config_file)
 		{"TLSCipherPSK",		&cfg_tls_cipher_psk,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
-			PARM_OPT,	0,			__INT_MAX__},
+			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 
