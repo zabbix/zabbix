@@ -246,7 +246,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, ZBX_RTC_GET_DATA(flags), flags);
 			break;
 		case ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER, 1, flags);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER, 1, flags);
 			break;
 		default:
 			if (NULL != zbx_sigusr_handler)

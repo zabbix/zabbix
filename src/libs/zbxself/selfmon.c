@@ -122,7 +122,7 @@ extern int	CONFIG_ALERTDB_FORKS;
 extern int	CONFIG_HISTORYPOLLER_FORKS;
 extern int	CONFIG_AVAILMAN_FORKS;
 extern int	CONFIG_SERVICEMAN_FORKS;
-extern int	CONFIG_TRIGGERHOUSEKEEPER_FORKS;
+extern int	CONFIG_PROBLEMHOUSEKEEPER_FORKS;
 
 extern unsigned char	process_type;
 extern int		process_num;
@@ -212,8 +212,8 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_AVAILMAN_FORKS;
 		case ZBX_PROCESS_TYPE_SERVICEMAN:
 			return CONFIG_SERVICEMAN_FORKS;
-		case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
-			return CONFIG_TRIGGERHOUSEKEEPER_FORKS;
+		case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
+			return CONFIG_PROBLEMHOUSEKEEPER_FORKS;
 	}
 
 	return get_component_process_type_forks(proc_type);
