@@ -53,7 +53,7 @@ void	zbx_service_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size,
 	char			*error = NULL;
 	static zbx_ipc_socket_t	socket = {0};
 
-	/* each process has a permanent connection to preprocessing manager */
+	/* each process has a permanent connection to service manager */
 	if (0 == socket.fd && FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_SERVICE, SEC_PER_MIN,
 			&error))
 	{

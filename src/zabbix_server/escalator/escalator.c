@@ -1110,7 +1110,6 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		ZBX_STR2UCHAR(script.type, row[3]);
 
-
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
 			ZBX_STR2UCHAR(script.execute_on, row[5]);
 
@@ -2307,14 +2306,16 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 
 /******************************************************************************
  *                                                                            *
- * Function: escalation_acknowledge                                           *
+ * Function: escalation_update                                                *
  *                                                                            *
- * Purpose: process escalation acknowledge                                    *
+ * Purpose: process update escalation                                         *
  *                                                                            *
- * Parameters: escalation - [IN/OUT] the escalation to recovery               *
- *             action     - [IN]     the action                               *
- *             event      - [IN]     the event                                *
- *             r_event    - [IN]     the recovery event                       *
+ * Parameters: escalation       - [IN/OUT] the escalation to recovery         *
+ *             action           - [IN] the action                             *
+ *             event            - [IN] the event                              *
+ *             service_alarm    - [IN] the service alarm                      *
+ *             service          - [IN] the service                            *
+ *             default_timezone - [IN] the time zone                          *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_update(DB_ESCALATION *escalation, const DB_ACTION *action,

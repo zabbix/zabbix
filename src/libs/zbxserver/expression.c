@@ -4141,7 +4141,6 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to, tz);
 				}
-
 				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_NSEVERITY))
 				{
 					if (NULL != service_alarm)
