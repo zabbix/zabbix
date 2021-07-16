@@ -72,8 +72,14 @@ class CWidgetHelper {
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 			->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate))
-			->addItem((new CScriptTag('$("z-select#type").on("change", updateWidgetConfigDialogue);'))
-				->setOnDocumentReady()
+			->addItem(
+				(new CScriptTag('$("z-select#type").on("change", updateWidgetConfigDialogue);'.
+					'$("#widget_dialogue_form").on("blur change", \'[data-trim="1"]\', function () {
+						const $box = $(this);
+						$box.val($box.val().trim());
+					});'
+				))
+					->setOnDocumentReady()
 			);
 	}
 
