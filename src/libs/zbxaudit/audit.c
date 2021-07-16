@@ -240,9 +240,8 @@ void	zbx_audit_flush(void)
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_new_cuid(audit_cuid);
-
-		if (AUDIT_ACTION_UPDATE != (*audit_entry)->audit_action ||
-				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
+		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
+				0 != strcmp((*audit_entry)->details_json.buffer, "[{}]"))
 		{
 			zbx_json_close(&((*audit_entry)->details_json));
 #define AUDIT_USERID	0

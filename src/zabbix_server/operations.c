@@ -275,7 +275,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 					" order by ds.dserviceid",
 					event->objectid);
 		}
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER BEFORE");
 
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -302,7 +301,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 					port = ZBX_DEFAULT_AGENT_PORT;
 					interface_type = INTERFACE_TYPE_AGENT;
 			}
-			zabbix_log(LOG_LEVEL_INFORMATION, "BADGER HOSTID: %lu", hostid);
+
 			if (0 == hostid)
 			{
 				result2 = DBselect(
@@ -449,8 +448,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
-				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER ALPHA");
-
 				zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, host_visible_unique);
 				zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
 						host_unique);
@@ -468,7 +465,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, char **hostname, 
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER BETA");
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, *hostname);
 				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
