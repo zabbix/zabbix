@@ -204,7 +204,7 @@ class CConfiguration extends CApiService {
 			->setStrict(true)
 			->validate($data, '/');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2'] as $version) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4'] as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -214,7 +214,7 @@ class CConfiguration extends CApiService {
 				->convert($data);
 
 			$data = $validator
-				// Must not use XML_INDEXED_ARRAY key validaiton for the converted data.
+				// Must not use XML_INDEXED_ARRAY key validation for the converted data.
 				->setStrict(false)
 				->validate($data, '/');
 		}
@@ -274,7 +274,7 @@ class CConfiguration extends CApiService {
 			->setPreview(true)
 			->validate($data, '/');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2'] as $version) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4'] as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
