@@ -47,7 +47,7 @@ class CCuid {
 	}
 
 	private static function getRandomBlock(): string {
-		$rand = floor(mt_rand() / mt_getrandmax() * pow(self::BASE36, self::BLOCK_SIZE));
+		$rand = floor(mt_rand() / mt_getrandmax() * self::DISCRETE_VALUES);
 
 		return self::pad((string) $rand, self::BLOCK_SIZE);
 	}
