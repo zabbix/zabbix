@@ -59,7 +59,6 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != mode && 0 == strcmp(mode, "lines"))
 	{
-		size_t		i;
 		ssize_t		nbytes;
 		char		cbuf[MAX_BUFFER_LEN];
 		zbx_uint64_t	lines_num = 0;
@@ -76,6 +75,9 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		while (0 < (nbytes = read(f, cbuf, ARRSIZE(cbuf))))
 		{
+			char	*p1, *p2;
+			size_t	sz = (size_t)nbytes, dif;
+
 			if (CONFIG_TIMEOUT < zbx_time() - ts)
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
@@ -83,10 +85,19 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 				goto err;
 			}
 
-			for (i = 0; i < (size_t)nbytes; i++)
+			p1 = cbuf;
+
+			while (NULL != (p2 = memchr(p1, '\n', sz)))
 			{
-				if ('\n' == cbuf[i])
-					lines_num++;
+				lines_num++;
+				dif = p2 - p1;
+
+				if (dif < sz)
+				{
+					sz -= dif + 1;
+					p1 = p2 + 1;
+				}
+
 			}
 		}
 
