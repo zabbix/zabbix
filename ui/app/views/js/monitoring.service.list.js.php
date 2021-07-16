@@ -76,11 +76,12 @@
 
 		initActionButtons() {
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-create-service')) {
-					this.edit();
-				}
-				else if (e.target.classList.contains('js-add-child-service')) {
-					this.edit({parent_serviceids: [e.target.dataset.serviceid]});
+				if (e.target.matches('.js-create-service, .js-add-child-service')) {
+					const options = e.target.dataset.serviceid !== undefined
+						? {parent_serviceids: [e.target.dataset.serviceid]}
+						: {};
+
+					this.edit(options);
 				}
 				else if (e.target.classList.contains('js-edit-service')) {
 					this.edit({serviceid: e.target.dataset.serviceid});
