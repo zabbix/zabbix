@@ -25,12 +25,12 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "sha256crypt.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
 #include "sddl.h"
 #endif
-#include "sha256crypt.h"
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 
@@ -59,24 +59,46 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != mode && 0 == strcmp(mode, "lines"))
 	{
-		FILE		*f;
-		zbx_uint64_t	lines = 0;
-		char		sym;
+		size_t		i;
+		ssize_t		nbytes;
+		char		cbuf[MAX_BUFFER_LEN];
+		zbx_uint64_t	lines_num = 0;
+		int		f = -1;
+		double		ts;
 
-		if (NULL == (f = fopen(filename, "r")))
+		ts = zbx_time();
+
+		if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
 			goto err;
 		}
 
-		while (EOF != (sym = fgetc(f)))
+		while (0 < (nbytes = read(f, cbuf, ARRSIZE(cbuf))))
 		{
-			if (sym == '\n')
-				lines++;
+			if (CONFIG_TIMEOUT < zbx_time() - ts)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
+				close(f);
+				goto err;
+			}
+
+			for (i = 0; i < (size_t)nbytes; i++)
+			{
+				if ('\n' == cbuf[i])
+					lines_num++;
+			}
 		}
 
-		fclose(f);
-		SET_UI64_RESULT(result, lines);
+		close(f);
+
+		if (0 > nbytes)
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot read from file: %s", zbx_strerror(errno)));
+			goto err;
+		}
+
+		SET_UI64_RESULT(result, lines_num);
 	}
 	else if (NULL != mode && 0 != strcmp(mode, "bytes"))
 	{
@@ -1154,7 +1176,7 @@ err:
 int	VFS_FILE_PERMISSIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "Item is not supported at Windows."));
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Item is not supported on Windows."));
 
 	return SYSINFO_RET_FAIL;
 }
