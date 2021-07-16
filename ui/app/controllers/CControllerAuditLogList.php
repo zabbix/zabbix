@@ -78,6 +78,7 @@ class CControllerAuditLogList extends CController {
 			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
 		];
 		$users = [];
+		$usernames = [];
 		$filter = [];
 
 		if (array_key_exists((int) $data['auditlog_action'], $data['actions'])) {
@@ -113,7 +114,8 @@ class CControllerAuditLogList extends CController {
 		if ($data['userids']) {
 			$users = API::User()->get([
 				'output' => ['userid', 'username', 'name', 'surname'],
-				'userids' => $data['userids']
+				'userids' => $data['userids'],
+				'preservekeys' => true
 			]);
 
 			$data['userids'] = $this->sanitizeUsersForMultiselect($users);
@@ -122,6 +124,10 @@ class CControllerAuditLogList extends CController {
 				$params['userids'] = array_column($users, 'userid');
 				$data['auditlogs'] = API::AuditLog()->get($params);
 			}
+
+			$users = array_map(function (array $value): string {
+				return $value['username'];
+			}, $users);
 		}
 		else {
 			$data['auditlogs'] = API::AuditLog()->get($params);
@@ -132,13 +138,32 @@ class CControllerAuditLogList extends CController {
 		);
 
 		if (!$users) {
-			$users = API::User()->get([
-				'output' => ['userid', 'username'],
-				'userids' => array_column($data['auditlogs'], 'userid', 'userid')
-			]);
+			$userids = array_filter(array_column($data['auditlogs'], 'userid'), function ($id) {
+				return $id != 0;
+			});
+
+			$db_users = [];
+			if ($userids) {
+				$db_users = API::User()->get([
+					'output' => ['userid', 'username'],
+					'userids' => $userids,
+					'preservekeys' => true
+				]);
+			}
+
+			$users = [];
+			foreach ($data['auditlogs'] as $auditlog) {
+				if (!array_key_exists($auditlog['userid'], $db_users)) {
+					$usernames[$auditlog['userid']] = $auditlog['username'];
+					continue;
+				}
+
+				$users[$auditlog['userid']] = $db_users[$auditlog['userid']]['username'];
+			}
 		}
 
-		$data['users'] = array_column($users, 'username', 'userid');
+		$data['users'] = $users;
+		$data['usernames'] = $usernames;
 
 		natsort($data['actions']);
 		natsort($data['resources']);
