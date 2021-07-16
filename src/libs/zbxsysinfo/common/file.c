@@ -1061,6 +1061,7 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		DWORD		acc_sz = 0, dmn_sz = 0;
 		wchar_t		*acc_name = NULL, *dmn_name = NULL;
 		SID_NAME_USE	acc_type = SidTypeUnknown;
+		char		*acc_utf8, *dmn_ut8;
 
 		LookupAccountSid(NULL, sid, acc_name, (LPDWORD)&acc_sz, dmn_name, (LPDWORD)&dmn_sz, &acc_type);
 
@@ -1076,10 +1077,15 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err_sec;
 		}
 
-		SET_STR_RESULT(result, zbx_unicode_to_utf8(acc_name));
+		acc_utf8 = (zbx_unicode_to_utf8(acc_name));
+		dmn_ut8 = (zbx_unicode_to_utf8(dmn_name));
+
+		SET_STR_RESULT(result, zbx_dsprintf(NULL, "%s\\%s", dmn_ut8, acc_utf8));
 
 		zbx_free(acc_name);
 		zbx_free(dmn_name);
+		zbx_free(acc_utf8);
+		zbx_free(dmn_ut8);
 	}
 	else
 	{
@@ -1261,7 +1267,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	int			ret = SYSINFO_RET_FAIL;
 	DWORD			file_attributes, acc_sz = 0, dmn_sz = 0;
 	wchar_t			*wpath = NULL, *sid_string = NULL, *acc_name = NULL, *dmn_name = NULL;
-	char			*tmp;
+	char			*tmp, *acc_ut8, *dmn_ut8;
 	struct zbx_json		j;
 	HANDLE			handle;
 	PSID			sid = NULL;
@@ -1343,8 +1349,12 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	tmp = zbx_unicode_to_utf8(acc_name);
+	acc_ut8 = zbx_unicode_to_utf8(acc_name);
+	dmn_ut8 = zbx_unicode_to_utf8(dmn_name);
+	tmp = zbx_dsprintf(NULL, "%s\\%s", dmn_ut8, acc_ut8);
 	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_USER, tmp, ZBX_JSON_TYPE_STRING);
+	zbx_free(acc_ut8);
+	zbx_free(dmn_ut8);
 	zbx_free(tmp);
 
 	zbx_free(acc_name);
