@@ -96,7 +96,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 								(new CDiv())
 							])
 							->addItem([
-								(new CDiv(_('Parents')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+								(new CDiv(_('Parent services')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
 								(new CDiv($parents))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 							])
 							->addItem([

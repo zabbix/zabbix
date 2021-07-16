@@ -105,7 +105,7 @@ if ($data['service'] !== null && !$data['is_filtered']) {
 							))->addClass(ZBX_STYLE_SERVICE_ACTIONS)
 						])
 						->addItem([
-							(new CDiv(_('Parents')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+							(new CDiv(_('Parent services')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
 							(new CDiv($parents))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 						])
 						->addItem([
