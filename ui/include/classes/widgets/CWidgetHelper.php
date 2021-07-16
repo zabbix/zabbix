@@ -71,16 +71,18 @@ class CWidgetHelper {
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 			->addItem(
-				(new CScriptTag('$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());'.
-					'document.getElementById("widget-dialogue-form").addEventListener("change", (e) => {
-						if (e.target.matches(\'[data-trim="1"]\')) {
-							e.target.value = e.target.value.trim();
-						}
-					});'
-				))
-					->setOnDocumentReady()
-			);
+				(new CScriptTag('
+					$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());
 
+					document
+						.getElementById("widget-dialogue-form")
+						.addEventListener("change", (e) => {
+							if (e.target.matches(\'[data-trim="1"]\')) {
+								e.target.value = e.target.value.trim();
+							}
+						});
+				'))->setOnDocumentReady()
+			);
 
 		if ($field_rf_rate !== null) {
 			$form_list->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
