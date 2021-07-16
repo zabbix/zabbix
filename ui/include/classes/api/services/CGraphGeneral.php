@@ -938,14 +938,12 @@ abstract class CGraphGeneral extends CApiService {
 
 		$itemids = array_keys($itemids);
 
-		$items_templateids = [];
 		$itemids_templateids = [];
 		$templateids = [];
 
-		$db_items = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.dbConditionId('i.itemid', $itemids));
+		$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionId('i.itemid', $itemids));
 
 		while ($db_item = DBfetch($db_items)) {
-			$items_templateids[$db_item['key_']][$db_item['itemid']] = $db_item['hostid'];
 			$itemids_templateids[$db_item['itemid']] = $db_item['hostid'];
 			$templateids[$db_item['hostid']] = true;
 		}
@@ -997,32 +995,24 @@ abstract class CGraphGeneral extends CApiService {
 			}
 		}
 
-		$items_hostids = [];
-		$db_items = DBselect(
-			'SELECT dest.itemid,src.key_,dest.hostid'.
-			' FROM items dest,items src'.
-			' WHERE dest.key_=src.key_'.
-				' AND '.dbConditionId('dest.hostid', $hostids).
-				' AND '.dbConditionId('src.itemid', $itemids)
-		);
-
-		while ($item = DBfetch($db_items)) {
-			$items_hostids[$item['key_']][$item['itemid']] = $item['hostid'];
-		}
-
 		/*
 		 * In case when all equivalent items to graphs templates items exists on all hosts, to which they are linked,
 		 * there will be collected relations between template items and these equivalents on hosts.
 		 */
-		$template_itemids_hostids_itemids = [];
+		$item_links = [];
 
-		foreach ($items_templateids as $key => $_itemids_templateids) {
-			foreach ($_itemids_templateids as $template_itemid => $templateid) {
-				foreach ($items_hostids[$key] as $host_itemid => $hostid) {
-					if (array_key_exists($hostid, $templateids_hosts[$templateid])) {
-						$template_itemids_hostids_itemids[$template_itemid][$hostid] = $host_itemid;
-					}
-				}
+		$db_items = DBselect(
+			'SELECT src.itemid AS src_itemid,src.hostid AS src_hostid,'.
+				'dest.itemid AS dest_itemid,dest.hostid AS dest_hostid'.
+			' FROM items src,items dest'.
+			' WHERE src.itemid=dest.templateid'.
+				' AND '.dbConditionId('src.itemid', $itemids).
+				' AND '.dbConditionId('dest.hostid', $hostids)
+		);
+
+		while ($db_item = DBfetch($db_items)) {
+			if (array_key_exists($db_item['dest_hostid'], $templateids_hosts[$db_item['src_hostid']])) {
+				$item_links[$db_item['src_itemid']][$db_item['dest_hostid']] = $db_item['dest_itemid'];
 			}
 		}
 
@@ -1074,17 +1064,15 @@ abstract class CGraphGeneral extends CApiService {
 					$child_graph_to_update = ['graphid' => $child_graphid, 'templateid' => $graphid] + $graph;
 
 					if ($graph['ymin_itemid'] != 0) {
-						$child_graph_to_update['ymin_itemid'] =
-							$template_itemids_hostids_itemids[$graph['ymin_itemid']][$child_graph_hostid];
+						$child_graph_to_update['ymin_itemid'] = $item_links[$graph['ymin_itemid']][$child_graph_hostid];
 					}
 
 					if ($graph['ymax_itemid'] != 0) {
-						$child_graph_to_update['ymax_itemid'] =
-							$template_itemids_hostids_itemids[$graph['ymax_itemid']][$child_graph_hostid];
+						$child_graph_to_update['ymax_itemid'] = $item_links[$graph['ymax_itemid']][$child_graph_hostid];
 					}
 
 					foreach ($child_graph_to_update['gitems'] as &$gitem) {
-						$gitem['itemid'] = $template_itemids_hostids_itemids[$gitem['itemid']][$child_graph_hostid];
+						$gitem['itemid'] = $item_links[$gitem['itemid']][$child_graph_hostid];
 					}
 					unset($gitem);
 
@@ -1211,9 +1199,7 @@ abstract class CGraphGeneral extends CApiService {
 					$child_graph_to_update = [];
 
 					foreach ($parent_graph['gitems'] as $parent_gitem) {
-						$index = array_search($template_itemids_hostids_itemids[$parent_gitem['itemid']][$hostid],
-							$gitems_itemids
-						);
+						$index = array_search($item_links[$parent_gitem['itemid']][$hostid], $gitems_itemids);
 
 						if ($index === false) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1225,7 +1211,7 @@ abstract class CGraphGeneral extends CApiService {
 
 						unset($gitems_itemids[$index]);
 
-						$parent_gitem['itemid'] = $template_itemids_hostids_itemids[$parent_gitem['itemid']][$hostid];
+						$parent_gitem['itemid'] = $item_links[$parent_gitem['itemid']][$hostid];
 						$child_graph_to_update['gitems'][] = $parent_gitem;
 					}
 
@@ -1234,13 +1220,11 @@ abstract class CGraphGeneral extends CApiService {
 					] + $parent_graph;
 
 					if ($parent_graph['ymin_itemid'] != 0) {
-						$child_graph_to_update['ymin_itemid'] =
-							$template_itemids_hostids_itemids[$parent_graph['ymin_itemid']][$hostid];
+						$child_graph_to_update['ymin_itemid'] = $item_links[$parent_graph['ymin_itemid']][$hostid];
 					}
 
 					if ($parent_graph['ymax_itemid'] != 0) {
-						$child_graph_to_update['ymax_itemid'] =
-							$template_itemids_hostids_itemids[$parent_graph['ymax_itemid']][$hostid];
+						$child_graph_to_update['ymax_itemid'] = $item_links[$parent_graph['ymax_itemid']][$hostid];
 					}
 
 					$child_graphs_to_update[] = $child_graph_to_update;
@@ -1270,17 +1254,15 @@ abstract class CGraphGeneral extends CApiService {
 					$child_graph_to_add = ['templateid' => $graphid] + array_diff_key($graph, ['graphid' => true]);
 
 					if ($graph['ymin_itemid'] != 0) {
-						$child_graph_to_add['ymin_itemid'] =
-							$template_itemids_hostids_itemids[$graph['ymin_itemid']][$hostid];
+						$child_graph_to_add['ymin_itemid'] = $item_links[$graph['ymin_itemid']][$hostid];
 					}
 
 					if ($graph['ymax_itemid'] != 0) {
-						$child_graph_to_add['ymax_itemid'] =
-							$template_itemids_hostids_itemids[$graph['ymax_itemid']][$hostid];
+						$child_graph_to_add['ymax_itemid'] = $item_links[$graph['ymax_itemid']][$hostid];
 					}
 
 					foreach ($child_graph_to_add['gitems'] as &$gitem) {
-						$gitem['itemid'] = $template_itemids_hostids_itemids[$gitem['itemid']][$hostid];
+						$gitem['itemid'] = $item_links[$gitem['itemid']][$hostid];
 					}
 					unset($gitem);
 
