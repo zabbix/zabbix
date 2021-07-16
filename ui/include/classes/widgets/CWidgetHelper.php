@@ -72,15 +72,11 @@ class CWidgetHelper {
 			)
 			->addItem(
 				(new CScriptTag('$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());'.
-					'const trimFlaggedFields = (e) => {
-								if (e.target.matches(\'[data-trim="1"]\')) {
-									e.target.value = e.target.value.trim();
-								}
-							},
-							widget_form = document.getElementById("widget-dialogue-form");
-
-					widget_form.addEventListener("focusout", trimFlaggedFields);
-					widget_form.addEventListener("change", trimFlaggedFields);'
+					'document.getElementById("widget-dialogue-form").addEventListener("change", (e) => {
+						if (e.target.matches(\'[data-trim="1"]\')) {
+							e.target.value = e.target.value.trim();
+						}
+					});'
 				))
 					->setOnDocumentReady()
 			);
