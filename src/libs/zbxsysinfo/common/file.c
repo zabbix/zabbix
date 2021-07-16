@@ -684,7 +684,7 @@ err:
 
 static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 {
-	int		i, nbytes, f = -1, ret = SYSINFO_RET_FAIL;
+	int		i, nbytes, f, ret = SYSINFO_RET_FAIL;
 	md5_state_t	state;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	char		*hash_text = NULL;
@@ -824,7 +824,7 @@ static u_long	crctab[] =
 
 static int	vfs_file_cksum_crc32(char *filename, AGENT_RESULT *result)
 {
-	int		i, nr, f = -1, ret = SYSINFO_RET_FAIL;
+	int		i, nr, f, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	crc, flen;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	u_long		cval;
@@ -884,7 +884,7 @@ err:
 
 static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 {
-	int		i, nr, f = -1, ret = SYSINFO_RET_FAIL;
+	int		i, nr, f, ret = SYSINFO_RET_FAIL;
 	char		buf[16 * ZBX_KIBIBYTE];
 	char		hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 	double		ts;
@@ -973,9 +973,9 @@ int	VFS_FILE_CKSUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == method || '\0' == *method || 0 == strcmp(method, "crc32"))
 		ret = vfs_file_cksum_crc32(filename, result);
-	else if (NULL != method && 0 == strcmp(method, "md5"))
+	else if (0 == strcmp(method, "md5"))
 		ret = vfs_file_cksum_md5(filename, result);
-	else if (NULL != method && 0 == strcmp(method, "sha256"))
+	else if (0 == strcmp(method, "sha256"))
 		ret = vfs_file_cksum_sha256(filename, result);
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
