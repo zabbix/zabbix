@@ -57,6 +57,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 			" from events"
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids->values, eventids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by eventid");
 
 	result = DBselect("%s", sql);
 
