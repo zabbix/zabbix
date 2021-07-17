@@ -258,21 +258,21 @@ class testGraphLinking extends CIntegrationTest {
 		$i = 0;
 		foreach ($response['result'] as $entry) {
 
-			$this->assertEquals($entry['height'], self::GRAPH_HEIGHT + $i);
-			$this->assertEquals($entry['width'], self::GRAPH_WIDTH + $i);
-			$this->assertEquals($entry['name'], self::GRAPH_NAME_PRE . '_' . $i);
-			$this->assertEquals($entry['graphtype'], self::GRAPH_TYPE);
-			$this->assertEquals($entry['percent_left'], self::GRAPH_PERCENT_LEFT + $i);
-			$this->assertEquals($entry['percent_right'], self::GRAPH_PERCENT_RIGHT - $i);
-			$this->assertEquals($entry['show_3d'], self::GRAPH_SHOW_3D);
-			$this->assertEquals($entry['show_legend'], self::GRAPH_SHOW_LEGEND);
-			$this->assertEquals($entry['show_work_period'], self::GRAPH_SHOW_WORK_PERIOD);
-			$this->assertEquals($entry['show_triggers'], self::GRAPH_SHOW_TRIGGERS);
-			$this->assertEquals($entry['yaxismax'], self::GRAPH_YAXISMAX + $i);
-			$this->assertEquals($entry['yaxismin'], self::GRAPH_YAXISMIN + $i);
-			$this->assertEquals($entry['ymax_itemid'], $itemids[$i]);
-			$this->assertEquals($entry['ymax_type'], self::GRAPH_YMAX_TYPE);
-			$this->assertEquals($entry['ymin_type'], self::GRAPH_YMIN_TYPE);
+			$this->assertEquals($entry['height'], self::GRAPH_HEIGHT + $i, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['width'], self::GRAPH_WIDTH + $i, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['name'], self::GRAPH_NAME_PRE . '_' . $i, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['graphtype'], self::GRAPH_TYPE, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['percent_left'], self::GRAPH_PERCENT_LEFT + $i, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['percent_right'], self::GRAPH_PERCENT_RIGHT - $i, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['show_3d'], self::GRAPH_SHOW_3D, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['show_legend'], self::GRAPH_SHOW_LEGEND, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['show_work_period'], self::GRAPH_SHOW_WORK_PERIOD, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['show_triggers'], self::GRAPH_SHOW_TRIGGERS, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['yaxismax'], self::GRAPH_YAXISMAX + $i, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['yaxismin'], self::GRAPH_YAXISMIN + $i, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['ymax_itemid'], $itemids[$i],json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['ymax_type'], self::GRAPH_YMAX_TYPE, json_encode($response, JSON_PRETTY_PRINT));
+			$this->assertEquals($entry['ymin_type'], self::GRAPH_YMIN_TYPE, json_encode($response, JSON_PRETTY_PRINT));
 
 			$graph_item_response = $this->call('graphitem.get', [
 				'output' => 'extend',
@@ -303,7 +303,7 @@ class testGraphLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'End of DBregister_host_active():SUCCEED'
 		]);
-
+		sleep(10);
 		$this->checkGraphsCreate();
 		self::stopComponent(self::COMPONENT_AGENT);
 	}

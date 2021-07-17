@@ -212,7 +212,7 @@ class testTriggerLinking extends CIntegrationTest {
 	public function checkTriggersCreate() {
 
 		$response = $this->call('host.get', ['filter' => ['host' => self::HOST_NAME]]);
-		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertArrayHasKey(0, $response['result'], json_encode($response, JSON_PRETTY_PRINT));
 		$this->assertArrayHasKey('host', $response['result'][0]);
 
 		$response = $this->call('trigger.get', [
@@ -255,7 +255,7 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertArrayHasKey('tags', $entry);
 			$this->assertArrayHasKey(0, $entry['tags']);
 			$this->assertArrayHasKey('tag', $entry['tags'][0]);
-			$this->assertEquals(self::TAG_NAME_PRE . "_" . $i, $entry['tags'][0]['tag']);
+			$this->assertEquals(self::TAG_NAME_PRE . "_" . $i, $entry['tags'][0]['tag'],json_encode($response, JSON_PRETTY_PRINT));
 
 			$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_PRE . "_" . $i);
 			$this->assertEquals($entry['priority'],    self::TRIGGER_PRIORITY);
@@ -293,7 +293,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'End of DBregister_host_active():SUCCEED'
 		]);
-
+		sleep(10);
 		$this->checkTriggersCreate();
 		self::stopComponent(self::COMPONENT_AGENT);
 	}
