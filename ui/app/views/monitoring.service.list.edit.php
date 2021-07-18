@@ -212,7 +212,8 @@ $filter->addFilterTab(_('Filter'), [
 	)
 	->addItem($filter)
 	->addItem(new CPartial('monitoring.service.list.edit', array_intersect_key($data, array_flip([
-		'path', 'is_filtered', 'max_in_table', 'service', 'services', 'tags', 'paging', 'back_url'
+		'can_monitor_problems', 'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags',
+		'paging', 'back_url'
 	]))))
 	->show();
 

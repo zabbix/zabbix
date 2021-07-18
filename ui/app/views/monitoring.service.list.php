@@ -177,8 +177,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
 	)
 	->addItem($filter)
-	->addItem(new CPartial('monitoring.service.list', array_intersect_key($data, array_flip([
-		'path', 'is_filtered', 'max_in_table', 'service', 'services', 'tags', 'paging'
+	->addItem(new CPartial('monitoring.service.list', array_intersect_key($data, array_flip(['can_monitor_problems',
+		'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags', 'paging'
 	]))))
 	->show();
 

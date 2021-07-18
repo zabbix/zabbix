@@ -100,6 +100,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 
 		$data = [
 			'can_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES),
+			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 			'path' => $path,
 			'breadcrumbs' => $this->getBreadcrumbs($path, $is_filtered),
 			'filter' => $filter,
@@ -129,6 +130,8 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'sortorder' => ZBX_SORT_UP,
 			'preservekeys' => true
 		]);
+
+		$data['events'] = $this->getProblemEvents($db_serviceids);
 
 		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 

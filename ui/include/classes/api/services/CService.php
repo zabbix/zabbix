@@ -1220,7 +1220,7 @@ class CService extends CApiService {
 			$problemServiceIds = [];
 			foreach ($services as &$service) {
 				// don't calculate SLA for services with disabled status calculation
-				if ($this->isStatusEnabled($service)) {
+				if ($service['algorithm'] != SERVICE_ALGORITHM_NONE) {
 					$usedSeviceIds[$service['serviceid']] = $service['serviceid'];
 					$service['alarms'] = [];
 
@@ -1234,7 +1234,7 @@ class CService extends CApiService {
 			// initial data
 			foreach ($services as $service) {
 				$rs[$service['serviceid']] = [
-					'status' => ($this->isStatusEnabled($service)) ? $service['status'] : null,
+					'status' => $service['algorithm'] != SERVICE_ALGORITHM_NONE ? $service['status'] : null,
 					'problems' => [],
 					'sla' => []
 				];
@@ -1251,7 +1251,7 @@ class CService extends CApiService {
 						'SELECT *'.
 						' FROM service_alarms sa'.
 						' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
-						' AND ('.implode(' OR ', $intervalConditions).')'.
+							' AND ('.implode(' OR ', $intervalConditions).')'.
 						' ORDER BY sa.servicealarmid'
 					);
 					while ($data = DBfetch($query)) {
@@ -1259,10 +1259,42 @@ class CService extends CApiService {
 					}
 				}
 
-				// add problem triggers
-				if ($problemServiceIds) {
-					$problemTriggers = $this->fetchProblemTriggers($problemServiceIds);
-					$rs = $this->escalateProblems($services, $problemTriggers, $rs);
+				// add problem events
+				$deep_problem_serviceids = $problemServiceIds;
+				$deep_services = $services;
+
+				while ($problemServiceIds) {
+					$child_services = $this->get([
+						'output' => ['serviceid', 'name', 'status', 'algorithm'],
+						'selectParents' => ['serviceid'],
+						'parentids' => $problemServiceIds,
+						'preservekeys' => true
+					]);
+
+					$child_services = array_filter($child_services, function (array $service): bool {
+						return $service['algorithm'] != SERVICE_ALGORITHM_NONE && $service['status'] > 0;
+					});
+
+					$deep_services += $child_services;
+
+					$problemServiceIds = array_keys($child_services);
+					$deep_problem_serviceids = array_merge($deep_problem_serviceids, $problemServiceIds);
+				}
+
+				if ($deep_problem_serviceids) {
+					$deep_problem_events = [];
+
+					$query = DBSelect(
+						'SELECT sp.eventid, sp.serviceid, sp.severity'.
+						' FROM service_problem sp'.
+						' WHERE '.dbConditionId('sp.serviceid', $deep_problem_serviceids)
+					);
+
+					while ($row = DBfetch($query)) {
+						$deep_problem_events[$row['serviceid']][$row['eventid']] = ['eventid' => $row['eventid']];
+					}
+
+					$rs = $this->escalateProblems($deep_services, $deep_problem_events, $rs);
 				}
 
 				$slaCalculator = new CServicesSlaCalculator();
@@ -1307,65 +1339,28 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * Returns true if status calculation is enabled for the given service.
-	 *
-	 * @param array $service
-	 *
-	 * @return bool
-	 */
-	protected function isStatusEnabled(array $service) {
-		return ($service['algorithm'] != SERVICE_ALGORITHM_NONE);
-	}
-
-	/**
-	 * Returns an array of triggers which are in a problem state and are linked to the given services.
-	 *
-	 * @param array $serviceIds
-	 *
-	 * @return array    in the form of array(serviceId1 => array(triggerId => trigger), ...)
-	 */
-	protected function fetchProblemTriggers(array $serviceIds) {
-		$sql = 'SELECT s.serviceid,t.triggerid'.
-			' FROM services s,triggers t'.
-			' WHERE s.status>0'.
-			' AND t.triggerid=s.triggerid'.
-			' AND '.dbConditionInt('s.serviceid', $serviceIds).
-			' ORDER BY s.status DESC,t.description';
-
-		// get service reason
-		$triggers = DBfetchArray(DBSelect($sql));
-
-		$rs = [];
-		foreach ($triggers as $trigger) {
-			$serviceId = $trigger['serviceid'];
-			unset($trigger['serviceid']);
-
-			$rs[$serviceId] = [$trigger['triggerid'] => $trigger];
-		}
-
-		return $rs;
-	}
-
-	/**
-	 * Escalates the problem triggers from the child services to their parents and adds them to $slaData.
+	 * Escalate problem events from the child services to their parents and adds them to $slaData.
 	 * The escalation will stop if a service has status calculation disabled or is in OK state.
 	 *
 	 * @param array $services
-	 * @param array $serviceProblems    an array of service triggers defines as
-	 *                                  array(serviceId1 => array(triggerId => trigger), ...)
+	 * @param array $problem_events  An array of service problems.
 	 * @param array $slaData
 	 *
 	 * @return array
 	 */
-	protected function escalateProblems(array $services, array $serviceProblems, array $slaData) {
+	protected function escalateProblems(array $services, array $problem_events, array $slaData) {
 		$parentProblems = [];
-		foreach ($serviceProblems as $serviceId => $problemTriggers) {
+		foreach ($problem_events as $serviceId => $service_problem_events) {
 			$service = $services[$serviceId];
 
-			// add the problem trigger of the current service to the data
-			$slaData[$serviceId]['problems'] = zbx_array_merge($slaData[$serviceId]['problems'], $problemTriggers);
+			// add the problem events of the current service to the data
+			if (array_key_exists($serviceId, $slaData)) {
+				$slaData[$serviceId]['problems'] = zbx_array_merge($slaData[$serviceId]['problems'],
+					$service_problem_events
+				);
+			}
 
-			// add the same trigger to the parent services
+			// add the same problem events to the parent services
 			foreach ($service['parents'] as $parent) {
 				$parentServiceId = $parent['serviceid'];
 
@@ -1373,11 +1368,13 @@ class CService extends CApiService {
 					$parentService = $services[$parentServiceId];
 
 					// escalate only if status calculation is enabled for the parent service and it's in problem state
-					if ($this->isStatusEnabled($parentService) && $parentService['status']) {
+					if ($parentService['algorithm'] != SERVICE_ALGORITHM_NONE && $parentService['status'] > 0) {
 						if (!isset($parentProblems[$parentServiceId])) {
 							$parentProblems[$parentServiceId] = [];
 						}
-						$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId], $problemTriggers);
+						$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId],
+							$service_problem_events
+						);
 					}
 				}
 			}
@@ -1406,7 +1403,7 @@ class CService extends CApiService {
 			' FROM (SELECT sa2.serviceid,MAX(sa2.servicealarmid) AS servicealarmid'.
 			' FROM service_alarms sa2'.
 			' WHERE sa2.clock<'.zbx_dbstr($beforeTime).
-			' AND '.dbConditionInt('sa2.serviceid', $serviceIds).
+				' AND '.dbConditionInt('sa2.serviceid', $serviceIds).
 			' GROUP BY sa2.serviceid) ss2'.
 			' JOIN service_alarms sa ON sa.servicealarmid = ss2.servicealarmid'
 		);
