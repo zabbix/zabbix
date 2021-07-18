@@ -556,45 +556,64 @@ class DB {
 	}
 
 	/**
+	 * Add IDs to inserted rows.
+	 *
+	 * @param string $table
+	 * @param array  $values
+	 *
+	 * @return array An array of IDs with the keys preserved.
+	 */
+	private static function addIds(string $table, array &$values): array {
+		$table_schema = self::getSchema($table);
+		$resultids = [];
+
+		if ($table_schema['fields'][$table_schema['key']]['type'] === DB::FIELD_TYPE_ID) {
+			$id = self::reserveIds($table, count($values));
+		}
+
+		foreach ($values as $key => &$row) {
+			switch ($table_schema['fields'][$table_schema['key']]['type']) {
+				case DB::FIELD_TYPE_ID:
+					$resultids[$key] = $id;
+					$row[$table_schema['key']] = $id;
+					$id = bcadd($id, 1, 0);
+					break;
+
+				case DB::FIELD_TYPE_CUID:
+					$id = CCuid::generate();
+					$resultids[$key] = $id;
+					$row[$table_schema['key']] = $id;
+					break;
+			}
+		}
+		unset($row);
+
+		return $resultids;
+	}
+
+	/**
 	 * Insert batch data into DB.
 	 *
 	 * @param string $table
 	 * @param array  $values pair of fieldname => fieldvalue
 	 * @param bool   $getids
 	 *
-	 * @return array    an array of ids with the keys preserved
+	 * @return array An array of IDs with the keys preserved.
 	 */
 	public static function insertBatch($table, $values, $getids = true) {
 		if (empty($values)) {
 			return true;
 		}
 
-		$resultIds = [];
-
+		$resultids = [];
 		$table_schema = self::getSchema($table);
-
-		if ($getids) {
-			if ($table_schema['fields'][$table_schema['key']]['type'] != DB::FIELD_TYPE_CUID) {
-				$id = self::reserveIds($table, count($values));
-			}
-		}
-
 		$mandatory_fields = self::getMandatoryFields($table_schema);
 
-		foreach ($values as $key => &$row) {
-			if ($getids) {
-				if ($table_schema['fields'][$table_schema['key']]['type'] != DB::FIELD_TYPE_CUID) {
-					$resultIds[$key] = $id;
-					$row[$table_schema['key']] = $id;
-					$id = bcadd($id, 1, 0);
-				}
-				else {
-					$id = CCuid::generate();
-					$resultIds[$key] = $id;
-					$row[$table_schema['key']] = $id;
-				}
-			}
+		if ($getids) {
+			$resultids = self::addIds($table, $values);
+		}
 
+		foreach ($values as &$row) {
 			$row += $mandatory_fields;
 
 			self::checkValueTypes($table_schema, $row);
@@ -607,7 +626,7 @@ class DB {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 		}
 
-		return $resultIds;
+		return $resultids;
 	}
 
 	/**
