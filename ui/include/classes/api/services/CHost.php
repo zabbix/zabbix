@@ -493,9 +493,9 @@ class CHost extends CHostGeneral {
 		$write_only_keys = ['tls_psk_identity', 'tls_psk'];
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$allowed_keys = array_keys(DB::getSchema($this->tableName())['fields']);
-			$allowed_keys[] = 'inventory_mode';
-			$options['output'] = array_diff($allowed_keys, $write_only_keys);
+			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
+			$all_keys[] = 'inventory_mode';
+			$options['output'] = array_diff($all_keys, $write_only_keys);
 		}
 		/*
 		* For internal calls of API method, is possible to get the write-only fields if they were specified in output.
