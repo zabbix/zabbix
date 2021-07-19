@@ -1,8 +1,7 @@
 Changes for 5.4.3rc2
 
-New features:
-
 Bug fixes:
+.......P.. [ZBX-19500] fixed crash in sync_proxy_history (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.3rc1
