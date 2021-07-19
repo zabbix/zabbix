@@ -1360,7 +1360,7 @@ static void	its_itservice_update_status(zbx_service_t *itservice, const zbx_time
 			}
 			break;
 		case SERVICE_ALGORITHM_MAX:
-			status = 0;
+			status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 			for (i = 0; i < itservice->children.values_num; i++)
 			{
 				zbx_service_t	*child = (zbx_service_t *)itservice->children.values[i];
@@ -1370,7 +1370,8 @@ static void	its_itservice_update_status(zbx_service_t *itservice, const zbx_time
 			}
 			break;
 		case SERVICE_ALGORITHM_NONE:
-			return;
+			status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unknown calculation algorithm of service status [%d]",
 					itservice->algorithm);
@@ -2018,9 +2019,6 @@ static void	db_update_services(zbx_service_manager_t *manager)
 
 		if (0 == ts.sec)
 			zbx_timespec(&ts);
-
-		if (SERVICE_ALGORITHM_NONE == service->algorithm)
-			continue;
 
 		if (service->status != status)
 		{

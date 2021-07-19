@@ -79,6 +79,23 @@ foreach ($data['services'] as $serviceid => $service) {
 		$row[] = $parents;
 	}
 
+	$root_cause = [];
+
+	foreach ($data['events'][$serviceid] as $event) {
+		if ($root_cause) {
+			$root_cause[] = ', ';
+		}
+
+		$root_cause[] = $data['can_monitor_problems']
+			? new CLink($event['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'problem.view')
+					->setArgument('filter_name', '')
+					->setArgument('triggerids', [$event['objectid']])
+			)
+			: $event['name'];
+	}
+
 	$table->addRow(new CRow(array_merge($row, [
 		($service['children'] > 0)
 			? [
@@ -94,7 +111,7 @@ foreach ($data['services'] as $serviceid => $service) {
 		in_array($service['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])
 			? (new CCol(_('OK')))->addClass(ZBX_STYLE_GREEN)
 			: (new CCol(getSeverityName($service['status'])))->addClass(getSeverityStyle($service['status'])),
-		'',
+		$root_cause,
 		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
 		$data['tags'][$serviceid],
 		(new CCol([

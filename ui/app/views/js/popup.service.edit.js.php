@@ -29,11 +29,13 @@ window.service_edit_popup = {
 
 	serviceid: null,
 	overlay: null,
+	dialogue: null,
 	form: null,
 
 	init({serviceid, children, children_problem_tags_html, problem_tags}) {
 		this.serviceid = serviceid;
 		this.overlay = overlays_stack.getById('service_edit');
+		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		// Setup Tabs.
@@ -168,7 +170,7 @@ window.service_edit_popup = {
 
 		const overlay = PopUp('popup.service.time.edit', popup_params, 'service_time_edit', document.activeElement);
 
-		overlay.$dialogue[0].addEventListener('service-time-submit', (e) => {
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const new_row = e.detail;
 
 			if (row !== null) {
@@ -238,7 +240,7 @@ window.service_edit_popup = {
 			exclude_serviceids
 		}, 'services', document.activeElement);
 
-		overlay.$dialogue[0].addEventListener('services-submit', (e) => {
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			for (const service of e.detail) {
 				this.addChild(service);
 			}
@@ -261,7 +263,7 @@ window.service_edit_popup = {
 			exclude_serviceids
 		}, 'services', document.activeElement);
 
-		overlay.$dialogue[0].addEventListener('services-submit', (e) => {
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];
 
 			for (const service of e.detail) {
@@ -298,15 +300,14 @@ window.service_edit_popup = {
 					throw {html_string: response.errors};
 				}
 
-				postMessageOk(response.title);
-
-				if ('messages' in response) {
-					postMessageDetails('success', response.messages);
-				}
-
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				location.href = location.href;
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
+					detail: {
+						title: response.title,
+						messages: ('messages' in response) ? response.messages : null
+					}
+				}));
 			})
 			.catch((error) => {
 				let message_box;

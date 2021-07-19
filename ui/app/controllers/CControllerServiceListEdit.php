@@ -112,7 +112,6 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		$view_mode_curl = (clone $paging_curl)
 			->setArgument('action', 'service.list')
-			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
 			->removeArgument('filter_without_children')
 			->removeArgument('filter_without_problem_tags')
 			->removeArgument('filter_tag_source');
@@ -126,6 +125,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
 
 		$data = [
+			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 			'uncheck' => $uncheck,
 			'path' => $path,
 			'breadcrumbs' => $this->getBreadcrumbs($path, $is_filtered),
@@ -157,6 +157,8 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'sortorder' => ZBX_SORT_UP,
 			'preservekeys' => true
 		]);
+
+		$data['events'] = $this->getProblemEvents($db_serviceids);
 
 		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 

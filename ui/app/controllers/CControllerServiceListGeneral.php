@@ -279,4 +279,38 @@ abstract class CControllerServiceListGeneral extends CController {
 
 		return array_keys($filtered_serviceids);
 	}
+
+	protected function getProblemEvents(array $serviceids): array {
+		$sla = API::Service()->getSla([
+			'serviceids' => $serviceids,
+			'intervals' => [['from' => 0, 'to' => 0]]
+		]);
+
+		$eventids_by_service = [];
+		$eventids = [];
+
+		foreach ($sla as $serviceid => $service_sla) {
+			$eventids_by_service[$serviceid] = array_column($service_sla['problems'], 'eventid', 'eventid');
+			$eventids += $eventids_by_service[$serviceid];
+		}
+
+		$events = API::Event()->get([
+			'output' => ['name', 'objectid', 'severity'],
+			'eventids' => $eventids,
+			'preservekeys' => true
+		]);
+
+		CArrayHelper::sort($events, [
+			['field' => 'severity', 'order' => ZBX_SORT_DOWN],
+			['field' => 'name', 'order' => ZBX_SORT_UP]
+		]);
+
+		$events_sorted = [];
+
+		foreach ($eventids_by_service as $serviceid => $service_events) {
+			$events_sorted[$serviceid] = array_intersect_key($events, $service_events);
+		}
+
+		return $events_sorted;
+	}
 }

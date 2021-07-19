@@ -88,6 +88,7 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 		$is_filtered = !$this->isDefaultFilter($filter);
 
 		$data = [
+			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 			'path' => $path,
 			'is_filtered' => $is_filtered,
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
@@ -133,6 +134,8 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 			'sortorder' => ZBX_SORT_UP,
 			'preservekeys' => true
 		]);
+
+		$data['events'] = $this->getProblemEvents($db_serviceids);
 
 		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 

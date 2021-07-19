@@ -450,14 +450,9 @@ function acknowledgePopUp(options, trigger_elmnt) {
 		history.replaceState({}, '', url.getUrl());
 	});
 
-	var close = function(e, dialogue) {
-		if (dialogue.dialogueid === overlay.dialogueid) {
-			history.replaceState({}, '', backurl);
-			$.unsubscribe('overlay.close', close);
-		}
-	};
-
-	$.subscribe('overlay.close', close);
+	overlay.$dialogue[0].addEventListener('overlay.close', () => {
+		history.replaceState({}, '', backurl);
+	}, {once: true});
 
 	return overlay;
 }

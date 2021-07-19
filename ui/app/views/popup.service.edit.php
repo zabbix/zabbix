@@ -101,7 +101,7 @@ $service_tab = (new CFormGrid())
 											SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
 											SERVICE_TAG_OPERATOR_LIKE => _('Contains')
 										]))
-										->setValue(SERVICE_TAG_OPERATOR_LIKE),
+										->setValue(SERVICE_TAG_OPERATOR_EQUAL),
 									(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
 										DB::getFieldLength('service_problem_tag', 'value')
 									))

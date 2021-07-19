@@ -105,7 +105,7 @@ if ($data['service'] !== null && !$data['is_filtered']) {
 							))->addClass(ZBX_STYLE_SERVICE_ACTIONS)
 						])
 						->addItem([
-							(new CDiv(_('Parents')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
+							(new CDiv(_('Parent services')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
 							(new CDiv($parents))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 						])
 						->addItem([
@@ -212,7 +212,8 @@ $filter->addFilterTab(_('Filter'), [
 	)
 	->addItem($filter)
 	->addItem(new CPartial('monitoring.service.list.edit', array_intersect_key($data, array_flip([
-		'path', 'is_filtered', 'max_in_table', 'service', 'services', 'tags', 'paging', 'back_url'
+		'can_monitor_problems', 'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags',
+		'paging', 'back_url'
 	]))))
 	->show();
 

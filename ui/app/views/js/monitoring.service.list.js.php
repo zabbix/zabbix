@@ -76,11 +76,12 @@
 
 		initActionButtons() {
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-create-service')) {
-					this.edit();
-				}
-				else if (e.target.classList.contains('js-add-child-service')) {
-					this.edit({parent_serviceids: [e.target.dataset.serviceid]});
+				if (e.target.matches('.js-create-service, .js-add-child-service')) {
+					const options = e.target.dataset.serviceid !== undefined
+						? {parent_serviceids: [e.target.dataset.serviceid]}
+						: {};
+
+					this.edit(options);
 				}
 				else if (e.target.classList.contains('js-edit-service')) {
 					this.edit({serviceid: e.target.dataset.serviceid});
@@ -111,17 +112,19 @@
 		edit(options = {}) {
 			this.pauseRefresh();
 
-			PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
+			const overlay = PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
 
-			const overlay_close = (e, data) => {
-				if (data.dialogueid === 'service_edit') {
-					this.resumeRefresh();
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
 
-					jQuery.unsubscribe('overlay.close', overlay_close);
+				if (e.detail.messages !== null) {
+					postMessageDetails('success', e.detail.messages);
 				}
-			};
 
-			jQuery.subscribe('overlay.close', overlay_close);
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
 		},
 
 		pauseRefresh() {
