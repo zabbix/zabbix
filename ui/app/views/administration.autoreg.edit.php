@@ -48,7 +48,7 @@ $autoreg_tab = (new CFormList())
 				->setLabel(_('No encryption'))
 			)
 			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
-	);
+			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')));
 
 if ($data['change_psk']) {
 	$autoreg_tab

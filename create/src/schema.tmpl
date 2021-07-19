@@ -1135,6 +1135,8 @@ FIELD		|listen_dns	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|host_metadata	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|tls_accepted	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|tls_issuer	|t_varchar(1024)|''	|NOT NULL	|0
+FIELD		|tls_subject	|t_varchar(1024)|''	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|proxy_hostid
 

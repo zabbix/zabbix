@@ -46,6 +46,8 @@ typedef struct
 	char		*ip;
 	char		*dns;
 	char		*host_metadata;
+	char		*tls_subject;
+	char		*tls_issuer;
 	int		now;
 	unsigned short	port;
 	unsigned short	flag;
@@ -1544,13 +1546,13 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now)
+		int now, const char *tls_subject, const char *tls_issuer)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 
 	zbx_vector_ptr_create(&autoreg_hosts);
 
-	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag, now);
+	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, tls_subject, tls_issuer, flag, now);
 	DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 
 	DBregister_host_clean(&autoreg_hosts);
@@ -1588,12 +1590,14 @@ static void	autoreg_host_free(zbx_autoreg_host_t *autoreg_host)
 	zbx_free(autoreg_host->ip);
 	zbx_free(autoreg_host->dns);
 	zbx_free(autoreg_host->host_metadata);
+	zbx_free(autoreg_host->tls_subject);
+	zbx_free(autoreg_host->tls_issuer);
 	zbx_free(autoreg_host);
 }
 
 void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now)
+		unsigned short port, unsigned int connection_type, const char *host_metadata, const char *tls_subject,
+		const char *tls_issuer, unsigned short flag, int now)
 {
 	zbx_autoreg_host_t	*autoreg_host;
 	int 			i;
@@ -1618,6 +1622,8 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, 
 	autoreg_host->port = port;
 	autoreg_host->connection_type = connection_type;
 	autoreg_host->host_metadata = zbx_strdup(NULL, host_metadata);
+	autoreg_host->tls_subject = zbx_strdup(NULL, tls_subject);
+	autoreg_host->tls_issuer = zbx_strdup(NULL, tls_issuer);
 	autoreg_host->flag = flag;
 	autoreg_host->now = now;
 
@@ -1792,7 +1798,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		autoreg_hostid = DBget_maxid_num("autoreg_host", create);
 
 		zbx_db_insert_prepare(&db_insert, "autoreg_host", "autoreg_hostid", "proxy_hostid", "host", "listen_ip",
-				"listen_dns", "listen_port", "tls_accepted", "host_metadata", "flags", NULL);
+				"listen_dns", "listen_port", "tls_accepted", "host_metadata", "tls_subject", "tls_issuer", "flags", NULL);
 	}
 
 	if (0 != (update = autoreg_hosts->values_num - create))
@@ -1814,7 +1820,8 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxy_hostid,
 					autoreg_host->host, autoreg_host->ip, autoreg_host->dns,
 					(int)autoreg_host->port, (int)autoreg_host->connection_type,
-					autoreg_host->host_metadata, autoreg_host->flag);
+					autoreg_host->host_metadata, autoreg_host->tls_subject,
+					autoreg_host->tls_issuer, autoreg_host->flag);
 		}
 		else
 		{

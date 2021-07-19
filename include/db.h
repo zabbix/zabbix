@@ -633,11 +633,12 @@ const char	*zbx_user_string(zbx_uint64_t userid);
 int	DBget_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now);
+		unsigned short port, unsigned int connection_type, const char *tls_issuer, unsigned short flag, int now,
+		const char *host_metadata, const char *tls_subject);
+
 void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now);
+		unsigned short port, unsigned int connection_type, const char *host_metadata, const char *tls_subject,
+		const char *tls_issuer, unsigned short flag, int now);
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid);
 void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 
