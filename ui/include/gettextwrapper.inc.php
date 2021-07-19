@@ -207,10 +207,11 @@ function _params($format, array $arguments) {
  * Note: should be called before including file includes/translateDefines.inc.php.
  *
  * @param string $language    Locale language prefix like en_US, ru_RU etc.
+ * @param string $error       Message on failure.
  *
- * @return string    Empty string on success or error message on failure.
+ * @return bool    Whether locale could be switched.
  */
-function setupLocale(string $language): string {
+function setupLocale(string $language, ?string &$error = ''): bool {
 	$numeric_locales = [
 		'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
 	];
@@ -240,15 +241,15 @@ function setupLocale(string $language): string {
 		textdomain('frontend');
 	}
 
-	if (!$locale_set) {
+	if (!$locale_set && strtolower($language) !== 'en_gb') {
 		$language = htmlspecialchars($language, ENT_QUOTES, 'UTF-8');
 		$locale_variants = array_map(function ($locale) {
 			return htmlspecialchars($locale, ENT_QUOTES, 'UTF-8');
 		}, $locale_variants);
 
-		return 'Locale for language "'.$language.'" is not found on the web server. Tried to set: '.
+		$error = 'Locale for language "'.$language.'" is not found on the web server. Tried to set: '.
 			implode(', ', $locale_variants).'. Unable to translate Zabbix interface.';
 	}
 
-	return '';
+	return $locale_set;
 }

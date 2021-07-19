@@ -376,10 +376,9 @@ class ZBase {
 	 */
 	protected function initLocales(array $user_data) {
 		$language = $user_data['lang'];
-		$message = setupLocale($language);
 
-		if ($message !== '' && strtolower($language) !== 'en_gb') {
-			error($message);
+		if (!setupLocale($language, $error) && $error !== '') {
+			error($error);
 		}
 
 		require_once $this->getRootDir().'/include/translateDefines.inc.php';
