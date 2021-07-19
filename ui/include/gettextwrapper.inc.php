@@ -209,7 +209,7 @@ function _params($format, array $arguments) {
  * @param string $language    Locale language prefix like en_US, ru_RU etc.
  * @param string $error       Message on failure.
  *
- * @return bool    Whether locale could be switched.
+ * @return bool    Whether locale could be switched; always true for en_GB.
  */
 function setupLocale(string $language, ?string &$error = ''): bool {
 	$numeric_locales = [
@@ -217,6 +217,7 @@ function setupLocale(string $language, ?string &$error = ''): bool {
 	];
 	$locale_variants = zbx_locale_variants($language);
 	$locale_set = false;
+	$error = '';
 
 	init_mbstrings();
 
@@ -251,5 +252,5 @@ function setupLocale(string $language, ?string &$error = ''): bool {
 			implode(', ', $locale_variants).'. Unable to translate Zabbix interface.';
 	}
 
-	return $locale_set;
+	return ($error === '');
 }
