@@ -1,0 +1,758 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-07-19T07:01:02Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 08ef3d687d754b0aba17e1dcbd77d4bd
+      template: 'Cloudflare by HTTP'
+      name: 'Cloudflare by HTTP'
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 2be79391779a4cd395723e62694262e8
+          name: cloudflare.bandwidth.all
+          type: DEPENDENT
+          key: cloudflare.bandwidth.all
+          delay: '0'
+          units: B
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.bandwidth.all
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 7f5900d6c707405789624f84f502b042
+          name: cloudflare.bandwidth.cached
+          type: DEPENDENT
+          key: cloudflare.bandwidth.cached
+          delay: '0'
+          units: B
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.bandwidth.cached
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: c5ab8cc281ff4f75bd4ada79d2c0d1e8
+          name: 'Cache Hit Ratio'
+          type: DEPENDENT
+          key: cloudflare.bandwidth.cache_hit_ratio
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.bandwidth.cache_hit_ratio
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 901db6b121c7473485c91b0f27e7cf50
+          name: cloudflare.bandwidth.ssl.encrypted
+          type: DEPENDENT
+          key: cloudflare.bandwidth.ssl.encrypted
+          delay: '0'
+          units: B
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.bandwidth.encrypted
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 4637d88e62204f9d8fb9fc0f179c5319
+          name: cloudflare.bandwidth.ssl.unencrypted
+          type: DEPENDENT
+          key: cloudflare.bandwidth.ssl.unencrypted
+          delay: '0'
+          units: B
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.bandwidth.unencrypted
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 96e88a64df014997b8c675cbc4bb97a1
+          name: cloudflare.bandwidth.uncached
+          type: DEPENDENT
+          key: cloudflare.bandwidth.uncached
+          delay: '0'
+          units: B
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.bandwidth.uncached
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 6eff62f2786d42a7925bd516a1c2a958
+          name: cloudflare.dns.query.all
+          type: DEPENDENT
+          key: cloudflare.dns.query.all
+          delay: '0'
+          units: conns
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.dns.query.all
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 4612a834ef054740ba5fea529a08e220
+          name: cloudflare.dns.query.stale
+          type: DEPENDENT
+          key: cloudflare.dns.query.stale
+          delay: '0'
+          units: conns
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.dns.query.stale
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 4aeb289b631a402390a833e3c5227d38
+          name: cloudflare.dns.query.uncached
+          type: DEPENDENT
+          key: cloudflare.dns.query.uncached
+          delay: '0'
+          units: conns
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.dns.query.uncached
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 9450a68208fd4cb8bde009296d722064
+          name: Get
+          type: SCRIPT
+          key: cloudflare.get
+          delay: 0;m01
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Cloudflare = {
+                params: {},
+            
+                setParams: function (params) {
+                    ['api_endpoint', 'token', 'zone'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                            || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                    });
+            
+                    Cloudflare.params = params;
+                    if (typeof Cloudflare.params.api_endpoint === 'string') {
+                        if (!Cloudflare.params.api_endpoint.endsWith('/')) {
+                            Cloudflare.params.api_endpoint += '/';
+                        }
+                    }
+                },
+            
+                request: function (method, query, data) {
+                    var response,
+                        request = new HttpRequest(),
+                        url = Cloudflare.params.api_endpoint + query;
+            
+                    request.addHeader('Content-Type: application/json');
+            
+                    if (Cloudflare.token !== null) {
+                        request.addHeader('Authorization: Bearer ' + Cloudflare.params.token);
+                    }
+            
+                    if (typeof data !== 'undefined') {
+                        data = JSON.stringify(data);
+                    }
+            
+                    Zabbix.Log(4, '[ Cloudflare ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
+            
+                    switch (method) {
+                        case 'get':
+                            response = request.get(url, data);
+                            break;
+            
+                        case 'post':
+                            response = request.post(url, data);
+                            break;
+            
+                        default:
+                            throw 'Unsupported HTTP request method: ' + method;
+                    }
+            
+                    Zabbix.log(4, '[ Cloudflare ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        var message = 'Request failed with status code ' + request.getStatus();
+            
+                        message += ': ' + response;
+                        throw message;
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from Cloudflare. Check debug log for more information.';
+                        }
+                    }
+            
+                    return {
+                        status: request.getStatus(),
+                        response: response
+                    };
+                }
+            }
+            
+            try {
+                Cloudflare.setParams(JSON.parse(value));
+            
+                var lastHour = new Date(),
+                    prevHour = new Date();
+            
+                prevHour.setTime(lastHour.getTime() - 3600000);
+                prevHour.setMinutes(0, 0, 0);
+                lastHour.setTime(prevHour.getTime());
+                lastHour.setMinutes(59, 59, 0);
+            
+                var data = {
+                    "query": "{viewer {zones(filter: {zoneTag: " + Cloudflare.params.zone + "}) {\
+                    httpRequests1hGroups(limit: 100 filter: {\
+                        datetime_geq: \"" + prevHour.toISOString() + "\",  datetime_leq: \"" + lastHour.toISOString() + "\"\
+                        }) {\
+                            sum{\
+                                requests\
+                                cachedRequests\
+                                encryptedRequests\
+                                responseStatusMap{ requests edgeResponseStatus }\
+                                bytes\
+                                cachedBytes\
+                                encryptedBytes\
+                                threats\
+                                pageViews\
+                            }\
+                            uniq{uniques}\
+                            }\
+                        }}}", "variables": {}
+                }
+                var result = Cloudflare.request("post", "graphql/", data);
+                var cloudflare = {
+                    requests: {
+                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.requests,
+                        cached: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedRequests,
+                        uncached: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.requests -
+                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedRequests,
+                        cache_hit_ratio: (result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedRequests /
+                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.requests * 100).toFixed(2),
+                        encrypted: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.encryptedRequests,
+                        unencrypted: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.requests -
+                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.encryptedRequests
+                    },
+                    bandwidth: {
+                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.bytes,
+                        cached: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedBytes,
+                        uncached: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.bytes -
+                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedBytes,
+                        cache_hit_ratio: (result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedBytes /
+                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.bytes * 100).toFixed(2),
+                        encrypted: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.encryptedBytes,
+                        unencrypted: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.bytes -
+                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.encryptedBytes
+                    },
+                    threats: {
+                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.threats
+                    },
+                    pageviews: {
+                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.pageViews
+                    },
+                    uniques: {
+                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].uniq.uniques
+                    }
+            
+                }
+                cloudflare.requests.non_error = 0;
+                cloudflare.requests.error = 0;
+                result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.responseStatusMap.forEach(function (element) {
+                    if (element.edgeResponseStatus == 200) {
+                        cloudflare.requests.non_error = element.requests;
+                    } else {
+                        cloudflare.requests.error += element.requests;
+                    }
+                });
+                cloudflare.requests.non_error_rate = (cloudflare.requests.non_error / cloudflare.requests.all * 100).toFixed(2);
+                cloudflare.requests.error_rate = (cloudflare.requests.error / cloudflare.requests.all * 100).toFixed(2);
+            
+                result = Cloudflare.request("get", "zones/" + Cloudflare.params.zone
+                    + "/dns_analytics/report?dimensions=queryName&metrics=queryCount,uncachedCount,staleCount&since="
+                    + prevHour.toISOString() + "&until=" + lastHour.toISOString());
+                cloudflare.dns = {
+                    query: {
+                        all: result.response.result.totals.queryCount,
+                        uncached: result.response.result.totals.uncachedCount,
+                        stale: result.response.result.totals.staleCount
+                    }
+                }
+            
+                return JSON.stringify(cloudflare);
+            }
+            catch (error) {
+                Zabbix.log(3, '[ Cloudflare ] ERROR: ' + error);
+                throw 'Requesting failed: ' + error;
+            }
+          parameters:
+            -
+              name: token
+              value: '{$CLOUDFLARE.API.TOKEN}'
+            -
+              name: zone
+              value: '{$CLOUDFLARE.ZONE_ID}'
+            -
+              name: api_endpoint
+              value: '{$CLOUDFLARE.API.URL}'
+        -
+          uuid: 71efacd9f1dc46a7aa29876c8bf7906c
+          name: cloudflare.pageviews.all
+          type: DEPENDENT
+          key: cloudflare.pageviews.all
+          delay: '0'
+          units: pgs
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pageviews.all
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: d4a7431b1f6a4d3ab11551a36c98fbf7
+          name: cloudflare.requests.all
+          type: DEPENDENT
+          key: cloudflare.requests.all
+          delay: '0'
+          units: reqs
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.all
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: cc9d651cdec94afeb12ead87b3c3e8f3
+          name: cloudflare.requests.cached
+          type: DEPENDENT
+          key: cloudflare.requests.cached
+          delay: '0'
+          units: reqs
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.cached
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: e1c2a1280d25439f8020b3ebc451d892
+          name: 'Cache hit ratio % over time'
+          type: DEPENDENT
+          key: cloudflare.requests.cache_hit_ratio
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.cache_hit_ratio
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 228912bdae724d70b1abe79510b69082
+          name: 'Error rate (non 2xx)'
+          type: DEPENDENT
+          key: cloudflare.requests.error_rate
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.error_rate
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 6100ff50001543ae83e84ab2c47260f3
+          name: '2xx rate'
+          type: DEPENDENT
+          key: cloudflare.requests.non_error_rate
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.non_error_rate
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: d39fcd4fdc594257bea91de0890d326b
+          name: cloudflare.requests.ssl.encrypted
+          type: DEPENDENT
+          key: cloudflare.requests.ssl.encrypted
+          delay: '0'
+          units: reqs
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.encrypted
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: acbbc431dfc3431583123380edb6da38
+          name: cloudflare.requests.ssl.unencrypted
+          type: DEPENDENT
+          key: cloudflare.requests.ssl.unencrypted
+          delay: '0'
+          units: reqs
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.unencrypted
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 7907f68e795b40fca1bd520556ea1fff
+          name: cloudflare.requests.uncached
+          type: DEPENDENT
+          key: cloudflare.requests.uncached
+          delay: '0'
+          units: reqs
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.uncached
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: 328051a78529494e943edda567aa0e24
+          name: cloudflare.threats.all
+          type: DEPENDENT
+          key: cloudflare.threats.all
+          delay: '0'
+          units: ops
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.threats.all
+          master_item:
+            key: cloudflare.get
+        -
+          uuid: d1a2ec213b084701805f3f974af25a21
+          name: cloudflare.uniques.all
+          type: DEPENDENT
+          key: cloudflare.uniques.all
+          delay: '0'
+          units: conns
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.uniques.all
+          master_item:
+            key: cloudflare.get
+      macros:
+        -
+          macro: '{$CLOUDFLARE.API.TOKEN}'
+          value: '<change>'
+        -
+          macro: '{$CLOUDFLARE.API.URL}'
+          value: '<change>'
+        -
+          macro: '{$CLOUDFLARE.ZONE_ID}'
+          value: '<change>'
+      dashboards:
+        -
+          uuid: 51f1013e8a3d492faed27fe80b68fc53
+          name: Bandwidth
+          display_period: '60'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  x: '6'
+                  width: '14'
+                  height: '8'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: Bandwidth
+                        host: 'Cloudflare by HTTP'
+                -
+                  type: PLAIN_TEXT
+                  name: 'Cache Hit Ratio'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: cloudflare.bandwidth.cache_hit_ratio
+                        host: 'Cloudflare by HTTP'
+        -
+          uuid: 3a43364e8b0a41e7b606826889333425
+          name: DNS
+          display_period: '60'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  width: '17'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'DNS requests'
+                        host: 'Cloudflare by HTTP'
+        -
+          uuid: 8b655c52ee6b41d5b3c2e9b9d59be5c9
+          name: Others
+          display_period: '60'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  name: IPs
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: cloudflare.uniques.all
+                        host: 'Cloudflare by HTTP'
+                -
+                  type: GRAPH_CLASSIC
+                  name: Pageviews
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: cloudflare.pageviews.all
+                        host: 'Cloudflare by HTTP'
+                -
+                  type: GRAPH_CLASSIC
+                  name: Threats
+                  x: '12'
+                  width: '11'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: cloudflare.threats.all
+                        host: 'Cloudflare by HTTP'
+        -
+          uuid: 30a45580395644a28d9f276f02a9c66a
+          name: Requests
+          display_period: '60'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '3'
+                  width: '18'
+                  height: '6'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Web requests'
+                        host: 'Cloudflare by HTTP'
+                -
+                  type: PLAIN_TEXT
+                  name: '2xx rate'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: cloudflare.requests.non_error_rate
+                        host: 'Cloudflare by HTTP'
+                -
+                  type: PLAIN_TEXT
+                  name: 'Cache hit ratio % over time'
+                  x: '6'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: cloudflare.requests.cache_hit_ratio
+                        host: 'Cloudflare by HTTP'
+                -
+                  type: PLAIN_TEXT
+                  name: 'Error rate (non 2xx)'
+                  x: '12'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: cloudflare.requests.error_rate
+                        host: 'Cloudflare by HTTP'
+  graphs:
+    -
+      uuid: 09e113216680490c9dd15805474bcac7
+      name: Bandwidth
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.bandwidth.all
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.bandwidth.cached
+        -
+          sortorder: '3'
+          color: 2774A4
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.bandwidth.ssl.encrypted
+        -
+          sortorder: '4'
+          color: A54F10
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.bandwidth.ssl.unencrypted
+        -
+          sortorder: '5'
+          color: FC6EA3
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.bandwidth.uncached
+    -
+      uuid: 25df26cece41403d864f1ced5901bffa
+      name: 'DNS requests'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.dns.query.all
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.dns.query.stale
+        -
+          sortorder: '3'
+          color: 2774A4
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.dns.query.uncached
+    -
+      uuid: 659df99629a341449c77baf7a9b99b77
+      name: 'Web requests'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.requests.all
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.requests.cached
+        -
+          sortorder: '3'
+          color: 2774A4
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.requests.ssl.encrypted
+        -
+          sortorder: '4'
+          color: A54F10
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.requests.ssl.unencrypted
+        -
+          sortorder: '5'
+          color: FC6EA3
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.requests.uncached
