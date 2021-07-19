@@ -137,6 +137,8 @@ class CControllerAuditLogList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
+		$data['auditlogs'] = $this->sanitizeDetailsForAuditlog($data['auditlogs']);
+
 		if (!$users) {
 			$userids = array_filter(array_column($data['auditlogs'], 'userid'), function ($id) {
 				return $id != 0;
@@ -266,5 +268,29 @@ class CControllerAuditLogList extends CController {
 		CArrayHelper::sort($users, ['name']);
 
 		return $users;
+	}
+
+	private function sanitizeDetailsForAuditlog(array $auditlogs): array {
+		foreach ($auditlogs as &$auditlog) {
+			if ($auditlog['action'] != AUDIT_ACTION_UPDATE) {
+				continue;
+			}
+
+			$details = json_decode($auditlog['details'], true);
+			if (!count($details)) {
+				$auditlog['details'] = '';
+				continue;
+			}
+
+			$new_details = [];
+			foreach ($details as $key => $detail) {
+				$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
+			}
+
+			$auditlog['details'] = implode("\n", $new_details);
+		}
+		unset($auditlog);
+
+		return $auditlogs;
 	}
 }

@@ -108,7 +108,7 @@ foreach ($data['auditlogs'] as $auditlog) {
 			: _('Unknown action'),
 		$auditlog['resourceid'],
 		$auditlog['resourcename'],
-		$auditlog['details']
+		zbx_nl2br($auditlog['details'])
 	]);
 }
 
