@@ -31,6 +31,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['foo(/host/key)', [], ['rc' => false, 'error' => 'unknown function "foo"']],
 			['avg_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "avg_foreach"']],
 			['count_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "count_foreach"']],
+			['exists_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "exists_foreach"']],
 			['last_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "last_foreach"']],
 			['max_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "max_foreach"']],
 			['min_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "min_foreach"']],
@@ -137,6 +138,9 @@ class CHistFunctionValidatorTest extends TestCase {
 			['countunique(/host/key, #256, "regexp", {$MACRO})', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['countunique(/host/key, #256, "regexp", {#LLDMACRO})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
 			['countunique(/host/key, #256, "regexp",,)', [], ['rc' => false, 'error' => 'invalid number of parameters in function "countunique"']],
+
+			['exists_foreach(/host/key)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['exists_foreach(/host/key,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "exists_foreach"']],
 
 			['find(/host/key)', [], ['rc' => true, 'error' => null]],
 			['find(/host/key,)', [], ['rc' => true, 'error' => null]],

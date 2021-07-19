@@ -38,6 +38,11 @@ class CExpressionValidatorTest extends TestCase {
 			['min(count_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['sum(count_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 
+			['avg(exists_foreach(/host/key))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['max(exists_foreach(/host/key))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['min(exists_foreach(/host/key))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['sum(exists_foreach(/host/key))', ['calculated' => true], ['rc' => true, 'error' => null]],
+
 			['avg(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['max(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['min(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
@@ -77,6 +82,7 @@ class CExpressionValidatorTest extends TestCase {
 			// Unknown function in trigger expression.
 			['avg_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "avg_foreach"']],
 			['count_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "count_foreach"']],
+			['exists_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "exists_foreach"']],
 			['last_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "last_foreach"']],
 			['max_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "max_foreach"']],
 			['min_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "min_foreach"']],
@@ -85,6 +91,7 @@ class CExpressionValidatorTest extends TestCase {
 			// Not aggregated.
 			['avg_foreach(/host/key, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "avg_foreach"']],
 			['count_foreach(/host/key, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "count_foreach"']],
+			['exists_foreach(/host/key)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "exists_foreach"']],
 			['last_foreach(/host/key, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "last_foreach"']],
 			['max_foreach(/host/key, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "max_foreach"']],
 			['min_foreach(/host/key, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "min_foreach"']],

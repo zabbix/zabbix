@@ -67,6 +67,9 @@ final class CHistFunctionData {
 			],
 			['required' => false]
 		],
+		'exists_foreach' => [
+			['rules' => [['type' => 'query']]]
+		],
 		'find' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]], 'required' => false],
@@ -231,6 +234,7 @@ final class CHistFunctionData {
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'countunique' => self::ITEM_VALUE_TYPES_ALL,
+		'exists_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'find' => self::ITEM_VALUE_TYPES_ALL,
 		'first' => self::ITEM_VALUE_TYPES_ALL,
 		'forecast' => self::ITEM_VALUE_TYPES_NUM,
@@ -357,6 +361,7 @@ final class CHistFunctionData {
 		switch ($function) {
 			case 'avg_foreach':
 			case 'count_foreach':
+			case 'exists_foreach':
 			case 'last_foreach':
 			case 'max_foreach':
 			case 'min_foreach':
