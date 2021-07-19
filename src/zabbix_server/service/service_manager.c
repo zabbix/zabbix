@@ -1254,7 +1254,7 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 
 			status_update->servicealarmid = alarmid++;
 			zbx_db_insert_add_values(&db_insert, status_update->servicealarmid, status_update->sourceid,
-					status_update->status, 	status_update->clock);
+					status_update->status, status_update->clock);
 		}
 
 		ret = zbx_db_insert_execute(&db_insert);
@@ -1407,7 +1407,6 @@ static char	*service_get_event_name(zbx_service_manager_t *manager, const char *
 {
 	const char	*severity;
 
-
 	switch (status)
 	{
 		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
@@ -1532,7 +1531,6 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 	zbx_db_insert_autoincrement(&db_insert_escalations, "escalationid");
 	zbx_db_insert_execute(&db_insert_escalations);
 	zbx_db_insert_clean(&db_insert_escalations);
-
 out:
 	for (i = 0; i < updates->values_num; i++)
 		zbx_vector_uint64_destroy(&actionids[i]);

@@ -73,7 +73,7 @@ static int	condition_match_service_name(const zbx_service_action_condition_t *co
  ******************************************************************************/
 static int	match_tags(const zbx_vector_ptr_t *tags, const char *name, const char *value, unsigned char op)
 {
-	int	i, ret = FAIL, expected_ret;
+	int	i, ret, expected_ret;
 
 	if (CONDITION_OPERATOR_EQUAL == op || CONDITION_OPERATOR_LIKE == op)
 	{
