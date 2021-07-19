@@ -920,7 +920,7 @@ msgstr "高级标签"
 
 #: include/events.inc.php:285
 msgid "Age"
-msgstr "持续时间"
+msgstr "历时"
 
 #: app/partials/common.filter.trigger.php:108
 #: app/partials/monitoring.problem.filter.php:116
