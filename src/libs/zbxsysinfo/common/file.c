@@ -1000,7 +1000,6 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*filename, *ownertype, *resulttype;
 	int			ret = SYSINFO_RET_FAIL;
 	wchar_t			*wpath;
-	HANDLE			handle;
 	PSECURITY_DESCRIPTOR	sec = NULL;
 	PSID			sid = NULL;
 
@@ -1026,22 +1025,12 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (INVALID_HANDLE_VALUE == (handle = CreateFile(wpath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL, NULL)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information."));
-		goto err;
-	}
-
-	if (ERROR_SUCCESS != GetSecurityInfo(handle, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &sid, NULL, NULL, NULL,
+	if (ERROR_SUCCESS != GetNamedSecurityInfo(wpath, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &sid, NULL, NULL, NULL,
 			&sec))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain security information."));
-		CloseHandle(handle);
 		goto err;
 	}
-
-	CloseHandle(handle);
 
 	if (NULL != resulttype && 0 == strcmp(resulttype, "id"))
 	{
@@ -1050,7 +1039,7 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (TRUE != ConvertSidToStringSid(sid, &sid_string))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain SID."));
-			goto err_sec;
+			goto err;
 		}
 
 		SET_STR_RESULT(result, zbx_unicode_to_utf8(sid_string));
@@ -1074,7 +1063,7 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user name."));
 			zbx_free(acc_name);
 			zbx_free(dmn_name);
-			goto err_sec;
+			goto err;
 		}
 
 		acc_utf8 = (zbx_unicode_to_utf8(acc_name));
@@ -1090,13 +1079,14 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto err_sec;
+		goto err;
 	}
 
 	ret = SYSINFO_RET_OK;
-err_sec:
-	LocalFree(sec);
 err:
+	if (NULL != sec)
+		LocalFree(sec);
+
 	return ret;
 }
 #else
@@ -1269,7 +1259,6 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	wchar_t			*wpath = NULL, *sid_string = NULL, *acc_name = NULL, *dmn_name = NULL;
 	char			*tmp, *acc_ut8, *dmn_ut8;
 	struct zbx_json		j;
-	HANDLE			handle;
 	PSID			sid = NULL;
 	PSECURITY_DESCRIPTOR	sec = NULL;
 	SID_NAME_USE		acc_type = SidTypeUnknown;
@@ -1317,22 +1306,12 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 
 	/* User name */
 
-	if (INVALID_HANDLE_VALUE == (handle = CreateFile(wpath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL, NULL)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information."));
-		goto err;
-	}
-
-	if (ERROR_SUCCESS != GetSecurityInfo(handle, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &sid, NULL, NULL, NULL,
-			&sec))
+	if (ERROR_SUCCESS != GetNamedSecurityInfo(wpath, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &sid, NULL, NULL,
+			NULL, &sec))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain security information."));
-		CloseHandle(handle);
 		goto err;
 	}
-
-	CloseHandle(handle);
 
 	LookupAccountSid(NULL, sid, acc_name, (LPDWORD)&acc_sz, dmn_name, (LPDWORD)&dmn_sz, &acc_type);
 
@@ -1345,7 +1324,6 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user name."));
 		zbx_free(acc_name);
 		zbx_free(dmn_name);
-		LocalFree(sec);
 		goto err;
 	}
 
@@ -1365,11 +1343,8 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	if (TRUE != ConvertSidToStringSid(sid, &sid_string))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain SID."));
-		LocalFree(sec);
 		goto err;
 	}
-
-	LocalFree(sec);
 
 	tmp = zbx_unicode_to_utf8(sid_string);
 	LocalFree(sid_string);
@@ -1420,6 +1395,9 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 
 	ret =  SYSINFO_RET_OK;
 err:
+	if (NULL != sec)
+		LocalFree(sec);
+
 	zbx_free(wpath);
 	zbx_json_free(&j);
 
@@ -1429,7 +1407,7 @@ err:
 static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
-	char		*tmp;
+	char		*tmp = NULL;
 	zbx_file_time_t	file_time;
 	zbx_stat_t	buf;
 	struct zbx_json	j;
