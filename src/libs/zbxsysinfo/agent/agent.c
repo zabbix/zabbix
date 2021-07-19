@@ -60,7 +60,6 @@ static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	**value;
 	int	ret = SYSINFO_RET_OK;
 
 	ZBX_UNUSED(request);
@@ -72,7 +71,7 @@ static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (NULL != CONFIG_HOST_METADATA_ITEM)
 	{
 		if (SUCCEED != process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, result) ||
-				NULL == (value = GET_STR_RESULT(result)))
+				NULL == GET_STR_RESULT(result))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get host metadata using item \"%s\"",
 					CONFIG_HOST_METADATA_ITEM));
