@@ -670,7 +670,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			}
 
 			if (0 == itemkey_num)
+			{
+				zbx_free(itemkey);
 				THIS_SHOULD_NEVER_HAPPEN;
+			}
 		}
 		DBfree_result(tresult);
 	}
