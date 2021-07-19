@@ -377,9 +377,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_item_permission                                              *
+ * Function: get_service_permission                                           *
  *                                                                            *
- * Purpose: Return user permissions for access to item                        *
+ * Purpose: Return user permissions for access to services                    *
  *                                                                            *
  * Return value: PERM_DENY - if host or user not found,                       *
  *                   or permission otherwise                                  *
