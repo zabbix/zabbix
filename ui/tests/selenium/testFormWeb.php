@@ -177,7 +177,7 @@ class testFormWeb extends CLegacyWebTest {
 	 */
 	public function testFormWeb_CheckLayout($data) {
 		if (isset($data['template'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->zbxTestLogin('templates.php?page=2');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 

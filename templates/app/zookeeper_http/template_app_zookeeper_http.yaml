@@ -695,7 +695,7 @@ zabbix_export:
           triggers:
             -
               uuid: 494624353875401eaf65f7eb0273ca35
-              expression: '(last(/Zookeeper by HTTP/zookeeper.server_state,#1)<>last(/Zookeeper by HTTP/zookeeper.server_state,#2))=1 and length(last(/Zookeeper by HTTP/zookeeper.server_state))>0'
+              expression: 'last(/Zookeeper by HTTP/zookeeper.server_state,#1)<>last(/Zookeeper by HTTP/zookeeper.server_state,#2) and length(last(/Zookeeper by HTTP/zookeeper.server_state))>0'
               name: 'Zookeeper: Server mode has changed (new mode: {ITEM.VALUE})'
               priority: INFO
               description: 'Zookeeper node state has changed. Ack to close.'
@@ -796,7 +796,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2a091bcfafe84ea9aee5238ce5e25651
-              expression: '(last(/Zookeeper by HTTP/zookeeper.version,#1)<>last(/Zookeeper by HTTP/zookeeper.version,#2))=1 and length(last(/Zookeeper by HTTP/zookeeper.version))>0'
+              expression: 'last(/Zookeeper by HTTP/zookeeper.version,#1)<>last(/Zookeeper by HTTP/zookeeper.version,#2) and length(last(/Zookeeper by HTTP/zookeeper.version))>0'
               name: 'Zookeeper: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Zookeeper version has changed. Ack to close.'

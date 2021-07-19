@@ -529,6 +529,15 @@ class CHost extends CHostGeneral {
 			return (string) count($result);
 		}
 
+		// Hosts share table with host prototypes. Therefore remove host unrelated fields.
+		if ($this->outputIsRequested('discover', $options['output'])) {
+			foreach ($result as &$row) {
+				unset($row['discover']);
+			}
+
+			unset($row);
+		}
+
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 		}

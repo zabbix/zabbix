@@ -104,7 +104,7 @@ zabbix_export:
           triggers:
             -
               uuid: eba057a7ef5743ecb2c037476c97fc38
-              expression: '(last(/Netgear Fastpath SNMP/system.hw.serialnumber,#1)<>last(/Netgear Fastpath SNMP/system.hw.serialnumber,#2))=1 and length(last(/Netgear Fastpath SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Netgear Fastpath SNMP/system.hw.serialnumber,#1)<>last(/Netgear Fastpath SNMP/system.hw.serialnumber,#2) and length(last(/Netgear Fastpath SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -135,7 +135,7 @@ zabbix_export:
           triggers:
             -
               uuid: bf0a6ff122a14f4c9baa640d27c8f982
-              expression: '(last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#1)<>last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#2))=1 and length(last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0]))>0'
+              expression: 'last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#1)<>last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#2) and length(last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'

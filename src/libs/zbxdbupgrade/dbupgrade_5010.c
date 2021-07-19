@@ -603,8 +603,12 @@ static void	DBpatch_get_preferred_widget_size(zbx_db_screen_item_t *item, int *w
 		*h += 215;	/* SCREEN_LEGEND_HEIGHT */
 	}
 
+	if (SCREEN_RESOURCE_PLAIN_TEXT == item->resourcetype)
+		*h = 2 + 2 * MIN(25, item->elements) / 5;
+	else
+		*h = (int)round((double)*h / 70);			/* WIDGET_ROW_HEIGHT */
+
 	*w = (int)round((double)*w / 1920 * DASHBOARD_MAX_COLS);	/* DISPLAY_WIDTH */
-	*h = (int)round((double)*h / 70);				/* WIDGET_ROW_HEIGHT */
 
 	*w = MIN(DASHBOARD_MAX_COLS, MAX(1, *w));
 	*h = MIN(DASHBOARD_WIDGET_MAX_ROWS, MAX(DASHBOARD_WIDGET_MIN_ROWS, *h));
@@ -1311,6 +1315,34 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		{
 			scr_item->rowspan = 1;
 			zabbix_log(LOG_LEVEL_WARNING, "warning: rowspan is 0, converted to 1 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
+		if (SCREEN_MAX_COLS <= scr_item->x)
+		{
+			scr_item->x = SCREEN_MAX_COLS - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: x is more than %d, limited for item " ZBX_FS_UI64,
+					scr_item->x, scr_item->screenitemid);
+		}
+
+		if (0 > scr_item->x)
+		{
+			scr_item->x = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: x is negative, set to 0 for item " ZBX_FS_UI64,
+					scr_item->screenitemid);
+		}
+
+		if (SCREEN_MAX_ROWS <= scr_item->y)
+		{
+			scr_item->y = SCREEN_MAX_ROWS - 1;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: y is more than %d, limited for item " ZBX_FS_UI64,
+					scr_item->y, scr_item->screenitemid);
+		}
+
+		if (0 > scr_item->y)
+		{
+			scr_item->y = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "warning: y is negative, set to 0 for item " ZBX_FS_UI64,
 					scr_item->screenitemid);
 		}
 

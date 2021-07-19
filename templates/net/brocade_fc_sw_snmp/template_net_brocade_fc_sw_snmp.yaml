@@ -79,7 +79,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9c5ae10dbafb45658f25f0279a8a1934
-              expression: '(last(/Brocade FC SNMP/system.hw.firmware,#1)<>last(/Brocade FC SNMP/system.hw.firmware,#2))=1 and length(last(/Brocade FC SNMP/system.hw.firmware))>0'
+              expression: 'last(/Brocade FC SNMP/system.hw.firmware,#1)<>last(/Brocade FC SNMP/system.hw.firmware,#2) and length(last(/Brocade FC SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -109,7 +109,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9939f98da99c435a9b5505e55e8abb5f
-              expression: '(last(/Brocade FC SNMP/system.hw.serialnumber,#1)<>last(/Brocade FC SNMP/system.hw.serialnumber,#2))=1 and length(last(/Brocade FC SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Brocade FC SNMP/system.hw.serialnumber,#1)<>last(/Brocade FC SNMP/system.hw.serialnumber,#2) and length(last(/Brocade FC SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'

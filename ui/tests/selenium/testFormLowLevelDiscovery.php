@@ -171,7 +171,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	public function testFormLowLevelDiscovery_CheckLayout($data) {
 
 		if (isset($data['template'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->zbxTestLogin('templates.php?page=2');
 			$this->zbxTestClickLinkTextWait($data['template']);
 			$hostid = 30000;
 		}

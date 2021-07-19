@@ -29,7 +29,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	use TableTrait;
 
 	const DICROVERY_RULE_ID = 90001;
-	const HOST_PROTOTYPES_COUNT = 10;
+	const HOST_PROTOTYPES_COUNT = 8;
 
 	public function testPageHostPrototypes_CheckLayout() {
 		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID.'&context=host');

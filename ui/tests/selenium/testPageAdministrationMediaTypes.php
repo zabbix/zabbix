@@ -199,9 +199,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select one.
 			[
 				[
-					'rows' => [
-						'Name' => 'Email'
-					],
+					'rows' => ['Email'],
 					'db_name' => 'Email',
 					'used_by_action' => 'Trigger action 3'
 				]
@@ -209,9 +207,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select several.
 			[
 				[
-					'rows' => [
-						['Name' => 'SMS']
-					],
+					'rows' => ['SMS'],
 					'db_name' => ['SMS']
 				]
 			],
@@ -233,7 +229,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 */
 	public function testPageAdministrationMediaTypes_Disable($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
+		$this->selectTableRows('Name', CTestArrayHelper::get($data, 'rows', []));
 
 		// Check number of all selected media types.
 		if (array_key_exists('select_all', $data)) {
@@ -277,7 +273,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 */
 	public function testPageAdministrationMediaTypes_Enable($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
+		$this->selectTableRows('Name', CTestArrayHelper::get($data, 'rows', []));
 
 		if (array_key_exists('select_all', $data)) {
 			// Check number of all selected media types.
@@ -550,7 +546,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$old_hash = CDBHelper::getHash($sql);
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
+		$this->selectTableRows('Name', CTestArrayHelper::get($data, 'rows', []));
 
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();

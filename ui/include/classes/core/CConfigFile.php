@@ -230,26 +230,28 @@ class CConfigFile {
 
 	public function save() {
 		try {
-			if (is_null($this->configFile)) {
+			$file = $this->configFile;
+
+			if (is_null($file)) {
 				self::exception('Cannot save, config file is not set.');
 			}
 
 			$this->check();
 
-			if (file_put_contents($this->configFile, $this->getString())) {
-				if (!chmod($this->configFile, 0600)) {
+			$file_is_writable = ((!file_exists($file) && is_writable(dirname($file))) || is_writable($file));
+
+			if ($file_is_writable && file_put_contents($file, $this->getString())) {
+				if (!chmod($file, 0600)) {
 					self::exception(_('Unable to change configuration file permissions to 0600.'));
 				}
 			}
+			elseif (is_readable($file)) {
+				if (file_get_contents($file) !== $this->getString()) {
+					self::exception(_('Unable to overwrite the existing configuration file.'));
+				}
+			}
 			else {
-				if (file_exists($this->configFile)) {
-					if (file_get_contents($this->configFile) !== $this->getString()) {
-						self::exception(_('Unable to overwrite the existing configuration file.'));
-					}
-				}
-				else {
-					self::exception(_('Unable to create the configuration file.'));
-				}
+				self::exception(_('Unable to create the configuration file.'));
 			}
 
 			return true;
