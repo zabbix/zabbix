@@ -1004,8 +1004,7 @@ abstract class CGraphGeneral extends CApiService {
 		$item_links = [];
 
 		$db_items = DBselect(
-			'SELECT src.itemid AS src_itemid,src.hostid AS src_hostid,'.
-				'dest.itemid AS dest_itemid,dest.hostid AS dest_hostid'.
+			'SELECT src.itemid AS src_itemid,dest.itemid AS dest_itemid,dest.hostid AS dest_hostid'.
 			' FROM items src,items dest'.
 			' WHERE src.itemid=dest.templateid'.
 				' AND '.dbConditionId('src.itemid', $itemids).
@@ -1013,9 +1012,7 @@ abstract class CGraphGeneral extends CApiService {
 		);
 
 		while ($db_item = DBfetch($db_items)) {
-			if (array_key_exists($db_item['dest_hostid'], $templateids_hosts[$db_item['src_hostid']])) {
-				$item_links[$db_item['src_itemid']][$db_item['dest_hostid']] = $db_item['dest_itemid'];
-			}
+			$item_links[$db_item['src_itemid']][$db_item['dest_hostid']] = $db_item['dest_itemid'];
 		}
 
 		$child_graphs_to_add = [];
