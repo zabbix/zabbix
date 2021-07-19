@@ -648,6 +648,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		while (NULL != (trow = DBfetch(tresult)))
 		{
 			char	*itemkey;
+			int	itemkey_num = 0;
 
 			ZBX_STR2UINT64(graphid, trow[0]);
 			itemkey = zbx_strdup(NULL, trow[1]);
@@ -657,10 +658,19 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 				graph = (zbx_template_graph_valid_t *)graphs.values[i];
 
 				if (graphid == graph->tgraphid)
+				{
 					zbx_vector_str_append(&graph->tkeys, itemkey);
+					itemkey_num++;
+				}
 				else if (graphid == graph->hgraphid)
+				{
 					zbx_vector_str_append(&graph->hkeys, itemkey);
+					itemkey_num++;
+				}
 			}
+
+			if (0 == itemkey_num)
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 		DBfree_result(tresult);
 	}
