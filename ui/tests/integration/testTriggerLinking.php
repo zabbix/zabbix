@@ -56,8 +56,7 @@ class testTriggerLinking extends CIntegrationTest {
 	const NUMBER_OF_TRIGGERS_PER_TEMPLATE = 10;
 
 	private static $templateids = array();
-
-	private static $string_ids = array();
+	private static $stringids = array();
 
 	public function createTemplates() {
 
@@ -130,11 +129,10 @@ class testTriggerLinking extends CIntegrationTest {
 		$z = 'a';
 		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE; $i++)
 		{
-			array_push(self::$string_ids, $z);
+			array_push(self::$stringids, $z);
 			$z++;
 		}
-
-		sort(self::$string_ids);
+		sort(self::$stringids);
 
 		$this->createTemplates();
 
@@ -144,8 +142,8 @@ class testTriggerLinking extends CIntegrationTest {
 			$templateid_loc = self::$templateids[$templ_counter];
 			$response = $this->call('item.create', [
 				'hostid' => $templateid_loc,
-				'name' => self::ITEM_NAME_PRE . "_" . self::$string_ids[$i],
-				'key_' => self::ITEM_KEY_PRE . "_" . self::$string_ids[$i],
+				'name' => self::ITEM_NAME_PRE . "_" . self::$stringids[$i],
+				'key_' => self::ITEM_KEY_PRE . "_" . self::$stringids[$i],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]);
@@ -154,26 +152,26 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertEquals(1, count($response['result']['itemids']));
 
 			$response = $this->call('trigger.create', [
-				'description' => self::TRIGGER_DESCRIPTION_PRE . "_" . self::$string_ids[$i],
+				'description' => self::TRIGGER_DESCRIPTION_PRE . "_" . self::$stringids[$i],
 				'priority' => self::TRIGGER_PRIORITY,
 				'status' => self::TRIGGER_STATUS,
-				'comments' => self::TRIGGER_COMMENTS_PRE . "_" . self::$string_ids[$i],
-				'url' => self::TRIGGER_URL_PRE . "_" . self::$string_ids[$i],
+				'comments' => self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i],
+				'url' => self::TRIGGER_URL_PRE . "_" . self::$stringids[$i],
 				'type' => self::TRIGGER_TYPE,
 				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
 				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
-				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE . "_" . self::$string_ids[$i],
+				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE . "_" . self::$stringids[$i],
 				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-				'opdata' => self::TRIGGER_OPDATA_PRE . "_" . self::$string_ids[$i],
-				'event_name' => self::TRIGGER_EVENT_NAME_PRE . "_" . self::$string_ids[$i],
+				'opdata' => self::TRIGGER_OPDATA_PRE . "_" . self::$stringids[$i],
+				'event_name' => self::TRIGGER_EVENT_NAME_PRE . "_" . self::$stringids[$i],
 				'expression' => 'last(/' . self::TEMPLATE_NAME_PRE . "_" . $templ_counter . '/' .
-				self::ITEM_KEY_PRE . "_" . self::$string_ids[$i] . ')=2',
+				self::ITEM_KEY_PRE . "_" . self::$stringids[$i] . ')=2',
 				'recovery_expression' => 'last(/' . self::TEMPLATE_NAME_PRE . "_" . $templ_counter . '/' .
-				self::ITEM_KEY_PRE . "_" . self::$string_ids[$i] . ')=3',
+				self::ITEM_KEY_PRE . "_" . self::$stringids[$i] . ')=3',
 				'tags' => [
 					[
-						'tag' => self::TAG_NAME_PRE . "_" . self::$string_ids[$i],
-						'value' => self::TAG_VALUE_PRE . "_" . self::$string_ids[$i]
+						'tag' => self::TAG_NAME_PRE . "_" . self::$stringids[$i],
+						'value' => self::TAG_VALUE_PRE . "_" . self::$stringids[$i]
 					]
 				]
 			]);
@@ -188,7 +186,7 @@ class testTriggerLinking extends CIntegrationTest {
 	}
 
 	/**
-	* Component configuration provider for agent related tests.
+	* Component configuration provider for server related tests.
 	*
 	* @return array
 	*/
@@ -271,24 +269,24 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertArrayHasKey('tags', $entry, $ep);
 			$this->assertArrayHasKey(0, $entry['tags'], $ep);
 			$this->assertArrayHasKey('tag', $entry['tags'][0], $ep);
-			$this->assertEquals(self::TAG_NAME_PRE . "_" . self::$string_ids[$i], $entry['tags'][0]['tag'], $ep);
+			$this->assertEquals(self::TAG_NAME_PRE . "_" . self::$stringids[$i], $entry['tags'][0]['tag'], $ep);
 
-			$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_PRE . "_" . self::$string_ids[$i],
+			$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_PRE . "_" . self::$stringids[$i],
 					$ep);
 			$this->assertEquals($entry['priority'],    self::TRIGGER_PRIORITY, $ep);
 			$this->assertEquals($entry['status'],      self::TRIGGER_STATUS, $ep);
-			$this->assertEquals($entry['comments'],    self::TRIGGER_COMMENTS_PRE . "_" . self::$string_ids[$i], $ep);
-			$this->assertEquals($entry['url'],         self::TRIGGER_URL_PRE . "_" . self::$string_ids[$i], $ep);
+			$this->assertEquals($entry['comments'],    self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i], $ep);
+			$this->assertEquals($entry['url'],         self::TRIGGER_URL_PRE . "_" . self::$stringids[$i], $ep);
 			$this->assertEquals($entry['type'],        self::TRIGGER_TYPE, $ep);
 
 			$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE, $ep);
 			$this->assertEquals($entry['correlation_mode'], self::TRIGGER_CORRELATION_MODE, $ep);
 			$this->assertEquals($entry['correlation_tag'],  self::TRIGGER_CORRELATION_TAG_PRE . "_" .
-					self::$string_ids[$i], $ep);
+					self::$stringids[$i], $ep);
 			$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
-			$this->assertEquals($entry['opdata'],           self::TRIGGER_OPDATA_PRE . "_" . self::$string_ids[$i],
+			$this->assertEquals($entry['opdata'],           self::TRIGGER_OPDATA_PRE . "_" . self::$stringids[$i],
 					$ep);
-			$this->assertEquals($entry['event_name'],       self::TRIGGER_EVENT_NAME_PRE . "_" . self::$string_ids[$i],
+			$this->assertEquals($entry['event_name'],       self::TRIGGER_EVENT_NAME_PRE . "_" . self::$stringids[$i],
 					$ep);
 			$this->assertEquals($entry['functions'][0]['parameter'], '$', $ep);
 			$this->assertEquals($entry['functions'][0]['function'], 'last', $ep);
