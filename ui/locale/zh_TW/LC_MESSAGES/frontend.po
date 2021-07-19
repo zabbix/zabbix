@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-16 10:58+0300\n"
+"POT-Creation-Date: 2021-07-02 19:55+0300\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -57,7 +57,7 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:599
 #: include/classes/api/services/CMaintenance.php:615
 #: include/classes/api/services/CMaintenance.php:684 maintenance.php:137
-#: maintenance.php:143 services.php:177 services.php:186
+#: maintenance.php:143 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
 msgstr ""
@@ -242,7 +242,7 @@ msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr ""
 
-#: jsLoader.php:363
+#: jsLoader.php:362
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -556,7 +556,7 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:792
 #: include/views/monitoring.sysmap.edit.php:278
 #: include/views/monitoring.sysmap.edit.php:322
-#: include/views/monitoring.sysmap.edit.php:359 services.php:348
+#: include/views/monitoring.sysmap.edit.php:359 services.php:353
 msgid "Action"
 msgstr "動作"
 
@@ -992,7 +992,7 @@ msgstr ""
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:385
 msgid "All"
 msgstr "所有"
 
@@ -1705,7 +1705,7 @@ msgstr ""
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
-#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
+#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:381
 msgid "Cancel"
 msgstr "取消"
 
@@ -1777,7 +1777,7 @@ msgstr ""
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:107
-#: app/controllers/CControllerImageCreate.php:131
+#: app/controllers/CControllerImageCreate.php:133
 msgid "Cannot add image"
 msgstr "無法新增圖片"
 
@@ -1793,7 +1793,7 @@ msgstr "無法新增原型項目"
 msgid "Cannot add maintenance"
 msgstr "無法新增維修"
 
-#: include/classes/api/services/CMap.php:1559
+#: include/classes/api/services/CMap.php:1558
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
 msgstr ""
@@ -1819,12 +1819,12 @@ msgstr "無法新增超過一個 \"圖形總計\"類型的項目於圖形 \"%1$s
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr ""
 
-#: sysmaps.php:215
+#: sysmaps.php:216
 msgid "Cannot add network map"
 msgstr "無法新增網路拓墣圖"
 
 #: app/controllers/CControllerProxyCreate.php:58
-#: app/controllers/CControllerProxyCreate.php:120
+#: app/controllers/CControllerProxyCreate.php:126
 msgid "Cannot add proxy"
 msgstr "無法新增系統代理程式"
 
@@ -1842,7 +1842,7 @@ msgstr ""
 msgid "Cannot add script"
 msgstr "無法新增脚本"
 
-#: services.php:152
+#: services.php:154
 msgid "Cannot add service"
 msgstr "無法新增服務"
 
@@ -1938,7 +1938,7 @@ msgstr ""
 msgid "Cannot convert POST data:"
 msgstr ""
 
-#: graphs.php:392
+#: graphs.php:401
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] ""
@@ -2042,19 +2042,19 @@ msgstr[0] "無法删除探索規則"
 msgid "Cannot delete discovery rules"
 msgstr "無法刪除探索規則"
 
-#: graphs.php:283
+#: graphs.php:292
 msgid "Cannot delete graph"
 msgstr "無法删除圖形"
 
-#: graphs.php:275
+#: graphs.php:284
 msgid "Cannot delete graph prototype"
 msgstr "無法刪除圖形原型"
 
-#: graphs.php:316
+#: graphs.php:325
 msgid "Cannot delete graph prototypes"
 msgstr "無法刪除原型圖表"
 
-#: graphs.php:333
+#: graphs.php:342
 msgid "Cannot delete graphs"
 msgstr "無法删除圖形"
 
@@ -2088,7 +2088,7 @@ msgstr "無法刪除數筆原型主機"
 msgid "Cannot delete icon map"
 msgstr "無法刪除圖示對應"
 
-#: app/controllers/CControllerImageDelete.php:69
+#: app/controllers/CControllerImageDelete.php:70
 msgid "Cannot delete image"
 msgstr "無法删除圖片"
 
@@ -2132,7 +2132,7 @@ msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
 msgstr[0] ""
 
-#: sysmaps.php:262
+#: sysmaps.php:269
 msgid "Cannot delete network map"
 msgstr "無法刪除網路拓墣圖"
 
@@ -2170,7 +2170,7 @@ msgstr "無法刪除腳本. 腳本 \"%1$s\" 用於動作操作\"%2$s\"."
 msgid "Cannot delete selected actions"
 msgstr "無法刪除所選的動作"
 
-#: services.php:107
+#: services.php:108
 msgid "Cannot delete service"
 msgstr "無法删除服務"
 
@@ -2523,7 +2523,7 @@ msgstr ""
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "無法形成樹狀格式. 檢查服務連結的邏輯結構."
 
-#: services.php:353
+#: services.php:358
 msgid "Cannot format tree."
 msgstr "無法形成樹狀格式"
 
@@ -2654,12 +2654,12 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:514
+#: include/classes/api/services/CGraphGeneral.php:507
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:521
+#: include/classes/api/services/CGraphGeneral.php:514
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr ""
@@ -2721,12 +2721,12 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:700
+#: include/classes/api/services/CGraphGeneral.php:693
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:705
+#: include/classes/api/services/CGraphGeneral.php:698
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr ""
@@ -2763,7 +2763,7 @@ msgstr ""
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CImage.php:519
+#: include/classes/api/services/CImage.php:506
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
 msgstr ""
@@ -2823,7 +2823,7 @@ msgid "Cannot update event"
 msgid_plural "Cannot update events"
 msgstr[0] ""
 
-#: graphs.php:243 graphs.php:296
+#: graphs.php:243 graphs.php:305
 msgid "Cannot update graph"
 msgstr "無法更新圖形"
 
@@ -2865,7 +2865,7 @@ msgstr "無法更新圖示對應"
 
 #: app/controllers/CControllerImageUpdate.php:43
 #: app/controllers/CControllerImageUpdate.php:110
-#: app/controllers/CControllerImageUpdate.php:144
+#: app/controllers/CControllerImageUpdate.php:146
 msgid "Cannot update image"
 msgstr "無法更新圖片"
 
@@ -2914,12 +2914,12 @@ msgid "Cannot update network map"
 msgstr "無法更新網路拓墣圖"
 
 #: app/controllers/CControllerProxyUpdate.php:59
-#: app/controllers/CControllerProxyUpdate.php:118
+#: app/controllers/CControllerProxyUpdate.php:124
 msgid "Cannot update proxy"
 msgstr "無法更新系統代理程式"
 
-#: include/classes/api/services/CProxy.php:746
-#: include/classes/api/services/CProxy.php:870
+#: include/classes/api/services/CProxy.php:739
+#: include/classes/api/services/CProxy.php:860
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr ""
@@ -2951,7 +2951,7 @@ msgstr "無法更新脚本"
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr ""
 
-#: services.php:146
+#: services.php:147
 msgid "Cannot update service"
 msgstr "無法更新服務"
 
@@ -3319,7 +3319,7 @@ msgstr "克隆"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
-#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
+#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:374
 msgid "Close"
 msgstr "關閉"
 
@@ -3913,7 +3913,7 @@ msgstr ""
 msgid "Correlation updated"
 msgstr ""
 
-#: include/classes/api/services/CImage.php:341
+#: include/classes/api/services/CImage.php:333
 msgid "Could not save image!"
 msgstr "不能儲存圖片!"
 
@@ -4237,8 +4237,8 @@ msgstr ""
 msgid "Custom label"
 msgstr "自訂標示"
 
-#: include/classes/api/services/CMap.php:889
-#: include/classes/api/services/CMap.php:1361
+#: include/classes/api/services/CMap.php:888
+#: include/classes/api/services/CMap.php:1360
 #, c-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "自訂標示給類型 \"%1$s\"的拓墣圖 \"%2$s\"組件, 其不得為空白."
@@ -4374,7 +4374,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172 jsLoader.php:337
+#: include/views/inventory.host.view.php:172
 msgid "Dashboards"
 msgstr ""
 
@@ -4544,7 +4544,7 @@ msgstr "週中第幾日"
 msgid "Days"
 msgstr "日數"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:365
 msgid "Debug"
 msgstr "調試"
 
@@ -4689,7 +4689,7 @@ msgstr "延遲因"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
 #: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
-#: jsLoader.php:176 jsLoader.php:338
+#: jsLoader.php:176 jsLoader.php:337
 msgid "Delete"
 msgstr "删除"
 
@@ -4718,7 +4718,7 @@ msgstr "刪除目前的動作?"
 msgid "Delete current correlation?"
 msgstr ""
 
-#: jsLoader.php:339
+#: jsLoader.php:338
 msgid "Delete dashboard?"
 msgstr ""
 
@@ -5469,7 +5469,7 @@ msgstr "顯示重疊圖表"
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1646 include/actions.inc.php:1717
 #: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:378
+#: jsLoader.php:377
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "顯示 已探索的 %2$s中的%1$s"
@@ -5505,7 +5505,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:216 jsLoader.php:340
+#: jsLoader.php:216 jsLoader.php:339
 msgid "Do you wish to replace the conditional expression?"
 msgstr "您想要替換條件式表示式嗎?"
 
@@ -5602,8 +5602,8 @@ msgstr ""
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:614
-#: include/classes/api/services/CMap.php:1076
+#: include/classes/api/services/CMap.php:613
+#: include/classes/api/services/CMap.php:1075
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
 msgstr ""
@@ -5630,14 +5630,14 @@ msgstr ""
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:743
-#: include/classes/api/services/CMap.php:1211
+#: include/classes/api/services/CMap.php:742
+#: include/classes/api/services/CMap.php:1210
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:818
-#: include/classes/api/services/CMap.php:1285
+#: include/classes/api/services/CMap.php:817
+#: include/classes/api/services/CMap.php:1284
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr ""
@@ -5707,7 +5707,7 @@ msgstr ""
 msgid "Edit tree element"
 msgstr ""
 
-#: jsLoader.php:341
+#: jsLoader.php:340
 msgid "Edit trigger"
 msgstr "編輯觸發器"
 
@@ -5808,18 +5808,18 @@ msgstr ""
 #: include/classes/api/services/CHost.php:1369
 #: include/classes/api/services/CHost.php:1898
 #: include/classes/api/services/CHostPrototype.php:1093
-#: include/classes/api/services/CImage.php:448
-#: include/classes/api/services/CImage.php:501
+#: include/classes/api/services/CImage.php:430
+#: include/classes/api/services/CImage.php:482
 #: include/classes/api/services/CMaintenance.php:542
-#: include/classes/api/services/CMap.php:563
-#: include/classes/api/services/CMap.php:589
-#: include/classes/api/services/CMap.php:1034
+#: include/classes/api/services/CMap.php:562
+#: include/classes/api/services/CMap.php:588
+#: include/classes/api/services/CMap.php:1033
 #: include/classes/api/services/CMediatype.php:182
 #: include/classes/api/services/CMediatype.php:448
-#: include/classes/api/services/CService.php:360
-#: include/classes/api/services/CService.php:395
-#: include/classes/api/services/CService.php:459
-#: include/classes/api/services/CService.php:527
+#: include/classes/api/services/CService.php:345
+#: include/classes/api/services/CService.php:378
+#: include/classes/api/services/CService.php:442
+#: include/classes/api/services/CService.php:510
 #: include/classes/api/services/CTemplate.php:682
 #: include/classes/api/services/CTrigger.php:798
 #: include/classes/api/services/CUserMacro.php:506
@@ -5828,7 +5828,7 @@ msgstr ""
 msgid "Empty input parameter."
 msgstr "空的輸入參數."
 
-#: include/classes/api/services/CMap.php:1042
+#: include/classes/api/services/CMap.php:1041
 msgid "Empty map ID."
 msgstr ""
 
@@ -5836,11 +5836,11 @@ msgstr ""
 msgid "Empty media type ID."
 msgstr ""
 
-#: include/classes/api/services/CService.php:881
+#: include/classes/api/services/CService.php:864
 msgid "Empty name."
 msgstr "空名稱."
 
-#: include/classes/api/services/CImage.php:360
+#: include/classes/api/services/CImage.php:350
 msgid "Empty parameters"
 msgstr "空參數"
 
@@ -6063,7 +6063,7 @@ msgstr "英語 (en_GB)"
 msgid "English (en_US)"
 msgstr "英語(en_US)"
 
-#: include/classes/api/services/CGraphGeneral.php:625
+#: include/classes/api/services/CGraphGeneral.php:618
 #: include/classes/api/services/CHostGroup.php:757
 #: include/classes/api/services/CHostPrototype.php:341
 #: include/classes/api/services/CHttpTest.php:390
@@ -6220,7 +6220,7 @@ msgstr ""
 msgid "Execute"
 msgstr "執行"
 
-#: include/classes/api/services/CImage.php:224
+#: include/classes/api/services/CImage.php:225
 #, c-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "執行SQL錯誤[%1$s]於[%2$s]."
@@ -6513,7 +6513,7 @@ msgstr ""
 msgid "Field \"%1$s\" is mandatory."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:793
+#: include/classes/api/services/CMap.php:792
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr ""
@@ -6562,7 +6562,7 @@ msgstr ""
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr ""
 
-#: include/classes/api/services/CImage.php:570
+#: include/classes/api/services/CImage.php:557
 msgid "File format is unsupported."
 msgstr ""
 
@@ -6773,7 +6773,7 @@ msgstr "週五"
 #: include/views/configuration.services.edit.php:259
 #: include/views/configuration.services.edit.php:307
 #: include/views/js/monitoring.sysmaps.js.php:748 report4.php:191
-#: services.php:47 services.php:177
+#: services.php:47 services.php:182
 msgid "From"
 msgstr "自從"
 
@@ -6888,7 +6888,7 @@ msgstr ""
 msgid "Go back to %1$s"
 msgstr ""
 
-#: jsLoader.php:346
+#: jsLoader.php:345
 msgid "Go to"
 msgstr "到"
 
@@ -7000,12 +7000,12 @@ msgstr ""
 msgid "Graph added"
 msgstr "圖形已新增"
 
-#: graphs.php:391
+#: graphs.php:400
 msgid "Graph copied"
 msgid_plural "Graphs copied"
 msgstr[0] ""
 
-#: graphs.php:283
+#: graphs.php:292
 msgid "Graph deleted"
 msgstr "圖形已删除"
 
@@ -7042,7 +7042,7 @@ msgstr "含模板項目的圖形原型\"%1$s\"不能包含其它主機的項目.
 msgid "Graph prototype added"
 msgstr ""
 
-#: graphs.php:275
+#: graphs.php:284
 msgid "Graph prototype deleted"
 msgstr ""
 
@@ -7064,7 +7064,7 @@ msgstr ""
 msgid "Graph prototypes"
 msgstr "圖形原型"
 
-#: graphs.php:316
+#: graphs.php:325
 msgid "Graph prototypes deleted"
 msgstr ""
 
@@ -7081,7 +7081,7 @@ msgstr "圖形總合"
 msgid "Graph type"
 msgstr "圖形類別"
 
-#: graphs.php:242 graphs.php:296
+#: graphs.php:242 graphs.php:305
 msgid "Graph updated"
 msgstr "圖形已更新"
 
@@ -7091,7 +7091,7 @@ msgstr "圖形已更新"
 msgid "Graph with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:838
+#: include/classes/api/services/CGraphGeneral.php:831
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "名為\"%1$s\"的圖形已經存在於圖形或圖形原型中."
@@ -7113,7 +7113,7 @@ msgstr "同名但不同類型的圖形已存在."
 #: app/views/monitoring.charts.view.php:138 app/views/popup.import.php:38
 #: app/views/search.php:89 app/views/search.php:96 app/views/search.php:137
 #: app/views/search.php:142 app/views/search.php:316 app/views/search.php:321
-#: graphs.php:485 include/html.inc.php:356
+#: graphs.php:494 include/html.inc.php:356
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:44
 #: include/views/configuration.host.discovery.list.php:195
@@ -7124,11 +7124,11 @@ msgstr "同名但不同類型的圖形已存在."
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:347
+#: include/views/inventory.host.view.php:217 jsLoader.php:346
 msgid "Graphs"
 msgstr "圖形"
 
-#: graphs.php:333
+#: graphs.php:342
 msgid "Graphs deleted"
 msgstr "圖形已删除"
 
@@ -7328,7 +7328,7 @@ msgstr ""
 msgid "Hidden"
 msgstr "隱藏的"
 
-#: jsLoader.php:367
+#: jsLoader.php:366
 msgid "Hide debug"
 msgstr ""
 
@@ -7380,7 +7380,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:348
+#: jsLoader.php:347
 msgid "History"
 msgstr "歷史記錄"
 
@@ -7468,7 +7468,7 @@ msgstr "横向對齊"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:255 jsLoader.php:349 report2.php:506
+#: jsLoader.php:255 jsLoader.php:348 report2.php:506
 #, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
@@ -7489,7 +7489,7 @@ msgstr "主機 \"%1$s\" 已存在."
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:500
+#: include/classes/api/services/CProxy.php:493
 #, c-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "主機\"%1$s\"是以系統代理程式\"%2$s\"來監控的."
@@ -8044,19 +8044,19 @@ msgstr ""
 msgid "Image"
 msgstr "圖片"
 
-#: include/classes/api/services/CImage.php:468
-#: include/classes/api/services/CImage.php:481
-#: include/classes/api/services/CImage.php:526
-#: include/classes/api/services/CImage.php:544
+#: include/classes/api/services/CImage.php:450
+#: include/classes/api/services/CImage.php:463
+#: include/classes/api/services/CImage.php:513
+#: include/classes/api/services/CImage.php:531
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr ""
 
-#: app/controllers/CControllerImageCreate.php:123
+#: app/controllers/CControllerImageCreate.php:125
 msgid "Image added"
 msgstr "圖片已新增"
 
-#: app/controllers/CControllerImageDelete.php:62
+#: app/controllers/CControllerImageDelete.php:63
 msgid "Image deleted"
 msgstr "圖片已删除"
 
@@ -8064,18 +8064,18 @@ msgstr "圖片已删除"
 msgid "Image label type"
 msgstr "圖片標示類型"
 
-#: include/classes/api/services/CImage.php:228
+#: include/classes/api/services/CImage.php:229
 #, c-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr ""
 
-#: include/classes/api/services/CImage.php:561
+#: include/classes/api/services/CImage.php:548
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
 msgstr ""
 
-#: app/controllers/CControllerImageUpdate.php:135
+#: app/controllers/CControllerImageUpdate.php:137
 msgid "Image updated"
 msgstr "圖片已更新"
 
@@ -8231,49 +8231,49 @@ msgstr ""
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:655
-#: include/classes/api/services/CMap.php:1138
+#: include/classes/api/services/CMap.php:654
+#: include/classes/api/services/CMap.php:1137
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:803
-#: include/classes/api/services/CMap.php:1271
+#: include/classes/api/services/CMap.php:802
+#: include/classes/api/services/CMap.php:1270
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:728
-#: include/classes/api/services/CMap.php:1197
+#: include/classes/api/services/CMap.php:727
+#: include/classes/api/services/CMap.php:1196
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:674
-#: include/classes/api/services/CMap.php:1144
+#: include/classes/api/services/CMap.php:673
+#: include/classes/api/services/CMap.php:1143
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CService.php:1104
+#: include/classes/api/services/CService.php:1085
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "不正確的相依性\"soft\"欄位值予服務\"%1$s\"."
 
-#: include/classes/api/services/CMap.php:649
-#: include/classes/api/services/CMap.php:1132
+#: include/classes/api/services/CMap.php:648
+#: include/classes/api/services/CMap.php:1131
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:876
-#: include/classes/api/services/CMap.php:883
-#: include/classes/api/services/CMap.php:899
-#: include/classes/api/services/CMap.php:909
-#: include/classes/api/services/CMap.php:1344
-#: include/classes/api/services/CMap.php:1353
-#: include/classes/api/services/CMap.php:1370
-#: include/classes/api/services/CMap.php:1382
+#: include/classes/api/services/CMap.php:875
+#: include/classes/api/services/CMap.php:882
+#: include/classes/api/services/CMap.php:898
+#: include/classes/api/services/CMap.php:908
+#: include/classes/api/services/CMap.php:1343
+#: include/classes/api/services/CMap.php:1352
+#: include/classes/api/services/CMap.php:1369
+#: include/classes/api/services/CMap.php:1381
 #, c-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "不正確的%1$s標示類型值予拓墣圖\"%2$s\"."
@@ -8299,7 +8299,7 @@ msgstr ""
 msgid "Incorrect Vault token."
 msgstr ""
 
-#: include/classes/api/services/CService.php:927
+#: include/classes/api/services/CService.php:910
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "不正確的可接受SLA予服務\"%1$s\"."
@@ -8408,7 +8408,7 @@ msgstr "不正確的動作操作用戶. 用戶不存在或您沒有存取權."
 msgid "Incorrect action operationid."
 msgstr "不正確的動作操作ID(operationid)."
 
-#: include/classes/api/services/CService.php:894
+#: include/classes/api/services/CService.php:877
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "不正確的服務\"%1$s\"的演算法."
@@ -8483,13 +8483,13 @@ msgstr "不正確的自變數傳入方程式"
 #: include/classes/api/services/CMapElement.php:740
 #: include/classes/api/services/CMapElement.php:775
 #: include/classes/api/services/CMapElement.php:800
-#: include/classes/api/services/CMap.php:698
-#: include/classes/api/services/CMap.php:772
-#: include/classes/api/services/CMap.php:986
-#: include/classes/api/services/CMap.php:1059
-#: include/classes/api/services/CMap.php:1167
-#: include/classes/api/services/CMap.php:1240
-#: include/classes/api/services/CMap.php:1460
+#: include/classes/api/services/CMap.php:697
+#: include/classes/api/services/CMap.php:771
+#: include/classes/api/services/CMap.php:985
+#: include/classes/api/services/CMap.php:1058
+#: include/classes/api/services/CMap.php:1166
+#: include/classes/api/services/CMap.php:1239
+#: include/classes/api/services/CMap.php:1459
 #: include/classes/api/services/CMediatype.php:189
 #: include/classes/api/services/CMediatype.php:485
 msgid "Incorrect arguments passed to function."
@@ -8499,7 +8499,7 @@ msgstr "不正確的自變數傳給方程式"
 msgid "Incorrect bulk value for interface."
 msgstr ""
 
-#: include/classes/api/services/CService.php:911
+#: include/classes/api/services/CService.php:894
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "不正確的計算SLA值予服務\"%1$s\"."
@@ -8511,8 +8511,8 @@ msgstr "不正確的計算SLA值予服務\"%1$s\"."
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:665
-#: include/classes/api/services/CProxy.php:781
+#: include/classes/api/services/CProxy.php:658
+#: include/classes/api/services/CProxy.php:774
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr ""
@@ -8586,7 +8586,7 @@ msgstr ""
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "不正確的欄位名稱\"%1$s\"或用於資料表\"%2$s\"的where陳述式的值."
 
-#: include/classes/api/services/CMap.php:606
+#: include/classes/api/services/CMap.php:605
 msgid "Incorrect fields for sysmap."
 msgstr ""
 
@@ -8660,12 +8660,12 @@ msgstr "不正確的圖片索引"
 #: include/classes/api/services/CHost.php:1014
 #: include/classes/api/services/CHost.php:1917
 #: include/classes/api/services/CHost.php:2116
-#: include/classes/api/services/CImage.php:460
-#: include/classes/api/services/CImage.php:506
-#: include/classes/api/services/CProxy.php:660
-#: include/classes/api/services/CProxy.php:726
-#: include/classes/api/services/CProxy.php:770
-#: include/classes/api/services/CProxy.php:792
+#: include/classes/api/services/CImage.php:442
+#: include/classes/api/services/CImage.php:487
+#: include/classes/api/services/CProxy.php:653
+#: include/classes/api/services/CProxy.php:719
+#: include/classes/api/services/CProxy.php:763
+#: include/classes/api/services/CProxy.php:785
 #: include/classes/api/services/CTemplate.php:489
 #: include/classes/api/services/CTemplate.php:662
 #: include/classes/api/services/CTrigger.php:803
@@ -8692,7 +8692,7 @@ msgstr ""
 msgid "Incorrect inventory mode in action operation."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:304
+#: include/classes/api/services/CGraphGeneral.php:297
 msgid "Incorrect item for axis value."
 msgstr "不正確的項目予軸值."
 
@@ -8723,7 +8723,7 @@ msgstr "不正確的維修-日期必須在1970.01.01和2038.01.18之間"
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "不正確的維修期間(至少要5分鐘)"
 
-#: include/classes/api/services/CMap.php:1043
+#: include/classes/api/services/CMap.php:1042
 msgid "Incorrect map ID."
 msgstr ""
 
@@ -8771,12 +8771,12 @@ msgstr "不正確的條件參數."
 msgid "Incorrect parameters for maintenance."
 msgstr "予維修不正確的參數."
 
-#: include/classes/api/services/CService.php:969
+#: include/classes/api/services/CService.php:952
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "予服務\"%1$s\"的不正確上層"
 
-#: include/classes/api/services/CService.php:972
+#: include/classes/api/services/CService.php:955
 msgid "Incorrect parent service."
 msgstr "不正確的上層服務."
 
@@ -8809,7 +8809,7 @@ msgstr "不正確的服務開始時間."
 msgid "Incorrect service time type."
 msgstr "不正確的服務時間類型."
 
-#: include/classes/api/services/CService.php:942
+#: include/classes/api/services/CService.php:925
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr ""
@@ -8825,7 +8825,7 @@ msgstr ""
 msgid "Incorrect status for host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CService.php:990
+#: include/classes/api/services/CService.php:973
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "予服務\"%1$s\"不正確的狀態."
@@ -8834,7 +8834,7 @@ msgstr "予服務\"%1$s\"不正確的狀態."
 msgid "Incorrect templated web scenario step count."
 msgstr ""
 
-#: include/classes/api/services/CService.php:955
+#: include/classes/api/services/CService.php:938
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "不正確的觸發器ID予服務\"%1$s\"."
@@ -8883,14 +8883,14 @@ msgstr ""
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:764
-#: include/classes/api/services/CMap.php:1232
+#: include/classes/api/services/CMap.php:763
+#: include/classes/api/services/CMap.php:1231
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:835
-#: include/classes/api/services/CMap.php:1302
+#: include/classes/api/services/CMap.php:834
+#: include/classes/api/services/CMap.php:1301
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
 msgstr ""
@@ -9164,10 +9164,10 @@ msgstr ""
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
 #: include/classes/api/services/CMapElement.php:169
-#: include/classes/api/services/CMap.php:682
-#: include/classes/api/services/CMap.php:688
-#: include/classes/api/services/CMap.php:1151
-#: include/classes/api/services/CMap.php:1157
+#: include/classes/api/services/CMap.php:681
+#: include/classes/api/services/CMap.php:687
+#: include/classes/api/services/CMap.php:1150
+#: include/classes/api/services/CMap.php:1156
 #: include/classes/api/services/CMediatype.php:377
 #: include/classes/api/services/CMediatype.php:387
 #: include/classes/api/services/CMediatype.php:396
@@ -9186,14 +9186,14 @@ msgstr ""
 #: include/classes/api/services/CMediatype.php:762
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CMediatype.php:800
+#: include/classes/api/services/CProxy.php:592
 #: include/classes/api/services/CProxy.php:599
-#: include/classes/api/services/CProxy.php:606
-#: include/classes/api/services/CProxy.php:619
-#: include/classes/api/services/CProxy.php:625
-#: include/classes/api/services/CProxy.php:704
-#: include/classes/api/services/CProxy.php:712
-#: include/classes/api/services/CProxy.php:833
-#: include/classes/api/services/CProxy.php:841
+#: include/classes/api/services/CProxy.php:612
+#: include/classes/api/services/CProxy.php:618
+#: include/classes/api/services/CProxy.php:697
+#: include/classes/api/services/CProxy.php:705
+#: include/classes/api/services/CProxy.php:823
+#: include/classes/api/services/CProxy.php:831
 #: include/classes/api/services/CSettings.php:312
 #: include/classes/api/services/CTemplate.php:449
 #: include/classes/api/services/CTriggerGeneral.php:148
@@ -9267,12 +9267,12 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:631
+#: include/classes/api/services/CProxy.php:624
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:687
-#: include/classes/api/services/CProxy.php:822
+#: include/classes/api/services/CProxy.php:680
+#: include/classes/api/services/CProxy.php:815
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr ""
@@ -9359,7 +9359,7 @@ msgid "Insert"
 msgstr "插入"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:341
 msgid "Insert expression"
 msgstr ""
 
@@ -9438,8 +9438,8 @@ msgid "Internal data storage period"
 msgstr ""
 
 #: include/classes/api/helpers/CApiHostHelper.php:90
-#: include/classes/api/services/CGraphGeneral.php:529
-#: include/classes/api/services/CGraphGeneral.php:712
+#: include/classes/api/services/CGraphGeneral.php:522
+#: include/classes/api/services/CGraphGeneral.php:705
 #: include/classes/api/services/CTriggerGeneral.php:1035
 #: include/classes/api/services/CTriggerGeneral.php:1162
 #: include/classes/api/services/CTriggerGeneral.php:1267
@@ -9570,9 +9570,9 @@ msgstr ""
 msgid "Invalid macro \"%1$s\": %2$s."
 msgstr ""
 
-#: include/classes/api/services/CService.php:216
-#: include/classes/api/services/CService.php:400
-#: include/classes/api/services/CService.php:1233
+#: include/classes/api/services/CService.php:212
+#: include/classes/api/services/CService.php:383
+#: include/classes/api/services/CService.php:1214
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
 msgstr "無效的方法參數."
@@ -9598,8 +9598,8 @@ msgstr "無效的方法參數."
 #: include/classes/api/services/CDiscoveryRule.php:1992
 #: include/classes/api/services/CDiscoveryRule.php:2010
 #: include/classes/api/services/CDiscoveryRule.php:2018
-#: include/classes/api/services/CGraphGeneral.php:605
-#: include/classes/api/services/CGraphGeneral.php:728
+#: include/classes/api/services/CGraphGeneral.php:598
+#: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1672
 #: include/classes/api/services/CHostPrototype.php:1677
@@ -9834,7 +9834,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:349
 msgid "Inventory"
 msgstr "資產記錄"
 
@@ -10020,7 +10020,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:372
+#: jsLoader.php:371
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10388,11 +10388,11 @@ msgstr ""
 msgid "Last check"
 msgstr "最近檢查記錄"
 
-#: jsLoader.php:353
+#: jsLoader.php:352
 msgid "Last hour graph"
 msgstr "最近一小時"
 
-#: jsLoader.php:354
+#: jsLoader.php:353
 msgid "Last month graph"
 msgstr "上月圖形"
 
@@ -10422,7 +10422,7 @@ msgstr ""
 msgid "Last value"
 msgstr "最新數據"
 
-#: jsLoader.php:355
+#: jsLoader.php:354
 msgid "Last week graph"
 msgstr "仩週圖形"
 
@@ -10435,11 +10435,11 @@ msgstr "仩週圖形"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:351
+#: include/views/inventory.host.view.php:149 jsLoader.php:350
 msgid "Latest data"
 msgstr "最新數據"
 
-#: jsLoader.php:352
+#: jsLoader.php:351
 msgid "Latest values"
 msgstr "最新數據"
 
@@ -10537,14 +10537,14 @@ msgstr "連結指示器"
 msgid "Link new templates"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:1006
-#: include/classes/api/services/CMap.php:1476
+#: include/classes/api/services/CMap.php:1005
+#: include/classes/api/services/CMap.php:1475
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "連結欄位selementid1是為拓墣圖\"%2$s\"指向不存在的拓墣圖 selement ID \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:1014
-#: include/classes/api/services/CMap.php:1484
+#: include/classes/api/services/CMap.php:1013
+#: include/classes/api/services/CMap.php:1483
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "連結欄位selementid2是為拓墣圖\"%2$s\"指向不存在的拓墣圖 selement ID \"%1$s\"."
@@ -10963,16 +10963,16 @@ msgstr ""
 msgid "Map"
 msgstr "拓墣圖"
 
-#: include/classes/api/services/CMap.php:627
-#: include/classes/api/services/CMap.php:1092
+#: include/classes/api/services/CMap.php:626
+#: include/classes/api/services/CMap.php:1091
 #, c-format
 msgid "Map \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:737
-#: include/classes/api/services/CMap.php:812
-#: include/classes/api/services/CMap.php:1205
-#: include/classes/api/services/CMap.php:1279
+#: include/classes/api/services/CMap.php:736
+#: include/classes/api/services/CMap.php:811
+#: include/classes/api/services/CMap.php:1204
+#: include/classes/api/services/CMap.php:1278
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
 msgstr ""
@@ -11006,7 +11006,7 @@ msgstr ""
 msgid "Map label type"
 msgstr "拓樸圖標示類型"
 
-#: include/classes/api/services/CMap.php:1062
+#: include/classes/api/services/CMap.php:1061
 msgid "Map name cannot be empty."
 msgstr ""
 
@@ -11015,8 +11015,8 @@ msgstr ""
 msgid "Map navigation tree"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:662
-#: include/classes/api/services/CMap.php:1116
+#: include/classes/api/services/CMap.php:661
+#: include/classes/api/services/CMap.php:1115
 msgid "Map owner cannot be empty."
 msgstr ""
 
@@ -11420,8 +11420,8 @@ msgstr "分"
 msgid "Missing \"gitemid\" field for item."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:469
-#: include/classes/api/services/CGraphGeneral.php:655
+#: include/classes/api/services/CGraphGeneral.php:462
+#: include/classes/api/services/CGraphGeneral.php:648
 msgid "Missing \"itemid\" field for item."
 msgstr "缺少項目的\"itemid\"欄位"
 
@@ -11582,7 +11582,7 @@ msgstr ""
 msgid "More than 10 minutes"
 msgstr "10分鐘以上"
 
-#: include/classes/api/services/CGraphGeneral.php:851
+#: include/classes/api/services/CGraphGeneral.php:844
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "於主機中多於一個名為\"%1$s\"的圖形."
@@ -11813,11 +11813,11 @@ msgstr ""
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr ""
 
-#: sysmaps.php:214
+#: sysmaps.php:215
 msgid "Network map added"
 msgstr "網路拓墣圖已新增"
 
-#: sysmaps.php:262
+#: sysmaps.php:269
 msgid "Network map deleted"
 msgstr "網路拓墣圖已刪除"
 
@@ -11987,7 +11987,7 @@ msgstr ""
 msgid "No \"%1$s\" given for graph."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:1041
+#: include/classes/api/services/CMap.php:1040
 #, c-format
 msgid "No \"%1$s\" given for map."
 msgstr ""
@@ -12137,7 +12137,7 @@ msgstr "沒有圖片"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:370
 msgid "No interface found"
 msgstr "沒有找到介面"
 
@@ -12145,8 +12145,8 @@ msgstr "沒有找到介面"
 msgid "No interface found."
 msgstr "沒有找到介面."
 
-#: include/classes/api/services/CProxy.php:696
-#: include/classes/api/services/CProxy.php:879
+#: include/classes/api/services/CProxy.php:689
+#: include/classes/api/services/CProxy.php:869
 #, c-format
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr ""
@@ -12290,10 +12290,10 @@ msgstr ""
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CIconMap.php:285
 #: include/classes/api/services/CIconMap.php:528
-#: include/classes/api/services/CImage.php:364
-#: include/classes/api/services/CImage.php:444
-#: include/classes/api/services/CImage.php:497
-#: include/classes/api/services/CImage.php:513
+#: include/classes/api/services/CImage.php:354
+#: include/classes/api/services/CImage.php:426
+#: include/classes/api/services/CImage.php:478
+#: include/classes/api/services/CImage.php:500
 #: include/classes/api/services/CItemGeneral.php:221
 #: include/classes/api/services/CItemGeneral.php:329
 #: include/classes/api/services/CItemGeneral.php:344
@@ -12308,20 +12308,20 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:777
 #: include/classes/api/services/CMapElement.php:189
 #: include/classes/api/services/CMapElement.php:319
-#: include/classes/api/services/CMap.php:575
-#: include/classes/api/services/CMap.php:990
-#: include/classes/api/services/CMap.php:1052
-#: include/classes/api/services/CMap.php:1611
-#: include/classes/api/services/CMap.php:2056
-#: include/classes/api/services/CMap.php:2118
+#: include/classes/api/services/CMap.php:574
+#: include/classes/api/services/CMap.php:989
+#: include/classes/api/services/CMap.php:1051
+#: include/classes/api/services/CMap.php:1610
+#: include/classes/api/services/CMap.php:2048
+#: include/classes/api/services/CMap.php:2110
 #: include/classes/api/services/CMediatype.php:478
 #: include/classes/api/services/CModule.php:231
 #: include/classes/api/services/CProxy.php:186
-#: include/classes/api/services/CProxy.php:281
-#: include/classes/api/services/CProxy.php:456
-#: include/classes/api/services/CProxy.php:740
-#: include/classes/api/services/CProxy.php:774
-#: include/classes/api/services/CProxy.php:864
+#: include/classes/api/services/CProxy.php:276
+#: include/classes/api/services/CProxy.php:449
+#: include/classes/api/services/CProxy.php:733
+#: include/classes/api/services/CProxy.php:767
+#: include/classes/api/services/CProxy.php:854
 #: include/classes/api/services/CReport.php:925
 #: include/classes/api/services/CRole.php:388
 #: include/classes/api/services/CRole.php:805
@@ -12330,8 +12330,8 @@ msgstr ""
 #: include/classes/api/services/CScript.php:1043
 #: include/classes/api/services/CScript.php:1060
 #: include/classes/api/services/CScript.php:1071
-#: include/classes/api/services/CService.php:1017
-#: include/classes/api/services/CService.php:1043
+#: include/classes/api/services/CService.php:1000
+#: include/classes/api/services/CService.php:1024
 #: include/classes/api/services/CSettings.php:264
 #: include/classes/api/services/CTask.php:430
 #: include/classes/api/services/CTask.php:477
@@ -12394,7 +12394,7 @@ msgstr "沒有指定給動作操作命令的腳本."
 msgid "No target selected"
 msgstr "沒有選擇目標"
 
-#: graphs.php:396 items.php:1058
+#: graphs.php:405 items.php:1058
 msgid "No target selected."
 msgstr "沒有已選的目標"
 
@@ -12807,7 +12807,7 @@ msgstr "關"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:382
 #: report2.php:506
 msgid "Ok"
 msgstr "正常"
@@ -12887,8 +12887,8 @@ msgstr ""
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:666
-#: include/classes/api/services/CMap.php:1120
+#: include/classes/api/services/CMap.php:665
+#: include/classes/api/services/CMap.php:1119
 msgid "Only administrators can set map owner."
 msgstr ""
 
@@ -13410,7 +13410,7 @@ msgstr ""
 msgid "PSK identity"
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:637
+#: include/classes/api/services/CProxy.php:630
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr ""
@@ -13497,7 +13497,7 @@ msgstr ""
 msgid "Parse"
 msgstr ""
 
-#: include/classes/api/services/CImage.php:218
+#: include/classes/api/services/CImage.php:219
 #, c-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "解析SQL錯誤[%1$s]於[%2$s]之中."
@@ -14007,7 +14007,7 @@ msgstr "問題, 如果至少一個下層有一個問題"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:355 report2.php:506
 msgid "Problems"
 msgstr "問題"
 
@@ -14075,8 +14075,8 @@ msgstr "系統代理程式"
 msgid "Proxy"
 msgstr "系統代理程式"
 
-#: include/classes/api/services/CProxy.php:679
-#: include/classes/api/services/CProxy.php:808
+#: include/classes/api/services/CProxy.php:672
+#: include/classes/api/services/CProxy.php:801
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
 msgstr ""
@@ -14086,17 +14086,17 @@ msgstr ""
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "主機\"%2$s\"的系統代理程式\"%1$s\"不存在."
 
-#: include/classes/api/services/CProxy.php:523
+#: include/classes/api/services/CProxy.php:516
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:480
+#: include/classes/api/services/CProxy.php:473
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "系統代理程式\"%1$s\"是用在探索規則\"%2$s\"上."
 
-#: app/controllers/CControllerProxyCreate.php:113
+#: app/controllers/CControllerProxyCreate.php:119
 msgid "Proxy added"
 msgstr "系統代理程式已新增"
 
@@ -14113,7 +14113,7 @@ msgstr[0] "系統代理程式已刪除"
 msgid "Proxy interface creation failed."
 msgstr "系統代理程式介面創建失敗"
 
-#: include/classes/api/services/CProxy.php:405
+#: include/classes/api/services/CProxy.php:400
 msgid "Proxy interface update failed."
 msgstr "系統代理程式介面更新失敗"
 
@@ -14125,7 +14125,7 @@ msgstr "系統代理程式模式"
 msgid "Proxy name"
 msgstr "系統代理程式名稱"
 
-#: app/controllers/CControllerProxyUpdate.php:110
+#: app/controllers/CControllerProxyUpdate.php:116
 msgid "Proxy updated"
 msgstr "系統代理程式已新增"
 
@@ -15367,7 +15367,7 @@ msgstr "脚本已更新"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:356
 msgid "Scripts"
 msgstr "脚本"
 
@@ -15586,27 +15586,27 @@ msgstr "伺服器時間"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/popup.services.php:46 include/actions.inc.php:75
-#: include/views/configuration.services.edit.php:356 services.php:347
+#: include/views/configuration.services.edit.php:356 services.php:352
 #: srv_status.php:144
 msgid "Service"
 msgstr "服務"
 
-#: include/classes/api/services/CService.php:1074
+#: include/classes/api/services/CService.php:1055
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "服務\"%1$s\"不能被刪除, 因為它相依於另一個服務."
 
-#: include/classes/api/services/CService.php:1093
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "服務\"%1$s\"不能相依於自己."
 
-#: include/classes/api/services/CService.php:1168
+#: include/classes/api/services/CService.php:1149
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "服務 \"%1$s\"不能被連結到一個觸發器且同時有相依的服務."
 
-#: include/classes/api/services/CService.php:1145
+#: include/classes/api/services/CService.php:1126
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "服務\"%1$s\"已經緊緊連結到一個不同的服務."
@@ -15616,15 +15616,15 @@ msgstr "服務\"%1$s\"已經緊緊連結到一個不同的服務."
 msgid "Service availability report"
 msgstr ""
 
-#: include/classes/api/services/CService.php:977
+#: include/classes/api/services/CService.php:960
 msgid "Service cannot be parent and child at the same time."
 msgstr "服務不能同時為上層與下層"
 
-#: services.php:151
+#: services.php:153
 msgid "Service created"
 msgstr ""
 
-#: services.php:107
+#: services.php:108
 msgid "Service deleted"
 msgstr "服務已删除"
 
@@ -15652,7 +15652,7 @@ msgstr "服務次數"
 msgid "Service type"
 msgstr "服務類型"
 
-#: services.php:145
+#: services.php:146
 msgid "Service updated"
 msgstr "服務已更新"
 
@@ -15668,7 +15668,7 @@ msgstr "服務已更新"
 msgid "Services"
 msgstr "服務"
 
-#: include/classes/api/services/CService.php:1215
+#: include/classes/api/services/CService.php:1196
 msgid "Services form a circular dependency."
 msgstr "服務形成了一個循環式迴圈."
 
@@ -15702,7 +15702,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr ""
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:388
 msgid "Set new value"
 msgstr ""
 
@@ -15792,13 +15792,13 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:342
 msgid "Sharing"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:718
-#: include/classes/api/services/CMap.php:1187
-#: include/classes/api/services/CMap.php:1261
+#: include/classes/api/services/CMap.php:717
+#: include/classes/api/services/CMap.php:1186
+#: include/classes/api/services/CMap.php:1260
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr ""
@@ -16258,7 +16258,7 @@ msgstr ""
 msgid "Status"
 msgstr "狀態"
 
-#: app/views/popup.services.php:47 services.php:349
+#: app/views/popup.services.php:47 services.php:354
 msgid "Status calculation"
 msgstr "狀態統計"
 
@@ -16404,7 +16404,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr ""
 
-#: jsLoader.php:358
+#: jsLoader.php:357
 msgid "Submap"
 msgstr "子拓墣圖"
 
@@ -16956,13 +16956,13 @@ msgstr ""
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
-#: include/classes/api/services/CImage.php:383
+#: include/classes/api/services/CImage.php:373
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] ""
 
-#: include/classes/api/services/CImage.php:409
+#: include/classes/api/services/CImage.php:399
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -17074,7 +17074,7 @@ msgstr "週四"
 #: app/views/report.services.php:82
 #: include/views/configuration.services.edit.php:266
 #: include/views/configuration.services.edit.php:321 report4.php:191
-#: services.php:48 services.php:186
+#: services.php:48 services.php:191
 msgid "Till"
 msgstr "直到"
 
@@ -17171,7 +17171,7 @@ msgstr "時間戳"
 msgid "To"
 msgstr "到"
 
-#: jsLoader.php:370
+#: jsLoader.php:369
 msgid "To set a host interface select a single item type for all items"
 msgstr "要設定一個主機介面, 選擇一個單一的項目類型給所有的項目"
 
@@ -17303,8 +17303,8 @@ msgstr "趨勢"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
-#: services.php:350
+#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:358
+#: services.php:355
 msgid "Trigger"
 msgstr "觸發器"
 
@@ -17474,11 +17474,11 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "觸發器示警度"
 
-#: jsLoader.php:344
+#: jsLoader.php:343
 msgid "Trigger status \"OK\""
 msgstr ""
 
-#: jsLoader.php:345
+#: jsLoader.php:344
 msgid "Trigger status \"Problem\""
 msgstr ""
 
@@ -17644,7 +17644,7 @@ msgstr "未知的"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:359
 msgid "URL"
 msgstr "URL"
 
@@ -17669,8 +17669,8 @@ msgstr "URL C"
 msgid "URL is not properly encoded."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:961
-#: include/classes/api/services/CMap.php:1436
+#: include/classes/api/services/CMap.php:960
+#: include/classes/api/services/CMap.php:1435
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr ""
@@ -17683,14 +17683,14 @@ msgstr ""
 msgid "URL parameter name is empty."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:955
-#: include/classes/api/services/CMap.php:1430
+#: include/classes/api/services/CMap.php:954
+#: include/classes/api/services/CMap.php:1429
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:360
 msgid "URLs"
 msgstr "URLs"
 
@@ -18212,8 +18212,8 @@ msgstr[0] ""
 msgid "User group for database down message"
 msgstr "用於資料庫斷線訊息的用戶群組"
 
-#: include/classes/api/services/CMap.php:784
-#: include/classes/api/services/CMap.php:1252
+#: include/classes/api/services/CMap.php:783
+#: include/classes/api/services/CMap.php:1251
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr ""
@@ -18324,8 +18324,8 @@ msgstr ""
 msgid "User settings"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:709
-#: include/classes/api/services/CMap.php:1178
+#: include/classes/api/services/CMap.php:708
+#: include/classes/api/services/CMap.php:1177
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr ""
@@ -18705,20 +18705,20 @@ msgstr ""
 msgid "Value"
 msgstr "ֵ值"
 
-#: include/classes/api/services/CMap.php:930
-#: include/classes/api/services/CMap.php:1405
+#: include/classes/api/services/CMap.php:929
+#: include/classes/api/services/CMap.php:1404
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "參數\"grid_align\"的值\"%1$s\"是無效的. 可用的是: \"%2$s\"和\"%3$s\""
 
-#: include/classes/api/services/CMap.php:941
-#: include/classes/api/services/CMap.php:1416
+#: include/classes/api/services/CMap.php:940
+#: include/classes/api/services/CMap.php:1415
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:920
-#: include/classes/api/services/CMap.php:1395
+#: include/classes/api/services/CMap.php:919
+#: include/classes/api/services/CMap.php:1394
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr ""
@@ -18951,7 +18951,7 @@ msgstr "我們很抱歉, 已經到了可記住的最大可能的組件數量."
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:362
+#: include/views/inventory.host.view.php:219 jsLoader.php:361
 msgid "Web"
 msgstr "Web"
 
@@ -19128,7 +19128,7 @@ msgstr "寫"
 msgid "Wrong Module.php class name for module located at %1$s."
 msgstr ""
 
-#: include/classes/api/services/CService.php:415
+#: include/classes/api/services/CService.php:398
 #, c-format
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "錯誤的服務\"%1$s\"其相依關係欄位."
@@ -19150,19 +19150,19 @@ msgid "Wrong fields for map link."
 msgstr "拓墣圖連結的錯誤欄位"
 
 #: include/classes/api/services/CService.php:135
-#: include/classes/api/services/CService.php:249
+#: include/classes/api/services/CService.php:244
 #, c-format
 msgid "Wrong fields for service \"%1$s\"."
 msgstr "錯誤的服務欄位\"%1$s\"."
 
-#: include/classes/api/services/CService.php:495
+#: include/classes/api/services/CService.php:478
 #, c-format
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "錯誤的服務\"%1$s\"其時間欄位."
 
 #: include/classes/api/services/CMapElement.php:74
-#: include/classes/api/services/CMap.php:977
-#: include/classes/api/services/CMap.php:1452
+#: include/classes/api/services/CMap.php:976
+#: include/classes/api/services/CMap.php:1451
 msgid "Wrong value for url field."
 msgstr ""
 
@@ -19232,7 +19232,7 @@ msgstr "縱軸最大值"
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:328
+#: include/classes/api/services/CGraphGeneral.php:321
 #: include/classes/graphdraw/CLineGraphDraw.php:1872
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y axis MAX value must be greater than Y axis MIN value."
@@ -19937,8 +19937,8 @@ msgstr ""
 #: include/classes/api/services/CMediatype.php:731
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:619
-#: include/classes/api/services/CProxy.php:625
+#: include/classes/api/services/CProxy.php:612
+#: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:470
@@ -20285,13 +20285,13 @@ msgctxt "XML time format"
 msgid "hh.mm"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:853
-#: include/classes/api/services/CMap.php:1321
+#: include/classes/api/services/CMap.php:852
+#: include/classes/api/services/CMap.php:1320
 msgid "host"
 msgstr "主機"
 
-#: include/classes/api/services/CMap.php:849
-#: include/classes/api/services/CMap.php:1317
+#: include/classes/api/services/CMap.php:848
+#: include/classes/api/services/CMap.php:1316
 msgid "host group"
 msgstr "主機群組"
 
@@ -20305,13 +20305,13 @@ msgstr ""
 msgid "hostid of dependent item and master item should match"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:844
-#: include/classes/api/services/CMap.php:1311
+#: include/classes/api/services/CMap.php:843
+#: include/classes/api/services/CMap.php:1310
 msgid "icon"
 msgstr "圖示"
 
-#: include/classes/api/services/CMap.php:865
-#: include/classes/api/services/CMap.php:1333
+#: include/classes/api/services/CMap.php:864
+#: include/classes/api/services/CMap.php:1332
 msgid "image"
 msgstr "圖片"
 
@@ -20553,7 +20553,7 @@ msgstr "低階探索規則"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
+#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:378
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
@@ -20590,8 +20590,8 @@ msgstr ""
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CMap.php:861
-#: include/classes/api/services/CMap.php:1329
+#: include/classes/api/services/CMap.php:860
+#: include/classes/api/services/CMap.php:1328
 msgid "map"
 msgstr "拓墣圖"
 
@@ -20848,7 +20848,7 @@ msgstr ""
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:389
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21006,8 +21006,8 @@ msgstr "簡述"
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMediatype.php:793
-#: include/classes/api/services/CProxy.php:705
-#: include/classes/api/services/CProxy.php:834
+#: include/classes/api/services/CProxy.php:698
+#: include/classes/api/services/CProxy.php:824
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:579
@@ -21188,8 +21188,8 @@ msgstr ""
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:857
-#: include/classes/api/services/CMap.php:1325 include/events.inc.php:34
+#: include/classes/api/services/CMap.php:856
+#: include/classes/api/services/CMap.php:1324 include/events.inc.php:34
 #: include/events.inc.php:59
 msgid "trigger"
 msgstr "觸發器"
@@ -21261,8 +21261,8 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1702
 #: include/classes/api/services/CDiscoveryRule.php:1725
 #: include/classes/api/services/CDiscoveryRule.php:1744
-#: include/classes/api/services/CGraphGeneral.php:606
-#: include/classes/api/services/CGraphGeneral.php:728
+#: include/classes/api/services/CGraphGeneral.php:599
+#: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1719
 #: include/classes/api/services/CHttpTest.php:372
@@ -21300,8 +21300,8 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
+#: include/classes/api/services/CProxy.php:593
 #: include/classes/api/services/CProxy.php:600
-#: include/classes/api/services/CProxy.php:607
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""
@@ -21358,7 +21358,7 @@ msgstr ""
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:390
 msgid "value"
 msgstr "值"
 
@@ -21444,10 +21444,10 @@ msgstr ""
 #: include/classes/api/services/CHost.php:2001
 #: include/classes/api/services/CHost.php:2156
 #: include/classes/api/services/CMapElement.php:86
-#: include/classes/api/services/CMap.php:683
-#: include/classes/api/services/CMap.php:689
-#: include/classes/api/services/CMap.php:1152
-#: include/classes/api/services/CMap.php:1158
+#: include/classes/api/services/CMap.php:682
+#: include/classes/api/services/CMap.php:688
+#: include/classes/api/services/CMap.php:1151
+#: include/classes/api/services/CMap.php:1157
 #: include/classes/api/services/CReport.php:209
 #: include/classes/api/services/CReport.php:612
 #: include/classes/import/validators/C52XmlValidator.php:2582

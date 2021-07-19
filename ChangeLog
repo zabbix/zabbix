@@ -1,7 +1,6 @@
 Changes for 6.0.0alpha1
 
 New features:
-A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sections Images, Proxies, Graphs and Graph prototypes, Services, and Maps to API (rlataria)
 ........S. [ZBXNEXT-6679] improved performance of template linking on Zabbix Server (akozlovs, arimdjonoks)
 .........T [ZBXNEXT-5925] added template "Systemd by Zabbix agent 2" (ychukina)
 .........T [ZBXNEXT-6660] added template for f5 BIG-IP (abakaldin)
@@ -22,7 +21,6 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
-..F....... [ZBX-19218] fixed missed untranslated string in jsLoader (rlataria)
 ....I..... [ZBX-19498] fixed 'subject' being too long when {TRIGGER.NAME} is converted to {EVENT.RECOVERY.NAME} (dgoloscapov, wiper)
 A......... [ZBX-19536] fixed host.get with selectTags = ['tag'] call attempting to retrieve tag value(s) as well (jfreibergs)
 ........S. [ZBX-19481] fixed alerting problem while being in maintenance (dgoloscapov)
@@ -115,11 +113,9 @@ A......... [ZBX-8999] fixed exporting of images separately from other objects (I
 ........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
 
 --------------------------------------------------------------------------------
-Changes for 5.4.3rc2
+Changes for 5.4.3
 
-New features:
-
-Bug fixes:
+5.4.3rc1 was released as 5.4.3 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.4.3rc1
@@ -1035,13 +1031,6 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
-
---------------------------------------------------------------------------------
-Changes for 5.0.15rc1
-
-New features:
-
-Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.14

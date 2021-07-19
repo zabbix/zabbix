@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-16 10:58+0300\n"
+"POT-Creation-Date: 2021-07-02 19:55+0300\n"
 "PO-Revision-Date: 2018-09-24 07:57+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -54,7 +54,7 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:599
 #: include/classes/api/services/CMaintenance.php:615
 #: include/classes/api/services/CMaintenance.php:684 maintenance.php:137
-#: maintenance.php:143 services.php:177 services.php:186
+#: maintenance.php:143 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
 msgstr ""
@@ -269,7 +269,7 @@ msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, pouze ke čtení"
 
-#: jsLoader.php:363
+#: jsLoader.php:362
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -593,7 +593,7 @@ msgstr "Potvrzené VYŘEŠENÉ události"
 #: include/views/js/monitoring.sysmaps.js.php:792
 #: include/views/monitoring.sysmap.edit.php:278
 #: include/views/monitoring.sysmap.edit.php:322
-#: include/views/monitoring.sysmap.edit.php:359 services.php:348
+#: include/views/monitoring.sysmap.edit.php:359 services.php:353
 msgid "Action"
 msgstr "Akce"
 
@@ -1033,7 +1033,7 @@ msgstr "Přidej prvky mapy"
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:385
 msgid "All"
 msgstr "Vše"
 
@@ -1750,7 +1750,7 @@ msgstr "Nemůže být odstraněno"
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
-#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
+#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:381
 msgid "Cancel"
 msgstr "Zrušit"
 
@@ -1822,7 +1822,7 @@ msgstr "Není možné přidat prototyp hosta"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:107
-#: app/controllers/CControllerImageCreate.php:131
+#: app/controllers/CControllerImageCreate.php:133
 msgid "Cannot add image"
 msgstr "Nelze přidat obrázek"
 
@@ -1838,7 +1838,7 @@ msgstr "Není možné přidat prototyp položky"
 msgid "Cannot add maintenance"
 msgstr "Nelze přidat plánovanou odstávku"
 
-#: include/classes/api/services/CMap.php:1559
+#: include/classes/api/services/CMap.php:1558
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
 msgstr "Není možná přidat složku map pro mapu \"%1$s\" kvůli cyklickému odkazu."
@@ -1866,12 +1866,12 @@ msgstr "Nelze přidat více než jednu položku typu \"Souhrn grafu\" pro graf \
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr "Nelze přidat víc jak jednu položku typu \"Souhrn grafu\" k prototypu grafu \"%1$s\"."
 
-#: sysmaps.php:215
+#: sysmaps.php:216
 msgid "Cannot add network map"
 msgstr "Nelze přidat mapu sítě"
 
 #: app/controllers/CControllerProxyCreate.php:58
-#: app/controllers/CControllerProxyCreate.php:120
+#: app/controllers/CControllerProxyCreate.php:126
 msgid "Cannot add proxy"
 msgstr "Nelze přidat proxy"
 
@@ -1889,7 +1889,7 @@ msgstr ""
 msgid "Cannot add script"
 msgstr "Nelze přidat skript"
 
-#: services.php:152
+#: services.php:154
 msgid "Cannot add service"
 msgstr "Nelze přidat službu"
 
@@ -1985,7 +1985,7 @@ msgstr "Není možné se připojit k databázi."
 msgid "Cannot convert POST data:"
 msgstr ""
 
-#: graphs.php:392
+#: graphs.php:401
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] "Nelze kopírovat graf"
@@ -2104,19 +2104,19 @@ msgstr[2] "Nelze smazat pravidlo nálezu"
 msgid "Cannot delete discovery rules"
 msgstr "Není možné smazat objevovací pravidla"
 
-#: graphs.php:283
+#: graphs.php:292
 msgid "Cannot delete graph"
 msgstr "Nelze smazat graf"
 
-#: graphs.php:275
+#: graphs.php:284
 msgid "Cannot delete graph prototype"
 msgstr "Není možné smazat prototyp grafu"
 
-#: graphs.php:316
+#: graphs.php:325
 msgid "Cannot delete graph prototypes"
 msgstr "Není možné smazat prototypy grafů"
 
-#: graphs.php:333
+#: graphs.php:342
 msgid "Cannot delete graphs"
 msgstr "Nelze smazat grafy"
 
@@ -2155,7 +2155,7 @@ msgstr "Není možné smazat prototypy hostů"
 msgid "Cannot delete icon map"
 msgstr "Není možné smazat mapu ikon"
 
-#: app/controllers/CControllerImageDelete.php:69
+#: app/controllers/CControllerImageDelete.php:70
 msgid "Cannot delete image"
 msgstr "Nelze smazat obrázek"
 
@@ -2203,7 +2203,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: sysmaps.php:262
+#: sysmaps.php:269
 msgid "Cannot delete network map"
 msgstr "Nelze smazat síťovou mapu"
 
@@ -2249,7 +2249,7 @@ msgstr "Není možné smazat skripty. Skript \"%1$s\" se používá v operaci ak
 msgid "Cannot delete selected actions"
 msgstr "Není možné smazat označené akce"
 
-#: services.php:107
+#: services.php:108
 msgid "Cannot delete service"
 msgstr "Nelze smazat službu"
 
@@ -2650,7 +2650,7 @@ msgstr "Nelze nalézt mapu hodnot \"%1$s\" použitou pro prototyp položky \"%2$
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "Nelze formátovat strom. Zkontrolujte logickou struktůru v servisních linkách."
 
-#: services.php:353
+#: services.php:358
 msgid "Cannot format tree."
 msgstr "Nelze formátovat strom."
 
@@ -2785,12 +2785,12 @@ msgstr "Nejde poslat požadavek: %1$s."
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
 msgstr "Nelze nastavit \"%1$s\" pro akci \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:514
+#: include/classes/api/services/CGraphGeneral.php:507
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
 msgstr "Nelze nastavit \"%1$s\" pro graf \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:521
+#: include/classes/api/services/CGraphGeneral.php:514
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Nelze nastavit \"%1$s\" pro prototyp grafu \"%2$s\"."
@@ -2854,12 +2854,12 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Nelze aktualizovat \"%1$s\" pro akci \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:700
+#: include/classes/api/services/CGraphGeneral.php:693
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
 msgstr "Nelze aktualizovat \"%1$s\" pro graf \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:705
+#: include/classes/api/services/CGraphGeneral.php:698
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Nelze aktualizovat \"%1$s\" pro prototyp grafu \"%2$s\"."
@@ -2896,7 +2896,7 @@ msgstr "Není možné aktualizovat \"%2$s\" pro objevenou položku \"%1$s\"."
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Není možné aktualizovat \"%2$s\" pro objevený spouštěč \"%1$s\"."
 
-#: include/classes/api/services/CImage.php:519
+#: include/classes/api/services/CImage.php:506
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
 msgstr "Není možné aktualizovat \"imagetype\" pro obrázek \"%1$s\"."
@@ -2958,7 +2958,7 @@ msgstr[0] "Nejde aktualizovat událost"
 msgstr[1] "Nejde aktualizovat události"
 msgstr[2] "Nejde aktualizovat události"
 
-#: graphs.php:243 graphs.php:296
+#: graphs.php:243 graphs.php:305
 msgid "Cannot update graph"
 msgstr "Nelze upravit graf"
 
@@ -3002,7 +3002,7 @@ msgstr "Nelze aktualizovat mapu ikon"
 
 #: app/controllers/CControllerImageUpdate.php:43
 #: app/controllers/CControllerImageUpdate.php:110
-#: app/controllers/CControllerImageUpdate.php:144
+#: app/controllers/CControllerImageUpdate.php:146
 msgid "Cannot update image"
 msgstr "Nelze upravit obrázek"
 
@@ -3053,12 +3053,12 @@ msgid "Cannot update network map"
 msgstr "Nelze upravit síťovou mapu"
 
 #: app/controllers/CControllerProxyUpdate.php:59
-#: app/controllers/CControllerProxyUpdate.php:118
+#: app/controllers/CControllerProxyUpdate.php:124
 msgid "Cannot update proxy"
 msgstr "Nelze upravit proxy"
 
-#: include/classes/api/services/CProxy.php:746
-#: include/classes/api/services/CProxy.php:870
+#: include/classes/api/services/CProxy.php:739
+#: include/classes/api/services/CProxy.php:860
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Není možné aktualizovat proxy pro objeveného hosta \"%1$s\"."
@@ -3090,7 +3090,7 @@ msgstr "Nelze upravit skript"
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr ""
 
-#: services.php:146
+#: services.php:147
 msgid "Cannot update service"
 msgstr "Nelze upravit službu"
 
@@ -3462,7 +3462,7 @@ msgstr "Vytvořit kopii"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
-#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
+#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:374
 msgid "Close"
 msgstr "Zavřít"
 
@@ -4063,7 +4063,7 @@ msgstr "Korelační pravidlo"
 msgid "Correlation updated"
 msgstr "Korelace aktualizována"
 
-#: include/classes/api/services/CImage.php:341
+#: include/classes/api/services/CImage.php:333
 msgid "Could not save image!"
 msgstr "Nepodařilo se uložit obrázek!"
 
@@ -4387,8 +4387,8 @@ msgstr "Vlastní intervaly"
 msgid "Custom label"
 msgstr "Vlastní popis"
 
-#: include/classes/api/services/CMap.php:889
-#: include/classes/api/services/CMap.php:1361
+#: include/classes/api/services/CMap.php:888
+#: include/classes/api/services/CMap.php:1360
 #, c-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Vlastní popis pro elementy typu \"%1$s\" v mapě \"%2$s\" nemůže byt prázdný."
@@ -4526,7 +4526,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172 jsLoader.php:337
+#: include/views/inventory.host.view.php:172
 msgid "Dashboards"
 msgstr "Dashboardy"
 
@@ -4696,7 +4696,7 @@ msgstr "Den v týdnu"
 msgid "Days"
 msgstr "Dní"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:365
 msgid "Debug"
 msgstr "Ladící výstup"
 
@@ -4841,7 +4841,7 @@ msgstr "Zpožděno o"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
 #: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
-#: jsLoader.php:176 jsLoader.php:338
+#: jsLoader.php:176 jsLoader.php:337
 msgid "Delete"
 msgstr "Smazat"
 
@@ -4870,7 +4870,7 @@ msgstr "Smazat aktuální akci?"
 msgid "Delete current correlation?"
 msgstr "Smazat aktuální korelaci?"
 
-#: jsLoader.php:339
+#: jsLoader.php:338
 msgid "Delete dashboard?"
 msgstr "Smazat dashboard?"
 
@@ -5627,7 +5627,7 @@ msgstr "Zobrazit skládaný graf"
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1646 include/actions.inc.php:1717
 #: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:378
+#: jsLoader.php:377
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Zobrazeno %1$s z %2$s nalezených"
@@ -5663,7 +5663,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:216 jsLoader.php:340
+#: jsLoader.php:216 jsLoader.php:339
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Přejete si změnit podmínkový výraz?"
 
@@ -5760,8 +5760,8 @@ msgstr "Duplicita \"%1$s\" hodnoty \"%2$s\" pro korelaci \"%3$s\"."
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 msgstr "Duplicate \"%1$s\" hodnoty \"%2$s\" pro korelaci."
 
-#: include/classes/api/services/CMap.php:614
-#: include/classes/api/services/CMap.php:1076
+#: include/classes/api/services/CMap.php:613
+#: include/classes/api/services/CMap.php:1075
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
 msgstr "Duplicitní \"name\" hodnota \"%1$s\" pro mapu."
@@ -5788,14 +5788,14 @@ msgstr ""
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:743
-#: include/classes/api/services/CMap.php:1211
+#: include/classes/api/services/CMap.php:742
+#: include/classes/api/services/CMap.php:1210
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "Duplicitní userid \"%1$s\" u uživatele mapy \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:818
-#: include/classes/api/services/CMap.php:1285
+#: include/classes/api/services/CMap.php:817
+#: include/classes/api/services/CMap.php:1284
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Duplicitní usrgrpid \"%1$s\" v uživatelských skupinách v mapě \"%2$s\"."
@@ -5865,7 +5865,7 @@ msgstr ""
 msgid "Edit tree element"
 msgstr "Upravit prvek stromu"
 
-#: jsLoader.php:341
+#: jsLoader.php:340
 msgid "Edit trigger"
 msgstr "Editovat spouštěč"
 
@@ -5966,18 +5966,18 @@ msgstr "Podmíněný typ akce pro prázdný filtr \"%1$s\"."
 #: include/classes/api/services/CHost.php:1369
 #: include/classes/api/services/CHost.php:1898
 #: include/classes/api/services/CHostPrototype.php:1093
-#: include/classes/api/services/CImage.php:448
-#: include/classes/api/services/CImage.php:501
+#: include/classes/api/services/CImage.php:430
+#: include/classes/api/services/CImage.php:482
 #: include/classes/api/services/CMaintenance.php:542
-#: include/classes/api/services/CMap.php:563
-#: include/classes/api/services/CMap.php:589
-#: include/classes/api/services/CMap.php:1034
+#: include/classes/api/services/CMap.php:562
+#: include/classes/api/services/CMap.php:588
+#: include/classes/api/services/CMap.php:1033
 #: include/classes/api/services/CMediatype.php:182
 #: include/classes/api/services/CMediatype.php:448
-#: include/classes/api/services/CService.php:360
-#: include/classes/api/services/CService.php:395
-#: include/classes/api/services/CService.php:459
-#: include/classes/api/services/CService.php:527
+#: include/classes/api/services/CService.php:345
+#: include/classes/api/services/CService.php:378
+#: include/classes/api/services/CService.php:442
+#: include/classes/api/services/CService.php:510
 #: include/classes/api/services/CTemplate.php:682
 #: include/classes/api/services/CTrigger.php:798
 #: include/classes/api/services/CUserMacro.php:506
@@ -5986,7 +5986,7 @@ msgstr "Podmíněný typ akce pro prázdný filtr \"%1$s\"."
 msgid "Empty input parameter."
 msgstr "Prázdná vstupní parametr."
 
-#: include/classes/api/services/CMap.php:1042
+#: include/classes/api/services/CMap.php:1041
 msgid "Empty map ID."
 msgstr "Prázdné ID mapy."
 
@@ -5994,11 +5994,11 @@ msgstr "Prázdné ID mapy."
 msgid "Empty media type ID."
 msgstr "Prázdný typ média ID."
 
-#: include/classes/api/services/CService.php:881
+#: include/classes/api/services/CService.php:864
 msgid "Empty name."
 msgstr "Prázdné jméno."
 
-#: include/classes/api/services/CImage.php:360
+#: include/classes/api/services/CImage.php:350
 msgid "Empty parameters"
 msgstr "Prázdné parametry"
 
@@ -6221,7 +6221,7 @@ msgstr "Anglicky (en_GB)"
 msgid "English (en_US)"
 msgstr "Anglicky (en_US)"
 
-#: include/classes/api/services/CGraphGeneral.php:625
+#: include/classes/api/services/CGraphGeneral.php:618
 #: include/classes/api/services/CHostGroup.php:757
 #: include/classes/api/services/CHostPrototype.php:341
 #: include/classes/api/services/CHttpTest.php:390
@@ -6380,7 +6380,7 @@ msgstr "Vyloučit skupiny hostů"
 msgid "Execute"
 msgstr "Vykonat"
 
-#: include/classes/api/services/CImage.php:224
+#: include/classes/api/services/CImage.php:225
 #, c-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "SQL chyba při spuštění [%1$s] v [%2$s]."
@@ -6673,7 +6673,7 @@ msgstr "Pole \"%1$s\" nemůže být nastavené na NULL."
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Pole \"%1$s\" je povinné."
 
-#: include/classes/api/services/CMap.php:793
+#: include/classes/api/services/CMap.php:792
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Pole \"%1$s\" chybí, hodnoty pro mapu \"%2$s\"."
@@ -6722,7 +6722,7 @@ msgstr "Pole \"host\" je vyžadované."
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Kontrolní součet souboru kalkulovaný UNIX cksum algoritmem. Vráti celé číslo"
 
-#: include/classes/api/services/CImage.php:570
+#: include/classes/api/services/CImage.php:557
 msgid "File format is unsupported."
 msgstr "Formát souboru není podporovaný."
 
@@ -6933,7 +6933,7 @@ msgstr "Pátek"
 #: include/views/configuration.services.edit.php:259
 #: include/views/configuration.services.edit.php:307
 #: include/views/js/monitoring.sysmaps.js.php:748 report4.php:191
-#: services.php:47 services.php:177
+#: services.php:47 services.php:182
 msgid "From"
 msgstr "Od"
 
@@ -7048,7 +7048,7 @@ msgstr "Globální hodnota"
 msgid "Go back to %1$s"
 msgstr "Vrátit zpět na %1$s"
 
-#: jsLoader.php:346
+#: jsLoader.php:345
 msgid "Go to"
 msgstr "Jdi na"
 
@@ -7160,14 +7160,14 @@ msgstr "Graf (základní)"
 msgid "Graph added"
 msgstr "Graf byl přidán"
 
-#: graphs.php:391
+#: graphs.php:400
 msgid "Graph copied"
 msgid_plural "Graphs copied"
 msgstr[0] "Graf zkopírován"
 msgstr[1] "Grafy zkopírovány"
 msgstr[2] "Grafy zkopírovány"
 
-#: graphs.php:283
+#: graphs.php:292
 msgid "Graph deleted"
 msgstr "Graf byl smazán"
 
@@ -7204,7 +7204,7 @@ msgstr "Prototyp grafu \"%1$s\" s položkami šablon nemůže obsahovat položky
 msgid "Graph prototype added"
 msgstr "Prototyp grafu byl přidán"
 
-#: graphs.php:275
+#: graphs.php:284
 msgid "Graph prototype deleted"
 msgstr "Prototyp grafu byl smazán"
 
@@ -7226,7 +7226,7 @@ msgstr "Prototyp grafu s ID \"%1$s\" není k dispozici."
 msgid "Graph prototypes"
 msgstr "Prototypy grafů"
 
-#: graphs.php:316
+#: graphs.php:325
 msgid "Graph prototypes deleted"
 msgstr "Prototypy grafů byly smazány"
 
@@ -7243,7 +7243,7 @@ msgstr "Souhrn grafu"
 msgid "Graph type"
 msgstr "Typ grafu"
 
-#: graphs.php:242 graphs.php:296
+#: graphs.php:242 graphs.php:305
 msgid "Graph updated"
 msgstr "Graf byl aktualizován"
 
@@ -7253,7 +7253,7 @@ msgstr "Graf byl aktualizován"
 msgid "Graph with ID \"%1$s\" is not available."
 msgstr "Graf s ID \"%1$s\" není k dispozici."
 
-#: include/classes/api/services/CGraphGeneral.php:838
+#: include/classes/api/services/CGraphGeneral.php:831
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Graf se jménem \"%1$s\" již existuje v grafech, nebo prototypech grafů."
@@ -7275,7 +7275,7 @@ msgstr "Graf s totožným jménem, ale jiného typu již existuje."
 #: app/views/monitoring.charts.view.php:138 app/views/popup.import.php:38
 #: app/views/search.php:89 app/views/search.php:96 app/views/search.php:137
 #: app/views/search.php:142 app/views/search.php:316 app/views/search.php:321
-#: graphs.php:485 include/html.inc.php:356
+#: graphs.php:494 include/html.inc.php:356
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:44
 #: include/views/configuration.host.discovery.list.php:195
@@ -7286,11 +7286,11 @@ msgstr "Graf s totožným jménem, ale jiného typu již existuje."
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:347
+#: include/views/inventory.host.view.php:217 jsLoader.php:346
 msgid "Graphs"
 msgstr "Grafy"
 
-#: graphs.php:333
+#: graphs.php:342
 msgid "Graphs deleted"
 msgstr "Grafy byly smazány"
 
@@ -7491,7 +7491,7 @@ msgstr "Z hexadecimální do desítkové"
 msgid "Hidden"
 msgstr "Skryta"
 
-#: jsLoader.php:367
+#: jsLoader.php:366
 msgid "Hide debug"
 msgstr "Skrýt debug"
 
@@ -7543,7 +7543,7 @@ msgstr "Označ celý řádek"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:348
+#: jsLoader.php:347
 msgid "History"
 msgstr "Historie"
 
@@ -7631,7 +7631,7 @@ msgstr "Vodorovné zarovnání"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:255 jsLoader.php:349 report2.php:506
+#: jsLoader.php:255 jsLoader.php:348 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Hostitel"
@@ -7653,7 +7653,7 @@ msgstr "Host \"%1$s\" již existuje."
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Host \"%1$s\" nemůže být bez hostitelské skupiny."
 
-#: include/classes/api/services/CProxy.php:500
+#: include/classes/api/services/CProxy.php:493
 #, c-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Host \"%1$s\" je monitorovaný s proxy \"%2$s\"."
@@ -8214,19 +8214,19 @@ msgstr ""
 msgid "Image"
 msgstr "Obrázek"
 
-#: include/classes/api/services/CImage.php:468
-#: include/classes/api/services/CImage.php:481
-#: include/classes/api/services/CImage.php:526
-#: include/classes/api/services/CImage.php:544
+#: include/classes/api/services/CImage.php:450
+#: include/classes/api/services/CImage.php:463
+#: include/classes/api/services/CImage.php:513
+#: include/classes/api/services/CImage.php:531
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr "Obrázek \"%1$s\" již existuje."
 
-#: app/controllers/CControllerImageCreate.php:123
+#: app/controllers/CControllerImageCreate.php:125
 msgid "Image added"
 msgstr "Obrázek byl přidán"
 
-#: app/controllers/CControllerImageDelete.php:62
+#: app/controllers/CControllerImageDelete.php:63
 msgid "Image deleted"
 msgstr "Obrázek byl smazán"
 
@@ -8234,18 +8234,18 @@ msgstr "Obrázek byl smazán"
 msgid "Image label type"
 msgstr "Typ popisky obrázku"
 
-#: include/classes/api/services/CImage.php:228
+#: include/classes/api/services/CImage.php:229
 #, c-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr "Chyba načtení obrázku [%1$s] v [%2$s]."
 
-#: include/classes/api/services/CImage.php:561
+#: include/classes/api/services/CImage.php:548
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
 msgstr ""
 
-#: app/controllers/CControllerImageUpdate.php:135
+#: app/controllers/CControllerImageUpdate.php:137
 msgid "Image updated"
 msgstr "Obrázek byl aktualizován"
 
@@ -8401,49 +8401,49 @@ msgstr "Zahrnují podskupiny"
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Statistika příchozího provozu na síťovém rozhraní. Vráti celé číslo"
 
-#: include/classes/api/services/CMap.php:655
-#: include/classes/api/services/CMap.php:1138
+#: include/classes/api/services/CMap.php:654
+#: include/classes/api/services/CMap.php:1137
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
 msgstr "Nesprávná \"height\" hodnota mapy \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:803
-#: include/classes/api/services/CMap.php:1271
+#: include/classes/api/services/CMap.php:802
+#: include/classes/api/services/CMap.php:1270
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Nesprávná hodnota \"oprávnění\" \"%1$s\" v uživatelských skupinách pro mapu \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:728
-#: include/classes/api/services/CMap.php:1197
+#: include/classes/api/services/CMap.php:727
+#: include/classes/api/services/CMap.php:1196
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
 msgstr "Nesprávná hodnota \"oprávnění\" \"%1$s\" v uživatelích pro mapu \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:674
-#: include/classes/api/services/CMap.php:1144
+#: include/classes/api/services/CMap.php:673
+#: include/classes/api/services/CMap.php:1143
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
 msgstr "Nesprávná hodnota \"soukromé\" \"%1$s\" pro mapu \"%2$s\"."
 
-#: include/classes/api/services/CService.php:1104
+#: include/classes/api/services/CService.php:1085
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Neplatná hodnota pole \"soft\" pro závislost na službě \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:649
-#: include/classes/api/services/CMap.php:1132
+#: include/classes/api/services/CMap.php:648
+#: include/classes/api/services/CMap.php:1131
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
 msgstr "Nesprávná hodnota \"width\" pro mapu \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:876
-#: include/classes/api/services/CMap.php:883
-#: include/classes/api/services/CMap.php:899
-#: include/classes/api/services/CMap.php:909
-#: include/classes/api/services/CMap.php:1344
-#: include/classes/api/services/CMap.php:1353
-#: include/classes/api/services/CMap.php:1370
-#: include/classes/api/services/CMap.php:1382
+#: include/classes/api/services/CMap.php:875
+#: include/classes/api/services/CMap.php:882
+#: include/classes/api/services/CMap.php:898
+#: include/classes/api/services/CMap.php:908
+#: include/classes/api/services/CMap.php:1343
+#: include/classes/api/services/CMap.php:1352
+#: include/classes/api/services/CMap.php:1369
+#: include/classes/api/services/CMap.php:1381
 #, c-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "Neplatná hodnota %1$s typu popisky pro mapu \"%2$s\"."
@@ -8469,7 +8469,7 @@ msgstr ""
 msgid "Incorrect Vault token."
 msgstr ""
 
-#: include/classes/api/services/CService.php:927
+#: include/classes/api/services/CService.php:910
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Neplatná akceptovatelná SLA pro službu \"%1$s\"."
@@ -8578,7 +8578,7 @@ msgstr "Neplatná operace uživatele. Uživatel neexistuje nebo k němu nemáte 
 msgid "Incorrect action operationid."
 msgstr "Neplatné akce operace ID."
 
-#: include/classes/api/services/CService.php:894
+#: include/classes/api/services/CService.php:877
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Neplatný algoritmus pro službu \"%1$s\"."
@@ -8653,13 +8653,13 @@ msgstr "Funkci byly předány neplatné argumenty"
 #: include/classes/api/services/CMapElement.php:740
 #: include/classes/api/services/CMapElement.php:775
 #: include/classes/api/services/CMapElement.php:800
-#: include/classes/api/services/CMap.php:698
-#: include/classes/api/services/CMap.php:772
-#: include/classes/api/services/CMap.php:986
-#: include/classes/api/services/CMap.php:1059
-#: include/classes/api/services/CMap.php:1167
-#: include/classes/api/services/CMap.php:1240
-#: include/classes/api/services/CMap.php:1460
+#: include/classes/api/services/CMap.php:697
+#: include/classes/api/services/CMap.php:771
+#: include/classes/api/services/CMap.php:985
+#: include/classes/api/services/CMap.php:1058
+#: include/classes/api/services/CMap.php:1166
+#: include/classes/api/services/CMap.php:1239
+#: include/classes/api/services/CMap.php:1459
 #: include/classes/api/services/CMediatype.php:189
 #: include/classes/api/services/CMediatype.php:485
 msgid "Incorrect arguments passed to function."
@@ -8669,7 +8669,7 @@ msgstr "Funkci byly předané neplatné argumenty."
 msgid "Incorrect bulk value for interface."
 msgstr "Neplatná hromadná hodnota pro rozhraní."
 
-#: include/classes/api/services/CService.php:911
+#: include/classes/api/services/CService.php:894
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Nesprávně vypočítaná hodnota SLA pro službu \"%1$s\"."
@@ -8681,8 +8681,8 @@ msgstr "Nesprávně vypočítaná hodnota SLA pro službu \"%1$s\"."
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:665
-#: include/classes/api/services/CProxy.php:781
+#: include/classes/api/services/CProxy.php:658
+#: include/classes/api/services/CProxy.php:774
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Nesprávné znaky použité pro jméno proxy \"%1$s\"."
@@ -8756,7 +8756,7 @@ msgstr "Neplatná hodnota zdroje události."
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Neplatné jméno pole \"%1$s\" nebo hodnota údaje pro tabulku \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:606
+#: include/classes/api/services/CMap.php:605
 msgid "Incorrect fields for sysmap."
 msgstr "Neplatné pole pro sysmap."
 
@@ -8830,12 +8830,12 @@ msgstr "Neplatný obrázkový index."
 #: include/classes/api/services/CHost.php:1014
 #: include/classes/api/services/CHost.php:1917
 #: include/classes/api/services/CHost.php:2116
-#: include/classes/api/services/CImage.php:460
-#: include/classes/api/services/CImage.php:506
-#: include/classes/api/services/CProxy.php:660
-#: include/classes/api/services/CProxy.php:726
-#: include/classes/api/services/CProxy.php:770
-#: include/classes/api/services/CProxy.php:792
+#: include/classes/api/services/CImage.php:442
+#: include/classes/api/services/CImage.php:487
+#: include/classes/api/services/CProxy.php:653
+#: include/classes/api/services/CProxy.php:719
+#: include/classes/api/services/CProxy.php:763
+#: include/classes/api/services/CProxy.php:785
 #: include/classes/api/services/CTemplate.php:489
 #: include/classes/api/services/CTemplate.php:662
 #: include/classes/api/services/CTrigger.php:803
@@ -8862,7 +8862,7 @@ msgstr ""
 msgid "Incorrect inventory mode in action operation."
 msgstr "Neplatný mód inventáře v akci."
 
-#: include/classes/api/services/CGraphGeneral.php:304
+#: include/classes/api/services/CGraphGeneral.php:297
 msgid "Incorrect item for axis value."
 msgstr "Neplatná položka pro hodnotu osy."
 
@@ -8893,7 +8893,7 @@ msgstr "Neplatné datum údržby - datum musí být mezi 1970.01.01 a 2038.01.18
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Neplatná perioda údržby (minimálně 5 minut)"
 
-#: include/classes/api/services/CMap.php:1043
+#: include/classes/api/services/CMap.php:1042
 msgid "Incorrect map ID."
 msgstr "Neplatné ID mapy."
 
@@ -8941,12 +8941,12 @@ msgstr "Neplatné parametry pro podmínku."
 msgid "Incorrect parameters for maintenance."
 msgstr "Neplatné parametry pro údržbu."
 
-#: include/classes/api/services/CService.php:969
+#: include/classes/api/services/CService.php:952
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Neplatný nadřízený pro službu \"%1$s\"."
 
-#: include/classes/api/services/CService.php:972
+#: include/classes/api/services/CService.php:955
 msgid "Incorrect parent service."
 msgstr "Neplatná nadřízená služba."
 
@@ -8979,7 +8979,7 @@ msgstr "Neplatný čas začátku služby."
 msgid "Incorrect service time type."
 msgstr "Neplatný typ času služby."
 
-#: include/classes/api/services/CService.php:942
+#: include/classes/api/services/CService.php:925
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "Neplatné pořadí řazení pro službu \"%1$s\"."
@@ -8995,7 +8995,7 @@ msgstr "Neplatná hodnota zdroje."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Neplatný stav pro hosta \"%1$s\"."
 
-#: include/classes/api/services/CService.php:990
+#: include/classes/api/services/CService.php:973
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Neplatný stav pro službu \"%1$s\"."
@@ -9004,7 +9004,7 @@ msgstr "Neplatný stav pro službu \"%1$s\"."
 msgid "Incorrect templated web scenario step count."
 msgstr "Neplatný počet kroků šablony web scénáře."
 
-#: include/classes/api/services/CService.php:955
+#: include/classes/api/services/CService.php:938
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Neplatné ID spouštěče pro službu \"%1$s\"."
@@ -9053,14 +9053,14 @@ msgstr "Neplatný typ výpočtu pro korelaci \"%1$s\"."
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Neplatný typ výpočtu pro pravidlo nálezu \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:764
-#: include/classes/api/services/CMap.php:1232
+#: include/classes/api/services/CMap.php:763
+#: include/classes/api/services/CMap.php:1231
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
 msgstr "Neplatné user ID specifikované pro mapu \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:835
-#: include/classes/api/services/CMap.php:1302
+#: include/classes/api/services/CMap.php:834
+#: include/classes/api/services/CMap.php:1301
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
 msgstr "Neplatná uživatelská skupina ID specifikovaná pro mapu \"%1$s\"."
@@ -9334,10 +9334,10 @@ msgstr "Nesprávná hodnota pro pole \"%1$s\"."
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
 #: include/classes/api/services/CMapElement.php:169
-#: include/classes/api/services/CMap.php:682
-#: include/classes/api/services/CMap.php:688
-#: include/classes/api/services/CMap.php:1151
-#: include/classes/api/services/CMap.php:1157
+#: include/classes/api/services/CMap.php:681
+#: include/classes/api/services/CMap.php:687
+#: include/classes/api/services/CMap.php:1150
+#: include/classes/api/services/CMap.php:1156
 #: include/classes/api/services/CMediatype.php:377
 #: include/classes/api/services/CMediatype.php:387
 #: include/classes/api/services/CMediatype.php:396
@@ -9356,14 +9356,14 @@ msgstr "Nesprávná hodnota pro pole \"%1$s\"."
 #: include/classes/api/services/CMediatype.php:762
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CMediatype.php:800
+#: include/classes/api/services/CProxy.php:592
 #: include/classes/api/services/CProxy.php:599
-#: include/classes/api/services/CProxy.php:606
-#: include/classes/api/services/CProxy.php:619
-#: include/classes/api/services/CProxy.php:625
-#: include/classes/api/services/CProxy.php:704
-#: include/classes/api/services/CProxy.php:712
-#: include/classes/api/services/CProxy.php:833
-#: include/classes/api/services/CProxy.php:841
+#: include/classes/api/services/CProxy.php:612
+#: include/classes/api/services/CProxy.php:618
+#: include/classes/api/services/CProxy.php:697
+#: include/classes/api/services/CProxy.php:705
+#: include/classes/api/services/CProxy.php:823
+#: include/classes/api/services/CProxy.php:831
 #: include/classes/api/services/CSettings.php:312
 #: include/classes/api/services/CTemplate.php:449
 #: include/classes/api/services/CTriggerGeneral.php:148
@@ -9437,12 +9437,12 @@ msgstr "Nesprávná hodnota pro pole \"%1$s\"."
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Neplatná hodnota pro pole \"%1$s\": %2$s."
 
-#: include/classes/api/services/CProxy.php:631
+#: include/classes/api/services/CProxy.php:624
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
 msgstr "Neplatná hodnota používaná pro pole PSK. To by mělo obsahovat sudý počet hexadecimálních znaků."
 
-#: include/classes/api/services/CProxy.php:687
-#: include/classes/api/services/CProxy.php:822
+#: include/classes/api/services/CProxy.php:680
+#: include/classes/api/services/CProxy.php:815
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr "Neplatná hodnota použitá pro proxy stav \"%1$s\"."
@@ -9529,7 +9529,7 @@ msgid "Insert"
 msgstr "Vložit"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:341
 msgid "Insert expression"
 msgstr "Vložit výraz"
 
@@ -9608,8 +9608,8 @@ msgid "Internal data storage period"
 msgstr "Perioda ukládání interních dat"
 
 #: include/classes/api/helpers/CApiHostHelper.php:90
-#: include/classes/api/services/CGraphGeneral.php:529
-#: include/classes/api/services/CGraphGeneral.php:712
+#: include/classes/api/services/CGraphGeneral.php:522
+#: include/classes/api/services/CGraphGeneral.php:705
 #: include/classes/api/services/CTriggerGeneral.php:1035
 #: include/classes/api/services/CTriggerGeneral.php:1162
 #: include/classes/api/services/CTriggerGeneral.php:1267
@@ -9740,9 +9740,9 @@ msgstr "Neplatný klíč \"%1$s\": %2$s."
 msgid "Invalid macro \"%1$s\": %2$s."
 msgstr "Neplatné makro \"%1$s\": %2$s."
 
-#: include/classes/api/services/CService.php:216
-#: include/classes/api/services/CService.php:400
-#: include/classes/api/services/CService.php:1233
+#: include/classes/api/services/CService.php:212
+#: include/classes/api/services/CService.php:383
+#: include/classes/api/services/CService.php:1214
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
 msgstr "Neplatné parametry metody."
@@ -9768,8 +9768,8 @@ msgstr "Neplatné parametry metody."
 #: include/classes/api/services/CDiscoveryRule.php:1992
 #: include/classes/api/services/CDiscoveryRule.php:2010
 #: include/classes/api/services/CDiscoveryRule.php:2018
-#: include/classes/api/services/CGraphGeneral.php:605
-#: include/classes/api/services/CGraphGeneral.php:728
+#: include/classes/api/services/CGraphGeneral.php:598
+#: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1672
 #: include/classes/api/services/CHostPrototype.php:1677
@@ -10004,7 +10004,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:349
 msgid "Inventory"
 msgstr "Inventář"
 
@@ -10198,7 +10198,7 @@ msgstr "Položka prototypu aktualizována"
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:372
+#: jsLoader.php:371
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10578,11 +10578,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Poslední kontrola"
 
-#: jsLoader.php:353
+#: jsLoader.php:352
 msgid "Last hour graph"
 msgstr "Graf za poslední hodinu"
 
-#: jsLoader.php:354
+#: jsLoader.php:353
 msgid "Last month graph"
 msgstr "Graf za poslední měsíc"
 
@@ -10612,7 +10612,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Poslední hodnota"
 
-#: jsLoader.php:355
+#: jsLoader.php:354
 msgid "Last week graph"
 msgstr "Graf za poslední týden"
 
@@ -10625,11 +10625,11 @@ msgstr "Graf za poslední týden"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:351
+#: include/views/inventory.host.view.php:149 jsLoader.php:350
 msgid "Latest data"
 msgstr "Poslední hodnoty"
 
-#: jsLoader.php:352
+#: jsLoader.php:351
 msgid "Latest values"
 msgstr "Poslední hodnoty"
 
@@ -10727,14 +10727,14 @@ msgstr "Ukazatel stavu spojnice"
 msgid "Link new templates"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:1006
-#: include/classes/api/services/CMap.php:1476
+#: include/classes/api/services/CMap.php:1005
+#: include/classes/api/services/CMap.php:1475
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Pole spojnice selementid1 odkazuje na neexistující mapový element s ID \"%1$s\" pro mapu \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:1014
-#: include/classes/api/services/CMap.php:1484
+#: include/classes/api/services/CMap.php:1013
+#: include/classes/api/services/CMap.php:1483
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Pole spojnice selementid2 odkazuje na neexistující mapový element s ID \"%1$s\" pro mapu \"%2$s\"."
@@ -11153,16 +11153,16 @@ msgstr "Manuál zavřen"
 msgid "Map"
 msgstr "Mapa"
 
-#: include/classes/api/services/CMap.php:627
-#: include/classes/api/services/CMap.php:1092
+#: include/classes/api/services/CMap.php:626
+#: include/classes/api/services/CMap.php:1091
 #, c-format
 msgid "Map \"%1$s\" already exists."
 msgstr "Mapa \"%1$s\" již existuje."
 
-#: include/classes/api/services/CMap.php:737
-#: include/classes/api/services/CMap.php:812
-#: include/classes/api/services/CMap.php:1205
-#: include/classes/api/services/CMap.php:1279
+#: include/classes/api/services/CMap.php:736
+#: include/classes/api/services/CMap.php:811
+#: include/classes/api/services/CMap.php:1204
+#: include/classes/api/services/CMap.php:1278
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
 msgstr "Mapa \"%1$s\" je veřejná a sdílení jen pro čtení je zakázané."
@@ -11196,7 +11196,7 @@ msgstr ""
 msgid "Map label type"
 msgstr "Typ popisky mapy"
 
-#: include/classes/api/services/CMap.php:1062
+#: include/classes/api/services/CMap.php:1061
 msgid "Map name cannot be empty."
 msgstr "Jméno mapy nemůže byt prázdné."
 
@@ -11205,8 +11205,8 @@ msgstr "Jméno mapy nemůže byt prázdné."
 msgid "Map navigation tree"
 msgstr "Mapa stromu navigace"
 
-#: include/classes/api/services/CMap.php:662
-#: include/classes/api/services/CMap.php:1116
+#: include/classes/api/services/CMap.php:661
+#: include/classes/api/services/CMap.php:1115
 msgid "Map owner cannot be empty."
 msgstr "Vlastník mapy nemůže být prázdný."
 
@@ -11618,8 +11618,8 @@ msgstr "Minut"
 msgid "Missing \"gitemid\" field for item."
 msgstr "Chybějící \"gitemid\" pole pro položku."
 
-#: include/classes/api/services/CGraphGeneral.php:469
-#: include/classes/api/services/CGraphGeneral.php:655
+#: include/classes/api/services/CGraphGeneral.php:462
+#: include/classes/api/services/CGraphGeneral.php:648
 msgid "Missing \"itemid\" field for item."
 msgstr "Chybějící \"itemid\" pole pro položku."
 
@@ -11788,7 +11788,7 @@ msgstr "Nalezeno více než %1$d spojení pro %2$s"
 msgid "More than 10 minutes"
 msgstr "Více jak 10 minut"
 
-#: include/classes/api/services/CGraphGeneral.php:851
+#: include/classes/api/services/CGraphGeneral.php:844
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Víc jak jeden graf se jménem \"%1$s\" pro host."
@@ -12019,11 +12019,11 @@ msgstr "Perioda ukládání dat pro zjišťování sítě"
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "Seznam síťových rozhraní (zahrnuje typ rozhraní, status, IPv4 adresu, popis). Vráti text"
 
-#: sysmaps.php:214
+#: sysmaps.php:215
 msgid "Network map added"
 msgstr "Síťová mapa byla přidána"
 
-#: sysmaps.php:262
+#: sysmaps.php:269
 msgid "Network map deleted"
 msgstr "Síťová mapa byla smazána"
 
@@ -12193,7 +12193,7 @@ msgstr "Žádné \"%1$s\" dané pro prototyp grafu."
 msgid "No \"%1$s\" given for graph."
 msgstr "Žádné \"%1$s\" dané pro graf."
 
-#: include/classes/api/services/CMap.php:1041
+#: include/classes/api/services/CMap.php:1040
 #, c-format
 msgid "No \"%1$s\" given for map."
 msgstr "Žádné \"%1$s\" dané pro mapu."
@@ -12343,7 +12343,7 @@ msgstr "Žádný obrázek"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:370
 msgid "No interface found"
 msgstr "Nenalezené žádné rozhraní"
 
@@ -12351,8 +12351,8 @@ msgstr "Nenalezené žádné rozhraní"
 msgid "No interface found."
 msgstr "Nenalezené žádné rozhraní."
 
-#: include/classes/api/services/CProxy.php:696
-#: include/classes/api/services/CProxy.php:879
+#: include/classes/api/services/CProxy.php:689
+#: include/classes/api/services/CProxy.php:869
 #, c-format
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr ""
@@ -12496,10 +12496,10 @@ msgstr ""
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CIconMap.php:285
 #: include/classes/api/services/CIconMap.php:528
-#: include/classes/api/services/CImage.php:364
-#: include/classes/api/services/CImage.php:444
-#: include/classes/api/services/CImage.php:497
-#: include/classes/api/services/CImage.php:513
+#: include/classes/api/services/CImage.php:354
+#: include/classes/api/services/CImage.php:426
+#: include/classes/api/services/CImage.php:478
+#: include/classes/api/services/CImage.php:500
 #: include/classes/api/services/CItemGeneral.php:221
 #: include/classes/api/services/CItemGeneral.php:329
 #: include/classes/api/services/CItemGeneral.php:344
@@ -12514,20 +12514,20 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:777
 #: include/classes/api/services/CMapElement.php:189
 #: include/classes/api/services/CMapElement.php:319
-#: include/classes/api/services/CMap.php:575
-#: include/classes/api/services/CMap.php:990
-#: include/classes/api/services/CMap.php:1052
-#: include/classes/api/services/CMap.php:1611
-#: include/classes/api/services/CMap.php:2056
-#: include/classes/api/services/CMap.php:2118
+#: include/classes/api/services/CMap.php:574
+#: include/classes/api/services/CMap.php:989
+#: include/classes/api/services/CMap.php:1051
+#: include/classes/api/services/CMap.php:1610
+#: include/classes/api/services/CMap.php:2048
+#: include/classes/api/services/CMap.php:2110
 #: include/classes/api/services/CMediatype.php:478
 #: include/classes/api/services/CModule.php:231
 #: include/classes/api/services/CProxy.php:186
-#: include/classes/api/services/CProxy.php:281
-#: include/classes/api/services/CProxy.php:456
-#: include/classes/api/services/CProxy.php:740
-#: include/classes/api/services/CProxy.php:774
-#: include/classes/api/services/CProxy.php:864
+#: include/classes/api/services/CProxy.php:276
+#: include/classes/api/services/CProxy.php:449
+#: include/classes/api/services/CProxy.php:733
+#: include/classes/api/services/CProxy.php:767
+#: include/classes/api/services/CProxy.php:854
 #: include/classes/api/services/CReport.php:925
 #: include/classes/api/services/CRole.php:388
 #: include/classes/api/services/CRole.php:805
@@ -12536,8 +12536,8 @@ msgstr ""
 #: include/classes/api/services/CScript.php:1043
 #: include/classes/api/services/CScript.php:1060
 #: include/classes/api/services/CScript.php:1071
-#: include/classes/api/services/CService.php:1017
-#: include/classes/api/services/CService.php:1043
+#: include/classes/api/services/CService.php:1000
+#: include/classes/api/services/CService.php:1024
 #: include/classes/api/services/CSettings.php:264
 #: include/classes/api/services/CTask.php:430
 #: include/classes/api/services/CTask.php:477
@@ -12600,7 +12600,7 @@ msgstr "Není specifikovaný skript pro akci příkazu."
 msgid "No target selected"
 msgstr "Není vybrán cíl"
 
-#: graphs.php:396 items.php:1058
+#: graphs.php:405 items.php:1058
 msgid "No target selected."
 msgstr "Není vybraný cíl."
 
@@ -13013,7 +13013,7 @@ msgstr "Vypnuté"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:382
 #: report2.php:506
 msgid "Ok"
 msgstr "Ok"
@@ -13093,8 +13093,8 @@ msgstr "Jenom super administrátoři mohou aktualizovat skupiny uživatelů."
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Jen kontroly typu Zabbix agent, SNMPv1, SNMPv2 nebo SNMPv3 mohou být unikátní."
 
-#: include/classes/api/services/CMap.php:666
-#: include/classes/api/services/CMap.php:1120
+#: include/classes/api/services/CMap.php:665
+#: include/classes/api/services/CMap.php:1119
 msgid "Only administrators can set map owner."
 msgstr "Pouze administrátoři mohou nastavit vlastníka mapy."
 
@@ -13618,7 +13618,7 @@ msgstr "PSK"
 msgid "PSK identity"
 msgstr "PSK identita"
 
-#: include/classes/api/services/CProxy.php:637
+#: include/classes/api/services/CProxy.php:630
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr "PSK je příliš krátký. Minimum je %1$s hexadecimalních čísel."
@@ -13705,7 +13705,7 @@ msgstr "Nadřazené web scénáře"
 msgid "Parse"
 msgstr "Analyzovat"
 
-#: include/classes/api/services/CImage.php:218
+#: include/classes/api/services/CImage.php:219
 #, c-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "Parsovací SQL chyba [%1$s] v [%2$s]."
@@ -14215,7 +14215,7 @@ msgstr "Problém, když alespoň jeden podřazený má problém"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:355 report2.php:506
 msgid "Problems"
 msgstr "Problémy"
 
@@ -14283,8 +14283,8 @@ msgstr "Proxy"
 msgid "Proxy"
 msgstr "Proxy"
 
-#: include/classes/api/services/CProxy.php:679
-#: include/classes/api/services/CProxy.php:808
+#: include/classes/api/services/CProxy.php:672
+#: include/classes/api/services/CProxy.php:801
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
 msgstr ""
@@ -14294,17 +14294,17 @@ msgstr ""
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Proxy \"%1$s\" pro host \"%2$s\" neexistuje."
 
-#: include/classes/api/services/CProxy.php:523
+#: include/classes/api/services/CProxy.php:516
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
 msgstr "Proxy \"%1$s\" je používána akcí \"%2$s\"."
 
-#: include/classes/api/services/CProxy.php:480
+#: include/classes/api/services/CProxy.php:473
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Proxy \"%1$s\" je použitá pravidlem nálezu \"%2$s\"."
 
-#: app/controllers/CControllerProxyCreate.php:113
+#: app/controllers/CControllerProxyCreate.php:119
 msgid "Proxy added"
 msgstr "Proxy byla přidána"
 
@@ -14323,7 +14323,7 @@ msgstr[2] "Proxy byla smazána"
 msgid "Proxy interface creation failed."
 msgstr "Vytvoření proxy rozhraní selhalo."
 
-#: include/classes/api/services/CProxy.php:405
+#: include/classes/api/services/CProxy.php:400
 msgid "Proxy interface update failed."
 msgstr "Aktualizace rozhraní proxy selhalo."
 
@@ -14335,7 +14335,7 @@ msgstr "Mód proxy"
 msgid "Proxy name"
 msgstr "Název proxy"
 
-#: app/controllers/CControllerProxyUpdate.php:110
+#: app/controllers/CControllerProxyUpdate.php:116
 msgid "Proxy updated"
 msgstr "Proxy byla aktualizována"
 
@@ -15587,7 +15587,7 @@ msgstr "Skript byl aktualizován"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:356
 msgid "Scripts"
 msgstr "Skripty"
 
@@ -15806,27 +15806,27 @@ msgstr "Čas na serveru"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/popup.services.php:46 include/actions.inc.php:75
-#: include/views/configuration.services.edit.php:356 services.php:347
+#: include/views/configuration.services.edit.php:356 services.php:352
 #: srv_status.php:144
 msgid "Service"
 msgstr "Služba"
 
-#: include/classes/api/services/CService.php:1074
+#: include/classes/api/services/CService.php:1055
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Služba \"%1$s\" nemůže být smazána, protože na ní závisí jiná služba."
 
-#: include/classes/api/services/CService.php:1093
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Služba \"%1$s\" nemůže záviset sama na sobě."
 
-#: include/classes/api/services/CService.php:1168
+#: include/classes/api/services/CService.php:1149
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Služba \"%1$s\" nemůže být připojená k spouštěči a mít zároveň podřízené služby."
 
-#: include/classes/api/services/CService.php:1145
+#: include/classes/api/services/CService.php:1126
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Služba \"%1$s\" je již připojená k dalším službám."
@@ -15836,15 +15836,15 @@ msgstr "Služba \"%1$s\" je již připojená k dalším službám."
 msgid "Service availability report"
 msgstr "Report dostupnosti služeb"
 
-#: include/classes/api/services/CService.php:977
+#: include/classes/api/services/CService.php:960
 msgid "Service cannot be parent and child at the same time."
 msgstr "Služba nemůže být nadřazená i podřazená zároveň."
 
-#: services.php:151
+#: services.php:153
 msgid "Service created"
 msgstr "Služba vytvořená"
 
-#: services.php:107
+#: services.php:108
 msgid "Service deleted"
 msgstr "Služba byla smazána"
 
@@ -15872,7 +15872,7 @@ msgstr "Servisní časy"
 msgid "Service type"
 msgstr "Typ služby"
 
-#: services.php:145
+#: services.php:146
 msgid "Service updated"
 msgstr "Služba byla aktualizována"
 
@@ -15888,7 +15888,7 @@ msgstr "Služba byla aktualizována"
 msgid "Services"
 msgstr "Služby"
 
-#: include/classes/api/services/CService.php:1215
+#: include/classes/api/services/CService.php:1196
 msgid "Services form a circular dependency."
 msgstr "Služby tvoří kruhovou závislost."
 
@@ -15922,7 +15922,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Nastavení hostitelského inventáře"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:388
 msgid "Set new value"
 msgstr ""
 
@@ -16012,13 +16012,13 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:342
 msgid "Sharing"
 msgstr "Sdílení"
 
-#: include/classes/api/services/CMap.php:718
-#: include/classes/api/services/CMap.php:1187
-#: include/classes/api/services/CMap.php:1261
+#: include/classes/api/services/CMap.php:717
+#: include/classes/api/services/CMap.php:1186
+#: include/classes/api/services/CMap.php:1260
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Chybějící sdílení \"%1$s\" v hodnotě pro mapu \"%2$s\"."
@@ -16478,7 +16478,7 @@ msgstr ""
 msgid "Status"
 msgstr "Stav"
 
-#: app/views/popup.services.php:47 services.php:349
+#: app/views/popup.services.php:47 services.php:354
 msgid "Status calculation"
 msgstr "Výpočet stavu"
 
@@ -16624,7 +16624,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Subjekt"
 
-#: jsLoader.php:358
+#: jsLoader.php:357
 msgid "Submap"
 msgstr "Podmapa"
 
@@ -17176,7 +17176,7 @@ msgstr "Host již není objevovaný a bude zmazaný %1$s (na %2$s v %3$s)."
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Host již není objevovaný a bude smazaný při dalším objevování."
 
-#: include/classes/api/services/CImage.php:383
+#: include/classes/api/services/CImage.php:373
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
@@ -17184,7 +17184,7 @@ msgstr[0] "Obrázek je použitý v mapě ikon %1$s."
 msgstr[1] "Obrázek je použitý v mapách ikon %1$s."
 msgstr[2] "Obrázek je použitý v mapách ikon %1$s."
 
-#: include/classes/api/services/CImage.php:409
+#: include/classes/api/services/CImage.php:399
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -17298,7 +17298,7 @@ msgstr "Čtvrtek"
 #: app/views/report.services.php:82
 #: include/views/configuration.services.edit.php:266
 #: include/views/configuration.services.edit.php:321 report4.php:191
-#: services.php:48 services.php:186
+#: services.php:48 services.php:191
 msgid "Till"
 msgstr "Do"
 
@@ -17395,7 +17395,7 @@ msgstr "Časové razítko"
 msgid "To"
 msgstr "Do"
 
-#: jsLoader.php:370
+#: jsLoader.php:369
 msgid "To set a host interface select a single item type for all items"
 msgstr "Na nastavení rozhraní hosta označte jeden typ položky pro všechny položky"
 
@@ -17527,8 +17527,8 @@ msgstr "Trendy"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
-#: services.php:350
+#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:358
+#: services.php:355
 msgid "Trigger"
 msgstr "Spouštěč"
 
@@ -17706,11 +17706,11 @@ msgstr "Prototypy spouštěčů aktualizované"
 msgid "Trigger severity"
 msgstr "Závažnost spouštěče"
 
-#: jsLoader.php:344
+#: jsLoader.php:343
 msgid "Trigger status \"OK\""
 msgstr "Status spouštěče \"OK\""
 
-#: jsLoader.php:345
+#: jsLoader.php:344
 msgid "Trigger status \"Problem\""
 msgstr "Status spouštěče \"Problém\""
 
@@ -17876,7 +17876,7 @@ msgstr "NEZNÁMÝ"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:359
 msgid "URL"
 msgstr "URL"
 
@@ -17901,8 +17901,8 @@ msgstr "URL C"
 msgid "URL is not properly encoded."
 msgstr "URL není správně zakódována."
 
-#: include/classes/api/services/CMap.php:961
-#: include/classes/api/services/CMap.php:1436
+#: include/classes/api/services/CMap.php:960
+#: include/classes/api/services/CMap.php:1435
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "Jméno URL musí byt jedinečné v mapě \"%1$s\"."
@@ -17915,14 +17915,14 @@ msgstr "URL parametr nemůže být pole."
 msgid "URL parameter name is empty."
 msgstr "URL parametr jméno je prázdný."
 
-#: include/classes/api/services/CMap.php:955
-#: include/classes/api/services/CMap.php:1430
+#: include/classes/api/services/CMap.php:954
+#: include/classes/api/services/CMap.php:1429
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL musí mít \"jméno\" a \"url\" v mapě \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:360
 msgid "URLs"
 msgstr "URL"
 
@@ -18450,8 +18450,8 @@ msgstr[2] ""
 msgid "User group for database down message"
 msgstr "Skupina uživatelů pro zprávy o nefunkční databázi"
 
-#: include/classes/api/services/CMap.php:784
-#: include/classes/api/services/CMap.php:1252
+#: include/classes/api/services/CMap.php:783
+#: include/classes/api/services/CMap.php:1251
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "Skupinové sdílení má chybějící parametr: %1$s v mapě \"%2$s\"."
@@ -18566,8 +18566,8 @@ msgstr "Uživatelské sezení"
 msgid "User settings"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:709
-#: include/classes/api/services/CMap.php:1178
+#: include/classes/api/services/CMap.php:708
+#: include/classes/api/services/CMap.php:1177
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "Uživatelské sdílení má chybějící parametr: %1$s v mapě \"%2$s\"."
@@ -18949,20 +18949,20 @@ msgstr "Validace"
 msgid "Value"
 msgstr "Hodnota"
 
-#: include/classes/api/services/CMap.php:930
-#: include/classes/api/services/CMap.php:1405
+#: include/classes/api/services/CMap.php:929
+#: include/classes/api/services/CMap.php:1404
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Hodnota \"%1$s\" je neplatná pro parametr \"grid_align\". Možnosti: \"%2$s\" a \"%3$s\""
 
-#: include/classes/api/services/CMap.php:941
-#: include/classes/api/services/CMap.php:1416
+#: include/classes/api/services/CMap.php:940
+#: include/classes/api/services/CMap.php:1415
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\"."
 msgstr "Hodnota \"%1$s\" je neplatná pro parametr \"grid_show\". Možnosti: \"%2$s\" a \"%3$s\"."
 
-#: include/classes/api/services/CMap.php:920
-#: include/classes/api/services/CMap.php:1395
+#: include/classes/api/services/CMap.php:919
+#: include/classes/api/services/CMap.php:1394
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "Hodnota \"%1$s\" je neplatná pro parametr \"grid_show\". Možnosti: \"%2$s\"."
@@ -19195,7 +19195,7 @@ msgstr "Je nám líto, maximální počet elementů na zapamatování byl již d
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:362
+#: include/views/inventory.host.view.php:219 jsLoader.php:361
 msgid "Web"
 msgstr "Web"
 
@@ -19376,7 +19376,7 @@ msgstr "Zápis"
 msgid "Wrong Module.php class name for module located at %1$s."
 msgstr ""
 
-#: include/classes/api/services/CService.php:415
+#: include/classes/api/services/CService.php:398
 #, c-format
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Nesprávné pole pro závislost na službě \"%1$s\"."
@@ -19398,19 +19398,19 @@ msgid "Wrong fields for map link."
 msgstr "Nesprávné pole pro link mapy."
 
 #: include/classes/api/services/CService.php:135
-#: include/classes/api/services/CService.php:249
+#: include/classes/api/services/CService.php:244
 #, c-format
 msgid "Wrong fields for service \"%1$s\"."
 msgstr "Nesprávné pole pro službu \"%1$s\"."
 
-#: include/classes/api/services/CService.php:495
+#: include/classes/api/services/CService.php:478
 #, c-format
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Nesprávné pole pro čas služby \"%1$s\"."
 
 #: include/classes/api/services/CMapElement.php:74
-#: include/classes/api/services/CMap.php:977
-#: include/classes/api/services/CMap.php:1452
+#: include/classes/api/services/CMap.php:976
+#: include/classes/api/services/CMap.php:1451
 msgid "Wrong value for url field."
 msgstr "Špatná hodnota pro pole url."
 
@@ -19480,7 +19480,7 @@ msgstr "Maximální hodnota na ose Y"
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr "MAX hodnota osy Y musí být větší než MIN hodnota osy Y"
 
-#: include/classes/api/services/CGraphGeneral.php:328
+#: include/classes/api/services/CGraphGeneral.php:321
 #: include/classes/graphdraw/CLineGraphDraw.php:1872
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Maximální hodnota pro osu Y musí být větší než minimální hodnota pro osu."
@@ -20185,8 +20185,8 @@ msgstr "nemůže být změněno"
 #: include/classes/api/services/CMediatype.php:731
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:619
-#: include/classes/api/services/CProxy.php:625
+#: include/classes/api/services/CProxy.php:612
+#: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:470
@@ -20533,13 +20533,13 @@ msgctxt "XML time format"
 msgid "hh.mm"
 msgstr "hh.mm"
 
-#: include/classes/api/services/CMap.php:853
-#: include/classes/api/services/CMap.php:1321
+#: include/classes/api/services/CMap.php:852
+#: include/classes/api/services/CMap.php:1320
 msgid "host"
 msgstr "host"
 
-#: include/classes/api/services/CMap.php:849
-#: include/classes/api/services/CMap.php:1317
+#: include/classes/api/services/CMap.php:848
+#: include/classes/api/services/CMap.php:1316
 msgid "host group"
 msgstr "skupina"
 
@@ -20553,13 +20553,13 @@ msgstr "vzorec hosta"
 msgid "hostid of dependent item and master item should match"
 msgstr "hostid závislé položky a master položky by měly být shodné"
 
-#: include/classes/api/services/CMap.php:844
-#: include/classes/api/services/CMap.php:1311
+#: include/classes/api/services/CMap.php:843
+#: include/classes/api/services/CMap.php:1310
 msgid "icon"
 msgstr "ikonka"
 
-#: include/classes/api/services/CMap.php:865
-#: include/classes/api/services/CMap.php:1333
+#: include/classes/api/services/CMap.php:864
+#: include/classes/api/services/CMap.php:1332
 msgid "image"
 msgstr "obrázek"
 
@@ -20801,7 +20801,7 @@ msgstr "základní pravidlo nálezu"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
+#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:378
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
@@ -20838,8 +20838,8 @@ msgstr ""
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CMap.php:861
-#: include/classes/api/services/CMap.php:1329
+#: include/classes/api/services/CMap.php:860
+#: include/classes/api/services/CMap.php:1328
 msgid "map"
 msgstr "mapa"
 
@@ -21096,7 +21096,7 @@ msgstr "výstup"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:389
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21254,8 +21254,8 @@ msgstr "krátký popis"
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMediatype.php:793
-#: include/classes/api/services/CProxy.php:705
-#: include/classes/api/services/CProxy.php:834
+#: include/classes/api/services/CProxy.php:698
+#: include/classes/api/services/CProxy.php:824
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:579
@@ -21436,8 +21436,8 @@ msgstr ""
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:857
-#: include/classes/api/services/CMap.php:1325 include/events.inc.php:34
+#: include/classes/api/services/CMap.php:856
+#: include/classes/api/services/CMap.php:1324 include/events.inc.php:34
 #: include/events.inc.php:59
 msgid "trigger"
 msgstr "spouštěč"
@@ -21509,8 +21509,8 @@ msgstr "neočekávaný konec makra"
 #: include/classes/api/services/CDiscoveryRule.php:1702
 #: include/classes/api/services/CDiscoveryRule.php:1725
 #: include/classes/api/services/CDiscoveryRule.php:1744
-#: include/classes/api/services/CGraphGeneral.php:606
-#: include/classes/api/services/CGraphGeneral.php:728
+#: include/classes/api/services/CGraphGeneral.php:599
+#: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1719
 #: include/classes/api/services/CHttpTest.php:372
@@ -21548,8 +21548,8 @@ msgstr "neočekávaný text \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
+#: include/classes/api/services/CProxy.php:593
 #: include/classes/api/services/CProxy.php:600
-#: include/classes/api/services/CProxy.php:607
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""
@@ -21606,7 +21606,7 @@ msgstr "nepodporované číslo verze"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:390
 msgid "value"
 msgstr "hodnota"
 
@@ -21692,10 +21692,10 @@ msgstr ""
 #: include/classes/api/services/CHost.php:2001
 #: include/classes/api/services/CHost.php:2156
 #: include/classes/api/services/CMapElement.php:86
-#: include/classes/api/services/CMap.php:683
-#: include/classes/api/services/CMap.php:689
-#: include/classes/api/services/CMap.php:1152
-#: include/classes/api/services/CMap.php:1158
+#: include/classes/api/services/CMap.php:682
+#: include/classes/api/services/CMap.php:688
+#: include/classes/api/services/CMap.php:1151
+#: include/classes/api/services/CMap.php:1157
 #: include/classes/api/services/CReport.php:209
 #: include/classes/api/services/CReport.php:612
 #: include/classes/import/validators/C52XmlValidator.php:2582

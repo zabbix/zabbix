@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-16 10:58+0300\n"
+"POT-Creation-Date: 2021-07-02 19:55+0300\n"
 "PO-Revision-Date: 2021-06-17 14:02+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -54,7 +54,7 @@ msgstr "\"%1$s\" должно быть пустой строкой или бол
 #: include/classes/api/services/CMaintenance.php:599
 #: include/classes/api/services/CMaintenance.php:615
 #: include/classes/api/services/CMaintenance.php:684 maintenance.php:137
-#: maintenance.php:143 services.php:177 services.php:186
+#: maintenance.php:143 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%1$s\" должно быть между 1970.01.01 и 2038.01.18."
@@ -269,7 +269,7 @@ msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, только чтение"
 
-#: jsLoader.php:363
+#: jsLoader.php:362
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -593,7 +593,7 @@ msgstr "Подтвержденные РЕШЕННЫЕ события"
 #: include/views/js/monitoring.sysmaps.js.php:792
 #: include/views/monitoring.sysmap.edit.php:278
 #: include/views/monitoring.sysmap.edit.php:322
-#: include/views/monitoring.sysmap.edit.php:359 services.php:348
+#: include/views/monitoring.sysmap.edit.php:359 services.php:353
 msgid "Action"
 msgstr "Действие"
 
@@ -1033,7 +1033,7 @@ msgstr "Выровнять элементы карты"
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:385
 msgid "All"
 msgstr "Все"
 
@@ -1750,7 +1750,7 @@ msgstr "Нельзя удалить"
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
-#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
+#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:381
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -1822,7 +1822,7 @@ msgstr "Не удалось добавить прототип узлов сет�
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:107
-#: app/controllers/CControllerImageCreate.php:131
+#: app/controllers/CControllerImageCreate.php:133
 msgid "Cannot add image"
 msgstr "Не удалось добавить изображение"
 
@@ -1838,7 +1838,7 @@ msgstr "Не удалось добавить прототип элементов
 msgid "Cannot add maintenance"
 msgstr "Не удалось добавить обслуживание"
 
-#: include/classes/api/services/CMap.php:1559
+#: include/classes/api/services/CMap.php:1558
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
 msgstr "Не удалось добавить элемент карты на карту \"%1$s\" по причине цикличности."
@@ -1866,12 +1866,12 @@ msgstr "Невозможно добавить более одного элеме
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr "Невозможно добавить более одного элемента данных с типом \"Суммарный график\" к прототипу графика \"%1$s\"."
 
-#: sysmaps.php:215
+#: sysmaps.php:216
 msgid "Cannot add network map"
 msgstr "Не удалось добавить карту сети"
 
 #: app/controllers/CControllerProxyCreate.php:58
-#: app/controllers/CControllerProxyCreate.php:120
+#: app/controllers/CControllerProxyCreate.php:126
 msgid "Cannot add proxy"
 msgstr "Не удалось добавить прокси"
 
@@ -1889,7 +1889,7 @@ msgstr "Не удалось добавить регулярный отчет"
 msgid "Cannot add script"
 msgstr "Не удалось добавить скрипт"
 
-#: services.php:152
+#: services.php:154
 msgid "Cannot add service"
 msgstr "Невозможно добавить услугу"
 
@@ -1985,7 +1985,7 @@ msgstr "Не возможно подключиться к базе данных.
 msgid "Cannot convert POST data:"
 msgstr "Не удалось выполнить конвертацию POST данных:"
 
-#: graphs.php:392
+#: graphs.php:401
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] "Не удалось скопировать график"
@@ -2102,19 +2102,19 @@ msgstr[2] "Не удалось удалить правила обнаружен�
 msgid "Cannot delete discovery rules"
 msgstr "Не удалось удалить правила обнаружения"
 
-#: graphs.php:283
+#: graphs.php:292
 msgid "Cannot delete graph"
 msgstr "Не удалось удалить график"
 
-#: graphs.php:275
+#: graphs.php:284
 msgid "Cannot delete graph prototype"
 msgstr "Не удалось удалить прототип графика"
 
-#: graphs.php:316
+#: graphs.php:325
 msgid "Cannot delete graph prototypes"
 msgstr "Не удалось удалить прототипы графиков"
 
-#: graphs.php:333
+#: graphs.php:342
 msgid "Cannot delete graphs"
 msgstr "Не удалось удалить график"
 
@@ -2153,7 +2153,7 @@ msgstr "Не удалось удалить прототипы узлов сет�
 msgid "Cannot delete icon map"
 msgstr "Не удалось удалить соответствие иконок"
 
-#: app/controllers/CControllerImageDelete.php:69
+#: app/controllers/CControllerImageDelete.php:70
 msgid "Cannot delete image"
 msgstr "Не удалось удалить изображение"
 
@@ -2201,7 +2201,7 @@ msgstr[0] "Не удалось удалить модуль: %1$s."
 msgstr[1] "Не удалось удалить модули: %1$s."
 msgstr[2] "Не удалось удалить модули: %1$s."
 
-#: sysmaps.php:262
+#: sysmaps.php:269
 msgid "Cannot delete network map"
 msgstr "Не удалось удалить карту сети"
 
@@ -2247,7 +2247,7 @@ msgstr "Не удалось удалить скрипты. Скрипт \"%1$s\"
 msgid "Cannot delete selected actions"
 msgstr "Не удалось удалить выбранные действия"
 
-#: services.php:107
+#: services.php:108
 msgid "Cannot delete service"
 msgstr "Не удалось удалить услугу"
 
@@ -2648,7 +2648,7 @@ msgstr "Не удалось найти преобразование значен
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "Не удалось построить дерево. Проверьте логическую структуру в соединениях между услугами."
 
-#: services.php:353
+#: services.php:358
 msgid "Cannot format tree."
 msgstr "Не удалось построить дерево."
 
@@ -2783,12 +2783,12 @@ msgstr "Не удалось отправить запрос: %1$s."
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для действия \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:514
+#: include/classes/api/services/CGraphGeneral.php:507
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для графика \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:521
+#: include/classes/api/services/CGraphGeneral.php:514
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для прототипа графика \"%2$s\"."
@@ -2852,12 +2852,12 @@ msgstr "Не удалось отсоединить триггер \"%1$s\", у �
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для действия \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:700
+#: include/classes/api/services/CGraphGeneral.php:693
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для графика \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:705
+#: include/classes/api/services/CGraphGeneral.php:698
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для прототипа графика \"%2$s\"."
@@ -2894,7 +2894,7 @@ msgstr "Не удалось обновить \"%1$s\" у обнаруженно�
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Не удалось обновить \"%2$s\" у обнаруженного триггера \"%1$s\"."
 
-#: include/classes/api/services/CImage.php:519
+#: include/classes/api/services/CImage.php:506
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
 msgstr "Не удалось обновить \"imagetype\" для изображения \"%1$s\"."
@@ -2956,7 +2956,7 @@ msgstr[0] "Не удалось обновить событие"
 msgstr[1] "Не удалось обновить события"
 msgstr[2] "Не удалось обновить события"
 
-#: graphs.php:243 graphs.php:296
+#: graphs.php:243 graphs.php:305
 msgid "Cannot update graph"
 msgstr "Не удалось обновить график"
 
@@ -3000,7 +3000,7 @@ msgstr "Не удалось обновить соответствие иконо
 
 #: app/controllers/CControllerImageUpdate.php:43
 #: app/controllers/CControllerImageUpdate.php:110
-#: app/controllers/CControllerImageUpdate.php:144
+#: app/controllers/CControllerImageUpdate.php:146
 msgid "Cannot update image"
 msgstr "Не удалось обновить изображение"
 
@@ -3051,12 +3051,12 @@ msgid "Cannot update network map"
 msgstr "Не удалось обновить карту сети"
 
 #: app/controllers/CControllerProxyUpdate.php:59
-#: app/controllers/CControllerProxyUpdate.php:118
+#: app/controllers/CControllerProxyUpdate.php:124
 msgid "Cannot update proxy"
 msgstr "Не удалось обновить прокси"
 
-#: include/classes/api/services/CProxy.php:746
-#: include/classes/api/services/CProxy.php:870
+#: include/classes/api/services/CProxy.php:739
+#: include/classes/api/services/CProxy.php:860
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Не удалось обновить прокси для обнаруженного узла сети \"%1$s\"."
@@ -3088,7 +3088,7 @@ msgstr "Не удалось обновить скрипт"
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr "Не удалось обновить область использования скрипта. Скрипт \"%1$s\" используется в действии \"%2$s\"."
 
-#: services.php:146
+#: services.php:147
 msgid "Cannot update service"
 msgstr "Невозможно обновить услугу"
 
@@ -3460,7 +3460,7 @@ msgstr "Клонировать"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
-#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
+#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:374
 msgid "Close"
 msgstr "Закрыть"
 
@@ -4071,7 +4071,7 @@ msgstr "Правило корреляции"
 msgid "Correlation updated"
 msgstr "Корреляция обновлена"
 
-#: include/classes/api/services/CImage.php:341
+#: include/classes/api/services/CImage.php:333
 msgid "Could not save image!"
 msgstr "Не удалось сохранить изображение!"
 
@@ -4395,8 +4395,8 @@ msgstr "Пользовательские интервалы"
 msgid "Custom label"
 msgstr "Пользовательская подпись"
 
-#: include/classes/api/services/CMap.php:889
-#: include/classes/api/services/CMap.php:1361
+#: include/classes/api/services/CMap.php:888
+#: include/classes/api/services/CMap.php:1360
 #, c-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Пользовательская подпись для карты сети \"%2$s\" у элементов с типом \"%1$s\" не может быть пустой."
@@ -4534,7 +4534,7 @@ msgstr "Панель с ID \"%1$s\" недоступна."
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172 jsLoader.php:337
+#: include/views/inventory.host.view.php:172
 msgid "Dashboards"
 msgstr "Панели"
 
@@ -4704,7 +4704,7 @@ msgstr "День недели"
 msgid "Days"
 msgstr "Дни"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:365
 msgid "Debug"
 msgstr "Отладка"
 
@@ -4849,7 +4849,7 @@ msgstr "Задерживается на"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
 #: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
-#: jsLoader.php:176 jsLoader.php:338
+#: jsLoader.php:176 jsLoader.php:337
 msgid "Delete"
 msgstr "Удалить"
 
@@ -4878,7 +4878,7 @@ msgstr "Удалить текущее действие?"
 msgid "Delete current correlation?"
 msgstr "Удалить текущую корреляцию?"
 
-#: jsLoader.php:339
+#: jsLoader.php:338
 msgid "Delete dashboard?"
 msgstr "Удалить панель?"
 
@@ -5634,7 +5634,7 @@ msgstr "Показать стэкируемый график"
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1646 include/actions.inc.php:1717
 #: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:378
+#: jsLoader.php:377
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Отображено %1$s из %2$s найденных"
@@ -5670,7 +5670,7 @@ msgstr "Не хранить историю"
 msgid "Do not keep trends"
 msgstr "Не хранить динамику изменений"
 
-#: jsLoader.php:216 jsLoader.php:340
+#: jsLoader.php:216 jsLoader.php:339
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Вы хотите заменить условие выражения?"
 
@@ -5767,8 +5767,8 @@ msgstr "Дубликат \"%1$s\" значения \"%2$s\" у корреляц�
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 msgstr "Дубликат \"%1$s\" значения \"%2$s\" у корреляции."
 
-#: include/classes/api/services/CMap.php:614
-#: include/classes/api/services/CMap.php:1076
+#: include/classes/api/services/CMap.php:613
+#: include/classes/api/services/CMap.php:1075
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
 msgstr "Дубликат значения \"имя\" \"%1$s\" у карты сети."
@@ -5795,14 +5795,14 @@ msgstr "Дубликат узла сети. Узел сети с таким же
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr "Дубликат узла сети. Узел сети с таким же видимым именем узла сети \"%1$s\" уже существует в данных."
 
-#: include/classes/api/services/CMap.php:743
-#: include/classes/api/services/CMap.php:1211
+#: include/classes/api/services/CMap.php:742
+#: include/classes/api/services/CMap.php:1210
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "Дубликат userid \"%1$s\" в пользователях у карты сети \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:818
-#: include/classes/api/services/CMap.php:1285
+#: include/classes/api/services/CMap.php:817
+#: include/classes/api/services/CMap.php:1284
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Дубликат usrgrpid \"%1$s\" в группах пользователей у карты сети \"%2$s\"."
@@ -5872,7 +5872,7 @@ msgstr "Изменить операцию"
 msgid "Edit tree element"
 msgstr "Изменит элемент дерева"
 
-#: jsLoader.php:341
+#: jsLoader.php:340
 msgid "Edit trigger"
 msgstr "Изменить триггер"
 
@@ -5973,18 +5973,18 @@ msgstr "Пустой тип условия фильтрации для дейс�
 #: include/classes/api/services/CHost.php:1369
 #: include/classes/api/services/CHost.php:1898
 #: include/classes/api/services/CHostPrototype.php:1093
-#: include/classes/api/services/CImage.php:448
-#: include/classes/api/services/CImage.php:501
+#: include/classes/api/services/CImage.php:430
+#: include/classes/api/services/CImage.php:482
 #: include/classes/api/services/CMaintenance.php:542
-#: include/classes/api/services/CMap.php:563
-#: include/classes/api/services/CMap.php:589
-#: include/classes/api/services/CMap.php:1034
+#: include/classes/api/services/CMap.php:562
+#: include/classes/api/services/CMap.php:588
+#: include/classes/api/services/CMap.php:1033
 #: include/classes/api/services/CMediatype.php:182
 #: include/classes/api/services/CMediatype.php:448
-#: include/classes/api/services/CService.php:360
-#: include/classes/api/services/CService.php:395
-#: include/classes/api/services/CService.php:459
-#: include/classes/api/services/CService.php:527
+#: include/classes/api/services/CService.php:345
+#: include/classes/api/services/CService.php:378
+#: include/classes/api/services/CService.php:442
+#: include/classes/api/services/CService.php:510
 #: include/classes/api/services/CTemplate.php:682
 #: include/classes/api/services/CTrigger.php:798
 #: include/classes/api/services/CUserMacro.php:506
@@ -5993,7 +5993,7 @@ msgstr "Пустой тип условия фильтрации для дейс�
 msgid "Empty input parameter."
 msgstr "Пустой входной параметр."
 
-#: include/classes/api/services/CMap.php:1042
+#: include/classes/api/services/CMap.php:1041
 msgid "Empty map ID."
 msgstr "Пустой ID карты сети."
 
@@ -6001,11 +6001,11 @@ msgstr "Пустой ID карты сети."
 msgid "Empty media type ID."
 msgstr "Пустой ID типа оповещений."
 
-#: include/classes/api/services/CService.php:881
+#: include/classes/api/services/CService.php:864
 msgid "Empty name."
 msgstr "Пустое имя."
 
-#: include/classes/api/services/CImage.php:360
+#: include/classes/api/services/CImage.php:350
 msgid "Empty parameters"
 msgstr "Пустые параметры"
 
@@ -6228,7 +6228,7 @@ msgstr "Английский (en_GB)"
 msgid "English (en_US)"
 msgstr "Английский (en_US)"
 
-#: include/classes/api/services/CGraphGeneral.php:625
+#: include/classes/api/services/CGraphGeneral.php:618
 #: include/classes/api/services/CHostGroup.php:757
 #: include/classes/api/services/CHostPrototype.php:341
 #: include/classes/api/services/CHttpTest.php:390
@@ -6387,7 +6387,7 @@ msgstr "Исключить группы узлов сети"
 msgid "Execute"
 msgstr "Выполнить"
 
-#: include/classes/api/services/CImage.php:224
+#: include/classes/api/services/CImage.php:225
 #, c-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "Ошибка выполнения SQL [%1$s] в [%2$s]."
@@ -6680,7 +6680,7 @@ msgstr "Поле \"%1$s\" не может быть NULL."
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Поле \"%1$s\" обязательно."
 
-#: include/classes/api/services/CMap.php:793
+#: include/classes/api/services/CMap.php:792
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "В поле \"%1$s\" пропущено значение у карты сети \"%2$s\"."
@@ -6729,7 +6729,7 @@ msgstr "Поле \"host\" является обязательным."
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Контрольная сумма файла, вычисляется алгоритмом UNIX cksum. Возвращает целое число"
 
-#: include/classes/api/services/CImage.php:570
+#: include/classes/api/services/CImage.php:557
 msgid "File format is unsupported."
 msgstr "Формат файла не поддерживается."
 
@@ -6940,7 +6940,7 @@ msgstr "Пятница"
 #: include/views/configuration.services.edit.php:259
 #: include/views/configuration.services.edit.php:307
 #: include/views/js/monitoring.sysmaps.js.php:748 report4.php:191
-#: services.php:47 services.php:177
+#: services.php:47 services.php:182
 msgid "From"
 msgstr "От"
 
@@ -7055,7 +7055,7 @@ msgstr "Глобальное значение"
 msgid "Go back to %1$s"
 msgstr "Вернуться к %1$s"
 
-#: jsLoader.php:346
+#: jsLoader.php:345
 msgid "Go to"
 msgstr "Перейти к"
 
@@ -7167,14 +7167,14 @@ msgstr "График (классический)"
 msgid "Graph added"
 msgstr "График добавлен"
 
-#: graphs.php:391
+#: graphs.php:400
 msgid "Graph copied"
 msgid_plural "Graphs copied"
 msgstr[0] "График скопирован"
 msgstr[1] "Графики скопированы"
 msgstr[2] "Графики скопированы"
 
-#: graphs.php:283
+#: graphs.php:292
 msgid "Graph deleted"
 msgstr "График удален"
 
@@ -7211,7 +7211,7 @@ msgstr "Прототип графика \"%1$s\" с элементами дан�
 msgid "Graph prototype added"
 msgstr "Прототип графиков добавлен"
 
-#: graphs.php:275
+#: graphs.php:284
 msgid "Graph prototype deleted"
 msgstr "Прототип графиков удален"
 
@@ -7233,7 +7233,7 @@ msgstr "Прототип графиков с ID \"%1$s\" недоступен."
 msgid "Graph prototypes"
 msgstr "Прототипы графиков"
 
-#: graphs.php:316
+#: graphs.php:325
 msgid "Graph prototypes deleted"
 msgstr "Прототипы графиков удалены"
 
@@ -7250,7 +7250,7 @@ msgstr "Суммарный график"
 msgid "Graph type"
 msgstr "Тип графика"
 
-#: graphs.php:242 graphs.php:296
+#: graphs.php:242 graphs.php:305
 msgid "Graph updated"
 msgstr "График обновлен"
 
@@ -7260,7 +7260,7 @@ msgstr "График обновлен"
 msgid "Graph with ID \"%1$s\" is not available."
 msgstr "График с ID \"%1$s\" недоступен."
 
-#: include/classes/api/services/CGraphGeneral.php:838
+#: include/classes/api/services/CGraphGeneral.php:831
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "График с именем \"%1$s\" уже существует в графиках или в прототипах графиков."
@@ -7282,7 +7282,7 @@ msgstr "График с таким же именем, но другого тип
 #: app/views/monitoring.charts.view.php:138 app/views/popup.import.php:38
 #: app/views/search.php:89 app/views/search.php:96 app/views/search.php:137
 #: app/views/search.php:142 app/views/search.php:316 app/views/search.php:321
-#: graphs.php:485 include/html.inc.php:356
+#: graphs.php:494 include/html.inc.php:356
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:44
 #: include/views/configuration.host.discovery.list.php:195
@@ -7293,11 +7293,11 @@ msgstr "График с таким же именем, но другого тип
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:347
+#: include/views/inventory.host.view.php:217 jsLoader.php:346
 msgid "Graphs"
 msgstr "Графики"
 
-#: graphs.php:333
+#: graphs.php:342
 msgid "Graphs deleted"
 msgstr "График удален"
 
@@ -7498,7 +7498,7 @@ msgstr "Шестнадцатеричное в десятичное"
 msgid "Hidden"
 msgstr "Скрыта"
 
-#: jsLoader.php:367
+#: jsLoader.php:366
 msgid "Hide debug"
 msgstr "Скрыть отладку"
 
@@ -7550,7 +7550,7 @@ msgstr "Подсвечивать всю строку"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:348
+#: jsLoader.php:347
 msgid "History"
 msgstr "История"
 
@@ -7638,7 +7638,7 @@ msgstr "Выравнивание по горизонтали"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:255 jsLoader.php:349 report2.php:506
+#: jsLoader.php:255 jsLoader.php:348 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Узел сети"
@@ -7660,7 +7660,7 @@ msgstr "Узел сети \"%1$s\" уже существует."
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Узел сети \"%1$s\" не может быть без группы узлов сети."
 
-#: include/classes/api/services/CProxy.php:500
+#: include/classes/api/services/CProxy.php:493
 #, c-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Узел сети \"%1$s\" наблюдается через прокси \"%2$s\"."
@@ -8221,19 +8221,19 @@ msgstr "Исключения для атрибута sandbox в iframe"
 msgid "Image"
 msgstr "Изображение"
 
-#: include/classes/api/services/CImage.php:468
-#: include/classes/api/services/CImage.php:481
-#: include/classes/api/services/CImage.php:526
-#: include/classes/api/services/CImage.php:544
+#: include/classes/api/services/CImage.php:450
+#: include/classes/api/services/CImage.php:463
+#: include/classes/api/services/CImage.php:513
+#: include/classes/api/services/CImage.php:531
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr "Изображение \"%1$s\" уже существует."
 
-#: app/controllers/CControllerImageCreate.php:123
+#: app/controllers/CControllerImageCreate.php:125
 msgid "Image added"
 msgstr "Изображение добавлено"
 
-#: app/controllers/CControllerImageDelete.php:62
+#: app/controllers/CControllerImageDelete.php:63
 msgid "Image deleted"
 msgstr "Изображение удалено"
 
@@ -8241,18 +8241,18 @@ msgstr "Изображение удалено"
 msgid "Image label type"
 msgstr "Тип подписи к изображению"
 
-#: include/classes/api/services/CImage.php:228
+#: include/classes/api/services/CImage.php:229
 #, c-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr "Ошибка при загрузке изображения [%1$s] в [%2$s]."
 
-#: include/classes/api/services/CImage.php:561
+#: include/classes/api/services/CImage.php:548
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
 msgstr "Размер изображения должен быть менее %1$s."
 
-#: app/controllers/CControllerImageUpdate.php:135
+#: app/controllers/CControllerImageUpdate.php:137
 msgid "Image updated"
 msgstr "Изображение обновлено"
 
@@ -8408,49 +8408,49 @@ msgstr "Включая подгруппы"
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Статистика входящего трафика сетевого интерфейса. Возвращает целое число"
 
-#: include/classes/api/services/CMap.php:655
-#: include/classes/api/services/CMap.php:1138
+#: include/classes/api/services/CMap.php:654
+#: include/classes/api/services/CMap.php:1137
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
 msgstr "Некорректное значение \"высоты\" у карты сети \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:803
-#: include/classes/api/services/CMap.php:1271
+#: include/classes/api/services/CMap.php:802
+#: include/classes/api/services/CMap.php:1270
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Некорректное значение \"permission\" \"%1$s\" в группах пользователях у карты сети \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:728
-#: include/classes/api/services/CMap.php:1197
+#: include/classes/api/services/CMap.php:727
+#: include/classes/api/services/CMap.php:1196
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
 msgstr "Некорректное значение \"permission\" \"%1$s\" в пользователях у карты сети \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:674
-#: include/classes/api/services/CMap.php:1144
+#: include/classes/api/services/CMap.php:673
+#: include/classes/api/services/CMap.php:1143
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
 msgstr "Некорректное значение \"private\" \"%1$s\" у карты сети \"%2$s\"."
 
-#: include/classes/api/services/CService.php:1104
+#: include/classes/api/services/CService.php:1085
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Некорректное значение поля \"нежесткая\" для зависимости у услуги \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:649
-#: include/classes/api/services/CMap.php:1132
+#: include/classes/api/services/CMap.php:648
+#: include/classes/api/services/CMap.php:1131
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
 msgstr "Некорректное значение \"width\" у карты сети \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:876
-#: include/classes/api/services/CMap.php:883
-#: include/classes/api/services/CMap.php:899
-#: include/classes/api/services/CMap.php:909
-#: include/classes/api/services/CMap.php:1344
-#: include/classes/api/services/CMap.php:1353
-#: include/classes/api/services/CMap.php:1370
-#: include/classes/api/services/CMap.php:1382
+#: include/classes/api/services/CMap.php:875
+#: include/classes/api/services/CMap.php:882
+#: include/classes/api/services/CMap.php:898
+#: include/classes/api/services/CMap.php:908
+#: include/classes/api/services/CMap.php:1343
+#: include/classes/api/services/CMap.php:1352
+#: include/classes/api/services/CMap.php:1369
+#: include/classes/api/services/CMap.php:1381
 #, c-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "Некорректное значение %1$s типа подписи для карты сети \"%2$s\"."
@@ -8476,7 +8476,7 @@ msgstr "Некорректный endpoint API Хранилища."
 msgid "Incorrect Vault token."
 msgstr "Некорректный токен Vault."
 
-#: include/classes/api/services/CService.php:927
+#: include/classes/api/services/CService.php:910
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Некорректное значение допустимого SLA для услуги \"%1$s\"."
@@ -8585,7 +8585,7 @@ msgstr "Некорректный пользователь для операци�
 msgid "Incorrect action operationid."
 msgstr "Некорректный operationid действия."
 
-#: include/classes/api/services/CService.php:894
+#: include/classes/api/services/CService.php:877
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Некорректный алгоритм для услуги \"%1$s\"."
@@ -8660,13 +8660,13 @@ msgstr "В функцию переданы некорректные аргуме
 #: include/classes/api/services/CMapElement.php:740
 #: include/classes/api/services/CMapElement.php:775
 #: include/classes/api/services/CMapElement.php:800
-#: include/classes/api/services/CMap.php:698
-#: include/classes/api/services/CMap.php:772
-#: include/classes/api/services/CMap.php:986
-#: include/classes/api/services/CMap.php:1059
-#: include/classes/api/services/CMap.php:1167
-#: include/classes/api/services/CMap.php:1240
-#: include/classes/api/services/CMap.php:1460
+#: include/classes/api/services/CMap.php:697
+#: include/classes/api/services/CMap.php:771
+#: include/classes/api/services/CMap.php:985
+#: include/classes/api/services/CMap.php:1058
+#: include/classes/api/services/CMap.php:1166
+#: include/classes/api/services/CMap.php:1239
+#: include/classes/api/services/CMap.php:1459
 #: include/classes/api/services/CMediatype.php:189
 #: include/classes/api/services/CMediatype.php:485
 msgid "Incorrect arguments passed to function."
@@ -8676,7 +8676,7 @@ msgstr "В функцию переданы некорректные аргуме
 msgid "Incorrect bulk value for interface."
 msgstr "Некорректное значение массового опроса для интерфейса."
 
-#: include/classes/api/services/CService.php:911
+#: include/classes/api/services/CService.php:894
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Некорректное вычисляемое значение SLA для услуги \"%1$s\"."
@@ -8688,8 +8688,8 @@ msgstr "Некорректное вычисляемое значение SLA д�
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr "Использованы некорректные символы в имени узла сети \"%1$s\"."
 
-#: include/classes/api/services/CProxy.php:665
-#: include/classes/api/services/CProxy.php:781
+#: include/classes/api/services/CProxy.php:658
+#: include/classes/api/services/CProxy.php:774
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Использованы некорректные символы в имени прокси \"%1$s\"."
@@ -8763,7 +8763,7 @@ msgstr "Некорректное значение eventsource."
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Некорректное имя поля \"%1$s\" или значение в выражении where для таблицы \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:606
+#: include/classes/api/services/CMap.php:605
 msgid "Incorrect fields for sysmap."
 msgstr "Некорректные поля для карты сети."
 
@@ -8837,12 +8837,12 @@ msgstr "Некорректный индекс изображения."
 #: include/classes/api/services/CHost.php:1014
 #: include/classes/api/services/CHost.php:1917
 #: include/classes/api/services/CHost.php:2116
-#: include/classes/api/services/CImage.php:460
-#: include/classes/api/services/CImage.php:506
-#: include/classes/api/services/CProxy.php:660
-#: include/classes/api/services/CProxy.php:726
-#: include/classes/api/services/CProxy.php:770
-#: include/classes/api/services/CProxy.php:792
+#: include/classes/api/services/CImage.php:442
+#: include/classes/api/services/CImage.php:487
+#: include/classes/api/services/CProxy.php:653
+#: include/classes/api/services/CProxy.php:719
+#: include/classes/api/services/CProxy.php:763
+#: include/classes/api/services/CProxy.php:785
 #: include/classes/api/services/CTemplate.php:489
 #: include/classes/api/services/CTemplate.php:662
 #: include/classes/api/services/CTrigger.php:803
@@ -8869,7 +8869,7 @@ msgstr "Некорректное поле инвентарных данных \"
 msgid "Incorrect inventory mode in action operation."
 msgstr "Некорректный режим инвентарных данных в операции действия."
 
-#: include/classes/api/services/CGraphGeneral.php:304
+#: include/classes/api/services/CGraphGeneral.php:297
 msgid "Incorrect item for axis value."
 msgstr "Некорректный элемент данных для значения оси."
 
@@ -8900,7 +8900,7 @@ msgstr "Некорректное обслуживание - дата должн�
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Некорректный период обслуживания (минимум 5 минут)"
 
-#: include/classes/api/services/CMap.php:1043
+#: include/classes/api/services/CMap.php:1042
 msgid "Incorrect map ID."
 msgstr "Некорректный ID карты сети."
 
@@ -8948,12 +8948,12 @@ msgstr "Некорректные параметры для условии."
 msgid "Incorrect parameters for maintenance."
 msgstr "Некорректные параметры для обслуживания."
 
-#: include/classes/api/services/CService.php:969
+#: include/classes/api/services/CService.php:952
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Некорректный родитель для услуги \"%1$s\"."
 
-#: include/classes/api/services/CService.php:972
+#: include/classes/api/services/CService.php:955
 msgid "Incorrect parent service."
 msgstr "Некорректная родительская услуга."
 
@@ -8986,7 +8986,7 @@ msgstr "Некорректное время начала услуги."
 msgid "Incorrect service time type."
 msgstr "Некорректный тип времени услуги."
 
-#: include/classes/api/services/CService.php:942
+#: include/classes/api/services/CService.php:925
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "Некорректный порядок сортировки у услуги \"%1$s\"."
@@ -9002,7 +9002,7 @@ msgstr "Некорректное значение источника."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Некорректное состояние для узла сети \"%1$s\"."
 
-#: include/classes/api/services/CService.php:990
+#: include/classes/api/services/CService.php:973
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Некорректное состояние для услуги \"%1$s\"."
@@ -9011,7 +9011,7 @@ msgstr "Некорректное состояние для услуги \"%1$s\"
 msgid "Incorrect templated web scenario step count."
 msgstr "Некорректное количество шагов у шаблонного веб-сценария."
 
-#: include/classes/api/services/CService.php:955
+#: include/classes/api/services/CService.php:938
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Некорректный ID триггера для услуги \"%1$s\"."
@@ -9060,14 +9060,14 @@ msgstr "Некорректный тип вычисления для коррел
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Некорректный тип вычисления для правила обнаружения \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:764
-#: include/classes/api/services/CMap.php:1232
+#: include/classes/api/services/CMap.php:763
+#: include/classes/api/services/CMap.php:1231
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
 msgstr "Указано некорректное значение ID пользователя у карты сети \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:835
-#: include/classes/api/services/CMap.php:1302
+#: include/classes/api/services/CMap.php:834
+#: include/classes/api/services/CMap.php:1301
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
 msgstr "Указано некорректное значение ID группы пользователей у карты сети \"%1$s\"."
@@ -9341,10 +9341,10 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
 #: include/classes/api/services/CMapElement.php:169
-#: include/classes/api/services/CMap.php:682
-#: include/classes/api/services/CMap.php:688
-#: include/classes/api/services/CMap.php:1151
-#: include/classes/api/services/CMap.php:1157
+#: include/classes/api/services/CMap.php:681
+#: include/classes/api/services/CMap.php:687
+#: include/classes/api/services/CMap.php:1150
+#: include/classes/api/services/CMap.php:1156
 #: include/classes/api/services/CMediatype.php:377
 #: include/classes/api/services/CMediatype.php:387
 #: include/classes/api/services/CMediatype.php:396
@@ -9363,14 +9363,14 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CMediatype.php:762
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CMediatype.php:800
+#: include/classes/api/services/CProxy.php:592
 #: include/classes/api/services/CProxy.php:599
-#: include/classes/api/services/CProxy.php:606
-#: include/classes/api/services/CProxy.php:619
-#: include/classes/api/services/CProxy.php:625
-#: include/classes/api/services/CProxy.php:704
-#: include/classes/api/services/CProxy.php:712
-#: include/classes/api/services/CProxy.php:833
-#: include/classes/api/services/CProxy.php:841
+#: include/classes/api/services/CProxy.php:612
+#: include/classes/api/services/CProxy.php:618
+#: include/classes/api/services/CProxy.php:697
+#: include/classes/api/services/CProxy.php:705
+#: include/classes/api/services/CProxy.php:823
+#: include/classes/api/services/CProxy.php:831
 #: include/classes/api/services/CSettings.php:312
 #: include/classes/api/services/CTemplate.php:449
 #: include/classes/api/services/CTriggerGeneral.php:148
@@ -9444,12 +9444,12 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Некорректное значение для поля \"%1$s\": %2$s."
 
-#: include/classes/api/services/CProxy.php:631
+#: include/classes/api/services/CProxy.php:624
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
 msgstr "Использовано некорректное значение в поле PSK. Оно должно состоять из четного количества шестнадцатеричных символов."
 
-#: include/classes/api/services/CProxy.php:687
-#: include/classes/api/services/CProxy.php:822
+#: include/classes/api/services/CProxy.php:680
+#: include/classes/api/services/CProxy.php:815
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr "Использовано некорректное значение для состояния прокси \"%1$s\"."
@@ -9536,7 +9536,7 @@ msgid "Insert"
 msgstr "Вставить"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:341
 msgid "Insert expression"
 msgstr "Вставить выражение"
 
@@ -9615,8 +9615,8 @@ msgid "Internal data storage period"
 msgstr "Период хранения внутренних данных"
 
 #: include/classes/api/helpers/CApiHostHelper.php:90
-#: include/classes/api/services/CGraphGeneral.php:529
-#: include/classes/api/services/CGraphGeneral.php:712
+#: include/classes/api/services/CGraphGeneral.php:522
+#: include/classes/api/services/CGraphGeneral.php:705
 #: include/classes/api/services/CTriggerGeneral.php:1035
 #: include/classes/api/services/CTriggerGeneral.php:1162
 #: include/classes/api/services/CTriggerGeneral.php:1267
@@ -9747,9 +9747,9 @@ msgstr "Ошибочный ключ \"%1$s\": %2$s."
 msgid "Invalid macro \"%1$s\": %2$s."
 msgstr "Ошибочный макрос \"%1$s\": %2$s."
 
-#: include/classes/api/services/CService.php:216
-#: include/classes/api/services/CService.php:400
-#: include/classes/api/services/CService.php:1233
+#: include/classes/api/services/CService.php:212
+#: include/classes/api/services/CService.php:383
+#: include/classes/api/services/CService.php:1214
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
 msgstr "Ошибочные параметры метода."
@@ -9775,8 +9775,8 @@ msgstr "Ошибочные параметры метода."
 #: include/classes/api/services/CDiscoveryRule.php:1992
 #: include/classes/api/services/CDiscoveryRule.php:2010
 #: include/classes/api/services/CDiscoveryRule.php:2018
-#: include/classes/api/services/CGraphGeneral.php:605
-#: include/classes/api/services/CGraphGeneral.php:728
+#: include/classes/api/services/CGraphGeneral.php:598
+#: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1672
 #: include/classes/api/services/CHostPrototype.php:1677
@@ -10011,7 +10011,7 @@ msgstr "Ошибочное значение макроса \"%1$s\": %2$s."
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:349
 msgid "Inventory"
 msgstr "Инвентаризация"
 
@@ -10205,7 +10205,7 @@ msgstr "Прототипы элементов данных обновлены"
 msgid "Item tags"
 msgstr "Теги элемента данных"
 
-#: jsLoader.php:372
+#: jsLoader.php:371
 msgid "Item type does not use interface"
 msgstr "Тип элемента данных не использует интерфейс"
 
@@ -10585,11 +10585,11 @@ msgstr "Время последнего использования"
 msgid "Last check"
 msgstr "Последняя проверка"
 
-#: jsLoader.php:353
+#: jsLoader.php:352
 msgid "Last hour graph"
 msgstr "График за последний час"
 
-#: jsLoader.php:354
+#: jsLoader.php:353
 msgid "Last month graph"
 msgstr "График за последний месяц"
 
@@ -10619,7 +10619,7 @@ msgstr "Последняя отправка"
 msgid "Last value"
 msgstr "Последнее значение"
 
-#: jsLoader.php:355
+#: jsLoader.php:354
 msgid "Last week graph"
 msgstr "График за последнюю неделю"
 
@@ -10632,11 +10632,11 @@ msgstr "График за последнюю неделю"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:351
+#: include/views/inventory.host.view.php:149 jsLoader.php:350
 msgid "Latest data"
 msgstr "Последние данные"
 
-#: jsLoader.php:352
+#: jsLoader.php:351
 msgid "Latest values"
 msgstr "Последние значения"
 
@@ -10734,14 +10734,14 @@ msgstr "Индикаторы связи"
 msgid "Link new templates"
 msgstr "Присоединение новых шаблонов"
 
-#: include/classes/api/services/CMap.php:1006
-#: include/classes/api/services/CMap.php:1476
+#: include/classes/api/services/CMap.php:1005
+#: include/classes/api/services/CMap.php:1475
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Поле связи selementid1 указывает на не существующий selement ID \"%1$s\" для карты сети \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:1014
-#: include/classes/api/services/CMap.php:1484
+#: include/classes/api/services/CMap.php:1013
+#: include/classes/api/services/CMap.php:1483
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Поле связи selementid2 указывает на не существующий selement ID \"%1$s\" для карты сети \"%2$s\"."
@@ -11160,16 +11160,16 @@ msgstr "Закрыт вручную"
 msgid "Map"
 msgstr "Карта сети"
 
-#: include/classes/api/services/CMap.php:627
-#: include/classes/api/services/CMap.php:1092
+#: include/classes/api/services/CMap.php:626
+#: include/classes/api/services/CMap.php:1091
 #, c-format
 msgid "Map \"%1$s\" already exists."
 msgstr "Карта сети \"%1$s\" уже существует."
 
-#: include/classes/api/services/CMap.php:737
-#: include/classes/api/services/CMap.php:812
-#: include/classes/api/services/CMap.php:1205
-#: include/classes/api/services/CMap.php:1279
+#: include/classes/api/services/CMap.php:736
+#: include/classes/api/services/CMap.php:811
+#: include/classes/api/services/CMap.php:1204
+#: include/classes/api/services/CMap.php:1278
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
 msgstr "Карта сети \"%1$s\" является публичной и общий доступ только на чтение отключен."
@@ -11203,7 +11203,7 @@ msgstr "Карта обновлена! Вернуться в список кар
 msgid "Map label type"
 msgstr "Тип подписи к карте сети"
 
-#: include/classes/api/services/CMap.php:1062
+#: include/classes/api/services/CMap.php:1061
 msgid "Map name cannot be empty."
 msgstr "Имя карты сети не может быть пустым."
 
@@ -11212,8 +11212,8 @@ msgstr "Имя карты сети не может быть пустым."
 msgid "Map navigation tree"
 msgstr "Дерево навигации карт сетей"
 
-#: include/classes/api/services/CMap.php:662
-#: include/classes/api/services/CMap.php:1116
+#: include/classes/api/services/CMap.php:661
+#: include/classes/api/services/CMap.php:1115
 msgid "Map owner cannot be empty."
 msgstr "Владелец карты сети не может быть пустым."
 
@@ -11625,8 +11625,8 @@ msgstr "Минут"
 msgid "Missing \"gitemid\" field for item."
 msgstr "Пропущенное поле \"gitemid\" для элемента данных."
 
-#: include/classes/api/services/CGraphGeneral.php:469
-#: include/classes/api/services/CGraphGeneral.php:655
+#: include/classes/api/services/CGraphGeneral.php:462
+#: include/classes/api/services/CGraphGeneral.php:648
 msgid "Missing \"itemid\" field for item."
 msgstr "Пропущенное поле \"itemid\" для элемента данных."
 
@@ -11795,7 +11795,7 @@ msgstr "Найдено более чем %1$d соответствий с %2$s"
 msgid "More than 10 minutes"
 msgstr "Более 10 минут"
 
-#: include/classes/api/services/CGraphGeneral.php:851
+#: include/classes/api/services/CGraphGeneral.php:844
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Более чем один график с именем \"%1$s\" у узла сети."
@@ -12026,11 +12026,11 @@ msgstr "Период хранения данных о событиях сете�
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "Список сетевых интерфейсов (включая тип, состояние, IPv4 адресс, описание). Возвращает текст"
 
-#: sysmaps.php:214
+#: sysmaps.php:215
 msgid "Network map added"
 msgstr "Карта сети добавлена"
 
-#: sysmaps.php:262
+#: sysmaps.php:269
 msgid "Network map deleted"
 msgstr "Карта сети удалена"
 
@@ -12200,7 +12200,7 @@ msgstr "Не задано \"%1$s\" для прототипа графиков."
 msgid "No \"%1$s\" given for graph."
 msgstr "Не задано \"%1$s\" для графика."
 
-#: include/classes/api/services/CMap.php:1041
+#: include/classes/api/services/CMap.php:1040
 #, c-format
 msgid "No \"%1$s\" given for map."
 msgstr "Не указан \"%1$s\" у карты сети."
@@ -12350,7 +12350,7 @@ msgstr "Нет изображения"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:370
 msgid "No interface found"
 msgstr "Интерфейс не найден"
 
@@ -12358,8 +12358,8 @@ msgstr "Интерфейс не найден"
 msgid "No interface found."
 msgstr "Интерфейс не найден."
 
-#: include/classes/api/services/CProxy.php:696
-#: include/classes/api/services/CProxy.php:879
+#: include/classes/api/services/CProxy.php:689
+#: include/classes/api/services/CProxy.php:869
 #, c-format
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr "Не указан интерфейс для прокси \"%1$s\"."
@@ -12503,10 +12503,10 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CIconMap.php:285
 #: include/classes/api/services/CIconMap.php:528
-#: include/classes/api/services/CImage.php:364
-#: include/classes/api/services/CImage.php:444
-#: include/classes/api/services/CImage.php:497
-#: include/classes/api/services/CImage.php:513
+#: include/classes/api/services/CImage.php:354
+#: include/classes/api/services/CImage.php:426
+#: include/classes/api/services/CImage.php:478
+#: include/classes/api/services/CImage.php:500
 #: include/classes/api/services/CItemGeneral.php:221
 #: include/classes/api/services/CItemGeneral.php:329
 #: include/classes/api/services/CItemGeneral.php:344
@@ -12521,20 +12521,20 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 #: include/classes/api/services/CMaintenance.php:777
 #: include/classes/api/services/CMapElement.php:189
 #: include/classes/api/services/CMapElement.php:319
-#: include/classes/api/services/CMap.php:575
-#: include/classes/api/services/CMap.php:990
-#: include/classes/api/services/CMap.php:1052
-#: include/classes/api/services/CMap.php:1611
-#: include/classes/api/services/CMap.php:2056
-#: include/classes/api/services/CMap.php:2118
+#: include/classes/api/services/CMap.php:574
+#: include/classes/api/services/CMap.php:989
+#: include/classes/api/services/CMap.php:1051
+#: include/classes/api/services/CMap.php:1610
+#: include/classes/api/services/CMap.php:2048
+#: include/classes/api/services/CMap.php:2110
 #: include/classes/api/services/CMediatype.php:478
 #: include/classes/api/services/CModule.php:231
 #: include/classes/api/services/CProxy.php:186
-#: include/classes/api/services/CProxy.php:281
-#: include/classes/api/services/CProxy.php:456
-#: include/classes/api/services/CProxy.php:740
-#: include/classes/api/services/CProxy.php:774
-#: include/classes/api/services/CProxy.php:864
+#: include/classes/api/services/CProxy.php:276
+#: include/classes/api/services/CProxy.php:449
+#: include/classes/api/services/CProxy.php:733
+#: include/classes/api/services/CProxy.php:767
+#: include/classes/api/services/CProxy.php:854
 #: include/classes/api/services/CReport.php:925
 #: include/classes/api/services/CRole.php:388
 #: include/classes/api/services/CRole.php:805
@@ -12543,8 +12543,8 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 #: include/classes/api/services/CScript.php:1043
 #: include/classes/api/services/CScript.php:1060
 #: include/classes/api/services/CScript.php:1071
-#: include/classes/api/services/CService.php:1017
-#: include/classes/api/services/CService.php:1043
+#: include/classes/api/services/CService.php:1000
+#: include/classes/api/services/CService.php:1024
 #: include/classes/api/services/CSettings.php:264
 #: include/classes/api/services/CTask.php:430
 #: include/classes/api/services/CTask.php:477
@@ -12607,7 +12607,7 @@ msgstr "Не указан скрипт для команды в операции
 msgid "No target selected"
 msgstr "Цель не выбрана"
 
-#: graphs.php:396 items.php:1058
+#: graphs.php:405 items.php:1058
 msgid "No target selected."
 msgstr "Цель не выбрана."
 
@@ -13020,7 +13020,7 @@ msgstr "Выкл"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:382
 #: report2.php:506
 msgid "Ok"
 msgstr "Ok"
@@ -13100,8 +13100,8 @@ msgstr "Только Супер Администраторы могут обно
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Только Zabbix агент, SNMPv1, SNMPv2 и SNMPv3 проверки могут быть сделаны уникальными."
 
-#: include/classes/api/services/CMap.php:666
-#: include/classes/api/services/CMap.php:1120
+#: include/classes/api/services/CMap.php:665
+#: include/classes/api/services/CMap.php:1119
 msgid "Only administrators can set map owner."
 msgstr "Только администраторы могут указывать владельца карты сети."
 
@@ -13625,7 +13625,7 @@ msgstr "PSK"
 msgid "PSK identity"
 msgstr "Идентификатор PSK"
 
-#: include/classes/api/services/CProxy.php:637
+#: include/classes/api/services/CProxy.php:630
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr "PSK слишком короткий. Минимально %1$s шестнадцатеричных цифр."
@@ -13712,7 +13712,7 @@ msgstr "Родительские веб-сценарии"
 msgid "Parse"
 msgstr "Анализ"
 
-#: include/classes/api/services/CImage.php:218
+#: include/classes/api/services/CImage.php:219
 #, c-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "Ошибка разбора SQL [%1$s] в [%2$s]."
@@ -14222,7 +14222,7 @@ msgstr "Проблема, если хотя бы у одного из подчи
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:355 report2.php:506
 msgid "Problems"
 msgstr "Проблемы"
 
@@ -14290,8 +14290,8 @@ msgstr "Прокси"
 msgid "Proxy"
 msgstr "Прокси"
 
-#: include/classes/api/services/CProxy.php:679
-#: include/classes/api/services/CProxy.php:808
+#: include/classes/api/services/CProxy.php:672
+#: include/classes/api/services/CProxy.php:801
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
 msgstr "Прокси \"%1$s\" уже существует."
@@ -14301,17 +14301,17 @@ msgstr "Прокси \"%1$s\" уже существует."
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Прокси \"%1$s\" для узла сети \"%2$s\" не существует."
 
-#: include/classes/api/services/CProxy.php:523
+#: include/classes/api/services/CProxy.php:516
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
 msgstr "Прокси \"%1$s\" используется действием \"%2$s\"."
 
-#: include/classes/api/services/CProxy.php:480
+#: include/classes/api/services/CProxy.php:473
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Прокси \"%1$s\" используется правилом обнаружения \"%2$s\"."
 
-#: app/controllers/CControllerProxyCreate.php:113
+#: app/controllers/CControllerProxyCreate.php:119
 msgid "Proxy added"
 msgstr "Прокси добавлен"
 
@@ -14330,7 +14330,7 @@ msgstr[2] "Прокси удален"
 msgid "Proxy interface creation failed."
 msgstr "Ошибка при создании интерфейса прокси."
 
-#: include/classes/api/services/CProxy.php:405
+#: include/classes/api/services/CProxy.php:400
 msgid "Proxy interface update failed."
 msgstr "Ошибка при обновлении интерфейса прокси."
 
@@ -14342,7 +14342,7 @@ msgstr "Режим прокси"
 msgid "Proxy name"
 msgstr "Имя прокси"
 
-#: app/controllers/CControllerProxyUpdate.php:110
+#: app/controllers/CControllerProxyUpdate.php:116
 msgid "Proxy updated"
 msgstr "Прокси обновлен"
 
@@ -15594,7 +15594,7 @@ msgstr "Скрипт обновлен"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:356
 msgid "Scripts"
 msgstr "Скрипты"
 
@@ -15813,27 +15813,27 @@ msgstr "Время на сервере"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/popup.services.php:46 include/actions.inc.php:75
-#: include/views/configuration.services.edit.php:356 services.php:347
+#: include/views/configuration.services.edit.php:356 services.php:352
 #: srv_status.php:144
 msgid "Service"
 msgstr "Услуга"
 
-#: include/classes/api/services/CService.php:1074
+#: include/classes/api/services/CService.php:1055
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Услуга \"%1$s\" не может быть удалена, потому что другая услуга зависит от неё."
 
-#: include/classes/api/services/CService.php:1093
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Услуга \"%1$s\" не может зависеть сама от себя."
 
-#: include/classes/api/services/CService.php:1168
+#: include/classes/api/services/CService.php:1149
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Услуга \"%1$s\" не может быть связана с триггером и быть подчиненной одновременно."
 
-#: include/classes/api/services/CService.php:1145
+#: include/classes/api/services/CService.php:1126
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Услуга \"%1$s\" уже жестко связана с другой услугой."
@@ -15843,15 +15843,15 @@ msgstr "Услуга \"%1$s\" уже жестко связана с другой
 msgid "Service availability report"
 msgstr "Отчет доступности услуг"
 
-#: include/classes/api/services/CService.php:977
+#: include/classes/api/services/CService.php:960
 msgid "Service cannot be parent and child at the same time."
 msgstr "Услуга не может быть родительской и подчиненной одновременно."
 
-#: services.php:151
+#: services.php:153
 msgid "Service created"
 msgstr "Услуга создана"
 
-#: services.php:107
+#: services.php:108
 msgid "Service deleted"
 msgstr "Услуга удалена"
 
@@ -15879,7 +15879,7 @@ msgstr "Интервалы времени услуги"
 msgid "Service type"
 msgstr "Тип сервиса"
 
-#: services.php:145
+#: services.php:146
 msgid "Service updated"
 msgstr "Услуга обновлена"
 
@@ -15895,7 +15895,7 @@ msgstr "Услуга обновлена"
 msgid "Services"
 msgstr "Услуги"
 
-#: include/classes/api/services/CService.php:1215
+#: include/classes/api/services/CService.php:1196
 msgid "Services form a circular dependency."
 msgstr "Услуги образуют круговую зависимость."
 
@@ -15929,7 +15929,7 @@ msgstr "Задать дату и время срока действия"
 msgid "Set host inventory mode"
 msgstr "Задать режим инвентарных данных узлов сети"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:388
 msgid "Set new value"
 msgstr "Задать новое значение"
 
@@ -16019,13 +16019,13 @@ msgstr "Share"
 msgid "Shared"
 msgstr "Общий доступ"
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:342
 msgid "Sharing"
 msgstr "Общий доступ"
 
-#: include/classes/api/services/CMap.php:718
-#: include/classes/api/services/CMap.php:1187
-#: include/classes/api/services/CMap.php:1261
+#: include/classes/api/services/CMap.php:717
+#: include/classes/api/services/CMap.php:1186
+#: include/classes/api/services/CMap.php:1260
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Отсутствует значение опции общего доступа \"%1$s\" у карты сети \"%2$s\"."
@@ -16485,7 +16485,7 @@ msgstr "Статистика и доступность кэша записи в 
 msgid "Status"
 msgstr "Состояние"
 
-#: app/views/popup.services.php:47 services.php:349
+#: app/views/popup.services.php:47 services.php:354
 msgid "Status calculation"
 msgstr "Вычисление состояния"
 
@@ -16631,7 +16631,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Субъект"
 
-#: jsLoader.php:358
+#: jsLoader.php:357
 msgid "Submap"
 msgstr "Подкарта"
 
@@ -17183,7 +17183,7 @@ msgstr "Узел сети более не обнаруживается и буд
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Узел сети более не обнаруживается и будет удален при следующем выполнении правила обнаружения."
 
-#: include/classes/api/services/CImage.php:383
+#: include/classes/api/services/CImage.php:373
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
@@ -17191,7 +17191,7 @@ msgstr[0] "Изображение используется в соответст
 msgstr[1] "Изображение используется в соответствиях иконок %1$s."
 msgstr[2] "Изображение используется в соответствиях иконок %1$s."
 
-#: include/classes/api/services/CImage.php:409
+#: include/classes/api/services/CImage.php:399
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -17305,7 +17305,7 @@ msgstr "Четверг"
 #: app/views/report.services.php:82
 #: include/views/configuration.services.edit.php:266
 #: include/views/configuration.services.edit.php:321 report4.php:191
-#: services.php:48 services.php:186
+#: services.php:48 services.php:191
 msgid "Till"
 msgstr "До"
 
@@ -17402,7 +17402,7 @@ msgstr "Отметка времени"
 msgid "To"
 msgstr "К"
 
-#: jsLoader.php:370
+#: jsLoader.php:369
 msgid "To set a host interface select a single item type for all items"
 msgstr "Чтобы задать интерфейс узла сети выберите один тип элемента данных из всех элементов данных"
 
@@ -17534,8 +17534,8 @@ msgstr "Динамика изменений"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
-#: services.php:350
+#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:358
+#: services.php:355
 msgid "Trigger"
 msgstr "Триггер"
 
@@ -17713,11 +17713,11 @@ msgstr "Прототипы триггеров обновлены"
 msgid "Trigger severity"
 msgstr "Важность триггеров"
 
-#: jsLoader.php:344
+#: jsLoader.php:343
 msgid "Trigger status \"OK\""
 msgstr "Состояние триггера \"ОК\""
 
-#: jsLoader.php:345
+#: jsLoader.php:344
 msgid "Trigger status \"Problem\""
 msgstr "Состояние триггера \"Проблема\""
 
@@ -17883,7 +17883,7 @@ msgstr "НЕИЗВЕСТНО"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:359
 msgid "URL"
 msgstr "URL"
 
@@ -17908,8 +17908,8 @@ msgstr "URL C"
 msgid "URL is not properly encoded."
 msgstr "URL закодирован некорректно."
 
-#: include/classes/api/services/CMap.php:961
-#: include/classes/api/services/CMap.php:1436
+#: include/classes/api/services/CMap.php:960
+#: include/classes/api/services/CMap.php:1435
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "Имя URL должно быть уникальным у карты сети \"%1$s\"."
@@ -17922,14 +17922,14 @@ msgstr "Параметр URL не может быть массивом."
 msgid "URL parameter name is empty."
 msgstr "Параметр URL не может быть пустым."
 
-#: include/classes/api/services/CMap.php:955
-#: include/classes/api/services/CMap.php:1430
+#: include/classes/api/services/CMap.php:954
+#: include/classes/api/services/CMap.php:1429
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL должно быть с обоими полями \"name\" и \"url\" у карты сети \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:360
 msgid "URLs"
 msgstr "URLы"
 
@@ -18457,8 +18457,8 @@ msgstr[2] "Группы пользователей удалены"
 msgid "User group for database down message"
 msgstr "Группа пользователей для сообщения при недоступности базы данных"
 
-#: include/classes/api/services/CMap.php:784
-#: include/classes/api/services/CMap.php:1252
+#: include/classes/api/services/CMap.php:783
+#: include/classes/api/services/CMap.php:1251
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "Общий доступ группе пользователей имеет отсутствующие параметры: %1$s у карты сети \"%2$s\"."
@@ -18573,8 +18573,8 @@ msgstr "Сессии пользователей"
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: include/classes/api/services/CMap.php:709
-#: include/classes/api/services/CMap.php:1178
+#: include/classes/api/services/CMap.php:708
+#: include/classes/api/services/CMap.php:1177
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "Общий доступ пользователям имеет отсутствующие параметры: %1$s у карты сети \"%2$s\"."
@@ -18956,20 +18956,20 @@ msgstr "Валидация"
 msgid "Value"
 msgstr "Значение"
 
-#: include/classes/api/services/CMap.php:930
-#: include/classes/api/services/CMap.php:1405
+#: include/classes/api/services/CMap.php:929
+#: include/classes/api/services/CMap.php:1404
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Значение \"%1$s\" является недопустимым для параметра \"grid_align\". Варианты: \"%2$s\" и \"%3$s\""
 
-#: include/classes/api/services/CMap.php:941
-#: include/classes/api/services/CMap.php:1416
+#: include/classes/api/services/CMap.php:940
+#: include/classes/api/services/CMap.php:1415
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\"."
 msgstr "Значение \"%1$s\" является недопустимым для параметра \"grid_show\". Варианты: \"%2$s\" и \"%3$s\"."
 
-#: include/classes/api/services/CMap.php:920
-#: include/classes/api/services/CMap.php:1395
+#: include/classes/api/services/CMap.php:919
+#: include/classes/api/services/CMap.php:1394
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "Значение \"%1$s\" является недопустимым для параметра \"grid_show\". Варианты: \"%2$s\"."
@@ -19202,7 +19202,7 @@ msgstr "Приносим свои извинения, достигнуто ма�
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:362
+#: include/views/inventory.host.view.php:219 jsLoader.php:361
 msgid "Web"
 msgstr "Веб"
 
@@ -19383,7 +19383,7 @@ msgstr "Запись"
 msgid "Wrong Module.php class name for module located at %1$s."
 msgstr "Ошибочное имя класса Module.php для модуля расположенного в %1$s."
 
-#: include/classes/api/services/CService.php:415
+#: include/classes/api/services/CService.php:398
 #, c-format
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Ошибочные поля для зависимости услуги \"%1$s\"."
@@ -19405,19 +19405,19 @@ msgid "Wrong fields for map link."
 msgstr "Ошибочные поля для связи на карте сети."
 
 #: include/classes/api/services/CService.php:135
-#: include/classes/api/services/CService.php:249
+#: include/classes/api/services/CService.php:244
 #, c-format
 msgid "Wrong fields for service \"%1$s\"."
 msgstr "Ошибочные поля для услуги \"%1$s\"."
 
-#: include/classes/api/services/CService.php:495
+#: include/classes/api/services/CService.php:478
 #, c-format
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Ошибочные поля для времени услуги \"%1$s\"."
 
 #: include/classes/api/services/CMapElement.php:74
-#: include/classes/api/services/CMap.php:977
-#: include/classes/api/services/CMap.php:1452
+#: include/classes/api/services/CMap.php:976
+#: include/classes/api/services/CMap.php:1451
 msgid "Wrong value for url field."
 msgstr "Ошибочное значение для поля url."
 
@@ -19487,7 +19487,7 @@ msgstr "МАКС значение оси Y"
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr "МАКС значение оси Y должно быть больше чем МИН значение оси Y"
 
-#: include/classes/api/services/CGraphGeneral.php:328
+#: include/classes/api/services/CGraphGeneral.php:321
 #: include/classes/graphdraw/CLineGraphDraw.php:1872
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "МАКС значение оси Y должно быть больше чем МИН значение оси Y."
@@ -20195,8 +20195,8 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CMediatype.php:731
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:619
-#: include/classes/api/services/CProxy.php:625
+#: include/classes/api/services/CProxy.php:612
+#: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:470
@@ -20543,13 +20543,13 @@ msgctxt "XML time format"
 msgid "hh.mm"
 msgstr "hh.mm"
 
-#: include/classes/api/services/CMap.php:853
-#: include/classes/api/services/CMap.php:1321
+#: include/classes/api/services/CMap.php:852
+#: include/classes/api/services/CMap.php:1320
 msgid "host"
 msgstr "узел сети"
 
-#: include/classes/api/services/CMap.php:849
-#: include/classes/api/services/CMap.php:1317
+#: include/classes/api/services/CMap.php:848
+#: include/classes/api/services/CMap.php:1316
 msgid "host group"
 msgstr "группа узла сети"
 
@@ -20563,13 +20563,13 @@ msgstr "шаблон узла сети"
 msgid "hostid of dependent item and master item should match"
 msgstr "hostid зависимого элемента данных и мастер элемента данных должны совпадать"
 
-#: include/classes/api/services/CMap.php:844
-#: include/classes/api/services/CMap.php:1311
+#: include/classes/api/services/CMap.php:843
+#: include/classes/api/services/CMap.php:1310
 msgid "icon"
 msgstr "иконка"
 
-#: include/classes/api/services/CMap.php:865
-#: include/classes/api/services/CMap.php:1333
+#: include/classes/api/services/CMap.php:864
+#: include/classes/api/services/CMap.php:1332
 msgid "image"
 msgstr "изображение"
 
@@ -20811,7 +20811,7 @@ msgstr "правило низкоуровневого обнаружения"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr "ltrim() - Удаление указанных символов с начала строки"
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
+#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:378
 msgctxt "minute short"
 msgid "m"
 msgstr "м"
@@ -20848,8 +20848,8 @@ msgstr "mad() - Абсолютное отклонение среднего"
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr "пропущен обязательный параметр в функции \"%1$s\""
 
-#: include/classes/api/services/CMap.php:861
-#: include/classes/api/services/CMap.php:1329
+#: include/classes/api/services/CMap.php:860
+#: include/classes/api/services/CMap.php:1328
 msgid "map"
 msgstr "карта сети"
 
@@ -21106,7 +21106,7 @@ msgstr "вывод"
 msgid "path/to/secret"
 msgstr "путь/к/секрету"
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:389
 msgid "path/to/secret:key"
 msgstr "путь/к/секрету:ключ"
 
@@ -21264,8 +21264,8 @@ msgstr "краткое описание"
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMediatype.php:793
-#: include/classes/api/services/CProxy.php:705
-#: include/classes/api/services/CProxy.php:834
+#: include/classes/api/services/CProxy.php:698
+#: include/classes/api/services/CProxy.php:824
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:579
@@ -21446,8 +21446,8 @@ msgstr "trendmin() - Минимальное значение за период �
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr "trendsum() - Сумма значений за период Т с точным сдвигом периода"
 
-#: include/classes/api/services/CMap.php:857
-#: include/classes/api/services/CMap.php:1325 include/events.inc.php:34
+#: include/classes/api/services/CMap.php:856
+#: include/classes/api/services/CMap.php:1324 include/events.inc.php:34
 #: include/events.inc.php:59
 msgid "trigger"
 msgstr "триггер"
@@ -21519,8 +21519,8 @@ msgstr "неожиданное завершение макроса"
 #: include/classes/api/services/CDiscoveryRule.php:1702
 #: include/classes/api/services/CDiscoveryRule.php:1725
 #: include/classes/api/services/CDiscoveryRule.php:1744
-#: include/classes/api/services/CGraphGeneral.php:606
-#: include/classes/api/services/CGraphGeneral.php:728
+#: include/classes/api/services/CGraphGeneral.php:599
+#: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1719
 #: include/classes/api/services/CHttpTest.php:372
@@ -21558,8 +21558,8 @@ msgstr "неожиданный текст \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
+#: include/classes/api/services/CProxy.php:593
 #: include/classes/api/services/CProxy.php:600
-#: include/classes/api/services/CProxy.php:607
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""
@@ -21616,7 +21616,7 @@ msgstr "неподдерживаемый номер версии"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:390
 msgid "value"
 msgstr "значение"
 
@@ -21702,10 +21702,10 @@ msgstr "значение должно быть не меньше чем \"%1$s\"
 #: include/classes/api/services/CHost.php:2001
 #: include/classes/api/services/CHost.php:2156
 #: include/classes/api/services/CMapElement.php:86
-#: include/classes/api/services/CMap.php:683
-#: include/classes/api/services/CMap.php:689
-#: include/classes/api/services/CMap.php:1152
-#: include/classes/api/services/CMap.php:1158
+#: include/classes/api/services/CMap.php:682
+#: include/classes/api/services/CMap.php:688
+#: include/classes/api/services/CMap.php:1151
+#: include/classes/api/services/CMap.php:1157
 #: include/classes/api/services/CReport.php:209
 #: include/classes/api/services/CReport.php:612
 #: include/classes/import/validators/C52XmlValidator.php:2582
