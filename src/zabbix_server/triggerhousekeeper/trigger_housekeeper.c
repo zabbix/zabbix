@@ -28,7 +28,6 @@
 #include "sighandler.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
-#include "zbxalgo.h"
 #include "service_protocol.h"
 
 extern unsigned char	process_type, program_type;
@@ -48,7 +47,7 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 	if (NULL == data)
 		return;
 
-	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE, data, data_offset);
+	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE, data, (zbx_uint32_t)data_offset);
 	zbx_free(data);
 }
 

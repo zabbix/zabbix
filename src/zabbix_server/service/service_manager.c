@@ -27,7 +27,6 @@
 #include "sighandler.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
-#include "zbxalgo.h"
 #include "service_protocol.h"
 
 extern unsigned char	process_type, program_type;
@@ -147,7 +146,7 @@ static void	event_ptr_free(zbx_event_t **event)
 
 static zbx_hash_t	default_uint64_ptr_hash_func(const void *d)
 {
-	return ZBX_DEFAULT_UINT64_HASH_FUNC(*(const zbx_uint64_t **)d);
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(*(const zbx_uint64_t * const *)d);
 }
 
 static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_t *service_problem_tags_index,
@@ -352,14 +351,14 @@ static void	remove_service_problem(zbx_service_t *service, int index, zbx_hashse
 
 static zbx_hash_t	values_eq_hash(const void *data)
 {
-	zbx_values_eq_t	*d = (zbx_values_eq_t *)data;
+	zbx_values_eq_t	*d = (const zbx_values_eq_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(d->value, strlen(d->value), ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	values_eq_compare(const void *d1, const void *d2)
 {
-	return strcmp(((zbx_values_eq_t *)d1)->value, ((zbx_values_eq_t *)d2)->value);
+	return strcmp(((const zbx_values_eq_t *)d1)->value, ((const zbx_values_eq_t *)d2)->value);
 }
 
 static void	values_eq_clean(void *data)
@@ -764,14 +763,14 @@ static void	service_diff_clean(void *data)
 
 static zbx_hash_t	tag_services_hash(const void *data)
 {
-	zbx_tag_services_t	*d = (zbx_tag_services_t *)data;
+	const zbx_tag_services_t	*d = (const zbx_tag_services_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(d->tag, strlen(d->tag), ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	tag_services_compare(const void *d1, const void *d2)
 {
-	return strcmp(((zbx_tag_services_t *)d1)->tag, ((zbx_tag_services_t *)d2)->tag);
+	return strcmp(((const zbx_tag_services_t *)d1)->tag, ((const zbx_tag_services_t *)d2)->tag);
 }
 
 static void	tag_services_clean(void *data)
@@ -1236,7 +1235,7 @@ static void	db_update_services(zbx_hashset_t *services, zbx_hashset_t *service_d
 		}
 
 		if (0 == clock)
-			clock = time(NULL);
+			clock = (int)time(NULL);
 
 		if (service->status != status)
 		{
@@ -1325,7 +1324,7 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:%d", __func__, eventids->values_num);
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	for (i = 0; i < eventids->values_num; i++)
 	{
@@ -1333,7 +1332,7 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 		zbx_uint64_pair_t	pair;
 
 		pair.first = eventids->values[i];
-		pair.second = now;
+		pair.second = (zbx_uint64_t)now;
 
 		zbx_hashset_insert(&service_manager->deleted_eventids, &pair, sizeof(pair));
 
@@ -1729,14 +1728,14 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 			do
 			{
-				revision = time(NULL);
+				revision = (int)time(NULL);
 				DBbegin();
 				sync_services(&service_manager, &updated, revision);
 				sync_service_problem_tags(&service_manager, &updated, revision);
 				sync_services_links(&service_manager, &updated, revision);
 
 				/* load service problems once during startup */
-				if (0 == time_flush)
+				if (0 == (int)time_flush)
 				{
 					sync_service_problems(&service_manager.services,
 							&service_manager.service_problems_index);
@@ -1754,7 +1753,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 		if (ZBX_PROBLEM_CLEANUP_FREQUENCY < time_now - time_cleanup)
 		{
-			cleanup_deleted_problems(&service_manager, time_now);
+			cleanup_deleted_problems(&service_manager, (int)time_now);
 
 			time_cleanup = time_now;
 			time_now = zbx_time();

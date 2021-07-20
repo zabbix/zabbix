@@ -20,7 +20,6 @@
 #include "zbxservice.h"
 #include "log.h"
 #include "zbxipcservice.h"
-#include "service_protocol.h"
 
 void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
 {
