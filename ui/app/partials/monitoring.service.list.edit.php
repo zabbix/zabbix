@@ -64,8 +64,8 @@ foreach ($data['services'] as $serviceid => $service) {
 	if ($data['is_filtered']) {
 		$parents = [];
 
-		foreach (array_slice($service['parents'], 0, $data['max_in_table']) as $i => $parent) {
-			if ($i > 0) {
+		foreach (array_slice($service['parents'], 0, $data['max_in_table']) as $parent) {
+			if ($parents) {
 				$parents[] = ', ';
 			}
 
