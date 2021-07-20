@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -23,16 +23,39 @@
  * @var CView $this
  */
 
-require_once dirname(__FILE__).'/js/configuration.host.list.js.php';
+/*
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
+}
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+*/
+
+/**
+ * @var CView $this
+ */
+
+$scripts = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
+	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js'
+];
+
+foreach ($scripts as $script) {
+	$this->addJsFile($script);
+}
+
+$this->includeJsFile('host.list.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->setControls((new CTag('nav', true, (new CList())
-			->addItem(new CRedirectButton(_('Create host'), (new CUrl('hosts.php'))
-				->setArgument('form', 'create')
-				->setArgument('groupids', array_keys($data['filter']['groups']))
-				->getUrl()
-			))
+			->addItem(
+				(new CSimpleButton(_('Create host')))
+					->addClass('js-create-host')
+					->setAttribute('data-groupids', array_keys($data['filter']['groups']))
+			)
 			->addItem(
 				(new CButton('form', _('Import')))
 					->onClick('return PopUp("popup.import", {rules_preset: "host"}, null, this);')
@@ -42,6 +65,7 @@ $widget = (new CWidget())
 	);
 
 $filter_tags = $data['filter']['tags'];
+
 if (!$filter_tags) {
 	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
@@ -52,7 +76,7 @@ $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 ]);
 
 // filter
-$filter = new CFilter(new CUrl('hosts.php'));
+$filter = new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'host.list'));
 $filter
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
@@ -145,7 +169,7 @@ $table = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], 'hosts.php'),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], 'zabbix.php?action=host.list'),
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
@@ -155,7 +179,7 @@ $table = (new CTableInfo())
 		($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
 				|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY) ? _('Proxy') : null,
 		_('Templates'),
-		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder'], 'hosts.php'),
+		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder'], 'zabbix.php?action=host.list'),
 		_('Availability'),
 		_('Agent encryption'),
 		_('Info'),
@@ -199,12 +223,16 @@ foreach ($data['hosts'] as $host) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(CHtml::encode($host['name']), (new CUrl('hosts.php'))
-				->setArgument('form', 'update')
+	$description[] = (new CLink(CHtml::encode($host['name']),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'host.edit')
 				->setArgument('hostid', $host['hostid'])
-	);
+		))
+			->setAttribute('data-hostid', $host['hostid'])
+			->addClass('js-edit-host');
 
 	$maintenance_icon = false;
+
 	if ($host['status'] == HOST_STATUS_MONITORED) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
@@ -221,13 +249,13 @@ foreach ($data['hosts'] as $host) {
 		$statusCaption = _('Enabled');
 		$statusClass = ZBX_STYLE_GREEN;
 		$confirm_message = _('Disable host?');
-		$status_url = (new CUrl('hosts.php'))
+		$status_url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'host.massdisable')
 			->setArgument('hosts', [$host['hostid']]);
 	}
 	else {
 		$statusCaption = _('Disabled');
-		$status_url = (new CUrl('hosts.php'))
+		$status_url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'host.massenable')
 			->setArgument('hosts', [$host['hostid']]);
 		$confirm_message = _('Enable host?');
@@ -298,8 +326,8 @@ foreach ($data['hosts'] as $host) {
 				}
 				$caption[] = ', ';
 			}
-			array_pop($caption);
 
+			array_pop($caption);
 			$caption[] = ')';
 		}
 
@@ -311,6 +339,7 @@ foreach ($data['hosts'] as $host) {
 	}
 
 	$info_icons = [];
+
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
 		$info_icons[] = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
 	}
@@ -362,6 +391,15 @@ foreach ($data['hosts'] as $host) {
 			->addClass(ZBX_STYLE_NOWRAP);
 	}
 
+	$monitored_by = null;
+
+	if ($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
+			|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY) {
+		$monitored_by = ($host['proxy_hostid'] != 0)
+			? $data['proxies'][$host['proxy_hostid']]['host']
+			: '';
+	}
+
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
@@ -411,12 +449,7 @@ foreach ($data['hosts'] as $host) {
 			CViewHelper::showNum($host['httpTests'])
 		],
 		getHostInterface($interface),
-		($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
-				|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY)
-			? ($host['proxy_hostid'] != 0)
-				? $data['proxies'][$host['proxy_hostid']]['host']
-				: ''
-			: null,
+		$monitored_by,
 		$hostTemplates,
 		$status,
 		getHostAvailabilityTable($host['interfaces']),
@@ -435,7 +468,7 @@ $form->addItem([
 			'host.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?')],
 			'host.export' => [
 				'content' => new CButtonExport('export.hosts',
-					(new CUrl('hosts.php'))
+					(new CUrl('zabbix.php?action=host.list'))
 						->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
 						->getUrl()
 				)
@@ -454,3 +487,7 @@ $form->addItem([
 $widget->addItem($form);
 
 $widget->show();
+
+(new CScriptTag('host_list.init();'))
+	->setOnDocumentReady()
+	->show();

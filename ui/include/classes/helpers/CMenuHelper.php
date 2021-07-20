@@ -162,7 +162,7 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				? (new CMenuItem(_('Hosts')))
-					->setUrl(new CUrl('hosts.php'), 'hosts.php')
+					->setUrl((new CUrl('zabbix.php'))->setArgument('action', 'host.list'), 'host.list')
 					->setAliases([
 						'items.php?context=host', 'triggers.php?context=host', 'graphs.php?context=host',
 						'host_discovery.php?context=host', 'disc_prototypes.php?context=host',

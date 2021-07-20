@@ -107,6 +107,7 @@ class CRouter {
 		'gui.update'								=> ['CControllerGuiUpdate',								null,					null],
 		'hint.box'									=> ['CControllerHintBox',								'layout.json',			'hint.box'],
 		'host.dashboard.view'						=> ['CControllerHostDashboardView',						'layout.htmlpage',		'monitoring.host.dashboard.view'],
+		'host.list'									=> ['CControllerHostList',								'layout.htmlpage',		'host.list'],
 		'host.view'									=> ['CControllerHostView',								'layout.htmlpage',		'monitoring.host.view'],
 		'host.view.refresh'							=> ['CControllerHostViewRefresh',						'layout.json',			'monitoring.host.view.refresh'],
 		'hostmacros.list'							=> ['CControllerHostMacrosList',						'layout.json',			'hostmacros.list'],
