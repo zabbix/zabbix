@@ -642,7 +642,7 @@ class CTemplate extends CHostGeneral {
 	 */
 	protected function validateUpdate(array $templates, array &$db_templates = null) {
 		$db_templates = $this->get([
-			'output' => ['templateid', 'name', 'host', 'description'],
+			'output' => ['templateid', 'host', 'name', 'description'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true

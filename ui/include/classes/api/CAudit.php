@@ -152,7 +152,6 @@ class CAudit {
 			$diff = '';
 
 			if ($action == AUDIT_ACTION_UPDATE) {
-				$details = [];
 				$object_old = $objects_old[$resourceid];
 
 				/**
@@ -196,6 +195,8 @@ class CAudit {
 					$mask_object = false;
 				}
 
+				$details = [];
+
 				foreach (array_keys($object_diff) as $field_name) {
 					if (array_key_exists($field_name, $table_masked_fields)) {
 						if ($mask_object_old) {
@@ -235,8 +236,6 @@ class CAudit {
 			];
 		}
 
-		if ($auditlog) {
-			DB::insertBatch('auditlog', $auditlog);
-		}
+		DB::insertBatch('auditlog', $auditlog);
 	}
 }
