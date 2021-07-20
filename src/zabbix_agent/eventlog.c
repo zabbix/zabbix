@@ -403,7 +403,7 @@ static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize,
 	DWORD		status = 0;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:" ZBX_FS_UI64, __func__, *lastlogsize);
 
 	*FirstID = 0;
 	*LastID = 0;
@@ -461,11 +461,13 @@ static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize,
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() last EvtNext failed", __func__);
 		*LastID = 1;
 	}
+	else
+		*LastID += 1;	/* we should read the last record */
 
 	if (*lastlogsize >= *LastID)
 	{
 		*lastlogsize = *FirstID - 1;
-		zabbix_log(LOG_LEVEL_DEBUG, "lastlogsize is too big. It is set to:" ZBX_FS_UI64, *lastlogsize);
+		zabbix_log(LOG_LEVEL_WARNING, "lastlogsize is too big. It is set to:" ZBX_FS_UI64, *lastlogsize);
 	}
 
 	ret = SUCCEED;
