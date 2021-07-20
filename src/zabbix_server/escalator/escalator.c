@@ -2524,6 +2524,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 		for (i = 0; i < services->values_num; i++)
 		{
 			DB_SERVICE	*service = services->values[i];
+			DB_EVENT	*event;
 
 			for (j = 0; j < service->eventids.values_num; j++)
 			{
@@ -2533,7 +2534,10 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 					continue;
 				}
 
-				zbx_vector_ptr_append(&service->events, (DB_EVENT *)events->values[index]);
+				event = (DB_EVENT *)events->values[index];
+
+				if (0 != event->trigger.triggerid)
+					zbx_vector_ptr_append(&service->events, event);
 			}
 		}
 	}
