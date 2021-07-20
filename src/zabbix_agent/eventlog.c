@@ -335,171 +335,26 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
 	}
 }
 
-static zbx_uint64_t	get_eventlog6_last_id(const wchar_t *wsource)
+static int get_eventlog6_id(EVT_HANDLE *event_query, EVT_HANDLE *render_context, zbx_uint64_t *id, char **error)
 {
-	char		*err = NULL;
-	zbx_uint64_t	id = 0;
-	EVT_HANDLE	query, render_context= NULL, event_bookmark = NULL;
-	EVT_VARIANT*	renderedContent = NULL;
-	DWORD		status = 0;
-	DWORD		size_required = 0;
-	DWORD		size = DEFAULT_EVENT_CONTENT_SIZE;
-	DWORD		bookmarkedCount = 0;
-
-
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	/* start building the query */
-
-	/* create massive query for an event on a local computer*/
-	query = EvtQuery(NULL, wsource, NULL, EvtQueryChannelPath | EvtQueryReverseDirection);
-
-	if (NULL == query)
-	{
-		if (ERROR_EVT_CHANNEL_NOT_FOUND == (status = GetLastError()))
-			err = zbx_dsprintf(err, "EvtQuery channel missed:%s", strerror_from_system(status));
-		else
-			err = zbx_dsprintf(err, "EvtQuery failed:%s", strerror_from_system(status));
-
-		goto out;
-	}
-
-	/* create the system render */
-	if (NULL == (render_context = EvtCreateRenderContext(RENDER_ITEMS_COUNT, RENDER_ITEMS, EvtRenderContextValues)))
-	{
-		err = zbx_dsprintf(err, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
-		goto out;
-	}
-
-	/* get the entries and allocate the required space */
-	renderedContent = zbx_malloc(renderedContent, size);
-	if (TRUE != EvtNext(query, 1, &event_bookmark, INFINITE, 0, &size_required))
-	{
-		/* no data in eventlog */
-		err = zbx_dsprintf(err, "last EvtNext failed:%s", strerror_from_system(GetLastError()));
-		goto out;
-	}
-
-	/* obtain the information from selected events */
-	if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
-			&size_required, &bookmarkedCount))
-	{
-		/* information exceeds the allocated space */
-		if (ERROR_INSUFFICIENT_BUFFER != (status = GetLastError()))
-		{
-			err = zbx_dsprintf(err, "EvtRender failed:%s", strerror_from_system(status));
-			goto out;
-		}
-
-		renderedContent = (EVT_VARIANT*)zbx_realloc((void *)renderedContent, size_required);
-		size = size_required;
-
-		if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
-				&size_required, &bookmarkedCount))
-		{
-			err = zbx_dsprintf(err, "EvtRender failed:%s", strerror_from_system(GetLastError()));
-			goto out;
-		}
-	}
-
-	id = VAR_RECORD_NUMBER(renderedContent);
-
-out:
-	if (NULL != err)
-		zabbix_log(LOG_LEVEL_WARNING, "%s() error:%s", __func__, err);
-
-	zbx_free(err);
-	zbx_free(renderedContent);
-
-	if (NULL != query)
-		EvtClose(query);
-	if (NULL != render_context)
-		EvtClose(render_context);
-	if (NULL != event_bookmark)
-		EvtClose(event_bookmark);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() last EventRecordID:" ZBX_FS_UI64, __func__, id);
-
-	return id;
-}
-
-/* open eventlog using API 6 and return the number of records */
-static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize, EVT_HANDLE *render_context,
-		zbx_uint64_t *FirstID, zbx_uint64_t *LastID, char **error)
-{
-	EVT_HANDLE	log = NULL;
-	EVT_VARIANT	var;
-	EVT_HANDLE	tmp_all_event_query = NULL;
-	EVT_HANDLE	event_bookmark = NULL;
-	EVT_VARIANT*	renderedContent = NULL;
-	DWORD		status = 0;
-	DWORD		size_required = 0;
-	DWORD		size = DEFAULT_EVENT_CONTENT_SIZE;
-	DWORD		bookmarkedCount = 0;
-	zbx_uint64_t	numIDs = 0;
-	char		*tmp_str = NULL;
 	int		ret = FAIL;
-	zbx_uint64_t	last_evt_rec_id;
-
-	*FirstID = 0;
-	*LastID = 0;
+	DWORD		size_required = 0;
+	DWORD		size = DEFAULT_EVENT_CONTENT_SIZE;
+	DWORD		status = 0;
+	DWORD		bookmarkedCount = 0;
+	EVT_VARIANT*	renderedContent = NULL;
+	EVT_HANDLE	event_bookmark = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	last_evt_rec_id = get_eventlog6_last_id(wsource);
-
-	/* try to open the desired log */
-	if (NULL == (log = EvtOpenLog(NULL, wsource, EvtOpenChannelPath)))
-	{
-		status = GetLastError();
-		tmp_str = zbx_unicode_to_utf8(wsource);
-		*error = zbx_dsprintf(*error, "cannot open eventlog '%s':%s", tmp_str, strerror_from_system(status));
-		goto out;
-	}
-
-	/* obtain the number of records in the log */
-	if (TRUE != EvtGetLogInfo(log, EvtLogNumberOfLogRecords, sizeof(var), &var, &size_required))
-	{
-		*error = zbx_dsprintf(*error, "EvtGetLogInfo failed:%s", strerror_from_system(GetLastError()));
-		goto out;
-	}
-
-	numIDs = var.UInt64Val;
-
-	/* get the number of the oldest record in the log				*/
-	/* "EvtGetLogInfo()" does not work properly with "EvtLogOldestRecordNumber"	*/
-	/* we have to get it from the first EventRecordID				*/
-
-	/* create the system render */
-	if (NULL == (*render_context = EvtCreateRenderContext(RENDER_ITEMS_COUNT, RENDER_ITEMS, EvtRenderContextValues)))
-	{
-		*error = zbx_dsprintf(*error, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
-		goto out;
-	}
-
-	/* get all eventlog */
-	tmp_all_event_query = EvtQuery(NULL, wsource, NULL, EvtQueryChannelPath);
-	if (NULL == tmp_all_event_query)
-	{
-		if (ERROR_EVT_CHANNEL_NOT_FOUND == (status = GetLastError()))
-			*error = zbx_dsprintf(*error, "EvtQuery channel missed:%s", strerror_from_system(status));
-		else
-			*error = zbx_dsprintf(*error, "EvtQuery failed:%s", strerror_from_system(status));
-
-		goto out;
-	}
-
 	/* get the entries and allocate the required space */
 	renderedContent = zbx_malloc(renderedContent, size);
-	if (TRUE != EvtNext(tmp_all_event_query, 1, &event_bookmark, INFINITE, 0, &size_required))
+
+	if (TRUE != EvtNext(*event_query, 1, &event_bookmark, INFINITE, 0, &size_required))
 	{
 		/* no data in eventlog */
-		zabbix_log(LOG_LEVEL_DEBUG, "first EvtNext failed:%s", strerror_from_system(GetLastError()));
-		*FirstID = 1;
-		*LastID = 1;
-		numIDs = 0;
-		*lastlogsize = 0;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() EvtNext failed:%s", __func__, strerror_from_system(GetLastError()));
+		*id = 0;
 		ret = SUCCEED;
 		goto out;
 	}
@@ -526,8 +381,86 @@ static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize,
 		}
 	}
 
-	*FirstID = VAR_RECORD_NUMBER(renderedContent);
-	*LastID = *FirstID + numIDs;
+	*id = VAR_RECORD_NUMBER(renderedContent);
+	ret = SUCCEED;
+out:
+	if (NULL != event_bookmark)
+		EvtClose(event_bookmark);
+
+	zbx_free(renderedContent);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s id:" ZBX_FS_UI64, __func__, zbx_result_string(ret), id);
+
+	return ret;
+}
+
+/* open eventlog using API 6 and return the number of records */
+static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize, EVT_HANDLE *render_context,
+		zbx_uint64_t *FirstID, zbx_uint64_t *LastID, char **error)
+{
+	EVT_HANDLE	tmp_first_event_query = NULL;
+	EVT_HANDLE	tmp_last_event_query = NULL;
+	DWORD		status = 0;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	*FirstID = 0;
+	*LastID = 0;
+
+	/* get the number of the oldest record in the log				*/
+	/* "EvtGetLogInfo()" does not work properly with "EvtLogOldestRecordNumber"	*/
+	/* we have to get it from the first EventRecordID				*/
+
+	/* create the system render */
+	if (NULL == (*render_context = EvtCreateRenderContext(RENDER_ITEMS_COUNT, RENDER_ITEMS, EvtRenderContextValues)))
+	{
+		*error = zbx_dsprintf(*error, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
+		goto out;
+	}
+
+	/* get all eventlog */
+	if (NULL == (tmp_first_event_query = EvtQuery(NULL, wsource, NULL, EvtQueryChannelPath)))
+	{
+		if (ERROR_EVT_CHANNEL_NOT_FOUND == (status = GetLastError()))
+			*error = zbx_dsprintf(*error, "EvtQuery channel missed:%s", strerror_from_system(status));
+		else
+			*error = zbx_dsprintf(*error, "EvtQuery failed:%s", strerror_from_system(status));
+
+		goto out;
+	}
+
+	if (SUCCEED != get_eventlog6_id(&tmp_first_event_query, render_context, FirstID, error))
+		goto out;
+
+	if (0 == *FirstID)
+	{
+		/* no data in eventlog */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() first EvtNext failed", __func__);
+		*FirstID = 1;
+		*LastID = 1;
+		*lastlogsize = 0;
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (NULL == (tmp_last_event_query = EvtQuery(NULL, wsource, NULL,
+			EvtQueryChannelPath | EvtQueryReverseDirection)))
+	{
+		if (ERROR_EVT_CHANNEL_NOT_FOUND == (status = GetLastError()))
+			*error = zbx_dsprintf(*error, "EvtQuery channel missed:%s", strerror_from_system(status));
+		else
+			*error = zbx_dsprintf(*error, "EvtQuery failed:%s", strerror_from_system(status));
+
+		goto out;
+	}
+
+	if (SUCCEED != get_eventlog6_id(&tmp_last_event_query, render_context, LastID, error) || 0 == *LastID)
+	{
+		/* no data in eventlog */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() last EvtNext failed", __func__);
+		*LastID = 1;
+	}
 
 	if (*lastlogsize >= *LastID)
 	{
@@ -537,17 +470,13 @@ static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize,
 
 	ret = SUCCEED;
 out:
-	if (NULL != log)
-		EvtClose(log);
-	if (NULL != tmp_all_event_query)
-		EvtClose(tmp_all_event_query);
-	if (NULL != event_bookmark)
-		EvtClose(event_bookmark);
-	zbx_free(tmp_str);
-	zbx_free(renderedContent);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s FirstID:" ZBX_FS_UI64 " LastID:" ZBX_FS_UI64 " numIDs:" ZBX_FS_UI64
-			" last EventRecordID:" ZBX_FS_UI64, __func__, zbx_result_string(ret), *FirstID, *LastID,
-			numIDs, last_evt_rec_id);
+	if (NULL != tmp_first_event_query)
+		EvtClose(tmp_first_event_query);
+	if (NULL != tmp_last_event_query)
+		EvtClose(tmp_last_event_query);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s FirstID:" ZBX_FS_UI64 " LastID:" ZBX_FS_UI64,
+			__func__, zbx_result_string(ret), *FirstID, *LastID);
 
 	return ret;
 }
