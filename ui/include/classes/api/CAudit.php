@@ -109,6 +109,16 @@ class CAudit {
 	// 	]]);
 	// }
 
+	private static function getRecordSetId(): string {
+		static $recordsetid = null;
+
+		if ($recordsetid === null) {
+			$recordsetid = CCuid::generate();
+		}
+
+		return $recordsetid;
+	}
+
 	/**
 	 * Add audit records.
 	 *
@@ -128,7 +138,7 @@ class CAudit {
 			return;
 		}
 
-		$recordsetid = CCuid::generate();
+		$recordsetid = self::getRecordSetId();
 
 		[$field_name_resourceid, $field_name_resourcename, $table_name, $api_name] = self::$supported_type[$resourcetype];
 
@@ -186,17 +196,17 @@ class CAudit {
 					$mask_object = false;
 				}
 
-				foreach (array_keys($object_diff) as $path) {
-					if (array_key_exists($path, $table_masked_fields)) {
+				foreach (array_keys($object_diff) as $field_name) {
+					if (array_key_exists($field_name, $table_masked_fields)) {
 						if ($mask_object_old) {
-							$object_old[$path] = ZBX_SECRET_MASK;
+							$object_old[$field_name] = ZBX_SECRET_MASK;
 						}
 						if ($mask_object) {
-							$object[$path] = ZBX_SECRET_MASK;
+							$object[$field_name] = ZBX_SECRET_MASK;
 						}
 					}
 
-					$details[$api_name.'.'.$path ] = ['update', $object[$path], $object_old[$path]];
+					$details[$api_name.'.'.$field_name] = ['update', $object[$field_name], $object_old[$field_name]];
 				}
 
 				$diff = json_encode($details);

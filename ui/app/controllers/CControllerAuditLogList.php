@@ -137,7 +137,7 @@ class CControllerAuditLogList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		$data['auditlogs'] = $this->sanitizeDetailsForAuditlog($data['auditlogs']);
+		$data['auditlogs'] = $this->sanitizeDetails($data['auditlogs']);
 
 		if (!$users) {
 			$userids = array_filter(array_column($data['auditlogs'], 'userid'), function ($id) {
@@ -270,7 +270,7 @@ class CControllerAuditLogList extends CController {
 		return $users;
 	}
 
-	private function sanitizeDetailsForAuditlog(array $auditlogs): array {
+	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
 			if ($auditlog['action'] != AUDIT_ACTION_UPDATE) {
 				continue;
