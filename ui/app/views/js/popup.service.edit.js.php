@@ -49,23 +49,11 @@ window.service_edit_popup = {
 
 		// Add custom Select button for Parent services.
 
-		const template = document.createElement('template');
-
-		template.innerHTML = `
-			<div class="multiselect-button">
-				<button type="button" class="<?= ZBX_STYLE_BTN_GREY ?>"></button>
-			</div>
-		`;
-
-		const muiltiselect_button_wrap = template.content.firstElementChild;
-		const muiltiselect_button = muiltiselect_button_wrap.querySelector('button');
-
-		muiltiselect_button.textContent = <?= json_encode(_('Select')); ?>;
-		muiltiselect_button.addEventListener('click', () => {
-			this.selectParents();
-		});
-
-		document.getElementById('parent_serviceids_').parentElement.appendChild(muiltiselect_button_wrap);
+		jQuery('#parent_serviceids_')
+			.multiSelect('getSelectButton')
+			.addEventListener('click', () => {
+				this.selectParents();
+			});
 
 		// Fill-in current Child services.
 		for (const service of children) {

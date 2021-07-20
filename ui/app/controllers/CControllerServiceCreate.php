@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupServiceCreate extends CController {
+class CControllerServiceCreate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [

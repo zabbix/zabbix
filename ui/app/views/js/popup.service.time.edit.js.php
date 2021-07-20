@@ -54,7 +54,7 @@ window.service_time_edit_popup = {
 
 		const curl = new Curl('zabbix.php', false);
 
-		curl.setArgument('action', 'popup.service.time.validate');
+		curl.setArgument('action', 'service.time.validate');
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

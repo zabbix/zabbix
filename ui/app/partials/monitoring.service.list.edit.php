@@ -64,8 +64,8 @@ foreach ($data['services'] as $serviceid => $service) {
 	if ($data['is_filtered']) {
 		$parents = [];
 
-		foreach (array_slice($service['parents'], 0, $data['max_in_table']) as $i => $parent) {
-			if ($i > 0) {
+		foreach (array_slice($service['parents'], 0, $data['max_in_table']) as $parent) {
+			if ($parents) {
 				$parents[] = ', ';
 			}
 
@@ -118,15 +118,18 @@ foreach ($data['services'] as $serviceid => $service) {
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_ADD)
 				->addClass('js-add-child-service')
-				->setAttribute('data-serviceid', $serviceid),
+				->setAttribute('data-serviceid', $serviceid)
+				->setTitle(_('Add child service')),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_EDIT)
 				->addClass('js-edit-service')
-				->setAttribute('data-serviceid', $serviceid),
+				->setAttribute('data-serviceid', $serviceid)
+				->setTitle(_('Edit')),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
 				->addClass('js-remove-service')
 				->setAttribute('data-serviceid', $serviceid)
+				->setTitle(_('Delete'))
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	])));
 }
