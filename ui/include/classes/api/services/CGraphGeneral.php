@@ -1162,6 +1162,8 @@ abstract class CGraphGeneral extends CApiService {
 					$_graph = ['templateid' => $graphid] + array_diff_key($graph, ['graphid' => true]);
 				}
 
+				$_graph['uuid'] = '';
+
 				if ($_graph['ymin_itemid'] != 0) {
 					$_graph['ymin_itemid'] = $item_links[$_graph['ymin_itemid']][$hostid];
 				}
