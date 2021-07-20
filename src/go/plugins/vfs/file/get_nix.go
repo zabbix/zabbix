@@ -23,7 +23,7 @@ package file
 
 import (
 	"fmt"
-	"io/fs"
+	"os"
 	"os/user"
 	"strconv"
 	"syscall"
@@ -37,7 +37,7 @@ type userInfo struct {
 	Gid         uint32  `json:"gid"`
 }
 
-func getFileInfo(info *fs.FileInfo, name string) (fileinfo *fileInfo, err error) {
+func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error) {
 	var fi fileInfo
 
 	stat := (*info).Sys().(*syscall.Stat_t)
