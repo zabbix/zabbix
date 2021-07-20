@@ -941,12 +941,14 @@ abstract class CGraphGeneral extends CApiService {
 			 */
 			$graphids = DBfetchColumn(DBselect(
 				'SELECT DISTINCT gi.graphid'.
-				' FROM graphs_items gi,items i,hosts h,hosts_templates ht'.
+				' FROM graphs_items gi,items i,hosts h,hosts_templates ht,hosts h2'.
 				' WHERE gi.itemid=i.itemid'.
 					' AND i.hostid=h.hostid'.
 					' AND h.hostid=ht.templateid'.
+					' AND ht.hostid=h2.hostid'.
 					' AND '.dbConditionId('gi.graphid', array_keys($graphs)).
-					' AND h.status='.HOST_STATUS_TEMPLATE
+					' AND h.status='.HOST_STATUS_TEMPLATE.
+					' AND '.dbConditionInt('h2.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
 			), 'graphid');
 
 			// Based on the found graphs, we leave only graphs that is possible to inherit.
@@ -996,8 +998,10 @@ abstract class CGraphGeneral extends CApiService {
 		$templateids_hosts = [];
 
 		$sql = 'SELECT ht.templateid,ht.hostid'.
-			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionId('ht.templateid', array_keys($templateids));
+			' FROM hosts_templates ht,hosts h2'.
+			' WHERE ht.hostid=h2.hostid'.
+				' AND '.dbConditionId('ht.templateid', array_keys($templateids)).
+				' AND '.dbConditionInt('h2.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
 		if ($hostids !== null) {
 			$sql .= ' AND '.dbConditionId('ht.hostid', $hostids);
 		}
