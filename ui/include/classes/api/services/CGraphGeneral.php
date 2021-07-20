@@ -46,16 +46,16 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	public function update(array $graphs) {
 		$graphs = zbx_toArray($graphs);
-		$graphIds = zbx_objectValues($graphs, 'graphid');
+		$graphids = array_column($graphs, 'graphid');
 
 		$graphs = $this->extendObjects($this->tableName(), $graphs,
 			['name', 'graphtype', 'ymin_type', 'ymin_itemid', 'ymax_type', 'ymax_itemid', 'yaxismin', 'yaxismax']
 		);
 
-		$dbGraphs = $this->get([
+		$db_graphs = $this->get([
 			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
-			'graphids' => $graphIds,
+			'graphids' => $graphids,
 			'editable' => true,
 			'preservekeys' => true,
 			'inherited' => false
@@ -67,12 +67,12 @@ abstract class CGraphGeneral extends CApiService {
 
 		foreach ($graphs as &$graph) {
 			// check permissions
-			if (!isset($dbGraphs[$graph['graphid']])) {
+			if (!array_key_exists($graph['graphid'], $db_graphs)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			// cannot update discovered graphs
-			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $dbGraphs[$graph['graphid']]);
+			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $db_graphs[$graph['graphid']]);
 
 			// validate items on set or pass existing items from DB
 			if (array_key_exists('gitems', $graph)) {
@@ -84,7 +84,7 @@ abstract class CGraphGeneral extends CApiService {
 					if (array_key_exists('gitemid', $graph_item) && $graph_item['gitemid']) {
 						$validGraphItemIds = [];
 
-						foreach ($dbGraphs[$graph['graphid']]['gitems'] as $db_graph_item) {
+						foreach ($db_graphs[$graph['graphid']]['gitems'] as $db_graph_item) {
 							$validGraphItemIds[$db_graph_item['gitemid']] = $db_graph_item['gitemid'];
 						}
 
@@ -97,17 +97,17 @@ abstract class CGraphGeneral extends CApiService {
 				}
 			}
 			else {
-				$graph['gitems'] = $dbGraphs[$graph['graphid']]['gitems'];
+				$graph['gitems'] = $db_graphs[$graph['graphid']]['gitems'];
 			}
 		}
 		unset($graph);
 
-		$this->validateUpdate($graphs, $dbGraphs);
+		$this->validateUpdate($graphs, $db_graphs);
 
 		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
 
-			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $dbGraphs[$graph['graphid']]['gitems'];
+			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $db_graphs[$graph['graphid']]['gitems'];
 
 			// Y axis min clean unused fields
 			if (isset($graph['ymin_type'])) {
@@ -134,7 +134,7 @@ abstract class CGraphGeneral extends CApiService {
 		$this->updateReal($graphs);
 		$this->inherit($graphs);
 
-		return ['graphids' => $graphIds];
+		return ['graphids' => $graphids];
 	}
 
 	/**
