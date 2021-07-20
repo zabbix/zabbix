@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-07-19T07:01:02Z'
+  date: '2021-07-20T07:00:07Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -157,7 +157,7 @@ zabbix_export:
                 setParams: function (params) {
                     ['api_endpoint', 'token', 'zone'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
+                                || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -176,16 +176,13 @@ zabbix_export:
                         url = Cloudflare.params.api_endpoint + query;
             
                     request.addHeader('Content-Type: application/json');
-            
-                    if (Cloudflare.token !== null) {
-                        request.addHeader('Authorization: Bearer ' + Cloudflare.params.token);
-                    }
+                    request.addHeader('Authorization: Bearer ' + Cloudflare.params.token);
             
                     if (typeof data !== 'undefined') {
                         data = JSON.stringify(data);
                     }
             
-                    Zabbix.Log(4, '[ Cloudflare ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
+                    Zabbix.log(4, '[ Cloudflare ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
             
                     switch (method) {
                         case 'get':
@@ -203,10 +200,7 @@ zabbix_export:
                     Zabbix.log(4, '[ Cloudflare ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        var message = 'Request failed with status code ' + request.getStatus();
-            
-                        message += ': ' + response;
-                        throw message;
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
                     if (response !== null) {
@@ -216,6 +210,11 @@ zabbix_export:
                         catch (error) {
                             throw 'Failed to parse response received from Cloudflare. Check debug log for more information.';
                         }
+                    }
+            
+                    if (query.includes('graphql') && request.getStatus() == 200 && typeof response.errors !== 'undefined'
+                            && Array.isArray(response.errors)) {
+                        throw 'Request failed with error ' + response.errors[0].message;
                     }
             
                     return {
@@ -228,18 +227,21 @@ zabbix_export:
             try {
                 Cloudflare.setParams(JSON.parse(value));
             
-                var lastHour = new Date(),
-                    prevHour = new Date();
+                var datetime_end = new Date(),
+                    datetime_start = new Date();
             
-                prevHour.setTime(lastHour.getTime() - 3600000);
-                prevHour.setMinutes(0, 0, 0);
-                lastHour.setTime(prevHour.getTime());
-                lastHour.setMinutes(59, 59, 0);
+                datetime_start.setTime(datetime_end.getTime() - 3600000);
+                datetime_start.setMinutes(0, 0, 0);
+                datetime_end.setTime(datetime_start.getTime());
+                datetime_end.setMinutes(59, 59, 0);
+            
+                var datetime_start_str = datetime_start.toISOString(),
+                    datetime_end_str = datetime_end.toISOString();
             
                 var data = {
                     "query": "{viewer {zones(filter: {zoneTag: " + Cloudflare.params.zone + "}) {\
                     httpRequests1hGroups(limit: 100 filter: {\
-                        datetime_geq: \"" + prevHour.toISOString() + "\",  datetime_leq: \"" + lastHour.toISOString() + "\"\
+                        datetime_geq: \"" + datetime_start_str + "\",  datetime_leq: \"" + datetime_end_str + "\"\
                         }) {\
                             sum{\
                                 requests\
@@ -256,61 +258,73 @@ zabbix_export:
                             }\
                         }}}", "variables": {}
                 }
-                var result = Cloudflare.request("post", "graphql/", data);
-                var cloudflare = {
-                    requests: {
-                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.requests,
-                        cached: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedRequests,
-                        uncached: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.requests -
-                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedRequests,
-                        cache_hit_ratio: (result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedRequests /
-                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.requests * 100).toFixed(2),
-                        encrypted: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.encryptedRequests,
-                        unencrypted: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.requests -
-                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.encryptedRequests
-                    },
-                    bandwidth: {
-                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.bytes,
-                        cached: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedBytes,
-                        uncached: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.bytes -
-                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedBytes,
-                        cache_hit_ratio: (result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.cachedBytes /
-                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.bytes * 100).toFixed(2),
-                        encrypted: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.encryptedBytes,
-                        unencrypted: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.bytes -
-                            result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.encryptedBytes
-                    },
-                    threats: {
-                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.threats
-                    },
-                    pageviews: {
-                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.pageViews
-                    },
-                    uniques: {
-                        all: result.response.data.viewer.zones[0].httpRequests1hGroups[0].uniq.uniques
+                var result = Cloudflare.request('post', 'graphql/', data),
+                    cloudflare = {};
+            
+                if (typeof result.response.data.viewer.zones[0].httpRequests1hGroups[0] !== 'undefined'
+                        && typeof result.response.data.viewer.zones[0].httpRequests1hGroups[0] === 'object') {
+                    var res = result.response.data.viewer.zones[0].httpRequests1hGroups[0];
+            
+                    cloudflare = {
+                        requests: {
+                            all: (typeof res.sum.requests !== 'undefined') ? res.sum.requests : 0,
+                            cached: (typeof res.sum.cachedRequests !== 'undefined') ? res.sum.cachedRequests : 0,
+                            encrypted: (typeof res.sum.encryptedRequests !== 'undefined') ? res.sum.encryptedRequests : 0,
+                            non_error: 0,
+                            error: 0
+                        },
+                        bandwidth: {
+                            all: (typeof res.sum.bytes !== 'undefined') ? res.sum.bytes : 0,
+                            cached: (typeof res.sum.cachedBytes !== 'undefined') ? res.sum.cachedBytes : 0,
+                            encrypted: (typeof res.sum.encryptedBytes !== 'undefined') ? res.sum.encryptedBytes : 0,
+                        },
+                        threats: {
+                            all: (typeof res.sum.threats !== 'undefined') ? res.sum.threats : 0
+                        },
+                        pageviews: {
+                            all: (typeof res.sum.pageViews !== 'undefined') ? res.sum.pageViews : 0
+                        },
+                        uniques: {
+                            all: (typeof res.uniq.uniques !== 'undefined') ? res.uniq.uniques : 0
+                        }
+                    }
+                    cloudflare.requests.uncached = res.sum.requests - res.sum.cachedRequests;
+                    cloudflare.requests.cache_hit_ratio = (cloudflare.requests.cached /
+                        ((cloudflare.requests.all == 0) ? 1 : cloudflare.requests.all) * 100).toFixed(2);
+                    cloudflare.requests.unencrypted = cloudflare.requests.all - cloudflare.requests.encrypted;
+                    cloudflare.bandwidth.uncached = cloudflare.bandwidth.all - cloudflare.bandwidth.cached;
+                    cloudflare.bandwidth.cache_hit_ratio = (cloudflare.bandwidth.cached /
+                        ((cloudflare.bandwidth.all == 0) ? 1 : cloudflare.bandwidth.all) * 100).toFixed(2);
+                    cloudflare.bandwidth.unencrypted = cloudflare.bandwidth.all - cloudflare.bandwidth.encrypted;
+            
+                    if (Array.isArray(res.sum.responseStatusMap)) {
+                        res.sum.responseStatusMap.forEach(function (element) {
+                            if (element.edgeResponseStatus == 200) {
+                                cloudflare.requests.non_error = element.requests;
+                            } else {
+                                cloudflare.requests.error += element.requests;
+                            }
+                        });
                     }
             
-                }
-                cloudflare.requests.non_error = 0;
-                cloudflare.requests.error = 0;
-                result.response.data.viewer.zones[0].httpRequests1hGroups[0].sum.responseStatusMap.forEach(function (element) {
-                    if (element.edgeResponseStatus == 200) {
-                        cloudflare.requests.non_error = element.requests;
-                    } else {
-                        cloudflare.requests.error += element.requests;
-                    }
-                });
-                cloudflare.requests.non_error_rate = (cloudflare.requests.non_error / cloudflare.requests.all * 100).toFixed(2);
-                cloudflare.requests.error_rate = (cloudflare.requests.error / cloudflare.requests.all * 100).toFixed(2);
+                    cloudflare.requests.non_error_rate = (cloudflare.requests.non_error /
+                        ((cloudflare.requests.all == 0) ? 1 : cloudflare.requests.all) * 100).toFixed(2);
+                    cloudflare.requests.error_rate = (cloudflare.requests.error /
+                        ((cloudflare.requests.all == 0) ? 1 : cloudflare.requests.all) * 100).toFixed(2);
             
-                result = Cloudflare.request("get", "zones/" + Cloudflare.params.zone
-                    + "/dns_analytics/report?dimensions=queryName&metrics=queryCount,uncachedCount,staleCount&since="
-                    + prevHour.toISOString() + "&until=" + lastHour.toISOString());
-                cloudflare.dns = {
-                    query: {
-                        all: result.response.result.totals.queryCount,
-                        uncached: result.response.result.totals.uncachedCount,
-                        stale: result.response.result.totals.staleCount
+                    result = Cloudflare.request('get', 'zones/' + encodeURIComponent(Cloudflare.params.zone)
+                        + '/dns_analytics/report?dimensions=queryName&metrics=queryCount,uncachedCount,staleCount&since='
+                        + encodeURIComponent(datetime_start_str) + '&until=' + encodeURIComponent(datetime_end_str));
+            
+                    if (typeof result.response.result !== 'undefined' && typeof result.response.result === 'object') {
+                        res = result.response.result;
+                        cloudflare.dns = {
+                            query: {
+                                all: (typeof res.totals.queryCount !== 'undefined') ? res.totals.queryCount : 0,
+                                uncached: (typeof res.totals.uncachedCount !== 'undefined') ? res.totals.uncachedCount : 0,
+                                stale: (typeof res.totals.staleCount !== 'undefined') ? res.totals.staleCount : 0
+                            }
+                        }
                     }
                 }
             
@@ -521,7 +535,6 @@ zabbix_export:
                   type: PLAIN_TEXT
                   name: 'Cache Hit Ratio'
                   width: '6'
-                  height: '3'
                   fields:
                     -
                       type: INTEGER
@@ -617,8 +630,8 @@ zabbix_export:
               widgets:
                 -
                   type: GRAPH_CLASSIC
-                  'y': '3'
-                  width: '18'
+                  'y': '2'
+                  width: '19'
                   height: '6'
                   fields:
                     -
@@ -631,8 +644,11 @@ zabbix_export:
                   type: PLAIN_TEXT
                   name: '2xx rate'
                   width: '6'
-                  height: '3'
                   fields:
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
                     -
                       type: ITEM
                       name: itemids
@@ -643,9 +659,12 @@ zabbix_export:
                   type: PLAIN_TEXT
                   name: 'Cache hit ratio % over time'
                   x: '6'
-                  width: '6'
-                  height: '3'
+                  width: '7'
                   fields:
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
                     -
                       type: ITEM
                       name: itemids
@@ -655,10 +674,13 @@ zabbix_export:
                 -
                   type: PLAIN_TEXT
                   name: 'Error rate (non 2xx)'
-                  x: '12'
+                  x: '13'
                   width: '6'
-                  height: '3'
                   fields:
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
                     -
                       type: ITEM
                       name: itemids
