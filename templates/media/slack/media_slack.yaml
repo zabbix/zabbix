@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-06T06:13:42Z'
+  date: '2021-07-20T11:50:27Z'
   media_types:
     -
       name: Slack
@@ -18,9 +18,6 @@ zabbix_export:
         -
           name: channel
           value: '{ALERT.SENDTO}'
-        -
-          name: channel_id
-          value: '{EVENT.TAGS.__channel_id}'
         -
           name: discovery_host_dns
           value: '{DISCOVERY.DEVICE.DNS}'
@@ -53,7 +50,7 @@ zabbix_export:
           value: '{EVENT.SOURCE}'
         -
           name: event_tags
-          value: '{EVENT.TAGS}'
+          value: '{EVENT.TAGSJSON}'
         -
           name: event_time
           value: '{EVENT.TIME}'
@@ -74,10 +71,7 @@ zabbix_export:
           value: '{HOST.CONN}'
         -
           name: host_name
-          value: '{HOST.HOST}'
-        -
-          name: message_ts
-          value: '{EVENT.TAGS.__message_ts}'
+          value: '{HOST.NAME}'
         -
           name: slack_as_user
           value: 'true'
@@ -198,13 +192,20 @@ zabbix_export:
                     throw resp.error;
                 }
         
-                result.tags.__message_ts = resp.ts;
-                result.tags.__channel_id = resp.channel;
-                result.tags.__channel_name = params.channel;
-                result.tags.__message_link = getPermalink(resp.channel, resp.ts);
+                result.tags = {
+                    ["__message_ts_" + params.channel]: resp.ts,
+                    ["__channel_id_" + params.channel]: resp.channel,
+                    ["__message_link_" + params.channel]: getPermalink(resp.channel, resp.ts),
+                }
+        
             }
             else if (isEventUpdate(params)) {
-                fields.thread_ts = params.message_ts;
+                var channel_event_tags = JSON.parse(params.event_tags)
+        
+                if (channel_event_tags && channel_event_tags.length) {
+                    fields.thread_ts = channel_event_tags.filter(function (e) { return e.tag.includes("message_ts_" + params.channel) })[0]["value"]
+                }
+        
                 fields.attachments = [
                     createMessage(
                         SEVERITY_COLORS[params.event_nseverity] || 0,
@@ -222,9 +223,15 @@ zabbix_export:
         
             }
             else if (isEventResolve(params)) {
-                fields.channel = params.channel_id;
                 fields.text = '';
-                fields.ts = params.message_ts;
+        
+                var channel_event_tags = JSON.parse(params.event_tags)
+        
+                if (channel_event_tags && channel_event_tags.length) {
+                    fields.channel = channel_event_tags.filter(function (e) { return e.tag.includes("channel_id_" + params.channel) })[0]["value"]
+                    fields.ts = channel_event_tags.filter(function (e) { return e.tag.includes("message_ts_" + params.channel) })[0]["value"]
+                }
+        
                 fields.attachments = [
                     createMessage(
                         RESOLVE_COLOR,
@@ -263,8 +270,9 @@ zabbix_export:
                     throw resp.error;
                 }
         
-                result.tags.__channel_name = params.channel;
-                result.tags.__message_link = getPermalink(resp.channel, resp.ts);
+                result.tags = {
+                    ["__message_link_" + params.channel]: getPermalink(resp.channel, resp.ts)
+                }
         
             }
             else if (isEventUpdate(params)) {
@@ -359,7 +367,7 @@ zabbix_export:
                 message.fields.push(
                     {
                         title: 'Event tags',
-                        value: params.event_tags.replace(/__.+?:(.+?,|.+)/g, '') || 'None',
+                        value: JSON.parse(params.event_tags).filter(function (e) { return !e.tag.includes("__") }).map(function (e) { return e.tag + ": " + e.value }).join('\n') || 'None',
                         short: true
                     },
                     {
@@ -503,9 +511,6 @@ zabbix_export:
             throw 'Slack notification failed : ' + error;
         }
       process_tags: 'YES'
-      show_event_menu: 'YES'
-      event_menu_url: '{EVENT.TAGS.__message_link}'
-      event_menu_name: 'Open in Slack: {EVENT.TAGS.__channel_name}'
       message_templates:
         -
           event_source: TRIGGERS
