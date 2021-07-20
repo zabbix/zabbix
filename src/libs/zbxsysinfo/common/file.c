@@ -1069,7 +1069,10 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		acc_utf8 = (zbx_unicode_to_utf8(acc_name));
 		dmn_ut8 = (zbx_unicode_to_utf8(dmn_name));
 
-		SET_STR_RESULT(result, zbx_dsprintf(NULL, "%s\\%s", dmn_ut8, acc_utf8));
+		if (0 == strlen(dmn_ut8))
+			SET_STR_RESULT(result, zbx_dsprintf(NULL, "%s", acc_utf8));
+		else
+			SET_STR_RESULT(result, zbx_dsprintf(NULL, "%s\\%s", dmn_ut8, acc_utf8));
 
 		zbx_free(acc_name);
 		zbx_free(dmn_name);
@@ -1251,6 +1254,28 @@ static char	*get_print_time(time_t st_raw)
 #undef MAX_TIME_STR_LEN
 }
 
+#define VFS_FILE_ADD_TIME(time, tag)						\
+	do									\
+	{									\
+		if (0 < time)							\
+		{								\
+			tmp = get_print_time((time_t)time);			\
+			zbx_json_addstring(&j, tag, tmp, ZBX_JSON_TYPE_STRING);	\
+			zbx_free(tmp);						\
+		}								\
+		else								\
+			zbx_json_addstring(&j, tag, NULL, ZBX_JSON_TYPE_STRING);\
+	} while (0)
+
+#define VFS_FILE_ADD_TS(time, tag)						\
+	do									\
+	{									\
+		if (0 < time)							\
+			zbx_json_adduint64(&j, tag, (zbx_uint64_t)time);	\
+		else								\
+			zbx_json_addstring(&j, tag, NULL, ZBX_JSON_TYPE_STRING);\
+	} while (0)
+
 #if defined(_WINDOWS) || defined(__MINGW32__)
 static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 {
@@ -1318,22 +1343,24 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	acc_name = (wchar_t *)zbx_malloc(acc_name, acc_sz * sizeof(wchar_t));
 	dmn_name = (wchar_t *)zbx_malloc(dmn_name, dmn_sz * sizeof(wchar_t));
 
-	if (TRUE != LookupAccountSid(NULL, sid, acc_name, (LPDWORD)&acc_sz, dmn_name, (LPDWORD)&dmn_sz,
+	if (TRUE == LookupAccountSid(NULL, sid, acc_name, (LPDWORD)&acc_sz, dmn_name, (LPDWORD)&dmn_sz,
 			&acc_type))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user name."));
-		zbx_free(acc_name);
-		zbx_free(dmn_name);
-		goto err;
-	}
+		acc_ut8 = zbx_unicode_to_utf8(acc_name);
+		dmn_ut8 = zbx_unicode_to_utf8(dmn_name);
 
-	acc_ut8 = zbx_unicode_to_utf8(acc_name);
-	dmn_ut8 = zbx_unicode_to_utf8(dmn_name);
-	tmp = zbx_dsprintf(NULL, "%s\\%s", dmn_ut8, acc_ut8);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_USER, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(acc_ut8);
-	zbx_free(dmn_ut8);
-	zbx_free(tmp);
+		if (0 == strlen(dmn_ut8))
+			tmp = zbx_dsprintf(NULL, "%s", acc_ut8);
+		else
+			tmp = zbx_dsprintf(NULL, "%s\\%s", dmn_ut8, acc_ut8);
+
+		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_USER, tmp, ZBX_JSON_TYPE_STRING);
+		zbx_free(acc_ut8);
+		zbx_free(dmn_ut8);
+		zbx_free(tmp);
+	}
+	else
+		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_USER, NULL, ZBX_JSON_TYPE_STRING);
 
 	zbx_free(acc_name);
 	zbx_free(dmn_name);
@@ -1361,30 +1388,24 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 
 	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_SIZE, (zbx_uint64_t)buf.st_size);
 
+	/* time */
+
 	if (SUCCEED != zbx_get_file_time(filename, &file_time))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
-	/* time */
 	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIME);
-	tmp = get_print_time((time_t)file_time.access_time);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(tmp);
-	tmp = get_print_time((time_t)file_time.modification_time);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(tmp);
-	tmp = get_print_time((time_t)file_time.change_time);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(tmp);
+	VFS_FILE_ADD_TIME(file_time.access_time, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS);
+	VFS_FILE_ADD_TIME(file_time.modification_time, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY);
+	VFS_FILE_ADD_TIME(file_time.change_time, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE);
 	zbx_json_close(&j);
 
-	/* timestamp */
 	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIMESTAMP);
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS, (zbx_uint64_t)file_time.access_time);
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY, (zbx_uint64_t)file_time.modification_time);
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE, (zbx_uint64_t)file_time.change_time);
+	VFS_FILE_ADD_TS(file_time.access_time, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS);
+	VFS_FILE_ADD_TS(file_time.modification_time, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY);
+	VFS_FILE_ADD_TS(file_time.change_time, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE);
 	zbx_json_close(&j);
 
 	/* close object and array */
@@ -1474,30 +1495,24 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	/* size */
 	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_SIZE, (zbx_uint64_t)buf.st_size);
 
+	/* time */
+
 	if (SUCCEED != zbx_get_file_time(filename, &file_time))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
 
-	/* time */
 	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIME);
-	tmp = get_print_time((time_t)file_time.access_time);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(tmp);
-	tmp = get_print_time((time_t)file_time.modification_time);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(tmp);
-	tmp = get_print_time((time_t)file_time.change_time);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(tmp);
+	VFS_FILE_ADD_TIME(file_time.access_time, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS);
+	VFS_FILE_ADD_TIME(file_time.modification_time, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY);
+	VFS_FILE_ADD_TIME(file_time.change_time, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE);
 	zbx_json_close(&j);
 
-	/* timestamp */
 	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIMESTAMP);
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS, (zbx_uint64_t)file_time.access_time);
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY, (zbx_uint64_t)file_time.modification_time);
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE, (zbx_uint64_t)file_time.change_time);
+	VFS_FILE_ADD_TS(file_time.access_time, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS);
+	VFS_FILE_ADD_TS(file_time.modification_time, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY);
+	VFS_FILE_ADD_TS(file_time.change_time, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE);
 	zbx_json_close(&j);
 
 	zbx_json_close(&j);
@@ -1513,6 +1528,9 @@ err:
 	return ret;
 }
 #endif
+
+#undef VFS_FILE_ADD_TIME
+#undef VFS_FILE_ADD_TS
 
 int	VFS_FILE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
