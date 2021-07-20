@@ -630,22 +630,15 @@ switch ($data['type']) {
 				$service_multiselect = (new CMultiSelect([
 					'name' => 'value[]',
 					'object_name' => 'services',
-					'default_value' => 0,
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'services',
-							'srcfld1' => 'serviceid',
-							'dstfrm' => $form->getName(),
-							'dstfld1' => 'service_new_condition',
-							'editable' => true,
-							'noempty' => true
-						]
-					]
+					'custom_select' => true
 				]))
-					->setId('service_new_condition')
+					->setId('service-new-condition')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
-				$inline_js .= $service_multiselect->getPostJS();
+				$inline_js .= $service_multiselect->getPostJS().
+					'$("#service-new-condition")
+						.multiSelect("getSelectButton")
+						.addEventListener("click", selectServices);';
 
 				$form_list
 					->addRow(_('Operator'), $operator)
