@@ -351,7 +351,7 @@ static void	remove_service_problem(zbx_service_t *service, int index, zbx_hashse
 
 static zbx_hash_t	values_eq_hash(const void *data)
 {
-	zbx_values_eq_t	*d = (const zbx_values_eq_t *)data;
+	const zbx_values_eq_t	*d = (const zbx_values_eq_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(d->value, strlen(d->value), ZBX_DEFAULT_HASH_SEED);
 }
