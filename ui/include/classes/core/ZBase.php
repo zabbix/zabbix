@@ -445,7 +445,7 @@ class ZBase {
 				}
 			}
 
-			if (!$locale_found && strtolower($lang) !== 'en_us') {
+			if (!$locale_found && strtolower($lang) !== strtolower(ZBX_DEFAULT_LANG)) {
 				setlocale(LC_ALL, $default_locales);
 				error('Locale for language "'.$lang.'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
