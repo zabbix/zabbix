@@ -39,6 +39,7 @@ $parent_services = (new CMultiSelect([
 	'name' => 'parent_serviceids[]',
 	'object_name' => 'services',
 	'data' => CArrayHelper::renameObjectsKeys($data['form']['parents'], ['serviceid' => 'id']),
+	'custom_select' => true
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $service_tab = (new CFormGrid())

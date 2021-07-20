@@ -103,7 +103,10 @@ class CMultiSelect extends CTag {
 			}
 		}
 
-		if (array_key_exists('popup', $options)) {
+		if (array_key_exists('custom_select', $options)) {
+			$params['custom_select'] = $options['custom_select'];
+		}
+		elseif (array_key_exists('popup', $options)) {
 			if (array_key_exists('filter_preselect_fields', $options['popup'])) {
 				$params['popup']['filter_preselect_fields'] = $options['popup']['filter_preselect_fields'];
 			}
@@ -150,7 +153,7 @@ class CMultiSelect extends CTag {
 	 */
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup', 'placeholder', 'autosuggest'
+			'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest'
 		];
 
 		foreach ($options as $field => $value) {
@@ -211,7 +214,10 @@ class CMultiSelect extends CTag {
 
 		$autocomplete_parameters = [];
 
-		if (array_key_exists('popup', $options)) {
+		if (array_key_exists('custom_select', $options)) {
+			$mapped_options['custom_select'] = true;
+		}
+		elseif (array_key_exists('popup', $options)) {
 			$popup_parameters = [];
 
 			$valid_fields = ['parameters', 'filter_preselect_fields'];
