@@ -725,7 +725,7 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 
 	if (0 == token->opt)
 	{
-		*error = zbx_dsprintf(*error, "no arguments for function at \"%s\"", ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "no input data for function at \"%s\"", ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -2563,6 +2563,41 @@ static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const z
 	return SUCCEED;
 }
 
+static int	eval_execute_count_items(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret, i;
+	double		result;
+	zbx_uint64_t	count = 0;
+	zbx_variant_t	*arg, ret_value;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	arg = &output->values[output->values_num - 1];
+
+	if (arg->type != ZBX_VARIANT_DBL_VECTOR)
+	{
+		*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
+				ctx->expression + token->loc.l);
+	}
+
+	for (i = 0; i < arg->data.dbl_vector->values_num; i++)
+	{
+		count++;
+	}
+
+	zbx_variant_set_ui64(&ret_value, count);
+
+	eval_function_return(token->opt, &ret_value, output);
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: eval_execute_common_function                                     *
@@ -2726,6 +2761,8 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_varpop, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "varsamp", ZBX_CONST_STRLEN("varsamp")))
 		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_varsamp, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "count", ZBX_CONST_STRLEN("count")))
+		return eval_execute_count_items(ctx, token, output, error);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);
