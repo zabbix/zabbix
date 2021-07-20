@@ -661,11 +661,13 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 				{
 					zbx_vector_str_append(&graph->tkeys, itemkey);
 					itemkey_num++;
+					break;
 				}
 				else if (graphid == graph->hgraphid)
 				{
 					zbx_vector_str_append(&graph->hkeys, itemkey);
 					itemkey_num++;
+					break;
 				}
 			}
 
