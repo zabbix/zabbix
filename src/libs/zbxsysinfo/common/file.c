@@ -1241,13 +1241,7 @@ static char	*get_print_time(time_t st_raw)
 	char		*st_str;
 
 	st_str = zbx_malloc(NULL, MAX_TIME_STR_LEN);
-
-#if defined(_WINDOWS) || defined(__MINGW32__)
-	gmtime_s(&st, &st_raw);
-#else
-	gmtime_r(&st_raw, &st);
-#endif
-
+	localtime_r(&st_raw, &st);
 	strftime(st_str, MAX_TIME_STR_LEN, "%Y-%m-%dT%T%z", &st);
 
 	return st_str;
