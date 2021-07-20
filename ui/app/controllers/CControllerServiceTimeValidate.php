@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupServiceTimeValidate extends CController {
+class CControllerServiceTimeValidate extends CController {
 
 	private $ts_from;
 	private $ts_to;

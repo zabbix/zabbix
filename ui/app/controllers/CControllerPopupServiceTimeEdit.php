@@ -117,7 +117,7 @@ class CControllerPopupServiceTimeEdit extends CController {
 		}
 
 		$data = [
-			'title' => $this->hasInput('edit') ? _('Edit service time') : _('New service time'),
+			'title' => $this->hasInput('edit') ? _('Service time') : _('New service time'),
 			'is_edit' => $this->hasInput('edit'),
 			'row_index' => $this->getInput('row_index'),
 			'form' => $form,

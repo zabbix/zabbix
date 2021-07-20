@@ -131,9 +131,9 @@ class CControllerPopupServiceEdit extends CController {
 		$defaults = DB::getDefaults('services');
 
 		$data = [
-			'title' => _('Service'),
+			'title' => $this->service !== null ? _('Service') : _('New service'),
 			'serviceid' => $this->service !== null ? $this->service['serviceid'] : null,
-			'form_action' => $this->service !== null ? 'popup.service.update' : 'popup.service.create',
+			'form_action' => $this->service !== null ? 'service.update' : 'service.create',
 			'form' => [
 				'name' => $this->service !== null ? $this->service['name'] : $defaults['name'],
 				'parents' => $parents,
