@@ -1836,7 +1836,6 @@ static void	db_update_service_events(zbx_service_manager_t *manager, const zbx_v
 	zbx_db_insert_autoincrement(&db_insert_escalations, "escalationid");
 	zbx_db_insert_execute(&db_insert_escalations);
 	zbx_db_insert_clean(&db_insert_escalations);
-
 out:
 	for (i = 0; i < updates->values_num; i++)
 		zbx_vector_uint64_destroy(&actionids[i]);
@@ -2135,7 +2134,7 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 		zbx_hashset_remove_direct(&service_manager->problem_events, ptr);
 	}
 
-	db_update_services(service_manager);;
+	db_update_services(service_manager);
 	zbx_hashset_clear(&service_manager->service_diffs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

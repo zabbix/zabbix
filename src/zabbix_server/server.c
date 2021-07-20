@@ -930,7 +930,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			100},
 		{"WebServiceURL",		&CONFIG_WEBSERVICE_URL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ProblemHousekeepingFrequency",&CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY,		TYPE_INT,
+		{"ProblemHousekeepingFrequency",	&CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY,	TYPE_INT,
 			PARM_OPT,	1,			3600},
 		{"ServiceManagerSyncFrequency",	&CONFIG_SERVICEMAN_SYNC_FREQUENCY,	TYPE_INT,
 			PARM_OPT,	1,			3600},
