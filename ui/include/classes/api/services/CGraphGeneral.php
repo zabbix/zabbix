@@ -65,6 +65,11 @@ abstract class CGraphGeneral extends CApiService {
 			'messageAllowed' => _('Cannot update a discovered graph.')
 		]);
 
+		foreach ($db_graphs as &$db_graph) {
+			$db_graph['gitems'] = array_column($db_graph['gitems'], null, 'gitemid');
+		}
+		unset($db_graph);
+
 		foreach ($graphs as &$graph) {
 			// check permissions
 			if (!array_key_exists($graph['graphid'], $db_graphs)) {
@@ -76,25 +81,20 @@ abstract class CGraphGeneral extends CApiService {
 
 			// validate items on set or pass existing items from DB
 			if (array_key_exists('gitems', $graph)) {
-				foreach ($graph['gitems'] as $graph_item) {
-					if (array_key_exists('gitemid', $graph_item) && !$graph_item['gitemid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "gitemid" field for item.'));
-					}
-
-					if (array_key_exists('gitemid', $graph_item) && $graph_item['gitemid']) {
-						$validGraphItemIds = [];
-
-						foreach ($db_graphs[$graph['graphid']]['gitems'] as $db_graph_item) {
-							$validGraphItemIds[$db_graph_item['gitemid']] = $db_graph_item['gitemid'];
-						}
-
-						if (!in_array($graph_item['gitemid'], $validGraphItemIds)) {
+				foreach ($graph['gitems'] as &$gitem) {
+					if (array_key_exists('gitemid', $gitem)) {
+						if (!array_key_exists($gitem['gitemid'], $db_graphs[$graph['graphid']]['gitems'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_('No permissions to referred object or it does not exist!')
 							);
 						}
+
+						$db_gitem = $db_graphs[$graph['graphid']]['gitems'][$gitem['gitemid']];
+
+						$gitem += ['itemid' => $db_gitem['itemid']];
 					}
 				}
+				unset($gitem);
 			}
 			else {
 				$graph['gitems'] = $db_graphs[$graph['graphid']]['gitems'];
