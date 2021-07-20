@@ -54,7 +54,9 @@ abstract class CGraphGeneral extends CApiService {
 
 		$db_graphs = $this->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectGraphItems' => API_OUTPUT_EXTEND,
+			'selectGraphItems' => ['gitemid', 'itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc',
+				'type'
+			],
 			'graphids' => $graphids,
 			'editable' => true,
 			'preservekeys' => true,
@@ -89,9 +91,7 @@ abstract class CGraphGeneral extends CApiService {
 							);
 						}
 
-						$db_gitem = $db_graphs[$graph['graphid']]['gitems'][$gitem['gitemid']];
-
-						$gitem += ['itemid' => $db_gitem['itemid']];
+						$gitem += $db_graphs[$graph['graphid']]['gitems'][$gitem['gitemid']];
 					}
 				}
 				unset($gitem);
@@ -227,7 +227,7 @@ abstract class CGraphGeneral extends CApiService {
 		DB::update('graphs', $data);
 
 		$db_graph_items = API::GraphItem()->get([
-			'output' => ['gitemid'],
+			'output' => ['gitemid', 'itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
 			'graphids' => array_column($graphs, 'graphid'),
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -235,7 +235,7 @@ abstract class CGraphGeneral extends CApiService {
 
 		$ins_graph_items = [];
 		$upd_graph_items = [];
-		$del_graph_items = $db_graph_items;
+
 		foreach ($graphs as $graph) {
 			$sort_order = 0;
 
@@ -243,10 +243,17 @@ abstract class CGraphGeneral extends CApiService {
 				// Update an existing item.
 				if (array_key_exists('gitemid', $graph_item)
 						&& array_key_exists($graph_item['gitemid'], $db_graph_items)) {
-					unset($graph_item['graphid']);
-					$upd_graph_items[] = ['values' => $graph_item, 'where' => ['gitemid' => $graph_item['gitemid']]];
+					$db_graph_item = $db_graph_items[$graph_item['gitemid']];
+					$upd_graph_item = DB::getUpdatedValues('graphs_items', $graph_item, $db_graph_item);
 
-					unset($del_graph_items[$graph_item['gitemid']]);
+					if ($upd_graph_item) {
+						$upd_graph_items[] = [
+							'values' => $upd_graph_item,
+							'where' => ['gitemid' => $graph_item['gitemid']]
+						];
+					}
+
+					unset($db_graph_items[$graph_item['gitemid']]);
 				}
 				// Adding a new item.
 				else {
@@ -271,8 +278,8 @@ abstract class CGraphGeneral extends CApiService {
 			DB::update('graphs_items', $upd_graph_items);
 		}
 
-		if ($del_graph_items) {
-			DB::delete('graphs_items', ['gitemid' => array_keys($del_graph_items)]);
+		if ($db_graph_items) {
+			DB::delete('graphs_items', ['gitemid' => array_keys($db_graph_items)]);
 		}
 	}
 
@@ -883,6 +890,39 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
+	 * Adding graph items for selected graphs.
+	 *
+	 * @static
+	 *
+	 * @param array $graphs
+	 * @param bool  $with_hostid
+	 *
+	 * @return array
+	 */
+	private static function addGraphItems(array $graphs, bool $with_hostid = false): array {
+		$sql = $with_hostid
+			? 'SELECT gi.gitemid,gi.graphid,gi.itemid,i.hostid'.
+				' FROM graphs_items gi,items i'.
+				' WHERE gi.itemid=i.itemid'.
+					' AND '.dbConditionId('gi.graphid', array_keys($graphs)).
+				' ORDER BY gi.sortorder'
+			: 'SELECT gi.gitemid,gi.graphid,gi.itemid'.
+				' FROM graphs_items gi'.
+				' WHERE '.dbConditionId('gi.graphid', array_keys($graphs)).
+				' ORDER BY gi.sortorder';
+		$db_graph_items = DBselect($sql);
+
+		while ($db_graph_item = DBfetch($db_graph_items)) {
+			$graphid = $db_graph_item['graphid'];
+			unset($db_graph_item['graphid']);
+
+			$graphs[$graphid]['gitems'][] = $db_graph_item;
+		}
+
+		return $graphs;
+	}
+
+	/**
 	 * Updates the children of the graph on the given hosts and propagates the inheritance to the child hosts.
 	 *
 	 * @param array      $graphs   An array of graphs to inherit. Each graph must contain all graph properties including
@@ -1024,13 +1064,16 @@ abstract class CGraphGeneral extends CApiService {
 		if ($hostids !== null) {
 			$sql .= ' AND '.dbConditionId('i.hostid', $hostids);
 		}
-		$db_graphs = DBselect($sql);
+		$chd_graphs = DBfetchArrayAssoc(DBselect($sql), 'graphid');
 
-		while ($db_graph = DBfetch($db_graphs)) {
-			$chd_graphs_tpl[$db_graph['hostid']][$db_graph['templateid']] = [
-				'graphid' => $db_graph['graphid'],
-				'name' => $db_graph['name']
-			];
+		if ($chd_graphs) {
+			$chd_graphs = self::addGraphItems($chd_graphs);
+
+			foreach ($chd_graphs as $chd_graph) {
+				$chd_graphs_tpl[$chd_graph['hostid']][$chd_graph['templateid']] = array_intersect_key($chd_graph,
+					array_flip(['graphid', 'name', 'gitems'])
+				);
+			}
 		}
 
 		$hostids_by_name = [];
@@ -1051,8 +1094,7 @@ abstract class CGraphGeneral extends CApiService {
 			$flags = $this instanceof CGraph
 					? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 					: [ZBX_FLAG_DISCOVERY_PROTOTYPE];
-			$db_graphs = DBselect(
-				'SELECT g.graphid,g.name,g.templateid,g.flags'.
+			$sql = 'SELECT g.graphid,g.name,g.templateid,g.flags'.
 				' FROM graphs g'.
 				' WHERE '.dbConditionString('g.name', [$name]).
 					' AND '.dbConditionInt('g.flags', $flags).
@@ -1062,28 +1104,12 @@ abstract class CGraphGeneral extends CApiService {
 						' WHERE g.graphid=gi.graphid'.
 							' AND gi.itemid=i.itemid'.
 							' AND '.dbConditionId('i.hostid', $_hostids).
-					')'
-			);
-
-			while ($db_graph = DBfetch($db_graphs)) {
-				$chd_graphs[$db_graph['graphid']] = $db_graph + ['gitems' => []];
-			}
+					')';
+			$chd_graphs += DBfetchArrayAssoc(DBselect($sql), 'graphid');
 		}
 
 		if ($chd_graphs) {
-			$db_graph_items = DBselect(
-				'SELECT gi.gitemid,gi.graphid,gi.itemid,i.hostid'.
-				' FROM graphs_items gi,items i'.
-				' WHERE gi.itemid=i.itemid'.
-					' AND '.dbConditionId('gi.graphid', array_keys($chd_graphs))
-			);
-
-			while ($db_graph_item = DBfetch($db_graph_items)) {
-				$graphid = $db_graph_item['graphid'];
-				unset($db_graph_item['graphid']);
-
-				$chd_graphs[$graphid]['gitems'][] = $db_graph_item;
-			}
+			$chd_graphs = self::addGraphItems($chd_graphs, true);
 
 			foreach ($chd_graphs as $chd_graph) {
 				$hostid = $chd_graph['gitems'][0]['hostid'];
@@ -1101,11 +1127,9 @@ abstract class CGraphGeneral extends CApiService {
 					));
 				}
 
-				$chd_graphs_name[$hostid][$chd_graph['name']] = [
-					'graphid' => $chd_graph['graphid'],
-					'name' => $chd_graph['name'],
-					'gitems' => $chd_graph['gitems']
-				];
+				$chd_graphs_name[$hostid][$chd_graph['name']] = array_intersect_key($chd_graph,
+					array_flip(['graphid', 'name', 'gitems'])
+				);
 			}
 		}
 
@@ -1117,6 +1141,8 @@ abstract class CGraphGeneral extends CApiService {
 			$templateid = $graph_templateids[$graphid];
 
 			foreach (array_keys($templateids_hosts[$templateid]) as $hostid) {
+				$chd_graph = null;
+
 				if (array_key_exists($hostid, $chd_graphs_tpl)
 						&& array_key_exists($graphid, $chd_graphs_tpl[$hostid])) {
 					$chd_graph = $chd_graphs_tpl[$hostid][$graphid];
@@ -1172,12 +1198,18 @@ abstract class CGraphGeneral extends CApiService {
 					$_graph['ymax_itemid'] = $item_links[$_graph['ymax_itemid']][$hostid];
 				}
 
+				CArrayHelper::sort($_graph['gitems'], ['sortorder']);
+
 				foreach ($_graph['gitems'] as &$gitem) {
 					$gitem['itemid'] = $item_links[$gitem['itemid']][$hostid];
+
+					if ($chd_graph !== null && $chd_graph['gitems']) {
+						$gitem['gitemid'] = array_shift($chd_graph['gitems'])['gitemid'];
+					}
 				}
 				unset($gitem);
 
-				if (array_key_exists('graphid', $_graph)) {
+				if ($chd_graph !== null) {
 					$upd_graphs[] = $_graph;
 				}
 				else {
