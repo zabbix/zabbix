@@ -272,25 +272,37 @@ class CControllerAuditLogList extends CController {
 
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
-			if ($auditlog['action'] != AUDIT_ACTION_UPDATE) {
+			if ($auditlog['action'] != AUDIT_ACTION_UPDATE && ($auditlog['resourcename'] != AUDIT_RESOURCE_SCRIPT
+						&& $auditlog['action'] != AUDIT_ACTION_EXECUTE)) {
 				continue;
 			}
 
 			$details = json_decode($auditlog['details'], true);
-			if (!count($details)) {
+			if (!$details) {
 				$auditlog['details'] = '';
 				continue;
 			}
 
-			$new_details = [];
-			foreach ($details as $key => $detail) {
-				$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
-			}
-
-			$auditlog['details'] = implode("\n", $new_details);
+			$auditlog['details'] = $this->formatDetails($details, $auditlog['action']);
 		}
 		unset($auditlog);
 
 		return $auditlogs;
+	}
+
+	private function formatDetails(array $details, string $action): string {
+		$new_details = [];
+		foreach ($details as $key => $detail) {
+			switch ($action) {
+				case AUDIT_ACTION_UPDATE:
+					$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
+					break;
+				case AUDIT_ACTION_EXECUTE:
+					$new_details[] = sprintf('%s: %s', $key, $detail[1]);
+					break;
+			}
+		}
+
+		return implode("\n", $new_details);
 	}
 }
