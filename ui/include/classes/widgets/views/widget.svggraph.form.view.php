@@ -268,7 +268,7 @@ $tab_problems = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['severities']),
 		CWidgetHelper::getSeverities($fields['severities'])
 	)
-	->addRow(CWidgetHelper::getLabel($fields['problem_name']), CWidgetHelper::getProblemBox($fields['problem_name']))
+	->addRow(CWidgetHelper::getLabel($fields['problem_name']), CWidgetHelper::getTextBox($fields['problem_name']))
 	->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']))
 	->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
 

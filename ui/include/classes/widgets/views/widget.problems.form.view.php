@@ -61,7 +61,7 @@ $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $fiel
 $scripts[] = $field_hostids->getPostJS();
 
 // Problem.
-$form_list->addRow(CWidgetHelper::getLabel($fields['problem']), CWidgetHelper::getProblemBox($fields['problem']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['problem']), CWidgetHelper::getTextBox($fields['problem']));
 
 // Severity.
 $form_list->addRow(
