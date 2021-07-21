@@ -93,6 +93,7 @@ static void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags)
 	union sigval	s;
 	unsigned char	process_type;
 
+	s.sival_ptr = NULL;
 	s.ZBX_SIVAL_INT = flags;
 
 	for (i = 0; i < threads_num; i++)
