@@ -2526,4 +2526,914 @@ in:
 out:
   return: SUCCEED
   value: 1449.2
+---
+test case: Evaluate default weak, monoinc() is true
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 7
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#6'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate default weak monoinc() is false
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#6'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate specific weak monoinc() is true
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 7
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#6,"weak"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate specific weak monoinc() is false
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#6,"weak"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate strict monoinc() is true
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 0
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#6,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monoinc() is false
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#6,"strict"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate weak monoinc() is true for single element
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 0
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#6'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monoinc() is true for single element
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 0
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#6,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monoinc() is true, breaking element is too old
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#6,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monoinc() is true, using time
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 200
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 100
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '4m,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monoinc() is false, using time
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 200
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 100
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '5m,"strict"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate strict monoinc() is true, breaking element is ignored by time shift
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '4m:now-2m,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monoinc() is false, breaking element is NOT ignored by time shift
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 0
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '4m:now-1m,"strict"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate weak monoinc() is true DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.000002
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.000003
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#3'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate weak monoinc() is false DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.000002
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#3'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate weak monoinc() is true, due to lack precision DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.00000099
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.0000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#3'
+out:
+  return: SUCCEED
+  value: 1
+
+---
+test case: Evaluate strict monoinc() is false DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.00001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.00002
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.00001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#3,"strict"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate strict monoinc() is true, precision is enough to pass DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.0000001
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.0000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#3,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monoinc() is true, precision is still enough to pass DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.0000010
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.0000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#3,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monoinc() is false, precision is NOT enough to pass DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 1.0000011
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1.0000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monoinc
+  params: '#3,"strict"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate default weak, monodec() is false
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 7
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#6'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate default weak monodec() is false
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 26
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 12
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 16
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 56
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 112
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 24
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#6'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate specific weak monodec() is true
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 7
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#6,"weak"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate specific weak monodec() is true
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 5
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#6,"weak"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monodec() is true
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 888
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 777
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 666
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 555
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 444
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 333
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 222
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#6,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monodec() is false
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 7
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 7
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#6,"strict"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate weak monodec() is true for single element
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 0
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#6'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monodec() is true for single element
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 0
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#6,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monodec() is true, breaking element is too old
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 6
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#6,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monodec() is true, using time
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 200
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '4m,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monodec() is false, using time
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '5m,"strict"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate strict monodec() is true, breaking element is ignored by time shift
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 6
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 6
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '4m:now-2m,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monodec() is false, breaking element is NOT ignored by time shift
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 5
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 100
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 200
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '4m:now-1m,"strict"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate weak monodec() is true DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: -1.000002
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: -1.000003
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#3'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate weak monodec() is false DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: -1.000002
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: -1.000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#3'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate weak monodec() is true, due to lack precision DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.0000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: -1.00000099
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: -1.0000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#3'
+out:
+  return: SUCCEED
+  value: 1
+
+---
+test case: Evaluate strict monodec() is false DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.00001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: -1.00002
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: -1.00001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#3,"strict"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate strict monodec() is true, precision is enough to pass DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.0000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: -1.0000001
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: -1.0000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#3,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monodec() is true, precision is still enough to pass DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.0000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: -1.0000010
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: -1.0000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#3,"strict"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strict monodec() is false, precision is NOT enough to pass DOUBLE
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.0000001
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: -1.0000011
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: -1.0000001
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: monodec
+  params: '#3,"strict"'
+out:
+  return: SUCCEED
+  value: 0
 ...
