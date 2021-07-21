@@ -76,10 +76,11 @@ class CWidgetHelper {
 					document
 						.getElementById("widget-dialogue-form")
 						.addEventListener("change", (e) => {
-							const trimmable = e.target.matches(\'input[type="text"]:not([data-no-trim="1"]), \'+
-									\'textarea:not([data-no-trim="1"])\');
+							const is_trimmable = e.target.matches(
+								\'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])\'
+							);
 
-							if (trimmable) {
+							if (is_trimmable) {
 								e.target.value = e.target.value.trim();
 							}
 						}, {capture: true});
