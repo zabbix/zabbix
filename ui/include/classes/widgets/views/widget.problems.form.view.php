@@ -89,7 +89,6 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['tag_name_format']),
 // Tag display priority.
 $form_list->addRow(CWidgetHelper::getLabel($fields['tag_priority']),
 	CWidgetHelper::getTextBox($fields['tag_priority'])
-		->setAttribute('data-trim', 1)
 		->setAttribute('placeholder', _('comma-separated list'))
 		->setEnabled($fields['show_tags']->getValue() !== PROBLEMS_SHOW_TAGS_NONE)
 );
