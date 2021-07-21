@@ -84,8 +84,6 @@ class CDateSelector extends CTag {
 		$this->name = $name;
 		$this->value = $value;
 		$this->addClass(static::ZBX_STYLE_CLASS);
-
-		return $this;
 	}
 
 	/**
