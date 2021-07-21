@@ -1638,11 +1638,8 @@ static void	cleanup_deleted_problems(zbx_service_manager_t *service_manager, int
 
 static void	zbx_serviceman_sigusr_handler(int flags)
 {
-	if (ZBX_RTC_SERVICE_CACHE_RELOAD != ZBX_RTC_GET_MSG(flags) &&
-			(ZBX_RTC_CONFIG_CACHE_RELOAD != ZBX_RTC_GET_MSG(flags)))
-	{
+	if (ZBX_RTC_SERVICE_CACHE_RELOAD != ZBX_RTC_GET_MSG(flags))
 		return;
-	}
 
 	if (1 == service_cache_reload_requested)
 	{
