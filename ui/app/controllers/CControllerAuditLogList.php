@@ -125,7 +125,7 @@ class CControllerAuditLogList extends CController {
 				$data['auditlogs'] = API::AuditLog()->get($params);
 			}
 
-			$users = array_map(function (array $value): string {
+			$users = array_map(function(array $value): string {
 				return $value['username'];
 			}, $users);
 		}
@@ -137,10 +137,10 @@ class CControllerAuditLogList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		$data['auditlogs'] = $this->sanitizeDetails($data['auditlogs']);
+		$this->sanitizeDetails($data['auditlogs']);
 
 		if (!$users) {
-			$userids = array_filter(array_column($data['auditlogs'], 'userid'), function ($id) {
+			$userids = array_filter(array_column($data['auditlogs'], 'userid'), function($id) {
 				return $id != 0;
 			});
 
@@ -261,7 +261,7 @@ class CControllerAuditLogList extends CController {
 	}
 
 	private function sanitizeUsersForMultiselect(array $users): array {
-		$users = array_map(function (array $value): array {
+		$users = array_map(function(array $value): array {
 			return ['id' => $value['userid'], 'name' => getUserFullname($value)];
 		}, $users);
 
@@ -272,8 +272,7 @@ class CControllerAuditLogList extends CController {
 
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
-			if ($auditlog['action'] != AUDIT_ACTION_UPDATE && ($auditlog['resourcename'] != AUDIT_RESOURCE_SCRIPT
-						&& $auditlog['action'] != AUDIT_ACTION_EXECUTE)) {
+			if ($auditlog['action'] != AUDIT_ACTION_UPDATE && $auditlog['action'] != AUDIT_ACTION_EXECUTE) {
 				continue;
 			}
 
@@ -302,6 +301,8 @@ class CControllerAuditLogList extends CController {
 					break;
 			}
 		}
+
+		natsort($new_details);
 
 		return implode("\n", $new_details);
 	}
