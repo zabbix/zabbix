@@ -40,8 +40,8 @@ ZBX_METRIC parameters_specific[] =
 	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
 	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
 
-	{"net.tcp.socket.count",CF_HAVEPARAMS,	NET_TCP_SOCKET_COUNT,	",,127.0.0.1,80"},
-	{"net.udp.socket.count",CF_HAVEPARAMS,	NET_UDP_SOCKET_COUNT,	",,127.0.0.1,80"},
+	{"net.tcp.socket.count",CF_HAVEPARAMS,	NET_TCP_SOCKET_COUNT,	",80"},
+	{"net.udp.socket.count",CF_HAVEPARAMS,	NET_UDP_SOCKET_COUNT,	",68"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo,bytes"},
