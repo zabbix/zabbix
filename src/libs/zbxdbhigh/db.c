@@ -3601,7 +3601,7 @@ int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *
 	ZBX_STR2UINT64(user->userid, row[0]);
 	ZBX_STR2UINT64(user->roleid, row[1]);
 	user->username = zbx_strdup(NULL, row[2]);
-	user->type = atoi(row[2]);
+	user->type = atoi(row[3]);
 	ret = SUCCEED;
 out:
 	DBfree_result(result);
