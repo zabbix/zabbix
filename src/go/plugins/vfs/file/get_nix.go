@@ -65,5 +65,7 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 	c := jsTimeLoc(time.Unix(stat.Ctim.Unix()))
 	fi.Time.Change = &c
 
+	fi.Size = (*info).Size()
+
 	return &fi, nil
 }

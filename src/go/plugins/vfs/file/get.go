@@ -97,8 +97,6 @@ func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 		return nil, fmt.Errorf("Cannot obtain %s type information", params[0])
 	}
 
-	fi.Size = info.Size()
-
 	fi.Time.Modify = jsTimeLoc(info.ModTime())
 
 	fi.Timestamp.Modify = jsTimeUtc(fi.Time.Modify)
