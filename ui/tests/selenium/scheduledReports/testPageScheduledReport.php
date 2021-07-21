@@ -61,6 +61,47 @@ class testPageScheduledReport extends CWebTest {
 		return $result;
 	}
 
+	public static function getDashboardData() {
+		return [
+			[
+				[
+					'name' => 'Zabbix server health'
+				]
+			],
+			[
+				[
+					'name' => 'Zabbix server',
+					'no_reports' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test related reports view in dashboard.
+	 *
+	 * @dataProvider getDashboardData
+	 * @backupOnce profiles
+	 */
+	public function testPageScheduledReport_Dashboard($data) {
+		$dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name='.zbx_dbstr($data['name']));
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
+		$this->query('id:dashboard-actions')->one()->waitUntilClickable()->click();
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+
+		if (array_key_exists('no_reports', $data)) {
+			$this->assertFalse($popup->getItem('View related reports')->isEnabled());
+		}
+		else {
+			$popup->select('View related reports');
+			$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
+			$this->assertScreenshot($overlay);
+			sleep(1);
+			$overlay->query('button:Ok')->one()->click();
+			COverlayDialogElement::ensureNotPresent();
+		}
+	}
+
 	public function testPageScheduledReport_Layout() {
 		$expired_report = [
 			'Name' => 'Report for filter - expired',
@@ -408,47 +449,6 @@ class testPageScheduledReport extends CWebTest {
 			}
 			$this->assertEquals($expected, $values);
 			$header->click();
-		}
-	}
-
-	public static function getDashboardData() {
-		return [
-			[
-				[
-					'name' => 'Zabbix server health'
-				]
-			],
-			[
-				[
-					'name' => 'Zabbix server',
-					'no_reports' => true
-				]
-			]
-		];
-	}
-
-	/**
-	 * Test related dashboard reports.
-	 *
-	 * @dataProvider getDashboardData
-	 * @backupOnce profiles
-	 */
-	public function testPageScheduledReport_Dashboard($data) {
-		$dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name='.zbx_dbstr($data['name']));
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
-		$this->query('id:dashboard-actions')->one()->waitUntilClickable()->click();
-		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-
-		if (array_key_exists('no_reports', $data)) {
-			$this->assertTrue($popup->query('xpath://a[@aria-label="View related reports" and @class="menu-popup-item-disabled"]')
-					->one()->isPresent());
-		}
-		else {
-			$popup->select('View related reports');
-			$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
-			$this->assertScreenshot($overlay);
-			$overlay->query('button:Ok')->one()->click();
-			COverlayDialogElement::ensureNotPresent();
 		}
 	}
 
