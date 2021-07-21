@@ -76,7 +76,7 @@ class CExpressionValidator extends CValidator {
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
 
-		$this->math_function_data = new CMathFunctionData();
+		$this->math_function_data = new CMathFunctionData(['calculated' => $this->options['calculated']]);
 		$this->math_function_parameters = $this->math_function_data->getParameters();
 
 		$this->hist_function_data = new CHistFunctionData(['calculated' => $this->options['calculated']]);
@@ -135,6 +135,21 @@ class CExpressionValidator extends CValidator {
 						return false;
 					}
 
+					if ($this->options['calculated']
+							&& CMathFunctionData::isAggregatingHistOnly($token['data']['function'])) {
+						if (count($token['data']['parameters']) != 1
+								|| count($token['data']['parameters'][0]['data']['tokens']) != 1
+								|| $token['data']['parameters'][0]['data']['tokens'][0]['type']
+									!= CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
+								|| !CHistFunctionData::isAggregating(
+									$token['data']['parameters'][0]['data']['tokens'][0]['data']['function']
+								)) {
+							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
+
+							return false;
+						}
+					}
+
 					foreach ($token['data']['parameters'] as $parameter) {
 						if (!$this->validateRecursively($parameter['data']['tokens'], $token)) {
 							return false;
@@ -173,8 +188,9 @@ class CExpressionValidator extends CValidator {
 					if ($options['calculated'] && $options['aggregating']) {
 						if ($parent_token === null
 								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
-								|| !$this->math_function_data->isAggregating($parent_token['data']['function'])
-								|| count($parent_token['data']['parameters']) != 1) {
+								|| !CMathFunctionData::isAggregating($parent_token['data']['function'])
+								|| count($parent_token['data']['parameters']) != 1
+								|| count($parent_token['data']['parameters'][0]['data']['tokens']) != 1) {
 							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
 							return false;
@@ -184,7 +200,7 @@ class CExpressionValidator extends CValidator {
 					break;
 
 				case CExpressionParserResult::TOKEN_TYPE_EXPRESSION:
-					if (!$this->validateRecursively($parameter['data']['tokens'], $parent_token)) {
+					if (!$this->validateRecursively($token['data']['tokens'], null)) {
 						return false;
 					}
 
@@ -220,7 +236,7 @@ class CExpressionValidator extends CValidator {
 					return true;
 
 				case CExpressionParserResult::TOKEN_TYPE_EXPRESSION:
-					return self::hasHistoryFunctions($parameter['data']['tokens']);
+					return self::hasHistoryFunctions($token['data']['tokens']);
 			}
 		}
 
