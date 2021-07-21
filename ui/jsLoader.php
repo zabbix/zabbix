@@ -132,7 +132,8 @@ $availableJScripts = [
 	'srv_status.js' => 'pages/',
 	'monitoring.overview.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
-	'popup.operation.common.js' => 'pages/'
+	'popup.operation.common.js' => 'pages/',
+	'temp.host.list.js' => '',
 ];
 
 $tranStrings = [
@@ -458,6 +459,9 @@ foreach ($files as $file) {
 foreach ($files as $file) {
 	if (isset($availableJScripts[$file])) {
 		$js .= file_get_contents('js/'.$availableJScripts[$file].$file)."\n";
+	}
+	else {
+		throw new Exception($file.' not found in availableJScripts');
 	}
 }
 

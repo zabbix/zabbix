@@ -23,21 +23,6 @@
  * @var CView $this
  */
 
-/*
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-*/
-
-/**
- * @var CView $this
- */
-
 $scripts = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
 	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js'
 ];
@@ -46,6 +31,8 @@ foreach ($scripts as $script) {
 	$this->addJsFile($script);
 }
 
+// @TODO: coordinate with Miks
+$this->addJsFile('temp.host.list.js');
 $this->includeJsFile('host.list.js.php');
 
 $widget = (new CWidget())
@@ -74,14 +61,17 @@ $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 	'evaltype' => $data['filter']['evaltype'],
 	'tags' => $filter_tags
 ]);
+$filter = new CFilter(
+	(new CUrl('zabbix.php'))
+		->setArgument('action', $data['action'])
+);
 
-// filter
-$filter = new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'host.list'));
 $filter
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
+			->addItem((new CInput('hidden', 'action', $data['action'])))
 			->addRow(
 				(new CLabel(_('Host groups'), 'filter_groups__ms')),
 				(new CMultiSelect([
@@ -163,23 +153,34 @@ $widget->addItem($filter);
 
 // table hosts
 $form = (new CForm())->setName('hosts');
+$header_checkbox = (new CCheckBox('all_hosts'))
+	->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');");
+$show_monitored_by = ($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
+		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY);
+$header_sortable_name = make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
+	(new CUrl('zabbix.php'))
+		->setArgument('action', $data['action'])
+		->getUrl()
+);
+$header_sortable_status = make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder'],
+	(new CUrl('zabbix.php'))
+		->setArgument('action', $data['action'])
+		->getUrl()
+);
 
 $table = (new CTableInfo())
 	->setHeader([
-		(new CColHeader(
-			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], 'zabbix.php?action=host.list'),
+		(new CColHeader($header_checkbox))->addClass(ZBX_STYLE_CELL_WIDTH),
+		$header_sortable_name,
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
 		_('Discovery'),
 		_('Web'),
 		_('Interface'),
-		($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
-				|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY) ? _('Proxy') : null,
+		$show_monitored_by ? _('Proxy') : null,
 		_('Templates'),
-		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder'], 'zabbix.php?action=host.list'),
+		$header_sortable_status,
 		_('Availability'),
 		_('Agent encryption'),
 		_('Info'),
@@ -193,13 +194,16 @@ $interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JM
 foreach ($data['hosts'] as $host) {
 	// Select an interface from the list with highest priority.
 	$interface = null;
+
 	if ($host['interfaces']) {
 		foreach ($interface_types as $interface_type) {
 			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
 				return ($host_interface['type'] == $interface_type);
 			});
+
 			if ($host_interfaces) {
 				$interface = reset($host_interfaces);
+
 				break;
 			}
 		}
@@ -308,6 +312,7 @@ foreach ($data['hosts'] as $host) {
 
 		if ($parent_templates) {
 			order_result($parent_templates, 'name');
+
 			$caption[] = ' (';
 
 			foreach ($parent_templates as $parent_template) {
@@ -324,6 +329,7 @@ foreach ($data['hosts'] as $host) {
 				else {
 					$caption[] = (new CSpan(CHtml::encode($parent_template['name'])))->addClass(ZBX_STYLE_GREY);
 				}
+
 				$caption[] = ', ';
 			}
 
@@ -365,6 +371,7 @@ foreach ($data['hosts'] as $host) {
 
 		// Outgoing encryption.
 		$out_encryption = [];
+
 		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
 			$out_encryption[] = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
@@ -393,8 +400,7 @@ foreach ($data['hosts'] as $host) {
 
 	$monitored_by = null;
 
-	if ($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
-			|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY) {
+	if ($show_monitored_by) {
 		$monitored_by = ($host['proxy_hostid'] != 0)
 			? $data['proxies'][$host['proxy_hostid']]['host']
 			: '';
@@ -461,33 +467,29 @@ foreach ($data['hosts'] as $host) {
 
 $form->addItem([
 	$table,
-	$data['paging'],
-	new CActionButtonList('action', 'hosts',
-		[
-			'host.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
-			'host.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?')],
-			'host.export' => [
-				'content' => new CButtonExport('export.hosts',
-					(new CUrl('zabbix.php?action=host.list'))
-						->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
-						->getUrl()
-				)
-			],
-			'popup.massupdate.host' => [
-				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
-			],
-			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
-		]
-	)
+	$data['paginator'],
+	new CActionButtonList('action', 'hosts', [
+		'host.massenable'  => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
+		'host.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?')],
+		'host.export' => [
+			'content' => new CButtonExport('export.hosts',
+				(new CUrl('zabbix.php'))
+					->setArgument('action', $data['action'])
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+					->getUrl()
+			)
+		],
+		'popup.massupdate.host' => [
+			'content' => (new CButton('', _('Mass update')))
+				->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->removeAttribute('id')
+		],
+		'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
+	])
 ]);
 
-$widget->addItem($form);
-
-$widget->show();
-
-(new CScriptTag('host_list.init();'))
-	->setOnDocumentReady()
+$widget
+	->addItem($form)
+	->addItem((new CScriptTag('host_list.init();'))->setOnDocumentReady())
 	->show();

@@ -25,39 +25,28 @@ class CControllerHostList extends CController {
 	}
 
 	protected function checkInput() {
-		// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 		$fields = [
-			// actions
-			/*'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-											IN('"host.list"'),
-											null
-										],*/
+			'action'              => 'in host.list',
+			'page'                => 'ge 1',
 			// filter
-			'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-			'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-			'filter_host' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
-			'filter_templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-			'filter_groups' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-			'filter_ip' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
-			'filter_dns' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
-			'filter_port' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
-			'filter_monitored_by' =>	[T_ZBX_INT, O_OPT, null,
-											IN([ZBX_MONITORED_BY_ANY, ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY]),
-											null
-										],
-			'filter_proxyids' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-			'filter_evaltype' =>		[T_ZBX_INT, O_OPT, null,
-											IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
-											null
-										],
-			'filter_tags' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+			'filter_set'          => 'in 1',
+			'filter_rst'          => 'in 1',
+			'filter_host'         => 'string',
+			'filter_templates'    => 'array_db hosts.hostid',
+			'filter_groups'       => 'array_db hosts_groups.groupid',
+			'filter_ip'           => 'string',
+			'filter_dns'          => 'string',
+			'filter_port'         => 'string',
+			'filter_monitored_by' => 'in '.ZBX_MONITORED_BY_ANY.','.ZBX_MONITORED_BY_SERVER.','.ZBX_MONITORED_BY_PROXY,
+			'filter_proxyids'     => 'array_db hosts.proxy_hostid',
+			'filter_evaltype'     => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_tags'         => 'array',
 			// sort and sortorder
-			'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
-			'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+			'sort'                => 'in name,status',
+			'sortorder'           => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 		];
 
-		// ? $ret = $this->validateInput($fields);
-		$ret = check_fields($fields);
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -140,6 +129,7 @@ class CControllerHostList extends CController {
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
 		$tags = getRequest('tags', []);
+
 		foreach ($tags as $key => $tag) {
 			// remove empty new tag lines
 			if ($tag['tag'] === '' && $tag['value'] === '') {
@@ -156,11 +146,11 @@ class CControllerHostList extends CController {
 			}
 		}
 
-		$sortField = getRequest('sort', CProfile::get('web.host.list.sort', 'name'));
-		$sortOrder = getRequest('sortorder', CProfile::get('web.host.list.sortorder', ZBX_SORT_UP));
+		$sort_field = getRequest('sort', CProfile::get('web.'.$this->getAction().'.sort', 'name'));
+		$sort_order = getRequest('sortorder', CProfile::get('web.'.$this->getAction().'.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.host.list.sort', $sortField, PROFILE_TYPE_STR);
-		CProfile::update('web.host.list.sortorder', $sortOrder, PROFILE_TYPE_STR);
+		CProfile::update('web.'.$this->getAction().'.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.'.$this->getAction().'.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		// Get host groups.
 		$filter['groups'] = $filter['groups']
@@ -173,6 +163,7 @@ class CControllerHostList extends CController {
 			: [];
 
 		$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+
 		if ($filter_groupids) {
 			$filter_groupids = getSubGroups($filter_groupids);
 		}
@@ -208,13 +199,13 @@ class CControllerHostList extends CController {
 		// Select hosts.
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$hosts = API::Host()->get([
-			'output' => ['hostid', $sortField],
+			'output' => ['hostid', $sort_field],
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
 			'groupids' => $filter_groupids,
 			'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 			'editable' => true,
-			'sortfield' => $sortField,
+			'sortfield' => $sort_field,
 			'limit' => $limit,
 			'search' => [
 				'name' => ($filter['host'] === '') ? null : $filter['host'],
@@ -227,7 +218,7 @@ class CControllerHostList extends CController {
 			'proxyids' => $proxyids
 		]);
 
-		order_result($hosts, $sortField, $sortOrder);
+		order_result($hosts, $sort_field, $sort_order);
 
 		// pager
 		if (hasRequest('page')) {
@@ -237,12 +228,14 @@ class CControllerHostList extends CController {
 			$page_num = 1;
 		}
 		else {
-			$page_num = CPagerHelper::loadPage('host.list');
+			$page_num = CPagerHelper::loadPage($this->getAction());
 		}
 
-		CPagerHelper::savePage('host.list', $page_num);
+		CPagerHelper::savePage($this->getAction(), $page_num);
 
-		$pagingLine = CPagerHelper::paginate($page_num, $hosts, $sortOrder, new CUrl('host.list'));
+		$paginator = CPagerHelper::paginate($page_num, $hosts, $sort_order,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
 
 		$hosts = API::Host()->get([
 			'output' => API_OUTPUT_EXTEND,
@@ -256,16 +249,17 @@ class CControllerHostList extends CController {
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectHostDiscovery' => ['ts_delete'],
 			'selectTags' => ['tag', 'value'],
-			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
 		]);
-		order_result($hosts, $sortField, $sortOrder);
+
+		order_result($hosts, $sort_field, $sort_order);
 
 		// selecting linked templates to templates linked to hosts
 		$templateids = [];
 
 		foreach ($hosts as $host) {
-			$templateids = array_merge($templateids, zbx_objectValues($host['parentTemplates'], 'templateid'));
+			$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
 		}
 
 		$templateids = array_keys(array_flip($templateids));
@@ -277,11 +271,11 @@ class CControllerHostList extends CController {
 			'preservekeys' => true
 		]);
 
-		// selecting writable templates IDs
 		$writable_templates = [];
+
 		if ($templateids) {
 			foreach ($templates as $template) {
-				$templateids = array_merge($templateids, zbx_objectValues($template['parentTemplates'], 'templateid'));
+				$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
 			}
 
 			$writable_templates = API::Template()->get([
@@ -293,7 +287,7 @@ class CControllerHostList extends CController {
 		}
 
 		// Get proxy host IDs that are not 0 and maintenance IDs.
-		$proxyHostIds = [];
+		$proxy_hostids = [];
 		$maintenanceids = [];
 
 		foreach ($hosts as &$host) {
@@ -303,7 +297,7 @@ class CControllerHostList extends CController {
 			]);
 
 			if ($host['proxy_hostid']) {
-				$proxyHostIds[$host['proxy_hostid']] = $host['proxy_hostid'];
+				$proxy_hostids[$host['proxy_hostid']] = $host['proxy_hostid'];
 			}
 
 			if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -313,16 +307,18 @@ class CControllerHostList extends CController {
 		unset($host);
 
 		$proxies = [];
-		if ($proxyHostIds) {
+
+		if ($proxy_hostids) {
 			$proxies = API::Proxy()->get([
-				'proxyids' => $proxyHostIds,
+				'proxyids' => $proxy_hostids,
 				'output' => ['host'],
 				'preservekeys' => true
 			]);
 		}
 
-		// Prepare data for multiselect and remove unexisting proxies.
+		// Prepare data for multiselect and remove non-existing proxies.
 		$proxies_ms = [];
+
 		if ($filter['proxyids']) {
 			$filter_proxies = API::Proxy()->get([
 				'output' => ['proxyid', 'host'],
@@ -343,12 +339,13 @@ class CControllerHostList extends CController {
 		}
 
 		$data = [
+			'action' => $this->getAction(),
 			'hosts' => $hosts,
-			'paging' => $pagingLine,
+			'paginator' => $paginator,
 			'page' => $page_num,
 			'filter' => $filter,
-			'sortField' => $sortField,
-			'sortOrder' => $sortOrder,
+			'sortField' => $sort_field,
+			'sortOrder' => $sort_order,
 			'templates' => $templates,
 			'maintenances' => $db_maintenances,
 			'writable_templates' => $writable_templates,
@@ -360,10 +357,7 @@ class CControllerHostList extends CController {
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],
-			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-			'user' =>  [
-				'debug_mode' => $this->getDebugMode()
-			]
+			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
 
 		$this->setResponse(new CControllerResponseData($data));

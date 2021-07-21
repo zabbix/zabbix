@@ -490,7 +490,10 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				],
 				'ids' => $this->getInput('ids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
-				'location_url' => 'hosts.php'
+				'location_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'host.list')
+					->setArgument('page', CPagerHelper::loadPage('host.list'))
+					->getUrl()
 			];
 
 			$data['proxies'] = API::Proxy()->get([
