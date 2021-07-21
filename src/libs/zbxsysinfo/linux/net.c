@@ -57,6 +57,9 @@ net_count_info_t;
 #define ZBX_ADDR_TYPE_IPV4	0
 #define ZBX_ADDR_TYPE_IPV6	1
 
+#define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
+#define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
+
 #if HAVE_INET_DIAG
 #	include <sys/socket.h>
 #	include <linux/netlink.h>
@@ -781,10 +784,19 @@ static int	check_ip_mask(char *addr, int addr_type, unsigned int ip_cmpr, const 
 	int	ret = FAIL, type;
 	int	prefix_sz;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __func__, addr);
+
 	if (NULL != strchr(addr, ':'))
+	{
 		type = AF_INET6;
+		prefix_sz = IPV6_MAX_CIDR_PREFIX;
+	}
 	else
+	{
 		type = AF_INET;
+		prefix_sz = IPV4_MAX_CIDR_PREFIX;
+	}
+
 
 	if (NULL != (cidr_sep = strchr(addr, '/')))
 	{
@@ -801,8 +813,6 @@ static int	check_ip_mask(char *addr, int addr_type, unsigned int ip_cmpr, const 
 		*error = zbx_dsprintf(*error, "IP is not supported \"%s\"", addr);
 		goto out;
 	}
-	else
-		prefix_sz = 32;
 
 	if (ZBX_ADDR_TYPE_IPV4 == addr_type)
 	{
@@ -814,14 +824,29 @@ static int	check_ip_mask(char *addr, int addr_type, unsigned int ip_cmpr, const 
 			goto out;
 		}
 
-		ret = subnet_match(type, prefix_sz, addr, ip);
+		if (prefix_sz == IPV4_MAX_CIDR_PREFIX)
+		{
+			if (0 == strcmp(ip, addr))
+				ret = SUCCEED;
+		}
+		else
+			ret = subnet_match(type, prefix_sz, ip, addr);
 	}
 	else
-		ret = subnet_match(type, prefix_sz, addr, ip_cmpr6);
-
+	{
+		if (prefix_sz == IPV6_MAX_CIDR_PREFIX)
+		{
+			if (0 == strcmp(ip_cmpr6, addr))
+				ret = SUCCEED;
+		}
+		else
+			ret = subnet_match(type, prefix_sz, addr, ip_cmpr6);
+	}
 out:
 	if (NULL != cidr_sep)
 		*cidr_sep = '/';
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -901,10 +926,11 @@ static unsigned short	get_service_port_tcp(const char *name)
 static int	get_proc_net_count(const char *filename, int addr_type, net_count_info_t *result_exp,
 		zbx_uint64_t *count, char **error)
 {
-	char			line[MAX_STRING_LEN];
-	FILE			*f;
-	net_count_info_t	result;
-	int			ret = SUCCEED;
+	char	line[MAX_STRING_LEN];
+	FILE	*f;
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s'", __func__, filename);
 
 	if (NULL == (f = fopen(filename, "r")))
 	{
@@ -914,8 +940,8 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		unsigned int	laddr, raddr;
-		char		*p;
+		unsigned int	laddr_n, raddr_n, lport, rport, state;
+		char		laddr[MAX_STRING_LEN], raddr[MAX_STRING_LEN], *p;
 
 		if (NULL == (p = strstr(line, ":")))
 			continue;
@@ -923,15 +949,15 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 		if (ZBX_ADDR_TYPE_IPV6 == addr_type)
 		{
 			if (5 == sscanf(p, ": %s:%x %s:%x %x",
-					result.laddr,
-					&result.lport,
-					result.raddr,
-					&result.rport,
-					&result.state))
+					laddr,
+					&lport,
+					raddr,
+					&rport,
+					&state))
 			{
 				if (NULL != result_exp->laddr && '\0' != *result_exp->laddr &&
 						SUCCEED != check_ip_mask(result_exp->laddr, ZBX_ADDR_TYPE_IPV6, 0,
-						result.laddr, error))
+						laddr, error))
 				{
 					if (NULL != *error)
 					{
@@ -945,7 +971,7 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 
 				if (NULL != result_exp->raddr && '\0' != *result_exp->raddr &&
 						SUCCEED != check_ip_mask(result_exp->raddr, ZBX_ADDR_TYPE_IPV6, 0,
-						result.raddr, error))
+						raddr, error))
 				{
 					if (NULL != *error)
 					{
@@ -957,9 +983,9 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 					continue;
 				}
 
-				if ((0 != result_exp->lport && result_exp->lport != result.lport) ||
-						(0 != result_exp->rport && result_exp->rport != result.rport) ||
-						(0 != result_exp->state && result_exp->state != result.state))
+				if ((0 != result_exp->lport && result_exp->lport != lport) ||
+						(0 != result_exp->rport && result_exp->rport != rport) ||
+						(0 != result_exp->state && result_exp->state != state))
 				{
 					continue;
 				}
@@ -970,15 +996,15 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 		else
 		{
 			if (5 == sscanf(p, ": %x:%x %x:%x %x",
-					&laddr,
-					&result.lport,
-					&raddr,
-					&result.rport,
-					&result.state))
+					&laddr_n,
+					&lport,
+					&raddr_n,
+					&rport,
+					&state))
 			{
 				if (NULL != result_exp->laddr && '\0' != *result_exp->laddr &&
 						SUCCEED != check_ip_mask(result_exp->laddr, ZBX_ADDR_TYPE_IPV4,
-						htonl(laddr), NULL, error))
+						htonl(laddr_n), NULL, error))
 				{
 					if (NULL != *error)
 					{
@@ -992,7 +1018,7 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 
 				if (NULL != result_exp->raddr && '\0' != *result_exp->raddr &&
 						SUCCEED != check_ip_mask(result_exp->raddr, ZBX_ADDR_TYPE_IPV4,
-						htonl(raddr), NULL, error))
+						htonl(raddr_n), NULL, error))
 				{
 					if (NULL != *error)
 					{
@@ -1004,9 +1030,9 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 					continue;
 				}
 
-				if ((0 != result_exp->lport && result_exp->lport != result.lport) ||
-						(0 != result_exp->rport && result_exp->rport != result.rport) ||
-						(0 != result_exp->state && result_exp->state != result.state))
+				if ((0 != result_exp->lport && result_exp->lport != lport) ||
+						(0 != result_exp->rport && result_exp->rport != rport) ||
+						(0 != result_exp->state && result_exp->state != state))
 				{
 					continue;
 				}
@@ -1017,6 +1043,8 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 	}
 
 	zbx_fclose(f);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
