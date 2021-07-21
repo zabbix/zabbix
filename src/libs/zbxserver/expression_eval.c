@@ -1324,7 +1324,7 @@ static void	evaluate_exists_item(zbx_vector_dbl_t *results)
 
 static void	evaluate_item_count(zbx_uint64_t *result)
 {
-	*result++;
+	(*result)++;
 }
 
 /******************************************************************************
@@ -1435,12 +1435,12 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		if (HOST_STATUS_MONITORED != dcitem->host.status)
 			continue;
 
-		if (item_func == ZBX_ITEM_FUNC_EXISTS)
+		if (ZBX_ITEM_FUNC_EXISTS == item_func)
 		{
 			evaluate_exists_item(results_vector);
 			continue;
 		}
-		else if (item_func == ZBX_ITEM_FUNC_ITEMCOUNT)
+		else if (ZBX_ITEM_FUNC_ITEMCOUNT == item_func)
 		{
 			evaluate_item_count(&result_uint);
 			continue;
@@ -1461,7 +1461,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		zbx_history_record_vector_destroy(&values, dcitem->value_type);
 	}
 
-	if (item_func == ZBX_ITEM_FUNC_ITEMCOUNT)
+	if (ZBX_ITEM_FUNC_ITEMCOUNT == item_func)
 		zbx_variant_set_ui64(value, result_uint);
 	else
 		zbx_variant_set_dbl_vector(value, results_vector);

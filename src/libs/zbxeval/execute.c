@@ -2566,9 +2566,8 @@ static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const z
 static int	eval_execute_count_items(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	int		ret, i;
-	double		result;
-	zbx_uint64_t	count = 0;
+	int		i;
+	zbx_uint64_t	count;
 	zbx_variant_t	*arg, ret_value;
 
 	if (1 != token->opt)
@@ -2580,11 +2579,13 @@ static int	eval_execute_count_items(const zbx_eval_context_t *ctx, const zbx_eva
 
 	arg = &output->values[output->values_num - 1];
 
-	if (arg->type != ZBX_VARIANT_DBL_VECTOR)
+	if (ZBX_VARIANT_DBL_VECTOR != arg->type)
 	{
 		*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
 				ctx->expression + token->loc.l);
 	}
+
+	count = 0;
 
 	for (i = 0; i < arg->data.dbl_vector->values_num; i++)
 	{
