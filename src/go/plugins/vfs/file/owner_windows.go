@@ -34,14 +34,18 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 
 	switch len(params) {
 	case 3:
-		if params[2] != "name" && params[2] != "SID" {
-			return nil, fmt.Errorf("Invalid third parameter: %s", params[2])
+		if params[2] != "" {
+			if params[2] != "name" && params[2] != "SID" {
+				return nil, fmt.Errorf("Invalid third parameter: %s", params[2])
+			}
+			resulttype = params[2]
 		}
-		resulttype = params[2]
 		fallthrough
 	case 2:
-		if params[1] != ownertype {
-			return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
+		if params[1] != "" {
+			if params[1] != ownertype {
+				return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
+			}
 		}
 		fallthrough
 	case 1:
