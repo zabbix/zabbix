@@ -115,6 +115,13 @@ A......... [ZBX-8999] fixed exporting of images separately from other objects (I
 ........S. [ZBX-19307] improved performance of history syncers by reducing time spent in locks when syncing history and receiving new history from proxy (vso)
 
 --------------------------------------------------------------------------------
+Changes for 5.4.3
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.4.3rc2
 
 Bug fixes:
