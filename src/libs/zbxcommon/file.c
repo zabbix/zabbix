@@ -150,7 +150,7 @@ int	zbx_is_regular_file(const char *path)
 	return FAIL;
 }
 
-#ifndef _WINDOWS
+#if !(defined(_WINDOWS) || defined(__MINGW32__))
 int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time)
 {
 	zbx_stat_t	buf;

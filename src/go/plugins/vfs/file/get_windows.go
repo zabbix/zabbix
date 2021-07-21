@@ -72,7 +72,7 @@ func getFileInfo(info *os.FileInfo, path string) (fileinfo *fileInfo, err error)
 		fi.Time.Change = &c
 	}
 
-	if (*info.).mode.IsRegular() {
+	if (*info).Mode().IsRegular() {
 		fi.Size = (*info).Size()
 	}
 
