@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-07-20T10:44:00Z</date>
+    <date>2021-07-21T14:31:20Z</date>
     <media_types>
         <media_type>
             <name>Slack</name>
@@ -224,14 +224,22 @@ function handlerAlarm(params) {&#13;
             [&quot;__message_ts_&quot; + params.channel]: resp.ts,&#13;
             [&quot;__channel_id_&quot; + params.channel]: resp.channel,&#13;
             [&quot;__message_link_&quot; + params.channel]: getPermalink(resp.channel, resp.ts),&#13;
-        }&#13;
+        };&#13;
 &#13;
     }&#13;
     else if (isEventUpdate(params)) {&#13;
-        var channel_event_tags = JSON.parse(params.event_tags)&#13;
+        try {&#13;
+            var channel_event_tags = JSON.parse(params.event_tags);&#13;
+        } catch (error) {&#13;
+            throw &quot;Can't process event tags: &quot; + error;&#13;
+        }&#13;
 &#13;
-        if (channel_event_tags &amp;&amp; channel_event_tags.length) {&#13;
-            fields.thread_ts = channel_event_tags.filter(function (e) { return e.tag.includes(&quot;message_ts_&quot; + params.channel) })[0][&quot;value&quot;]&#13;
+        if (Array.isArray(channel_event_tags)) {&#13;
+            for (i in channel_event_tags) {&#13;
+                if (channel_event_tags[i].tag.includes(&quot;__message_ts_&quot; + params.channel)) {&#13;
+                    fields.thread_ts = channel_event_tags[i].value;&#13;
+                }&#13;
+            }&#13;
         }&#13;
 &#13;
         fields.attachments = [&#13;
@@ -253,11 +261,21 @@ function handlerAlarm(params) {&#13;
     else if (isEventResolve(params)) {&#13;
         fields.text = '';&#13;
 &#13;
-        var channel_event_tags = JSON.parse(params.event_tags)&#13;
+        try {&#13;
+            var channel_event_tags = JSON.parse(params.event_tags);&#13;
+        } catch (error) {&#13;
+            throw &quot;Can't process event tags: &quot; + error;&#13;
+        }&#13;
 &#13;
-        if (channel_event_tags &amp;&amp; channel_event_tags.length) {&#13;
-            fields.channel = channel_event_tags.filter(function (e) { return e.tag.includes(&quot;channel_id_&quot; + params.channel) })[0][&quot;value&quot;]&#13;
-            fields.ts = channel_event_tags.filter(function (e) { return e.tag.includes(&quot;message_ts_&quot; + params.channel) })[0][&quot;value&quot;]&#13;
+        if (Array.isArray(channel_event_tags)) {&#13;
+            for (i in channel_event_tags) {&#13;
+                if (channel_event_tags[i].tag.includes(&quot;__channel_id_&quot; + params.channel)) {&#13;
+                    fields.channel = channel_event_tags[i].value;&#13;
+                }&#13;
+                if (channel_event_tags[i].tag.includes(&quot;__message_ts_&quot; + params.channel)) {&#13;
+                    fields.ts = channel_event_tags[i].value;&#13;
+                }&#13;
+            }&#13;
         }&#13;
 &#13;
         fields.attachments = [&#13;
