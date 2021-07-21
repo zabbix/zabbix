@@ -943,17 +943,12 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 		unsigned int	laddr_n, raddr_n, lport, rport, state;
 		char		laddr[MAX_STRING_LEN], raddr[MAX_STRING_LEN], *p;
 
-		if (NULL == (p = strstr(line, ":")))
+		if (NULL == (p = strchr(line, ':')))
 			continue;
 
 		if (ZBX_ADDR_TYPE_IPV6 == addr_type)
 		{
-			if (5 == sscanf(p, ": %s:%x %s:%x %x",
-					laddr,
-					&lport,
-					raddr,
-					&rport,
-					&state))
+			if (5 == sscanf(p, ": %s:%x %s:%x %x", laddr, &lport, raddr, &rport, &state))
 			{
 				if (NULL != result_exp->laddr && '\0' != *result_exp->laddr &&
 						SUCCEED != check_ip_mask(result_exp->laddr, ZBX_ADDR_TYPE_IPV6, 0,
@@ -995,12 +990,7 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 		}
 		else
 		{
-			if (5 == sscanf(p, ": %x:%x %x:%x %x",
-					&laddr_n,
-					&lport,
-					&raddr_n,
-					&rport,
-					&state))
+			if (5 == sscanf(p, ": %x:%x %x:%x %x", &laddr_n, &lport, &raddr_n, &rport, &state))
 			{
 				if (NULL != result_exp->laddr && '\0' != *result_exp->laddr &&
 						SUCCEED != check_ip_mask(result_exp->laddr, ZBX_ADDR_TYPE_IPV4,
