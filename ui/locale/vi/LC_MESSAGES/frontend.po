@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-02 19:55+0300\n"
+"POT-Creation-Date: 2021-07-16 10:58+0300\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -54,7 +54,7 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:599
 #: include/classes/api/services/CMaintenance.php:615
 #: include/classes/api/services/CMaintenance.php:684 maintenance.php:137
-#: maintenance.php:143 services.php:182 services.php:191
+#: maintenance.php:143 services.php:177 services.php:186
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
 msgstr ""
@@ -239,7 +239,7 @@ msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, chỉ đọc"
 
-#: jsLoader.php:362
+#: jsLoader.php:363
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -553,7 +553,7 @@ msgstr " Sự kiện được ghi nhận giải quyết"
 #: include/views/js/monitoring.sysmaps.js.php:792
 #: include/views/monitoring.sysmap.edit.php:278
 #: include/views/monitoring.sysmap.edit.php:322
-#: include/views/monitoring.sysmap.edit.php:359 services.php:353
+#: include/views/monitoring.sysmap.edit.php:359 services.php:348
 msgid "Action"
 msgstr "Hành động"
 
@@ -989,7 +989,7 @@ msgstr "Sắp xếp phần tử sơ đồ"
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:385
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
 msgid "All"
 msgstr "Tất cả"
 
@@ -1706,7 +1706,7 @@ msgstr "Không thể xóa"
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
-#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:381
+#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
 msgid "Cancel"
 msgstr "Hủy bỏ"
 
@@ -1778,7 +1778,7 @@ msgstr "Không thể thêm kiểu host"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:107
-#: app/controllers/CControllerImageCreate.php:133
+#: app/controllers/CControllerImageCreate.php:131
 msgid "Cannot add image"
 msgstr "Không thể thêm hình ảnh"
 
@@ -1794,7 +1794,7 @@ msgstr "Không thể thêm kiểu item"
 msgid "Cannot add maintenance"
 msgstr "Không thể thêm bảo trì"
 
-#: include/classes/api/services/CMap.php:1558
+#: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
 msgstr "Không thể thêm phần tử sơ đồ của sơ đồ \"%1$s\" do tham chiếu vòng tròn."
@@ -1820,12 +1820,12 @@ msgstr "Không thể thêm nhiều hơn một item với kiểu \"Graph sum
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr "Không thể thêm nhiều hơn một item với kiểu \"Graph sum\" trên kiểu đồ thị \"%1$s\"."
 
-#: sysmaps.php:216
+#: sysmaps.php:215
 msgid "Cannot add network map"
 msgstr "Không thể thêm mạng sơ đồ."
 
 #: app/controllers/CControllerProxyCreate.php:58
-#: app/controllers/CControllerProxyCreate.php:126
+#: app/controllers/CControllerProxyCreate.php:120
 msgid "Cannot add proxy"
 msgstr "Không thể thêm proxy"
 
@@ -1843,7 +1843,7 @@ msgstr ""
 msgid "Cannot add script"
 msgstr "Không thể thêm tập lệnh"
 
-#: services.php:154
+#: services.php:152
 msgid "Cannot add service"
 msgstr "Không thể thêm dịch vụ"
 
@@ -1939,7 +1939,7 @@ msgstr "Không thể kết nối đến cơ sở dữ liệu."
 msgid "Cannot convert POST data:"
 msgstr ""
 
-#: graphs.php:401
+#: graphs.php:392
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] "Không thể sao chép đồ thị"
@@ -2044,19 +2044,19 @@ msgstr[0] "Không thể xóa quy tắc phát hiện"
 msgid "Cannot delete discovery rules"
 msgstr "Không thể xóa các quy tắc phát hiện"
 
-#: graphs.php:292
+#: graphs.php:283
 msgid "Cannot delete graph"
 msgstr "Không thể xóa biểu đồ"
 
-#: graphs.php:284
+#: graphs.php:275
 msgid "Cannot delete graph prototype"
 msgstr "Không thể xóa kiểu biểu đồ."
 
-#: graphs.php:325
+#: graphs.php:316
 msgid "Cannot delete graph prototypes"
 msgstr "Không thể xóa các kiểu biểu đồ"
 
-#: graphs.php:342
+#: graphs.php:333
 msgid "Cannot delete graphs"
 msgstr "Không thể xóa các biểu đồ."
 
@@ -2093,7 +2093,7 @@ msgstr "Không thể xóa các kiểu host"
 msgid "Cannot delete icon map"
 msgstr "Không thể xóa biểu tượng sơ đồ"
 
-#: app/controllers/CControllerImageDelete.php:70
+#: app/controllers/CControllerImageDelete.php:69
 msgid "Cannot delete image"
 msgstr "Không thể xóa hình ảnh"
 
@@ -2137,7 +2137,7 @@ msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
 msgstr[0] ""
 
-#: sysmaps.php:269
+#: sysmaps.php:262
 msgid "Cannot delete network map"
 msgstr "Không thể xóa sơ đồ mạng"
 
@@ -2175,7 +2175,7 @@ msgstr "Không thể xóa các tập lệnh. Tập lệnh \"%1$s\" đươ
 msgid "Cannot delete selected actions"
 msgstr "Không thể xóa các hành động được lựa chọn"
 
-#: services.php:108
+#: services.php:107
 msgid "Cannot delete service"
 msgstr "Không thể xóa dịch vụ"
 
@@ -2526,7 +2526,7 @@ msgstr "Không thể tìm thấy giá trị sơ đồ \"%1$s\"  được s
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "Không thể tìm thấy dạng thức cây. Kiểm tra cấu trúc bản ghi trong các liên kết dịch vụ."
 
-#: services.php:358
+#: services.php:353
 msgid "Cannot format tree."
 msgstr "Không thể tìm thấy dạng thức cây."
 
@@ -2657,12 +2657,12 @@ msgstr "Không thể gửi yêu cầu: %1$s."
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
 msgstr "Không thể đặt \"%1$s\" cho hoạt động \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:507
+#: include/classes/api/services/CGraphGeneral.php:514
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
 msgstr "Không thể đặt \"%1$s\" cho đồ thị \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:514
+#: include/classes/api/services/CGraphGeneral.php:521
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Không thể đặt \"%1$s\" cho kiểu đồ thị \"%2$s\"."
@@ -2724,12 +2724,12 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Không thể cập nhật \"%1$s\" cho hành động \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:693
+#: include/classes/api/services/CGraphGeneral.php:700
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
 msgstr "Không thể cập nhật \"%1$s\" cho đồ thị \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:698
+#: include/classes/api/services/CGraphGeneral.php:705
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Không thể cập nhật \"%1$s\" cho kiểu đồ thị \"%2$s\"."
@@ -2766,7 +2766,7 @@ msgstr "Không thể cập nhật \"%2$s\" cho item được khám phá \"%1$s\"
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Không thể cập nhật \"%2$s\" cho một trigger khám phá \"%1$s\"."
 
-#: include/classes/api/services/CImage.php:506
+#: include/classes/api/services/CImage.php:519
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
 msgstr "Không thể cập nhật \"imagetype\" cho ảnh \"%1$s\"."
@@ -2826,7 +2826,7 @@ msgid "Cannot update event"
 msgid_plural "Cannot update events"
 msgstr[0] "Không thể cập nhật sự kiện"
 
-#: graphs.php:243 graphs.php:305
+#: graphs.php:243 graphs.php:296
 msgid "Cannot update graph"
 msgstr "Không thể cập nhật đồ thị"
 
@@ -2868,7 +2868,7 @@ msgstr "Không thể cập nhật biểu tượng sơ đồ"
 
 #: app/controllers/CControllerImageUpdate.php:43
 #: app/controllers/CControllerImageUpdate.php:110
-#: app/controllers/CControllerImageUpdate.php:146
+#: app/controllers/CControllerImageUpdate.php:144
 msgid "Cannot update image"
 msgstr "Không thể cập nhật hình ảnh"
 
@@ -2917,12 +2917,12 @@ msgid "Cannot update network map"
 msgstr "Không thể cập nhật sơ đồ mạng"
 
 #: app/controllers/CControllerProxyUpdate.php:59
-#: app/controllers/CControllerProxyUpdate.php:124
+#: app/controllers/CControllerProxyUpdate.php:118
 msgid "Cannot update proxy"
 msgstr "Không thể cập nhật proxy"
 
-#: include/classes/api/services/CProxy.php:739
-#: include/classes/api/services/CProxy.php:860
+#: include/classes/api/services/CProxy.php:746
+#: include/classes/api/services/CProxy.php:870
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Không thể cập nhật proxy cho host được phát hiện \"%1$s\"."
@@ -2954,7 +2954,7 @@ msgstr "Không thể cập nhật script"
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr ""
 
-#: services.php:147
+#: services.php:146
 msgid "Cannot update service"
 msgstr "Không thể cập nhật dịch vụ"
 
@@ -3322,7 +3322,7 @@ msgstr "Tạo bản sao"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
-#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:374
+#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
 msgid "Close"
 msgstr "Đóng"
 
@@ -3917,7 +3917,7 @@ msgstr "Quy tắc liên kết"
 msgid "Correlation updated"
 msgstr "Liên kết được cập nhật"
 
-#: include/classes/api/services/CImage.php:333
+#: include/classes/api/services/CImage.php:341
 msgid "Could not save image!"
 msgstr "Không thể lưu trữ hình ảnh!"
 
@@ -4241,8 +4241,8 @@ msgstr "Khoảng thời gian tự chọn"
 msgid "Custom label"
 msgstr "Tùy chỉnh nhãn"
 
-#: include/classes/api/services/CMap.php:888
-#: include/classes/api/services/CMap.php:1360
+#: include/classes/api/services/CMap.php:889
+#: include/classes/api/services/CMap.php:1361
 #, c-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Tùy chỉnh nhãn cho phần tử bản đồ \"%2$s\" của kiểu \"%1$s\" không thể để trống."
@@ -4378,7 +4378,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172
+#: include/views/inventory.host.view.php:172 jsLoader.php:337
 msgid "Dashboards"
 msgstr "Bảng điều khiển"
 
@@ -4548,7 +4548,7 @@ msgstr "Ngày trong tuần "
 msgid "Days"
 msgstr "Các ngày"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:365
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
 msgid "Debug"
 msgstr "Gỡ lỗi"
 
@@ -4693,7 +4693,7 @@ msgstr "Trễ bởi"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
 #: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
-#: jsLoader.php:176 jsLoader.php:337
+#: jsLoader.php:176 jsLoader.php:338
 msgid "Delete"
 msgstr "Xóa"
 
@@ -4722,7 +4722,7 @@ msgstr "Xóa hành động hiện tại?"
 msgid "Delete current correlation?"
 msgstr "Xóa sự liên kết hiện tại?"
 
-#: jsLoader.php:338
+#: jsLoader.php:339
 msgid "Delete dashboard?"
 msgstr "Xóa bảng điều khiển?"
 
@@ -5473,7 +5473,7 @@ msgstr "Hiển thị sơ đồ xếp chồng"
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1646 include/actions.inc.php:1717
 #: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:377
+#: jsLoader.php:378
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Hiển thị %1$s của %2$s đã tìm được"
@@ -5509,7 +5509,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:216 jsLoader.php:339
+#: jsLoader.php:216 jsLoader.php:340
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Bạn có muốn thay thế biểu thức điều kiện không?"
 
@@ -5606,8 +5606,8 @@ msgstr "Tạo bản sao \"%1$s\" giá trị \"%2$s\" cho liên kết\"%3$s\"."
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 msgstr "Tạo bản sao \"%1$s\" giá trị \"%2$s\" cho liên kết."
 
-#: include/classes/api/services/CMap.php:613
-#: include/classes/api/services/CMap.php:1075
+#: include/classes/api/services/CMap.php:614
+#: include/classes/api/services/CMap.php:1076
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
 msgstr "Tạo bản sao \"tên\" giá trị \"%1$s\" cho sơ đồ."
@@ -5634,14 +5634,14 @@ msgstr ""
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:742
-#: include/classes/api/services/CMap.php:1210
+#: include/classes/api/services/CMap.php:743
+#: include/classes/api/services/CMap.php:1211
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "Tạo bản sao id người dùng \"%1$s\" trong người dùng cho sơ đồ \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:817
-#: include/classes/api/services/CMap.php:1284
+#: include/classes/api/services/CMap.php:818
+#: include/classes/api/services/CMap.php:1285
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Tạo bản sao id nhóm người dùng \"%1$s\" trong nhóm người dùng cho sơ đồ \"%2$s\"."
@@ -5711,7 +5711,7 @@ msgstr ""
 msgid "Edit tree element"
 msgstr "Chỉnh sửa phần tử cây"
 
-#: jsLoader.php:340
+#: jsLoader.php:341
 msgid "Edit trigger"
 msgstr "Chỉnh sửa trigger"
 
@@ -5812,18 +5812,18 @@ msgstr ""
 #: include/classes/api/services/CHost.php:1369
 #: include/classes/api/services/CHost.php:1898
 #: include/classes/api/services/CHostPrototype.php:1093
-#: include/classes/api/services/CImage.php:430
-#: include/classes/api/services/CImage.php:482
+#: include/classes/api/services/CImage.php:448
+#: include/classes/api/services/CImage.php:501
 #: include/classes/api/services/CMaintenance.php:542
-#: include/classes/api/services/CMap.php:562
-#: include/classes/api/services/CMap.php:588
-#: include/classes/api/services/CMap.php:1033
+#: include/classes/api/services/CMap.php:563
+#: include/classes/api/services/CMap.php:589
+#: include/classes/api/services/CMap.php:1034
 #: include/classes/api/services/CMediatype.php:182
 #: include/classes/api/services/CMediatype.php:448
-#: include/classes/api/services/CService.php:345
-#: include/classes/api/services/CService.php:378
-#: include/classes/api/services/CService.php:442
-#: include/classes/api/services/CService.php:510
+#: include/classes/api/services/CService.php:360
+#: include/classes/api/services/CService.php:395
+#: include/classes/api/services/CService.php:459
+#: include/classes/api/services/CService.php:527
 #: include/classes/api/services/CTemplate.php:682
 #: include/classes/api/services/CTrigger.php:798
 #: include/classes/api/services/CUserMacro.php:506
@@ -5832,7 +5832,7 @@ msgstr ""
 msgid "Empty input parameter."
 msgstr "Không có tham số đầu vào."
 
-#: include/classes/api/services/CMap.php:1041
+#: include/classes/api/services/CMap.php:1042
 msgid "Empty map ID."
 msgstr "ID sơ đồ trống."
 
@@ -5840,11 +5840,11 @@ msgstr "ID sơ đồ trống."
 msgid "Empty media type ID."
 msgstr "ID loại phương tiện trống."
 
-#: include/classes/api/services/CService.php:864
+#: include/classes/api/services/CService.php:881
 msgid "Empty name."
 msgstr "Không có tên."
 
-#: include/classes/api/services/CImage.php:350
+#: include/classes/api/services/CImage.php:360
 msgid "Empty parameters"
 msgstr "Tham số rỗng"
 
@@ -6067,7 +6067,7 @@ msgstr "English (en_GB)"
 msgid "English (en_US)"
 msgstr "English (en_US)"
 
-#: include/classes/api/services/CGraphGeneral.php:618
+#: include/classes/api/services/CGraphGeneral.php:625
 #: include/classes/api/services/CHostGroup.php:757
 #: include/classes/api/services/CHostPrototype.php:341
 #: include/classes/api/services/CHttpTest.php:390
@@ -6224,7 +6224,7 @@ msgstr "Loại trừ các nhóm máy chủ"
 msgid "Execute"
 msgstr "Thực hiện"
 
-#: include/classes/api/services/CImage.php:225
+#: include/classes/api/services/CImage.php:224
 #, c-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "Thực hiện lỗi SQL [%1$s] trong [%2$s]."
@@ -6517,7 +6517,7 @@ msgstr "Trường \"%1$s\" không thể bị thiết lập là NULL."
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Trường \"%1$s\" là bắt buộc."
 
-#: include/classes/api/services/CMap.php:792
+#: include/classes/api/services/CMap.php:793
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Trường \"%1$s\" thiếu giá trị cho sơ đồ \"%2$s\"."
@@ -6566,7 +6566,7 @@ msgstr "Trường \"máy chủ\" là bắt buộc."
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Tổng kiểm tra tệp, được tính toán bằng thuật toán cksum UNIX. Trả về kiểu integer"
 
-#: include/classes/api/services/CImage.php:557
+#: include/classes/api/services/CImage.php:570
 msgid "File format is unsupported."
 msgstr "Định dạng tập tin không được hỗ trợ."
 
@@ -6777,7 +6777,7 @@ msgstr "Thứ sáu"
 #: include/views/configuration.services.edit.php:259
 #: include/views/configuration.services.edit.php:307
 #: include/views/js/monitoring.sysmaps.js.php:748 report4.php:191
-#: services.php:47 services.php:182
+#: services.php:47 services.php:177
 msgid "From"
 msgstr "Từ"
 
@@ -6892,7 +6892,7 @@ msgstr "Giá trị toàn cục"
 msgid "Go back to %1$s"
 msgstr "Quay trở về %1$s"
 
-#: jsLoader.php:345
+#: jsLoader.php:346
 msgid "Go to"
 msgstr "Đi tới"
 
@@ -7004,12 +7004,12 @@ msgstr "đồ thị (cơ bản)"
 msgid "Graph added"
 msgstr "Đồ thị được thêm vào"
 
-#: graphs.php:400
+#: graphs.php:391
 msgid "Graph copied"
 msgid_plural "Graphs copied"
 msgstr[0] "Đồ thị được sao chép"
 
-#: graphs.php:292
+#: graphs.php:283
 msgid "Graph deleted"
 msgstr "Đồ thị đã xóa"
 
@@ -7046,7 +7046,7 @@ msgstr "Kiểu đồ thị \"%1$s\" với các template item không thể c
 msgid "Graph prototype added"
 msgstr "Kiểu đồ thị đã được thêm vào"
 
-#: graphs.php:284
+#: graphs.php:275
 msgid "Graph prototype deleted"
 msgstr "Kiểu đồ thị đã xóa"
 
@@ -7068,7 +7068,7 @@ msgstr "Kiều đồ thị với ID \"%1$s\" không sẵn sàng."
 msgid "Graph prototypes"
 msgstr "Các kiểu đồ thị"
 
-#: graphs.php:325
+#: graphs.php:316
 msgid "Graph prototypes deleted"
 msgstr "Các kiểu đồ thị đã xóa"
 
@@ -7085,7 +7085,7 @@ msgstr "Tính tổng đồ thị"
 msgid "Graph type"
 msgstr "Kiểu đồ thị"
 
-#: graphs.php:242 graphs.php:305
+#: graphs.php:242 graphs.php:296
 msgid "Graph updated"
 msgstr "Đồ thị được cập nhật"
 
@@ -7095,7 +7095,7 @@ msgstr "Đồ thị được cập nhật"
 msgid "Graph with ID \"%1$s\" is not available."
 msgstr "Đồ thị với ID \"%1$s\" không sẵn sàng."
 
-#: include/classes/api/services/CGraphGeneral.php:831
+#: include/classes/api/services/CGraphGeneral.php:838
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Đồ thị với tên \"%1$s\" đã tồn tại trong số các đồ thị hoặc các kiểu đồ thị."
@@ -7117,7 +7117,7 @@ msgstr "Đồ thị với tên giống nhau nhưng kiểu khác nhau tồn
 #: app/views/monitoring.charts.view.php:138 app/views/popup.import.php:38
 #: app/views/search.php:89 app/views/search.php:96 app/views/search.php:137
 #: app/views/search.php:142 app/views/search.php:316 app/views/search.php:321
-#: graphs.php:494 include/html.inc.php:356
+#: graphs.php:485 include/html.inc.php:356
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:44
 #: include/views/configuration.host.discovery.list.php:195
@@ -7128,11 +7128,11 @@ msgstr "Đồ thị với tên giống nhau nhưng kiểu khác nhau tồn
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:346
+#: include/views/inventory.host.view.php:217 jsLoader.php:347
 msgid "Graphs"
 msgstr "Đồ thị"
 
-#: graphs.php:342
+#: graphs.php:333
 msgid "Graphs deleted"
 msgstr "Các đồ thị đã xóa"
 
@@ -7331,7 +7331,7 @@ msgstr "Thập lục phân đến thập phân"
 msgid "Hidden"
 msgstr "Ẩn"
 
-#: jsLoader.php:366
+#: jsLoader.php:367
 msgid "Hide debug"
 msgstr "Ẩn gỡ lỗi"
 
@@ -7383,7 +7383,7 @@ msgstr "Làm nổi bật toàn bộ hàng"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:347
+#: jsLoader.php:348
 msgid "History"
 msgstr "Lịch sử"
 
@@ -7471,7 +7471,7 @@ msgstr "Sắp xếp theo chiều ngang"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:255 jsLoader.php:348 report2.php:506
+#: jsLoader.php:255 jsLoader.php:349 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
@@ -7491,7 +7491,7 @@ msgstr "Host \"%1$s\" đã tồn tại."
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Máy chủ \"%1$s\" không thể không có nhóm máy chủ."
 
-#: include/classes/api/services/CProxy.php:493
+#: include/classes/api/services/CProxy.php:500
 #, c-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "Host \"%1$s\" được theo dõi với proxy \"%2$s\"."
@@ -8046,19 +8046,19 @@ msgstr ""
 msgid "Image"
 msgstr "Hình ảnh"
 
-#: include/classes/api/services/CImage.php:450
-#: include/classes/api/services/CImage.php:463
-#: include/classes/api/services/CImage.php:513
-#: include/classes/api/services/CImage.php:531
+#: include/classes/api/services/CImage.php:468
+#: include/classes/api/services/CImage.php:481
+#: include/classes/api/services/CImage.php:526
+#: include/classes/api/services/CImage.php:544
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr "Hình ảnh \"%1$s\" đã tồn tại."
 
-#: app/controllers/CControllerImageCreate.php:125
+#: app/controllers/CControllerImageCreate.php:123
 msgid "Image added"
 msgstr "Hình ảnh đã được thêm"
 
-#: app/controllers/CControllerImageDelete.php:63
+#: app/controllers/CControllerImageDelete.php:62
 msgid "Image deleted"
 msgstr "Hình ảnh đã bị xóa"
 
@@ -8066,18 +8066,18 @@ msgstr "Hình ảnh đã bị xóa"
 msgid "Image label type"
 msgstr "Loại nhãn hình ảnh"
 
-#: include/classes/api/services/CImage.php:229
+#: include/classes/api/services/CImage.php:228
 #, c-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr "Lỗi tải hình ảnh [%1$s]  trong [%2$s]."
 
-#: include/classes/api/services/CImage.php:548
+#: include/classes/api/services/CImage.php:561
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
 msgstr ""
 
-#: app/controllers/CControllerImageUpdate.php:137
+#: app/controllers/CControllerImageUpdate.php:135
 msgid "Image updated"
 msgstr "Hình ảnh được cập nhật"
 
@@ -8233,49 +8233,49 @@ msgstr "Bao gồm các nhóm nhỏ"
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Thống kê lưu lượng truy cập đến interface mạng. Trả về kiểu trigger"
 
-#: include/classes/api/services/CMap.php:654
-#: include/classes/api/services/CMap.php:1137
+#: include/classes/api/services/CMap.php:655
+#: include/classes/api/services/CMap.php:1138
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
 msgstr "Giá trị \"độ cao\" không chính xác cho sơ đồ \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:802
-#: include/classes/api/services/CMap.php:1270
+#: include/classes/api/services/CMap.php:803
+#: include/classes/api/services/CMap.php:1271
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Giá trị \"Quyền truy cập\" \"%1$s\" không chính xác trong nhóm người dùng cho sơ đồ \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:727
-#: include/classes/api/services/CMap.php:1196
+#: include/classes/api/services/CMap.php:728
+#: include/classes/api/services/CMap.php:1197
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
 msgstr "Giá trị \"quyền truy cập\" \"%1$s\" không chính xác trong người dùng cho sơ đồ \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:673
-#: include/classes/api/services/CMap.php:1143
+#: include/classes/api/services/CMap.php:674
+#: include/classes/api/services/CMap.php:1144
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
 msgstr "Giá trị \"riêng\" \"%1$s\" không chính xác cho sơ đồ \"%2$s\"."
 
-#: include/classes/api/services/CService.php:1085
+#: include/classes/api/services/CService.php:1104
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Giá trị trường \"soft\" không chính xác cho sự phụ thuộc đối với dịch vụ \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:648
-#: include/classes/api/services/CMap.php:1131
+#: include/classes/api/services/CMap.php:649
+#: include/classes/api/services/CMap.php:1132
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
 msgstr "Giá trị \"chiều rộng\" không chính xác cho sơ đồ \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:875
-#: include/classes/api/services/CMap.php:882
-#: include/classes/api/services/CMap.php:898
-#: include/classes/api/services/CMap.php:908
-#: include/classes/api/services/CMap.php:1343
-#: include/classes/api/services/CMap.php:1352
-#: include/classes/api/services/CMap.php:1369
-#: include/classes/api/services/CMap.php:1381
+#: include/classes/api/services/CMap.php:876
+#: include/classes/api/services/CMap.php:883
+#: include/classes/api/services/CMap.php:899
+#: include/classes/api/services/CMap.php:909
+#: include/classes/api/services/CMap.php:1344
+#: include/classes/api/services/CMap.php:1353
+#: include/classes/api/services/CMap.php:1370
+#: include/classes/api/services/CMap.php:1382
 #, c-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "Kiểu giá trị nhãn %1$s không chính xác cho bản đồ \"%2$s\"."
@@ -8301,7 +8301,7 @@ msgstr ""
 msgid "Incorrect Vault token."
 msgstr ""
 
-#: include/classes/api/services/CService.php:910
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Sự chấp nhận SLA không chính xác đối với dịch vụ \"%1$s\"."
@@ -8410,7 +8410,7 @@ msgstr "Thao tác người dùng action không chính xác. Người dùn
 msgid "Incorrect action operationid."
 msgstr "operationid action không chính xác."
 
-#: include/classes/api/services/CService.php:877
+#: include/classes/api/services/CService.php:894
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Thuật toán đối với dịch vụ \"%1$s\" không chính xác."
@@ -8485,13 +8485,13 @@ msgstr "Đối số không chính xác được thông qua hàm."
 #: include/classes/api/services/CMapElement.php:740
 #: include/classes/api/services/CMapElement.php:775
 #: include/classes/api/services/CMapElement.php:800
-#: include/classes/api/services/CMap.php:697
-#: include/classes/api/services/CMap.php:771
-#: include/classes/api/services/CMap.php:985
-#: include/classes/api/services/CMap.php:1058
-#: include/classes/api/services/CMap.php:1166
-#: include/classes/api/services/CMap.php:1239
-#: include/classes/api/services/CMap.php:1459
+#: include/classes/api/services/CMap.php:698
+#: include/classes/api/services/CMap.php:772
+#: include/classes/api/services/CMap.php:986
+#: include/classes/api/services/CMap.php:1059
+#: include/classes/api/services/CMap.php:1167
+#: include/classes/api/services/CMap.php:1240
+#: include/classes/api/services/CMap.php:1460
 #: include/classes/api/services/CMediatype.php:189
 #: include/classes/api/services/CMediatype.php:485
 msgid "Incorrect arguments passed to function."
@@ -8501,7 +8501,7 @@ msgstr "Các đối số không chính xác được thông qua hàm."
 msgid "Incorrect bulk value for interface."
 msgstr "Giá trị số lượng lớn không chính xác cho interface."
 
-#: include/classes/api/services/CService.php:894
+#: include/classes/api/services/CService.php:911
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Tính toán giá trị SLA cho dịch vụ \"%1$s\" không chính xác."
@@ -8513,8 +8513,8 @@ msgstr "Tính toán giá trị SLA cho dịch vụ \"%1$s\" không chính xa
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:658
-#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:665
+#: include/classes/api/services/CProxy.php:781
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Các ký tự được sử dụng cho tên proxy \"%1$s\" không chính xác."
@@ -8588,7 +8588,7 @@ msgstr "Giá trị nguồn sự kiện không chính xác."
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Trường có tên \"%1$s\" không chính xác hoặc giá trị ở nơi báo cáo đối với bảng \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:605
+#: include/classes/api/services/CMap.php:606
 msgid "Incorrect fields for sysmap."
 msgstr "Các trường đối với sysmap không chính xác."
 
@@ -8662,12 +8662,12 @@ msgstr "Chỉ số hình ảnh không chính xác."
 #: include/classes/api/services/CHost.php:1014
 #: include/classes/api/services/CHost.php:1917
 #: include/classes/api/services/CHost.php:2116
-#: include/classes/api/services/CImage.php:442
-#: include/classes/api/services/CImage.php:487
-#: include/classes/api/services/CProxy.php:653
-#: include/classes/api/services/CProxy.php:719
-#: include/classes/api/services/CProxy.php:763
-#: include/classes/api/services/CProxy.php:785
+#: include/classes/api/services/CImage.php:460
+#: include/classes/api/services/CImage.php:506
+#: include/classes/api/services/CProxy.php:660
+#: include/classes/api/services/CProxy.php:726
+#: include/classes/api/services/CProxy.php:770
+#: include/classes/api/services/CProxy.php:792
 #: include/classes/api/services/CTemplate.php:489
 #: include/classes/api/services/CTemplate.php:662
 #: include/classes/api/services/CTrigger.php:803
@@ -8694,7 +8694,7 @@ msgstr ""
 msgid "Incorrect inventory mode in action operation."
 msgstr "Chế độ kiểm kê không chính xác trong thao tác hoạt động."
 
-#: include/classes/api/services/CGraphGeneral.php:297
+#: include/classes/api/services/CGraphGeneral.php:304
 msgid "Incorrect item for axis value."
 msgstr "Item không chính xác đối với trục giá trị."
 
@@ -8725,7 +8725,7 @@ msgstr "Bảo trì không chính xác - Ngày phải ở giữa 1970.01.01
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Chu kỳ bảo trì không chính xác (nhỏ nhất là 5 phút)"
 
-#: include/classes/api/services/CMap.php:1042
+#: include/classes/api/services/CMap.php:1043
 msgid "Incorrect map ID."
 msgstr "ID sơ đồ không chính xác."
 
@@ -8773,12 +8773,12 @@ msgstr "Các tham số cho điều kiện không chính xác."
 msgid "Incorrect parameters for maintenance."
 msgstr "Các tham số cho bảo trì không chính xác."
 
-#: include/classes/api/services/CService.php:952
+#: include/classes/api/services/CService.php:969
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Dịch vụ gốc \"%1$s\" không chính xác."
 
-#: include/classes/api/services/CService.php:955
+#: include/classes/api/services/CService.php:972
 msgid "Incorrect parent service."
 msgstr "Dịch vụ gốc không chính xác."
 
@@ -8811,7 +8811,7 @@ msgstr "Thời gian bắt đầu dịch vụ không chính xác."
 msgid "Incorrect service time type."
 msgstr "Kiểu thời gian dịch vụ không chính xác."
 
-#: include/classes/api/services/CService.php:925
+#: include/classes/api/services/CService.php:942
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "Thứ tự sắp xếp không chính xác cho dịch vụ \"%1$s\"."
@@ -8827,7 +8827,7 @@ msgstr "Giá trị nguồn không chính xác."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Trạng thái máy chủ không chính xác \"%1$s\"."
 
-#: include/classes/api/services/CService.php:973
+#: include/classes/api/services/CService.php:990
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Trạng thái cho dịch vụ \"%1$s\" không chính xác."
@@ -8836,7 +8836,7 @@ msgstr "Trạng thái cho dịch vụ \"%1$s\" không chính xác."
 msgid "Incorrect templated web scenario step count."
 msgstr "Bước web scenario mẫu không chính xác."
 
-#: include/classes/api/services/CService.php:938
+#: include/classes/api/services/CService.php:955
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Trigger ID cho dịch vụ \"%1$s\" không chính xác."
@@ -8885,14 +8885,14 @@ msgstr "Loại tính toán không chính xác cho liên kết\"%1$s\"."
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Loại tính toán không chính xác cho quy tắc khám phá \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:763
-#: include/classes/api/services/CMap.php:1231
+#: include/classes/api/services/CMap.php:764
+#: include/classes/api/services/CMap.php:1232
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
 msgstr "ID người dùng không chính xác được chỉ định cho sơ đồ \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:834
-#: include/classes/api/services/CMap.php:1301
+#: include/classes/api/services/CMap.php:835
+#: include/classes/api/services/CMap.php:1302
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
 msgstr "ID nhóm người dùng không chính xác được chỉ định cho sơ đồ \"%1$s\"."
@@ -9166,10 +9166,10 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
 #: include/classes/api/services/CMapElement.php:169
-#: include/classes/api/services/CMap.php:681
-#: include/classes/api/services/CMap.php:687
-#: include/classes/api/services/CMap.php:1150
-#: include/classes/api/services/CMap.php:1156
+#: include/classes/api/services/CMap.php:682
+#: include/classes/api/services/CMap.php:688
+#: include/classes/api/services/CMap.php:1151
+#: include/classes/api/services/CMap.php:1157
 #: include/classes/api/services/CMediatype.php:377
 #: include/classes/api/services/CMediatype.php:387
 #: include/classes/api/services/CMediatype.php:396
@@ -9188,14 +9188,14 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CMediatype.php:762
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:592
 #: include/classes/api/services/CProxy.php:599
-#: include/classes/api/services/CProxy.php:612
-#: include/classes/api/services/CProxy.php:618
-#: include/classes/api/services/CProxy.php:697
-#: include/classes/api/services/CProxy.php:705
-#: include/classes/api/services/CProxy.php:823
-#: include/classes/api/services/CProxy.php:831
+#: include/classes/api/services/CProxy.php:606
+#: include/classes/api/services/CProxy.php:619
+#: include/classes/api/services/CProxy.php:625
+#: include/classes/api/services/CProxy.php:704
+#: include/classes/api/services/CProxy.php:712
+#: include/classes/api/services/CProxy.php:833
+#: include/classes/api/services/CProxy.php:841
 #: include/classes/api/services/CSettings.php:312
 #: include/classes/api/services/CTemplate.php:449
 #: include/classes/api/services/CTriggerGeneral.php:148
@@ -9269,12 +9269,12 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr "Giá trị không chính xác cho trường \"%1$s\": %2$s."
 
-#: include/classes/api/services/CProxy.php:624
+#: include/classes/api/services/CProxy.php:631
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
 msgstr "Giá trị không chính xác được sử dụng cho trường PSK. Nó nên bao gồm một số chẵn các ký tự thập lục phân."
 
-#: include/classes/api/services/CProxy.php:680
-#: include/classes/api/services/CProxy.php:815
+#: include/classes/api/services/CProxy.php:687
+#: include/classes/api/services/CProxy.php:822
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr "Giá trị được sử dụng cho trạng thái proxy \"%1$s\" không chính xác."
@@ -9361,7 +9361,7 @@ msgid "Insert"
 msgstr "Chèn"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:341
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
 msgid "Insert expression"
 msgstr "Chèn biểu thức"
 
@@ -9440,8 +9440,8 @@ msgid "Internal data storage period"
 msgstr "Chu kì lưu trữ dữ liệu nội bộ"
 
 #: include/classes/api/helpers/CApiHostHelper.php:90
-#: include/classes/api/services/CGraphGeneral.php:522
-#: include/classes/api/services/CGraphGeneral.php:705
+#: include/classes/api/services/CGraphGeneral.php:529
+#: include/classes/api/services/CGraphGeneral.php:712
 #: include/classes/api/services/CTriggerGeneral.php:1035
 #: include/classes/api/services/CTriggerGeneral.php:1162
 #: include/classes/api/services/CTriggerGeneral.php:1267
@@ -9572,9 +9572,9 @@ msgstr "Key \"%1$s\" không hợp lệ: \"%2$s\"."
 msgid "Invalid macro \"%1$s\": %2$s."
 msgstr "Macro \"%1$s\" không hợp lệ: %2$s."
 
-#: include/classes/api/services/CService.php:212
-#: include/classes/api/services/CService.php:383
-#: include/classes/api/services/CService.php:1214
+#: include/classes/api/services/CService.php:216
+#: include/classes/api/services/CService.php:400
+#: include/classes/api/services/CService.php:1233
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
 msgstr "Phương pháp tham số không hợp lệ."
@@ -9600,8 +9600,8 @@ msgstr "Phương pháp tham số không hợp lệ."
 #: include/classes/api/services/CDiscoveryRule.php:1992
 #: include/classes/api/services/CDiscoveryRule.php:2010
 #: include/classes/api/services/CDiscoveryRule.php:2018
-#: include/classes/api/services/CGraphGeneral.php:598
-#: include/classes/api/services/CGraphGeneral.php:721
+#: include/classes/api/services/CGraphGeneral.php:605
+#: include/classes/api/services/CGraphGeneral.php:728
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1672
 #: include/classes/api/services/CHostPrototype.php:1677
@@ -9836,7 +9836,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:349
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
 msgid "Inventory"
 msgstr "Kiểm kê"
 
@@ -10022,7 +10022,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:371
+#: jsLoader.php:372
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10390,11 +10390,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Lần kiểm tra cuối cùng"
 
-#: jsLoader.php:352
+#: jsLoader.php:353
 msgid "Last hour graph"
 msgstr "Đồ thị giờ cuối cuối cùng"
 
-#: jsLoader.php:353
+#: jsLoader.php:354
 msgid "Last month graph"
 msgstr "Đồ thị tháng cuối cùng"
 
@@ -10424,7 +10424,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Giá trị cuối cùng"
 
-#: jsLoader.php:354
+#: jsLoader.php:355
 msgid "Last week graph"
 msgstr "Đồ thị tuần cuối cùng"
 
@@ -10437,11 +10437,11 @@ msgstr "Đồ thị tuần cuối cùng"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:350
+#: include/views/inventory.host.view.php:149 jsLoader.php:351
 msgid "Latest data"
 msgstr "Dữ liệu gần đây nhất"
 
-#: jsLoader.php:351
+#: jsLoader.php:352
 msgid "Latest values"
 msgstr "Các giá trị gần đây nhất"
 
@@ -10539,14 +10539,14 @@ msgstr "Chỉ số liên kết"
 msgid "Link new templates"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:1005
-#: include/classes/api/services/CMap.php:1475
+#: include/classes/api/services/CMap.php:1006
+#: include/classes/api/services/CMap.php:1476
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Trường liên kết selementid1 được trỏ đến một bản đồ không tồn tại selement ID \"%1$s\" cho bản đồ \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:1013
-#: include/classes/api/services/CMap.php:1483
+#: include/classes/api/services/CMap.php:1014
+#: include/classes/api/services/CMap.php:1484
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Trường liên kết selementid2 được trỏ đến một bản đồ không tồn tại selement ID \"%1$s\" cho bản đồ \"%2$s\"."
@@ -10965,16 +10965,16 @@ msgstr "Hướng dẫn bị đóng"
 msgid "Map"
 msgstr "Bản đồ"
 
-#: include/classes/api/services/CMap.php:626
-#: include/classes/api/services/CMap.php:1091
+#: include/classes/api/services/CMap.php:627
+#: include/classes/api/services/CMap.php:1092
 #, c-format
 msgid "Map \"%1$s\" already exists."
 msgstr "Sơ đồ \"%1$s\" đã tồn tại."
 
-#: include/classes/api/services/CMap.php:736
-#: include/classes/api/services/CMap.php:811
-#: include/classes/api/services/CMap.php:1204
-#: include/classes/api/services/CMap.php:1278
+#: include/classes/api/services/CMap.php:737
+#: include/classes/api/services/CMap.php:812
+#: include/classes/api/services/CMap.php:1205
+#: include/classes/api/services/CMap.php:1279
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
 msgstr "Sơ đồ \"%1$s\" công khai và chia sẻ chỉ đọc không được phép"
@@ -11008,7 +11008,7 @@ msgstr ""
 msgid "Map label type"
 msgstr "Kiểu nhãn bản đồ"
 
-#: include/classes/api/services/CMap.php:1061
+#: include/classes/api/services/CMap.php:1062
 msgid "Map name cannot be empty."
 msgstr "Tên sơ đồ không thể để trống."
 
@@ -11017,8 +11017,8 @@ msgstr "Tên sơ đồ không thể để trống."
 msgid "Map navigation tree"
 msgstr "Cây điều hướng bản đồ"
 
-#: include/classes/api/services/CMap.php:661
-#: include/classes/api/services/CMap.php:1115
+#: include/classes/api/services/CMap.php:662
+#: include/classes/api/services/CMap.php:1116
 msgid "Map owner cannot be empty."
 msgstr "Chủ sở hữu sơ đồ không thể để trống."
 
@@ -11420,8 +11420,8 @@ msgstr "Phút"
 msgid "Missing \"gitemid\" field for item."
 msgstr "Thiếu trường \"gitemid\" cho item."
 
-#: include/classes/api/services/CGraphGeneral.php:462
-#: include/classes/api/services/CGraphGeneral.php:648
+#: include/classes/api/services/CGraphGeneral.php:469
+#: include/classes/api/services/CGraphGeneral.php:655
 msgid "Missing \"itemid\" field for item."
 msgstr "Thiếu trường \"itemid\" cho item."
 
@@ -11582,7 +11582,7 @@ msgstr "Nhiều hơn %1$d khớp với %2$s được tìm thấy"
 msgid "More than 10 minutes"
 msgstr "Nhiều hơn 10 phút"
 
-#: include/classes/api/services/CGraphGeneral.php:844
+#: include/classes/api/services/CGraphGeneral.php:851
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Nhiều hơn một đồ thị với tên \"%1$s\" trong host."
@@ -11813,11 +11813,11 @@ msgstr "Chu kì lưu trữ dữ liệu khám phá mạng"
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "Danh sách interface (bao gồm loại interface, trạng thái, địa chỉ IPv4, mô tả). Trả về kiểu text"
 
-#: sysmaps.php:215
+#: sysmaps.php:214
 msgid "Network map added"
 msgstr "Sơ đồ mạng được thêm vào"
 
-#: sysmaps.php:269
+#: sysmaps.php:262
 msgid "Network map deleted"
 msgstr "Sơ đồ mạng đã bị xóa"
 
@@ -11987,7 +11987,7 @@ msgstr "\"%1$s\" không được đưa ra cho kiểu đồ thị."
 msgid "No \"%1$s\" given for graph."
 msgstr "\"%1$s\" không được đưa ra cho đồ thị."
 
-#: include/classes/api/services/CMap.php:1040
+#: include/classes/api/services/CMap.php:1041
 #, c-format
 msgid "No \"%1$s\" given for map."
 msgstr "Không có \"%1$s\" cho sơ đồ."
@@ -12137,7 +12137,7 @@ msgstr "Không có hình ảnh"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:370
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
 msgid "No interface found"
 msgstr "Không tìm thấy interface "
 
@@ -12145,8 +12145,8 @@ msgstr "Không tìm thấy interface "
 msgid "No interface found."
 msgstr "Không tìm thấy interface."
 
-#: include/classes/api/services/CProxy.php:689
-#: include/classes/api/services/CProxy.php:869
+#: include/classes/api/services/CProxy.php:696
+#: include/classes/api/services/CProxy.php:879
 #, c-format
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr ""
@@ -12290,10 +12290,10 @@ msgstr ""
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CIconMap.php:285
 #: include/classes/api/services/CIconMap.php:528
-#: include/classes/api/services/CImage.php:354
-#: include/classes/api/services/CImage.php:426
-#: include/classes/api/services/CImage.php:478
-#: include/classes/api/services/CImage.php:500
+#: include/classes/api/services/CImage.php:364
+#: include/classes/api/services/CImage.php:444
+#: include/classes/api/services/CImage.php:497
+#: include/classes/api/services/CImage.php:513
 #: include/classes/api/services/CItemGeneral.php:221
 #: include/classes/api/services/CItemGeneral.php:329
 #: include/classes/api/services/CItemGeneral.php:344
@@ -12308,20 +12308,20 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:777
 #: include/classes/api/services/CMapElement.php:189
 #: include/classes/api/services/CMapElement.php:319
-#: include/classes/api/services/CMap.php:574
-#: include/classes/api/services/CMap.php:989
-#: include/classes/api/services/CMap.php:1051
-#: include/classes/api/services/CMap.php:1610
-#: include/classes/api/services/CMap.php:2048
-#: include/classes/api/services/CMap.php:2110
+#: include/classes/api/services/CMap.php:575
+#: include/classes/api/services/CMap.php:990
+#: include/classes/api/services/CMap.php:1052
+#: include/classes/api/services/CMap.php:1611
+#: include/classes/api/services/CMap.php:2056
+#: include/classes/api/services/CMap.php:2118
 #: include/classes/api/services/CMediatype.php:478
 #: include/classes/api/services/CModule.php:231
 #: include/classes/api/services/CProxy.php:186
-#: include/classes/api/services/CProxy.php:276
-#: include/classes/api/services/CProxy.php:449
-#: include/classes/api/services/CProxy.php:733
-#: include/classes/api/services/CProxy.php:767
-#: include/classes/api/services/CProxy.php:854
+#: include/classes/api/services/CProxy.php:281
+#: include/classes/api/services/CProxy.php:456
+#: include/classes/api/services/CProxy.php:740
+#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:864
 #: include/classes/api/services/CReport.php:925
 #: include/classes/api/services/CRole.php:388
 #: include/classes/api/services/CRole.php:805
@@ -12330,8 +12330,8 @@ msgstr ""
 #: include/classes/api/services/CScript.php:1043
 #: include/classes/api/services/CScript.php:1060
 #: include/classes/api/services/CScript.php:1071
-#: include/classes/api/services/CService.php:1000
-#: include/classes/api/services/CService.php:1024
+#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:1043
 #: include/classes/api/services/CSettings.php:264
 #: include/classes/api/services/CTask.php:430
 #: include/classes/api/services/CTask.php:477
@@ -12394,7 +12394,7 @@ msgstr "Không quy được script cho thao tác lệnh action."
 msgid "No target selected"
 msgstr "Không có mục tiêu nào được chọn"
 
-#: graphs.php:405 items.php:1058
+#: graphs.php:396 items.php:1058
 msgid "No target selected."
 msgstr "Không có mục tiêu nào được chọn."
 
@@ -12807,7 +12807,7 @@ msgstr "Off"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:382
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
 #: report2.php:506
 msgid "Ok"
 msgstr "Ok"
@@ -12887,8 +12887,8 @@ msgstr "Chỉ Siêu Admin mới có thể cập nhật nhóm người dùng."
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Chỉ có Zabbix agent, SNMPv1, SNMPv2 và SNMPv3 có thể được tạo thành duy nhất."
 
-#: include/classes/api/services/CMap.php:665
-#: include/classes/api/services/CMap.php:1119
+#: include/classes/api/services/CMap.php:666
+#: include/classes/api/services/CMap.php:1120
 msgid "Only administrators can set map owner."
 msgstr "Chỉ quản trị viên mới có thể đặt chủ sở hữu sơ đồ."
 
@@ -13410,7 +13410,7 @@ msgstr "PSK"
 msgid "PSK identity"
 msgstr "Danh tính PSK"
 
-#: include/classes/api/services/CProxy.php:630
+#: include/classes/api/services/CProxy.php:637
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr "PSK quá ngắn. Tối thiểu là %1$s hex-digits."
@@ -13497,7 +13497,7 @@ msgstr "Các web scenario gốc"
 msgid "Parse"
 msgstr "Phân tích"
 
-#: include/classes/api/services/CImage.php:219
+#: include/classes/api/services/CImage.php:218
 #, c-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr "Lỗi Parse SQL [%1$s] trong [%2$s]."
@@ -14007,7 +14007,7 @@ msgstr "Vấn đề, nếu ít nhất một phần tử con có vấn 
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:355 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
 msgid "Problems"
 msgstr "Các vấn đề"
 
@@ -14075,8 +14075,8 @@ msgstr "Proxies"
 msgid "Proxy"
 msgstr "Proxy"
 
-#: include/classes/api/services/CProxy.php:672
-#: include/classes/api/services/CProxy.php:801
+#: include/classes/api/services/CProxy.php:679
+#: include/classes/api/services/CProxy.php:808
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
 msgstr ""
@@ -14086,17 +14086,17 @@ msgstr ""
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Proxy \"%1$s\" cho host \"%2$s\" không tồn tại."
 
-#: include/classes/api/services/CProxy.php:516
+#: include/classes/api/services/CProxy.php:523
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
 msgstr "Proxy \"%1$s\" được sử dụng cho hoạt động \"%2$s\"."
 
-#: include/classes/api/services/CProxy.php:473
+#: include/classes/api/services/CProxy.php:480
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Proxy \"%1$s\"  được sử dụng bởi quy tắc phát hiện \"%2$s\"."
 
-#: app/controllers/CControllerProxyCreate.php:119
+#: app/controllers/CControllerProxyCreate.php:113
 msgid "Proxy added"
 msgstr "Proxy đã được thêm vào"
 
@@ -14113,7 +14113,7 @@ msgstr[0] "Proxy đã bị xóa"
 msgid "Proxy interface creation failed."
 msgstr "Proxy interface tạo thất bại."
 
-#: include/classes/api/services/CProxy.php:400
+#: include/classes/api/services/CProxy.php:405
 msgid "Proxy interface update failed."
 msgstr "Proxy interface cập nhật thất bại."
 
@@ -14125,7 +14125,7 @@ msgstr "Chế độ proxy"
 msgid "Proxy name"
 msgstr "Tên proxy"
 
-#: app/controllers/CControllerProxyUpdate.php:116
+#: app/controllers/CControllerProxyUpdate.php:110
 msgid "Proxy updated"
 msgstr "Proxy đã được cập nhật"
 
@@ -15367,7 +15367,7 @@ msgstr "Script đã được cập nhật"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:356
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
 msgid "Scripts"
 msgstr "Các Script"
 
@@ -15586,27 +15586,27 @@ msgstr "thời gian máy chủ"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/popup.services.php:46 include/actions.inc.php:75
-#: include/views/configuration.services.edit.php:356 services.php:352
+#: include/views/configuration.services.edit.php:356 services.php:347
 #: srv_status.php:144
 msgid "Service"
 msgstr "Dịch vụ"
 
-#: include/classes/api/services/CService.php:1055
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Dịch vụ \"%1$s\" không thể bị xóa, bởi vì nó phụ thuộc vào dịch vụ khác."
 
-#: include/classes/api/services/CService.php:1074
+#: include/classes/api/services/CService.php:1093
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Dịch vụ \"%1$s\" không thể phụ thuộc vào chính nó."
 
-#: include/classes/api/services/CService.php:1149
+#: include/classes/api/services/CService.php:1168
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Dịch vụ \"%1$s\" không thể liên kết đến một trigger và có sản phẩm cùng một lúc."
 
-#: include/classes/api/services/CService.php:1126
+#: include/classes/api/services/CService.php:1145
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Dịch vụ \"%1$s\" đã có liên kết tắt cứng đến một dịch vụ khác."
@@ -15616,15 +15616,15 @@ msgstr "Dịch vụ \"%1$s\" đã có liên kết tắt cứng đến mô�
 msgid "Service availability report"
 msgstr "Thông báo tính sẵn sàng dịch vụ"
 
-#: include/classes/api/services/CService.php:960
+#: include/classes/api/services/CService.php:977
 msgid "Service cannot be parent and child at the same time."
 msgstr "Dịch vụ không thể vừa là cha vừa là con cùng một thời điểm."
 
-#: services.php:153
+#: services.php:151
 msgid "Service created"
 msgstr "Dịch vụ được tạo"
 
-#: services.php:108
+#: services.php:107
 msgid "Service deleted"
 msgstr "Dịch vụ đã bị xóa"
 
@@ -15652,7 +15652,7 @@ msgstr "Thời gian dịch vụ"
 msgid "Service type"
 msgstr "Kiểu dịch vụ"
 
-#: services.php:146
+#: services.php:145
 msgid "Service updated"
 msgstr "Dịch vụ được cập nhật"
 
@@ -15668,7 +15668,7 @@ msgstr "Dịch vụ được cập nhật"
 msgid "Services"
 msgstr "Các dịch vụ"
 
-#: include/classes/api/services/CService.php:1196
+#: include/classes/api/services/CService.php:1215
 msgid "Services form a circular dependency."
 msgstr "Các dịch vụ tạo thành một quan hệ phụ thuộc vòng tròn."
 
@@ -15702,7 +15702,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Đặt chế độ kiểm kê máy chủ"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:388
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
 msgid "Set new value"
 msgstr ""
 
@@ -15792,13 +15792,13 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:342
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
 msgid "Sharing"
 msgstr "Chia sẻ"
 
-#: include/classes/api/services/CMap.php:717
-#: include/classes/api/services/CMap.php:1186
-#: include/classes/api/services/CMap.php:1260
+#: include/classes/api/services/CMap.php:718
+#: include/classes/api/services/CMap.php:1187
+#: include/classes/api/services/CMap.php:1261
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Chia sẻ tùy chọn \"%1$s\" bị thiếu một giá trị cho sơ đồ \"%2$s\"."
@@ -16258,7 +16258,7 @@ msgstr ""
 msgid "Status"
 msgstr "Trạng thái"
 
-#: app/views/popup.services.php:47 services.php:354
+#: app/views/popup.services.php:47 services.php:349
 msgid "Status calculation"
 msgstr "Tính toán trạng thái"
 
@@ -16404,7 +16404,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Chủ đề"
 
-#: jsLoader.php:357
+#: jsLoader.php:358
 msgid "Submap"
 msgstr "Submap"
 
@@ -16956,13 +16956,13 @@ msgstr "Host không được phát hiện nữa và sẽ bị xóa trong %
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Máy chủ không được khám phá nữa và sẽ bị xóa trong lần xử lý khám phá tiếp theo."
 
-#: include/classes/api/services/CImage.php:373
+#: include/classes/api/services/CImage.php:383
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] "Hình ảnh được sử dụng trong biểu tượng bản đồ %1$s."
 
-#: include/classes/api/services/CImage.php:399
+#: include/classes/api/services/CImage.php:409
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -17074,7 +17074,7 @@ msgstr "Thứ năm"
 #: app/views/report.services.php:82
 #: include/views/configuration.services.edit.php:266
 #: include/views/configuration.services.edit.php:321 report4.php:191
-#: services.php:48 services.php:191
+#: services.php:48 services.php:186
 msgid "Till"
 msgstr "Cho tới"
 
@@ -17171,7 +17171,7 @@ msgstr "Nhãn thời gian"
 msgid "To"
 msgstr "To"
 
-#: jsLoader.php:369
+#: jsLoader.php:370
 msgid "To set a host interface select a single item type for all items"
 msgstr "Để thiết lập một host interface chọn một kiểu item duy nhất cho tất cả các item"
 
@@ -17303,8 +17303,8 @@ msgstr "Các khuynh hướng "
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:358
-#: services.php:355
+#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
+#: services.php:350
 msgid "Trigger"
 msgstr "Trigger"
 
@@ -17474,11 +17474,11 @@ msgstr "Các kiểu trigger đã được cập nhật"
 msgid "Trigger severity"
 msgstr "Mức độ quan trọng của trigger"
 
-#: jsLoader.php:343
+#: jsLoader.php:344
 msgid "Trigger status \"OK\""
 msgstr "Trạng thái trigger \"OK\""
 
-#: jsLoader.php:344
+#: jsLoader.php:345
 msgid "Trigger status \"Problem\""
 msgstr "Trạng thái Trigger \"Problem\""
 
@@ -17644,7 +17644,7 @@ msgstr "UNKNOWN"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:359
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
 msgid "URL"
 msgstr "URL"
 
@@ -17669,8 +17669,8 @@ msgstr "URL C"
 msgid "URL is not properly encoded."
 msgstr "URL không được mã hóa chính xác."
 
-#: include/classes/api/services/CMap.php:960
-#: include/classes/api/services/CMap.php:1435
+#: include/classes/api/services/CMap.php:961
+#: include/classes/api/services/CMap.php:1436
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "Tên URL phải là duy nhất trong sơ đồ \"%1$s\"."
@@ -17683,14 +17683,14 @@ msgstr "Tham số URL không thể là kiểu mảng."
 msgid "URL parameter name is empty."
 msgstr "Tên tham số URL là trống."
 
-#: include/classes/api/services/CMap.php:954
-#: include/classes/api/services/CMap.php:1429
+#: include/classes/api/services/CMap.php:955
+#: include/classes/api/services/CMap.php:1430
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL phải có cả trường \"tên\" và \"url\" cho sơ đồ \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:360
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
 msgid "URLs"
 msgstr "URLs"
 
@@ -18212,8 +18212,8 @@ msgstr[0] ""
 msgid "User group for database down message"
 msgstr "Nhóm người dùng cho cơ sở dữ liệu tin nhắn không hoạt động"
 
-#: include/classes/api/services/CMap.php:783
-#: include/classes/api/services/CMap.php:1251
+#: include/classes/api/services/CMap.php:784
+#: include/classes/api/services/CMap.php:1252
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "Chia sẻ nhóm người dùng bị thiếu tham số: %1$s cho sơ đồ \"%2$s\"."
@@ -18324,8 +18324,8 @@ msgstr "Các phiên làm việc của người dùng"
 msgid "User settings"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:708
-#: include/classes/api/services/CMap.php:1177
+#: include/classes/api/services/CMap.php:709
+#: include/classes/api/services/CMap.php:1178
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "Chia sẻ của người dùng bị thiếu tham số: %1$s cho sơ đồ \"%2$s\"."
@@ -18705,20 +18705,20 @@ msgstr ""
 msgid "Value"
 msgstr "Giá trị"
 
-#: include/classes/api/services/CMap.php:929
-#: include/classes/api/services/CMap.php:1404
+#: include/classes/api/services/CMap.php:930
+#: include/classes/api/services/CMap.php:1405
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Giá trị \"%1$s\" là không hợp lệ đối với tham số \"grid-align\". Các lựa chọn là: \"%2$s\" và \"%3$s\""
 
-#: include/classes/api/services/CMap.php:940
-#: include/classes/api/services/CMap.php:1415
+#: include/classes/api/services/CMap.php:941
+#: include/classes/api/services/CMap.php:1416
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\"."
 msgstr "Giá trị \"%1$s\" là không hợp lệ đối với tham số \"grid-show\". Các lựa chọn là: \"%2$s\" và \"%3$s\"."
 
-#: include/classes/api/services/CMap.php:919
-#: include/classes/api/services/CMap.php:1394
+#: include/classes/api/services/CMap.php:920
+#: include/classes/api/services/CMap.php:1395
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "Giá trị \"%1$s\" là không hợp lệ đối với tham số \"grid-align\". Các lựa chọn là: \"%2$s\"."
@@ -18951,7 +18951,7 @@ msgstr "Chúng tôi xin lỗi, số lượng tối đa có thể của ca
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:361
+#: include/views/inventory.host.view.php:219 jsLoader.php:362
 msgid "Web"
 msgstr "Web"
 
@@ -19128,7 +19128,7 @@ msgstr "Ghi"
 msgid "Wrong Module.php class name for module located at %1$s."
 msgstr ""
 
-#: include/classes/api/services/CService.php:398
+#: include/classes/api/services/CService.php:415
 #, c-format
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Những trường không đúng đối với quan hệ phụ thuộc cho dịch vụ \"%1$s\"."
@@ -19150,19 +19150,19 @@ msgid "Wrong fields for map link."
 msgstr "Những trường không đúng đối với liên kết bản đồ."
 
 #: include/classes/api/services/CService.php:135
-#: include/classes/api/services/CService.php:244
+#: include/classes/api/services/CService.php:249
 #, c-format
 msgid "Wrong fields for service \"%1$s\"."
 msgstr "Những trường không đúng đối với dịch vụ \"%1$s\"."
 
-#: include/classes/api/services/CService.php:478
+#: include/classes/api/services/CService.php:495
 #, c-format
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Những trường không đúng đối với thời gian của dịch vụ \"%1$s\"."
 
 #: include/classes/api/services/CMapElement.php:74
-#: include/classes/api/services/CMap.php:976
-#: include/classes/api/services/CMap.php:1451
+#: include/classes/api/services/CMap.php:977
+#: include/classes/api/services/CMap.php:1452
 msgid "Wrong value for url field."
 msgstr "Giá trị sai cho trường url."
 
@@ -19232,7 +19232,7 @@ msgstr "Giá trị cực đại của trục Y"
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:321
+#: include/classes/api/services/CGraphGeneral.php:328
 #: include/classes/graphdraw/CLineGraphDraw.php:1872
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Giá trị cực đại của trục Y phải lớn hơn giá trị cực tiểu trục Y."
@@ -19937,8 +19937,8 @@ msgstr "Không thể thay đổi"
 #: include/classes/api/services/CMediatype.php:731
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:612
-#: include/classes/api/services/CProxy.php:618
+#: include/classes/api/services/CProxy.php:619
+#: include/classes/api/services/CProxy.php:625
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:470
@@ -20285,13 +20285,13 @@ msgctxt "XML time format"
 msgid "hh.mm"
 msgstr "hh.mm"
 
-#: include/classes/api/services/CMap.php:852
-#: include/classes/api/services/CMap.php:1320
+#: include/classes/api/services/CMap.php:853
+#: include/classes/api/services/CMap.php:1321
 msgid "host"
 msgstr "host"
 
-#: include/classes/api/services/CMap.php:848
-#: include/classes/api/services/CMap.php:1316
+#: include/classes/api/services/CMap.php:849
+#: include/classes/api/services/CMap.php:1317
 msgid "host group"
 msgstr "Nhóm host"
 
@@ -20305,13 +20305,13 @@ msgstr "Mẫu máy chủ"
 msgid "hostid of dependent item and master item should match"
 msgstr "id máy chủ của item phụ thuộc và item chủ phải phù hợp"
 
-#: include/classes/api/services/CMap.php:843
-#: include/classes/api/services/CMap.php:1310
+#: include/classes/api/services/CMap.php:844
+#: include/classes/api/services/CMap.php:1311
 msgid "icon"
 msgstr "Biểu tượng"
 
-#: include/classes/api/services/CMap.php:864
-#: include/classes/api/services/CMap.php:1332
+#: include/classes/api/services/CMap.php:865
+#: include/classes/api/services/CMap.php:1333
 msgid "image"
 msgstr "Hình ảnh"
 
@@ -20553,7 +20553,7 @@ msgstr "Quy tắc phát hiện low-level"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:378
+#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
@@ -20590,8 +20590,8 @@ msgstr ""
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CMap.php:860
-#: include/classes/api/services/CMap.php:1328
+#: include/classes/api/services/CMap.php:861
+#: include/classes/api/services/CMap.php:1329
 msgid "map"
 msgstr "Bản đồ"
 
@@ -20848,7 +20848,7 @@ msgstr "đầu ra"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:389
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21006,8 +21006,8 @@ msgstr "Mô tả ngắn"
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMediatype.php:793
-#: include/classes/api/services/CProxy.php:698
-#: include/classes/api/services/CProxy.php:824
+#: include/classes/api/services/CProxy.php:705
+#: include/classes/api/services/CProxy.php:834
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:579
@@ -21188,8 +21188,8 @@ msgstr ""
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:856
-#: include/classes/api/services/CMap.php:1324 include/events.inc.php:34
+#: include/classes/api/services/CMap.php:857
+#: include/classes/api/services/CMap.php:1325 include/events.inc.php:34
 #: include/events.inc.php:59
 msgid "trigger"
 msgstr "trigger"
@@ -21261,8 +21261,8 @@ msgstr "kết thúc bất ngờ của macro"
 #: include/classes/api/services/CDiscoveryRule.php:1702
 #: include/classes/api/services/CDiscoveryRule.php:1725
 #: include/classes/api/services/CDiscoveryRule.php:1744
-#: include/classes/api/services/CGraphGeneral.php:599
-#: include/classes/api/services/CGraphGeneral.php:721
+#: include/classes/api/services/CGraphGeneral.php:606
+#: include/classes/api/services/CGraphGeneral.php:728
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1719
 #: include/classes/api/services/CHttpTest.php:372
@@ -21300,8 +21300,8 @@ msgstr "Văn bản bất ngờ \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
-#: include/classes/api/services/CProxy.php:593
 #: include/classes/api/services/CProxy.php:600
+#: include/classes/api/services/CProxy.php:607
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""
@@ -21358,7 +21358,7 @@ msgstr "Số phiên bản không được hỗ trợ"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:390
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
 msgid "value"
 msgstr "Giá trị"
 
@@ -21444,10 +21444,10 @@ msgstr ""
 #: include/classes/api/services/CHost.php:2001
 #: include/classes/api/services/CHost.php:2156
 #: include/classes/api/services/CMapElement.php:86
-#: include/classes/api/services/CMap.php:682
-#: include/classes/api/services/CMap.php:688
-#: include/classes/api/services/CMap.php:1151
-#: include/classes/api/services/CMap.php:1157
+#: include/classes/api/services/CMap.php:683
+#: include/classes/api/services/CMap.php:689
+#: include/classes/api/services/CMap.php:1152
+#: include/classes/api/services/CMap.php:1158
 #: include/classes/api/services/CReport.php:209
 #: include/classes/api/services/CReport.php:612
 #: include/classes/import/validators/C52XmlValidator.php:2582

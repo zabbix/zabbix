@@ -23,61 +23,72 @@
  * Class to work with CUID hash. Based on server CUID implementation.
  */
 class CCuid {
-	private const BASE = 36;
+	private const BASE36 = 36;
 	private const BLOCK_SIZE = 4;
 	private const DECIMAL = 10;
-	public const CUID_LENGTH = 25;
-	private const CUID_PREFIX = 'c';
+	private const PREFIX = 'c';
+	private const DISCRETE_VALUES = 1679616;
+	public const LENGTH = 25;
 
-	private static $cuid_counter = 0;
+	private static $counter = -1;
 
 	private static function pad(string $value, int $size): string {
-		return substr(str_pad(base_convert($value, self::DECIMAL, self::BASE), $size, '0', STR_PAD_LEFT), 0, $size);
+		return substr(str_pad(base_convert($value, self::DECIMAL, self::BASE36), $size, '0', STR_PAD_LEFT), -$size);
 	}
 
-	private static function getCounter(): int {
-		return self::$cuid_counter++;
+	private static function next(): int {
+		self::$counter++;
+
+		if (self::$counter >= self::DISCRETE_VALUES) {
+			self::$counter = 0;
+		}
+
+		return self::$counter;
 	}
 
 	private static function getRandomBlock(): string {
-		$rand = floor(mt_rand() / mt_getrandmax() * pow(self::BASE, self::BLOCK_SIZE));
+		$rand = floor(mt_rand() / mt_getrandmax() * self::DISCRETE_VALUES);
 
 		return self::pad((string) $rand, self::BLOCK_SIZE);
 	}
 
 	private static function getCounterBlock(): string {
-		return self::pad((string) self::getCounter(), self::BLOCK_SIZE);
+		return self::pad((string) self::next(), self::BLOCK_SIZE);
 	}
 
 	private static function getTimestampBlock(): string {
 		return self::pad((string) floor(microtime(true) * 1000), self::BLOCK_SIZE * 2);
 	}
 
-	private static function getHostnameAsNumber(): int {
-		return array_sum(array_map(function (string $char): int {
-			return ord($char);
-		}, str_split(gethostname()))) + strlen(gethostname()) + self::BASE;
+	private static function getHostnameSubBlock(): string {
+		$sum = strlen(gethostname()) + self::BASE36;
+
+		foreach (str_split(gethostname()) as $char) {
+			$sum += ord($char);
+		}
+
+		return self::pad((string) $sum, self::BLOCK_SIZE / 2);
 	}
 
-	private static function getPid(): string {
-		return substr(self::pad((string) getmypid(), self::BLOCK_SIZE), -2);
+	private static function getPidSubBlock(): string {
+		return self::pad((string) getmypid(), self::BLOCK_SIZE / 2);
 	}
 
 	private static function getFingerprintBlock(): string {
-		return self::getPid().self::pad((string) self::getHostnameAsNumber(), self::BLOCK_SIZE / 2);
+		return self::getPidSubBlock().self::getHostnameSubBlock();
 	}
 
-	public static function cuid(): string {
-		return sprintf('%s%s%s%s%s%s', self::CUID_PREFIX, self::getTimestampBlock(), self::getCounterBlock(),
+	public static function generate(): string {
+		return sprintf('%s%s%s%s%s%s', self::PREFIX, self::getTimestampBlock(), self::getCounterBlock(),
 			self::getFingerprintBlock(), self::getRandomBlock(), self::getRandomBlock()
 		);
 	}
 
 	public static function isCuid(string $hash): bool {
-		return $hash[0] === self::CUID_PREFIX;
+		return $hash[0] === self::PREFIX;
 	}
 
-	public static function isCuidLength(string $hash): bool {
-		return strlen($hash) === self::CUID_LENGTH;
+	public static function checkLength(string $hash): bool {
+		return strlen($hash) === self::LENGTH;
 	}
 }

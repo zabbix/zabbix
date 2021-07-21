@@ -106,7 +106,7 @@ class CSettings extends CApiService {
 		$output_fields = ['default_theme', 'show_technical_errors', 'severity_color_0', 'severity_color_1',
 			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'custom_color',
 			'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
-			'x_frame_options', 'default_timezone', 'session_key', 'dbversion_status', 'auditlog_enabled'
+			'x_frame_options', 'default_timezone', 'session_key', 'dbversion_status'
 		];
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND]
@@ -254,7 +254,7 @@ class CSettings extends CApiService {
 			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'url' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'url')],
 			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
-			'auditlog_enabled' =>			['type' => API_INT32, 'in' => '0,1']
+			'auditlog_enabled' =>				['type' => API_INT32, 'in' => '0,1']
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

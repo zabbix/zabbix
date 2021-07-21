@@ -592,13 +592,6 @@ class CTemplate extends CHostGeneral {
 	public function update(array $templates) {
 		$templates = zbx_toArray($templates);
 
-		$db_templates = $this->get([
-			'output' => ['templateid', 'name', 'host', 'description'],
-			'templateids' => array_column($templates, 'templateid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
 		$this->validateUpdate($templates, $db_templates);
 
 		$macros = [];
@@ -647,7 +640,14 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $templates, array $db_templates) {
+	protected function validateUpdate(array $templates, array &$db_templates = null) {
+		$db_templates = $this->get([
+			'output' => ['templateid', 'host', 'name', 'description'],
+			'templateids' => array_column($templates, 'templateid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
 		foreach ($templates as $index => $template) {
 			if (!isset($db_templates[$template['templateid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));

@@ -115,8 +115,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zbx_new_cuid(auditid_cuid);
 
-	zbx_json_initarray(&details_json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addobject(&details_json, NULL);
+	zbx_json_init(&details_json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%hhu", script_execute_on);
 
@@ -141,12 +140,17 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.command", script_command_orig);
 
 	if (NULL != output)
-		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.output", output);
+	{
+		char	*output_esc;
+
+		output_esc = zbx_strdup(NULL, output);
+		zbx_json_escape(&output_esc);
+		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.output", output_esc);
+		zbx_free(output_esc);
+	}
 
 	if (NULL != error)
 		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.error", error);
-
-	zbx_json_close(&details_json);
 
 	if (ZBX_DB_OK > DBexecute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
 			"resourcename,resourcetype,recordsetid,details) values ('%s'," ZBX_FS_UI64 ",'%s',%d,'%d','%s',"

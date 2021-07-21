@@ -125,7 +125,7 @@ class CControllerAuditLogList extends CController {
 				$data['auditlogs'] = API::AuditLog()->get($params);
 			}
 
-			$users = array_map(function (array $value): string {
+			$users = array_map(function(array $value): string {
 				return $value['username'];
 			}, $users);
 		}
@@ -137,19 +137,14 @@ class CControllerAuditLogList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		if (!$users) {
-			$userids = array_filter(array_column($data['auditlogs'], 'userid'), function ($id) {
-				return $id != 0;
-			});
+		$data['auditlogs'] = $this->sanitizeDetails($data['auditlogs']);
 
-			$db_users = [];
-			if ($userids) {
-				$db_users = API::User()->get([
-					'output' => ['userid', 'username'],
-					'userids' => $userids,
-					'preservekeys' => true
-				]);
-			}
+		if (!$users && $data['auditlogs']) {
+			$db_users = API::User()->get([
+				'output' => ['username'],
+				'userids' => array_unique(array_column($data['auditlogs'], 'userid')),
+				'preservekeys' => true
+			]);
 
 			$users = [];
 			foreach ($data['auditlogs'] as $auditlog) {
@@ -259,12 +254,49 @@ class CControllerAuditLogList extends CController {
 	}
 
 	private function sanitizeUsersForMultiselect(array $users): array {
-		$users = array_map(function (array $value): array {
+		$users = array_map(function(array $value): array {
 			return ['id' => $value['userid'], 'name' => getUserFullname($value)];
 		}, $users);
 
 		CArrayHelper::sort($users, ['name']);
 
 		return $users;
+	}
+
+	private function sanitizeDetails(array $auditlogs): array {
+		foreach ($auditlogs as &$auditlog) {
+			if ($auditlog['action'] != AUDIT_ACTION_UPDATE && $auditlog['action'] != AUDIT_ACTION_EXECUTE) {
+				continue;
+			}
+
+			$details = json_decode($auditlog['details'], true);
+			if (!$details) {
+				$auditlog['details'] = '';
+				continue;
+			}
+
+			$auditlog['details'] = $this->formatDetails($details, $auditlog['action']);
+		}
+		unset($auditlog);
+
+		return $auditlogs;
+	}
+
+	private function formatDetails(array $details, string $action): string {
+		$new_details = [];
+		foreach ($details as $key => $detail) {
+			switch ($action) {
+				case AUDIT_ACTION_UPDATE:
+					$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
+					break;
+				case AUDIT_ACTION_EXECUTE:
+					$new_details[] = sprintf('%s: %s', $key, $detail[1]);
+					break;
+			}
+		}
+
+		natsort($new_details);
+
+		return implode("\n", $new_details);
 	}
 }

@@ -3533,7 +3533,7 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	sessionid_esc = DBdyn_escape_string(sessionid);
 
 	if (NULL == (result = DBselect(
-			"select u.userid,u.roleid,u.name,r.type"
+			"select u.userid,u.roleid,u.username,r.type"
 				" from sessions s,users u,role r"
 			" where s.userid=u.userid"
 				" and s.sessionid='%s'"
@@ -3585,7 +3585,7 @@ int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
 
 	if (NULL == (result = DBselect(
-			"select u.userid,u.roleid,r.type"
+			"select u.userid,u.roleid,u.username,r.type"
 				" from token t,users u,role r"
 			" where t.userid=u.userid"
 				" and t.token='%s'"
@@ -3602,7 +3602,8 @@ int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *
 
 	ZBX_STR2UINT64(user->userid, row[0]);
 	ZBX_STR2UINT64(user->roleid, row[1]);
-	user->type = atoi(row[2]);
+	user->username = zbx_strdup(NULL, row[2]);
+	user->type = atoi(row[3]);
 	ret = SUCCEED;
 out:
 	DBfree_result(result);
