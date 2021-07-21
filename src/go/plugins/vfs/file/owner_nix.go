@@ -32,25 +32,30 @@ import (
 
 // Export -
 func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
-	if len(params) > 3 {
-		return nil, errors.New("Too many parameters.")
-	}
-	if len(params) == 0 || params[0] == "" {
-		return nil, errors.New("Invalid first parameter.")
-	}
+	resulttype := "name"
 	ownertype := "user"
-	if len(params) > 1 && params[1] != "" {
+
+	switch len(params) {
+	case 3:
+		if params[2] != "name" && params[2] != "id" {
+			return nil, fmt.Errorf("Invalid third parameter: %s", params[2])
+		}
+		resulttype = params[2]
+		fallthrough
+	case 2:
 		if params[1] != "user" && params[1] != "group" {
 			return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
 		}
 		ownertype = params[1]
-	}
-	resulttype := "name"
-	if len(params) > 2 && params[2] != "" {
-		if params[2] != "name" && params[2] != "id" {
-			return nil, fmt.Errorf("Invalid second parameter: %s", params[2])
+		fallthrough
+	case 1:
+		if params[0] == "" {
+			return nil, errors.New("Invalid first parameter.")
 		}
-		resulttype = params[2]
+	case 0:
+		return nil, errors.New("Invalid first parameter.")
+	default:
+		return nil, errors.New("Too many parameters.")
 	}
 
 	info, err := os.Lstat(params[0])

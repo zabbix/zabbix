@@ -29,22 +29,29 @@ import (
 
 // Export -
 func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
-	if len(params) > 3 {
-		return nil, errors.New("Too many parameters.")
-	}
-	if len(params) == 0 || params[0] == "" {
-		return nil, errors.New("Invalid first parameter.")
-	}
-	ownertype := "user"
-	if len(params) > 1 && params[1] != "" && params[1] != "user" {
-		return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
-	}
 	resulttype := "name"
-	if len(params) > 2 && params[2] != "" {
+	ownertype := "user"
+
+	switch len(params) {
+	case 3:
 		if params[2] != "name" && params[2] != "SID" {
-			return nil, fmt.Errorf("Invalid second parameter: %s", params[2])
+			return nil, fmt.Errorf("Invalid third parameter: %s", params[2])
 		}
 		resulttype = params[2]
+		fallthrough
+	case 2:
+		if params[1] != ownertype {
+			return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
+		}
+		fallthrough
+	case 1:
+		if params[0] == "" {
+			return nil, errors.New("Invalid first parameter.")
+		}
+	case 0:
+		return nil, errors.New("Invalid first parameter.")
+	default:
+		return nil, errors.New("Too many parameters.")
 	}
 
 	sd, err := windows.GetNamedSecurityInfo(params[0], windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
