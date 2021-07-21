@@ -1599,6 +1599,8 @@ class CAction extends CApiService {
 	 * @param array  $conditions                     Conditions data array.
 	 * @param string $conditions[]['conditiontype']  Action condition type.
 	 * @param int    $conditions[]['operator']       Action condition operator.
+	 *
+	 * @throws APIException
 	 */
 	public function validateFilterConditionsIntegrity($name, $eventsource, array $conditions): void {
 		foreach ($conditions as $condition) {
@@ -2485,7 +2487,7 @@ class CAction extends CApiService {
 				}
 			}
 
-			if ($this->outputIsRequested('opmessage_grp', $update_options) && $nonack_messages) {
+			if ($nonack_messages && $this->outputIsRequested('opmessage_grp', $update_options)) {
 				foreach ($nonack_messages as $operationid) {
 					$update_operations[$operationid]['opmessage_grp'] = [];
 				}
@@ -2502,7 +2504,7 @@ class CAction extends CApiService {
 				}
 			}
 
-			if ($this->outputIsRequested('opmessage_usr', $update_options) && $nonack_messages) {
+			if ($nonack_messages && $this->outputIsRequested('opmessage_usr', $update_options)) {
 				foreach ($nonack_messages as $operationid) {
 					$update_operations[$operationid]['opmessage_usr'] = [];
 				}
@@ -2983,14 +2985,14 @@ class CAction extends CApiService {
 			$operations_defined = array_key_exists('operations', $action)
 				? (bool) $action['operations']
 				: (bool) $db_action['operations'];
-			$rcv_operations_defined = array_key_exists('recovery_operations', $action)
+			$recovery_operations_defined = array_key_exists('recovery_operations', $action)
 				? (bool) $action['recovery_operations']
 				: (bool) $db_action['recovery_operations'];
-			$upd_operations_defined = array_key_exists('update_operations', $action)
+			$update_operations_defined = array_key_exists('update_operations', $action)
 				? (bool) $action['update_operations']
 				: (bool) $db_action['update_operations'];
 
-			if (!$operations_defined && !$rcv_operations_defined && !$upd_operations_defined) {
+			if (!$operations_defined && !$recovery_operations_defined && !$update_operations_defined) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $action_name));
 			}
 
