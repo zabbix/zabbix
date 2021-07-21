@@ -76,13 +76,13 @@ class CWidgetHelper {
 					document
 						.getElementById("widget-dialogue-form")
 						.addEventListener("change", (e) => {
-								if (e.target.matches(\'input[type="text"]:not([data-no-trim="1"]), \'+
-										\'textarea:not([data-no-trim="1"])\')) {
-									e.target.value = e.target.value.trim();
-								}
-							},
-							true
-						);
+							const trimmable = e.target.matches(\'input[type="text"]:not([data-no-trim="1"]), \'+
+									\'textarea:not([data-no-trim="1"])\');
+
+							if (trimmable) {
+								e.target.value = e.target.value.trim();
+							}
+						}, {capture: true});
 				'))->setOnDocumentReady()
 			);
 
