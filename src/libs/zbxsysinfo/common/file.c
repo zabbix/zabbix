@@ -150,7 +150,7 @@ int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (SUCCEED != zbx_get_file_time(filename, &file_time))
+	if (SUCCEED != zbx_get_file_time(filename, 0, &file_time))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
@@ -1384,7 +1384,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 
 	/* time */
 
-	if (SUCCEED != zbx_get_file_time(filename, &file_time))
+	if (SUCCEED != zbx_get_file_time(filename, 1, &file_time))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
@@ -1491,7 +1491,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 
 	/* time */
 
-	if (SUCCEED != zbx_get_file_time(filename, &file_time))
+	if (SUCCEED != zbx_get_file_time(filename, 1, &file_time))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;

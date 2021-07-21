@@ -151,12 +151,20 @@ int	zbx_is_regular_file(const char *path)
 }
 
 #ifndef _WINDOWS
-int	zbx_get_file_time(const char *path, zbx_file_time_t *time)
+int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time)
 {
 	zbx_stat_t	buf;
 
-	if (0 != zbx_stat(path, &buf))
-		return FAIL;
+	if (0 != sym)
+	{
+		if (0 != lstat(path, &buf))
+			return FAIL;
+	}
+	else
+	{
+		if (0 != zbx_stat(path, &buf))
+			return FAIL;
+	}
 
 	time->access_time = (zbx_fs_time_t)buf.st_atime;
 	time->modification_time = (zbx_fs_time_t)buf.st_mtime;
@@ -182,11 +190,13 @@ static	int	get_file_time_stat(const char *path, zbx_file_time_t *time)
 	return SUCCEED;
 }
 
-int	zbx_get_file_time(const char *path, zbx_file_time_t *time)
+int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time)
 {
 	int			f = -1, ret = SUCCEED;
 	intptr_t		h;
 	ZBX_FILE_BASIC_INFO	info;
+
+	ZBX_UNUSED(sym);
 
 	if (NULL == zbx_GetFileInformationByHandleEx || -1 == (f = zbx_open(path, O_RDONLY)))
 		return get_file_time_stat(path, time); /* fall back to stat() */
