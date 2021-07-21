@@ -7,6 +7,10 @@ UPDATE hosts SET status=0 WHERE host='Zabbix server';
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50029,50009,1,2,1,'127.0.0.1','','161');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50030,50009,1,4,1,'127.0.0.1','','12345');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50031,50009,1,3,1,'127.0.0.1','','623');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community, securityname, securitylevel, authpassphrase, privpassphrase, authprotocol, privprotocol, contextname) VALUES (50029, 2, 1, '{$SNMP_COMMUNITY}', '', 0, '', '', 0, 0, '');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50012,'API group for hosts',0);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50013,'API group for templates',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
@@ -35,6 +39,11 @@ INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50015,NU
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (112, 50015, '', 50014, NULL);
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50028,50015,1,2,1,'127.0.0.1','','10050');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (50028, 2, 1, '{$SNMP_COMMUNITY}');
+
+
+-- host tags
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50032, 'API host with tag', 'API host with tag', 0, 0, '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (50033, 50032, 'b', 'b');
 
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'API user group for update');

@@ -301,6 +301,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template_full_delete."'");
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
+		$this->zbxTestOpen('templates.php?page=2');
 		$this->zbxTestClickLinkTextWait($this->template_full_delete);
 		$this->zbxTestClickWait('delete_and_clear');
 		$this->zbxTestAcceptAlert();

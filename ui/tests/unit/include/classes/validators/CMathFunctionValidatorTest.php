@@ -21,7 +21,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-class CMastFunctionValidatorTest extends TestCase {
+class CMathFunctionValidatorTest extends TestCase {
 
 	/**
 	 * An array of math functions, options and the expected results.
@@ -302,7 +302,7 @@ class CMastFunctionValidatorTest extends TestCase {
 	 * @dataProvider dataProvider
 	 */
 	public function testMathFunctionValidator(string $source, array $expected) {
-		$expression_parser = new CExpressionParser(['lldmacros' => true]);
+		$expression_parser = new CExpressionParser();
 		$math_function_validator = new CMathFunctionValidator([
 			'parameters' => (new CMathFunctionData())->getParameters()
 		]);

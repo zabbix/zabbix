@@ -1425,12 +1425,12 @@ jQuery(function($) {
 			});
 		}
 
+		link.addClass('menu-popup-item');
+
 		if (options.disabled) {
-			link.addClass('menu-popup-item-disabled');
+			link.addClass('disabled');
 		}
 		else {
-			link.addClass('menu-popup-item');
-
 			if (typeof options.url !== 'undefined') {
 				link.attr('href', options.url);
 

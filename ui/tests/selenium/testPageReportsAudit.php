@@ -221,7 +221,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	}
 
 	/**
-	 * @backup-once globalmacro
+	 * @backupOnce globalmacro
 	 */
 	public function testPageReportsAudit_UpdateMacroDescription() {
 		// Update Macro description.

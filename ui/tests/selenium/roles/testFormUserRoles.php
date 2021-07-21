@@ -25,8 +25,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup role, module, users
- * @on-before prepareRoleData
- * @on-before prepareUserData
+ * @onBefore prepareRoleData
+ * @onBefore prepareUserData
  */
 class testFormUserRoles extends CWebTest {
 
@@ -933,9 +933,7 @@ class testFormUserRoles extends CWebTest {
 				$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 				$this->query('button:Scan directory')->one()->click();
 				$table = $this->query('class:list-table')->asTable()->one();
-				foreach ($modules as $module) {
-					$table->findRows(['Name' => $module])->select();
-				}
+				$table->findRows('Name', $modules)->select();
 				$this->query('button:Enable')->one()->click();
 				$this->page->acceptAlert();
 				$this->page->waitUntilReady();

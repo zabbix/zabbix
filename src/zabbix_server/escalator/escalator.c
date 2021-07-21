@@ -1103,46 +1103,41 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		/* get host details */
 
-		if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
+		if (0 != host.hostid)	/* target is from "Host" list or "Host group" list */
 		{
-			if (0 != host.hostid)	/* target is from "Host" list or "Host group" list */
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
-				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					goto skip;
-				}
+				goto skip;
+			}
 
-				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-				strscpy(host.host, row[2]);
-				host.tls_connect = (unsigned char)atoi(row[17]);
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+			strscpy(host.host, row[2]);
+			host.tls_connect = (unsigned char)atoi(row[17]);
 #ifdef HAVE_OPENIPMI
-				host.ipmi_authtype = (signed char)atoi(row[18]);
-				host.ipmi_privilege = (unsigned char)atoi(row[19]);
-				strscpy(host.ipmi_username, row[20]);
-				strscpy(host.ipmi_password, row[21]);
+			host.ipmi_authtype = (signed char)atoi(row[18]);
+			host.ipmi_privilege = (unsigned char)atoi(row[19]);
+			strscpy(host.ipmi_username, row[20]);
+			strscpy(host.ipmi_password, row[21]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
+			strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
-			}
-			else if (SUCCEED == (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
-					sizeof(error))))	/* target is "Current host" */
-			{
-				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					goto skip;
-				}
-
-				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-			}
 		}
-		else
-			zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
+		else if (SUCCEED == (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
+				sizeof(error))))	/* target is "Current host" */
+		{
+			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				goto skip;
+			}
+
+			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+		}
 
 		/* substitute macros in script body and webhook parameters */
 
@@ -1926,12 +1921,15 @@ static const char	*check_escalation_result_string(int result)
 	}
 }
 
-static	int	postpone_escalation(const DB_ESCALATION *escalation)
+static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 {
 	int		ret;
 	char		*sql;
 	DB_RESULT	result;
 	DB_ROW		row;
+
+	if (0 == escalation->r_eventid)
+		return SUCCEED;
 
 	sql = zbx_dsprintf(NULL, "select eventid from alerts where eventid=" ZBX_FS_UI64 " and actionid=" ZBX_FS_UI64
 			" and status in (0,3)", escalation->eventid, escalation->actionid);
@@ -1940,9 +1938,9 @@ static	int	postpone_escalation(const DB_ESCALATION *escalation)
 	zbx_free(sql);
 
 	if (NULL != (row = DBfetch(result)))
-		ret = ZBX_ESCALATION_SKIP;
+		ret = FAIL;
 	else
-		ret = ZBX_ESCALATION_PROCESS;
+		ret = SUCCEED;
 
 	DBfree_result(result);
 
@@ -1990,22 +1988,13 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		maintenance = (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed ? HOST_MAINTENANCE_STATUS_ON :
 				HOST_MAINTENANCE_STATUS_OFF);
 
-		if (0 != escalation->r_eventid)
-		{
-			ret = postpone_escalation(escalation);
-			goto out;
-		}
+		if (0 == skip && SUCCEED != check_unfinished_alerts(escalation))
+			skip = 1;
 	}
 	else if (EVENT_SOURCE_INTERNAL == event->source)
 	{
 		if (EVENT_OBJECT_ITEM == event->object || EVENT_OBJECT_LLDRULE == event->object)
 		{
-			if (0 != escalation->r_eventid)
-			{
-				ret = postpone_escalation(escalation);
-				goto out;
-			}
-
 			/* item disabled or deleted? */
 			DCconfig_get_items_by_itemids(&item, &escalation->itemid, &errcode, 1);
 
@@ -2032,6 +2021,9 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 
 			if (NULL != *error)
 				goto out;
+
+			if (SUCCEED != check_unfinished_alerts(escalation))
+				skip = 1;
 		}
 	}
 

@@ -108,7 +108,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * Check media types filtering.
 	 *
 	 * @dataProvider getFilterData
-	 * @on-after resetFilter
+	 * @onAfter resetFilter
 	 */
 	public function testPageAdministrationMediaTypes_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
@@ -134,7 +134,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	/*
 	 * Check sorting of media types by Name column.
 	 *
-	 * @on-after resetFilter
+	 * @onAfter resetFilter
 	 */
 	public function testPageAdministrationMediaTypes_TableSorting() {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
@@ -199,9 +199,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select one.
 			[
 				[
-					'rows' => [
-						'Name' => 'Email'
-					],
+					'rows' => ['Email'],
 					'db_name' => 'Email',
 					'used_by_action' => 'Trigger action 3'
 				]
@@ -209,9 +207,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select several.
 			[
 				[
-					'rows' => [
-						['Name' => 'SMS']
-					],
+					'rows' => ['SMS'],
 					'db_name' => ['SMS']
 				]
 			],
