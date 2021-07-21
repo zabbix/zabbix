@@ -1039,7 +1039,7 @@ static int	get_proc_net_count(const char *filename, int addr_type, net_count_inf
 	return ret;
 }
 
-int	NET_TCP_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_TCP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_count_info_t	res;
 	char			*error = NULL, *lport, *rport, *state;
@@ -1091,7 +1091,7 @@ int	NET_TCP_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_UDP_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_UDP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_count_info_t	res;
 	char			*error = NULL, *lport, *rport, *state;
