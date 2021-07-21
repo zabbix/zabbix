@@ -95,8 +95,10 @@ class testPageScheduledReport extends CWebTest {
 		else {
 			$popup->select('View related reports');
 			$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
+			$this->page->removeFocus();
 			sleep(1);
 			$this->assertScreenshot($overlay);
+			sleep(1);
 			$overlay->query('button:Ok')->one()->click();
 			COverlayDialogElement::ensureNotPresent();
 		}
