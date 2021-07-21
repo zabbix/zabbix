@@ -71,7 +71,11 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("Cannot obtain %s owner name information: %s", params[0], err)
 		}
-		ret = domain + "\\" + account
+		ret := domain
+		if ret != "" {
+			ret += "\\"
+		}
+		ret += account
 	}
 
 	return ret, nil

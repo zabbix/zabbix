@@ -53,7 +53,12 @@ func getFileInfo(info *os.FileInfo, path string) (fileinfo *fileInfo, err error)
 	fi.SID = sdOwner.String()
 
 	if account, domain, _, ok := sdOwner.LookupAccount(""); ok == nil {
-		u := domain + "\\" + account
+		u := domain
+		if u != "" {
+			u += "\\"
+		}
+		u += account
+
 		fi.User = &u
 	}
 
