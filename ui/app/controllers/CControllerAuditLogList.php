@@ -137,21 +137,14 @@ class CControllerAuditLogList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		$this->sanitizeDetails($data['auditlogs']);
+		$data['auditlogs'] = $this->sanitizeDetails($data['auditlogs']);
 
-		if (!$users) {
-			$userids = array_filter(array_column($data['auditlogs'], 'userid'), function($id) {
-				return $id != 0;
-			});
-
-			$db_users = [];
-			if ($userids) {
-				$db_users = API::User()->get([
-					'output' => ['userid', 'username'],
-					'userids' => $userids,
-					'preservekeys' => true
-				]);
-			}
+		if (!$users && $data['auditlogs']) {
+			$db_users = API::User()->get([
+				'output' => ['username'],
+				'userids' => array_unique(array_column($data['auditlogs'], 'userid')),
+				'preservekeys' => true
+			]);
 
 			$users = [];
 			foreach ($data['auditlogs'] as $auditlog) {
