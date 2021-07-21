@@ -53,13 +53,14 @@ class testGraphLinking extends CIntegrationTest {
 	const GRAPH_YMAX_TYPE = 2;
 	const GRAPH_YMIN_TYPE = 1;
 
-	const GRAPH_ITEM_COLOR = '00AA00';
+	const GRAPH_ITEM_COLOR = '00AA';
 
 	const NUMBER_OF_TEMPLATES = 5;
 	const NUMBER_OF_GRAPHS_PER_TEMPLATE = 5;
 
 	private static $templateids = array();
 	private static $stringids = array();
+	private static $colors = array();
 
 	public function createTemplates() {
 
@@ -130,6 +131,7 @@ class testGraphLinking extends CIntegrationTest {
 		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_GRAPHS_PER_TEMPLATE; $i++)
 		{
 			array_push(self::$stringids, $z);
+			array_push(self::$colors, dechex(16 + $i));
 			$z++;
 		}
 		sort(self::$stringids);
@@ -178,7 +180,7 @@ class testGraphLinking extends CIntegrationTest {
 				'gitems' => [
 					[
 						'itemid' => $itemids[$i],
-						'color' => self::GRAPH_ITEM_COLOR
+						'color' => self::GRAPH_ITEM_COLOR . self::$colors[$i]
 					]
 				]
 			]);
@@ -300,8 +302,8 @@ class testGraphLinking extends CIntegrationTest {
 
 			$this->assertArrayHasKey(0, $graph_item_response['result'], $ep);
 			$this->assertArrayHasKey('itemid', $graph_item_response['result'][0], $ep);
-			$this->assertEquals($graph_item_response['result'][0]['itemid'], $itemids[$i], $ep);
-			$this->assertEquals($graph_item_response['result'][0]['color'], self::GRAPH_ITEM_COLOR, $ep);
+			$this->assertEquals($graph_item_response['result'][0]['color'],
+					self::GRAPH_ITEM_COLOR . self::$colors[$i], $ep);
 
 			$i++;
 		}
