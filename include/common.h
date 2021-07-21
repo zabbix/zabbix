@@ -1011,9 +1011,9 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_SCOPE_MASK	0x0000ff00
 #define ZBX_RTC_DATA_MASK	0xffff0000
 
-#define ZBX_RTC_GET_MSG(task)	(int)((task & ZBX_RTC_MSG_MASK) >> ZBX_RTC_MSG_SHIFT)
-#define ZBX_RTC_GET_SCOPE(task)	(int)((task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
-#define ZBX_RTC_GET_DATA(task)	(int)((task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
+#define ZBX_RTC_GET_MSG(task)	(int)(((unsigned int)task & ZBX_RTC_MSG_MASK) >> ZBX_RTC_MSG_SHIFT)
+#define ZBX_RTC_GET_SCOPE(task)	(int)(((unsigned int)task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
+#define ZBX_RTC_GET_DATA(task)	(int)(((unsigned int)task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
 
 #define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
 	(data << ZBX_RTC_DATA_SHIFT))
