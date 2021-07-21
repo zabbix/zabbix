@@ -56,28 +56,30 @@ func SetPerformTask(f PerformTask) {
 }
 
 func processConfigItem(timeout time.Duration, name, value, item string, length int, clientID uint64) (string, error) {
-	if len(item) > 0 {
-		if len(value) > 0 {
-			log.Warningf("both \"%s\" and \"%sItem\" configuration parameter defined, using \"%s\"", name, name, name)
-			return value, nil
-		}
+	if len(item) == 0 {
+		return value, nil
+	}
 
-		var err error
-		value, err = performTask(item, timeout, clientID)
-		if err != nil {
-			return "", err
-		}
+	if len(value) > 0 {
+		log.Warningf("both \"%s\" and \"%sItem\" configuration parameter defined, using \"%s\"", name, name, name)
+		return value, nil
+	}
 
-		if !utf8.ValidString(value) {
-			return "", fmt.Errorf("value is not an UTF-8 string")
-		}
+	var err error
+	value, err = performTask(item, timeout, clientID)
+	if err != nil {
+		return "", err
+	}
 
-		if len(value) > length {
-			log.Warningf("the returned value of \"%s\" item specified by \"%sItem\" configuration parameter"+
-				" is too long, using first %d characters", item, name, length)
+	if !utf8.ValidString(value) {
+		return "", fmt.Errorf("value is not an UTF-8 string")
+	}
 
-			return CutAfterN(value, length), nil
-		}
+	if len(value) > length {
+		log.Warningf("the returned value of \"%s\" item specified by \"%sItem\" configuration parameter"+
+			" is too long, using first %d characters", item, name, length)
+
+		return CutAfterN(value, length), nil
 	}
 
 	return value, nil
