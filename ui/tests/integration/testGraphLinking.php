@@ -289,7 +289,6 @@ class testGraphLinking extends CIntegrationTest {
 			$this->assertEquals($entry['show_triggers'], self::GRAPH_SHOW_TRIGGERS, $ep);
 			$this->assertEquals($entry['yaxismax'], self::GRAPH_YAXISMAX + $i, $ep);
 			$this->assertEquals($entry['yaxismin'], self::GRAPH_YAXISMIN + $i, $ep);
-			$this->assertEquals($entry['ymax_itemid'], $itemids[$i], $ep);
 			$this->assertEquals($entry['ymax_type'], self::GRAPH_YMAX_TYPE, $ep);
 			$this->assertEquals($entry['ymin_type'], self::GRAPH_YMIN_TYPE, $ep);
 
