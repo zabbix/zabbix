@@ -193,6 +193,8 @@ static int	hc_get_history_compression_age(void);
 ZBX_PTR_VECTOR_DECL(item_tag, zbx_tag_t)
 ZBX_PTR_VECTOR_IMPL(item_tag, zbx_tag_t)
 
+ZBX_PTR_VECTOR_IMPL(tags, zbx_tag_t*)
+
 /******************************************************************************
  *                                                                            *
  * Function: DCget_stats_all                                                  *
@@ -3210,16 +3212,16 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 						zbx_db_save_trigger_changes(&trigger_diff);
 
 					if (ZBX_DB_OK == (txn_error = DBcommit()))
-					{
 						DCconfig_triggers_apply_changes(&trigger_diff);
-						DBupdate_itservices(&trigger_diff);
-					}
 					else
 						zbx_clean_events();
 
 					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 				}
 				while (ZBX_DB_DOWN == txn_error);
+
+				if (ZBX_DB_OK == txn_error)
+					zbx_events_update_itservices();
 			}
 		}
 

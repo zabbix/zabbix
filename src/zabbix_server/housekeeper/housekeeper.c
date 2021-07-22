@@ -962,8 +962,6 @@ static int	housekeeping_cleanup(void)
 
 			if (0 == strcmp(row[2], "triggerid"))
 			{
-				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
-						objectid, &more);
 				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER,
 						objectid, &more);
 			}

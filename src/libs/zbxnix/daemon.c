@@ -93,6 +93,7 @@ static void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags)
 	union sigval	s;
 	unsigned char	process_type;
 
+	s.sival_ptr = NULL;
 	s.ZBX_SIVAL_INT = flags;
 
 	for (i = 0; i < threads_num; i++)
@@ -221,6 +222,12 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 						" cannot be performed for a passive proxy");
 				return;
 			}
+
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			{
+				zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, 1,
+						ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_SERVICE_CACHE_RELOAD, 0, 0));
+			}
 			ZBX_FALLTHROUGH;
 		case ZBX_RTC_SECRETS_RELOAD:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_CONFSYNCER, 1, flags);
@@ -241,6 +248,12 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TRAPPER, ZBX_RTC_GET_DATA(flags), flags);
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_DISCOVERER, ZBX_RTC_GET_DATA(flags), flags);
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TASKMANAGER, ZBX_RTC_GET_DATA(flags), flags);
+			break;
+		case ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER, 1, flags);
+			break;
+		case ZBX_RTC_SERVICE_CACHE_RELOAD:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, ZBX_RTC_GET_DATA(flags), flags);
 			break;
 		default:
 			if (NULL != zbx_sigusr_handler)

@@ -36,7 +36,8 @@ foreach ($data['host_inventories'] as $inventoryField) {
 
 // filter
 $widget->addItem(
-	(new CFilter(new CUrl('hostinventories.php')))
+	(new CFilter())
+		->setResetUrl(new CUrl('hostinventories.php'))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [

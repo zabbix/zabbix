@@ -751,17 +751,14 @@ FIELD		|serviceid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|algorithm	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|triggerid	|t_id		|	|NULL		|0			|1|triggers
 FIELD		|showsla	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|goodsla	|t_double	|'99.9'	|NOT NULL	|0
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
-INDEX		|1		|triggerid
 
 TABLE|services_links|linkid|ZBX_DATA
 FIELD		|linkid		|t_id		|	|NOT NULL	|0
 FIELD		|serviceupid	|t_id		|	|NOT NULL	|0			|1|services	|serviceid
 FIELD		|servicedownid	|t_id		|	|NOT NULL	|0			|2|services	|serviceid
-FIELD		|soft		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|servicedownid
 UNIQUE		|2		|serviceupid,servicedownid
 
@@ -1849,7 +1846,30 @@ FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0		|2|usrgrp|usrgrpid
 FIELD		|access_userid	|t_id		|	|NULL		|0		|3|users|userid		|RESTRICT
 INDEX		|1		|reportid
 
+TABLE|service_problem_tag|service_problem_tagid|ZBX_DATA
+FIELD		|service_problem_tagid	|t_id		|	|NOT NULL	|0
+FIELD		|serviceid		|t_id		|	|NOT NULL	|0	|1|services|serviceid
+FIELD		|tag			|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|operator		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value			|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1			|serviceid
+
+TABLE|service_problem|service_problemid|ZBX_DATA
+FIELD		|service_problemid	|t_id		|	|NOT NULL	|0
+FIELD		|eventid		|t_id		|	|NOT NULL	|0	|1|problem|eventid
+FIELD		|serviceid		|t_id		|	|NOT NULL	|0	|2|services|serviceid
+FIELD		|severity		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1			|eventid
+INDEX		|2			|serviceid
+
+TABLE|service_tag|servicetagid|0
+FIELD		|servicetagid	|t_id		|	|NOT NULL	|0
+FIELD		|serviceid	|t_id		|	|NOT NULL	|0		|1|services|serviceid
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1		|serviceid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050007	|5050007
+ROW		|5050024	|5050024

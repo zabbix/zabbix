@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,9 +19,23 @@
 **/
 
 
-$(() => {
-	const $form = $(document.forms['srv_status']);
-	$form.find('[name="period"]').on('change', (e) => {
-		$form.submit();
-	})
-});
+/**
+ * @var CView $this
+ */
+
+$output = [
+	'body' => (new CPartial('service.time.row', [
+		'row_index' => $data['row_index'],
+		'type' => $data['form']['type'],
+		'ts_from' => $data['form']['ts_from'],
+		'ts_to' => $data['form']['ts_to'],
+		'note' => $data['form']['note']
+	]))->getOutput()
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);

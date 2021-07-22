@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,12 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_SERVICE_H
+#define ZABBIX_SERVICE_H
 
-/**
- * @var CView $this
- */
+#include "zbxtypes.h"
+#include "zbxalgo.h"
+#include "db.h"
 
-(new CWidget())
-	->setTitle(_('Services'))
-	->addItem($this->data['tree']->getHTML())
-	->show();
+#define ZBX_IPC_SERVICE_SERVICE			"service"
+#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS	1
+#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS	2
+#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE	3
+
+void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
+
+#endif /* ZABBIX_AVAILABILITY_H */
