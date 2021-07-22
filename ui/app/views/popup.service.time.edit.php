@@ -79,7 +79,7 @@ switch ($data['form']['type']) {
 							->setId('service_time_from_minute')
 							->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 							->setAttribute('placeholder', _('mm'))
-							->setAriaRequired(),
+							->setAriaRequired()
 					]))
 				]))
 			])
@@ -105,7 +105,7 @@ switch ($data['form']['type']) {
 							->setId('service_time_till_minute')
 							->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 							->setAttribute('placeholder', _('mm'))
-							->setAriaRequired(),
+							->setAriaRequired()
 					]))
 				]))
 			]);
@@ -159,7 +159,7 @@ $output = [
 		]
 	],
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.service.time.edit.js.php'),
+		$this->readJsFile('popup.service.time.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

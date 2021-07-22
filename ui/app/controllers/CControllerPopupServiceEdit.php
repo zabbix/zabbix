@@ -28,7 +28,7 @@ class CControllerPopupServiceEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'serviceid' =>			'db services.serviceid',
-			'parent_serviceids' =>	'array_db services.serviceid',
+			'parent_serviceids' =>	'array_db services.serviceid'
 		];
 
 		$ret = $this->validateInput($fields);

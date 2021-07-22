@@ -163,7 +163,7 @@ $sla_tab = (new CFormGrid())
 		new CFormField([
 			(new CDiv($times))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		])
 	]);
 
@@ -218,7 +218,7 @@ $child_services_tab = (new CFormGrid())
 		new CFormField([
 			(new CDiv($child_services))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		])
 	]);
 

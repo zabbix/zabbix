@@ -61,7 +61,7 @@ switch ($data['type']) {
 			->addClass('js-edit'),
 		(new CSimpleButton(_('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('js-remove'),
+			->addClass('js-remove')
 	])
 ]))
 	->setAttribute('data-row_index', $data['row_index'])

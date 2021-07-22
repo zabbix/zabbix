@@ -110,7 +110,7 @@ class CControllerPopupServiceTimeEdit extends CController {
 							: $default_from,
 						'till' => $this->hasInput('ts_to')
 							? date(DATE_TIME_FORMAT, (int) $this->getInput('ts_to'))
-							: $default_till,
+							: $default_till
 					];
 				}
 				break;

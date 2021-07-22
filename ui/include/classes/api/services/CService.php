@@ -363,7 +363,7 @@ class CService extends CApiService {
 			$sqlParts['left_join'][] = [
 				'table' => 'services_links',
 				'alias' => 'slp',
-				'using' => 'servicedownid',
+				'using' => 'servicedownid'
 			];
 			$sqlParts['where'][] = dbConditionId('slp.serviceupid', $options['parentids']);
 		}
@@ -373,7 +373,7 @@ class CService extends CApiService {
 			$sqlParts['left_join'][] = [
 				'table' => 'services_links',
 				'alias' => 'slc',
-				'using' => 'serviceupid',
+				'using' => 'serviceupid'
 			];
 			$sqlParts['where'][] = dbConditionId('slc.servicedownid', $options['childids']);
 		}
@@ -394,7 +394,7 @@ class CService extends CApiService {
 			$sqlParts['left_join'][] = [
 				'table' => 'service_problem_tag',
 				'alias' => 'spt',
-				'using' => 'serviceid',
+				'using' => 'serviceid'
 			];
 			$sqlParts['where'][] = dbConditionId('spt.service_problem_tagid', [0]);
 		}
