@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-22T04:39:23Z</date>
+   <date>2021-07-22T09:35:35Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -1192,15 +1192,15 @@ return JSON.stringify(outArr);
                </preprocessing>
                <overrides>
                   <override>
-                     <name>Trigger disabled</name>
+                     <name>Don't create triggers for matching interface</name>
                      <step>1</step>
                      <filter>
                         <conditions>
                            <condition>
                               <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>.*</value>
+                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
+                              <operator>NOT_MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1211,29 +1211,6 @@ return JSON.stringify(outArr);
                            <value>.*</value>
                            <status>ENABLED</status>
                            <discover>NO_DISCOVER</discover>
-                        </operation>
-                     </operations>
-                  </override>
-                  <override>
-                     <name>Trigger enabled</name>
-                     <step>2</step>
-                     <filter>
-                        <conditions>
-                           <condition>
-                              <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
-                              <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
-                           </condition>
-                        </conditions>
-                     </filter>
-                     <operations>
-                        <operation>
-                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
-                           <operator>REGEXP</operator>
-                           <value>.*</value>
-                           <status>ENABLED</status>
-                           <discover>DISCOVER</discover>
                         </operation>
                      </operations>
                   </override>

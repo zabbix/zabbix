@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-22T04:39:22Z</date>
+   <date>2021-07-22T09:29:50Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
