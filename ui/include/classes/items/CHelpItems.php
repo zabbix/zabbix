@@ -65,6 +65,10 @@ class CHelpItems {
 					'description' => _('Agent host name. Returns string')
 				],
 				[
+					'key' => 'agent.hostmetadata',
+					'description' => _('Agent host metadata. Returns string')
+				],
+				[
 					'key' => 'agent.ping',
 					'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available')
 				],
@@ -79,6 +83,10 @@ class CHelpItems {
 				[
 					'key' => 'kernel.maxproc',
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
+				],
+				[
+					'key' => 'kernel.openfiles',
+					'description' => _('Number of currently open file descriptors. Returns integer')
 				],
 				[
 					'key' => 'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
@@ -133,6 +141,10 @@ class CHelpItems {
 					'description' => _('Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
 				],
 				[
+					'key' => 'net.tcp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+					'description' => _('Returns number of TCP sockets that match parameters. Returns integer')
+				],
+				[
 					'key' => 'net.udp.listen[port]',
 					'description' => _('Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
 				],
@@ -143,6 +155,10 @@ class CHelpItems {
 				[
 					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
 					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
+				],
+				[
+					'key' => 'net.udp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+					'description' => _('Returns number of UDP sockets that match parameters. Returns integer')
 				],
 				[
 					'key' => 'perf_instance.discovery[object]',
@@ -305,8 +321,8 @@ class CHelpItems {
 					'description' => _('Directory size (in bytes). Returns integer')
 				],
 				[
-					'key' => 'vfs.file.cksum[file]',
-					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer')
+					'key' => 'vfs.file.cksum[file,<mode>]',
+					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256')
 				],
 				[
 					'key' => 'vfs.file.contents[file,<encoding>]',
@@ -333,12 +349,20 @@ class CHelpItems {
 					'description' => _('Find string in a file. Returns 0 - match not found; 1 - found')
 				],
 				[
-					'key' => 'vfs.file.size[file]',
-					'description' => _('File size (in bytes). Returns integer')
+					'key' => 'vfs.file.size[file,<mode>]',
+					'description' => _('File size in bytes (default) or in newlines. Returns integer')
 				],
 				[
 					'key' => 'vfs.file.time[file,<mode>]',
 					'description' => _('File time information. Returns integer (Unix timestamp)')
+				],
+				[
+					'key' => 'vfs.file.permissions[file]',
+					'description' => _('Returns 4-digit string containing octal number with Unix permissions')
+				],
+				[
+					'key' => 'vfs.file.get[file]',
+					'description' => _('Information about a file. Returns JSON')
 				],
 				[
 					'key' => 'vfs.fs.discovery',
@@ -399,6 +423,10 @@ class CHelpItems {
 					'description' => _('Agent host name. Returns string')
 				],
 				[
+					'key' => 'agent.hostmetadata',
+					'description' => _('Agent host metadata. Returns string')
+				],
+				[
 					'key' => 'agent.ping',
 					'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available')
 				],
@@ -417,6 +445,10 @@ class CHelpItems {
 				[
 					'key' => 'kernel.maxproc',
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
+				],
+				[
+					'key' => 'kernel.openfiles',
+					'description' => _('Number of currently open file descriptors. Returns integer')
 				],
 				[
 					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
@@ -491,6 +523,10 @@ class CHelpItems {
 					'description' => _('Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
 				],
 				[
+					'key' => 'net.tcp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+					'description' => _('Returns number of TCP sockets that match parameters. Returns integer')
+				],
+				[
 					'key' => 'net.udp.listen[port]',
 					'description' => _('Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
 				],
@@ -501,6 +537,10 @@ class CHelpItems {
 				[
 					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
 					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
+				],
+				[
+					'key' => 'net.udp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+					'description' => _('Returns number of UDP sockets that match parameters. Returns integer')
 				],
 				[
 					'key' => 'perf_instance.discovery[object]',
@@ -663,8 +703,8 @@ class CHelpItems {
 					'description' => _('Directory size (in bytes). Returns integer')
 				],
 				[
-					'key' => 'vfs.file.cksum[file]',
-					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer')
+					'key' => 'vfs.file.cksum[file,<mode>]',
+					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256')
 				],
 				[
 					'key' => 'vfs.file.contents[file,<encoding>]',
@@ -691,12 +731,20 @@ class CHelpItems {
 					'description' => _('Find string in a file. Returns 0 - match not found; 1 - found')
 				],
 				[
-					'key' => 'vfs.file.size[file]',
-					'description' => _('File size (in bytes). Returns integer')
+					'key' => 'vfs.file.size[file,<mode>]',
+					'description' => _('File size in bytes (default) or in newlines. Returns integer')
 				],
 				[
 					'key' => 'vfs.file.time[file,<mode>]',
 					'description' => _('File time information. Returns integer (Unix timestamp)')
+				],
+				[
+					'key' => 'vfs.file.permissions[file]',
+					'description' => _('Returns 4-digit string containing octal number with Unix permissions')
+				],
+				[
+					'key' => 'vfs.file.get[file]',
+					'description' => _('Information about a file. Returns JSON')
 				],
 				[
 					'key' => 'vfs.fs.discovery',
