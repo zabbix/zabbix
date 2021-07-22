@@ -20,7 +20,6 @@
 #include "zbxservice.h"
 #include "log.h"
 #include "zbxipcservice.h"
-#include "service_protocol.h"
 
 #include "../../libs/zbxalgo/vectorimpl.h"
 ZBX_PTR_VECTOR_IMPL(service, DB_SERVICE *)

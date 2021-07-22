@@ -39,7 +39,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 
 	if (0 != tags->values_num)
 	{
-		len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * 2 * tags->values_num);
+		len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * 2 * (size_t)tags->values_num);
 		for (i = 0; i < tags->values_num; i++)
 		{
 			zbx_tag_t	*tag = (zbx_tag_t *)tags->values[i];
@@ -103,7 +103,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 
 		if (0 != values_num)
 		{
-			zbx_vector_ptr_reserve(&event->tags, values_num);
+			zbx_vector_ptr_reserve(&event->tags, (size_t)values_num);
 
 			for (i = 0; i < values_num; i++)
 			{
@@ -132,7 +132,7 @@ void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc
 
 	if (0 != tags->values_num)
 	{
-		len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * 2 * tags->values_num);
+		len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * 2 * (size_t)tags->values_num);
 		for (i = 0; i < tags->values_num; i++)
 		{
 			zbx_tag_t	*tag = (zbx_tag_t *)tags->values[i];
@@ -188,7 +188,7 @@ void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_
 
 		if (0 != values_num)
 		{
-			zbx_vector_ptr_reserve(&event->tags, values_num);
+			zbx_vector_ptr_reserve(&event->tags, (size_t)values_num);
 
 			for (i = 0; i < values_num; i++)
 			{
