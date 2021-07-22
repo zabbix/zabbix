@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"zabbix.com/pkg/zbxerr"
 )
 
 // Export -
@@ -45,7 +47,7 @@ func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
 		if f, err := stdOs.Stat(params[0]); err == nil {
 			return f.Size(), nil
 		} else {
-			return nil, fmt.Errorf("Cannot obtain file information: %s", err.Error())
+			return nil, zbxerr.New(fmt.Sprintf("Cannot obtain file information")).Wrap(err)
 		}
 	case "lines":
 		return lineCounter(params[0])
@@ -58,7 +60,7 @@ func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
 func lineCounter(fileName string) (result interface{}, err error) {
 	var file *os.File
 	if file, err = os.Open(fileName); err != nil {
-		return nil, fmt.Errorf("Invalid first parameter: %s", err.Error())
+		return nil, zbxerr.New(fmt.Sprintf("Invalid first parameter")).Wrap(err)
 	}
 	defer file.Close()
 	buf := make([]byte, 64*1024)
@@ -73,7 +75,7 @@ func lineCounter(fileName string) (result interface{}, err error) {
 		case err == io.EOF:
 			return count, nil
 		case err != nil:
-			return nil, fmt.Errorf("Invalid file content: %s", err.Error())
+			return nil, zbxerr.New(fmt.Sprintf("Invalid file content")).Wrap(err)
 		}
 	}
 }

@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"zabbix.com/pkg/std"
+	"zabbix.com/pkg/zbxerr"
 )
 
 func md5sum(file std.File, start time.Time, timeout int) (result interface{}, err error) {
@@ -58,7 +59,7 @@ func (p *Plugin) exportMd5sum(params []string) (result interface{}, err error) {
 
 	file, err := stdOs.Open(params[0])
 	if err != nil {
-		return nil, fmt.Errorf("Cannot open file: %s", err.Error())
+		return nil, zbxerr.New(fmt.Sprintf("Cannot open file")).Wrap(err)
 	}
 	defer file.Close()
 

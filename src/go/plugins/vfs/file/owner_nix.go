@@ -28,6 +28,8 @@ import (
 	"os/user"
 	"strconv"
 	"syscall"
+
+	"zabbix.com/pkg/zbxerr"
 )
 
 // Export -
@@ -74,7 +76,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 
 	stat := info.Sys().(*syscall.Stat_t)
 	if stat == nil {
-		return nil, fmt.Errorf("Cannot obtain %s owner information.", params[0])
+		return nil, fmt.Errorf("Cannot obtain %s owner information.", path)
 	}
 
 	var ret string
@@ -90,7 +92,8 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		u := strconv.FormatUint(uint64(stat.Uid), 10)
 		usr, err := user.LookupId(u)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot obtain %s user information: %s", params[0], err.Error())
+			return nil, zbxerr.New(fmt.Sprintf("Cannot obtain %s user information", path)).Wrap(err)
+
 		}
 
 		ret = usr.Username
@@ -98,7 +101,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		g := strconv.FormatUint(uint64(stat.Gid), 10)
 		group, err := user.LookupGroupId(g)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot obtain %s group information: %s", params[0], err.Error())
+			return nil, zbxerr.New(fmt.Sprintf("Cannot obtain %s group information", path)).Wrap(err)
 		}
 
 		ret = group.Name

@@ -25,6 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"golang.org/x/sys/windows"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // Export -
@@ -62,7 +63,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 
 	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s information: %s", path, err.Error())
+		return nil, zbxerr.New(fmt.Sprintf("Cannot obtain %s information", path)).Wrap(err)
 	}
 	if !sd.IsValid() {
 		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor.", path)
@@ -70,7 +71,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 
 	sdOwner, _, err := sd.Owner()
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s owner information: %s", path, err.Error())
+		return nil, zbxerr.New(fmt.Sprintf("Cannot obtain %s owner information", path)).Wrap(err)
 	}
 	if !sdOwner.IsValid() {
 		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor owner.", path)
@@ -84,7 +85,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 	case "username":
 		account, domain, _, err := sdOwner.LookupAccount("")
 		if err != nil {
-			return nil, fmt.Errorf("Cannot obtain %s owner name information: %s", path, err.Error())
+			return nil, zbxerr.New(fmt.Sprintf("Cannot obtain %s owner name information", path)).Wrap(err)
 		}
 
 		if ret = domain; ret != "" {
