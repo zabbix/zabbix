@@ -50,14 +50,14 @@ func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
 			return nil, zbxerr.New(fmt.Sprintf("Cannot obtain file information")).Wrap(err)
 		}
 	case "lines":
-		return lineCounter(params[0])
+		return newlineCounter(params[0])
 	default:
 		return nil, errors.New("Invalid second parameter.")
 	}
 }
 
-// lineCounter - count number of line in file
-func lineCounter(fileName string) (result interface{}, err error) {
+// lineCounter - count number of newline in file
+func newlineCounter(fileName string) (result interface{}, err error) {
 	var file *os.File
 	if file, err = os.Open(fileName); err != nil {
 		return nil, zbxerr.New(fmt.Sprintf("Invalid first parameter")).Wrap(err)

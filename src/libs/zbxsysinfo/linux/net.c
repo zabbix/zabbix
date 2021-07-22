@@ -865,9 +865,9 @@ out:
 	return ret;
 }
 
-static int	get_connection_state(const char *name)
+static unsigned int	get_connection_state(const char *name)
 {
-	int	state;
+	unsigned int	state;
 
 	if (0 == strcmp(name, "established"))
 		state = 1;
