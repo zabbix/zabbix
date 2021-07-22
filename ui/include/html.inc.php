@@ -1079,6 +1079,12 @@ function getTriggerSeverityCss() {
 		ZBX_STYLE_DISASTER_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_5)
 	];
 
+	$css .= ':root {'."\n";
+	foreach ($severities as $class => $color) {
+		$css .= '--severity-color-'.$class.': #'.$color.';'."\n";
+	}
+	$css .= '}'."\n";
+
 	foreach ($severities as $class => $color) {
 		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before, .flh-'.$class.
 			', .status-'.$class.', .status-'.$class.':before { background-color: #'.$color.' }'."\n";

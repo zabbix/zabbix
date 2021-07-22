@@ -491,7 +491,8 @@ else {
 	unset($trigger);
 
 	$reportWidget->addItem(
-		(new CFilter(new CUrl('report2.php')))
+		(new CFilter())
+			->setResetUrl(new CUrl('report2.php'))
 			->setProfile($data['filter']['timeline']['profileIdx'])
 			->setActiveTab($data['filter']['active_tab'])
 			->addFormItem((new CVar('mode', $report_mode))->removeId())

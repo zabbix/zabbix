@@ -52,22 +52,23 @@ $widget = (new CWidget())
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$widget
-		->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list')))
-		->setProfile($data['profileIdx'])
-		->setActiveTab($data['active_tab'])
-		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			),
-			(new CFormList())->addRow(_('Show'),
-				(new CRadioButtonList('filter_show', (int) $data['filter']['show']))
-					->addValue(_('All'), DASHBOARD_FILTER_SHOW_ALL)
-					->addValue(_('Created by me'), DASHBOARD_FILTER_SHOW_MY)
-					->setModern(true)
-			)
-		])
-		->addVar('action', 'dashboard.list')
-	);
+		->addItem((new CFilter())
+			->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list'))
+			->setProfile($data['profileIdx'])
+			->setActiveTab($data['active_tab'])
+			->addFilterTab(_('Filter'), [
+				(new CFormList())->addRow(_('Name'),
+					(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				),
+				(new CFormList())->addRow(_('Show'),
+					(new CRadioButtonList('filter_show', (int) $data['filter']['show']))
+						->addValue(_('All'), DASHBOARD_FILTER_SHOW_ALL)
+						->addValue(_('Created by me'), DASHBOARD_FILTER_SHOW_MY)
+						->setModern(true)
+				)
+			])
+			->addVar('action', 'dashboard.list')
+		);
 }
 
 $form = (new CForm())->setName('dashboardForm');

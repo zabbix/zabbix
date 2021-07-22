@@ -145,9 +145,9 @@ foreach ($data['items'] as $item) {
 
 	$item_menu = CMenuPopupHelper::getItemPrototype(['itemid' => $item['itemid'], 'context' => $data['context']]);
 
-	$wizard = (new CSpan(
-		(new CButton(null))->addClass(ZBX_STYLE_ICON_WZRD_ACTION)->setMenuPopup($item_menu)
-	))->addClass(ZBX_STYLE_REL_CONTAINER);
+	$wizard = (new CButton(null))
+		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+		->setMenuPopup($item_menu);
 
 	$nodiscover = ($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),

@@ -28,7 +28,7 @@
 
 #define zbx_serialize_prepare_str_len(len, str, str_len)			\
 	str_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);		\
-	len += str_len + sizeof(zbx_uint32_t)
+	len += str_len + (zbx_uint32_t)sizeof(zbx_uint32_t)
 
 #define zbx_serialize_prepare_value(len, value)			\
 	len += (zbx_uint32_t)sizeof(value)

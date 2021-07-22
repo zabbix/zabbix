@@ -661,7 +661,7 @@ class CWidgetHelper {
 				(new CDiv(
 					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_REMOVE_BTN)
+						->addClass(ZBX_STYLE_BTN_REMOVE)
 						->removeId()
 				))
 					->addClass(ZBX_STYLE_COLUMN_5)
@@ -872,7 +872,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#overrides-row",'.
 					'beforeRow: ".overrides-foot",'.
-					'remove: ".'.ZBX_STYLE_REMOVE_BTN.'",'.
+					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
 					'add: "#override-add",'.
 					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
 				'})'.
@@ -1013,7 +1013,7 @@ class CWidgetHelper {
 				(new CDiv([
 					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_REMOVE_BTN)
+						->addClass(ZBX_STYLE_BTN_REMOVE)
 						->removeId()
 				]))->addClass(ZBX_STYLE_COLUMN_5)
 			]))
@@ -1257,7 +1257,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#dataset-row",'.
 					'beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",'.
-					'remove: ".'.ZBX_STYLE_REMOVE_BTN.'",'.
+					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
 					'add: "#dataset-add",'.
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.

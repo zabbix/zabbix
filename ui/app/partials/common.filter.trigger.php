@@ -30,7 +30,8 @@ foreach (getHostInventories() as $inventory) {
 
 $this->includeJsFile('common.filter.trigger.js.php', ['inventory_fields' => $inventory_fields]);
 
-$filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', SHOW_TRIGGERS)))
+$filterForm = (new CFilter())
+	->setResetUrl((new CUrl('overview.php'))->setArgument('type', SHOW_TRIGGERS))
 	->addVar('type', SHOW_TRIGGERS)
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab']);

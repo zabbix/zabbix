@@ -30,8 +30,8 @@ if ($data['uncheck']) {
 $this->addJsFile('multiselect.js');
 $this->includeJsFile('administration.token.list.js.php');
 
-$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'token.list')));
-$filter
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'token.list'))
 	->addVar('action', 'token.list')
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
@@ -53,7 +53,7 @@ $filter
 							'srctbl' => 'users',
 							'srcfld1' => 'userid',
 							'srcfld2' => 'fullname',
-							'dstfrm' => $filter->getName(),
+							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_userids_'
 						]
 					]
@@ -83,7 +83,7 @@ $filter
 							'srctbl' => 'users',
 							'srcfld1' => 'userid',
 							'srcfld2' => 'fullname',
-							'dstfrm' => $filter->getName(),
+							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_creator_userids_'
 						]
 					]
