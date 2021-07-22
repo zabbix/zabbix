@@ -66,8 +66,8 @@ net_count_info_t;
 
 typedef struct
 {
-	zbx_uint64_t	port;
 	char		*name;
+	zbx_uint64_t	port;
 }
 service_t;
 
@@ -940,10 +940,9 @@ static unsigned short	get_service_port_tcp(const char *name)
 static zbx_hash_t	services_hash_func(const void *data)
 {
 	const service_t	*service = (const service_t *)data;
-	zbx_hash_t		hash;
+	zbx_hash_t	hash;
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&service->port);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(service->name, strlen(service->name), hash);
+	hash = ZBX_DEFAULT_STRING_HASH_FUNC(service->name);
 
 	return hash;
 }
@@ -952,9 +951,7 @@ static int	services_compare_func(const void *d1, const void *d2)
 {
 	const service_t	*service1 = (const service_t *)d1;
 	const service_t	*service2 = (const service_t *)d2;
-	int			ret;
-
-	ZBX_RETURN_IF_NOT_EQUAL(service1->port, service2->port);
+	int		ret;
 
 	if (0 != (ret = strcmp(service1->name, service2->name)))
 		return ret;
@@ -994,8 +991,8 @@ static int	read_services(void)
 
 		if (3 == sscanf(line, "%s\t%u/%s\t", name, &port, type))
 		{
-			service.port = port;
 			service.name = zbx_strdup(NULL, name);
+			service.port = port;
 
 			if (0 == strcmp(type, "tcp"))
 				zbx_hashset_insert(&tcp_services, &service, sizeof(service));
@@ -1011,11 +1008,10 @@ static int	read_services(void)
 	return SUCCEED;
 }
 
-static unsigned short	get_service_port(const char *name, int type)
+static unsigned short	get_service_port(char *name, int type)
 {
-	static int		intialized = 0;
-	zbx_hashset_iter_t	iter;
-	service_t		*service;
+	static int	intialized = 0;
+	service_t	*service, service_exp;
 
 	if (0 == intialized)
 	{
@@ -1025,16 +1021,16 @@ static unsigned short	get_service_port(const char *name, int type)
 			goto out;
 	}
 
-	if (NET_CONN_TYPE_TCP == type)
-		zbx_hashset_iter_reset(&tcp_services, &iter);
-	else
-		zbx_hashset_iter_reset(&udp_services, &iter);
+	service_exp.name = name;
 
-	while (NULL != (service = (service_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (0 == strcmp(name, service->name))
-			return service->port;
-	}
+	if (NET_CONN_TYPE_TCP == type)
+		service = (service_t *)zbx_hashset_search(&tcp_services, &service_exp);
+	else
+		service = (service_t *)zbx_hashset_search(&udp_services, &service_exp);
+
+	if (NULL != service)
+		return service->port;
+
 out:
 	return (NET_CONN_TYPE_TCP == type ? get_service_port_tcp(name) : get_service_port_udp(name));
 }
