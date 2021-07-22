@@ -1,5 +1,5 @@
 
-# IES1248-51 SNMP
+# ZYXEL IES1248-51 SNMP
 
 ## Overview
 
