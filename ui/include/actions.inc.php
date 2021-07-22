@@ -509,7 +509,6 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 	}
 
 	$media_types = [];
-	$users = [];
 	$user_groups = [];
 	$hosts = [];
 	$host_groups = [];
@@ -632,8 +631,10 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 						$scriptid = $operation['opcommand']['scriptid'];
 
 						if ($eventsource == EVENT_SOURCE_SERVICE) {
-							$result[$i][$j][] = bold(_s('Run script "%1$s"', $scripts[$scriptid]['name']));
-							$result[$i][$j][] = BR();
+							$result[$i][$j][] = [
+								bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])),
+								BR()
+							];
 
 							break;
 						}
@@ -808,8 +809,10 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 						$scriptid = $operation['opcommand']['scriptid'];
 
 						if ($eventsource == EVENT_SOURCE_SERVICE) {
-							$result[$i][$j][] = bold(_s('Run script "%1$s"', $scripts[$scriptid]['name']));
-							$result[$i][$j][] = BR();
+							$result[$i][$j][] = [
+								bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])),
+								BR()
+							];
 
 							break;
 						}
