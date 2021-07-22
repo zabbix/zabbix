@@ -582,7 +582,6 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 			proxy_item = zbx_hashset_insert(&proxy_items, &proxy_item_local, sizeof(proxy_item_local));
 
 			proxyconfig_add_row(&json_array, row, table);
-			zbx_json_close(&json_array);
 
 			proxy_item->buffer = zbx_malloc(NULL, json_array.buffer_size + 1);
 			memcpy(proxy_item->buffer, json_array.buffer, json_array.buffer_size + 1);
