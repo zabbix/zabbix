@@ -42,10 +42,8 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		}
 		fallthrough
 	case 2:
-		if params[1] != "" {
-			if params[1] != ownertype {
-				return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
-			}
+		if params[1] != "" && params[1] != ownertype {
+			return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
 		}
 		fallthrough
 	case 1:
