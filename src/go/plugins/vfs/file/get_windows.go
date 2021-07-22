@@ -42,6 +42,7 @@ func getFileInfo(info *os.FileInfo, path string) (fileinfo *fileInfo, err error)
 	if !sd.IsValid() {
 		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor", path)
 	}
+
 	sdOwner, _, err := sd.Owner()
 	if err != nil {
 		return nil, fmt.Errorf("Cannot obtain %s owner information: %s", path, err)

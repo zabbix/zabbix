@@ -45,19 +45,20 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 		return nil, fmt.Errorf("Cannot obtain %s permission information", name)
 	}
 
-	perm := fmt.Sprintf("%04o", stat.Mode&07777)
-	fi.Permissions = perm
+	fi.Permissions = fmt.Sprintf("%04o", stat.Mode&07777)
 
 	u := strconv.FormatUint(uint64(stat.Uid), 10)
 	if usr, ok := user.LookupId(u); ok == nil {
 		fi.User = &usr.Username
 	}
+
 	fi.Uid = stat.Uid
 
 	g := strconv.FormatUint(uint64(stat.Gid), 10)
 	if group, ok := user.LookupGroupId(g); ok == nil {
 		fi.Group = &group.Name
 	}
+
 	fi.Gid = stat.Gid
 
 	a := jsTimeLoc(time.Unix(stat.Atim.Unix()))
