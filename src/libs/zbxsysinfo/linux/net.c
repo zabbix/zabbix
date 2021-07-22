@@ -22,6 +22,7 @@
 #include "zbxjson.h"
 #include "log.h"
 #include "comms.h"
+#include "zbxalgo.h"
 
 typedef struct
 {
@@ -59,6 +60,19 @@ net_count_info_t;
 
 #define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
+
+#define NET_CONN_TYPE_TCP	0
+#define NET_CONN_TYPE_UDP	1
+
+typedef struct
+{
+	zbx_uint64_t	port;
+	char		*name;
+}
+service_t;
+
+static zbx_hashset_t	tcp_services;
+static zbx_hashset_t	udp_services;
 
 #if HAVE_INET_DIAG
 #	include <sys/socket.h>
@@ -923,6 +937,108 @@ static unsigned short	get_service_port_tcp(const char *name)
 	return port;
 }
 
+static zbx_hash_t	services_hash_func(const void *data)
+{
+	const service_t	*service = (const service_t *)data;
+	zbx_hash_t		hash;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&service->port);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(service->name, strlen(service->name), hash);
+
+	return hash;
+}
+
+static int	services_compare_func(const void *d1, const void *d2)
+{
+	const service_t	*service1 = (const service_t *)d1;
+	const service_t	*service2 = (const service_t *)d2;
+	int			ret;
+
+	ZBX_RETURN_IF_NOT_EQUAL(service1->port, service2->port);
+
+	if (0 != (ret = strcmp(service1->name, service2->name)))
+		return ret;
+
+	return 0;
+}
+
+static void	services_clean(void *ptr)
+{
+	service_t	*service = (service_t *)ptr;
+
+	zbx_free(service->name);
+}
+
+static int	read_services(void)
+{
+	service_t	service;
+	FILE		*f;
+	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], type[MAX_STRING_LEN];
+	unsigned int	port;
+
+	if (NULL == (f = fopen("/etc/services", "r")))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot open /etc/services: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	zbx_hashset_create_ext(&tcp_services, 0, services_hash_func, services_compare_func, services_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_hashset_create_ext(&udp_services, 0, services_hash_func, services_compare_func, services_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	while (NULL != fgets(line, sizeof(line), f))
+	{
+		if (0 == strlen(line) || '#' == *line)
+			continue;
+
+		if (3 == sscanf(line, "%s\t%u/%s\t", name, &port, type))
+		{
+			service.port = port;
+			service.name = zbx_strdup(NULL, name);
+
+			if (0 == strcmp(type, "tcp"))
+				zbx_hashset_insert(&tcp_services, &service, sizeof(service));
+			else if (0 == strcmp(type, "udp"))
+				zbx_hashset_insert(&udp_services, &service, sizeof(service));
+			else
+				continue;
+		}
+	}
+
+	zbx_fclose(f);
+
+	return SUCCEED;
+}
+
+static unsigned short	get_service_port(const char *name, int type)
+{
+	static int		intialized = 0;
+	zbx_hashset_iter_t	iter;
+	service_t		*service;
+
+	if (0 == intialized)
+	{
+		if (SUCCEED == read_services())
+			intialized = 1;
+		else
+			goto out;
+	}
+
+	if (NET_CONN_TYPE_TCP == type)
+		zbx_hashset_iter_reset(&tcp_services, &iter);
+	else
+		zbx_hashset_iter_reset(&udp_services, &iter);
+
+	while (NULL != (service = (service_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (0 == strcmp(name, service->name))
+			return service->port;
+	}
+out:
+	return (NET_CONN_TYPE_TCP == type ? get_service_port_tcp(name) : get_service_port_udp(name));
+}
+
 static int	get_proc_net_count(const char *filename, int addr_type, net_count_info_t *result_exp,
 		zbx_uint64_t *count, char **error)
 {
@@ -1059,15 +1175,15 @@ int	NET_TCP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	rport = get_rparam(request, 3);
 	state = get_rparam(request, 4);
 
-	if (NULL != lport && '\0' != *lport && 0 == (res.lport = get_service_port_tcp(lport)) &&
-			SUCCEED != is_ushort(lport, &res.lport))
+	if (NULL != lport && '\0' != *lport && SUCCEED != is_ushort(lport, &res.lport) &&
+			0 == (res.lport = get_service_port(lport, NET_CONN_TYPE_TCP)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL != rport && '\0' != *rport && 0 == (res.rport = get_service_port_tcp(rport)) &&
-			SUCCEED != is_ushort(rport, &res.rport))
+	if (NULL != rport && '\0' != *rport && SUCCEED != is_ushort(rport, &res.rport) &&
+			0 == (res.rport = get_service_port(rport, NET_CONN_TYPE_TCP)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		return SYSINFO_RET_FAIL;
@@ -1111,15 +1227,15 @@ int	NET_UDP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	rport = get_rparam(request, 3);
 	state = get_rparam(request, 4);
 
-	if (NULL != lport && '\0' != *lport && 0 == (res.lport = get_service_port_udp(lport)) &&
-			SUCCEED != is_ushort(lport, &res.lport))
+	if (NULL != lport && '\0' != *lport && SUCCEED != is_ushort(lport, &res.lport) &&
+			0 == (res.lport = get_service_port(lport, NET_CONN_TYPE_UDP)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL != rport && '\0' != *rport && 0 == (res.rport = get_service_port_udp(rport)) &&
-			SUCCEED != is_ushort(rport, &res.rport))
+	if (NULL != rport && '\0' != *rport && SUCCEED != is_ushort(rport, &res.rport) &&
+			0 == (res.rport = get_service_port(rport, NET_CONN_TYPE_UDP)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		return SYSINFO_RET_FAIL;
