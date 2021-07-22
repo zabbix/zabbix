@@ -501,6 +501,7 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 	zbx_vector_ptr_t	items;
 	zbx_uint64_t		itemid;
 	zbx_hashset_iter_t	iter;
+	struct zbx_json		json_array;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __func__, proxy_hostid);
 
@@ -565,6 +566,7 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 	}
 
 	zbx_hashset_create(&proxy_items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_json_initarray(&json_array, 256);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -574,20 +576,18 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 		if (SUCCEED != DBis_null(row[fld_master]))
 		{
 			zbx_proxy_item_config_t	proxy_item_local, *proxy_item;
-			struct zbx_json		json_array;
 
 			ZBX_STR2UINT64(proxy_item_local.itemid, row[0]);
 			ZBX_STR2UINT64(proxy_item_local.master_itemid, row[fld_master]);
 			proxy_item = zbx_hashset_insert(&proxy_items, &proxy_item_local, sizeof(proxy_item_local));
 
-			zbx_json_initarray(&json_array, 256);
 			proxyconfig_add_row(&json_array, row, table);
 			zbx_json_close(&json_array);
 
 			proxy_item->buffer = zbx_malloc(NULL, json_array.buffer_size + 1);
 			memcpy(proxy_item->buffer, json_array.buffer, json_array.buffer_size + 1);
 
-			zbx_json_free(&json_array);
+			zbx_json_cleanarray(&json_array);
 		}
 		else
 		{
@@ -600,6 +600,7 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 		}
 	}
 	DBfree_result(result);
+	zbx_json_free(&json_array);
 
 	/* flush cached dependent items */
 
