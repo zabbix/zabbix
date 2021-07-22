@@ -36,7 +36,7 @@ func (p *Plugin) exportTime(params []string) (result interface{}, err error) {
 		return nil, errors.New("Invalid first parameter.")
 	}
 	if f, err := stdOs.Stat(params[0]); err != nil {
-		return nil, fmt.Errorf("Cannot obtain file information: %s", err)
+		return nil, fmt.Errorf("Cannot obtain file information: %s", err.Error())
 	} else {
 		if len(params) == 1 || params[1] == "" || params[1] == "modify" {
 			return f.ModTime().Unix(), nil

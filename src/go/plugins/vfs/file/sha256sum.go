@@ -39,7 +39,7 @@ func sha256sum(file std.File, start time.Time, timeout int) (result interface{},
 	for bnum > 0 {
 		bnum, _ = io.CopyBuffer(hash, file, buf)
 		if time.Since(start) > time.Duration(timeout)*time.Second {
-			return nil, errors.New("Timeout while processing item")
+			return nil, errors.New("Timeout while processing item.")
 		}
 	}
 

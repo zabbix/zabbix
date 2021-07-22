@@ -34,8 +34,10 @@ func (p *Plugin) exportNetTcpSocketCount(params []string) (result int, err error
 	if len(params) > 5 {
 		return 0, errors.New(errorTooManyParams)
 	}
+
 	var laddres net.IP
 	var lNet *net.IPNet
+
 	if len(params) > 0 && len(params[0]) > 0 {
 		if ip := net.ParseIP(params[0]); ip != nil {
 			laddres = ip
@@ -43,6 +45,7 @@ func (p *Plugin) exportNetTcpSocketCount(params []string) (result int, err error
 			return 0, errors.New(errorInvalidFirstParam)
 		}
 	}
+
 	lport := 0
 	if len(params) > 1 && len(params[1]) > 0 {
 		if port, err := strconv.ParseUint(params[1], 10, 16); err != nil {
@@ -55,8 +58,10 @@ func (p *Plugin) exportNetTcpSocketCount(params []string) (result int, err error
 			lport = int(port)
 		}
 	}
+
 	var raddres net.IP
 	var rNet *net.IPNet
+
 	if len(params) > 2 && len(params[2]) > 0 {
 		if ip := net.ParseIP(params[2]); ip != nil {
 			raddres = ip
@@ -64,6 +69,7 @@ func (p *Plugin) exportNetTcpSocketCount(params []string) (result int, err error
 			return 0, errors.New(errorInvalidThirdParam)
 		}
 	}
+
 	rport := 0
 	if len(params) > 3 && len(params[3]) > 0 {
 		if port, err := strconv.ParseUint(params[3], 10, 16); err != nil {
@@ -76,7 +82,9 @@ func (p *Plugin) exportNetTcpSocketCount(params []string) (result int, err error
 			rport = int(port)
 		}
 	}
+
 	var state netstat.SkState
+
 	if len(params) > 4 && len(params[4]) > 0 {
 		switch params[4] {
 		case "established":

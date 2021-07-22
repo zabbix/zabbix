@@ -94,7 +94,7 @@ func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 	case mode&os.ModeNamedPipe != 0:
 		fi.Type = "fifo"
 	default:
-		return nil, fmt.Errorf("Cannot obtain %s type information", params[0])
+		return nil, fmt.Errorf("Cannot obtain %s type information.", params[0])
 	}
 
 	fi.Time.Modify = jsTimeLoc(info.ModTime())

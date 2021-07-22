@@ -57,7 +57,7 @@ func getFirstNum(key string) (max uint64, err error) {
 	}
 
 	if err != nil {
-		err = fmt.Errorf("Cannot obtain data from %s", fileName)
+		err = fmt.Errorf("Cannot obtain data from %s.", fileName)
 	}
 
 	return

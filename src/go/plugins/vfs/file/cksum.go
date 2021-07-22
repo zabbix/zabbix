@@ -99,7 +99,7 @@ func crc32(file std.File, start time.Time, timeout int) (result interface{}, err
 
 		flen += uint32(bnum)
 		if time.Since(start) > time.Duration(timeout)*time.Second {
-			return 0, errors.New("Timeout while processing item")
+			return 0, errors.New("Timeout while processing item.")
 		}
 	}
 
@@ -140,7 +140,7 @@ func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
 
 	file, err := stdOs.Open(params[0])
 	if err != nil {
-		return nil, fmt.Errorf("Cannot open file %s", params[0])
+		return nil, fmt.Errorf("Cannot open file %s.", params[0])
 	}
 	defer file.Close()
 

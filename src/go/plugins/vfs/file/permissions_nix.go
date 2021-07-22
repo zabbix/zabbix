@@ -40,9 +40,10 @@ func (p *Plugin) exportPermissions(params []string) (result interface{}, err err
 	if err != nil {
 		return nil, err
 	}
+
 	stat := info.Sys().(*syscall.Stat_t)
 	if stat == nil {
-		return nil, fmt.Errorf("Cannot obtain %s permission information", params[0])
+		return nil, fmt.Errorf("Cannot obtain %s permission information.", params[0])
 	}
 
 	return fmt.Sprintf("%04o", stat.Mode&07777), nil

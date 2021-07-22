@@ -48,7 +48,7 @@ type FILE_BASIC_INFO struct {
 func getFileChange(path string) (unixTimeNano int64, err error) {
 	var f *os.File
 	if f, err = os.Open(path); err != nil {
-		return 0, fmt.Errorf("Cannot open file: %s", err)
+		return 0, fmt.Errorf("Cannot open file: %s", err.Error())
 	}
 	defer f.Close()
 
@@ -57,7 +57,7 @@ func getFileChange(path string) (unixTimeNano int64, err error) {
 		uint32(unsafe.Sizeof(bi)))
 
 	if err != nil {
-		return 0, fmt.Errorf("Cannot obtain file information: %s", err)
+		return 0, fmt.Errorf("Cannot obtain file information: %s", err.Error())
 	}
 	return bi.ChangeTime.Nanoseconds(), nil
 }
@@ -73,13 +73,13 @@ func (p *Plugin) exportTime(params []string) (result interface{}, err error) {
 
 	if len(params) == 1 || params[1] == "" || params[1] == "modify" {
 		if fi, ferr := os.Stat(params[0]); ferr != nil {
-			return nil, fmt.Errorf("Cannot stat file: %s", ferr)
+			return nil, fmt.Errorf("Cannot stat file: %s", ferr.Error())
 		} else {
 			return fi.ModTime().Unix(), nil
 		}
 	} else if params[1] == "access" {
 		if fi, ferr := os.Stat(params[0]); ferr != nil {
-			return nil, fmt.Errorf("Cannot stat file: %s", ferr)
+			return nil, fmt.Errorf("Cannot stat file: %s", ferr.Error())
 		} else {
 			if stat, ok := fi.Sys().(*syscall.Win32FileAttributeData); !ok {
 				return nil, errors.New("Invalid system data returned by stat.")

@@ -42,7 +42,7 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 
 	stat := (*info).Sys().(*syscall.Stat_t)
 	if stat == nil {
-		return nil, fmt.Errorf("Cannot obtain %s permission information", name)
+		return nil, fmt.Errorf("Cannot obtain %s permission information.", name)
 	}
 
 	fi.Permissions = fmt.Sprintf("%04o", stat.Mode&07777)

@@ -40,7 +40,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 	case 3:
 		if params[2] != "" {
 			if params[2] != "name" && params[2] != "id" {
-				return nil, fmt.Errorf("Invalid third parameter: %s", params[2])
+				return nil, fmt.Errorf("Invalid third parameter: %s.", params[2])
 			}
 
 			resulttype = params[2]
@@ -50,7 +50,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 	case 2:
 		if params[1] != "" {
 			if params[1] != "user" && params[1] != "group" {
-				return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
+				return nil, fmt.Errorf("Invalid second parameter: %s.", params[1])
 			}
 
 			ownertype = params[1]
@@ -74,7 +74,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 
 	stat := info.Sys().(*syscall.Stat_t)
 	if stat == nil {
-		return nil, fmt.Errorf("Cannot obtain %s owner information", params[0])
+		return nil, fmt.Errorf("Cannot obtain %s owner information.", params[0])
 	}
 
 	var ret string
@@ -90,7 +90,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		u := strconv.FormatUint(uint64(stat.Uid), 10)
 		usr, err := user.LookupId(u)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot obtain %s user information: %w", params[0], err)
+			return nil, fmt.Errorf("Cannot obtain %s user information: %s", params[0], err.Error())
 		}
 
 		ret = usr.Username
@@ -98,7 +98,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		g := strconv.FormatUint(uint64(stat.Gid), 10)
 		group, err := user.LookupGroupId(g)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot obtain %s group information: %w", params[0], err)
+			return nil, fmt.Errorf("Cannot obtain %s group information: %s", params[0], err.Error())
 		}
 
 		ret = group.Name

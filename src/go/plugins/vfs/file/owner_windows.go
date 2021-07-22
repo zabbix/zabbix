@@ -37,7 +37,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 	case 3:
 		if params[2] != "" {
 			if params[2] != "name" && params[2] != "SID" {
-				return nil, fmt.Errorf("Invalid third parameter: %s", params[2])
+				return nil, fmt.Errorf("Invalid third parameter: %s.", params[2])
 			}
 
 			resulttype = params[2]
@@ -46,7 +46,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		fallthrough
 	case 2:
 		if params[1] != "" && params[1] != ownertype {
-			return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
+			return nil, fmt.Errorf("Invalid second parameter: %s.", params[1])
 		}
 
 		fallthrough
@@ -62,18 +62,18 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 
 	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s information: %w", path, err)
+		return nil, fmt.Errorf("Cannot obtain %s information: %s", path, err.Error())
 	}
 	if !sd.IsValid() {
-		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor", path)
+		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor.", path)
 	}
 
 	sdOwner, _, err := sd.Owner()
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s owner information: %w", path, err)
+		return nil, fmt.Errorf("Cannot obtain %s owner information: %s", path, err.Error())
 	}
 	if !sdOwner.IsValid() {
-		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor owner", path)
+		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor owner.", path)
 	}
 
 	var ret string
@@ -84,7 +84,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 	case "username":
 		account, domain, _, err := sdOwner.LookupAccount("")
 		if err != nil {
-			return nil, fmt.Errorf("Cannot obtain %s owner name information: %w", path, err)
+			return nil, fmt.Errorf("Cannot obtain %s owner name information: %s", path, err.Error())
 		}
 
 		if ret = domain; ret != "" {

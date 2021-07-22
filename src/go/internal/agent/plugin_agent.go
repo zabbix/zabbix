@@ -61,7 +61,7 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 	}
 
 	if len(value) > 0 {
-		log.Warningf("both \"%s\" and \"%sItem\" configuration parameter defined, using \"%s\"", name, name, name)
+		log.Warningf("both \"%s\" and \"%sItem\" configuration parameter defined, using \"%s\".", name, name, name)
 		return value, nil
 	}
 
@@ -72,12 +72,12 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 	}
 
 	if !utf8.ValidString(value) {
-		return "", fmt.Errorf("value is not an UTF-8 string")
+		return "", fmt.Errorf("value is not an UTF-8 string.")
 	}
 
 	if len(value) > length {
 		log.Warningf("the returned value of \"%s\" item specified by \"%sItem\" configuration parameter"+
-			" is too long, using first %d characters", item, name, length)
+			" is too long, using first %d characters.", item, name, length)
 
 		return CutAfterN(value, length), nil
 	}
@@ -88,7 +88,7 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+		return nil, errors.New("Too many parameters.")
 	}
 
 	switch key {
@@ -99,7 +99,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return FirstHostname, nil
 	case "agent.hostmetadata":
 		if Options.HostMetadataItem == "agent.hostmetadata" {
-			return nil, errors.New("Invalid recursive HostMetadataItem value")
+			return nil, errors.New("Invalid recursive HostMetadataItem value.")
 		}
 		return processConfigItem(time.Duration(Options.Timeout)*time.Second, "HostMetadata",
 			Options.HostMetadata, Options.HostMetadataItem, 255, LocalChecksClientID)

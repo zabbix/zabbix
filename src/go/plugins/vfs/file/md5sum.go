@@ -39,7 +39,7 @@ func md5sum(file std.File, start time.Time, timeout int) (result interface{}, er
 	for bnum > 0 {
 		bnum, _ = io.CopyBuffer(hash, file, buf)
 		if time.Since(start) > time.Duration(timeout)*time.Second {
-			return nil, errors.New("Timeout while processing item")
+			return nil, errors.New("Timeout while processing item.")
 		}
 	}
 
@@ -58,7 +58,7 @@ func (p *Plugin) exportMd5sum(params []string) (result interface{}, err error) {
 
 	file, err := stdOs.Open(params[0])
 	if err != nil {
-		return nil, fmt.Errorf("Cannot open file: %s", err)
+		return nil, fmt.Errorf("Cannot open file: %s", err.Error())
 	}
 	defer file.Close()
 
