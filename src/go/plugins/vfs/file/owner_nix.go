@@ -93,7 +93,6 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		usr, err := user.LookupId(u)
 		if err != nil {
 			return nil, zbxerr.New(fmt.Sprintf("Cannot obtain %s user information", path)).Wrap(err)
-
 		}
 
 		ret = usr.Username

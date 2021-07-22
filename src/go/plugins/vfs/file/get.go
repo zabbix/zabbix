@@ -114,5 +114,6 @@ func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 	if b, err = json.Marshal(&fi); err != nil {
 		return
 	}
+
 	return string(b), nil
 }

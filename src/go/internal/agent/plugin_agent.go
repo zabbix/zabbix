@@ -62,6 +62,7 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 
 	if len(value) > 0 {
 		log.Warningf("both \"%s\" and \"%sItem\" configuration parameter defined, using \"%s\".", name, name, name)
+
 		return value, nil
 	}
 
@@ -96,11 +97,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if ctx.ClientID() > MaxBuiltinClientID {
 			return getHostname(ctx.ClientID()), nil
 		}
+
 		return FirstHostname, nil
 	case "agent.hostmetadata":
 		if Options.HostMetadataItem == "agent.hostmetadata" {
 			return nil, errors.New("Invalid recursive HostMetadataItem value.")
 		}
+
 		return processConfigItem(time.Duration(Options.Timeout)*time.Second, "HostMetadata",
 			Options.HostMetadata, Options.HostMetadataItem, 255, LocalChecksClientID)
 	case "agent.ping":

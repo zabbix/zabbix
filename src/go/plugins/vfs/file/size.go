@@ -47,7 +47,7 @@ func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
 		if f, err := stdOs.Stat(params[0]); err == nil {
 			return f.Size(), nil
 		} else {
-			return nil, zbxerr.New(fmt.Sprintf("Cannot obtain file information")).Wrap(err)
+			return nil, zbxerr.New("Cannot obtain file information").Wrap(err)
 		}
 	case "lines":
 		return newlineCounter(params[0])
@@ -60,7 +60,7 @@ func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
 func newlineCounter(fileName string) (result interface{}, err error) {
 	var file *os.File
 	if file, err = os.Open(fileName); err != nil {
-		return nil, zbxerr.New(fmt.Sprintf("Invalid first parameter")).Wrap(err)
+		return nil, zbxerr.New("Invalid first parameter").Wrap(err)
 	}
 	defer file.Close()
 	buf := make([]byte, 64*1024)

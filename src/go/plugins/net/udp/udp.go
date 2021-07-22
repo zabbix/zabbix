@@ -239,7 +239,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 	case "net.udp.socket.count":
 		return p.exportNetUdpSocketCount(params)
-
 	}
 
 	/* SHOULD_NEVER_HAPPEN */
