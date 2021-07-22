@@ -21,10 +21,11 @@ package file
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"time"
+
+	"zabbix.com/pkg/zbxerr"
 )
 
 type jsTimeLoc time.Time
@@ -62,10 +63,10 @@ type fileInfo struct {
 
 func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 	if len(params) > 1 {
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorInvalidParams
 	}
 	if len(params) == 0 || params[0] == "" {
-		return nil, errors.New("Invalid first parameter.")
+		return nil, zbxerr.ErrorTooFewParameters
 	}
 
 	var fi *fileInfo

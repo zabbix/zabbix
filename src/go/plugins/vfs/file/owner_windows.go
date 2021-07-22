@@ -56,9 +56,9 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 			return nil, errors.New("Invalid first parameter.")
 		}
 	case 0:
-		return nil, errors.New("Invalid first parameter.")
+		return nil, zbxerr.ErrorTooFewParameters
 	default:
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)

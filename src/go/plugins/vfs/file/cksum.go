@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"zabbix.com/pkg/std"
+	"zabbix.com/pkg/zbxerr"
 )
 
 type checkSum func(file std.File, start time.Time, timeout int) (result interface{}, err error)
@@ -113,7 +114,7 @@ func crc32(file std.File, start time.Time, timeout int) (result interface{}, err
 
 func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
 	if len(params) > 2 {
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 	if len(params) == 0 || params[0] == "" {
 		return nil, errors.New("Invalid first parameter.")

@@ -20,10 +20,9 @@
 package kernel
 
 import (
-	"errors"
-
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/std"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -
@@ -37,14 +36,11 @@ var stdOs std.Os
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 0 {
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	switch key {
-	case
-		"kernel.maxproc",
-		"kernel.maxfiles",
-		"kernel.openfiles":
+	case "kernel.maxproc", "kernel.maxfiles", "kernel.openfiles":
 		return getFirstNum(key)
 	default:
 		/* SHOULD_NEVER_HAPPEN */

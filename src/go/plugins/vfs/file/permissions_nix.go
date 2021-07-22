@@ -25,12 +25,14 @@ import (
 	"errors"
 	"fmt"
 	"syscall"
+
+	"zabbix.com/pkg/zbxerr"
 )
 
 // exportPermissions - returns 4-digit string containing octal number with Unix permissions
 func (p *Plugin) exportPermissions(params []string) (result interface{}, err error) {
 	if len(params) > 1 {
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 	if len(params) == 0 || len(params[0]) == 0 {
 		return nil, errors.New("Invalid first parameter.")
