@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-02 19:55+0300\n"
+"POT-Creation-Date: 2021-07-16 10:58+0300\n"
 "PO-Revision-Date: 2014-10-01 18:50+0300\n"
 "Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -54,7 +54,7 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:599
 #: include/classes/api/services/CMaintenance.php:615
 #: include/classes/api/services/CMaintenance.php:684 maintenance.php:137
-#: maintenance.php:143 services.php:182 services.php:191
+#: maintenance.php:143 services.php:177 services.php:186
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
 msgstr ""
@@ -254,7 +254,7 @@ msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr ""
 
-#: jsLoader.php:362
+#: jsLoader.php:363
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -573,7 +573,7 @@ msgstr "Aceptar eventos RESUELTOS"
 #: include/views/js/monitoring.sysmaps.js.php:792
 #: include/views/monitoring.sysmap.edit.php:278
 #: include/views/monitoring.sysmap.edit.php:322
-#: include/views/monitoring.sysmap.edit.php:359 services.php:353
+#: include/views/monitoring.sysmap.edit.php:359 services.php:348
 msgid "Action"
 msgstr "Acción"
 
@@ -1011,7 +1011,7 @@ msgstr ""
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:385
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
 msgid "All"
 msgstr "Todo"
 
@@ -1724,7 +1724,7 @@ msgstr ""
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
-#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:381
+#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -1796,7 +1796,7 @@ msgstr "No se pudo agregar el prototipo de equipo"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:107
-#: app/controllers/CControllerImageCreate.php:133
+#: app/controllers/CControllerImageCreate.php:131
 msgid "Cannot add image"
 msgstr "No se pudo agregar la imagen"
 
@@ -1812,7 +1812,7 @@ msgstr "No se pudo agregar el prototipo de ítem"
 msgid "Cannot add maintenance"
 msgstr "No se pudo agregar el periodo de mantenimiento"
 
-#: include/classes/api/services/CMap.php:1558
+#: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
 msgstr ""
@@ -1839,12 +1839,12 @@ msgstr "No se puede agregar más de un ítem con tipo \"Graph sum\" en la gráfi
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr "No se puede agregar más de un ítem con tipo \"Graph sum\" en el prototipo de gráfica \"%1$s\"."
 
-#: sysmaps.php:216
+#: sysmaps.php:215
 msgid "Cannot add network map"
 msgstr "No se pudo agregar el mapa de red"
 
 #: app/controllers/CControllerProxyCreate.php:58
-#: app/controllers/CControllerProxyCreate.php:126
+#: app/controllers/CControllerProxyCreate.php:120
 msgid "Cannot add proxy"
 msgstr "No se pudo agregar el proxy"
 
@@ -1862,7 +1862,7 @@ msgstr ""
 msgid "Cannot add script"
 msgstr "No se pudo agregar el script"
 
-#: services.php:154
+#: services.php:152
 msgid "Cannot add service"
 msgstr "No se pudo agregar el servicio"
 
@@ -1958,7 +1958,7 @@ msgstr "No se pudo conectar a la base de datos."
 msgid "Cannot convert POST data:"
 msgstr ""
 
-#: graphs.php:401
+#: graphs.php:392
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] "No se pudieron copiar la gráfica"
@@ -2070,19 +2070,19 @@ msgstr[1] "No es posible eliminar la regla"
 msgid "Cannot delete discovery rules"
 msgstr "No se pudo eliminar las reglas de descubrimiento"
 
-#: graphs.php:292
+#: graphs.php:283
 msgid "Cannot delete graph"
 msgstr "No es posible eliminar el gráfico"
 
-#: graphs.php:284
+#: graphs.php:275
 msgid "Cannot delete graph prototype"
 msgstr "No se pudo eliminar el prototipo de gráfica"
 
-#: graphs.php:325
+#: graphs.php:316
 msgid "Cannot delete graph prototypes"
 msgstr "No se pudo eliminar los prototipos de gráficas"
 
-#: graphs.php:342
+#: graphs.php:333
 msgid "Cannot delete graphs"
 msgstr "No es posible eliminar los gráficos"
 
@@ -2118,7 +2118,7 @@ msgstr "No se pudo eliminar los prototipos de equipo"
 msgid "Cannot delete icon map"
 msgstr "No es posible eliminar la asignación de icono"
 
-#: app/controllers/CControllerImageDelete.php:70
+#: app/controllers/CControllerImageDelete.php:69
 msgid "Cannot delete image"
 msgstr "No es posible eliminar la imágen"
 
@@ -2164,7 +2164,7 @@ msgid_plural "Cannot delete modules: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: sysmaps.php:269
+#: sysmaps.php:262
 msgid "Cannot delete network map"
 msgstr "No es posible eliminar el mapa de red"
 
@@ -2206,7 +2206,7 @@ msgstr "No es posible eliminar los scripts. script \"%1$s\" es usado en accioón
 msgid "Cannot delete selected actions"
 msgstr "No es posible eliminar las acciones seleccionadas"
 
-#: services.php:108
+#: services.php:107
 msgid "Cannot delete service"
 msgstr "No es posible eliminar el servicio"
 
@@ -2582,7 +2582,7 @@ msgstr "No se pudo encontrar el mapa de valores \"%1$s\" usado en el prototipo d
 msgid "Cannot format Tree. Check logic structure in service links."
 msgstr "No se pudo formatear el árbol. Revise la estructura lógica de los enlaces de servicio."
 
-#: services.php:358
+#: services.php:353
 msgid "Cannot format tree."
 msgstr "No se pudo formatear el árbol."
 
@@ -2715,12 +2715,12 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
 msgstr "No pude definir \"%1$s\" para la acción \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:507
+#: include/classes/api/services/CGraphGeneral.php:514
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
 msgstr "No pude definir \"%1$s\" para el gráfico \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:514
+#: include/classes/api/services/CGraphGeneral.php:521
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "No pude definir \"%1$s\" para el prototipo de gráfico \"%2$s\"."
@@ -2783,12 +2783,12 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "No se puede actualizar el \"%1$s\" de una acción \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:693
+#: include/classes/api/services/CGraphGeneral.php:700
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:698
+#: include/classes/api/services/CGraphGeneral.php:705
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr ""
@@ -2825,7 +2825,7 @@ msgstr "No se pudo actualizar \"%2$s\" en el ítem descubierto \"%1$s\"."
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "No se pudo actualizar \"%2$s\" en el disparador descubierto \"%1$s\"."
 
-#: include/classes/api/services/CImage.php:506
+#: include/classes/api/services/CImage.php:519
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
 msgstr "No se pudo actualizar \"imagetype\" en la imagen \"%1$s\"."
@@ -2886,7 +2886,7 @@ msgid_plural "Cannot update events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: graphs.php:243 graphs.php:305
+#: graphs.php:243 graphs.php:296
 msgid "Cannot update graph"
 msgstr "No es posible actualizar el gráfico"
 
@@ -2930,7 +2930,7 @@ msgstr "No pude actualizar la asignación de icono"
 
 #: app/controllers/CControllerImageUpdate.php:43
 #: app/controllers/CControllerImageUpdate.php:110
-#: app/controllers/CControllerImageUpdate.php:146
+#: app/controllers/CControllerImageUpdate.php:144
 msgid "Cannot update image"
 msgstr "No se pudo actualizar la imagen"
 
@@ -2981,12 +2981,12 @@ msgid "Cannot update network map"
 msgstr "No se pudo actualizar el mapa de red"
 
 #: app/controllers/CControllerProxyUpdate.php:59
-#: app/controllers/CControllerProxyUpdate.php:124
+#: app/controllers/CControllerProxyUpdate.php:118
 msgid "Cannot update proxy"
 msgstr "No se pudo actualizar el proxy"
 
-#: include/classes/api/services/CProxy.php:739
-#: include/classes/api/services/CProxy.php:860
+#: include/classes/api/services/CProxy.php:746
+#: include/classes/api/services/CProxy.php:870
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "No se pudo actualizar el proxy del equipo descubierto \"%1$s\"."
@@ -3018,7 +3018,7 @@ msgstr "No se pudo actualizar el script"
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr ""
 
-#: services.php:147
+#: services.php:146
 msgid "Cannot update service"
 msgstr "No es posible actualizar el servicio"
 
@@ -3389,7 +3389,7 @@ msgstr "Clonar"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
-#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:374
+#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
 msgid "Close"
 msgstr "Cerrar"
 
@@ -3987,7 +3987,7 @@ msgstr ""
 msgid "Correlation updated"
 msgstr ""
 
-#: include/classes/api/services/CImage.php:333
+#: include/classes/api/services/CImage.php:341
 msgid "Could not save image!"
 msgstr "¡No se puede guardar imagen!"
 
@@ -4311,8 +4311,8 @@ msgstr "Intervalos personalizados"
 msgid "Custom label"
 msgstr "Personalizar etiquetas"
 
-#: include/classes/api/services/CMap.php:888
-#: include/classes/api/services/CMap.php:1360
+#: include/classes/api/services/CMap.php:889
+#: include/classes/api/services/CMap.php:1361
 #, c-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Las etiquetas personalizadas de los elementos del mapa \"%2$s\" de tipo \"%1$s\" no pueden estar vacías."
@@ -4449,7 +4449,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172
+#: include/views/inventory.host.view.php:172 jsLoader.php:337
 msgid "Dashboards"
 msgstr ""
 
@@ -4619,7 +4619,7 @@ msgstr "Día de semana"
 msgid "Days"
 msgstr "Días"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:365
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
 msgid "Debug"
 msgstr "Depurar"
 
@@ -4764,7 +4764,7 @@ msgstr "Demorado por"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
 #: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
-#: jsLoader.php:176 jsLoader.php:337
+#: jsLoader.php:176 jsLoader.php:338
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -4793,7 +4793,7 @@ msgstr "¿Desea eliminar la acción actual?"
 msgid "Delete current correlation?"
 msgstr "¿Borrar la correlación actual?"
 
-#: jsLoader.php:338
+#: jsLoader.php:339
 msgid "Delete dashboard?"
 msgstr ""
 
@@ -5548,7 +5548,7 @@ msgstr "Mostrar gráfico apilado"
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1646 include/actions.inc.php:1717
 #: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:377
+#: jsLoader.php:378
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Mostrando %1$s de %2$s encontrados"
@@ -5584,7 +5584,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:216 jsLoader.php:339
+#: jsLoader.php:216 jsLoader.php:340
 msgid "Do you wish to replace the conditional expression?"
 msgstr "¿Desea sustituir la expresión condicional?"
 
@@ -5681,8 +5681,8 @@ msgstr "Valor \"%2$s\" duplicado \"%1$s\" para la correlación \"%3$s\"."
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:613
-#: include/classes/api/services/CMap.php:1075
+#: include/classes/api/services/CMap.php:614
+#: include/classes/api/services/CMap.php:1076
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
 msgstr "Valor \"nombre\" duplicado \"%1$s\" para el mapa."
@@ -5709,14 +5709,14 @@ msgstr ""
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:742
-#: include/classes/api/services/CMap.php:1210
+#: include/classes/api/services/CMap.php:743
+#: include/classes/api/services/CMap.php:1211
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "Userid duplicado \"%1$s\" en usuarios para el mapa \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:817
-#: include/classes/api/services/CMap.php:1284
+#: include/classes/api/services/CMap.php:818
+#: include/classes/api/services/CMap.php:1285
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Usrgrpid duplicado \"%1$s\" en grupo de usuarios para el mapa \"%2$s\"."
@@ -5786,7 +5786,7 @@ msgstr ""
 msgid "Edit tree element"
 msgstr ""
 
-#: jsLoader.php:340
+#: jsLoader.php:341
 msgid "Edit trigger"
 msgstr "Editar disparador"
 
@@ -5887,18 +5887,18 @@ msgstr ""
 #: include/classes/api/services/CHost.php:1369
 #: include/classes/api/services/CHost.php:1898
 #: include/classes/api/services/CHostPrototype.php:1093
-#: include/classes/api/services/CImage.php:430
-#: include/classes/api/services/CImage.php:482
+#: include/classes/api/services/CImage.php:448
+#: include/classes/api/services/CImage.php:501
 #: include/classes/api/services/CMaintenance.php:542
-#: include/classes/api/services/CMap.php:562
-#: include/classes/api/services/CMap.php:588
-#: include/classes/api/services/CMap.php:1033
+#: include/classes/api/services/CMap.php:563
+#: include/classes/api/services/CMap.php:589
+#: include/classes/api/services/CMap.php:1034
 #: include/classes/api/services/CMediatype.php:182
 #: include/classes/api/services/CMediatype.php:448
-#: include/classes/api/services/CService.php:345
-#: include/classes/api/services/CService.php:378
-#: include/classes/api/services/CService.php:442
-#: include/classes/api/services/CService.php:510
+#: include/classes/api/services/CService.php:360
+#: include/classes/api/services/CService.php:395
+#: include/classes/api/services/CService.php:459
+#: include/classes/api/services/CService.php:527
 #: include/classes/api/services/CTemplate.php:682
 #: include/classes/api/services/CTrigger.php:798
 #: include/classes/api/services/CUserMacro.php:506
@@ -5907,7 +5907,7 @@ msgstr ""
 msgid "Empty input parameter."
 msgstr "Vaciar parámetro de entrada."
 
-#: include/classes/api/services/CMap.php:1041
+#: include/classes/api/services/CMap.php:1042
 msgid "Empty map ID."
 msgstr "Vaciar identificador de mapa."
 
@@ -5915,11 +5915,11 @@ msgstr "Vaciar identificador de mapa."
 msgid "Empty media type ID."
 msgstr "Vaciar identificador de tipo de soporte."
 
-#: include/classes/api/services/CService.php:864
+#: include/classes/api/services/CService.php:881
 msgid "Empty name."
 msgstr "Vaciar nombre."
 
-#: include/classes/api/services/CImage.php:350
+#: include/classes/api/services/CImage.php:360
 msgid "Empty parameters"
 msgstr "Vaciar parámetros"
 
@@ -6142,7 +6142,7 @@ msgstr "Inglés (en_GB)"
 msgid "English (en_US)"
 msgstr "Inglés (en_US)"
 
-#: include/classes/api/services/CGraphGeneral.php:618
+#: include/classes/api/services/CGraphGeneral.php:625
 #: include/classes/api/services/CHostGroup.php:757
 #: include/classes/api/services/CHostPrototype.php:341
 #: include/classes/api/services/CHttpTest.php:390
@@ -6300,7 +6300,7 @@ msgstr "Excluir grupos de equipos"
 msgid "Execute"
 msgstr "Ejecutar"
 
-#: include/classes/api/services/CImage.php:225
+#: include/classes/api/services/CImage.php:224
 #, c-format
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "Ejecutar error SQL [%1$s] en [%2$s]."
@@ -6594,7 +6594,7 @@ msgstr "El campo \"%1$s\" no puede estar vacío."
 msgid "Field \"%1$s\" is mandatory."
 msgstr "El campo \"%1$s\" es obligatorio."
 
-#: include/classes/api/services/CMap.php:792
+#: include/classes/api/services/CMap.php:793
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Falta el valor del campo \"%1$s\" para el mapa \"%2$s\"."
@@ -6643,7 +6643,7 @@ msgstr "El campo \"host\" es obligatorio."
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Suma de comprobación del archivo, calculado por el algoritmo cksum de UNIX. Devuelve un entero"
 
-#: include/classes/api/services/CImage.php:557
+#: include/classes/api/services/CImage.php:570
 msgid "File format is unsupported."
 msgstr "Formato de archivo no soportado."
 
@@ -6854,7 +6854,7 @@ msgstr "Viernes"
 #: include/views/configuration.services.edit.php:259
 #: include/views/configuration.services.edit.php:307
 #: include/views/js/monitoring.sysmaps.js.php:748 report4.php:191
-#: services.php:47 services.php:182
+#: services.php:47 services.php:177
 msgid "From"
 msgstr "Desde"
 
@@ -6969,7 +6969,7 @@ msgstr ""
 msgid "Go back to %1$s"
 msgstr "Volver a %1$s"
 
-#: jsLoader.php:345
+#: jsLoader.php:346
 msgid "Go to"
 msgstr ""
 
@@ -7081,13 +7081,13 @@ msgstr ""
 msgid "Graph added"
 msgstr "Gráfico añadido"
 
-#: graphs.php:400
+#: graphs.php:391
 msgid "Graph copied"
 msgid_plural "Graphs copied"
 msgstr[0] "Gráfico copiado"
 msgstr[1] "Gráficos copiados"
 
-#: graphs.php:292
+#: graphs.php:283
 msgid "Graph deleted"
 msgstr "Gráfico eliminado"
 
@@ -7124,7 +7124,7 @@ msgstr "El prototipo de gráfica \"%1$s\" con ítems con plantilla no puede cont
 msgid "Graph prototype added"
 msgstr "Prototipo de gráfica agregado"
 
-#: graphs.php:284
+#: graphs.php:275
 msgid "Graph prototype deleted"
 msgstr "Prototipo de gráfico borrado"
 
@@ -7146,7 +7146,7 @@ msgstr ""
 msgid "Graph prototypes"
 msgstr "Prototipos de gráficos"
 
-#: graphs.php:325
+#: graphs.php:316
 msgid "Graph prototypes deleted"
 msgstr ""
 
@@ -7163,7 +7163,7 @@ msgstr ""
 msgid "Graph type"
 msgstr "Tipo de gráfico"
 
-#: graphs.php:242 graphs.php:305
+#: graphs.php:242 graphs.php:296
 msgid "Graph updated"
 msgstr "Gráfico actualizado"
 
@@ -7173,7 +7173,7 @@ msgstr "Gráfico actualizado"
 msgid "Graph with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:831
+#: include/classes/api/services/CGraphGeneral.php:838
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr ""
@@ -7195,7 +7195,7 @@ msgstr "La gráfica tiene el mismo nombre, pero existe otro tipo."
 #: app/views/monitoring.charts.view.php:138 app/views/popup.import.php:38
 #: app/views/search.php:89 app/views/search.php:96 app/views/search.php:137
 #: app/views/search.php:142 app/views/search.php:316 app/views/search.php:321
-#: graphs.php:494 include/html.inc.php:356
+#: graphs.php:485 include/html.inc.php:356
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:44
 #: include/views/configuration.host.discovery.list.php:195
@@ -7206,11 +7206,11 @@ msgstr "La gráfica tiene el mismo nombre, pero existe otro tipo."
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:346
+#: include/views/inventory.host.view.php:217 jsLoader.php:347
 msgid "Graphs"
 msgstr "Gráficos"
 
-#: graphs.php:342
+#: graphs.php:333
 msgid "Graphs deleted"
 msgstr "Gráficas eliminadas"
 
@@ -7410,7 +7410,7 @@ msgstr ""
 msgid "Hidden"
 msgstr ""
 
-#: jsLoader.php:366
+#: jsLoader.php:367
 msgid "Hide debug"
 msgstr ""
 
@@ -7462,7 +7462,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:347
+#: jsLoader.php:348
 msgid "History"
 msgstr "Histórico"
 
@@ -7550,7 +7550,7 @@ msgstr "Alineación horizontal"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:255 jsLoader.php:348 report2.php:506
+#: jsLoader.php:255 jsLoader.php:349 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Equipo"
@@ -7571,7 +7571,7 @@ msgstr "El equipo \"%1$s\" ya existe."
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "El equipo \"%1$s\" no puede estar sin grupo de equipos."
 
-#: include/classes/api/services/CProxy.php:493
+#: include/classes/api/services/CProxy.php:500
 #, c-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "El equipo \"%1$s\" está monitorizado con el proxy \"%2$s\"."
@@ -8131,19 +8131,19 @@ msgstr ""
 msgid "Image"
 msgstr "Imagen"
 
-#: include/classes/api/services/CImage.php:450
-#: include/classes/api/services/CImage.php:463
-#: include/classes/api/services/CImage.php:513
-#: include/classes/api/services/CImage.php:531
+#: include/classes/api/services/CImage.php:468
+#: include/classes/api/services/CImage.php:481
+#: include/classes/api/services/CImage.php:526
+#: include/classes/api/services/CImage.php:544
 #, c-format
 msgid "Image \"%1$s\" already exists."
 msgstr ""
 
-#: app/controllers/CControllerImageCreate.php:125
+#: app/controllers/CControllerImageCreate.php:123
 msgid "Image added"
 msgstr "Imágen añadida"
 
-#: app/controllers/CControllerImageDelete.php:63
+#: app/controllers/CControllerImageDelete.php:62
 msgid "Image deleted"
 msgstr "Imágen eliminada"
 
@@ -8151,18 +8151,18 @@ msgstr "Imágen eliminada"
 msgid "Image label type"
 msgstr ""
 
-#: include/classes/api/services/CImage.php:229
+#: include/classes/api/services/CImage.php:228
 #, c-format
 msgid "Image load error [%1$s] in [%2$s]."
 msgstr ""
 
-#: include/classes/api/services/CImage.php:548
+#: include/classes/api/services/CImage.php:561
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
 msgstr ""
 
-#: app/controllers/CControllerImageUpdate.php:137
+#: app/controllers/CControllerImageUpdate.php:135
 msgid "Image updated"
 msgstr "Imágen actualizada"
 
@@ -8318,49 +8318,49 @@ msgstr ""
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:654
-#: include/classes/api/services/CMap.php:1137
+#: include/classes/api/services/CMap.php:655
+#: include/classes/api/services/CMap.php:1138
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:802
-#: include/classes/api/services/CMap.php:1270
+#: include/classes/api/services/CMap.php:803
+#: include/classes/api/services/CMap.php:1271
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:727
-#: include/classes/api/services/CMap.php:1196
+#: include/classes/api/services/CMap.php:728
+#: include/classes/api/services/CMap.php:1197
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:673
-#: include/classes/api/services/CMap.php:1143
+#: include/classes/api/services/CMap.php:674
+#: include/classes/api/services/CMap.php:1144
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
 msgstr "Valor \"privado\" incorrecto \"%1$s\" para el mapa \"%2$s\"."
 
-#: include/classes/api/services/CService.php:1085
+#: include/classes/api/services/CService.php:1104
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:648
-#: include/classes/api/services/CMap.php:1131
+#: include/classes/api/services/CMap.php:649
+#: include/classes/api/services/CMap.php:1132
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
 msgstr "Valor \"ancho\" incorrecto para el mapa \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:875
-#: include/classes/api/services/CMap.php:882
-#: include/classes/api/services/CMap.php:898
-#: include/classes/api/services/CMap.php:908
-#: include/classes/api/services/CMap.php:1343
-#: include/classes/api/services/CMap.php:1352
-#: include/classes/api/services/CMap.php:1369
-#: include/classes/api/services/CMap.php:1381
+#: include/classes/api/services/CMap.php:876
+#: include/classes/api/services/CMap.php:883
+#: include/classes/api/services/CMap.php:899
+#: include/classes/api/services/CMap.php:909
+#: include/classes/api/services/CMap.php:1344
+#: include/classes/api/services/CMap.php:1353
+#: include/classes/api/services/CMap.php:1370
+#: include/classes/api/services/CMap.php:1382
 #, c-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr ""
@@ -8386,7 +8386,7 @@ msgstr ""
 msgid "Incorrect Vault token."
 msgstr ""
 
-#: include/classes/api/services/CService.php:910
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "SLA aceptable para el servicio \"%1$s\" incorrecto."
@@ -8496,7 +8496,7 @@ msgstr ""
 msgid "Incorrect action operationid."
 msgstr ""
 
-#: include/classes/api/services/CService.php:877
+#: include/classes/api/services/CService.php:894
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr ""
@@ -8571,13 +8571,13 @@ msgstr ""
 #: include/classes/api/services/CMapElement.php:740
 #: include/classes/api/services/CMapElement.php:775
 #: include/classes/api/services/CMapElement.php:800
-#: include/classes/api/services/CMap.php:697
-#: include/classes/api/services/CMap.php:771
-#: include/classes/api/services/CMap.php:985
-#: include/classes/api/services/CMap.php:1058
-#: include/classes/api/services/CMap.php:1166
-#: include/classes/api/services/CMap.php:1239
-#: include/classes/api/services/CMap.php:1459
+#: include/classes/api/services/CMap.php:698
+#: include/classes/api/services/CMap.php:772
+#: include/classes/api/services/CMap.php:986
+#: include/classes/api/services/CMap.php:1059
+#: include/classes/api/services/CMap.php:1167
+#: include/classes/api/services/CMap.php:1240
+#: include/classes/api/services/CMap.php:1460
 #: include/classes/api/services/CMediatype.php:189
 #: include/classes/api/services/CMediatype.php:485
 msgid "Incorrect arguments passed to function."
@@ -8587,7 +8587,7 @@ msgstr ""
 msgid "Incorrect bulk value for interface."
 msgstr ""
 
-#: include/classes/api/services/CService.php:894
+#: include/classes/api/services/CService.php:911
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr ""
@@ -8599,8 +8599,8 @@ msgstr ""
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:658
-#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:665
+#: include/classes/api/services/CProxy.php:781
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr ""
@@ -8674,7 +8674,7 @@ msgstr ""
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Valor o nombre de campo incorrecto \"%1$s\" en la cláusula where para la tabla \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:605
+#: include/classes/api/services/CMap.php:606
 msgid "Incorrect fields for sysmap."
 msgstr "Campos incorrectos para el mapa de sistemas."
 
@@ -8748,12 +8748,12 @@ msgstr "Índice de imagen incorrecto."
 #: include/classes/api/services/CHost.php:1014
 #: include/classes/api/services/CHost.php:1917
 #: include/classes/api/services/CHost.php:2116
-#: include/classes/api/services/CImage.php:442
-#: include/classes/api/services/CImage.php:487
-#: include/classes/api/services/CProxy.php:653
-#: include/classes/api/services/CProxy.php:719
-#: include/classes/api/services/CProxy.php:763
-#: include/classes/api/services/CProxy.php:785
+#: include/classes/api/services/CImage.php:460
+#: include/classes/api/services/CImage.php:506
+#: include/classes/api/services/CProxy.php:660
+#: include/classes/api/services/CProxy.php:726
+#: include/classes/api/services/CProxy.php:770
+#: include/classes/api/services/CProxy.php:792
 #: include/classes/api/services/CTemplate.php:489
 #: include/classes/api/services/CTemplate.php:662
 #: include/classes/api/services/CTrigger.php:803
@@ -8781,7 +8781,7 @@ msgstr ""
 msgid "Incorrect inventory mode in action operation."
 msgstr "Modo de inventario incorrecto en operación de acción."
 
-#: include/classes/api/services/CGraphGeneral.php:297
+#: include/classes/api/services/CGraphGeneral.php:304
 msgid "Incorrect item for axis value."
 msgstr "Elemento incorrecto para valor de eje."
 
@@ -8812,7 +8812,7 @@ msgstr "Mantenimiento incorrecto - la fecha debe estar entre 01/01/1970 y 18/01/
 msgid "Incorrect maintenance period (minimum 5 minutes)"
 msgstr "Periodo de mantenimiento incorrecto (mínimo 5 minutos)"
 
-#: include/classes/api/services/CMap.php:1042
+#: include/classes/api/services/CMap.php:1043
 msgid "Incorrect map ID."
 msgstr "Identificador de mapa incorrecto."
 
@@ -8860,12 +8860,12 @@ msgstr "Parámetros incorrectos para la condición."
 msgid "Incorrect parameters for maintenance."
 msgstr "Parámetros incorrectos para el mantenimiento."
 
-#: include/classes/api/services/CService.php:952
+#: include/classes/api/services/CService.php:969
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Padre incorrecto para el servicio \"%1$s\"."
 
-#: include/classes/api/services/CService.php:955
+#: include/classes/api/services/CService.php:972
 msgid "Incorrect parent service."
 msgstr "Servicio padre incorrecto."
 
@@ -8898,7 +8898,7 @@ msgstr ""
 msgid "Incorrect service time type."
 msgstr ""
 
-#: include/classes/api/services/CService.php:925
+#: include/classes/api/services/CService.php:942
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr ""
@@ -8914,7 +8914,7 @@ msgstr ""
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Estado incorrecto del host \"%1$s\"."
 
-#: include/classes/api/services/CService.php:973
+#: include/classes/api/services/CService.php:990
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr ""
@@ -8923,7 +8923,7 @@ msgstr ""
 msgid "Incorrect templated web scenario step count."
 msgstr ""
 
-#: include/classes/api/services/CService.php:938
+#: include/classes/api/services/CService.php:955
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr ""
@@ -8972,14 +8972,14 @@ msgstr ""
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:763
-#: include/classes/api/services/CMap.php:1231
+#: include/classes/api/services/CMap.php:764
+#: include/classes/api/services/CMap.php:1232
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:834
-#: include/classes/api/services/CMap.php:1301
+#: include/classes/api/services/CMap.php:835
+#: include/classes/api/services/CMap.php:1302
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
 msgstr ""
@@ -9253,10 +9253,10 @@ msgstr ""
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
 #: include/classes/api/services/CMapElement.php:169
-#: include/classes/api/services/CMap.php:681
-#: include/classes/api/services/CMap.php:687
-#: include/classes/api/services/CMap.php:1150
-#: include/classes/api/services/CMap.php:1156
+#: include/classes/api/services/CMap.php:682
+#: include/classes/api/services/CMap.php:688
+#: include/classes/api/services/CMap.php:1151
+#: include/classes/api/services/CMap.php:1157
 #: include/classes/api/services/CMediatype.php:377
 #: include/classes/api/services/CMediatype.php:387
 #: include/classes/api/services/CMediatype.php:396
@@ -9275,14 +9275,14 @@ msgstr ""
 #: include/classes/api/services/CMediatype.php:762
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:592
 #: include/classes/api/services/CProxy.php:599
-#: include/classes/api/services/CProxy.php:612
-#: include/classes/api/services/CProxy.php:618
-#: include/classes/api/services/CProxy.php:697
-#: include/classes/api/services/CProxy.php:705
-#: include/classes/api/services/CProxy.php:823
-#: include/classes/api/services/CProxy.php:831
+#: include/classes/api/services/CProxy.php:606
+#: include/classes/api/services/CProxy.php:619
+#: include/classes/api/services/CProxy.php:625
+#: include/classes/api/services/CProxy.php:704
+#: include/classes/api/services/CProxy.php:712
+#: include/classes/api/services/CProxy.php:833
+#: include/classes/api/services/CProxy.php:841
 #: include/classes/api/services/CSettings.php:312
 #: include/classes/api/services/CTemplate.php:449
 #: include/classes/api/services/CTriggerGeneral.php:148
@@ -9356,12 +9356,12 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\": %2$s."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:624
+#: include/classes/api/services/CProxy.php:631
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:680
-#: include/classes/api/services/CProxy.php:815
+#: include/classes/api/services/CProxy.php:687
+#: include/classes/api/services/CProxy.php:822
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr ""
@@ -9448,7 +9448,7 @@ msgid "Insert"
 msgstr "Insertar"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:341
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
 msgid "Insert expression"
 msgstr ""
 
@@ -9527,8 +9527,8 @@ msgid "Internal data storage period"
 msgstr "Periodo de almacenamiento de datos internos"
 
 #: include/classes/api/helpers/CApiHostHelper.php:90
-#: include/classes/api/services/CGraphGeneral.php:522
-#: include/classes/api/services/CGraphGeneral.php:705
+#: include/classes/api/services/CGraphGeneral.php:529
+#: include/classes/api/services/CGraphGeneral.php:712
 #: include/classes/api/services/CTriggerGeneral.php:1035
 #: include/classes/api/services/CTriggerGeneral.php:1162
 #: include/classes/api/services/CTriggerGeneral.php:1267
@@ -9659,9 +9659,9 @@ msgstr ""
 msgid "Invalid macro \"%1$s\": %2$s."
 msgstr ""
 
-#: include/classes/api/services/CService.php:212
-#: include/classes/api/services/CService.php:383
-#: include/classes/api/services/CService.php:1214
+#: include/classes/api/services/CService.php:216
+#: include/classes/api/services/CService.php:400
+#: include/classes/api/services/CService.php:1233
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
 msgstr ""
@@ -9687,8 +9687,8 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1992
 #: include/classes/api/services/CDiscoveryRule.php:2010
 #: include/classes/api/services/CDiscoveryRule.php:2018
-#: include/classes/api/services/CGraphGeneral.php:598
-#: include/classes/api/services/CGraphGeneral.php:721
+#: include/classes/api/services/CGraphGeneral.php:605
+#: include/classes/api/services/CGraphGeneral.php:728
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1672
 #: include/classes/api/services/CHostPrototype.php:1677
@@ -9923,7 +9923,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:349
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
 msgid "Inventory"
 msgstr "Inventario"
 
@@ -10113,7 +10113,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:371
+#: jsLoader.php:372
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10487,11 +10487,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Última comprobación"
 
-#: jsLoader.php:352
+#: jsLoader.php:353
 msgid "Last hour graph"
 msgstr "Gráfico de la última hora"
 
-#: jsLoader.php:353
+#: jsLoader.php:354
 msgid "Last month graph"
 msgstr "Gráfico del último mes"
 
@@ -10521,7 +10521,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Último valor"
 
-#: jsLoader.php:354
+#: jsLoader.php:355
 msgid "Last week graph"
 msgstr "Gráfico de la última semana"
 
@@ -10534,11 +10534,11 @@ msgstr "Gráfico de la última semana"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:350
+#: include/views/inventory.host.view.php:149 jsLoader.php:351
 msgid "Latest data"
 msgstr "Última fecha"
 
-#: jsLoader.php:351
+#: jsLoader.php:352
 msgid "Latest values"
 msgstr ""
 
@@ -10636,14 +10636,14 @@ msgstr ""
 msgid "Link new templates"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:1005
-#: include/classes/api/services/CMap.php:1475
+#: include/classes/api/services/CMap.php:1006
+#: include/classes/api/services/CMap.php:1476
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:1013
-#: include/classes/api/services/CMap.php:1483
+#: include/classes/api/services/CMap.php:1014
+#: include/classes/api/services/CMap.php:1484
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr ""
@@ -11062,16 +11062,16 @@ msgstr ""
 msgid "Map"
 msgstr "Mapa"
 
-#: include/classes/api/services/CMap.php:626
-#: include/classes/api/services/CMap.php:1091
+#: include/classes/api/services/CMap.php:627
+#: include/classes/api/services/CMap.php:1092
 #, c-format
 msgid "Map \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:736
-#: include/classes/api/services/CMap.php:811
-#: include/classes/api/services/CMap.php:1204
-#: include/classes/api/services/CMap.php:1278
+#: include/classes/api/services/CMap.php:737
+#: include/classes/api/services/CMap.php:812
+#: include/classes/api/services/CMap.php:1205
+#: include/classes/api/services/CMap.php:1279
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
 msgstr ""
@@ -11105,7 +11105,7 @@ msgstr ""
 msgid "Map label type"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:1061
+#: include/classes/api/services/CMap.php:1062
 msgid "Map name cannot be empty."
 msgstr ""
 
@@ -11114,8 +11114,8 @@ msgstr ""
 msgid "Map navigation tree"
 msgstr "Árbol de navegación del mapa"
 
-#: include/classes/api/services/CMap.php:661
-#: include/classes/api/services/CMap.php:1115
+#: include/classes/api/services/CMap.php:662
+#: include/classes/api/services/CMap.php:1116
 msgid "Map owner cannot be empty."
 msgstr ""
 
@@ -11522,8 +11522,8 @@ msgstr ""
 msgid "Missing \"gitemid\" field for item."
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:462
-#: include/classes/api/services/CGraphGeneral.php:648
+#: include/classes/api/services/CGraphGeneral.php:469
+#: include/classes/api/services/CGraphGeneral.php:655
 msgid "Missing \"itemid\" field for item."
 msgstr ""
 
@@ -11688,7 +11688,7 @@ msgstr ""
 msgid "More than 10 minutes"
 msgstr "Más de 10 minutos"
 
-#: include/classes/api/services/CGraphGeneral.php:844
+#: include/classes/api/services/CGraphGeneral.php:851
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr ""
@@ -11919,11 +11919,11 @@ msgstr "Periodo de almacenamiento de datos de descubrimiento de red"
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr ""
 
-#: sysmaps.php:215
+#: sysmaps.php:214
 msgid "Network map added"
 msgstr "Mapa de red añadido"
 
-#: sysmaps.php:269
+#: sysmaps.php:262
 msgid "Network map deleted"
 msgstr "Mapa de red eliminado"
 
@@ -12093,7 +12093,7 @@ msgstr ""
 msgid "No \"%1$s\" given for graph."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:1040
+#: include/classes/api/services/CMap.php:1041
 #, c-format
 msgid "No \"%1$s\" given for map."
 msgstr ""
@@ -12243,7 +12243,7 @@ msgstr ""
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:370
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
 msgid "No interface found"
 msgstr ""
 
@@ -12251,8 +12251,8 @@ msgstr ""
 msgid "No interface found."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:689
-#: include/classes/api/services/CProxy.php:869
+#: include/classes/api/services/CProxy.php:696
+#: include/classes/api/services/CProxy.php:879
 #, c-format
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr ""
@@ -12396,10 +12396,10 @@ msgstr ""
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CIconMap.php:285
 #: include/classes/api/services/CIconMap.php:528
-#: include/classes/api/services/CImage.php:354
-#: include/classes/api/services/CImage.php:426
-#: include/classes/api/services/CImage.php:478
-#: include/classes/api/services/CImage.php:500
+#: include/classes/api/services/CImage.php:364
+#: include/classes/api/services/CImage.php:444
+#: include/classes/api/services/CImage.php:497
+#: include/classes/api/services/CImage.php:513
 #: include/classes/api/services/CItemGeneral.php:221
 #: include/classes/api/services/CItemGeneral.php:329
 #: include/classes/api/services/CItemGeneral.php:344
@@ -12414,20 +12414,20 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:777
 #: include/classes/api/services/CMapElement.php:189
 #: include/classes/api/services/CMapElement.php:319
-#: include/classes/api/services/CMap.php:574
-#: include/classes/api/services/CMap.php:989
-#: include/classes/api/services/CMap.php:1051
-#: include/classes/api/services/CMap.php:1610
-#: include/classes/api/services/CMap.php:2048
-#: include/classes/api/services/CMap.php:2110
+#: include/classes/api/services/CMap.php:575
+#: include/classes/api/services/CMap.php:990
+#: include/classes/api/services/CMap.php:1052
+#: include/classes/api/services/CMap.php:1611
+#: include/classes/api/services/CMap.php:2056
+#: include/classes/api/services/CMap.php:2118
 #: include/classes/api/services/CMediatype.php:478
 #: include/classes/api/services/CModule.php:231
 #: include/classes/api/services/CProxy.php:186
-#: include/classes/api/services/CProxy.php:276
-#: include/classes/api/services/CProxy.php:449
-#: include/classes/api/services/CProxy.php:733
-#: include/classes/api/services/CProxy.php:767
-#: include/classes/api/services/CProxy.php:854
+#: include/classes/api/services/CProxy.php:281
+#: include/classes/api/services/CProxy.php:456
+#: include/classes/api/services/CProxy.php:740
+#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:864
 #: include/classes/api/services/CReport.php:925
 #: include/classes/api/services/CRole.php:388
 #: include/classes/api/services/CRole.php:805
@@ -12436,8 +12436,8 @@ msgstr ""
 #: include/classes/api/services/CScript.php:1043
 #: include/classes/api/services/CScript.php:1060
 #: include/classes/api/services/CScript.php:1071
-#: include/classes/api/services/CService.php:1000
-#: include/classes/api/services/CService.php:1024
+#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:1043
 #: include/classes/api/services/CSettings.php:264
 #: include/classes/api/services/CTask.php:430
 #: include/classes/api/services/CTask.php:477
@@ -12500,7 +12500,7 @@ msgstr ""
 msgid "No target selected"
 msgstr ""
 
-#: graphs.php:405 items.php:1058
+#: graphs.php:396 items.php:1058
 msgid "No target selected."
 msgstr ""
 
@@ -12913,7 +12913,7 @@ msgstr "INACTIVO"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:382
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
 #: report2.php:506
 msgid "Ok"
 msgstr "Ok"
@@ -12993,8 +12993,8 @@ msgstr ""
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:665
-#: include/classes/api/services/CMap.php:1119
+#: include/classes/api/services/CMap.php:666
+#: include/classes/api/services/CMap.php:1120
 msgid "Only administrators can set map owner."
 msgstr ""
 
@@ -13517,7 +13517,7 @@ msgstr "PSK"
 msgid "PSK identity"
 msgstr "Identidad PSK"
 
-#: include/classes/api/services/CProxy.php:630
+#: include/classes/api/services/CProxy.php:637
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr ""
@@ -13604,7 +13604,7 @@ msgstr ""
 msgid "Parse"
 msgstr ""
 
-#: include/classes/api/services/CImage.php:219
+#: include/classes/api/services/CImage.php:218
 #, c-format
 msgid "Parse SQL error [%1$s] in [%2$s]."
 msgstr ""
@@ -14114,7 +14114,7 @@ msgstr "Problema, si al menos un hijo tiene un problema"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:355 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
 msgid "Problems"
 msgstr "Problemas"
 
@@ -14182,8 +14182,8 @@ msgstr "Proxies"
 msgid "Proxy"
 msgstr "Proxy"
 
-#: include/classes/api/services/CProxy.php:672
-#: include/classes/api/services/CProxy.php:801
+#: include/classes/api/services/CProxy.php:679
+#: include/classes/api/services/CProxy.php:808
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
 msgstr ""
@@ -14193,17 +14193,17 @@ msgstr ""
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Proxy \"%1$s\" para el host \"%2$s\" no existe."
 
-#: include/classes/api/services/CProxy.php:516
+#: include/classes/api/services/CProxy.php:523
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CProxy.php:473
+#: include/classes/api/services/CProxy.php:480
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Proxy \"%1$s\" está siendo usado por la regla de descubrimiento \"%2$s\"."
 
-#: app/controllers/CControllerProxyCreate.php:119
+#: app/controllers/CControllerProxyCreate.php:113
 msgid "Proxy added"
 msgstr "Proxy agregado"
 
@@ -14221,7 +14221,7 @@ msgstr[1] "Proxies borrados"
 msgid "Proxy interface creation failed."
 msgstr "Falló la creación de la interfaz proxy."
 
-#: include/classes/api/services/CProxy.php:400
+#: include/classes/api/services/CProxy.php:405
 msgid "Proxy interface update failed."
 msgstr "Actualización de la interfaz proxy fallida."
 
@@ -14233,7 +14233,7 @@ msgstr "Modo de proxy"
 msgid "Proxy name"
 msgstr "Nombre del proxy"
 
-#: app/controllers/CControllerProxyUpdate.php:116
+#: app/controllers/CControllerProxyUpdate.php:110
 msgid "Proxy updated"
 msgstr "Proxy actualizado"
 
@@ -15480,7 +15480,7 @@ msgstr ""
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:356
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
 msgid "Scripts"
 msgstr ""
 
@@ -15699,27 +15699,27 @@ msgstr "Hora del sevidor"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/popup.services.php:46 include/actions.inc.php:75
-#: include/views/configuration.services.edit.php:356 services.php:352
+#: include/views/configuration.services.edit.php:356 services.php:347
 #: srv_status.php:144
 msgid "Service"
 msgstr "Servicio"
 
-#: include/classes/api/services/CService.php:1055
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr ""
 
-#: include/classes/api/services/CService.php:1074
+#: include/classes/api/services/CService.php:1093
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr ""
 
-#: include/classes/api/services/CService.php:1149
+#: include/classes/api/services/CService.php:1168
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr ""
 
-#: include/classes/api/services/CService.php:1126
+#: include/classes/api/services/CService.php:1145
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr ""
@@ -15729,15 +15729,15 @@ msgstr ""
 msgid "Service availability report"
 msgstr ""
 
-#: include/classes/api/services/CService.php:960
+#: include/classes/api/services/CService.php:977
 msgid "Service cannot be parent and child at the same time."
 msgstr ""
 
-#: services.php:153
+#: services.php:151
 msgid "Service created"
 msgstr ""
 
-#: services.php:108
+#: services.php:107
 msgid "Service deleted"
 msgstr "Servicio eliminado"
 
@@ -15765,7 +15765,7 @@ msgstr "Tiempos del servicio"
 msgid "Service type"
 msgstr "Tipo de servicio"
 
-#: services.php:146
+#: services.php:145
 msgid "Service updated"
 msgstr "Servicio actualizado"
 
@@ -15781,7 +15781,7 @@ msgstr "Servicio actualizado"
 msgid "Services"
 msgstr "Servicios"
 
-#: include/classes/api/services/CService.php:1196
+#: include/classes/api/services/CService.php:1215
 msgid "Services form a circular dependency."
 msgstr ""
 
@@ -15815,7 +15815,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr ""
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:388
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
 msgid "Set new value"
 msgstr ""
 
@@ -15905,13 +15905,13 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:342
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
 msgid "Sharing"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:717
-#: include/classes/api/services/CMap.php:1186
-#: include/classes/api/services/CMap.php:1260
+#: include/classes/api/services/CMap.php:718
+#: include/classes/api/services/CMap.php:1187
+#: include/classes/api/services/CMap.php:1261
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr ""
@@ -16371,7 +16371,7 @@ msgstr ""
 msgid "Status"
 msgstr "Estado"
 
-#: app/views/popup.services.php:47 services.php:354
+#: app/views/popup.services.php:47 services.php:349
 msgid "Status calculation"
 msgstr "Cálculo del estado"
 
@@ -16517,7 +16517,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Asunto"
 
-#: jsLoader.php:357
+#: jsLoader.php:358
 msgid "Submap"
 msgstr "Submapa"
 
@@ -17069,14 +17069,14 @@ msgstr ""
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
-#: include/classes/api/services/CImage.php:373
+#: include/classes/api/services/CImage.php:383
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] "La imagen está en uso en la asignación de icono %1$s."
 msgstr[1] "La imagen está en uso en las asignaciones de iconos %1$s."
 
-#: include/classes/api/services/CImage.php:399
+#: include/classes/api/services/CImage.php:409
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
@@ -17189,7 +17189,7 @@ msgstr "Jueves"
 #: app/views/report.services.php:82
 #: include/views/configuration.services.edit.php:266
 #: include/views/configuration.services.edit.php:321 report4.php:191
-#: services.php:48 services.php:191
+#: services.php:48 services.php:186
 msgid "Till"
 msgstr "Hasta"
 
@@ -17286,7 +17286,7 @@ msgstr "Marca de hora"
 msgid "To"
 msgstr "A"
 
-#: jsLoader.php:369
+#: jsLoader.php:370
 msgid "To set a host interface select a single item type for all items"
 msgstr ""
 
@@ -17418,8 +17418,8 @@ msgstr "Tendencias"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:358
-#: services.php:355
+#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
+#: services.php:350
 msgid "Trigger"
 msgstr "Iniciadores"
 
@@ -17593,11 +17593,11 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "Gravedad del iniciador"
 
-#: jsLoader.php:343
+#: jsLoader.php:344
 msgid "Trigger status \"OK\""
 msgstr ""
 
-#: jsLoader.php:344
+#: jsLoader.php:345
 msgid "Trigger status \"Problem\""
 msgstr ""
 
@@ -17763,7 +17763,7 @@ msgstr "DESCONOCIDO"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:359
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
 msgid "URL"
 msgstr "URL"
 
@@ -17788,8 +17788,8 @@ msgstr "URL C"
 msgid "URL is not properly encoded."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:960
-#: include/classes/api/services/CMap.php:1435
+#: include/classes/api/services/CMap.php:961
+#: include/classes/api/services/CMap.php:1436
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr ""
@@ -17802,14 +17802,14 @@ msgstr ""
 msgid "URL parameter name is empty."
 msgstr ""
 
-#: include/classes/api/services/CMap.php:954
-#: include/classes/api/services/CMap.php:1429
+#: include/classes/api/services/CMap.php:955
+#: include/classes/api/services/CMap.php:1430
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:360
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
 msgid "URLs"
 msgstr "URLs"
 
@@ -18334,8 +18334,8 @@ msgstr[1] ""
 msgid "User group for database down message"
 msgstr "Grupo de usuarios para mensajes de base de datos caída"
 
-#: include/classes/api/services/CMap.php:783
-#: include/classes/api/services/CMap.php:1251
+#: include/classes/api/services/CMap.php:784
+#: include/classes/api/services/CMap.php:1252
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr ""
@@ -18448,8 +18448,8 @@ msgstr "Sesiones de usuario"
 msgid "User settings"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:708
-#: include/classes/api/services/CMap.php:1177
+#: include/classes/api/services/CMap.php:709
+#: include/classes/api/services/CMap.php:1178
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr ""
@@ -18830,20 +18830,20 @@ msgstr ""
 msgid "Value"
 msgstr "Valor"
 
-#: include/classes/api/services/CMap.php:929
-#: include/classes/api/services/CMap.php:1404
+#: include/classes/api/services/CMap.php:930
+#: include/classes/api/services/CMap.php:1405
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "El valor \"%1$s\" es incorrecto para el parámetro \"grid_align\". Las opciones son: \"%2$s\" y \"%3$s\""
 
-#: include/classes/api/services/CMap.php:940
-#: include/classes/api/services/CMap.php:1415
+#: include/classes/api/services/CMap.php:941
+#: include/classes/api/services/CMap.php:1416
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\"."
 msgstr "El valor \"%1$s\" es incorrecto para el parámetro \"grid_show\". Las opciones son: \"%2$s\" y \"%3$s\"."
 
-#: include/classes/api/services/CMap.php:919
-#: include/classes/api/services/CMap.php:1394
+#: include/classes/api/services/CMap.php:920
+#: include/classes/api/services/CMap.php:1395
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr ""
@@ -19076,7 +19076,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:361
+#: include/views/inventory.host.view.php:219 jsLoader.php:362
 msgid "Web"
 msgstr "Web"
 
@@ -19255,7 +19255,7 @@ msgstr ""
 msgid "Wrong Module.php class name for module located at %1$s."
 msgstr ""
 
-#: include/classes/api/services/CService.php:398
+#: include/classes/api/services/CService.php:415
 #, c-format
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr ""
@@ -19277,19 +19277,19 @@ msgid "Wrong fields for map link."
 msgstr ""
 
 #: include/classes/api/services/CService.php:135
-#: include/classes/api/services/CService.php:244
+#: include/classes/api/services/CService.php:249
 #, c-format
 msgid "Wrong fields for service \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CService.php:478
+#: include/classes/api/services/CService.php:495
 #, c-format
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CMapElement.php:74
-#: include/classes/api/services/CMap.php:976
-#: include/classes/api/services/CMap.php:1451
+#: include/classes/api/services/CMap.php:977
+#: include/classes/api/services/CMap.php:1452
 msgid "Wrong value for url field."
 msgstr ""
 
@@ -19359,7 +19359,7 @@ msgstr "Valor MAX del eje Y"
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:321
+#: include/classes/api/services/CGraphGeneral.php:328
 #: include/classes/graphdraw/CLineGraphDraw.php:1872
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr ""
@@ -20064,8 +20064,8 @@ msgstr ""
 #: include/classes/api/services/CMediatype.php:731
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:612
-#: include/classes/api/services/CProxy.php:618
+#: include/classes/api/services/CProxy.php:619
+#: include/classes/api/services/CProxy.php:625
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:470
@@ -20412,13 +20412,13 @@ msgctxt "XML time format"
 msgid "hh.mm"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:852
-#: include/classes/api/services/CMap.php:1320
+#: include/classes/api/services/CMap.php:853
+#: include/classes/api/services/CMap.php:1321
 msgid "host"
 msgstr "equipo"
 
-#: include/classes/api/services/CMap.php:848
-#: include/classes/api/services/CMap.php:1316
+#: include/classes/api/services/CMap.php:849
+#: include/classes/api/services/CMap.php:1317
 msgid "host group"
 msgstr "grupo de equipos"
 
@@ -20432,13 +20432,13 @@ msgstr ""
 msgid "hostid of dependent item and master item should match"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:843
-#: include/classes/api/services/CMap.php:1310
+#: include/classes/api/services/CMap.php:844
+#: include/classes/api/services/CMap.php:1311
 msgid "icon"
 msgstr "icono"
 
-#: include/classes/api/services/CMap.php:864
-#: include/classes/api/services/CMap.php:1332
+#: include/classes/api/services/CMap.php:865
+#: include/classes/api/services/CMap.php:1333
 msgid "image"
 msgstr "imagen"
 
@@ -20680,7 +20680,7 @@ msgstr ""
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:378
+#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
 msgctxt "minute short"
 msgid "m"
 msgstr ""
@@ -20717,8 +20717,8 @@ msgstr ""
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CMap.php:860
-#: include/classes/api/services/CMap.php:1328
+#: include/classes/api/services/CMap.php:861
+#: include/classes/api/services/CMap.php:1329
 msgid "map"
 msgstr "mapa"
 
@@ -20975,7 +20975,7 @@ msgstr ""
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:389
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21133,8 +21133,8 @@ msgstr "descripción corta"
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMediatype.php:793
-#: include/classes/api/services/CProxy.php:698
-#: include/classes/api/services/CProxy.php:824
+#: include/classes/api/services/CProxy.php:705
+#: include/classes/api/services/CProxy.php:834
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:579
@@ -21315,8 +21315,8 @@ msgstr ""
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
-#: include/classes/api/services/CMap.php:856
-#: include/classes/api/services/CMap.php:1324 include/events.inc.php:34
+#: include/classes/api/services/CMap.php:857
+#: include/classes/api/services/CMap.php:1325 include/events.inc.php:34
 #: include/events.inc.php:59
 msgid "trigger"
 msgstr "iniciador"
@@ -21388,8 +21388,8 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1702
 #: include/classes/api/services/CDiscoveryRule.php:1725
 #: include/classes/api/services/CDiscoveryRule.php:1744
-#: include/classes/api/services/CGraphGeneral.php:599
-#: include/classes/api/services/CGraphGeneral.php:721
+#: include/classes/api/services/CGraphGeneral.php:606
+#: include/classes/api/services/CGraphGeneral.php:728
 #: include/classes/api/services/CHostPrototype.php:322
 #: include/classes/api/services/CHostPrototype.php:1719
 #: include/classes/api/services/CHttpTest.php:372
@@ -21427,8 +21427,8 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
-#: include/classes/api/services/CProxy.php:593
 #: include/classes/api/services/CProxy.php:600
+#: include/classes/api/services/CProxy.php:607
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""
@@ -21485,7 +21485,7 @@ msgstr ""
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:390
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
 msgid "value"
 msgstr "valor"
 
@@ -21571,10 +21571,10 @@ msgstr ""
 #: include/classes/api/services/CHost.php:2001
 #: include/classes/api/services/CHost.php:2156
 #: include/classes/api/services/CMapElement.php:86
-#: include/classes/api/services/CMap.php:682
-#: include/classes/api/services/CMap.php:688
-#: include/classes/api/services/CMap.php:1151
-#: include/classes/api/services/CMap.php:1157
+#: include/classes/api/services/CMap.php:683
+#: include/classes/api/services/CMap.php:689
+#: include/classes/api/services/CMap.php:1152
+#: include/classes/api/services/CMap.php:1158
 #: include/classes/api/services/CReport.php:209
 #: include/classes/api/services/CReport.php:612
 #: include/classes/import/validators/C52XmlValidator.php:2582
