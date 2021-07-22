@@ -1,3 +1,21 @@
+Changes for 5.4.4rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.4.3
+
+5.4.3rc2 was released as 5.4.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.3rc2
+
+Bug fixes:
+.......P.. [ZBX-19500] fixed crash in sync_proxy_history (dgoloscapov)
+
+--------------------------------------------------------------------------------
 Changes for 5.4.3rc1
 
 New features:
@@ -911,6 +929,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.15rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.14
+
+5.0.14rc1 was released as 5.0.14 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.14rc1
@@ -3069,6 +3099,7 @@ Changes for 4.0.33rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
 ........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
 ...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)
 
