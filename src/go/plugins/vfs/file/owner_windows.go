@@ -29,6 +29,7 @@ import (
 
 // Export -
 func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
+	var path string
 	resulttype := "name"
 	ownertype := "user"
 
@@ -38,16 +39,19 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 			if params[2] != "name" && params[2] != "SID" {
 				return nil, fmt.Errorf("Invalid third parameter: %s", params[2])
 			}
+
 			resulttype = params[2]
 		}
+
 		fallthrough
 	case 2:
 		if params[1] != "" && params[1] != ownertype {
 			return nil, fmt.Errorf("Invalid second parameter: %s", params[1])
 		}
+
 		fallthrough
 	case 1:
-		if params[0] == "" {
+		if path = params[0]; path == "" {
 			return nil, errors.New("Invalid first parameter.")
 		}
 	case 0:
@@ -56,32 +60,34 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		return nil, errors.New("Too many parameters.")
 	}
 
-	sd, err := windows.GetNamedSecurityInfo(params[0], windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
+	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s information: %s", params[0], err)
+		return nil, fmt.Errorf("Cannot obtain %s information: %w", path, err)
 	}
 	if !sd.IsValid() {
-		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor", params[0])
+		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor", path)
 	}
+
 	sdOwner, _, err := sd.Owner()
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain %s owner information: %s", params[0], err)
+		return nil, fmt.Errorf("Cannot obtain %s owner information: %w", path, err)
 	}
 	if !sdOwner.IsValid() {
-		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor owner", params[0])
+		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor owner", path)
 	}
 
 	var ret string
+
 	switch ownertype + resulttype {
 	case "userSID":
 		ret = sdOwner.String()
 	case "username":
 		account, domain, _, err := sdOwner.LookupAccount("")
 		if err != nil {
-			return nil, fmt.Errorf("Cannot obtain %s owner name information: %s", params[0], err)
+			return nil, fmt.Errorf("Cannot obtain %s owner name information: %w", path, err)
 		}
-		ret = domain
-		if ret != "" {
+
+		if ret = domain; ret != "" {
 			ret += "\\"
 		}
 		ret += account
