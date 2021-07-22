@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-07-20T15:44:51Z'
+  date: '2021-07-22T11:30:38Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,17 +10,23 @@ zabbix_export:
       uuid: 08ef3d687d754b0aba17e1dcbd77d4bd
       template: 'Cloudflare by HTTP'
       name: 'Cloudflare by HTTP'
+      description: |
+        The template to monitor Cloudflare to see your web traffic and DNS metrics. It works without any external scripts and uses Script item.
+        
+        Template tooling version used: 0.38
       groups:
         -
           name: Templates/Applications
       items:
         -
           uuid: 2be79391779a4cd395723e62694262e8
-          name: cloudflare.bandwidth.all
+          name: 'Cloudflare: Total bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.all
           delay: '0'
+          history: 7d
           units: B
+          description: 'The volume of all data.'
           preprocessing:
             -
               type: JSONPATH
@@ -28,13 +34,25 @@ zabbix_export:
                 - $.bandwidth.all
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 7f5900d6c707405789624f84f502b042
-          name: cloudflare.bandwidth.cached
+          name: 'Cloudflare: Cached bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.cached
           delay: '0'
+          history: 7d
           units: B
+          description: 'The volume of cached data.'
           preprocessing:
             -
               type: JSONPATH
@@ -42,14 +60,33 @@ zabbix_export:
                 - $.bandwidth.cached
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
+          triggers:
+            -
+              uuid: acf573785c394924aae8ef74b2683fd1
+              expression: 'max(/Cloudflare by HTTP/cloudflare.bandwidth.cached,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}'
+              name: 'Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
         -
           uuid: c5ab8cc281ff4f75bd4ada79d2c0d1e8
-          name: 'Cache Hit Ratio'
+          name: 'Cloudflare: Cache Hit Ratio'
           type: DEPENDENT
           key: cloudflare.bandwidth.cache_hit_ratio
           delay: '0'
+          history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The ratio of the amount cached bandwidth to the bandwidth in percentage.'
           preprocessing:
             -
               type: JSONPATH
@@ -57,13 +94,25 @@ zabbix_export:
                 - $.bandwidth.cache_hit_ratio
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 901db6b121c7473485c91b0f27e7cf50
-          name: cloudflare.bandwidth.ssl.encrypted
+          name: 'Cloudflare: SSL encrypted bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.ssl.encrypted
           delay: '0'
+          history: 7d
           units: B
+          description: 'The volume of encrypted data.'
           preprocessing:
             -
               type: JSONPATH
@@ -71,13 +120,25 @@ zabbix_export:
                 - $.bandwidth.encrypted
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 4637d88e62204f9d8fb9fc0f179c5319
-          name: cloudflare.bandwidth.ssl.unencrypted
+          name: 'Cloudflare: Unencrypted bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.ssl.unencrypted
           delay: '0'
+          history: 7d
           units: B
+          description: 'The volume of unencrypted data.'
           preprocessing:
             -
               type: JSONPATH
@@ -85,13 +146,25 @@ zabbix_export:
                 - $.bandwidth.unencrypted
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 96e88a64df014997b8c675cbc4bb97a1
-          name: cloudflare.bandwidth.uncached
+          name: 'Cloudflare: Uncached bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.uncached
           delay: '0'
+          history: 7d
           units: B
+          description: 'The volume of uncached data.'
           preprocessing:
             -
               type: JSONPATH
@@ -99,13 +172,25 @@ zabbix_export:
                 - $.bandwidth.uncached
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 6eff62f2786d42a7925bd516a1c2a958
-          name: cloudflare.dns.query.all
+          name: 'Cloudflare: DNS queries'
           type: DEPENDENT
           key: cloudflare.dns.query.all
           delay: '0'
+          history: 7d
           units: conns
+          description: 'The amount of all DNS queries.'
           preprocessing:
             -
               type: JSONPATH
@@ -113,13 +198,25 @@ zabbix_export:
                 - $.dns.query.all
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 4612a834ef054740ba5fea529a08e220
-          name: cloudflare.dns.query.stale
+          name: 'Cloudflare: Stale DNS queries'
           type: DEPENDENT
           key: cloudflare.dns.query.stale
           delay: '0'
+          history: 7d
           units: conns
+          description: 'The number of stale DNS queries.'
           preprocessing:
             -
               type: JSONPATH
@@ -127,13 +224,25 @@ zabbix_export:
                 - $.dns.query.stale
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 4aeb289b631a402390a833e3c5227d38
-          name: cloudflare.dns.query.uncached
+          name: 'Cloudflare: Uncached DNS queries'
           type: DEPENDENT
           key: cloudflare.dns.query.uncached
           delay: '0'
+          history: 7d
           units: conns
+          description: 'The number of uncached DNS queries.'
           preprocessing:
             -
               type: JSONPATH
@@ -141,9 +250,19 @@ zabbix_export:
                 - $.dns.query.uncached
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 9450a68208fd4cb8bde009296d722064
-          name: Get
+          name: 'Cloudflare: Get data'
           type: SCRIPT
           key: cloudflare.get
           delay: 0;m01
@@ -214,7 +333,7 @@ zabbix_export:
             
                     if (query === 'graphql/' && request.getStatus() == 200 && typeof response.errors !== 'undefined'
                             && Array.isArray(response.errors)) {
-                        throw 'Request failed with error "' + (response.errors[0].message || 'unknown') + '"';
+                        throw 'Request failed with error "' + (getField(response, 'errors.0.message') || 'unknown') + '"';
                     }
             
                     return {
@@ -276,41 +395,39 @@ zabbix_export:
                 }
                 var result = Cloudflare.request('post', 'graphql/', data),
                     cloudflare = {},
-                    res = getField(result.response, 'data.viewer.zones.0.httpRequests1hGroups.0');
+                    res = getField(result.response, 'data.viewer.zones.0.httpRequests1hGroups.0.sum');
             
                 if (typeof res === 'object') {
                     cloudflare = {
                         requests: {
-                            all: res.sum.requests || 0,
-                            cached: res.sum.cachedRequests || 0,
-                            encrypted: res.sum.encryptedRequests || 0,
+                            all: res.requests || 0,
+                            cached: res.cachedRequests || 0,
+                            encrypted: res.encryptedRequests || 0,
                             cache_hit_ratio: 0,
                             non_error: 0,
                             error: 0
                         },
                         bandwidth: {
-                            all: res.sum.bytes || 0,
-                            cached: res.sum.cachedBytes || 0,
+                            all: res.bytes || 0,
+                            cached: res.cachedBytes || 0,
                             cache_hit_ratio: 0,
-                            encrypted: res.sum.encryptedBytes || 0,
+                            encrypted: res.encryptedBytes || 0,
                         },
                         threats: {
-                            all: res.sum.threats || 0
+                            all: res.threats || 0
                         },
                         pageviews: {
-                            all: res.sum.pageViews || 0
-                        },
-                        uniques: {
-                            all: res.uniq.uniques || 0
+                            all: res.pageViews || 0
                         }
                     }
-                    cloudflare.requests.uncached = res.sum.requests - res.sum.cachedRequests;
+            
+                    cloudflare.requests.uncached = res.requests - res.cachedRequests;
                     cloudflare.requests.unencrypted = cloudflare.requests.all - cloudflare.requests.encrypted;
                     cloudflare.bandwidth.uncached = cloudflare.bandwidth.all - cloudflare.bandwidth.cached;
                     cloudflare.bandwidth.unencrypted = cloudflare.bandwidth.all - cloudflare.bandwidth.encrypted;
             
-                    if (Array.isArray(res.sum.responseStatusMap)) {
-                        res.sum.responseStatusMap.forEach(function (element) {
+                    if (Array.isArray(res.responseStatusMap)) {
+                        res.responseStatusMap.forEach(function (element) {
                             if (element.edgeResponseStatus >= 200 && element.edgeResponseStatus < 300) {
                                 cloudflare.requests.non_error += element.requests;
                             } else {
@@ -329,17 +446,26 @@ zabbix_export:
                         cloudflare.bandwidth.cache_hit_ratio = (cloudflare.bandwidth.cached / cloudflare.bandwidth.all * 100).toFixed(2);
                     }
             
+                    res = getField(result.response, 'data.viewer.zones.0.httpRequests1hGroups.0.uniq');
+            
+                    if (typeof res === 'object') {
+                        cloudflare.uniques = {
+                            all: res.uniques || 0
+                        }
+                    }
+            
                     result = Cloudflare.request('get', 'zones/' + encodeURIComponent(Cloudflare.params.zone)
                         + '/dns_analytics/report?dimensions=queryName&metrics=queryCount,uncachedCount,staleCount&since='
                         + encodeURIComponent(datetime_start_str) + '&until=' + encodeURIComponent(datetime_end_str));
             
+                    res = getField(result.response, 'result.totals');
+            
                     if (typeof result.response.result === 'object') {
-                        res = result.response.result;
                         cloudflare.dns = {
                             query: {
-                                all: res.totals.queryCount || 0,
-                                uncached: res.totals.uncachedCount || 0,
-                                stale: res.totals.staleCount || 0
+                                all: res.queryCount || 0,
+                                uncached: res.uncachedCount || 0,
+                                stale: res.staleCount || 0
                             }
                         }
                     }
@@ -348,9 +474,12 @@ zabbix_export:
                 return JSON.stringify(cloudflare);
             }
             catch (error) {
-                Zabbix.log(3, '[ Cloudflare ] ERROR: ' + ((error.endsWith('.')) ? error : error += '.'));
-                throw 'Requesting failed: ' + ((error.endsWith('.')) ? error : error += '.');
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ Cloudflare ] ERROR: ' + error);
+                throw 'Requesting failed: ' + error;
             }
+          description: 'The JSON with result of Cloudflare API request.'
+          timeout: '{$CLOUDFLARE.GET_DATA.TIMEOUT}'
           parameters:
             -
               name: token
@@ -361,13 +490,25 @@ zabbix_export:
             -
               name: api_endpoint
               value: '{$CLOUDFLARE.API.URL}'
+          tags:
+            -
+              tag: data
+              value: raw
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: transport
+              value: Script
         -
           uuid: 71efacd9f1dc46a7aa29876c8bf7906c
-          name: cloudflare.pageviews.all
+          name: 'Cloudflare: Total page views'
           type: DEPENDENT
           key: cloudflare.pageviews.all
           delay: '0'
+          history: 7d
           units: pgs
+          description: 'The amount of all pageviews.'
           preprocessing:
             -
               type: JSONPATH
@@ -375,13 +516,25 @@ zabbix_export:
                 - $.pageviews.all
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: d4a7431b1f6a4d3ab11551a36c98fbf7
-          name: cloudflare.requests.all
+          name: 'Cloudflare: Total requests'
           type: DEPENDENT
           key: cloudflare.requests.all
           delay: '0'
+          history: 7d
           units: reqs
+          description: 'The amount of all requests.'
           preprocessing:
             -
               type: JSONPATH
@@ -389,12 +542,23 @@ zabbix_export:
                 - $.requests.all
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: cc9d651cdec94afeb12ead87b3c3e8f3
-          name: cloudflare.requests.cached
+          name: 'Cloudflare: Cached requests'
           type: DEPENDENT
           key: cloudflare.requests.cached
           delay: '0'
+          history: 7d
           units: reqs
           preprocessing:
             -
@@ -403,14 +567,26 @@ zabbix_export:
                 - $.requests.cached
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: e1c2a1280d25439f8020b3ebc451d892
-          name: 'Cache hit ratio % over time'
+          name: 'Cloudflare: Cache hit ratio % over time'
           type: DEPENDENT
           key: cloudflare.requests.cache_hit_ratio
           delay: '0'
+          history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The ratio of the amount cached requests to all requests in percentage.'
           preprocessing:
             -
               type: JSONPATH
@@ -418,14 +594,26 @@ zabbix_export:
                 - $.requests.cache_hit_ratio
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 228912bdae724d70b1abe79510b69082
-          name: 'Error rate (non 2xx)'
+          name: 'Cloudflare: Error rate (non 2xx)'
           type: DEPENDENT
           key: cloudflare.requests.error_rate
           delay: '0'
+          history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The ratio of the amount requests with non-2xx response codes to all requests in percentage.'
           preprocessing:
             -
               type: JSONPATH
@@ -433,14 +621,34 @@ zabbix_export:
                 - $.requests.error_rate
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
+          triggers:
+            -
+              uuid: e76f4a61dd094419b6e0af706758e545
+              expression: 'min(/Cloudflare by HTTP/cloudflare.requests.error_rate,#3) > {$CLOUDFLARE.ERRORS.MAX.WARN}'
+              name: 'Cloudflare: Error rate is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'A large number of errors can indicate a malfunction of the site.'
         -
           uuid: 6100ff50001543ae83e84ab2c47260f3
-          name: '2xx rate'
+          name: 'Cloudflare: 2xx rate'
           type: DEPENDENT
           key: cloudflare.requests.non_error_rate
           delay: '0'
+          history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The ratio of the amount requests with 2xx response codes to all requests in percentage.'
           preprocessing:
             -
               type: JSONPATH
@@ -448,13 +656,25 @@ zabbix_export:
                 - $.requests.non_error_rate
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: d39fcd4fdc594257bea91de0890d326b
-          name: cloudflare.requests.ssl.encrypted
+          name: 'Cloudflare: SSL encrypted requests'
           type: DEPENDENT
           key: cloudflare.requests.ssl.encrypted
           delay: '0'
+          history: 7d
           units: reqs
+          description: 'The number of encrypted requests.'
           preprocessing:
             -
               type: JSONPATH
@@ -462,13 +682,25 @@ zabbix_export:
                 - $.requests.encrypted
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: acbbc431dfc3431583123380edb6da38
-          name: cloudflare.requests.ssl.unencrypted
+          name: 'Cloudflare: Unencrypted requests'
           type: DEPENDENT
           key: cloudflare.requests.ssl.unencrypted
           delay: '0'
+          history: 7d
           units: reqs
+          description: 'The number of unencrypted requests.'
           preprocessing:
             -
               type: JSONPATH
@@ -476,13 +708,25 @@ zabbix_export:
                 - $.requests.unencrypted
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 7907f68e795b40fca1bd520556ea1fff
-          name: cloudflare.requests.uncached
+          name: 'Cloudflare: Uncached requests'
           type: DEPENDENT
           key: cloudflare.requests.uncached
           delay: '0'
+          history: 7d
           units: reqs
+          description: 'The number of uncached requests.'
           preprocessing:
             -
               type: JSONPATH
@@ -490,13 +734,25 @@ zabbix_export:
                 - $.requests.uncached
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: 328051a78529494e943edda567aa0e24
-          name: cloudflare.threats.all
+          name: 'Cloudflare: Total threats'
           type: DEPENDENT
           key: cloudflare.threats.all
           delay: '0'
+          history: 7d
           units: ops
+          description: 'The number of all threats.'
           preprocessing:
             -
               type: JSONPATH
@@ -504,13 +760,25 @@ zabbix_export:
                 - $.threats.all
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
         -
           uuid: d1a2ec213b084701805f3f974af25a21
-          name: cloudflare.uniques.all
+          name: 'Cloudflare: Unique visitors'
           type: DEPENDENT
           key: cloudflare.uniques.all
           delay: '0'
+          history: 7d
           units: conns
+          description: 'The number of all visitors IPs.'
           preprocessing:
             -
               type: JSONPATH
@@ -518,95 +786,97 @@ zabbix_export:
                 - $.uniques.all
           master_item:
             key: cloudflare.get
+          tags:
+            -
+              tag: resource
+              value: General
+            -
+              tag: target
+              value: Cloudflare
+            -
+              tag: type
+              value: Gauge
       macros:
         -
           macro: '{$CLOUDFLARE.API.TOKEN}'
           value: '<change>'
+          description: 'Your Cloudflare API Token'
         -
           macro: '{$CLOUDFLARE.API.URL}'
-          value: '<change>'
+          value: 'https://api.cloudflare.com/client/v4'
+          description: 'The URL of Cloudflare API endpoint.'
+        -
+          macro: '{$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}'
+          value: '50'
+          description: 'Minimum of cached bandwidth in %'
+        -
+          macro: '{$CLOUDFLARE.ERRORS.MAX.WARN}'
+          value: '30'
+          description: 'Maximum responses with errors in %'
+        -
+          macro: '{$CLOUDFLARE.GET_DATA.TIMEOUT}'
+          value: 3s
+          description: 'Response timeout for Cloudflare API'
         -
           macro: '{$CLOUDFLARE.ZONE_ID}'
           value: '<change>'
+          description: 'Your Cloudflare Site Zone ID'
       dashboards:
         -
           uuid: 51f1013e8a3d492faed27fe80b68fc53
-          name: Bandwidth
-          display_period: '60'
+          name: Overview
           pages:
             -
               widgets:
                 -
                   type: GRAPH_CLASSIC
-                  x: '6'
-                  width: '14'
-                  height: '8'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        name: Bandwidth
-                        host: 'Cloudflare by HTTP'
-                -
-                  type: PLAIN_TEXT
-                  name: 'Cache Hit Ratio'
-                  width: '6'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemids
-                      value:
-                        key: cloudflare.bandwidth.cache_hit_ratio
-                        host: 'Cloudflare by HTTP'
-        -
-          uuid: 3a43364e8b0a41e7b606826889333425
-          name: DNS
-          display_period: '60'
-          pages:
-            -
-              widgets:
-                -
-                  type: GRAPH_CLASSIC
-                  width: '17'
-                  height: '6'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        name: 'DNS requests'
-                        host: 'Cloudflare by HTTP'
-        -
-          uuid: 8b655c52ee6b41d5b3c2e9b9d59be5c9
-          name: Others
-          display_period: '60'
-          pages:
-            -
-              widgets:
-                -
-                  type: GRAPH_CLASSIC
-                  name: IPs
                   width: '12'
                   height: '5'
                   fields:
                     -
                       type: INTEGER
                       name: source_type
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: columns
                       value: '1'
                     -
-                      type: ITEM
-                      name: itemid
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH
+                      name: graphid
                       value:
-                        key: cloudflare.uniques.all
+                        name: 'Cloudflare: Bandwidth'
                         host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
-                  name: Pageviews
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Cloudflare: Web requests'
+                        host: 'Cloudflare by HTTP'
+                -
+                  type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -614,184 +884,225 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: source_type
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: columns
                       value: '1'
                     -
-                      type: ITEM
-                      name: itemid
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH
+                      name: graphid
                       value:
-                        key: cloudflare.pageviews.all
+                        name: 'Cloudflare: DNS requests'
                         host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
-                  name: Threats
                   x: '12'
-                  width: '11'
+                  'y': '5'
+                  width: '12'
                   height: '5'
                   fields:
                     -
                       type: INTEGER
                       name: source_type
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: columns
                       value: '1'
                     -
-                      type: ITEM
-                      name: itemid
-                      value:
-                        key: cloudflare.threats.all
-                        host: 'Cloudflare by HTTP'
-        -
-          uuid: 30a45580395644a28d9f276f02a9c66a
-          name: Requests
-          display_period: '60'
-          pages:
-            -
-              widgets:
-                -
-                  type: GRAPH_CLASSIC
-                  'y': '2'
-                  width: '19'
-                  height: '6'
-                  fields:
+                      type: INTEGER
+                      name: rows
+                      value: '1'
                     -
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Web requests'
+                        name: 'Cloudflare: Caching'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: PLAIN_TEXT
-                  name: '2xx rate'
-                  width: '6'
+                  type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
-                      name: show_lines
+                      name: source_type
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: columns
                       value: '1'
                     -
-                      type: ITEM
-                      name: itemids
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH
+                      name: graphid
                       value:
-                        key: cloudflare.requests.non_error_rate
+                        name: 'Cloudflare: HTTP response status over time'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: PLAIN_TEXT
-                  name: 'Cache hit ratio % over time'
-                  x: '6'
-                  width: '7'
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
-                      name: show_lines
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemids
-                      value:
-                        key: cloudflare.requests.cache_hit_ratio
-                        host: 'Cloudflare by HTTP'
-                -
-                  type: PLAIN_TEXT
-                  name: 'Error rate (non 2xx)'
-                  x: '13'
-                  width: '6'
-                  fields:
+                      name: source_type
+                      value: '0'
                     -
                       type: INTEGER
-                      name: show_lines
+                      name: columns
                       value: '1'
                     -
-                      type: ITEM
-                      name: itemids
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH
+                      name: graphid
                       value:
-                        key: cloudflare.requests.error_rate
+                        name: 'Cloudflare: IPs and threats'
                         host: 'Cloudflare by HTTP'
   graphs:
     -
       uuid: 09e113216680490c9dd15805474bcac7
-      name: Bandwidth
+      name: 'Cloudflare: Bandwidth'
       graph_items:
         -
-          sortorder: '1'
           color: 1A7C11
           item:
             host: 'Cloudflare by HTTP'
             key: cloudflare.bandwidth.all
         -
-          sortorder: '2'
-          color: F63100
+          sortorder: '1'
+          color: 2774A4
           item:
             host: 'Cloudflare by HTTP'
             key: cloudflare.bandwidth.cached
         -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.bandwidth.uncached
+        -
           sortorder: '3'
-          color: 2774A4
+          color: A54F10
           item:
             host: 'Cloudflare by HTTP'
             key: cloudflare.bandwidth.ssl.encrypted
         -
           sortorder: '4'
-          color: A54F10
-          item:
-            host: 'Cloudflare by HTTP'
-            key: cloudflare.bandwidth.ssl.unencrypted
-        -
-          sortorder: '5'
           color: FC6EA3
           item:
             host: 'Cloudflare by HTTP'
-            key: cloudflare.bandwidth.uncached
+            key: cloudflare.bandwidth.ssl.unencrypted
     -
-      uuid: 25df26cece41403d864f1ced5901bffa
-      name: 'DNS requests'
+      uuid: ed4ef5ce4a6a4c5692c22079d8879e0e
+      name: 'Cloudflare: Caching'
       graph_items:
         -
+          color: 1A7C11
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.requests.cache_hit_ratio
+        -
           sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.bandwidth.cache_hit_ratio
+    -
+      uuid: 25df26cece41403d864f1ced5901bffa
+      name: 'Cloudflare: DNS requests'
+      graph_items:
+        -
           color: 1A7C11
           item:
             host: 'Cloudflare by HTTP'
             key: cloudflare.dns.query.all
         -
-          sortorder: '2'
-          color: F63100
+          sortorder: '1'
+          color: 2774A4
           item:
             host: 'Cloudflare by HTTP'
             key: cloudflare.dns.query.stale
         -
-          sortorder: '3'
-          color: 2774A4
+          sortorder: '2'
+          color: F63100
           item:
             host: 'Cloudflare by HTTP'
             key: cloudflare.dns.query.uncached
     -
-      uuid: 659df99629a341449c77baf7a9b99b77
-      name: 'Web requests'
+      uuid: c9e1708427a84182a406faec327bb6f1
+      name: 'Cloudflare: HTTP response status over time'
       graph_items:
         -
+          color: 1A7C11
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.requests.error_rate
+        -
           sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.requests.non_error_rate
+    -
+      uuid: 6a0da78eec23423ab084a0760f1691be
+      name: 'Cloudflare: IPs and threats'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.threats.all
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.uniques.all
+    -
+      uuid: 659df99629a341449c77baf7a9b99b77
+      name: 'Cloudflare: Web requests'
+      graph_items:
+        -
           color: 1A7C11
           item:
             host: 'Cloudflare by HTTP'
             key: cloudflare.requests.all
         -
-          sortorder: '2'
-          color: F63100
+          sortorder: '1'
+          color: 2774A4
           item:
             host: 'Cloudflare by HTTP'
             key: cloudflare.requests.cached
         -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Cloudflare by HTTP'
+            key: cloudflare.requests.uncached
+        -
           sortorder: '3'
-          color: 2774A4
+          color: A54F10
           item:
             host: 'Cloudflare by HTTP'
             key: cloudflare.requests.ssl.encrypted
         -
           sortorder: '4'
-          color: A54F10
-          item:
-            host: 'Cloudflare by HTTP'
-            key: cloudflare.requests.ssl.unencrypted
-        -
-          sortorder: '5'
           color: FC6EA3
           item:
             host: 'Cloudflare by HTTP'
-            key: cloudflare.requests.uncached
+            key: cloudflare.requests.ssl.unencrypted
