@@ -30,10 +30,24 @@
 	var host_edit = {
 
 		init() {
+			this.initHostTab();
 			this.initTemplatesTab();
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncriptionTab();
+		},
+
+		initHostTab() {
+			const host_field = document.getElementById('host');
+
+			'input paste'.split(' ').forEach(event => {
+				host_field.addEventListener(event, e => this.setVisibleNamePlaceholder(e.target.value));
+			});
+			this.setVisibleNamePlaceholder(host_field.value);
+		},
+
+		setVisibleNamePlaceholder(placeholder) {
+			document.getElementById('visiblename').placeholder = placeholder;
 		},
 
 		initTemplatesTab() {
