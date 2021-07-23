@@ -234,27 +234,10 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, e
 		dsn += " password=" + uri.Password()
 	}
 
-	config, err := pgxpool.ParseConfig(dsn)
+	client, err := createTLSClient(dsn, c.connectTimeout, details)
 	if err != nil {
 		return nil, err
 	}
-
-	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
-		d := net.Dialer{}
-		ctxTimeout, cancel := context.WithTimeout(context.Background(), c.connectTimeout)
-		defer cancel()
-
-		conn, err := d.DialContext(ctxTimeout, network, addr)
-
-		return conn, err
-	}
-
-	config.ConnConfig.TLSConfig, err = getTLSConfig(details)
-	if err != nil {
-		return nil, err
-	}
-
-	client := stdlib.OpenDB(*config.ConnConfig)
 
 	serverVersion, err := getPostgresVersion(ctx, client)
 	if err != nil {
@@ -277,6 +260,30 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, e
 	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
 
 	return c.connections[uri], nil
+}
+
+func createTLSClient(dsn string, timeout time.Duration, details tlsconfig.Details) (*sql.DB, error) {
+	config, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
+		d := net.Dialer{}
+		ctxTimeout, cancel := context.WithTimeout(context.Background(), timeout)
+		defer cancel()
+
+		conn, err := d.DialContext(ctxTimeout, network, addr)
+
+		return conn, err
+	}
+
+	config.ConnConfig.TLSConfig, err = getTLSConfig(details)
+	if err != nil {
+		return nil, err
+	}
+
+	return stdlib.OpenDB(*config.ConnConfig), nil
 }
 
 func getTLSConfig(details tlsconfig.Details) (*tls.Config, error) {

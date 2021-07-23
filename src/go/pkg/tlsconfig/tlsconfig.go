@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 
 	"zabbix.com/pkg/uri"
+	"zabbix.com/pkg/zbxerr"
 )
 
 type Details struct {
@@ -27,7 +28,7 @@ func CreateConfig(details Details, skipVerify bool) (*tls.Config, error) {
 	}
 
 	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-		return nil, errors.New("Failed to append PEM")
+		return nil, errors.New("Failed to append PEM.")
 	}
 
 	clientCerts := make([]tls.Certificate, 0, 1)
@@ -47,35 +48,60 @@ func CreateConfig(details Details, skipVerify bool) (*tls.Config, error) {
 		return nil, err
 	}
 
-	return &tls.Config{RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: url.Host()}, nil
+	return &tls.Config{
+		RootCAs: rootCertPool, Certificates: clientCerts, InsecureSkipVerify: skipVerify, ServerName: url.Host(),
+	}, nil
 }
 
 func CreateDetails(session, dbConnect, caFile, certFile, keyFile, uri string) (Details, error) {
-
 	if dbConnect != "" && dbConnect != "required" {
-		if caFile == "" {
-			return Details{}, fmt.Errorf("missing TLS CA file for database uri %s, with session %s", uri, session)
-		}
-		if certFile == "" {
-			return Details{}, fmt.Errorf("missing TLS certificate file for database uri %s, with session %s", uri, session)
-		}
-		if keyFile == "" {
-			return Details{}, fmt.Errorf("missing TLS key file for database uri %s, with session %s", uri, session)
+		if err := validateSetTLSFiles(caFile, certFile, keyFile); err != nil {
+			return Details{}, zbxerr.ErrorInvalidConfiguration.Wrap(
+				fmt.Errorf("%s uri %s, with session %s", err.Error(), uri, session),
+			)
 		}
 	} else {
-		if caFile != "" {
-			return Details{}, fmt.Errorf("TLS CA file configuration parameter set without certificates being used for database uri %s, with session %s", uri, session)
-
-		}
-		if certFile != "" {
-			return Details{}, fmt.Errorf("TLS certificate file configuration parameter set without certificates being used for database uri %s, with session %s", uri, session)
-
-		}
-		if keyFile != "" {
-			return Details{}, fmt.Errorf(" TLS key file configuration parameter set without certificates being used for database uri %s, with session %s", uri, session)
-
+		if err := validateUnsetTLSFiles(caFile, certFile, keyFile); err != nil {
+			return Details{}, zbxerr.ErrorInvalidConfiguration.Wrap(
+				fmt.Errorf("%s uri %s, with session %s", err.Error(), uri, session),
+			)
 		}
 	}
 
 	return Details{session, dbConnect, caFile, certFile, keyFile, uri}, nil
+}
+
+func validateSetTLSFiles(caFile, certFile, keyFile string) error {
+	if caFile == "" {
+		return errors.New("missing TLS CA file for database")
+	}
+
+	if certFile == "" {
+		return errors.New("missing TLS certificate file for database")
+	}
+
+	if keyFile == "" {
+		return errors.New("missing TLS key file for database")
+	}
+
+	return nil
+}
+
+func validateUnsetTLSFiles(caFile, certFile, keyFile string) error {
+	if caFile != "" {
+		return errors.New(
+			"TLS CA file configuration parameter set without certificates being used for database")
+	}
+
+	if certFile != "" {
+		return errors.New(
+			"TLS certificate file configuration parameter set without certificates being used for database")
+	}
+
+	if keyFile != "" {
+		return errors.New(
+			"TLS key file configuration parameter set without certificates being used for database")
+	}
+
+	return nil
 }

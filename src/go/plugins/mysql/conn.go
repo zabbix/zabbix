@@ -185,26 +185,36 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*MyConn, e
 func registerTLSConfig(config *mysql.Config, details tlsconfig.Details) error {
 	switch details.TlsConnect {
 	case "required":
-		mysql.RegisterTLSConfig(details.SessionName, &tls.Config{InsecureSkipVerify: true})
+		err := mysql.RegisterTLSConfig(details.SessionName, &tls.Config{InsecureSkipVerify: true})
+		if err != nil {
+			return err
+		}
 	case "verify_ca":
 		conf, err := tlsconfig.CreateConfig(details, true)
 		if err != nil {
 			return err
 		}
 
-		mysql.RegisterTLSConfig(details.SessionName, conf)
+		err = mysql.RegisterTLSConfig(details.SessionName, conf)
+		if err != nil {
+			return err
+		}
 	case "verify_full":
 		conf, err := tlsconfig.CreateConfig(details, false)
 		if err != nil {
 			return err
 		}
 
-		mysql.RegisterTLSConfig(details.SessionName, conf)
+		err = mysql.RegisterTLSConfig(details.SessionName, conf)
+		if err != nil {
+			return err
+		}
 	default:
 		return nil
 	}
 
 	config.TLSConfig = details.SessionName
+
 	return nil
 }
 
