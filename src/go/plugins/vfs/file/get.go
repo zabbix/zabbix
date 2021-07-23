@@ -86,14 +86,14 @@ func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 		fi.Type = "dir"
 	case mode&os.ModeSymlink != 0:
 		fi.Type = "sym"
-	case mode&os.ModeSocket != 0:
-		fi.Type = "sock"
-	case mode&os.ModeDevice != 0:
-		fi.Type = "bdev"
 	case mode&os.ModeCharDevice != 0:
 		fi.Type = "cdev"
+	case mode&os.ModeSocket != 0:
+		fi.Type = "sock"
 	case mode&os.ModeNamedPipe != 0:
 		fi.Type = "fifo"
+	case mode&os.ModeDevice != 0:
+		fi.Type = "bdev"
 	default:
 		return nil, fmt.Errorf("Cannot obtain %s type information.", params[0])
 	}
