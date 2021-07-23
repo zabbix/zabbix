@@ -53,7 +53,7 @@ class C54ImportConverterTest extends CImportConverterTest {
 		return [
 			'zabbix_export' => array_merge([
 				'version' => '6.0',
-				'date' => '2021-12-01T00:00:00Z'
+				'date' => '2021-06-01T00:00:00Z'
 			], $data)
 		];
 	}
