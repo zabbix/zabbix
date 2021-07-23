@@ -97,131 +97,6 @@
 				->toString()
 		?>
 	</script>
-	<script type="text/javascript">
-		function initMacroFields($parent) {
-			jQuery('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $parent).not('.initialized-field').each(function() {
-				var $obj = jQuery(this);
-
-				$obj.addClass('initialized-field');
-
-				if ($obj.hasClass('macro')) {
-					$obj.on('change keydown', function(e) {
-						if (e.type === 'change' || e.which === 13) {
-							macroToUpperCase(this);
-							$obj.textareaFlexible();
-						}
-					});
-				}
-
-				$obj.textareaFlexible();
-			});
-
-			// Init tab indicator observer.
-			const macro_indicator = new MacrosTabIndicatorItem;
-			// Tab element.
-			const tab = document.querySelector('#tab_macroTab');
-			if (tab) {
-				macro_indicator.initObserver(tab);
-			}
-		}
-
-		function initMacroTable($parent, show_inherited_macros) {
-			$parent
-				.dynamicRows({
-					remove_next_sibling: show_inherited_macros,
-					template: show_inherited_macros ? '#macro-row-tmpl-inherited' : '#macro-row-tmpl'
-				})
-				.on('click', 'button.element-table-add', function() {
-					initMacroFields($parent);
-				})
-				.on('click', 'button.element-table-change', function() {
-					const macro_num = jQuery(this).attr('id').split('_')[1];
-
-					if (jQuery('#macros_' + macro_num + '_inherited_type').val() & <?= ZBX_PROPERTY_OWN ?>) {
-						const macro_type = jQuery('#macros_' + macro_num + '_inherited_macro_type').val();
-
-						jQuery('#macros_' + macro_num + '_inherited_type')
-							.val(jQuery('#macros_' + macro_num + '_inherited_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
-
-						jQuery('#macros_' + macro_num + '_description')
-							.prop('readonly', true)
-							.val(jQuery('#macros_' + macro_num + '_inherited_description').val())
-							.trigger('input');
-
-						const $dropdown_btn = jQuery('#macros_' + macro_num + '_type_btn');
-
-						const dropdown_btn_classes = {
-							'<?= ZBX_MACRO_TYPE_TEXT ?>': '<?= ZBX_STYLE_ICON_TEXT ?>',
-							'<?= ZBX_MACRO_TYPE_SECRET ?>': '<?= ZBX_STYLE_ICON_INVISIBLE ?>',
-							'<?= ZBX_MACRO_TYPE_VAULT ?>': '<?= ZBX_STYLE_ICON_SECRET_TEXT ?>'
-						};
-
-						$dropdown_btn
-							.removeClass()
-							.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[macro_type]].join(' '));
-
-						jQuery('input[type=hidden]', $dropdown_btn.parent())
-							.val(macro_type)
-							.trigger('change');
-
-						$dropdown_btn
-							.prop('disabled', true)
-							.attr({'aria-haspopup': false});
-
-						jQuery('#macros_' + macro_num + '_value')
-							.prop('readonly', true)
-							.val(jQuery('#macros_' + macro_num + '_inherited_value').val())
-							.trigger('input');
-
-						if (macro_type == <?= ZBX_MACRO_TYPE_SECRET ?>) {
-							jQuery('#macros_' + macro_num + '_value').prop('disabled', true);
-						}
-
-						jQuery('#macros_' + macro_num + '_value_btn')
-							.prop('disabled', true)
-						jQuery('#macros_' + macro_num + '_value')
-							.closest('.input-group')
-							.find('.btn-undo')
-							.hide();
-
-						jQuery('#macros_' + macro_num + '_change').text(<?= json_encode(_x('Change', 'verb')) ?>);
-					}
-					else {
-						jQuery('#macros_' + macro_num + '_inherited_type')
-							.val(jQuery('#macros_' + macro_num + '_inherited_type').val() | <?= ZBX_PROPERTY_OWN ?>);
-						jQuery('#macros_' + macro_num + '_value')
-							.prop('readonly', false)
-							.focus();
-						jQuery('#macros_' + macro_num + '_value_btn').prop('disabled', false);
-						jQuery('#macros_' + macro_num + '_description').prop('readonly', false);
-						jQuery('#macros_' + macro_num + '_type_btn')
-							.prop('disabled', false)
-							.attr({'aria-haspopup': 'true'});
-						jQuery('#macros_' + macro_num + '_change').text(<?= json_encode(_('Remove')) ?>);
-					}
-				})
-				.on('afteradd.dynamicRows', function() {
-					jQuery('.input-group').macroValue();
-				});
-
-			initMacroFields($parent);
-		}
-
-		function macroToUpperCase(element) {
-			var macro = jQuery(element).val(),
-				end = macro.indexOf(':');
-
-			if (end == -1) {
-				jQuery(element).val(macro.toUpperCase());
-			}
-			else {
-				var macro_part = macro.substr(0, end),
-					context_part = macro.substr(end, macro.length);
-
-				jQuery(element).val(macro_part.toUpperCase() + context_part);
-			}
-		}
-	</script>
 <?php endif ?>
 
 <script type="text/javascript">
@@ -233,7 +108,8 @@
 	 * @returns {array|getAddTemplates.templateids}
 	 */
 	function getAddTemplates($ms) {
-		var templateids = [];
+		var $ms = $('#add_templates_'),
+			templateids = [];
 
 		// Readonly forms don't have multiselect.
 		if ($ms.length) {
@@ -246,60 +122,47 @@
 		return templateids;
 	}
 
-	/**
-	 * Get macros from Macros tab form.
-	 *
-	 * @param {jQuery} $form  jQuery object for host edit form.
-	 *
-	 * @returns {array}        List of all host macros in the form.
-	 */
-	function getMacros($form) {
-		var $macros = $form.find('input[name^="macros"], textarea[name^="macros"]').not(':disabled'),
-			macros = {};
-
-		// Find the correct macro inputs and prepare to submit them via AJAX. matches[1] - index, matches[2] field name.
-		$macros.each(function() {
-			var $this = jQuery(this),
-				matches = $this.attr('name').match(/macros\[(\d+)\]\[(\w+)\]/);
-
-			if (!macros.hasOwnProperty(matches[1])) {
-				macros[matches[1]] = new Object();
-			}
-
-			macros[matches[1]][matches[2]] = $this.val();
-		});
-
-		return macros;
-	}
-
 	jQuery(function($) {
-		var $container = $('#macros_container .table-forms-td-right'),
-			$ms = $('#add_templates_'),
-			$show_inherited_macros = $('input[name="show_inherited_macros"]'),
-			$form = $show_inherited_macros.closest('form'),
-			linked_templates = <?= json_encode($data['macros_tab']['linked_templates']) ?>,
-			add_templates = <?= json_encode($data['macros_tab']['add_templates']) ?>,
-			macros_initialized = false;
+		var $show_inherited_macros = $('input[name="show_inherited_macros"]'),
+			linked_templateids = <?= json_encode($data['macros_tab']['linked_templates']) ?>;
 
-		$('#host, #template_name')
+		$('#template_name')
 			.on('input keydown paste', function() {
 				$('#visiblename').attr('placeholder', $(this).val());
 			})
 			.trigger('input');
 
+		window.macros_manager = new HostMacrosManager(<?= json_encode([
+			'properties' => [
+				'readonly' => $data['readonly']
+			],
+			'defines' => [
+				'ZBX_STYLE_TEXTAREA_FLEXIBLE' => ZBX_STYLE_TEXTAREA_FLEXIBLE,
+				'ZBX_PROPERTY_OWN' => ZBX_PROPERTY_OWN,
+				'ZBX_MACRO_TYPE_TEXT' => ZBX_MACRO_TYPE_TEXT,
+				'ZBX_MACRO_TYPE_SECRET' => ZBX_MACRO_TYPE_SECRET,
+				'ZBX_MACRO_TYPE_VAULT' => ZBX_MACRO_TYPE_VAULT,
+				'ZBX_STYLE_ICON_TEXT' => ZBX_STYLE_ICON_TEXT,
+				'ZBX_STYLE_ICON_INVISIBLE' => ZBX_STYLE_ICON_INVISIBLE,
+				'ZBX_STYLE_ICON_SECRET_TEXT' => ZBX_STYLE_ICON_SECRET_TEXT
+			]
+		]) ?>);
+
 		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
 			var panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'macroTab') {
+				let macros_initialized = panel.data('macros_initialized') || false;
+
 				// Please note that macro initialization must take place once and only when the tab is visible.
-
 				if (event.type === 'tabsactivate') {
-					var add_templates_tmp = getAddTemplates($ms);
+					let panel_templateids = panel.data('templateids') || [],
+						templateids = getAddTemplates();
 
-					if (add_templates.xor(add_templates_tmp).length > 0) {
-						add_templates = add_templates_tmp;
-						$show_inherited_macros.trigger('change');
-						macros_initialized = true;
+					if (panel_templateids.xor(templateids).length > 0) {
+						panel.data('templateids', templateids);
+						window.macros_manager.load($show_inherited_macros.val(), linked_templateids.concat(templateids));
+						panel.data('macros_initialized', true);
 					}
 				}
 
@@ -311,10 +174,10 @@
 				<?php if ($data['readonly']): ?>
 					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 				<?php else: ?>
-					initMacroTable($('#tbl_macros'), $('input[name="show_inherited_macros"]:checked').val() == 1);
+					window.macros_manager.initMacroTable($('#tbl_macros'), $('input[name="show_inherited_macros"]:checked').val() == 1);
 				<?php endif ?>
 
-				macros_initialized = true;
+				panel.data('macros_initialized', true);
 			}
 		});
 
@@ -323,57 +186,8 @@
 				return;
 			}
 
-			var url = new Curl('zabbix.php'),
-				macros = getMacros($form),
-				show_inherited_macros = $(this).val() == 1;
-
-			url.setArgument('action', 'hostmacros.list');
-
-			$container
-				.empty()
-				.append($('<span>', {class: 'is-loading'}));
-
-			$.ajax(url.getUrl(), {
-				data: {
-					macros: macros,
-					show_inherited_macros: show_inherited_macros ? 1 : 0,
-					templateids: linked_templates.concat(add_templates),
-					<?= array_key_exists('parent_hostid', $data) ? 'parent_hostid: '.json_encode($data['parent_hostid']).',' : '' ?>
-					readonly: <?= (int) $data['readonly'] ?>
-				},
-				dataType: 'json',
-				method: 'POST'
-			})
-				.done(function(response) {
-					if (typeof response === 'object' && 'errors' in response) {
-						$container.append(response.errors);
-					}
-					else {
-						if (typeof response.messages !== 'undefined') {
-							$container.append(response.messages);
-						}
-
-						$container.append(response.body);
-
-						// Initialize macros.
-						<?php if ($data['readonly']): ?>
-							$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
-						<?php else: ?>
-							initMacroTable($('#tbl_macros'), show_inherited_macros);
-						<?php endif ?>
-
-						// Display debug after loaded content if it is enabled for user.
-						if (typeof response.debug !== 'undefined') {
-							$container.append(response.debug);
-
-							// Override margin for inline usage.
-							$('.debug-output', $container).css('margin', '10px 0');
-						}
-					}
-				})
-				.always(function() {
-					$('.is-loading', $container).remove();
-				});
+			let templateids = linked_templateids.concat(getAddTemplates());
+			window.macros_manager.load($(this).val(), templateids);
 		});
 	});
 </script>

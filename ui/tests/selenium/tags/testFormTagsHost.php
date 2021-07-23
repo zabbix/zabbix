@@ -30,7 +30,7 @@ class testFormTagsHost extends testFormTags {
 	public $clone_name = 'Host with tags for cloning';
 	public $link = null;
 	public $saved_link = null;
-	
+
 	public function __construct() {
 		$this->link = self::HOST_LIST_PAGE;
 		$this->saved_link = (new CUrl('zabbix.php'))
