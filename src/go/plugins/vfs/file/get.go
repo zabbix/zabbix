@@ -42,13 +42,13 @@ func (t jsTimeUtc) MarshalJSON() ([]byte, error) {
 
 type fiTime struct {
 	Access *jsTimeLoc `json:"access"`
-	Modify jsTimeLoc  `json:"modify"`
+	Modify *jsTimeLoc `json:"modify"`
 	Change *jsTimeLoc `json:"change"`
 }
 
 type fiTimeStamp struct {
 	Access *jsTimeUtc `json:"access"`
-	Modify jsTimeUtc  `json:"modify"`
+	Modify *jsTimeUtc `json:"modify"`
 	Change *jsTimeUtc `json:"change"`
 }
 
@@ -98,9 +98,13 @@ func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 		return nil, fmt.Errorf("Cannot obtain %s type information.", params[0])
 	}
 
-	fi.Time.Modify = jsTimeLoc(info.ModTime())
+	if !info.ModTime().IsZero() {
+		ml := jsTimeLoc(info.ModTime())
+		fi.Time.Modify = &ml
+		mu := jsTimeUtc(info.ModTime())
+		fi.Timestamp.Modify = &mu
+	}
 
-	fi.Timestamp.Modify = jsTimeUtc(fi.Time.Modify)
 	if fi.Time.Access != nil {
 		a := jsTimeUtc(*fi.Time.Access)
 		fi.Timestamp.Access = &a

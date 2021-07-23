@@ -61,10 +61,15 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 
 	fi.Gid = stat.Gid
 
-	a := jsTimeLoc(time.Unix(stat.Atim.Unix()))
-	fi.Time.Access = &a
-	c := jsTimeLoc(time.Unix(stat.Ctim.Unix()))
-	fi.Time.Change = &c
+	if stat.Atim.Sec > 0 {
+		a := jsTimeLoc(time.Unix(stat.Atim.Unix()))
+		fi.Time.Access = &a
+	}
+
+	if stat.Ctim.Sec > 0 {
+		c := jsTimeLoc(time.Unix(stat.Ctim.Unix()))
+		fi.Time.Change = &c
+	}
 
 	fi.Size = (*info).Size()
 

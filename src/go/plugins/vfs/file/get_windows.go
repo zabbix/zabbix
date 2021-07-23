@@ -64,12 +64,12 @@ func getFileInfo(info *os.FileInfo, path string) (fileinfo *fileInfo, err error)
 		fi.User = &u
 	}
 
-	if wFileSys := (*info).Sys().(*syscall.Win32FileAttributeData); wFileSys != nil {
+	if wFileSys := (*info).Sys().(*syscall.Win32FileAttributeData); wFileSys != nil && wFileSys.LastAccessTime.Nanoseconds() > 0 {
 		a := jsTimeLoc(time.Unix(0, wFileSys.LastAccessTime.Nanoseconds()))
 		fi.Time.Access = &a
 	}
 
-	if utn, ok := getFileChange(path); ok == nil {
+	if utn, ok := getFileChange(path); ok == nil && utn > 0 {
 		c := jsTimeLoc(time.Unix(0, utn))
 		fi.Time.Change = &c
 	}

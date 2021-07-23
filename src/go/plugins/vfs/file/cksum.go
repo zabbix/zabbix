@@ -108,8 +108,8 @@ func crc32(file std.File, start time.Time, timeout int) (result interface{}, err
 		crc = (crc << 8) ^ crctable[((crc>>24)^flen)&0xff]
 		flen >>= 8
 	}
-	return ^crc, nil
 
+	return ^crc, nil
 }
 
 func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
