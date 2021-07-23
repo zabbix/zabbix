@@ -1386,8 +1386,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 
 	if (SUCCEED != zbx_get_file_time(filename, 1, &file_time))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
-		goto err;
+		memset(&file_time, 0 ,sizeof(file_time));
 	}
 
 	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIME);
