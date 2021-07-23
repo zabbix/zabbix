@@ -37,7 +37,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 	switch len(params) {
 	case 3:
 		if params[2] != "" {
-			if params[2] != "name" && params[2] != "SID" {
+			if params[2] != "name" && params[2] != "id" {
 				return nil, fmt.Errorf("Invalid third parameter: %s.", params[2])
 			}
 
@@ -80,7 +80,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 	var ret string
 
 	switch ownertype + resulttype {
-	case "userSID":
+	case "userid":
 		ret = sdOwner.String()
 	case "username":
 		account, domain, _, err := sdOwner.LookupAccount("")

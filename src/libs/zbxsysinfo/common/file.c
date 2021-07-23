@@ -1025,8 +1025,15 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (ERROR_SUCCESS != GetNamedSecurityInfo(wpath, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &sid, NULL, NULL, NULL,
-			&sec))
+	if (NULL != resulttype && '\0' != *resulttype &&
+			(0 != strcmp(resulttype, "id") && 0 != strcmp(resulttype, "name")))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto err;
+	}
+
+	if (ERROR_SUCCESS != GetNamedSecurityInfo(wpath, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &sid, NULL, NULL,
+			NULL, &sec) || NULL == sid)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain security information."));
 		goto err;
@@ -1045,7 +1052,7 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_STR_RESULT(result, zbx_unicode_to_utf8(sid_string));
 		LocalFree(sid_string);
 	}
-	else if (NULL == resulttype || '\0' == *resulttype || 0 == strcmp(resulttype, "name"))
+	else
 	{
 		DWORD		acc_sz = 0, dmn_sz = 0;
 		wchar_t		*acc_name = NULL, *dmn_name = NULL;
@@ -1078,11 +1085,6 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_free(dmn_name);
 		zbx_free(acc_utf8);
 		zbx_free(dmn_ut8);
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto err;
 	}
 
 	ret = SYSINFO_RET_OK;
