@@ -725,7 +725,7 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 
 	if (0 == token->opt)
 	{
-		*error = zbx_dsprintf(*error, "no input data for function at \"%s\"", ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "no arguments for function at \"%s\"", ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
@@ -753,7 +753,7 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 
 		if (0 == output->values[i].data.dbl_vector->values_num)
 		{
-			*error = zbx_dsprintf(*error, "empty vector argument for function at \"%s\"",
+			*error = zbx_dsprintf(*error, "no input data for function at \"%s\"",
 					ctx->expression + token->loc.l);
 			return FAIL;
 		}
