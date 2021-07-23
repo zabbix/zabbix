@@ -95,3 +95,8 @@ void	zbx_export_events(void)
 {
 	THIS_SHOULD_NEVER_HAPPEN;
 }
+
+void	zbx_events_update_itservices(void)
+{
+	THIS_SHOULD_NEVER_HAPPEN;
+}

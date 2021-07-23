@@ -1413,6 +1413,10 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "report manager";
 		case ZBX_PROCESS_TYPE_REPORTWRITER:
 			return "report writer";
+		case ZBX_PROCESS_TYPE_SERVICEMAN:
+			return "service manager";
+		case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
+			return "trigger housekeeper";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

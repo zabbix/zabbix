@@ -1328,6 +1328,23 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_ipc_socket_connected                                         *
+ *                                                                            *
+ * Purpose: check if socket is opened                                         *
+ *                                                                            *
+ * Parameters: csocket      - [OUT] the IPC socket to the service             *
+ *                                                                            *
+ * Return value: SUCCEED - the socket was successfully opened                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ipc_socket_connected(const zbx_ipc_socket_t *csocket)
+{
+	return 0 < csocket->fd ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_ipc_message_free                                             *
  *                                                                            *
  * Purpose: frees the resources allocated to store IPC message data           *

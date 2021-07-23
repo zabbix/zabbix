@@ -194,7 +194,7 @@ $widget = (new CWidget())
 	->addItem($details_screen->get())
 	->addItem(new CTag('br'))
 	->addItem(
-		(new CFilter(new CUrl()))
+		(new CFilter())
 			->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
 			->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
 			->addTimeSelector($timeline['from'], $timeline['to'], $page['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE)

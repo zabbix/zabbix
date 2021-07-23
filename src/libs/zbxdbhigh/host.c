@@ -647,19 +647,23 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 
 		while (NULL != (trow = DBfetch(tresult)))
 		{
-			char	*itemkey;
-
 			ZBX_STR2UINT64(graphid, trow[0]);
-			itemkey = zbx_strdup(NULL, trow[1]);
 
 			for (i = 0; i < graphs.values_num; i++)
 			{
 				graph = (zbx_template_graph_valid_t *)graphs.values[i];
 
 				if (graphid == graph->tgraphid)
-					zbx_vector_str_append(&graph->tkeys, itemkey);
-				else if (graphid == graph->hgraphid)
-					zbx_vector_str_append(&graph->hkeys, itemkey);
+				{
+					zbx_vector_str_append(&graph->tkeys, zbx_strdup(NULL, trow[1]));
+					break;
+				}
+
+				if (graphid == graph->hgraphid)
+				{
+					zbx_vector_str_append(&graph->hkeys, zbx_strdup(NULL, trow[1]));
+					break;
+				}
 			}
 		}
 		DBfree_result(tresult);
@@ -936,8 +940,6 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&selementids);
-
-	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);

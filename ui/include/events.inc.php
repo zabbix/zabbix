@@ -573,11 +573,9 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 						->setHint($value);
 				}
 
-				$tags[$element[$key]][] = (new CSpan(
-					(new CButton(null))
-						->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-						->setHint(new CDiv($hint_content), '', true, 'max-width: 500px')
-				))->addClass(ZBX_STYLE_REL_CONTAINER);
+				$tags[$element[$key]][] = (new CButton(null))
+					->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP, true);
 			}
 		}
 		else {
