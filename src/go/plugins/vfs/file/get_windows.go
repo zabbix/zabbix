@@ -54,7 +54,7 @@ func getFileInfo(info *os.FileInfo, path string) (fileinfo *fileInfo, err error)
 
 	fi.SID = sdOwner.String()
 
-	if account, domain, _, ok := sdOwner.LookupAccount(""); ok == nil {
+	if account, domain, _, er := sdOwner.LookupAccount(""); er == nil {
 		u := domain
 		if u != "" {
 			u += "\\"
@@ -69,7 +69,7 @@ func getFileInfo(info *os.FileInfo, path string) (fileinfo *fileInfo, err error)
 		fi.Time.Access = &a
 	}
 
-	if utn, ok := getFileChange(path); ok == nil && utn > 0 {
+	if utn, er := getFileChange(path); er == nil && utn > 0 {
 		c := jsTimeLoc(time.Unix(0, utn))
 		fi.Time.Change = &c
 	}

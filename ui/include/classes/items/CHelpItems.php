@@ -342,7 +342,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vfs.file.owner[file,<ownertype>,<resulttype>]',
-					'description' => _('File owner information, where <ownertype> - user (default) or group and <resulttype> - name (default) or id (uid/gid on Unix, SID on Windows). Returns string')
+					'description' => _('File owner information. Returns string')
 				],
 				[
 					'key' => 'vfs.file.permissions[file]',
@@ -724,7 +724,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vfs.file.owner[file,<ownertype>,<resulttype>]',
-					'description' => _('File owner information, where <ownertype> - user (default) or group and <resulttype> - name (default) or id (uid/gid on Unix, SID on Windows). Returns string')
+					'description' => _('File owner information. Returns string')
 				],
 				[
 					'key' => 'vfs.file.permissions[file]',

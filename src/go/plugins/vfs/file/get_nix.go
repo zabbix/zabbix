@@ -48,14 +48,14 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 	fi.Permissions = mode2str(stat.Mode)
 
 	u := strconv.FormatUint(uint64(stat.Uid), 10)
-	if usr, ok := user.LookupId(u); ok == nil {
+	if usr, er := user.LookupId(u); er == nil {
 		fi.User = &usr.Username
 	}
 
 	fi.Uid = stat.Uid
 
 	g := strconv.FormatUint(uint64(stat.Gid), 10)
-	if group, ok := user.LookupGroupId(g); ok == nil {
+	if group, er := user.LookupGroupId(g); er == nil {
 		fi.Group = &group.Name
 	}
 
