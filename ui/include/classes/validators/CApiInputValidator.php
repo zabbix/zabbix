@@ -1575,7 +1575,7 @@ class CApiInputValidator {
 	 * Regular expression validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_GLOBAL_REGEX
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -1595,7 +1595,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($data !== '' && $data[0] === '@') {
+		if (($flags & API_ALLOW_GLOBAL_REGEX) && $data !== '' && $data[0] === '@') {
 			return true;
 		}
 
