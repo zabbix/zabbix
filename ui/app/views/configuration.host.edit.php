@@ -29,7 +29,9 @@ $this->addJsFile('macrovalue.js');
 $this->addJsFile('textareaflexible.js');
 $this->addJsFile('class.cviewswitcher.js');
 $this->addJsFile('class.cverticalaccordion.js');
+$this->addJsFile('class.tab-indicators.js');
 $this->addJsFile('hostinterfacemanager.js');
+$this->addJsFile('hostmacrosmanager.js');
 
 $data += [
 	'buttons' => ($data['hostid'] == 0)

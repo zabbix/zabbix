@@ -28,7 +28,7 @@ $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
 $page['scripts'] = ['class.cviewswitcher.js', 'multiselect.js', 'textareaflexible.js',
 	'class.cverticalaccordion.js', 'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js',
-	'hostinterfacemanager.js'
+	'hostinterfacemanager.js', 'hostmacrosmanager.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
