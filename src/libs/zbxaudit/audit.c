@@ -247,7 +247,6 @@ void	zbx_audit_flush(void)
 		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
 				0 != strcmp((*audit_entry)->details_json.buffer, "[{}]"))
 		{
-			zbx_json_close(&((*audit_entry)->details_json));
 #define AUDIT_USERID	0
 #define AUDIT_USERNAME	""
 #define AUDIT_IP	""
@@ -559,8 +558,7 @@ void	zbx_audit_host_create_entry(int audit_action, zbx_uint64_t hostid, const ch
 		local_audit_host_entry_insert->name = zbx_strdup(NULL, name);
 		local_audit_host_entry_insert->audit_action = audit_action;
 		local_audit_host_entry_insert->resource_type = AUDIT_RESOURCE_HOST;
-		zbx_json_initarray(&(local_audit_host_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
-		zbx_json_addobject(&(local_audit_host_entry_insert->details_json), NULL);
+		zbx_json_init(&(local_audit_host_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
 		zbx_hashset_insert(&zbx_audit, &local_audit_host_entry_insert, sizeof(local_audit_host_entry));
 	}
 }
