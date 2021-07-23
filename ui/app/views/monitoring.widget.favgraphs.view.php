@@ -47,7 +47,7 @@ foreach ($data['graphs'] as $graph) {
 			: $graph['label'],
 		(new CButton())
 			->onClick($on_click)
-			->addClass(ZBX_STYLE_REMOVE_BTN)
+			->addClass(ZBX_STYLE_BTN_REMOVE)
 			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
 			->removeId()
 	]);

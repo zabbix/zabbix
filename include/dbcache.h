@@ -213,6 +213,8 @@ typedef struct
 }
 zbx_tag_t;
 
+ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
+
 typedef struct
 {
 	zbx_uint64_t	hostid;

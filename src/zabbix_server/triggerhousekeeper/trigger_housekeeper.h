@@ -1,4 +1,3 @@
-<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,15 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_TRIGGER_HOUSEKEEPER_H
+#define ZABBIX_TRIGGER_HOUSEKEEPER_H
 
-/**
- * @var CView $this
- */
-?>
-<script type="text/javascript">
-	$(() => {
-		$('z-select[name="period"],z-select[name="year"]').on('change', (e) => {
-			document.forms['report.services'].submit();
-		});
-	});
-</script>
+#include "common.h"
+#include "threads.h"
+
+ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args);
+
+#endif

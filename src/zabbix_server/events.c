@@ -25,6 +25,8 @@
 #include "events.h"
 #include "zbxserver.h"
 #include "export.h"
+#include "zbxservice.h"
+#include "service_protocol.h"
 
 /* event recovery data */
 typedef struct
@@ -1912,6 +1914,52 @@ exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+void	zbx_events_update_itservices(void)
+{
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
+	int			i;
+	zbx_hashset_iter_t	iter;
+	zbx_event_recovery_t	*recovery;
+
+	zbx_hashset_iter_reset(&event_recovery, &iter);
+	while (NULL != (recovery = (zbx_event_recovery_t *)zbx_hashset_iter_next(&iter)))
+	{
+		int	values_num;
+
+		if (EVENT_SOURCE_TRIGGERS != recovery->r_event->source)
+			continue;
+
+		values_num = recovery->r_event->tags.values_num;
+		recovery->r_event->tags.values_num = 0;
+
+		zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
+				recovery->r_event->value, recovery->r_event->severity, &recovery->r_event->tags);
+
+		recovery->r_event->tags.values_num = values_num;
+	}
+
+	for (i = 0; i < events.values_num; i++)
+	{
+		DB_EVENT	*event = events.values[i];
+
+		if (EVENT_SOURCE_TRIGGERS != event->source || 0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
+			continue;
+
+		if (TRIGGER_VALUE_PROBLEM != event->value)
+			continue;
+
+		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->value,
+				event->severity, &event->tags);
+	}
+
+	if (NULL == data)
+		return;
+
+	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, (zbx_uint32_t)data_offset);
+	zbx_free(data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: add_event_suppress_data                                          *
@@ -2858,13 +2906,15 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		update_trigger_changes(&trigger_diff);
 		zbx_db_save_trigger_changes(&trigger_diff);
 
-		DBcommit();
+		if (ZBX_DB_OK == DBcommit())
+		{
+			DCconfig_triggers_apply_changes(&trigger_diff);
 
-		DCconfig_triggers_apply_changes(&trigger_diff);
-		DBupdate_itservices(&trigger_diff);
+			if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+				zbx_export_events();
 
-		if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-			zbx_export_events();
+			zbx_events_update_itservices();
+		}
 
 		zbx_clean_events();
 		zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);

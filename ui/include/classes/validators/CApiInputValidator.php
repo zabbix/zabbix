@@ -421,7 +421,7 @@ class CApiInputValidator {
 	 */
 	private static function validateMultiple($rule, &$data, $path, &$error, array $parent_data) {
 		foreach ($rule['rules'] as $field_rule) {
-			if (self::Int32In($parent_data[$field_rule['if']['field']], $field_rule['if']['in'])) {
+			if (self::isInRange($parent_data[$field_rule['if']['field']], $field_rule['if']['in'])) {
 				unset($field_rule['if']);
 
 				return self::validateData($field_rule, $data, $path, $error);
@@ -658,6 +658,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: '0,60:900'
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -691,6 +692,10 @@ class CApiInputValidator {
 		if (is_nan($value)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a floating point value is expected'));
 
+			return false;
+		}
+
+		if (!self::checkFloatIn($rule, $value, $path, $error)) {
 			return false;
 		}
 
@@ -746,7 +751,7 @@ class CApiInputValidator {
 		return true;
 	}
 
-	private static function Int32In($data, $in) {
+	private static function isInRange($data, $in) {
 		$valid = false;
 
 		foreach (explode(',', $in) as $in) {
@@ -781,11 +786,36 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$valid = self::Int32In($data, $rule['in']);
+		$valid = self::isInRange($data, $rule['in']);
 
 		if (!$valid) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_s('value must be one of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']))
+			);
+		}
+
+		return $valid;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['in']  (optional)
+	 * @param int    $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkFloatIn($rule, $data, $path, &$error) {
+		if (!array_key_exists('in', $rule)) {
+			return true;
+		}
+
+		$valid = self::isInRange($data, $rule['in']);
+
+		if (!$valid) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('value must be within the range of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']))
 			);
 		}
 

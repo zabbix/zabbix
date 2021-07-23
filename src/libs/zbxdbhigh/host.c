@@ -942,8 +942,6 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	zbx_vector_uint64_create(&selementids);
 
-	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
-
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 

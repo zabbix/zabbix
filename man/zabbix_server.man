@@ -83,6 +83,12 @@ Ignored if housekeeper is being currently executed.
 .RE
 .RS 4
 .TP 4
+.B trigger_housekeeper_execute
+Execute the trigger housekeeper.
+Ignored if trigger housekeeper is being currently executed.
+.RE
+.RS 4
+.TP 4
 .B secrets_reload
 Reload secrets from Vault.
 Ignored if configuration cache or secrets are being currently loaded.
@@ -111,7 +117,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager)
+All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, service\ manager)
 .RE
 .RS 4
 .TP 4

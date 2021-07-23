@@ -37,23 +37,22 @@ if ($data['roleid'] != 0) {
 	$form->addVar('roleid', $data['roleid']);
 }
 
-$form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
-
-$form_grid->addItem([
-	(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-	(new CFormField(
-		(new CTextBox('name', $data['name'], $data['readonly'], DB::getFieldLength('role', 'name')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('maxlength', DB::getFieldLength('role', 'name'))
-	))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+$form_grid = (new CFormGrid())
+	->addItem([
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('name', $data['name'], $data['readonly'], DB::getFieldLength('role', 'name')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
+				->setAttribute('maxlength', DB::getFieldLength('role', 'name'))
+		)
 ]);
 
 if ($data['readonly'] || $data['is_own_role']) {
 	$form_grid->addItem([
 		(new CLabel(_('User type'), 'type')),
-		(new CFormField([
+		new CFormField([
 			(new CTextBox('type', user_type2str()[$data['type']]))
 				->setId('type_readonly')
 				->setAttribute('readonly', true),
@@ -62,25 +61,24 @@ if ($data['readonly'] || $data['is_own_role']) {
 			$data['is_own_role']
 				? new CSpan(_('User cannot change the user type of own role.'))
 				: null
-		]))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		])
 	]);
 }
 else {
 	$form_grid->addItem([
 		(new CLabel(_('User type'), 'label-type')),
-		(new CFormField(
+		new CFormField(
 			(new CSelect('type'))
 				->setFocusableElementId('label-type')
 				->setValue($data['type'])
 				->addOptions(CSelect::createOptionsFromArray(user_type2str()))
 				->addClass('js-userrole-usertype')
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	]);
 }
 
 $form_grid->addItem(
 	(new CFormField((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header')))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 );
 
@@ -101,38 +99,36 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	}
 	$form_grid->addItem([
 		new CLabel($section_label, $section_key),
-		(new CFormField(
+		new CFormField(
 			(new CDiv(
 				(new CDiv($ui))
 					->addClass(ZBX_STYLE_COLUMNS)
 					->addClass(ZBX_STYLE_COLUMNS_3)
 			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	]);
 }
 
 if (!$data['readonly']) {
 	$form_grid->addItem(
 		(new CFormField((new CLabel(_('At least one UI element must be checked.')))->setAsteriskMark()))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	);
 }
 
 $form_grid->addItem([
 	new CLabel(_('Default access to new UI elements'), $data['readonly'] ? '' : 'ui.default_access'),
-	(new CFormField(
+	new CFormField(
 		(new CCheckBox('ui_default_access', 1))
 			->setId('ui.default_access')
 			->setChecked($data['rules'][CRoleHelper::UI_DEFAULT_ACCESS])
 			->setReadonly($data['readonly'])
 			->setUncheckedValue(0)
-	))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+	)
 ]);
 
 $form_grid->addItem(
 	(new CFormField((new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 );
 
@@ -158,14 +154,12 @@ if ($modules) {
 					->addClass(ZBX_STYLE_COLUMNS_3)
 			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	]);
 }
 else {
 	$form_grid->addItem(
 		(new CFormField((new CLabel(_('No enabled modules found.')))))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	);
 }
@@ -173,33 +167,32 @@ else {
 $form_grid
 	->addItem([
 		new CLabel(_('Default access to new modules'), $data['readonly'] ? '' : 'modules.default_access'),
-		(new CFormField(
+		new CFormField(
 			(new CCheckBox('modules_default_access', 1))
 				->setId('modules.default_access')
 				->setChecked($data['rules'][CRoleHelper::MODULES_DEFAULT_ACCESS])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem(
 		(new CFormField((new CTag('h4', true, _('Access to API')))->addClass('input-section-header')))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	)
 	->addItem([
 		new CLabel(_('Enabled'), $data['readonly'] ? '' : 'api.access'),
-		(new CFormField(
+		new CFormField(
 			(new CCheckBox('api_access', 1))
 				->setId('api.access')
 				->setChecked($data['rules'][CRoleHelper::API_ACCESS])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
 				->addClass('js-userrole-apiaccess')
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	])
 	->addItem([
 		new CLabel(_('API methods'), 'api.mode'),
-		(new CFormField(
+		new CFormField(
 			(new CRadioButtonList('api_mode', (int) $data['rules'][CRoleHelper::API_MODE]))
 				->setId('api.mode')
 				->addValue(_('Allow list'), CRoleHelper::API_MODE_ALLOW)
@@ -207,7 +200,7 @@ $form_grid
 				->setModern(true)
 				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
 				->addClass('js-userrole-apimode')
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		)
 	]);
 
 $form_grid->addItem(
@@ -231,13 +224,11 @@ $form_grid->addItem(
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->addClass('js-userrole-ms')
 	))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 );
 
 $form_grid->addItem(
 	(new CFormField((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 );
 
@@ -258,19 +249,18 @@ foreach ($data['labels']['actions'] as $action => $label) {
 
 $form_grid->addItem(
 	(new CFormField($actions))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 );
 
 $form_grid->addItem([
 	new CLabel(_('Default access to new actions'), $data['readonly'] ? '' : 'actions.default_access'),
-	(new CFormField(
+	new CFormField(
 		(new CCheckBox('actions_default_access', 1))
 			->setId('actions.default_access')
 			->setChecked($data['rules'][CRoleHelper::ACTIONS_DEFAULT_ACCESS])
 			->setReadonly($data['readonly'])
 			->setUncheckedValue(0)
-	))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+	)
 ]);
 
 $cancel_button = (new CRedirectButton(_('Cancel'),
@@ -305,7 +295,6 @@ $form_grid->addItem(
 			: (new CSubmitButton(_('Add'), 'action', 'userrole.create'))->setId('add'),
 		$buttons
 	))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 );
 

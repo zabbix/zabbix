@@ -46,7 +46,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		'tags' => $data['filter']['tags']
 	]);
 
-	$widget->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'latest.view')))
+	$widget->addItem((new CFilter())
+		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'latest.view'))
 		->setProfile('web.latest.filter')
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'latest.view'))->removeId())
