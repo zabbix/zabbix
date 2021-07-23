@@ -319,19 +319,6 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 		exit(EXIT_FAILURE);						\
 	}									\
 
-/* #define PREPARE_UPDATE_JSON_APPEND_OP(...)					\ */
-/* 	zbx_audit_entry_t	local_audit_entry, *found_audit_entry;				\ */
-/* 										\ */
-/* 	local_audit_entry.id = id;						\ */
-/* 										\ */
-/* 	if (NULL == (found_audit_entry = (zbx_audit_entry_t*)zbx_hashset_search(&zbx_audit, \ */
-/* 								&(local_audit_entry)))) \ */
-/* 	{									\ */
-/* 		THIS_SHOULD_NEVER_HAPPEN;					\ */
-/* 		exit(EXIT_FAILURE);						\ */
-/* 	}									\ */
-
-
 void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value)
 {
 	PREPARE_UPDATE_JSON_APPEND_OP();
@@ -397,34 +384,34 @@ void	zbx_audit_host_update_json_update_interface_useip(zbx_uint64_t hostid, zbx_
 void	zbx_audit_host_update_json_update_interface_ip(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		const char *ip_old, const char *ip_new)
 {
-	char	audit_key_ip[AUDIT_DETAILS_KEY_LEN];
+	char	buf[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_ip, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].ip", interfaceid);
-	zbx_audit_update_json_update_string(hostid, audit_key_ip, ip_old, ip_new);
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].ip", interfaceid);
+	zbx_audit_update_json_update_string(hostid, buf, ip_old, ip_new);
 }
 
 void	zbx_audit_host_update_json_update_interface_dns(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		const char *dns_old, const char *dns_new)
 {
-	char	audit_key_dns[AUDIT_DETAILS_KEY_LEN];
+	char	buf[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_dns, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].dns", interfaceid);
-	zbx_audit_update_json_update_string(hostid, audit_key_dns, dns_old, dns_new);
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].dns", interfaceid);
+	zbx_audit_update_json_update_string(hostid, buf, dns_old, dns_new);
 }
 
 void	zbx_audit_host_update_json_update_interface_port(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t port_old, zbx_uint64_t port_new)
 {
-	char	audit_key_port[AUDIT_DETAILS_KEY_LEN];
+	char	buf[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_port, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].port", interfaceid);
-	zbx_audit_update_json_update_uint64(hostid, audit_key_port, port_old, port_new);
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "host.interfaces[%lu].port", interfaceid);
+	zbx_audit_update_json_update_uint64(hostid, buf, port_old, port_new);
 }
 
 #define PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(...)								\

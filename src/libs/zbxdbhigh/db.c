@@ -3579,7 +3579,7 @@ out:
 int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
 {
 	int		ret = FAIL;
-	DB_RESULT	result;
+	DB_RESULT	result = NULL;
 	DB_ROW		row;
 	time_t		t;
 
