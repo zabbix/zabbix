@@ -3581,8 +3581,17 @@ int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
+	time_t		t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
+
+	t = time(NULL);
+
+	if (t == (time_t) - 1)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to get tune: %s", __func__, zbx_strerror(errno));
+		goto out;
+	}
 
 	if (NULL == (result = DBselect(
 			"select u.userid,u.roleid,u.username,r.type"
@@ -3592,7 +3601,8 @@ int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *
 				" and u.roleid=r.roleid"
 				" and t.status=%d"
 				" and (t.expires_at=%d or t.expires_at > %lu)",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES, time(NULL))))
+			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
+			(unsigned long)t)))
 	{
 		goto out;
 	}
