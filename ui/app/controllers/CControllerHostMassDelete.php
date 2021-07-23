@@ -24,6 +24,7 @@ class CControllerHostMassDelete extends CController {
 		$fields = [
 			'action'    => 'required|in host.massdelete',
 			'ids'       => 'required|array_db hosts.hostid',
+			'backurl'   => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,6 +41,8 @@ class CControllerHostMassDelete extends CController {
 	}
 
 	protected function doAction() {
+		header('Cache-Control: max-age=1');
+
 		DBstart();
 
 		$result = API::Host()->delete(getRequest('ids'));
@@ -65,10 +68,14 @@ class CControllerHostMassDelete extends CController {
 			CMessageHelper::setErrorTitle(_('Cannot delete host'));
 		}
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.list')
-			->setArgument('page', CPagerHelper::loadPage('host.list', null))
-		);
+		$redirect = $this->getInput('backurl', '');
+		if (!$redirect) {
+			$redirect = (new CUrl('zabbix.php'))
+				->setArgument('action', 'host.list')
+				->setArgument('page', CPagerHelper::loadPage('host.list', null));
+		}
+
+		$response = new CControllerResponseRedirect($redirect);
 
 		$this->setResponse($response);
 	}

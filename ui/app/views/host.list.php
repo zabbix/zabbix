@@ -24,16 +24,15 @@
  */
 
 $scripts = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
-	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js', 'hostinterfacemanager.js'
+	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js', 'hostinterfacemanager.js',
+	'hostlist.js'
 ];
 
 foreach ($scripts as $script) {
 	$this->addJsFile($script);
 }
 
-// @TODO: coordinate with Miks
-$this->addJsFile('temp.host.list.js');
-$this->includeJsFile('host.list.js.php');
+$this->includeJsFile('configuration.host.list.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
@@ -499,7 +498,6 @@ $form->addItem([
 			'content' => (new CButton('', _('Mass update')))
 				->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->removeAttribute('id')
 		],
 		'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
 	])

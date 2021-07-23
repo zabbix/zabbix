@@ -141,6 +141,31 @@
 			document.querySelector('[for="tls_issuer"]').style.display = use_cert ? '' : 'none';
 			document.querySelector('#tls_subject').closest('div').style.display = use_cert ? '' : 'none';
 			document.querySelector('[for="tls_subject"]').style.display = use_cert ? '' : 'none';
+		},
+
+		deleteHost() {
+			const form = Object.assign(document.createElement('form'), {
+				action: 'zabbix.php',
+				method: 'post',
+				style: 'display:none'
+			});
+
+			Object.entries({
+				action: 'host.massdelete',
+				'ids[0]': document.getElementById('hostid').value,
+				backurl: this.backurl || '',
+				sid: document.getElementById('sid').value
+			})
+				.forEach(([name, val]) => {
+					let input = document.createElement('input');
+					input.setAttribute('name', name);
+					input.setAttribute('value', val);
+					form.appendChild(input);
+				});
+
+			document.body.appendChild(form);
+
+			form.submit();
 		}
 	};
 </script>

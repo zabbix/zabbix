@@ -59,10 +59,11 @@ else {
 		],
 		[
 			'title' => _('Delete selected host?'),
+			'confirmation' => _('Delete selected host?'),
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'return Delete(overlay);'
+			'action' => 'host_edit.deleteHost();'
 		]
 	];
 }
