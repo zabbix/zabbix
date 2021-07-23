@@ -1375,13 +1375,17 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 
 	/* size */
 
-	if (0 != zbx_stat(filename, &buf))
+	if (0 != (file_attributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY)))
+	{
+		zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_SIZE, 0);
+	}
+	else if (0 != zbx_stat(filename, &buf))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		goto err;
 	}
-
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_SIZE, (zbx_uint64_t)buf.st_size);
+	else
+		zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_SIZE, (zbx_uint64_t)buf.st_size);
 
 	/* time */
 

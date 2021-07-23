@@ -198,7 +198,7 @@ int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time)
 	HANDLE			sym_handle = NULL;
 	wchar_t			*wpath = NULL;
 
-	if (0 == sym)
+	if (0 == sym || NULL == zbx_GetFileInformationByHandleEx)
 	{
 		if (NULL == zbx_GetFileInformationByHandleEx || -1 == (f = zbx_open(path, O_RDONLY)))
 			return get_file_time_stat(path, time); /* fall back to stat() */
@@ -210,8 +210,7 @@ int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time)
 			goto out;
 		}
 	}
-	else if (NULL == zbx_GetFileInformationByHandleEx || NULL == (wpath = zbx_utf8_to_unicode(path)) ||
-			INVALID_HANDLE_VALUE == (sym_handle = CreateFile(wpath,
+	else if (NULL == (wpath = zbx_utf8_to_unicode(path)) || INVALID_HANDLE_VALUE == (sym_handle = CreateFile(wpath,
 			GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
 			FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, NULL)) ||
 			0 == zbx_GetFileInformationByHandleEx(sym_handle, zbx_FileBasicInfo, &info, sizeof(info)))
