@@ -19,26 +19,7 @@
 **/
 
 
-class CFormGrid extends CTag {
-
-	/**
-	 * Default CSS class name for HTML root element.
-	 */
-	private const ZBX_STYLE_CLASS = 'form-grid';
-
-	public const ZBX_STYLE_FORM_GRID_OFFSET = 'form-grid-offset';
-
-	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
-	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
-
-	// 100px label column width for use in popup forms.
-	public const ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED = 'label-width-fixed';
-	// True label column width for use in filter forms.
-	public const ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE = 'label-width-true';
-
-	public function __construct($items = null) {
-		parent::__construct('div', true, $items);
-
-		$this->addClass(self::ZBX_STYLE_CLASS);
-	}
-}
+/**
+ * Configuration host edit controller for popup form.
+ */
+final class CControllerPopupHostEdit extends CControllerHostEdit {}
