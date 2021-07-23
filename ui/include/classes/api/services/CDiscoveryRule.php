@@ -2534,6 +2534,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectGroupPrototypes' => ['name'],
 			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
 			'selectTemplates' => ['templateid'],
+			'selectTags' => ['tag', 'value'],
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'preservekeys' => true
 		]);
