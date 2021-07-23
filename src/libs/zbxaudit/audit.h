@@ -28,8 +28,8 @@
 #define AUDIT_ACTION_EXECUTE		7
 
 #define AUDIT_DETAILS_ACTION_ADD	"add"
-#define AUDIT_DETAILS_ACTION_ATTACH	"attached"
-#define AUDIT_DETAILS_ACTION_DETACH	"detached"
+#define AUDIT_DETAILS_ACTION_ATTACH	"attach"
+#define AUDIT_DETAILS_ACTION_DETACH	"detach"
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
