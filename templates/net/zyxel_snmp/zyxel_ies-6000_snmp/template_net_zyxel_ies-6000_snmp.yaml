@@ -1565,7 +1565,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#ZYXEL.SLOTSTATUS}'
-                value: '{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}'
+                value: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The table which contains the slot information in a chassis.'
@@ -2070,12 +2070,12 @@ zabbix_export:
           value: '8'
           description: 'Type the minimum signal to noise margin (0-31 dB)'
         -
-          macro: '{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}'
+          macro: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
           value: '1'
           description: 'Filter to exclude discovered slots by status.'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'NEED TRIGGERS'
+          value: 'CHANGE_IF_NEEDED'
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}'
