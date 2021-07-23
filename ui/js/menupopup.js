@@ -230,8 +230,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			};
 
 			if (options.isWriteable) {
-				var config_url = new Curl('hosts.php', false);
-				config_url.setArgument('form', 'update');
+				var config_url = new Curl('zabbix.php', false);
+				config_url.setArgument('action', 'host.edit');
 				config_url.setArgument('hostid', options.hostid);
 				config.url = config_url.getUrl();
 			}

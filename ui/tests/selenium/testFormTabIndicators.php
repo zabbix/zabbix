@@ -97,7 +97,9 @@ class testFormTabIndicators extends CWebTest {
 			// Host configuration form tab data.
 			[
 				[
-					'url' => 'hosts.php?form=create',
+					'url' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'host.create')
+						->getUrl(),
 					'form' => 'name:hostsForm',
 					'tabs' => [
 						[

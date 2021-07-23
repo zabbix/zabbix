@@ -49,7 +49,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestClickLinkTextWait($this->hostName);
 
@@ -149,7 +149,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		switch ($result) {
 			case TEST_GOOD:
 				// check that the inherited item matches the original
-				$this->zbxTestOpen('hosts.php');
+				$this->zbxTestOpen(self::HOST_LIST_PAGE);
 				$this->zbxTestCheckHeader('Hosts');
 				$this->zbxTestClickLinkTextWait($this->hostName);
 				$this->zbxTestClickLinkTextWait('Items');
@@ -180,7 +180,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->hostName);
 
 		$this->zbxTestTabSwitch('Templates');
@@ -220,7 +220,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added');
 
 		// check that the inherited trigger matches the original
-		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->hostName);
 		$this->zbxTestClickLinkTextWait('Triggers');
 
@@ -272,7 +272,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Graph added');
 
 		// check that the inherited graph matches the original
-		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->hostName);
 		$this->zbxTestClickLinkTextWait('Graphs');
 
@@ -323,7 +323,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rule created');
 
 		// check that the inherited rule matches the original
-		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->hostName);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestAssertElementText("//a[text()='Test LLD']/parent::td", "$this->templateName: Test LLD");
@@ -377,7 +377,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Test LLD item');
 
 		// check that the inherited item prototype matches the original
-		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->hostName);
 		$this->zbxTestCheckHeader('Hosts');
 		$this->zbxTestClickLinkTextWait('Discovery rules');
@@ -438,7 +438,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Trigger prototype has not been added into Zabbix DB');
 
 		// check that the inherited trigger prototype matches the original
-		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->hostName);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
@@ -511,7 +511,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Test LLD graph');
 
 		// check that the inherited graph matches the original
-		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->hostName);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');

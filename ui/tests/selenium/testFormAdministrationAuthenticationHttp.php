@@ -171,7 +171,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open Hosts page due access.
 						[
-							'page' => 'hosts.php',
+							'page' => self::HOST_LIST_PAGE,
 							'error' => 'Access denied'
 						],
 						// Couldn't open GUI page due access.
@@ -209,7 +209,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 //						// wait for ZBX-14774.
 //						// Redirect to HTTP login form and user is signed on hosts page.
 //						[
-//							'page' => 'hosts.php',
+//							'page' => self::HOST_LIST_PAGE,
 //							'action' => self::LOGIN_HTTP,
 //							'target' => 'Hosts'
 //						],
@@ -317,7 +317,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 //						// Redirect to HTTP login form and user is signed on hosts page.
 //						// wait for ZBX-14774.
 //						[
-//							'page' => 'hosts.php',
+//							'page' => self::HOST_LIST_PAGE,
 //							'action' => self::LOGIN_HTTP,
 //							'target' => 'Hosts'
 //						],
@@ -371,7 +371,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 //						// wait for ZBX-14774.
 //						[
-//							'page' => 'hosts.php',
+//							'page' => self::HOST_LIST_PAGE,
 //							'action' => self::LOGIN_HTTP,
 //							'target' => 'hosts'
 //						],

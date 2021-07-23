@@ -458,7 +458,12 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getSecretMacrosLayoutData
 	 */
 	public function testFormMacrosHost_CheckSecretMacrosLayout($data) {
-		$this->checkSecretMacrosLayout($data, 'hosts.php?form=update&hostid=99011', 'hosts');
+		$this->checkSecretMacrosLayout($data, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', 99011)
+			->getUrl(),
+			'hosts'
+		);
 	}
 
 	public function getCreateSecretMacrosData() {
@@ -510,7 +515,12 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getCreateSecretMacrosData
 	 */
 	public function testFormMacrosHost_CreateSecretMacros($data) {
-		$this->createSecretMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
+		$this->createSecretMacros($data, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', 99134)
+			->getUrl(),
+			'hosts'
+		);
 	}
 
 	public function getRevertSecretMacrosData() {
@@ -539,7 +549,12 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getRevertSecretMacrosData
 	 */
 	public function testFormMacrosHost_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'hosts.php?form=update&hostid=99135', 'hosts');
+		$this->revertSecretMacroChanges($data, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', 99135)
+			->getUrl(),
+			'hosts'
+		);
 	}
 
 	public function getUpdateSecretMacrosData() {
@@ -583,7 +598,12 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
 	public function testFormMacrosHost_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'hosts.php?form=update&hostid=99135', 'hosts');
+		$this->updateSecretMacros($data, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', 99135)
+			->getUrl(),
+			'hosts'
+		);
 	}
 
 	public function testFormMacrosHost_ResolveSecretMacro() {
@@ -591,7 +611,13 @@ class testFormMacrosHost extends testFormMacros {
 			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'
 		];
-		$this->resolveSecretMacro($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
+		$this->resolveSecretMacro($macro, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', 99135)
+			->getUrl(),
+			'hosts',
+			'host'
+		);
 	}
 
 	public function getCreateVaultMacrosData() {
@@ -736,7 +762,12 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormMacrosHost_CreateVaultMacros($data) {
-		$this->createVaultMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
+		$this->createVaultMacros($data, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', 99134)
+			->getUrl(),
+			'hosts'
+		);
 	}
 
 	public function getUpdateVaultMacrosData() {
@@ -781,6 +812,11 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getUpdateVaultMacrosData
 	 */
 	public function testFormMacrosHost_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'hosts.php?form=update&hostid=99011', 'hosts');
+		$this->updateVaultMacros($data, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', 99011)
+			->getUrl(),
+			'hosts'
+		);
 	}
 }

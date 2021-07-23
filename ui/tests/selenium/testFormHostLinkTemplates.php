@@ -27,7 +27,10 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public $host_for_template = 'Visible host for template linkage';
 
 	public function testFormHostLinkTemplates_Layout() {
-		$this->zbxTestLogin('hosts.php?form=1');
+		$this->zbxTestLogin((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.create')
+			->getUrl()
+		);
 
 		$this->zbxTestTabSwitch('Inventory');
 
@@ -40,7 +43,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	}
 
 	public function testFormHostLinkTemplates_TemplateLink() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
@@ -76,7 +79,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$row2 = DBfetch(DBselect($sql2));
 		$hostid2 = $row2['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 		$this->zbxTestTabSwitch('Templates');
@@ -103,7 +106,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	}
 
 	public function testFormHostLinkTemplates_TemplateLinkUpdate() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
@@ -139,7 +142,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$row2 = DBfetch(DBselect($sql2));
 		$hostid2 = $row2['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 		$this->zbxTestTabSwitch('Templates');

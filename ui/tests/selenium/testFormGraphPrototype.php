@@ -320,7 +320,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($data['host']);
 			if (!isset($data['templatedHost'])) {
 				$discoveryRule = $this->discoveryRule;
@@ -1192,7 +1192,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Discovery rules');
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
@@ -1218,7 +1218,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 				$graphid = $row['graphid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Discovery rules');
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);

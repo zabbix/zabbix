@@ -90,7 +90,7 @@ $fields = [
 	'valuemaps' => 				[T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-									IN('"host.export","host.massdelete","host.massdisable", "host.massenable"'),
+									IN('"host.export","host.massdelete"'),
 									null
 								],
 	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],

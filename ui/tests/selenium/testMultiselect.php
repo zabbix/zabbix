@@ -38,8 +38,10 @@ class testMultiselect extends CWebTest {
 	}
 
 	public function testMultiselect_SuggestCreateNew() {
-		$this->checkSuggest('hosts.php?form=create', 'hostsForm',
-			'Groups', 'QQQwww', 'multiselect-suggest'
+		$this->checkSuggest((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.create')
+			->getUrl(),
+			'hostsForm', 'Groups', 'QQQwww', 'multiselect-suggest'
 		);
 	}
 

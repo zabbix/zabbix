@@ -23,7 +23,7 @@ class CControllerHostMassDelete extends CController {
 	protected function checkInput() {
 		$fields = [
 			'action'    => 'required|in host.massdelete',
-			'hosts'     => 'required|array_db hosts.hostid',
+			'ids'       => 'required|array_db hosts.hostid',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -42,7 +42,7 @@ class CControllerHostMassDelete extends CController {
 	protected function doAction() {
 		DBstart();
 
-		$result = API::Host()->delete(getRequest('hosts'));
+		$result = API::Host()->delete(getRequest('ids'));
 		$result = DBend($result);
 
 		if ($result) {
@@ -51,7 +51,7 @@ class CControllerHostMassDelete extends CController {
 		else {
 			$hostids = API::Host()->get([
 				'output' => [],
-				'hostids' => getRequest('hosts'),
+				'hostids' => getRequest('ids'),
 				'editable' => true
 			]);
 
