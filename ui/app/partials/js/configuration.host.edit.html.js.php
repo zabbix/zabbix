@@ -24,6 +24,81 @@
  */
 ?>
 
+<?php if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED): ?>
+	<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
+		<?= (new CRow([
+				(new CCol([
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->addClass('macro')
+						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+						->setAttribute('placeholder', '{$MACRO}'),
+					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
+				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				))->addClass(ZBX_STYLE_NOWRAP),
+				[
+					new CCol(
+						(new CDiv())
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					),
+					new CCol(),
+					new CCol(
+						(new CDiv())
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					)
+				]
+			]))
+				->addClass('form_row')
+				->toString().
+			(new CRow([
+				(new CCol(
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAttribute('placeholder', _('description'))
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
+			]))
+				->addClass('form_row')
+				->toString()
+		?>
+	</script>
+	<script type="text/x-jquery-tmpl" id="macro-row-tmpl">
+		<?= (new CRow([
+				(new CCol([
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->addClass('macro')
+						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+						->setAttribute('placeholder', '{$MACRO}')
+				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+						->setAttribute('placeholder', _('description'))
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				))->addClass(ZBX_STYLE_NOWRAP)
+			]))
+				->addClass('form_row')
+				->toString()
+		?>
+	</script>
+<?php endif ?>
+
 <script type="text/javascript">
 	'use strict';
 
@@ -70,8 +145,82 @@
 		},
 
 		initMacrosTab() {
-			// todo
-			console.log(`At galaxy far far away, there is an ugly code put into common.template.edit.js.php... this code must be addpted for life on host planet.`);
+			var linked_templateids = [],
+				$show_inherited_macros = $('input[name="show_inherited_macros"]');
+
+			this.macros_manager = new HostMacrosManager(<?= json_encode([
+				'properties' => [
+					'readonly' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+				],
+				'defines' => [
+					'ZBX_STYLE_TEXTAREA_FLEXIBLE' => ZBX_STYLE_TEXTAREA_FLEXIBLE,
+					'ZBX_PROPERTY_OWN' => ZBX_PROPERTY_OWN,
+					'ZBX_MACRO_TYPE_TEXT' => ZBX_MACRO_TYPE_TEXT,
+					'ZBX_MACRO_TYPE_SECRET' => ZBX_MACRO_TYPE_SECRET,
+					'ZBX_MACRO_TYPE_VAULT' => ZBX_MACRO_TYPE_VAULT,
+					'ZBX_STYLE_ICON_TEXT' => ZBX_STYLE_ICON_TEXT,
+					'ZBX_STYLE_ICON_INVISIBLE' => ZBX_STYLE_ICON_INVISIBLE,
+					'ZBX_STYLE_ICON_SECRET_TEXT' => ZBX_STYLE_ICON_SECRET_TEXT
+				]
+			]) ?>);
+
+			$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
+				var panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+
+				if (panel.attr('id') === 'macros-tab') {
+					let macros_initialized = panel.data('macros_initialized') || false;
+
+					// Please note that macro initialization must take place once and only when the tab is visible.
+					if (event.type === 'tabsactivate') {
+						let panel_templateids = panel.data('templateids') || [],
+							templateids = this.getNewlyAddedTemplates();
+
+						if (panel_templateids.xor(templateids).length > 0) {
+							panel.data('templateids', templateids);
+							this.macros_manager.load($show_inherited_macros.val(), linked_templateids.concat(templateids));
+							panel.data('macros_initialized', true);
+						}
+					}
+
+					if (macros_initialized) {
+						return;
+					}
+
+					// Initialize macros.
+					<?php if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED): ?>
+						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
+					<?php else: ?>
+						this.macros_manager.initMacroTable(this.macros_manager.getMacroTable(),
+							$('input[name="show_inherited_macros"]:checked').val()
+						);
+					<?php endif ?>
+
+					panel.data('macros_initialized', true);
+				}
+			});
+
+			$show_inherited_macros.on('change', event => {
+				if (event.target.name !== 'show_inherited_macros') {
+					return;
+				}
+
+				let templateids = linked_templateids.concat(this.getNewlyAddedTemplates());
+				this.macros_manager.load(event.target.value, templateids);
+			});
+		},
+
+		getNewlyAddedTemplates() {
+			let $ms = $('#add_templates_'),
+				templateids = [];
+
+			// Readonly forms don't have multiselect.
+			if ($ms.length) {
+				$ms.multiSelect('getData').forEach(template => {
+					templateids.push(template.id);
+				});
+			}
+
+			return templateids;
 		},
 
 		initInventoryTab() {
