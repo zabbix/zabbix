@@ -2406,7 +2406,25 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_REGEX],
 				'@^[a-z$',
 				'/1/expression',
-				'@^[a-z$'
+				'Invalid parameter "/1/expression": invalid regular expression.'
+			],
+			[
+				['type' => API_REGEX],
+				'@[a-z',
+				'/1/expression',
+				'Invalid parameter "/1/expression": invalid regular expression.'
+			],
+			[
+				['type' => API_REGEX],
+				'@[a-z]',
+				'/1/expression',
+				'@[a-z]'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_ALLOW_GLOBAL_REGEX],
+				'invalid [(regexp])',
+				'/1/expression',
+				'Invalid parameter "/1/expression": invalid regular expression.'
 			],
 			[
 				['type' => API_REGEX],
@@ -2419,6 +2437,18 @@ class CApiInputValidatorTest extends TestCase {
 				'/test/i',
 				'/1/expression',
 				'/test/i'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_ALLOW_GLOBAL_REGEX],
+				'@valid global regexp name [(regexp])',
+				'/1/expression',
+				'@valid global regexp name [(regexp])'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_ALLOW_GLOBAL_REGEX],
+				'/valid regexp',
+				'/1/expression',
+				'/valid regexp'
 			],
 			[
 				['type' => API_VARIABLE_NAME, 'length' => 6],
