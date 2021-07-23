@@ -847,26 +847,31 @@ class CHostPrototype extends CHostBase {
 
 
 	/**
-	 * Prepares and returns an array of child host prototypes, inherited from host prototypes $hostPrototypes
+	 * Prepares and returns an array of child host prototypes, inherited from host prototypes $host_prototypes
 	 * on the given hosts.
 	 *
 	 * Each host prototype must have the "ruleid" parameter set.
 	 *
-	 * @param array     $hostPrototypes
+	 * @param array     $host_prototypes
 	 * @param array		$hostIds
 	 *
 	 * @return array 	an array of unsaved child host prototypes
 	 */
-	protected function prepareInheritedObjects(array $hostPrototypes, array $hostIds = null) {
+	protected function prepareInheritedObjects(array $host_prototypes, array $hostIds = null) {
 		// Fetch the related discovery rules with their hosts.
 		$discoveryRules = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'hostid'],
 			'selectHosts' => ['hostid'],
-			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid'),
+			'itemids' => array_column($host_prototypes, 'ruleid'),
 			'templated' => true,
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
+
+		// Remove host prototypes which don't belong to templates, so they cannot be inherited.
+		$host_prototypes = array_filter($host_prototypes, function ($host_prototype) use ($discoveryRules) {
+			return array_key_exists($host_prototype['ruleid'], $discoveryRules);
+		});
 
 		// Fetch all child hosts to inherit to. Do not inherit host prototypes on discovered hosts.
 		$chdHosts = API::Host()->get([
@@ -926,7 +931,7 @@ class CHostPrototype extends CHostBase {
 			// skip items not from parent templates of current host
 			$templateIds = zbx_toHash($host['parentTemplates'], 'templateid');
 			$parentHostPrototypes = [];
-			foreach ($hostPrototypes as $inum => $parentHostPrototype) {
+			foreach ($host_prototypes as $inum => $parentHostPrototype) {
 				$parentTemplateId = $discoveryRules[$parentHostPrototype['ruleid']]['hostid'];
 
 				if (isset($templateIds[$parentTemplateId])) {
