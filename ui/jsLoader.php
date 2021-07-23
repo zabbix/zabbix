@@ -64,6 +64,7 @@ $availableJScripts = [
 	'class.widget.problemsbysv.js' => 'widgets/',
 	'class.widget.svggraph.js' => 'widgets/',
 	'class.widget.trigerover.js' => 'widgets/',
+	'hostinterfacemanager.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -303,6 +304,12 @@ $tranStrings = [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
 		'S_CLOSE' => _('Close')
+	],
+	'hostinterfacemanager.js' => [
+		'S_AGENT' => _('Agent'),
+		'S_SNMP' => _('SNMP'),
+		'S_JMX' => _('JMX'),
+		'S_IPMI' => _('IPMI')
 	],
 	'multilineinput.js' => [
 		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
