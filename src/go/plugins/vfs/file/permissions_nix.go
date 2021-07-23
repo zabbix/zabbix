@@ -29,6 +29,11 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
+// mode2str - permission printable format
+func mode2str(mode uint32) string {
+	return fmt.Sprintf("%04o", mode&07777)
+}
+
 // exportPermissions - returns 4-digit string containing octal number with Unix permissions
 func (p *Plugin) exportPermissions(params []string) (result interface{}, err error) {
 	if len(params) > 1 {
@@ -48,5 +53,5 @@ func (p *Plugin) exportPermissions(params []string) (result interface{}, err err
 		return nil, fmt.Errorf("Cannot obtain %s permission information.", params[0])
 	}
 
-	return fmt.Sprintf("%04o", stat.Mode&07777), nil
+	return mode2str(stat.Mode), nil
 }

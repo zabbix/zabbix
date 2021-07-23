@@ -45,7 +45,7 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 		return nil, fmt.Errorf("Cannot obtain %s permission information.", name)
 	}
 
-	fi.Permissions = fmt.Sprintf("%04o", stat.Mode&07777)
+	fi.Permissions = mode2str(stat.Mode)
 
 	u := strconv.FormatUint(uint64(stat.Uid), 10)
 	if usr, ok := user.LookupId(u); ok == nil {
