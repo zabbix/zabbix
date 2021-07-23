@@ -1290,8 +1290,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addobject(&j, NULL);
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	/* type */
 
@@ -1435,8 +1434,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addobject(&j, NULL);
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	/* type */
 
