@@ -63,7 +63,7 @@ type fileInfo struct {
 
 func (p *Plugin) exportGet(params []string) (result interface{}, err error) {
 	if len(params) > 1 {
-		return nil, zbxerr.ErrorInvalidParams
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 	if len(params) == 0 || params[0] == "" {
 		return nil, zbxerr.ErrorTooFewParameters
