@@ -1258,8 +1258,6 @@ abstract class CGraphGeneral extends CApiService {
 	 * Inherit template graphs from template to host.
 	 *
 	 * @param array $data
-	 *
-	 * @return bool
 	 */
 	public function syncTemplates(array $data): void {
 		$output = ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'templateid', 'show_work_period',
