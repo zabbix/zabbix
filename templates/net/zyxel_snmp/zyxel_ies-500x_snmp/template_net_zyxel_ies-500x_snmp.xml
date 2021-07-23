@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-22T09:33:46Z</date>
+   <date>2021-07-23T11:06:19Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -1799,7 +1799,7 @@ those that were discarded or not sent.</description>
                      </condition>
                      <condition>
                         <macro>{#ZYXEL.SLOTSTATUS}</macro>
-                        <value>{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}</value>
+                        <value>{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>B</formulaid>
                      </condition>
@@ -2363,13 +2363,8 @@ return JSON.stringify(outArr);
                <description>Type the minimum signal to noise margin (0-31 dB)</description>
             </macro>
             <macro>
-               <macro>{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}</macro>
-               <value>1</value>
-               <description>Filter to exclude discovered slots by status.</description>
-            </macro>
-            <macro>
                <macro>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</macro>
-               <value>NEED TRIGGERS</value>
+               <value>CHANGE_IF_NEEDED</value>
                <description>Triggers will be created only for interfaces whose description contains the value of this macro</description>
             </macro>
             <macro>
@@ -2396,6 +2391,11 @@ return JSON.stringify(outArr);
                <macro>{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}</macro>
                <value>.*</value>
                <description>Filter by discoverable slot status.</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}</macro>
+               <value>1</value>
+               <description>Filter to exclude discovered slots by status.</description>
             </macro>
          </macros>
       </template>

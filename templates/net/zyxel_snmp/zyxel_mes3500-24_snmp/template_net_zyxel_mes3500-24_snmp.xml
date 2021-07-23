@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-22T09:29:52Z</date>
+   <date>2021-07-23T11:06:20Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -452,7 +452,6 @@ Utilization of memory pool in %.</description>
                      </condition>
                   </conditions>
                </filter>
-               <description>An entry in fanRpmTable.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>ZYXEL MES3500-24: Port {#SNMPINDEX}: Administrative status</name>
@@ -1504,7 +1503,7 @@ return JSON.stringify(outArr);
             </macro>
             <macro>
                <macro>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</macro>
-               <value>NEED TRIGGERS</value>
+               <value>CHANGE_IF_NEEDED</value>
                <description>Triggers will be created only for interfaces whose description contains the value of this macro</description>
             </macro>
             <macro>
