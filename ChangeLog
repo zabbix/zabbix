@@ -1053,6 +1053,8 @@ Changes for 5.0.15rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
+........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.14
