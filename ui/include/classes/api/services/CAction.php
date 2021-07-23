@@ -2727,7 +2727,9 @@ class CAction extends CApiService {
 				$duplicates[$action['name']] = $action['name'];
 			}
 
-			if (array_key_exists('esc_period', $action) && $action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+			if (array_key_exists('esc_period', $action)
+					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
+						|| $action['eventsource'] == EVENT_SOURCE_SERVICETRIGGERS)) {
 				self::validateStepDuration($action['esc_period']);
 			}
 		}
@@ -2891,7 +2893,8 @@ class CAction extends CApiService {
 
 			// check if user changed esc_period for trigger eventsource
 			if (array_key_exists('esc_period', $action)
-					&& $db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+					&& ($db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS
+						|| $db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_SERVICE)) {
 				self::validateStepDuration($action['esc_period']);
 			}
 
