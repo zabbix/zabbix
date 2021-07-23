@@ -61,12 +61,12 @@ class CHelpItems {
 		return [
 			ITEM_TYPE_ZABBIX => [
 				[
-					'key' => 'agent.hostname',
-					'description' => _('Agent host name. Returns string')
-				],
-				[
 					'key' => 'agent.hostmetadata',
 					'description' => _('Agent host metadata. Returns string')
+				],
+				[
+					'key' => 'agent.hostname',
+					'description' => _('Agent host name. Returns string')
 				],
 				[
 					'key' => 'agent.ping',
@@ -419,12 +419,12 @@ class CHelpItems {
 			],
 			ITEM_TYPE_ZABBIX_ACTIVE => [
 				[
-					'key' => 'agent.hostname',
-					'description' => _('Agent host name. Returns string')
-				],
-				[
 					'key' => 'agent.hostmetadata',
 					'description' => _('Agent host metadata. Returns string')
+				],
+				[
+					'key' => 'agent.hostname',
+					'description' => _('Agent host name. Returns string')
 				],
 				[
 					'key' => 'agent.ping',
