@@ -333,12 +333,20 @@ class CHelpItems {
 					'description' => _('Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists')
 				],
 				[
+					'key' => 'vfs.file.get[file]',
+					'description' => _('Information about a file. Returns JSON')
+				],
+				[
 					'key' => 'vfs.file.md5sum[file]',
 					'description' => _('MD5 checksum of file. Returns character string (MD5 hash of the file)')
 				],
 				[
 					'key' => 'vfs.file.owner[file,<ownertype>,<resulttype>]',
-					'description' => _('File owner information. Returns character string')
+					'description' => _('File owner information, where <ownertype> - user (default) or group and <resulttype> - name (default) or id (uid/gid on Unix, SID on Windows). Returns string')
+				],
+				[
+					'key' => 'vfs.file.permissions[file]',
+					'description' => _('Returns 4-digit string containing octal number with Unix permissions')
 				],
 				[
 					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
@@ -355,14 +363,6 @@ class CHelpItems {
 				[
 					'key' => 'vfs.file.time[file,<mode>]',
 					'description' => _('File time information. Returns integer (Unix timestamp)')
-				],
-				[
-					'key' => 'vfs.file.permissions[file]',
-					'description' => _('Returns 4-digit string containing octal number with Unix permissions')
-				],
-				[
-					'key' => 'vfs.file.get[file]',
-					'description' => _('Information about a file. Returns JSON')
 				],
 				[
 					'key' => 'vfs.fs.discovery',
@@ -715,12 +715,20 @@ class CHelpItems {
 					'description' => _('Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists')
 				],
 				[
+					'key' => 'vfs.file.get[file]',
+					'description' => _('Information about a file. Returns JSON')
+				],
+				[
 					'key' => 'vfs.file.md5sum[file]',
 					'description' => _('MD5 checksum of file. Returns character string (MD5 hash of the file)')
 				],
 				[
 					'key' => 'vfs.file.owner[file,<ownertype>,<resulttype>]',
-					'description' => _('File owner information. Returns character string')
+					'description' => _('File owner information, where <ownertype> - user (default) or group and <resulttype> - name (default) or id (uid/gid on Unix, SID on Windows). Returns string')
+				],
+				[
+					'key' => 'vfs.file.permissions[file]',
+					'description' => _('Returns 4-digit string containing octal number with Unix permissions')
 				],
 				[
 					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
@@ -737,14 +745,6 @@ class CHelpItems {
 				[
 					'key' => 'vfs.file.time[file,<mode>]',
 					'description' => _('File time information. Returns integer (Unix timestamp)')
-				],
-				[
-					'key' => 'vfs.file.permissions[file]',
-					'description' => _('Returns 4-digit string containing octal number with Unix permissions')
-				],
-				[
-					'key' => 'vfs.file.get[file]',
-					'description' => _('Information about a file. Returns JSON')
 				],
 				[
 					'key' => 'vfs.fs.discovery',
