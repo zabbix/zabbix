@@ -3589,7 +3589,7 @@ int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *
 
 	if (t == (time_t) - 1)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to get tune: %s", __func__, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to get time: %s", __func__, zbx_strerror(errno));
 		goto out;
 	}
 
