@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,25 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+#include "zbxalgo.h"
+#include "service_manager_impl.h"
 
-/**
- * Factory for creating import conversions.
- */
-class CImportConverterFactory extends CRegistryFactory {
+#ifndef ZABBIX_SERVICE_ACTIONS_H
+#define ZABBIX_SERVICE_ACTIONS_H
 
-	public function __construct() {
-		parent::__construct([
-			'1.0' => 'C10ImportConverter',
-			'2.0' => 'C20ImportConverter',
-			'3.0' => 'C30ImportConverter',
-			'3.2' => 'C32ImportConverter',
-			'3.4' => 'C34ImportConverter',
-			'4.0' => 'C40ImportConverter',
-			'4.2' => 'C42ImportConverter',
-			'4.4' => 'C44ImportConverter',
-			'5.0' => 'C50ImportConverter',
-			'5.2' => 'C52ImportConverter',
-			'5.4' => 'C54ImportConverter'
-		]);
-	}
-}
+void	service_update_process_actions(const zbx_service_update_t *update, zbx_hashset_t *actions,
+		zbx_vector_uint64_t *actionids);
+
+#endif

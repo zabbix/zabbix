@@ -341,6 +341,15 @@ DB_TRIGGER;
 
 typedef struct
 {
+	zbx_uint64_t		serviceid;
+	char			*name;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_ptr_t	events;
+}
+DB_SERVICE;
+
+typedef struct
+{
 	zbx_uint64_t		eventid;
 	DB_TRIGGER		trigger;
 	zbx_uint64_t		objectid;
@@ -463,6 +472,8 @@ typedef struct
 	zbx_uint64_t		eventid;
 	zbx_uint64_t		r_eventid;
 	zbx_uint64_t		acknowledgeid;
+	zbx_uint64_t		servicealarmid;
+	zbx_uint64_t		serviceid;
 	int			nextcheck;
 	int			esc_step;
 	zbx_escalation_status_t	status;
@@ -492,6 +503,14 @@ typedef struct
 	int		new_severity;
 }
 DB_ACKNOWLEDGE;
+
+typedef struct
+{
+	zbx_uint64_t	service_alarmid;
+	int		value;
+	int		clock;
+}
+zbx_service_alarm_t;
 
 int	DBinit(char **error);
 void	DBdeinit(void);
@@ -765,6 +784,7 @@ typedef struct
 {
 	zbx_uint64_t		eventid;
 	int			clock;
+	int			ns;
 	int			value;
 	int			severity;
 

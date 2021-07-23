@@ -58,6 +58,10 @@ class CAction extends CApiService {
 		EVENT_SOURCE_INTERNAL => [
 			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TEMPLATE, CONDITION_TYPE_EVENT_TYPE,
 			CONDITION_TYPE_EVENT_TAG, CONDITION_TYPE_EVENT_TAG_VALUE
+		],
+		EVENT_SOURCE_SERVICE => [
+			CONDITION_TYPE_SERVICE, CONDITION_TYPE_SERVICE_NAME, CONDITION_TYPE_EVENT_TAG,
+			CONDITION_TYPE_EVENT_TAG_VALUE
 		]
 	];
 
@@ -103,7 +107,9 @@ class CAction extends CApiService {
 		],
 		CONDITION_TYPE_EVENT_TAG_VALUE => [
 			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
-		]
+		],
+		CONDITION_TYPE_SERVICE => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+		CONDITION_TYPE_SERVICE_NAME => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]
 	];
 
 	/**
@@ -158,7 +164,7 @@ class CAction extends CApiService {
 			'selectFilter'				=> null,
 			'selectOperations'			=> null,
 			'selectRecoveryOperations'	=> null,
-			'selectAcknowledgeOperations'	=> null,
+			'selectUpdateOperations'	=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
 			'sortfield'					=> '',
@@ -621,9 +627,9 @@ class CAction extends CApiService {
 				unset($operation);
 			}
 
-			// Set default values for acknowledge operations and their messages.
-			if (array_key_exists('acknowledge_operations', $action)) {
-				foreach ($action['acknowledge_operations'] as &$operation) {
+			// Set default values for update operations and their messages.
+			if (array_key_exists('update_operations', $action)) {
+				foreach ($action['update_operations'] as &$operation) {
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 							|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
 						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
@@ -686,12 +692,14 @@ class CAction extends CApiService {
 				}
 			}
 
-			if (array_key_exists('acknowledge_operations', $action) && $action['acknowledge_operations']) {
-				foreach ($action['acknowledge_operations'] as $ack_operation) {
-					$ack_operation['actionid'] = $actionid;
-					$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
-					unset($ack_operation['esc_period'], $ack_operation['esc_step_from'], $ack_operation['esc_step_to']);
-					$operations_to_create[] = $ack_operation;
+			if (array_key_exists('update_operations', $action) && $action['update_operations']) {
+				foreach ($action['update_operations'] as $update_operation) {
+					$update_operation['actionid'] = $actionid;
+					$update_operation['recovery'] = ACTION_UPDATE_OPERATION;
+					unset($update_operation['esc_period'], $update_operation['esc_step_from'],
+						$update_operation['esc_step_to']
+					);
+					$operations_to_create[] = $update_operation;
 				}
 			}
 		}
@@ -749,7 +757,7 @@ class CAction extends CApiService {
 			'selectFilter' => ['formula', 'conditions'],
 			'selectOperations' => API_OUTPUT_EXTEND,
 			'selectRecoveryOperations' => API_OUTPUT_EXTEND,
-			'selectAcknowledgeOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
+			'selectUpdateOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
 				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
 			],
 			'actionids' => $actionIds,
@@ -775,7 +783,7 @@ class CAction extends CApiService {
 				$actionUpdateValues['filter'],
 				$actionUpdateValues['operations'],
 				$actionUpdateValues['recovery_operations'],
-				$actionUpdateValues['acknowledge_operations'],
+				$actionUpdateValues['update_operations'],
 				$actionUpdateValues['conditions'],
 				$actionUpdateValues['formula'],
 				$actionUpdateValues['evaltype']
@@ -820,7 +828,7 @@ class CAction extends CApiService {
 			}
 
 			if (array_key_exists('recovery_operations', $action)) {
-				$db_recovery_operations = zbx_toHash($db_action['recoveryOperations'], 'operationid');
+				$db_recovery_operations = zbx_toHash($db_action['recovery_operations'], 'operationid');
 
 				foreach ($action['recovery_operations'] as $recovery_operation) {
 					unset($recovery_operation['esc_period'], $recovery_operation['esc_step_from'],
@@ -862,21 +870,24 @@ class CAction extends CApiService {
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_recovery_operations));
 			}
 
-			if (array_key_exists('acknowledge_operations', $action)) {
-				$db_ack_operations = zbx_toHash($db_action['acknowledgeOperations'], 'operationid');
+			if (array_key_exists('update_operations', $action)) {
+				$db_update_operations = zbx_toHash($db_action['update_operations'], 'operationid');
 
-				foreach ($action['acknowledge_operations'] as $ack_operation) {
-					$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
-					$opmessage = (array_key_exists('opmessage', $ack_operation) && is_array($ack_operation['opmessage']))
-						? $ack_operation['opmessage']
+				foreach ($action['update_operations'] as $update_operation) {
+					$update_operation['recovery'] = ACTION_UPDATE_OPERATION;
+					$opmessage = (array_key_exists('opmessage', $update_operation)
+							&& is_array($update_operation['opmessage']))
+						? $update_operation['opmessage']
 						: [];
-					unset($ack_operation['esc_period'], $ack_operation['esc_step_from'], $ack_operation['esc_step_to']);
-					$ack_operation['actionid'] = $action['actionid'];
+					unset($update_operation['esc_period'], $update_operation['esc_step_from'],
+						$update_operation['esc_step_to']
+					);
+					$update_operation['actionid'] = $action['actionid'];
 
-					if (!array_key_exists('operationid', $ack_operation)) {
-						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
-								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$ack_operation['opmessage'] += [
+					if (!array_key_exists('operationid', $update_operation)) {
+						if ($update_operation['operationtype'] == OPERATION_TYPE_MESSAGE
+								|| $update_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+							$update_operation['opmessage'] += [
 								'default_msg' => 1,
 								'mediatypeid' => 0,
 								'subject' => '',
@@ -884,13 +895,13 @@ class CAction extends CApiService {
 							];
 						}
 
-						$operations_to_create[] = $ack_operation;
+						$operations_to_create[] = $update_operation;
 					}
-					elseif (array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
-						if ($ack_operation['operationtype'] == OPERATION_TYPE_MESSAGE
-								|| $ack_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$db_opmessage = array_key_exists('opmessage', $db_ack_operations[$ack_operation['operationid']])
-								? $db_ack_operations[$ack_operation['operationid']]['opmessage']
+					elseif (array_key_exists($update_operation['operationid'], $db_update_operations)) {
+						if ($update_operation['operationtype'] == OPERATION_TYPE_MESSAGE
+								|| $update_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+							$db_opmessage = array_key_exists('opmessage', $db_update_operations[$update_operation['operationid']])
+								? $db_update_operations[$update_operation['operationid']]['opmessage']
 								: [
 									'default_msg' => 1,
 									'mediatypeid' => 0,
@@ -904,20 +915,20 @@ class CAction extends CApiService {
 							if ($default_msg == 1) {
 								$opmessage['subject'] = '';
 								$opmessage['message'] = '';
-								$ack_operation['opmessage'] = $opmessage;
+								$update_operation['opmessage'] = $opmessage;
 							}
 						}
 
-						$operations_to_update[] = $ack_operation;
-						unset($db_ack_operations[$ack_operation['operationid']]);
+						$operations_to_update[] = $update_operation;
+						unset($db_update_operations[$update_operation['operationid']]);
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-							$ack_operation['operationid'], 'operationid'
+							$update_operation['operationid'], 'operationid'
 						));
 					}
 				}
-				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_ack_operations));
+				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_update_operations));
 			}
 
 			if ($actionUpdateValues) {
@@ -1202,9 +1213,9 @@ class CAction extends CApiService {
 		$opInventoryToDeleteByOpId = [];
 
 		$operation_actions_hashkey = [
-			ACTION_OPERATION				=> 'operations',
-			ACTION_RECOVERY_OPERATION		=> 'recoveryOperations',
-			ACTION_ACKNOWLEDGE_OPERATION	=> 'acknowledgeOperations'
+			ACTION_OPERATION => 'operations',
+			ACTION_RECOVERY_OPERATION => 'recovery_operations',
+			ACTION_UPDATE_OPERATION => 'update_operations'
 		];
 
 		foreach ($operations as $operation) {
@@ -1589,9 +1600,9 @@ class CAction extends CApiService {
 	 * @param string $conditions[]['conditiontype']  Action condition type.
 	 * @param int    $conditions[]['operator']       Action condition operator.
 	 *
-	 * @return bool
+	 * @throws APIException
 	 */
-	public function validateFilterConditionsIntegrity($name, $eventsource, array $conditions) {
+	public function validateFilterConditionsIntegrity($name, $eventsource, array $conditions): void {
 		foreach ($conditions as $condition) {
 			if (!in_array($condition['conditiontype'], $this->valid_condition_types[$eventsource])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1609,7 +1620,7 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Validate operation, recovery operation, acknowledge operations.
+	 * Validate operations, recovery operations, update operations.
 	 *
 	 * @param array $operations  Operation data array.
 	 *
@@ -1640,16 +1651,21 @@ class CAction extends CApiService {
 					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
 					OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY
 				],
-				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE]
+				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE],
+				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND]
 			],
 			ACTION_RECOVERY_OPERATION => [
 				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
 					OPERATION_TYPE_RECOVERY_MESSAGE
 				],
-				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_RECOVERY_MESSAGE]
+				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_RECOVERY_MESSAGE],
+				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
+					OPERATION_TYPE_RECOVERY_MESSAGE
+				]
 			],
-			ACTION_ACKNOWLEDGE_OPERATION => [
-				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]
+			ACTION_UPDATE_OPERATION => [
+				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE],
+				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]
 			]
 		];
 
@@ -1757,6 +1773,10 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _(
 							'Specified script does not exist or you do not have rights on it for action operation command.'
 						));
+					}
+
+					if ($eventsource == EVENT_SOURCE_SERVICE) {
+						break;
 					}
 
 					$groupids = [];
@@ -1972,32 +1992,7 @@ class CAction extends CApiService {
 			unset($action);
 		}
 
-		// Acknowledge operations data.
-		if ($options['selectAcknowledgeOperations'] !== null
-				&& $options['selectAcknowledgeOperations'] != API_OUTPUT_COUNT) {
-			$ack_operations = API::getApiService()->select('operations', [
-				'output' => $this->outputExtend($options['selectAcknowledgeOperations'],
-					['operationid', 'actionid', 'operationtype']
-				),
-				'filter' => ['actionid' => $actionIds, 'recovery' => ACTION_ACKNOWLEDGE_OPERATION],
-				'preservekeys' => true
-			]);
-
-			foreach ($result as &$action) {
-				$action['acknowledgeOperations'] = [];
-			}
-			unset($action);
-
-			$ack_operations = $this->getAcknowledgeOperations($ack_operations, $options['selectAcknowledgeOperations']);
-
-			foreach ($ack_operations as $ack_operation) {
-				$actionid = $ack_operation['actionid'];
-				unset($ack_operation['actionid'], $ack_operation['recovery']);
-				$result[$actionid]['acknowledgeOperations'][] = $ack_operation;
-			}
-		}
-
-		// adding operations
+		// Adding operations.
 		if ($options['selectOperations'] !== null && $options['selectOperations'] != API_OUTPUT_COUNT) {
 			$operations = API::getApiService()->select('operations', [
 				'output' => $this->outputExtend($options['selectOperations'],
@@ -2231,8 +2226,7 @@ class CAction extends CApiService {
 		}
 
 		// Adding recovery operations.
-		if ($options['selectRecoveryOperations'] !== null
-				&& $options['selectRecoveryOperations'] != API_OUTPUT_COUNT) {
+		if ($options['selectRecoveryOperations'] !== null && $options['selectRecoveryOperations'] != API_OUTPUT_COUNT) {
 			$recovery_operations = API::getApiService()->select('operations', [
 				'output' => $this->outputExtend($options['selectRecoveryOperations'],
 					['operationid', 'actionid', 'operationtype']
@@ -2413,47 +2407,72 @@ class CAction extends CApiService {
 			$recovery_operations = $this->unsetExtraFields($recovery_operations,
 				['operationid', 'actionid', 'operationtype'], $options['selectRecoveryOperations']
 			);
-			$result = $relationMap->mapMany($result, $recovery_operations, 'recoveryOperations');
+			$result = $relationMap->mapMany($result, $recovery_operations, 'recovery_operations');
+		}
+
+		// Adding update operations.
+		if ($options['selectUpdateOperations'] !== null && $options['selectUpdateOperations'] != API_OUTPUT_COUNT) {
+			$update_operations = API::getApiService()->select('operations', [
+				'output' => $this->outputExtend($options['selectUpdateOperations'],
+					['operationid', 'actionid', 'operationtype']
+				),
+				'filter' => ['actionid' => $actionIds, 'recovery' => ACTION_UPDATE_OPERATION],
+				'preservekeys' => true
+			]);
+
+			foreach ($result as &$action) {
+				$action['update_operations'] = [];
+			}
+			unset($action);
+
+			$update_operations = $this->getUpdateOperations($update_operations, $options['selectUpdateOperations']);
+
+			foreach ($update_operations as $update_operation) {
+				$actionid = $update_operation['actionid'];
+				unset($update_operation['actionid'], $update_operation['recovery']);
+				$result[$actionid]['update_operations'][] = $update_operation;
+			}
 		}
 
 		return $result;
 	}
 
 	/**
-	 * Returns array of acknowledge operations according to requested options.
+	 * Returns an array of update operations according to requested options.
 	 *
-	 * @param array $ack_operations		Array of acknowledge operation with key set to operationid.
-	 * @param array $ack_options		Array of acknowledge operation options from request.
+	 * @param array  $update_operations                 An array of update operations.
+	 * @param string $update_operations[<operationid>]  Operation ID.
+	 * @param array  $update_options                    An array of update operation options from request.
 	 *
 	 * @return array
 	 */
-	protected function getAcknowledgeOperations($ack_operations, $ack_options) {
+	protected function getUpdateOperations(array $update_operations, array $update_options): array {
 		$opmessages = [];
 		$nonack_messages = [];
 		$opcommands = [];
 
-		foreach ($ack_operations as $ack_operationid => &$ack_operation) {
-			unset($ack_operation['esc_period'], $ack_operation['esc_step_from'], $ack_operation['esc_step_to']);
+		foreach ($update_operations as $operationid => &$update_operation) {
+			unset($update_operation['esc_period'], $update_operation['esc_step_from'], $update_operation['esc_step_to']);
 
-			switch ($ack_operation['operationtype']) {
+			switch ($update_operation['operationtype']) {
 				case OPERATION_TYPE_ACK_MESSAGE:
-					$opmessages[] = $ack_operationid;
+					$opmessages[] = $operationid;
 					break;
 				case OPERATION_TYPE_MESSAGE:
-					$opmessages[] = $ack_operationid;
-					$nonack_messages[] = $ack_operationid;
+					$opmessages[] = $operationid;
+					$nonack_messages[] = $operationid;
 					break;
 				case OPERATION_TYPE_COMMAND:
-					$opcommands[] = $ack_operationid;
+					$opcommands[] = $operationid;
 					break;
 			}
 		}
-		unset($ack_operation);
+		unset($update_operation);
 
 		if ($opmessages) {
-			if ($this->outputIsRequested('opmessage', $ack_options)) {
+			if ($this->outputIsRequested('opmessage', $update_options)) {
 				foreach ($opmessages as $operationid) {
-					$ack_operations[$operationid]['opmessage'] = [];
+					$update_operations[$operationid]['opmessage'] = [];
 				}
 
 				$db_opmessages = DBselect(
@@ -2464,13 +2483,13 @@ class CAction extends CApiService {
 				while ($db_opmessage = DBfetch($db_opmessages)) {
 					$operationid = $db_opmessage['operationid'];
 					unset($db_opmessage['operationid']);
-					$ack_operations[$operationid]['opmessage'] = $db_opmessage;
+					$update_operations[$operationid]['opmessage'] = $db_opmessage;
 				}
 			}
 
-			if ($this->outputIsRequested('opmessage_grp', $ack_options) && $nonack_messages) {
+			if ($nonack_messages && $this->outputIsRequested('opmessage_grp', $update_options)) {
 				foreach ($nonack_messages as $operationid) {
-					$ack_operations[$operationid]['opmessage_grp'] = [];
+					$update_operations[$operationid]['opmessage_grp'] = [];
 				}
 
 				$db_opmessage_grp = DBselect(
@@ -2481,13 +2500,13 @@ class CAction extends CApiService {
 				while ($opmessage_grp = DBfetch($db_opmessage_grp)) {
 					$operationid = $opmessage_grp['operationid'];
 					unset($opmessage_grp['operationid']);
-					$ack_operations[$operationid]['opmessage_grp'][] = $opmessage_grp;
+					$update_operations[$operationid]['opmessage_grp'][] = $opmessage_grp;
 				}
 			}
 
-			if ($this->outputIsRequested('opmessage_usr', $ack_options) && $nonack_messages) {
+			if ($nonack_messages && $this->outputIsRequested('opmessage_usr', $update_options)) {
 				foreach ($nonack_messages as $operationid) {
-					$ack_operations[$operationid]['opmessage_usr'] = [];
+					$update_operations[$operationid]['opmessage_usr'] = [];
 				}
 
 				$db_opmessage_usr = DBselect(
@@ -2498,15 +2517,15 @@ class CAction extends CApiService {
 				while ($opmessage_usr = DBfetch($db_opmessage_usr)) {
 					$operationid = $opmessage_usr['operationid'];
 					unset($opmessage_usr['operationid']);
-					$ack_operations[$operationid]['opmessage_usr'][] = $opmessage_usr;
+					$update_operations[$operationid]['opmessage_usr'][] = $opmessage_usr;
 				}
 			}
 		}
 
 		if ($opcommands) {
-			if ($this->outputIsRequested('opcommand', $ack_options)) {
+			if ($this->outputIsRequested('opcommand', $update_options)) {
 				foreach ($opcommands as $operationid) {
-					$ack_operations[$operationid]['opcommand'] = [];
+					$update_operations[$operationid]['opcommand'] = [];
 				}
 
 				$db_opcommands = DBselect(
@@ -2517,13 +2536,13 @@ class CAction extends CApiService {
 				while ($db_opcommand = DBfetch($db_opcommands)) {
 					$operationid = $db_opcommand['operationid'];
 					unset($db_opcommand['operationid']);
-					$ack_operations[$operationid]['opcommand'] = $db_opcommand;
+					$update_operations[$operationid]['opcommand'] = $db_opcommand;
 				}
 			}
 
-			if ($this->outputIsRequested('opcommand_hst', $ack_options)) {
+			if ($this->outputIsRequested('opcommand_hst', $update_options)) {
 				foreach ($opcommands as $operationid) {
-					$ack_operations[$operationid]['opcommand_hst'] = [];
+					$update_operations[$operationid]['opcommand_hst'] = [];
 				}
 
 				$db_opcommand_hst = DBselect(
@@ -2534,13 +2553,13 @@ class CAction extends CApiService {
 				while ($opcommand_hst = DBfetch($db_opcommand_hst)) {
 					$operationid = $opcommand_hst['operationid'];
 					unset($opcommand_hst['operationid']);
-					$ack_operations[$operationid]['opcommand_hst'][] = $opcommand_hst;
+					$update_operations[$operationid]['opcommand_hst'][] = $opcommand_hst;
 				}
 			}
 
-			if ($this->outputIsRequested('opcommand_grp', $ack_options)) {
+			if ($this->outputIsRequested('opcommand_grp', $update_options)) {
 				foreach ($opcommands as $operationid) {
-					$ack_operations[$operationid]['opcommand_grp'] = [];
+					$update_operations[$operationid]['opcommand_grp'] = [];
 				}
 
 				$db_opcommand_grp = DBselect(
@@ -2551,16 +2570,12 @@ class CAction extends CApiService {
 				while ($opcommand_grp = DBfetch($db_opcommand_grp)) {
 					$operationid = $opcommand_grp['operationid'];
 					unset($opcommand_grp['operationid']);
-					$ack_operations[$operationid]['opcommand_grp'][] = $opcommand_grp;
+					$update_operations[$operationid]['opcommand_grp'][] = $opcommand_grp;
 				}
 			}
 		}
 
-		$ack_operations = $this->unsetExtraFields($ack_operations, ['operationid', 'operationtype'],
-			$ack_options
-		);
-
-		return $ack_operations;
+		return $this->unsetExtraFields($update_operations, ['operationid', 'operationtype'], $update_options);
 	}
 
 	/**
@@ -2712,7 +2727,9 @@ class CAction extends CApiService {
 				$duplicates[$action['name']] = $action['name'];
 			}
 
-			if (array_key_exists('esc_period', $action) && $action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+			if (array_key_exists('esc_period', $action)
+					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
+						|| $action['eventsource'] == EVENT_SOURCE_SERVICETRIGGERS)) {
 				self::validateStepDuration($action['esc_period']);
 			}
 		}
@@ -2776,7 +2793,7 @@ class CAction extends CApiService {
 
 			if ((!array_key_exists('operations', $action) || !$action['operations'])
 					&& (!array_key_exists('recovery_operations', $action) || !$action['recovery_operations'])
-					&& (!array_key_exists('acknowledge_operations', $action) || !$action['acknowledge_operations'])) {
+					&& (!array_key_exists('update_operations', $action) || !$action['update_operations'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $action['name']));
 			}
 
@@ -2804,13 +2821,13 @@ class CAction extends CApiService {
 				}
 			}
 
-			if (array_key_exists('acknowledge_operations', $action)) {
-				foreach ($action['acknowledge_operations'] as $operation) {
+			if (array_key_exists('update_operations', $action)) {
+				foreach ($action['update_operations'] as $operation) {
 					if (array_key_exists('operationid', $operation)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
 					}
 
-					$operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
+					$operation['recovery'] = ACTION_UPDATE_OPERATION;
 					$operation['eventsource'] = $action['eventsource'];
 					$operations_to_validate[] = $operation;
 				}
@@ -2876,7 +2893,8 @@ class CAction extends CApiService {
 
 			// check if user changed esc_period for trigger eventsource
 			if (array_key_exists('esc_period', $action)
-					&& $db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+					&& ($db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS
+						|| $db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_SERVICE)) {
 				self::validateStepDuration($action['esc_period']);
 			}
 
@@ -2970,14 +2988,14 @@ class CAction extends CApiService {
 			$operations_defined = array_key_exists('operations', $action)
 				? (bool) $action['operations']
 				: (bool) $db_action['operations'];
-			$rcv_operations_defined = array_key_exists('recovery_operations', $action)
+			$recovery_operations_defined = array_key_exists('recovery_operations', $action)
 				? (bool) $action['recovery_operations']
-				: (bool) $db_action['recoveryOperations'];
-			$ack_operations_defined = array_key_exists('acknowledge_operations', $action)
-				? (bool) $action['acknowledge_operations']
-				: (bool) $db_action['acknowledgeOperations'];
+				: (bool) $db_action['recovery_operations'];
+			$update_operations_defined = array_key_exists('update_operations', $action)
+				? (bool) $action['update_operations']
+				: (bool) $db_action['update_operations'];
 
-			if (!$operations_defined && !$rcv_operations_defined && !$ack_operations_defined) {
+			if (!$operations_defined && !$recovery_operations_defined && !$update_operations_defined) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $action_name));
 			}
 
@@ -2998,7 +3016,7 @@ class CAction extends CApiService {
 
 			// Recovery operations.
 			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']) {
-				$db_recovery_operations = zbx_toHash($db_actions[$action['actionid']]['recoveryOperations'],
+				$db_recovery_operations = zbx_toHash($db_actions[$action['actionid']]['recovery_operations'],
 					'operationid'
 				);
 				foreach ($action['recovery_operations'] as $recovery_operation) {
@@ -3014,40 +3032,39 @@ class CAction extends CApiService {
 				}
 			}
 
-			if (array_key_exists('acknowledge_operations', $action) && $action['acknowledge_operations']) {
-				$db_ack_operations = zbx_toHash($db_actions[$action['actionid']]['acknowledgeOperations'],
-					'operationid'
-				);
-				foreach ($action['acknowledge_operations'] as $ack_operation) {
-					if (!array_key_exists('operationid', $ack_operation)
-							|| array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
-						$ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
-						$ack_operation['eventsource'] = $db_action['eventsource'];
+			if (array_key_exists('update_operations', $action) && $action['update_operations']) {
+				$db_update_operations = zbx_toHash($db_actions[$action['actionid']]['update_operations'], 'operationid');
 
-						if (array_key_exists('operationid', $ack_operation)
-								&& array_key_exists($ack_operation['operationid'], $db_ack_operations)) {
-							$db_ack_operation = $db_ack_operations[$ack_operation['operationid']];
-							$operation_type = array_key_exists('operationtype', $ack_operation)
-								? $ack_operation['operationtype']
-								: $db_ack_operation['operationtype'];
+				foreach ($action['update_operations'] as $update_operation) {
+					if (!array_key_exists('operationid', $update_operation)
+							|| array_key_exists($update_operation['operationid'], $db_update_operations)) {
+						$update_operation['recovery'] = ACTION_UPDATE_OPERATION;
+						$update_operation['eventsource'] = $db_action['eventsource'];
+
+						if (array_key_exists('operationid', $update_operation)
+								&& array_key_exists($update_operation['operationid'], $db_update_operations)) {
+							$db_update_operation = $db_update_operations[$update_operation['operationid']];
+							$operation_type = array_key_exists('operationtype', $update_operation)
+								? $update_operation['operationtype']
+								: $db_update_operation['operationtype'];
 
 							// Field 'operationtype' is required.
-							unset($db_ack_operation['operationtype']);
+							unset($db_update_operation['operationtype']);
 
 							if ($operation_type == OPERATION_TYPE_MESSAGE) {
-								unset($db_ack_operation['opmessage_grp'], $db_ack_operation['opmessage_usr']);
+								unset($db_update_operation['opmessage_grp'], $db_update_operation['opmessage_usr']);
 							}
 							elseif ($operation_type == OPERATION_TYPE_COMMAND) {
-								unset($db_ack_operation['opcommand_grp'], $db_ack_operation['opcommand_hst']);
+								unset($db_update_operation['opcommand_grp'], $db_update_operation['opcommand_hst']);
 							}
 
-							$ack_operation += $db_ack_operation;
+							$update_operation += $db_update_operation;
 						}
 
-						$operations_to_validate[] = $ack_operation;
+						$operations_to_validate[] = $update_operation;
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect acknowledgement action operationid.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect update action operationid.'));
 					}
 				}
 			}

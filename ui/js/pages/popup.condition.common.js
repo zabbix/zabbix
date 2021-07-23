@@ -95,3 +95,19 @@ function validateConditionPopup(overlay) {
 			}
 		});
 }
+
+function selectServices() {
+	const overlay = PopUp('popup.services', {
+		title: t('Add parent services'),
+	}, 'services', document.activeElement);
+
+	overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+		const data = [];
+
+		for (const service of e.detail) {
+			data.push({id: service.serviceid, name: service.name});
+		}
+
+		$('#service-new-condition').multiSelect('addData', data);
+	});
+}

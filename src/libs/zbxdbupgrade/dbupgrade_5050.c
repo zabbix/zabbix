@@ -341,6 +341,36 @@ out:
 	return ret;
 }
 
+static int	DBpatch_5050017(void)
+{
+	const ZBX_FIELD	field = {"servicealarmid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("escalations", &field);
+}
+static int	DBpatch_5050018(void)
+{
+	const ZBX_FIELD	field = {"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("escalations", &field);
+}
+
+static int	DBpatch_5050019(void)
+{
+	return DBdrop_index("escalations", "escalations_1");
+}
+
+static int	DBpatch_5050020(void)
+{
+	return DBcreate_index("escalations", "escalations_1", "triggerid,itemid,serviceid,escalationid", 1);
+}
+
+static int	DBpatch_5050021(void)
+{
+	const ZBX_FIELD	field = {"hk_events_service", "1d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -364,5 +394,10 @@ DBPATCH_ADD(5050013, 0, 1)
 DBPATCH_ADD(5050014, 0, 1)
 DBPATCH_ADD(5050015, 0, 1)
 DBPATCH_ADD(5050016, 0, 1)
+DBPATCH_ADD(5050017, 0, 1)
+DBPATCH_ADD(5050018, 0, 1)
+DBPATCH_ADD(5050019, 0, 1)
+DBPATCH_ADD(5050020, 0, 1)
+DBPATCH_ADD(5050021, 0, 1)
 
 DBPATCH_END()

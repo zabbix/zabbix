@@ -1415,8 +1415,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "report writer";
 		case ZBX_PROCESS_TYPE_SERVICEMAN:
 			return "service manager";
-		case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
-			return "trigger housekeeper";
+		case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
+			return "problem housekeeper";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -1709,7 +1709,7 @@ const char	*zbx_item_state_string(unsigned char state)
 
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value)
 {
-	if (EVENT_SOURCE_TRIGGERS == source)
+	if (EVENT_SOURCE_TRIGGERS == source || EVENT_SOURCE_SERVICE == source)
 	{
 		switch (value)
 		{
