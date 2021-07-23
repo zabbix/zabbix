@@ -27,8 +27,8 @@ No specific Zabbix configuration is required.
 |{$SNMP.TIMEOUT} |<p>The time interval for SNMP agent availability trigger expression.</p> |`5m` |
 |{$ZYXEL.ADSL.ATN.MAX} |<p>Type the maximum signal attenuation</p> |`40` |
 |{$ZYXEL.ADSL.SNR.MIN} |<p>Type the minimum signal to noise margin (0-31 dB)</p> |`8` |
-|{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES} |<p>Filter to exclude discovered slots by status.</p> |`1` |
-|{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES} |<p>Triggers will be created only for interfaces whose description contains the value of this macro</p> |`NEED TRIGGERS` |
+|{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES} |<p>Filter to exclude discovered slots by status.</p> |`1` |
+|{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES} |<p>Triggers will be created only for interfaces whose description contains the value of this macro</p> |`CHANGE_IF_NEEDED` |
 |{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES} |<p>Filter by discoverable interface names.</p> |`.*` |
 |{$ZYXEL.LLD.FILTER.IF.DESC.NOT_MATCHES} |<p>Filter to exclude discovered interfaces by name.</p> |`CHANGE_IF_NEEDED` |
 |{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES} |<p>Filter of discoverable link types.</p> |`.*` |
@@ -43,7 +43,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Slot discovery |<p>The table which contains the slot information in a chassis.</p> |SNMP |zyxel.ies6000.slot.discovery<p>**Filter**:</p>AND <p>- A: {#ZYXEL.SLOTSTATUS} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}`</p><p>- B: {#ZYXEL.SLOTSTATUS} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}`</p> |
+|Slot discovery |<p>The table which contains the slot information in a chassis.</p> |SNMP |zyxel.ies6000.slot.discovery<p>**Filter**:</p>AND <p>- A: {#ZYXEL.SLOTSTATUS} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}`</p><p>- B: {#ZYXEL.SLOTSTATUS} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}`</p> |
 |Fan discovery |<p>An entry in fanRpmTable.</p> |SNMP |zyxel.ies6000.fan.discovery |
 |Temperature discovery |<p>An entry in tempTable.</p> |SNMP |zyxel.ies6000.temp.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Voltage discovery |<p>An entry in voltageTable.</p> |SNMP |zyxel.ies6000.volt.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
