@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 
 	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
 )
 
 type Details struct {
@@ -56,15 +55,11 @@ func CreateConfig(details Details, skipVerify bool) (*tls.Config, error) {
 func CreateDetails(session, dbConnect, caFile, certFile, keyFile, uri string) (Details, error) {
 	if dbConnect != "" && dbConnect != "required" {
 		if err := validateSetTLSFiles(caFile, certFile, keyFile); err != nil {
-			return Details{}, zbxerr.ErrorInvalidConfiguration.Wrap(
-				fmt.Errorf("%s uri %s, with session %s", err.Error(), uri, session),
-			)
+			return Details{}, fmt.Errorf("%s uri %s, with session %s", err.Error(), uri, session)
 		}
 	} else {
 		if err := validateUnsetTLSFiles(caFile, certFile, keyFile); err != nil {
-			return Details{}, zbxerr.ErrorInvalidConfiguration.Wrap(
-				fmt.Errorf("%s uri %s, with session %s", err.Error(), uri, session),
-			)
+			return Details{}, fmt.Errorf("%s uri %s, with session %s", err.Error(), uri, session)
 		}
 	}
 
