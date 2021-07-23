@@ -1,0 +1,1 @@
+........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
