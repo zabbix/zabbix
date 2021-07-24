@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-10T18:31:46Z</date>
+   <date>2021-07-23T11:06:20Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template ZYXEL IES-6000 SNMP</template>
-         <name>Template ZYXEL IES-6000 SNMP</name>
+         <template>Template Net ZYXEL IES-6000 SNMP</template>
+         <name>Template Net ZYXEL IES-6000 SNMP</name>
          <description>ZYXEL IES-6000&#13;
 &#13;
 MIBs used:&#13;
@@ -96,7 +96,7 @@ Template tooling version used: 0.38</description>
                <snmp_oid>.1.3.6.1.2.1.1.4.0</snmp_oid>
                <key>zyxel.ies6000.contact</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -123,7 +123,7 @@ on how to contact this person.</description>
                <snmp_oid>.1.3.6.1.2.1.1.6.0</snmp_oid>
                <key>zyxel.ies6000.location</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -149,7 +149,7 @@ The physical location of this node (e.g.,&#13;
                <snmp_oid>.1.3.6.1.2.1.2.2.1.6.1</snmp_oid>
                <key>zyxel.ies6000.mac</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -178,7 +178,7 @@ should contain an octet string of zero length.</description>
                <snmp_oid>.1.3.6.1.2.1.1.1.0</snmp_oid>
                <key>zyxel.ies6000.model</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -216,7 +216,7 @@ printable ASCII characters.</description>
                <snmp_oid>.1.3.6.1.2.1.1.5.0</snmp_oid>
                <key>zyxel.ies6000.name</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -321,7 +321,7 @@ The packet buffer usage in the past 60 seconds.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.buffer[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -392,7 +392,7 @@ The CPU utilization in the past 60 seconds.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.cpu[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -462,7 +462,7 @@ Current speed in Revolutions Per Minute (RPM) on the fan.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.fan[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -517,7 +517,7 @@ The memory usage in the past 60 seconds.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.memory[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1109,7 +1109,7 @@ those that were discarded or not sent.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.adsl.in.ucastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1117,7 +1117,7 @@ those that were discarded or not sent.</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.adsl.out.ucastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1125,7 +1125,7 @@ those that were discarded or not sent.</description>
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.adsl.in.multicastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1133,7 +1133,7 @@ those that were discarded or not sent.</description>
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.adsl.out.multicastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1141,7 +1141,7 @@ those that were discarded or not sent.</description>
                            <sortorder>4</sortorder>
                            <color>FC6EA3</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.adsl.in.broadcastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1149,7 +1149,7 @@ those that were discarded or not sent.</description>
                            <sortorder>5</sortorder>
                            <color>6C59DC</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.adsl.out.broadcastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1161,7 +1161,7 @@ those that were discarded or not sent.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.adsl.in.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1169,7 +1169,7 @@ those that were discarded or not sent.</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.adsl.out.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1192,15 +1192,15 @@ return JSON.stringify(outArr);
                </preprocessing>
                <overrides>
                   <override>
-                     <name>Trigger disabled</name>
+                     <name>Don't create triggers for matching interface</name>
                      <step>1</step>
                      <filter>
                         <conditions>
                            <condition>
                               <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>.*</value>
+                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
+                              <operator>NOT_MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1211,29 +1211,6 @@ return JSON.stringify(outArr);
                            <value>.*</value>
                            <status>ENABLED</status>
                            <discover>NO_DISCOVER</discover>
-                        </operation>
-                     </operations>
-                  </override>
-                  <override>
-                     <name>Trigger enabled</name>
-                     <step>2</step>
-                     <filter>
-                        <conditions>
-                           <condition>
-                              <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
-                              <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
-                           </condition>
-                        </conditions>
-                     </filter>
-                     <operations>
-                        <operation>
-                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
-                           <operator>REGEXP</operator>
-                           <value>.*</value>
-                           <status>ENABLED</status>
-                           <discover>DISCOVER</discover>
                         </operation>
                      </operations>
                   </override>
@@ -1459,6 +1436,7 @@ or broadcast address at this sub-layer</description>
                      <key>zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>last(zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]) * (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) &lt;&gt; 0) /
 ( last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100</params>
@@ -1474,6 +1452,11 @@ or broadcast address at this sub-layer</description>
                            <params>0
 100</params>
                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>return +parseFloat(value).toFixed(0);
+</params>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -1652,6 +1635,7 @@ those that were discarded or not sent.</description>
                      <key>zyxel.ies6000.net.if.out.util[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>last(zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]) * (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) &lt;&gt; 0) /
 ( last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100</params>
@@ -1668,6 +1652,11 @@ those that were discarded or not sent.</description>
 100</params>
                            <error_handler>DISCARD_VALUE</error_handler>
                         </step>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>return +parseFloat(value).toFixed(0);
+</params>
+                        </step>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
@@ -1679,7 +1668,7 @@ those that were discarded or not sent.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.in.ucastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1687,7 +1676,7 @@ those that were discarded or not sent.</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.out.ucastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1695,7 +1684,7 @@ those that were discarded or not sent.</description>
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.in.multicastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1703,7 +1692,7 @@ those that were discarded or not sent.</description>
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.out.multicastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1711,7 +1700,7 @@ those that were discarded or not sent.</description>
                            <sortorder>4</sortorder>
                            <color>FC6EA3</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.in.broadcastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1719,7 +1708,7 @@ those that were discarded or not sent.</description>
                            <sortorder>5</sortorder>
                            <color>6C59DC</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.out.broadcastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1731,7 +1720,7 @@ those that were discarded or not sent.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1739,7 +1728,7 @@ those that were discarded or not sent.</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1753,7 +1742,7 @@ those that were discarded or not sent.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.out.util[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1761,7 +1750,7 @@ those that were discarded or not sent.</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1770,15 +1759,15 @@ those that were discarded or not sent.</description>
                </graph_prototypes>
                <overrides>
                   <override>
-                     <name>Trigger disabled</name>
+                     <name>Don't create triggers for matching interface</name>
                      <step>1</step>
                      <filter>
                         <conditions>
                            <condition>
                               <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>.*</value>
+                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
+                              <operator>NOT_MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1789,29 +1778,6 @@ those that were discarded or not sent.</description>
                            <value>.*</value>
                            <status>ENABLED</status>
                            <discover>NO_DISCOVER</discover>
-                        </operation>
-                     </operations>
-                  </override>
-                  <override>
-                     <name>Trigger enabled</name>
-                     <step>2</step>
-                     <filter>
-                        <conditions>
-                           <condition>
-                              <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
-                              <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
-                           </condition>
-                        </conditions>
-                     </filter>
-                     <operations>
-                        <operation>
-                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
-                           <operator>REGEXP</operator>
-                           <value>.*</value>
-                           <status>ENABLED</status>
-                           <discover>DISCOVER</discover>
                         </operation>
                      </operations>
                   </override>
@@ -1833,7 +1799,7 @@ those that were discarded or not sent.</description>
                      </condition>
                      <condition>
                         <macro>{#ZYXEL.SLOTSTATUS}</macro>
-                        <value>{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}</value>
+                        <value>{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>B</formulaid>
                      </condition>
@@ -2279,7 +2245,7 @@ The current temperature measured at this sensor</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.temp[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -2354,7 +2320,7 @@ The current voltage reading.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES-6000 SNMP</host>
+                              <host>Template Net ZYXEL IES-6000 SNMP</host>
                               <key>zyxel.ies6000.volt[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -2397,13 +2363,8 @@ return JSON.stringify(outArr);
                <description>Type the minimum signal to noise margin (0-31 dB)</description>
             </macro>
             <macro>
-               <macro>{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}</macro>
-               <value>1</value>
-               <description>Filter to exclude discovered slots by status.</description>
-            </macro>
-            <macro>
                <macro>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</macro>
-               <value>NEED TRIGGERS</value>
+               <value>CHANGE_IF_NEEDED</value>
                <description>Triggers will be created only for interfaces whose description contains the value of this macro</description>
             </macro>
             <macro>
@@ -2430,6 +2391,11 @@ return JSON.stringify(outArr);
                <macro>{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}</macro>
                <value>.*</value>
                <description>Filter by discoverable slot status.</description>
+            </macro>
+            <macro>
+               <macro>{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}</macro>
+               <value>1</value>
+               <description>Filter to exclude discovered slots by status.</description>
             </macro>
          </macros>
       </template>
