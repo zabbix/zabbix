@@ -950,7 +950,7 @@ function get_opconditions_by_eventsource($eventsource) {
  * @return array
  */
 function getAllowedOperations($eventsource) {
-	if ($eventsource == EVENT_SOURCE_TRIGGERS || $eventsource = EVENT_SOURCE_SERVICE) {
+	if ($eventsource == EVENT_SOURCE_TRIGGERS || $eventsource == EVENT_SOURCE_SERVICE) {
 		$operations = [
 			ACTION_OPERATION => [
 				OPERATION_TYPE_MESSAGE,
