@@ -2729,7 +2729,7 @@ class CAction extends CApiService {
 
 			if (array_key_exists('esc_period', $action)
 					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
-						|| $action['eventsource'] == EVENT_SOURCE_SERVICETRIGGERS)) {
+						|| $action['eventsource'] == EVENT_SOURCE_SERVICE)) {
 				self::validateStepDuration($action['esc_period']);
 			}
 		}
