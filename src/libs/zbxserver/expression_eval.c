@@ -1317,14 +1317,46 @@ static DC_ITEM	*get_dcitem(zbx_vector_ptr_t *dcitem_refs, zbx_uint64_t itemid)
 	return dcitem_refs->values[index];
 }
 
-static void	evaluate_exists_item(zbx_vector_dbl_t *results)
+static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_query_t *query, int item_func,
+		zbx_variant_t *value)
 {
-	zbx_vector_dbl_append(results, 1);
-}
+	zbx_expression_query_many_t	*data;
+	int				i;
+	zbx_vector_dbl_t		results;
 
-static void	evaluate_item_count(zbx_uint64_t *result)
-{
-	(*result)++;
+	zbx_vector_dbl_create(&results);
+
+	data = (zbx_expression_query_many_t *)query->data;
+
+	for (i = 0; i < data->itemids.values_num; i++)
+	{
+		DC_ITEM	*dcitem;
+
+		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
+			continue;
+
+		if (ITEM_STATUS_ACTIVE != dcitem->status)
+			continue;
+
+		if (HOST_STATUS_MONITORED != dcitem->host.status)
+			continue;
+
+		zbx_vector_dbl_append(&results, 1);
+	}
+
+	if (ZBX_ITEM_FUNC_EXISTS == item_func)
+	{
+		zbx_vector_dbl_t	*v;
+
+		v = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
+		*v = results;
+		zbx_variant_set_dbl_vector(value, v);
+	}
+	else
+	{
+		zbx_variant_set_ui64(value, results.values_num);
+		zbx_vector_dbl_destroy(&results);
+	}
 }
 
 /******************************************************************************
@@ -1352,12 +1384,11 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		size_t len, int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error)
 {
-	zbx_expression_query_many_t		*data;
+	zbx_expression_query_many_t	*data;
 	int				ret = FAIL, item_func, count, seconds, i;
 	zbx_vector_history_record_t	values;
 	zbx_vector_dbl_t		*results_vector;
 	double				result;
-	zbx_uint64_t			result_uint;
 	zbx_variant_t			arg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %.*s(/%s/%s?[%s],...)", __func__, (int)len, name,
@@ -1367,60 +1398,68 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 	ZBX_UNUSED(args_num);
 
 	data = (zbx_expression_query_many_t *)query->data;
+	item_func = get_function_by_name(name, len);
 
-	if (ZBX_VALUE_FUNC_UNKNOWN == (item_func = get_function_by_name(name, len)))
+	switch (item_func)
 	{
-		*error = zbx_strdup(NULL, "unsupported function");
-		goto out;
-	}
+		case ZBX_ITEM_FUNC_EXISTS:
+		case ZBX_ITEM_FUNC_ITEMCOUNT:
+			if (0 != args_num)
+			{
+				*error = zbx_strdup(NULL, "invalid number of function parameters");
+				goto out;
+			}
 
-	if (ZBX_VALUE_FUNC_LAST == item_func || ZBX_ITEM_FUNC_EXISTS == item_func || ZBX_ITEM_FUNC_ITEMCOUNT == item_func)
-	{
-		count = 1;
-		seconds = 0;
-	}
-	else
-	{
-		if (1 != args_num)
-		{
-			*error = zbx_strdup(NULL, "invalid number of function parameters");
+			expression_eval_exists(eval, query, item_func, value);
+			ret = SUCCEED;
 			goto out;
-		}
-
-		if (ZBX_VARIANT_STR == args[0].type)
-		{
-			if (FAIL == is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
+		case ZBX_VALUE_FUNC_LAST:
+			count = 1;
+			seconds = 0;
+			break;
+		case ZBX_VALUE_FUNC_MIN:
+		case ZBX_VALUE_FUNC_AVG:
+		case ZBX_VALUE_FUNC_MAX:
+		case ZBX_VALUE_FUNC_SUM:
+		case ZBX_VALUE_FUNC_COUNT:
+			if (1 != args_num)
 			{
-				*error = zbx_strdup(NULL, "invalid second parameter");
+				*error = zbx_strdup(NULL, "invalid number of function parameters");
 				goto out;
 			}
-		}
-		else
-		{
-			zbx_variant_copy(&arg, &args[0]);
 
-			if (SUCCEED != zbx_variant_convert(&arg, ZBX_VARIANT_DBL))
+			if (ZBX_VARIANT_STR == args[0].type)
 			{
+				if (FAIL == is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
+				{
+					*error = zbx_strdup(NULL, "invalid second parameter");
+					goto out;
+				}
+			}
+			else
+			{
+				zbx_variant_copy(&arg, &args[0]);
+
+				if (SUCCEED != zbx_variant_convert(&arg, ZBX_VARIANT_DBL))
+				{
+					zbx_variant_clear(&arg);
+					*error = zbx_strdup(NULL, "invalid second parameter");
+					goto out;
+				}
+
+				seconds = arg.data.dbl;
 				zbx_variant_clear(&arg);
-				*error = zbx_strdup(NULL, "invalid second parameter");
-				goto out;
 			}
+			count = 0;
 
-			seconds = arg.data.dbl;
-			zbx_variant_clear(&arg);
-		}
-		count = 0;
+			break;
+		default:
+			*error = zbx_strdup(NULL, "unsupported function");
+			goto out;
 	}
 
-	if (ZBX_ITEM_FUNC_ITEMCOUNT == item_func)
-	{
-		result_uint = 0;
-	}
-	else
-	{
-		results_vector = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
-		zbx_vector_dbl_create(results_vector);
-	}
+	results_vector = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
+	zbx_vector_dbl_create(results_vector);
 
 	for (i = 0; i < data->itemids.values_num; i++)
 	{
@@ -1434,17 +1473,6 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 		if (HOST_STATUS_MONITORED != dcitem->host.status)
 			continue;
-
-		if (ZBX_ITEM_FUNC_EXISTS == item_func)
-		{
-			evaluate_exists_item(results_vector);
-			continue;
-		}
-		else if (ZBX_ITEM_FUNC_ITEMCOUNT == item_func)
-		{
-			evaluate_item_count(&result_uint);
-			continue;
-		}
 
 		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
 			continue;
@@ -1461,10 +1489,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		zbx_history_record_vector_destroy(&values, dcitem->value_type);
 	}
 
-	if (ZBX_ITEM_FUNC_ITEMCOUNT == item_func)
-		zbx_variant_set_ui64(value, result_uint);
-	else
-		zbx_variant_set_dbl_vector(value, results_vector);
+	zbx_variant_set_dbl_vector(value, results_vector);
 
 	ret = SUCCEED;
 out:

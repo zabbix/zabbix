@@ -2563,11 +2563,10 @@ static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const z
 	return SUCCEED;
 }
 
-static int	eval_execute_count_items(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
 	int		i;
-	zbx_uint64_t	count;
 	zbx_variant_t	*arg, ret_value;
 
 	if (1 != token->opt)
@@ -2585,14 +2584,7 @@ static int	eval_execute_count_items(const zbx_eval_context_t *ctx, const zbx_eva
 				ctx->expression + token->loc.l);
 	}
 
-	count = 0;
-
-	for (i = 0; i < arg->data.dbl_vector->values_num; i++)
-	{
-		count++;
-	}
-
-	zbx_variant_set_ui64(&ret_value, count);
+	zbx_variant_set_ui64(&ret_value, arg->data.dbl_vector->values_num);
 
 	eval_function_return(token->opt, &ret_value, output);
 
@@ -2763,7 +2755,7 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "varsamp", ZBX_CONST_STRLEN("varsamp")))
 		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_varsamp, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "count", ZBX_CONST_STRLEN("count")))
-		return eval_execute_count_items(ctx, token, output, error);
+		return eval_execute_function_count(ctx, token, output, error);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);
