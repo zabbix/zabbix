@@ -23,14 +23,16 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
-$this->addJsFile('layout.mode.js');
-$this->addJsFile('menupopup.js');
-$this->addJsFile('gtlc.js');
-$this->addJsFile('class.calendar.js');
-$this->addJsFile('class.tabfilter.js');
-$this->addJsFile('class.tabfilteritem.js');
-$this->addJsFile('class.tagfilteritem.js');
+$scripts = [
+	'class.calendar.js', 'class.cverticalaccordion.js', 'class.cviewswitcher.js', 'class.tabfilter.js',
+	'class.tabfilteritem.js', 'class.tagfilteritem.js', 'class.tab-indicators.js', 'gtlc.js', 'hostinterfacemanager.js',
+	'hostmacrosmanager.js', 'hostpopup.js', 'inputsecret.js', 'macrovalue.js',  'menupopup.js', 'multiselect.js',
+	'layout.mode.js', 'textareaflexible.js'
+];
+
+foreach($scripts as $script) {
+	$this->addJsFile($script);
+}
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -39,7 +41,13 @@ $widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
-		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
+		(new CTag('nav', true, (new CList())
+			->addItem(
+				(new CSimpleButton(_('Create host')))
+					->addClass('js-create-host')
+			)
+			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+		))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -66,6 +74,6 @@ $widget->addItem((new CForm())->setName('host_view')->addClass('is-loading'));
 $widget->show();
 $this->includeJsFile('monitoring.host.view.js.php', $data);
 
-(new CScriptTag('host_page.start();'))
+(new CScriptTag('host_page.start();host_popup.init();'))
 	->setOnDocumentReady()
 	->show();

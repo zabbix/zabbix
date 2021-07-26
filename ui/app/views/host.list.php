@@ -25,7 +25,7 @@
 
 $scripts = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
 	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js', 'hostinterfacemanager.js',
-	'hostlist.js', 'hostmacrosmanager.js'
+	'hostpopup.js', 'hostmacrosmanager.js'
 ];
 
 foreach ($scripts as $script) {
@@ -507,6 +507,6 @@ $widget
 	->addItem($form)
 	->show();
 
-(new CScriptTag('host_list.init();'))
+(new CScriptTag('host_popup.init();'))
 	->setOnDocumentReady()
 	->show();

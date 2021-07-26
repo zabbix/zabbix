@@ -66,6 +66,7 @@ $availableJScripts = [
 	'class.widget.trigerover.js' => 'widgets/',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
+	'hostpopup.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -135,7 +136,6 @@ $availableJScripts = [
 	'monitoring.overview.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
 	'popup.operation.common.js' => 'pages/',
-	'hostlist.js' => '',
 ];
 
 $tranStrings = [
