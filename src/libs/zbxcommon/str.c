@@ -6249,7 +6249,6 @@ void	zbx_rtrim_utf8(char *str, const char *charlist)
 
 	for (last = str + strlen(str), prev = last; ; prev = utf8_chr_prev(prev))
 	{
-
 		if (SUCCEED != strchr_utf8(charlist, prev))
 			break;
 
