@@ -4926,7 +4926,7 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 	DB_ROW		row;
 	int		break_loop = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64, __func__, interfaceid);
 
 	result = DBselect(
 			"select version,bulk,community,securityname,securitylevel,authpassphrase,privpassphrase,"
