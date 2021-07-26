@@ -41,7 +41,7 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *even
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
 		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen);
+		int maxerrlen)
 {
 	ZBX_UNUSED(actionid);
 	ZBX_UNUSED(event);
@@ -57,7 +57,8 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *even
 	ZBX_UNUSED(macro_type);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
-	ZBX_UNUSED(tz);
+	ZBX_UNUSED(service_alarm);
+	ZBX_UNUSED(service);
 
 	return SUCCEED;
 }
