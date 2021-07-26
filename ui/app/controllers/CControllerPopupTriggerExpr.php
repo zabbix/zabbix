@@ -24,6 +24,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $metrics = [];
 	private $param1SecCount = [];
 	private $param1Period = [];
+	private $param1PeriodMode = [];
 	private $param1Sec = [];
 	private $param1Str = [];
 	private $param2SecCount = [];
@@ -94,6 +95,24 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Period shift'),
 				'T' => T_ZBX_INT,
 				'A' => true
+			]
+		];
+
+		$this->param1PeriodMode = [
+			'last' => [
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'period_shift' => [
+				'C' => _('Period shift'),
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'mode' => [
+				'C' => 'Mode',
+				'T' => T_ZBX_STR,
+				'A' => false
 			]
 		];
 
@@ -761,14 +780,14 @@ class CControllerPopupTriggerExpr extends CController {
 			'monodec' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('monodec() - Check if item values have been continuously decreasing, Mode (strict - require strict monotonicity)'),
-				'params' => $this->param2SecMode,
+				'params' => $this->param1PeriodMode,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'monoinc' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('monoinc() - Check if item values have been continuously increasing, Mode (strict - require strict monotonicity)'),
-				'params' => $this->param2SecMode,
+				'params' => $this->param1PeriodMode,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
