@@ -22,6 +22,10 @@
 /**
  * @var CView $this
  */
+
+$linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+	? array_column($data['host']['parentTemplates'], 'templateid')
+	: [];
 ?>
 
 <?php if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED): ?>
@@ -145,7 +149,7 @@
 		},
 
 		initMacrosTab() {
-			var linked_templateids = [],
+			var linked_templateids = <?= json_encode($linked_templates) ?>,
 				$show_inherited_macros = $('input[name="show_inherited_macros"]');
 
 			this.macros_manager = new HostMacrosManager(<?= json_encode([
