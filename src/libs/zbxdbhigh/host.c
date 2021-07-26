@@ -4650,10 +4650,12 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select httptestid,name"
+			"select httptestid"
 			" from httptest"
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+
+	DBselect_uint64(sql, &httptestids);
 
 	DBdelete_httptests(&httptestids);
 
