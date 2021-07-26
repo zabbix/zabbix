@@ -210,7 +210,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  *                                                                            *
  * Parameters: event          - [IN] the source event                         *
  *             status         - [OUT] found or created host status            *
- *             cfg            - [INT] the global configuration data           *
+ *             cfg            - [IN] the global configuration data           *
  *                                                                            *
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
