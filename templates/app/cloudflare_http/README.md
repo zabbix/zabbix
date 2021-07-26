@@ -48,7 +48,7 @@ There are no template links in this template.
 |General |Cloudflare: Total bandwidth |<p>The volume of all data.</p> |DEPENDENT |cloudflare.bandwidth.all<p>**Preprocessing**:</p><p>- JSONPATH: `$.bandwidth.all`</p> |
 |General |Cloudflare: Cached bandwidth |<p>The volume of cached data.</p> |DEPENDENT |cloudflare.bandwidth.cached<p>**Preprocessing**:</p><p>- JSONPATH: `$.bandwidth.cached`</p> |
 |General |Cloudflare: Uncached bandwidth |<p>The volume of uncached data.</p> |DEPENDENT |cloudflare.bandwidth.uncached<p>**Preprocessing**:</p><p>- JSONPATH: `$.bandwidth.uncached`</p> |
-|General |Cloudflare: Cache Hit Ratio |<p>The ratio of the amount cached bandwidth to the bandwidth in percentage.</p> |DEPENDENT |cloudflare.bandwidth.cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.bandwidth.cache_hit_ratio`</p> |
+|General |Cloudflare: Cache hit ratio of bandwidth |<p>The ratio of the amount cached bandwidth to the bandwidth in percentage.</p> |DEPENDENT |cloudflare.bandwidth.cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.bandwidth.cache_hit_ratio`</p> |
 |General |Cloudflare: SSL encrypted bandwidth |<p>The volume of encrypted data.</p> |DEPENDENT |cloudflare.bandwidth.ssl.encrypted<p>**Preprocessing**:</p><p>- JSONPATH: `$.bandwidth.encrypted`</p> |
 |General |Cloudflare: Unencrypted bandwidth |<p>The volume of unencrypted data.</p> |DEPENDENT |cloudflare.bandwidth.ssl.unencrypted<p>**Preprocessing**:</p><p>- JSONPATH: `$.bandwidth.unencrypted`</p> |
 |General |Cloudflare: DNS queries |<p>The amount of all DNS queries.</p> |DEPENDENT |cloudflare.dns.query.all<p>**Preprocessing**:</p><p>- JSONPATH: `$.dns.query.all`</p> |
@@ -59,8 +59,13 @@ There are no template links in this template.
 |General |Cloudflare: Cached requests |<p>-</p> |DEPENDENT |cloudflare.requests.cached<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.cached`</p> |
 |General |Cloudflare: Uncached requests |<p>The number of uncached requests.</p> |DEPENDENT |cloudflare.requests.uncached<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.uncached`</p> |
 |General |Cloudflare: Cache hit ratio % over time |<p>The ratio of the amount cached requests to all requests in percentage.</p> |DEPENDENT |cloudflare.requests.cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.cache_hit_ratio`</p> |
-|General |Cloudflare: Error rate (non 2xx) |<p>The ratio of the amount requests with non-2xx response codes to all requests in percentage.</p> |DEPENDENT |cloudflare.requests.error_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.error_rate`</p> |
-|General |Cloudflare: 2xx rate |<p>The ratio of the amount requests with 2xx response codes to all requests in percentage.</p> |DEPENDENT |cloudflare.requests.non_error_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.non_error_rate`</p> |
+|General |Cloudflare: Response codes 1xx |<p>The number requests with 1xx response codes.</p> |DEPENDENT |cloudflare.requests.response_100<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.response_100`</p> |
+|General |Cloudflare: Response codes 2xx |<p>The number requests with 2xx response codes.</p> |DEPENDENT |cloudflare.requests.response_200<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.response_200`</p> |
+|General |Cloudflare: Response codes 3xx |<p>The number requests with 3xx response codes.</p> |DEPENDENT |cloudflare.requests.response_300<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.response_300`</p> |
+|General |Cloudflare: Response codes 4xx |<p>The number requests with 4xx response codes.</p> |DEPENDENT |cloudflare.requests.response_400<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.response_400`</p> |
+|General |Cloudflare: Response codes 5xx |<p>The number requests with 5xx response codes.</p> |DEPENDENT |cloudflare.requests.response_500<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.response_500`</p> |
+|General |Cloudflare: Non-2xx responses ratio |<p>The ratio of the amount requests with non-2xx response codes to all requests in percentage.</p> |DEPENDENT |cloudflare.requests.others_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.others_ratio`</p> |
+|General |Cloudflare: 2xx responses ratio |<p>The ratio of the amount requests with 2xx response codes to all requests in percentage.</p> |DEPENDENT |cloudflare.requests.success_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.success_ratio`</p> |
 |General |Cloudflare: SSL encrypted requests |<p>The number of encrypted requests.</p> |DEPENDENT |cloudflare.requests.ssl.encrypted<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.encrypted`</p> |
 |General |Cloudflare: Unencrypted requests |<p>The number of unencrypted requests.</p> |DEPENDENT |cloudflare.requests.ssl.unencrypted<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.unencrypted`</p> |
 |General |Cloudflare: Total threats |<p>The number of all threats.</p> |DEPENDENT |cloudflare.threats.all<p>**Preprocessing**:</p><p>- JSONPATH: `$.threats.all`</p> |
@@ -72,7 +77,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements) | |`max(/TEMPLATE_NAME/cloudflare.bandwidth.cached,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}` |WARNING | |
-|Cloudflare: Error rate is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements) |<p>A large number of errors can indicate a malfunction of the site.</p> |`min(/TEMPLATE_NAME/cloudflare.requests.error_rate,#3) > {$CLOUDFLARE.ERRORS.MAX.WARN}` |AVERAGE | |
+|Cloudflare: Ratio of non-2xx responses is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements) |<p>A large number of errors can indicate a malfunction of the site.</p> |`min(/TEMPLATE_NAME/cloudflare.requests.others_ratio,#3) > {$CLOUDFLARE.ERRORS.MAX.WARN}` |AVERAGE | |
 
 ## Feedback
 
