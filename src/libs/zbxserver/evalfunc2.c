@@ -2516,17 +2516,17 @@ out:
 #define MONOINC		0
 #define MONODEC		1
 
-#define CHECK_MONOTONICITY(type, mode_op, epsi, epsi_op)				\
+#define CHECK_MONOTONICITY(type, mode_op, epsi_op)					\
 	for (i = 0; i < values.values_num - 1; i++)					\
 	{										\
 		if (0 == strict && values.values[i + 1].value.type mode_op		\
-				(epsi_op epsi + values.values[i].value.type))		\
+				(epsi_op + values.values[i].value.type))		\
 		{									\
 			res = 0;							\
 			break;								\
 		}									\
 		else if (1 == strict && values.values[i + 1].value.type mode_op##=	\
-				(epsi_op epsi + values.values[i].value.type ) )		\
+				(epsi_op + values.values[i].value.type ) )		\
 		{									\
 			res = 0;							\
 			break;								\
@@ -2619,11 +2619,11 @@ static int	evaluate_MONO(zbx_variant_t *value, DC_ITEM *item, const char *parame
 	{
 		if (MONOINC == gradient)
 		{
-			CHECK_MONOTONICITY(dbl, >, ZBX_DOUBLE_EPSILON, +);
+			CHECK_MONOTONICITY(dbl, >, +ZBX_DOUBLE_EPSILON);
 		}
 		else if (MONODEC == gradient)
 		{
-			CHECK_MONOTONICITY(dbl, <, ZBX_DOUBLE_EPSILON, -);
+			CHECK_MONOTONICITY(dbl, <, -ZBX_DOUBLE_EPSILON);
 		}
 		else
 		{
@@ -2634,11 +2634,11 @@ static int	evaluate_MONO(zbx_variant_t *value, DC_ITEM *item, const char *parame
 	{
 		if (MONOINC == gradient)
 		{
-			CHECK_MONOTONICITY(ui64, >, , );
+			CHECK_MONOTONICITY(ui64, >, 0);
 		}
 		else if (MONODEC == gradient)
 		{
-			CHECK_MONOTONICITY(ui64, <, , );
+			CHECK_MONOTONICITY(ui64, <, 0);
 		}
 		else
 		{
