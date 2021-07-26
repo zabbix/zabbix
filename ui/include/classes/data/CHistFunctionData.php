@@ -138,6 +138,16 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
 		],
+		'monodec' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(strict)$/']], 'required' => false]
+		],
+		'monoinc' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(strict)$/']], 'required' => false]
+		],
 		'nodata' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'time', 'min' => 1]]],
@@ -246,6 +256,8 @@ final class CHistFunctionData {
 		'max_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'min' => self::ITEM_VALUE_TYPES_NUM,
 		'min_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'monodec' =>  self::ITEM_VALUE_TYPES_NUM,
+		'monoinc' =>  self::ITEM_VALUE_TYPES_NUM,
 		'nodata' => self::ITEM_VALUE_TYPES_ALL,
 		'percentile' => self::ITEM_VALUE_TYPES_NUM,
 		'skewness' => self::ITEM_VALUE_TYPES_NUM,
