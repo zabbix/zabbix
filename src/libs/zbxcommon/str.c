@@ -6175,8 +6175,7 @@ static char	*utf8_chr_prev(char *str)
  ******************************************************************************/
 static int	strchr_utf8(const char *seq, char *c)
 {
-	size_t		len, c_len;
-	const char	*next;
+	size_t	len, c_len;
 
 	if (0 == (c_len = zbx_utf8_char_len(c)))
 		return FAIL;
@@ -6190,15 +6189,12 @@ static int	strchr_utf8(const char *seq, char *c)
 
 	while ('\0' != *seq)
 	{
-		next = utf8_chr_next((char *)seq);
-
-		if (0 == (len = next - seq))
-			return FAIL;
+		len = utf8_chr_next((char *)seq) - seq;
 
 		if (len == c_len && 0 == memcmp(seq, c, len))
 			return SUCCEED;
 
-		seq = next;
+		seq += len;
 	}
 
 	return FAIL;
