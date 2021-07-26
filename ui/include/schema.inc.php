@@ -2749,6 +2749,12 @@ return [
 				'length' => 1024,
 				'default' => ''
 			],
+			'hk_events_service' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1d'
+			],
 			'passwd_min_length' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -5427,6 +5433,20 @@ return [
 				'length' => 20,
 				'ref_table' => 'acknowledges',
 				'ref_field' => 'acknowledgeid'
+			],
+			'servicealarmid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'service_alarms',
+				'ref_field' => 'servicealarmid'
+			],
+			'serviceid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'services',
+				'ref_field' => 'serviceid'
 			]
 		]
 	],

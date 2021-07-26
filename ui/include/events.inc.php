@@ -34,7 +34,8 @@ function eventSource($source = null) {
 		EVENT_SOURCE_TRIGGERS => _('trigger'),
 		EVENT_SOURCE_DISCOVERY => _('discovery'),
 		EVENT_SOURCE_AUTOREGISTRATION => _('autoregistration'),
-		EVENT_SOURCE_INTERNAL => _x('internal', 'event source')
+		EVENT_SOURCE_INTERNAL => _x('internal', 'event source'),
+		EVENT_SOURCE_SERVICE => _('service')
 	];
 
 	if ($source === null) {
@@ -61,7 +62,8 @@ function eventObject($object = null) {
 		EVENT_OBJECT_DSERVICE => _('discovered service'),
 		EVENT_OBJECT_AUTOREGHOST => _('autoregistered host'),
 		EVENT_OBJECT_ITEM => _('item'),
-		EVENT_OBJECT_LLDRULE => _('low-level discovery rule')
+		EVENT_OBJECT_LLDRULE => _('low-level discovery rule'),
+		EVENT_OBJECT_SERVICE => _('service')
 	];
 
 	if ($object === null) {
@@ -88,7 +90,8 @@ function eventSourceObjects() {
 		['source' => EVENT_SOURCE_AUTOREGISTRATION, 'object' => EVENT_OBJECT_AUTOREGHOST],
 		['source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_TRIGGER],
 		['source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_ITEM],
-		['source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_LLDRULE]
+		['source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_LLDRULE],
+		['source' => EVENT_SOURCE_SERVICE, 'object' => EVENT_OBJECT_SERVICE]
 	];
 }
 

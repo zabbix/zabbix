@@ -24,9 +24,8 @@ SUBDIRS = \
 	availability \
 	lld \
 	reporter \
-	service \
-	triggerhousekeeper
-
+	service 
+	
 sbin_PROGRAMS = zabbix_server
 
 noinst_LIBRARIES = libzbxserver.a
@@ -71,7 +70,6 @@ zabbix_server_LDADD = \
 	preprocessor/libpreprocessor.a \
 	availability/libavailability.a \
 	service/libservice.a \
-	triggerhousekeeper/libtriggerhousekeeper.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \

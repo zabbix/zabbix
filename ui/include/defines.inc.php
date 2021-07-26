@@ -20,9 +20,9 @@
 
 define('ZABBIX_VERSION',		'6.0.0alpha1');
 define('ZABBIX_API_VERSION',	'6.0.0');
-define('ZABBIX_EXPORT_VERSION',	'5.4');
+define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050018);
+define('ZABBIX_DB_VERSION',		5050023);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -294,6 +294,8 @@ define('CONDITION_TYPE_EVENT_TYPE',			23);
 define('CONDITION_TYPE_HOST_METADATA',		24);
 define('CONDITION_TYPE_EVENT_TAG',			25);
 define('CONDITION_TYPE_EVENT_TAG_VALUE',	26);
+define('CONDITION_TYPE_SERVICE',			27);
+define('CONDITION_TYPE_SERVICE_NAME',		28);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -794,9 +796,9 @@ define('OPERATION_TYPE_HOST_INVENTORY',		10);
 define('OPERATION_TYPE_RECOVERY_MESSAGE',	11);
 define('OPERATION_TYPE_ACK_MESSAGE',		12);
 
-define('ACTION_OPERATION',					0);
-define('ACTION_RECOVERY_OPERATION',			1);
-define('ACTION_ACKNOWLEDGE_OPERATION',		2);
+define('ACTION_OPERATION',			0);
+define('ACTION_RECOVERY_OPERATION',	1);
+define('ACTION_UPDATE_OPERATION',	2);
 
 define('CONDITION_EVAL_TYPE_AND_OR',		0);
 define('CONDITION_EVAL_TYPE_AND',			1);
@@ -1026,6 +1028,7 @@ define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
 define('EVENT_SOURCE_AUTOREGISTRATION',	2);
 define('EVENT_SOURCE_INTERNAL',			3);
+define('EVENT_SOURCE_SERVICE',			4);
 
 define('EVENT_OBJECT_TRIGGER',			0);
 define('EVENT_OBJECT_DHOST',			1);
@@ -1033,6 +1036,7 @@ define('EVENT_OBJECT_DSERVICE',			2);
 define('EVENT_OBJECT_AUTOREGHOST',		3);
 define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
+define('EVENT_OBJECT_SERVICE',			6);
 
 // Problem and event tag constants.
 define('TAG_EVAL_TYPE_AND_OR',		0);
@@ -1397,6 +1401,7 @@ define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
 define('API_NUMERIC_RANGES',		41);
 define('API_UUID',					42);
+define('API_VAULT_SECRET',			43);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1412,6 +1417,7 @@ define('API_TIME_UNIT_WITH_YEAR',		0x0200);
 define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 define('API_PRESERVE_KEYS',				0x0800);
 define('API_ALLOW_MACRO',				0x1000);
+define('API_ALLOW_GLOBAL_REGEX',		0x2000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

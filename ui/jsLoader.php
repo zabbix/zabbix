@@ -387,6 +387,9 @@ $tranStrings = [
 		'Set new value' => _('Set new value'),
 		'path/to/secret:key' => _('path/to/secret:key'),
 		'value' => _('value')
+	],
+	'popup.condition.common.js' => [
+		'Add parent services' => _('Add parent services')
 	]
 ];
 

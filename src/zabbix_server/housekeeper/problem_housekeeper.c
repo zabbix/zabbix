@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "trigger_housekeeper.h"
+#include "problem_housekeeper.h"
 
 #include "common.h"
 #include "log.h"
@@ -33,7 +33,7 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-extern int		CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY;
+extern int		CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY;
 
 static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 {
@@ -42,7 +42,7 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 	int		i;
 
 	for (i = 0; i < eventids->values_num; i++)
-		zbx_service_serialize_eventid(&data, &data_alloc, &data_offset, eventids->values[i]);
+		zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventids->values[i]);
 
 	if (NULL == data)
 		return;
@@ -123,13 +123,13 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [startup idle for %d second(s)]", get_process_type_string(process_type),
-			CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
+			CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
 
 	zbx_set_sigusr_handler(zbx_trigger_housekeeper_sigusr_handler);
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_sleep_loop(CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
+		zbx_sleep_loop(CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
 
 		if (!ZBX_IS_RUNNING())
 			break;
@@ -143,7 +143,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 
 		zbx_setproctitle("%s [deleted %d problems records in " ZBX_FS_DBL " sec, idle for %d second(s)]",
 				get_process_type_string(process_type), deleted, zbx_time() - sec,
-				CONFIG_TRIGGERHOUSEKEEPING_FREQUENCY);
+				CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
 	}
 
 	DBclose();
