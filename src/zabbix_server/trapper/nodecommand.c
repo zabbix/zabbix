@@ -164,54 +164,6 @@ static void	auditlog_global_script(const zbx_script_t *script, zbx_uint64_t host
 	while (ZBX_DB_DOWN == DBcommit());
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_check_user_administration_permissions                        *
- *                                                                            *
- * Purpose: check if the user has specific or default access for              *
- *          administration actions                                            *
- *                                                                            *
- * Return value:  SUCCEED - the access is granted                             *
- *                FAIL    - the access is denied                              *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule)
-{
-	int		ret = FAIL;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
-
-	result = DBselect("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
-			" and (name='%s' or name='%s')", user->roleid, role_rule,
-			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (0 == strcmp(role_rule, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-			else
-				ret = FAIL;
-			break;
-		}
-		else if (0 == strcmp(ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, int *scope, zbx_uint64_t *usrgrpid,
 		zbx_uint64_t *groupid, char *error, size_t error_len)
 {
@@ -530,14 +482,14 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
 		if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
-				NULL, &host, NULL, NULL, NULL, user_timezone, &script.command, macro_type, error,
-				sizeof(error)))
+				NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command, macro_type,
+				error, sizeof(error)))
 		{
 			goto fail;
 		}
 
 		if (SUCCEED != substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL, &host,
-				NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type, error,
+				NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type, error,
 				sizeof(error)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -552,7 +504,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		for (i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-					&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone,
+					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone,
 					(char **)&webhook_params.values[i].second, macro_type, error,
 					sizeof(error)))
 			{
@@ -643,6 +595,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	}
 
 	if (SUCCEED != zbx_check_user_administration_actions_permissions(&user,
+			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
 	{
 		result = zbx_strdup(result, "Permission denied. No role access.");

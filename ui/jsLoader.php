@@ -104,7 +104,6 @@ $availableJScripts = [
 	'class.crangecontrol.js' => '',
 	'class.csuggest.js' => '',
 	'class.csvggraph.js' => '',
-	'class.ctree.js' => '',
 	'class.curl.js' => '',
 	'class.overlaycollection.js' => '',
 	'class.overlay.js' => '',
@@ -129,7 +128,6 @@ $availableJScripts = [
 	'report2.js' => 'pages/',
 	'report4.js' => 'pages/',
 	'setup.js' => 'pages/',
-	'srv_status.js' => 'pages/',
 	'monitoring.overview.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
 	'popup.operation.common.js' => 'pages/'
@@ -389,6 +387,9 @@ $tranStrings = [
 		'Set new value' => _('Set new value'),
 		'path/to/secret:key' => _('path/to/secret:key'),
 		'value' => _('value')
+	],
+	'popup.condition.common.js' => [
+		'Add parent services' => _('Add parent services')
 	]
 ];
 

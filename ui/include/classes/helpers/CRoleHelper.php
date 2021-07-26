@@ -48,7 +48,6 @@ class CRoleHelper {
 	public const UI_CONFIGURATION_ACTIONS = 'ui.configuration.actions';
 	public const UI_CONFIGURATION_EVENT_CORRELATION = 'ui.configuration.event_correlation';
 	public const UI_CONFIGURATION_DISCOVERY = 'ui.configuration.discovery';
-	public const UI_CONFIGURATION_SERVICES = 'ui.configuration.services';
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
 	public const UI_ADMINISTRATION_PROXIES = 'ui.administration.proxies';
 	public const UI_ADMINISTRATION_AUTHENTICATION = 'ui.administration.authentication';
@@ -78,6 +77,7 @@ class CRoleHelper {
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_MANAGE_API_TOKENS = 'actions.manage_api_tokens';
 	public const ACTIONS_MANAGE_SCHEDULED_REPORTS = 'actions.manage_scheduled_reports';
+	public const ACTIONS_MANAGE_SERVICES = 'actions.manage_services';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 	public const DEFAULT_ACCESS_DISABLED = 0;
 	public const DEFAULT_ACCESS_ENABLED = 1;
@@ -293,8 +293,7 @@ class CRoleHelper {
 			$rules = array_merge($rules, [
 				self::UI_MONITORING_DISCOVERY, self::UI_REPORTS_NOTIFICATIONS, self::UI_REPORTS_SCHEDULED_REPORTS,
 				self::UI_CONFIGURATION_HOST_GROUPS, self::UI_CONFIGURATION_TEMPLATES, self::UI_CONFIGURATION_HOSTS,
-				self::UI_CONFIGURATION_MAINTENANCE, self::UI_CONFIGURATION_ACTIONS, self::UI_CONFIGURATION_DISCOVERY,
-				self::UI_CONFIGURATION_SERVICES
+				self::UI_CONFIGURATION_MAINTENANCE, self::UI_CONFIGURATION_ACTIONS, self::UI_CONFIGURATION_DISCOVERY
 			]);
 		}
 
@@ -330,6 +329,7 @@ class CRoleHelper {
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
 			$rules[] = self::ACTIONS_MANAGE_SCHEDULED_REPORTS;
+			$rules[] = self::ACTIONS_MANAGE_SERVICES;
 		}
 
 		return $rules;
@@ -441,10 +441,7 @@ class CRoleHelper {
 				}
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
-					$labels += [
-						self::UI_CONFIGURATION_DISCOVERY => _('Discovery'),
-						self::UI_CONFIGURATION_SERVICES => _('Services')
-					];
+					$labels += [self::UI_CONFIGURATION_DISCOVERY => _('Discovery')];
 				}
 
 				return $labels;
@@ -501,7 +498,10 @@ class CRoleHelper {
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
-			$labels += [self::ACTIONS_MANAGE_SCHEDULED_REPORTS => _('Manage scheduled reports')];
+			$labels += [
+				self::ACTIONS_MANAGE_SCHEDULED_REPORTS => _('Manage scheduled reports'),
+				self::ACTIONS_MANAGE_SERVICES => _('Manage services')
+			];
 		}
 
 		return $labels;

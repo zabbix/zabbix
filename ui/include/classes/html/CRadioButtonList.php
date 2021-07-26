@@ -35,6 +35,7 @@ class CRadioButtonList extends CList {
 	private $readonly;
 	private $modern;
 	private $autofocused;
+	private $autocomplete = true;
 
 	/**
 	 * Array of value elements.
@@ -141,6 +142,10 @@ class CRadioButtonList extends CList {
 				}
 			}
 
+			if (!$this->autocomplete) {
+				$radio->setAttribute('autocomplete', 'off');
+			}
+
 			if ($this->modern) {
 				$this->addItem((new CListItem([$radio, new CLabel($value['name'], $value['id'])]))->addClass(
 					array_key_exists('class', $value) ? $value['class'] : null
@@ -177,5 +182,14 @@ class CRadioButtonList extends CList {
 		}
 
 		return parent::setAttribute($name, $value);
+	}
+
+	/**
+	 * Prevent browser to autocomplete input element.
+	 */
+	public function disableAutocomplete() {
+		$this->autocomplete = false;
+
+		return $this;
 	}
 }

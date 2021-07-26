@@ -115,6 +115,7 @@ void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket);
 int	zbx_ipc_socket_write(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const unsigned char *data,
 		zbx_uint32_t size);
 int	zbx_ipc_socket_read(zbx_ipc_socket_t *csocket, zbx_ipc_message_t *message);
+int	zbx_ipc_socket_connected(const zbx_ipc_socket_t *csocket);
 
 int	zbx_ipc_async_socket_open(zbx_ipc_async_socket_t *asocket, const char *service_name, int timeout, char **error);
 void	zbx_ipc_async_socket_close(zbx_ipc_async_socket_t *asocket);

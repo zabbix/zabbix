@@ -39,6 +39,7 @@ class CControllerHousekeepingUpdate extends CController {
 			'hk_events_discovery'	=> 'db config.hk_events_discovery|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
 			'hk_events_internal'	=> 'db config.hk_events_internal|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
 			'hk_events_trigger'		=> 'db config.hk_events_trigger|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
+			'hk_events_service'		=> 'db config.hk_events_service|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
 			'hk_events_mode'		=> 'db config.hk_events_mode|in 1',
 			'compression_status'	=> 'db config.compression_status|in 1',
 			'compress_older'		=> 'db config.compress_older|time_unit '.implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])
@@ -101,8 +102,9 @@ class CControllerHousekeepingUpdate extends CController {
 		}
 
 		if ($hk[CHousekeepingHelper::HK_EVENTS_MODE] == 1) {
-			$this->getInputs($hk, [CHousekeepingHelper::HK_EVENTS_TRIGGER, CHousekeepingHelper::HK_EVENTS_INTERNAL,
-				CHousekeepingHelper::HK_EVENTS_DISCOVERY, CHousekeepingHelper::HK_EVENTS_AUTOREG
+			$this->getInputs($hk, [CHousekeepingHelper::HK_EVENTS_TRIGGER, CHousekeepingHelper::HK_EVENTS_SERVICE,
+				CHousekeepingHelper::HK_EVENTS_INTERNAL, CHousekeepingHelper::HK_EVENTS_DISCOVERY,
+				CHousekeepingHelper::HK_EVENTS_AUTOREG
 			]);
 		}
 
