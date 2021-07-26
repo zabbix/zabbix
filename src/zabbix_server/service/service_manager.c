@@ -118,7 +118,7 @@ typedef struct
 	zbx_hashset_t	actions;
 	zbx_hashset_t	action_conditions;
 
-	zbx_config_t	config;
+	char		*severities[TRIGGER_SEVERITY_COUNT];
 }
 zbx_service_manager_t;
 
@@ -995,6 +995,38 @@ static void	sync_action_conditions(zbx_service_manager_t *service_manager, int r
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	sync_config(zbx_service_manager_t *service_manager)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		i;
+
+	result = DBselect("select severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,"
+				"severity_name_5 from config");
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		for (i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+			service_manager->severities[i] = zbx_strdup(service_manager->severities[i], row[i]);
+	}
+	else
+	{
+		const ZBX_TABLE	*table;
+		char		field[16];
+
+		table = DBget_table("config");
+
+		for (i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+		{
+			zbx_snprintf(field, sizeof(field), "severity_name_%d", i);
+			service_manager->severities[i] = zbx_strdup(service_manager->severities[i],
+					DBget_field(table, field)->default_value);
+		}
+	}
+
+	DBfree_result(result);
+}
+
 static void	service_clean(zbx_service_t *service)
 {
 	zbx_free(service->name);
@@ -1415,7 +1447,7 @@ static char	*service_get_event_name(zbx_service_manager_t *manager, const char *
 		case TRIGGER_SEVERITY_AVERAGE:
 		case TRIGGER_SEVERITY_HIGH:
 		case TRIGGER_SEVERITY_DISASTER:
-			severity = manager->config.severity_name[status];
+			severity = manager->severities[status];
 			break;
 		default:
 			severity = "unknown";
@@ -2352,15 +2384,17 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_action_condition_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	memset(&service_manager->config, 0, sizeof(service_manager->config));
-
+	memset(&service_manager->severities, 0, sizeof(service_manager->severities));
 }
 
 static void	service_manager_free(zbx_service_manager_t *service_manager)
 {
+	int	i;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_config_clean(&service_manager->config);
+	for (i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+		zbx_free(service_manager->severities[i]);
 
 	zbx_hashset_destroy(&service_manager->service_problems_index);
 	zbx_hashset_destroy(&service_manager->services_links);
@@ -2628,9 +2662,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				sync_services_links(&service_manager, &updated, revision);
 				sync_actions(&service_manager, revision);
 				sync_action_conditions(&service_manager, revision);
-
-				zbx_config_clean(&service_manager.config);
-				zbx_config_get(&service_manager.config, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
+				sync_config(&service_manager);
 
 				/* load service problems once during startup */
 				if (0 == (int)time_flush)

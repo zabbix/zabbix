@@ -229,7 +229,7 @@ void	zbx_service_serialize_id(unsigned char **data, size_t *data_alloc, size_t *
 	(void)zbx_serialize_value(ptr, id);
 }
 
-void	zbx_service_deserialize_ids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *eventids)
+void	zbx_service_deserialize_ids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *ids)
 {
 	const unsigned char	*end = data + size;
 
@@ -238,7 +238,7 @@ void	zbx_service_deserialize_ids(const unsigned char *data, zbx_uint32_t size, z
 		zbx_uint64_t	eventid;
 
 		data += zbx_deserialize_value(data, &eventid);
-		zbx_vector_uint64_append(eventids, eventid);
+		zbx_vector_uint64_append(ids, eventid);
 	}
 }
 
