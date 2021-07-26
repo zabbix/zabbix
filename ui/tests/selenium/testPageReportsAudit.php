@@ -181,7 +181,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 				case 'Authentication':
 				case 'Configuration of Zabbix':
-					$this->assertEquals(['Add', 'Delete', 'Disable', 'Enable', 'Execute', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Add', 'Delete', 'Execute', 'Login', 'Logout'], $disabled);
 					break;
 
 				case 'Discovery rule':
@@ -200,15 +200,15 @@ class testPageReportsAudit extends CLegacyWebTest {
 					break;
 
 				case 'Script':
-					$this->assertEquals(['Disable', 'Enable', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Login', 'Logout'], $disabled);
 					break;
 
 				case 'User':
-					$this->assertEquals(['Disable', 'Enable', 'Execute'], $disabled);
+					$this->assertEquals(['Execute'], $disabled);
 					break;
 
 				default:
-					$this->assertEquals(['Disable', 'Enable', 'Execute', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Execute', 'Login', 'Logout'], $disabled);
 			}
 		}
 	}
