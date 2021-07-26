@@ -21,6 +21,9 @@
 #include "log.h"
 #include "zbxipcservice.h"
 
+#include "../../libs/zbxalgo/vectorimpl.h"
+ZBX_PTR_VECTOR_IMPL(service, DB_SERVICE *)
+
 void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
 {
 	static zbx_ipc_socket_t	socket;
@@ -40,6 +43,32 @@ void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size
 	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to service manager service");
+		exit(EXIT_FAILURE);
+	}
+}
+
+void	zbx_service_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response)
+{
+	char			*error = NULL;
+	static zbx_ipc_socket_t	socket = {0};
+
+	/* each process has a permanent connection to service manager */
+	if (0 == socket.fd && FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_SERVICE, SEC_PER_MIN,
+			&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to service: %s", error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to service");
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL != response && FAIL == zbx_ipc_socket_read(&socket, response))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from service");
 		exit(EXIT_FAILURE);
 	}
 }

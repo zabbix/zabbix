@@ -23,12 +23,17 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "db.h"
+#include "zbxipcservice.h"
+
+ZBX_PTR_VECTOR_DECL(service, DB_SERVICE *)
 
 #define ZBX_IPC_SERVICE_SERVICE			"service"
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS	1
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS	2
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE	3
+#define ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE	4
 
 void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
+void	zbx_service_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response);
 
 #endif /* ZABBIX_AVAILABILITY_H */

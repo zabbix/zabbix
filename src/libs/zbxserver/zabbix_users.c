@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "zabbix_users.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -70,4 +71,53 @@ char	*get_user_timezone(zbx_uint64_t userid)
 	DBfree_result(result);
 
 	return user_timezone;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_user_administration_permissions                        *
+ *                                                                            *
+ * Purpose: check if the user has specific or default access for              *
+ *          administration actions                                            *
+ *                                                                            *
+ * Return value:  SUCCEED - the access is granted                             *
+ *                FAIL    - the access is denied                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
+		const char *role_rule)
+{
+	int		ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
+
+	result = DBselect("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
+			" and (name='%s' or name='%s')", user->roleid, role_rule,
+			role_rule_default);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 == strcmp(role_rule, row[1]))
+		{
+			if (ROLE_PERM_ALLOW == atoi(row[0]))
+				ret = SUCCEED;
+			else
+				ret = FAIL;
+			break;
+		}
+		else if (0 == strcmp(role_rule_default, row[1]))
+		{
+			if (ROLE_PERM_ALLOW == atoi(row[0]))
+				ret = SUCCEED;
+		}
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }

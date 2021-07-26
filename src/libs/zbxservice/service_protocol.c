@@ -24,7 +24,7 @@
 #include "dbcache.h"
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int clock, int value, int severity, const zbx_vector_ptr_t *tags)
+		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags)
 {
 	zbx_uint32_t	data_len = 0, *len = NULL;
 	int		i;
@@ -32,6 +32,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 
 	zbx_serialize_prepare_value(data_len, eventid);
 	zbx_serialize_prepare_value(data_len, clock);
+	zbx_serialize_prepare_value(data_len, ns);
 	zbx_serialize_prepare_value(data_len, value);
 	zbx_serialize_prepare_value(data_len, severity);
 	zbx_serialize_prepare_value(data_len, tags->values_num);
@@ -64,6 +65,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 
 	ptr += zbx_serialize_value(ptr, eventid);
 	ptr += zbx_serialize_value(ptr, clock);
+	ptr += zbx_serialize_value(ptr, ns);
 	ptr += zbx_serialize_value(ptr, value);
 	ptr += zbx_serialize_value(ptr, severity);
 	ptr += zbx_serialize_value(ptr, tags->values_num);
@@ -94,6 +96,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 
 		data += zbx_deserialize_value(data, &event->eventid);
 		data += zbx_deserialize_value(data, &event->clock);
+		data += zbx_deserialize_value(data, &event->ns);
 		data += zbx_deserialize_value(data, &event->value);
 		data += zbx_deserialize_value(data, &event->severity);
 		data += zbx_deserialize_value(data, &values_num);
@@ -202,13 +205,12 @@ void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_
 	}
 }
 
-void	zbx_service_serialize_eventid(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		zbx_uint64_t eventid)
+void	zbx_service_serialize_id(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t id)
 {
 	zbx_uint32_t	data_len = 0;
 	unsigned char	*ptr;
 
-	zbx_serialize_prepare_value(data_len, eventid);
+	zbx_serialize_prepare_value(data_len, id);
 
 	if (NULL != *data)
 	{
@@ -224,10 +226,10 @@ void	zbx_service_serialize_eventid(unsigned char **data, size_t *data_alloc, siz
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
 
-	(void)zbx_serialize_value(ptr, eventid);
+	(void)zbx_serialize_value(ptr, id);
 }
 
-void	zbx_service_deserialize_eventids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *eventids)
+void	zbx_service_deserialize_ids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *ids)
 {
 	const unsigned char	*end = data + size;
 
@@ -236,6 +238,76 @@ void	zbx_service_deserialize_eventids(const unsigned char *data, zbx_uint32_t si
 		zbx_uint64_t	eventid;
 
 		data += zbx_deserialize_value(data, &eventid);
-		zbx_vector_uint64_append(eventids, eventid);
+		zbx_vector_uint64_append(ids, eventid);
+	}
+}
+
+void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		zbx_uint64_t serviceid, const zbx_vector_uint64_t *eventids)
+{
+	zbx_uint32_t	data_len = 0;
+	int		i;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, serviceid);
+	zbx_serialize_prepare_value(data_len, eventids->values_num);
+
+	for (i = 0; i < eventids->values_num; i++)
+		zbx_serialize_prepare_value(data_len, eventids->values[i]);
+
+	if (NULL != *data)
+	{
+		while (data_len > *data_alloc - *data_offset)
+		{
+			*data_alloc *= 2;
+			*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
+		}
+	}
+	else
+		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+
+	ptr = *data + *data_offset;
+	*data_offset += data_len;
+
+	ptr += zbx_serialize_value(ptr, serviceid);
+	ptr += zbx_serialize_value(ptr, eventids->values_num);
+
+	for (i = 0; i < eventids->values_num; i++)
+		ptr += zbx_serialize_value(ptr, eventids->values[i]);
+}
+
+void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_service_t *services)
+{
+	const unsigned char	*end = data + size;
+
+	while (data < end)
+	{
+		DB_SERVICE	*service, service_local;
+		int		values_num, i;
+
+		data += zbx_deserialize_value(data, &service_local.serviceid);
+		data += zbx_deserialize_value(data, &values_num);
+
+		if (FAIL == (i = zbx_vector_service_bsearch(services, &service_local, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			service = NULL;
+		else
+			service = services->values[i];
+
+		if (0 == values_num)
+			continue;
+
+		if (NULL != service)
+			zbx_vector_uint64_reserve(&service->eventids, values_num);
+
+		for (i = 0; i < values_num; i++)
+		{
+			zbx_uint64_t	eventid;
+
+			data += zbx_deserialize_value(data, &eventid);
+
+			if (NULL != service)
+				zbx_vector_uint64_append(&service->eventids, eventid);
+		}
 	}
 }

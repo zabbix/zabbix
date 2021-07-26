@@ -1,6 +1,9 @@
 Changes for 6.0.0alpha1
 
 New features:
+A.F.I...S. [ZBXNEXT-6755] added support of alerting in services (agriscenko, ashubin, averza, vso, wiper)
+A.F.I...S. [ZBXNEXT-3022] improved scalability of services (ashubin, averza, vso, wiper)
+A.F.I...S. [ZBXNEXT-6674] added tag based mapping of problems in services (ashubin, averza, vso, wiper)
 A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sections Images, Proxies, Graphs and Graph prototypes, Services, and Maps to API (rlataria)
 ........S. [ZBXNEXT-6679] improved performance of template linking on Zabbix Server (akozlovs, arimdjonoks)
 .........T [ZBXNEXT-5925] added template "Systemd by Zabbix agent 2" (ychukina)
@@ -22,6 +25,10 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+A......... [ZBX-19597] fixed error when value maps API allow to create invalid value mapping of type regexp (gcalenko)
+........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
+A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
+A......... [ZBX-19491] fixed copying of host prototype tags when performing host full clone (miks)
 ..F....... [ZBX-19218] fixed missed untranslated string in jsLoader (rlataria)
 ....I..... [ZBX-19498] fixed 'subject' being too long when {TRIGGER.NAME} is converted to {EVENT.RECOVERY.NAME} (dgoloscapov, wiper)
 A......... [ZBX-19536] fixed host.get with selectTags = ['tag'] call attempting to retrieve tag value(s) as well (jfreibergs)
@@ -120,6 +127,11 @@ Changes for 5.4.4rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-19597] fixed error when value maps API allow to create invalid value mapping of type regexp (gcalenko)
+........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
+..F....... [ZBX-19218] fixed missed untranslated string in jsLoader (rlataria)
+A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
+A......... [ZBX-19491] fixed copying of host prototype tags when performing host full clone (miks)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.3
@@ -1053,6 +1065,8 @@ Changes for 5.0.15rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
+........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.14

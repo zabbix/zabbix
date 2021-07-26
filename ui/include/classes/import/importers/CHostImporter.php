@@ -324,7 +324,7 @@ class CHostImporter extends CImporter {
 
 			if (array_key_exists('macros', $host)) {
 				foreach ($host['macros'] as &$macro) {
-					$hostmacroid = $this->referencer->findMacroid($hostid, $macro['macro']);
+					$hostmacroid = $this->referencer->findHostMacroid($hostid, $macro['macro']);
 
 					if ($hostmacroid !== null) {
 						$macro['hostmacroid'] = $hostmacroid;
