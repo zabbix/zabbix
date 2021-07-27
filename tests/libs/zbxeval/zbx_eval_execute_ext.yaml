@@ -113,5 +113,52 @@ in:
 out:
   result: SUCCEED
   value: 6
+---
+test case: Expression 'count(last_foreach(/host/key,1h))'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/host/key,1h))'
+  callbacks:
+  - name: last_foreach
+    args_num: 2
+    retval: [1, 2, 3]
+out:
+  result: SUCCEED
+  value: 3
+---
+test case: Expression 'count(last_foreach(/host/key,1h)) - no items'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/host/key,1h))'
+  callbacks:
+  - name: last_foreach
+    args_num: 2
+    retval: []
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'count(last_foreach(/*/key))'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key))'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: [1, 2]
+out:
+  result: SUCCEED
+  value: 2
+---
+test case: Expression 'count(last_foreach(/*/key)) - no items'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key))'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: []
+out:
+  result: SUCCEED
+  value: 0
 ...
-
