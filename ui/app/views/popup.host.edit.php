@@ -70,7 +70,7 @@ else {
 	];
 }
 
-$inline_js = 
+$inline_js =
 	'document.getElementById("'.$data['form_name'].'").addEventListener("formSubmitted", function (event) {'.
 		'let response = event.detail,'.
 			'overlay = overlays_stack.end(),'.
