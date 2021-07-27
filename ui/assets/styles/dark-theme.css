@@ -3926,7 +3926,10 @@ z-select[disabled] button,
   background-color: #2b2b2b;
   border: 1px solid #383838;
   border-bottom-color: #353535;
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+  max-height: 90%;
+  overflow-x: hidden;
+  overflow-y: auto; }
   .menu-popup:focus {
     outline: none; }
   .menu-popup li {
@@ -6178,6 +6181,9 @@ svg {
   .btn-toggle-chevron:enabled:hover::after, .btn-toggle-chevron:enabled:focus::after, .btn-toggle-chevron:enabled:active::after, .btn-toggle-chevron:enabled[aria-expanded="true"]::after {
     border-top-color: #f2f2f2;
     border-right-color: #f2f2f2; }
+
+.btn-toggle-chevron-captioned {
+  padding-inline-end: 1.5rem; }
 
 .btn-dropdown-toggle {
   white-space: nowrap;

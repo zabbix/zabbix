@@ -2940,6 +2940,9 @@ $form-icon-btn: (
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
+	max-height: 90%;
+	overflow-x: hidden;
+	overflow-y: auto;
 
 	&:focus {
 		outline: none;
@@ -6155,6 +6158,10 @@ $range-input-width: 31px;
 			}
 		}
 	}
+}
+
+.btn-toggle-chevron-captioned {
+	padding-inline-end: 1.5rem;
 }
 
 .btn-dropdown-toggle {
