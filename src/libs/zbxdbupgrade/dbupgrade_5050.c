@@ -346,15 +346,45 @@ out:
 
 static int	DBpatch_5050017(void)
 {
+	const ZBX_FIELD	field = {"servicealarmid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("escalations", &field);
+}
+static int	DBpatch_5050018(void)
+{
+	const ZBX_FIELD	field = {"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("escalations", &field);
+}
+
+static int	DBpatch_5050019(void)
+{
+	return DBdrop_index("escalations", "escalations_1");
+}
+
+static int	DBpatch_5050020(void)
+{
+	return DBcreate_index("escalations", "escalations_1", "triggerid,itemid,serviceid,escalationid", 1);
+}
+
+static int	DBpatch_5050021(void)
+{
+	const ZBX_FIELD	field = {"hk_events_service", "1d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050022(void)
+{
 	return DBdrop_table("auditlog_details");
 }
 
-static int	DBpatch_5050018(void)
+static int	DBpatch_5050023(void)
 {
 	return DBdrop_table("auditlog");
 }
 
-static int	DBpatch_5050019(void)
+static int	DBpatch_5050024(void)
 {
 	const ZBX_TABLE table =
 		{"auditlog", "auditid", 0,
@@ -378,22 +408,22 @@ static int	DBpatch_5050019(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050020(void)
+static int	DBpatch_5050025(void)
 {
 	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
 }
 
-static int	DBpatch_5050021(void)
+static int	DBpatch_5050026(void)
 {
 	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
 }
 
-static int	DBpatch_5050022(void)
+static int	DBpatch_5050027(void)
 {
 	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
 }
 
-static int	DBpatch_5050023(void)
+static int	DBpatch_5050028(void)
 {
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
@@ -407,7 +437,7 @@ static int	DBpatch_5050023(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5050024(void)
+static int	DBpatch_5050029(void)
 {
 	const ZBX_FIELD	field = {"auditlog_enabled", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -444,5 +474,10 @@ DBPATCH_ADD(5050021, 0, 1)
 DBPATCH_ADD(5050022, 0, 1)
 DBPATCH_ADD(5050023, 0, 1)
 DBPATCH_ADD(5050024, 0, 1)
+DBPATCH_ADD(5050025, 0, 1)
+DBPATCH_ADD(5050026, 0, 1)
+DBPATCH_ADD(5050027, 0, 1)
+DBPATCH_ADD(5050028, 0, 1)
+DBPATCH_ADD(5050029, 0, 1)
 
 DBPATCH_END()

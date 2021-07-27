@@ -29,6 +29,7 @@ class CControllerHousekeepingEdit extends CController {
 		$fields = [
 			'hk_events_mode'			=> 'db config.hk_events_mode',
 			'hk_events_trigger'			=> 'db config.hk_events_trigger',
+			'hk_events_service'			=> 'db config.hk_events_service',
 			'hk_events_internal'		=> 'db config.hk_events_internal',
 			'hk_events_discovery'		=> 'db config.hk_events_discovery',
 			'hk_events_autoreg'			=> 'db config.hk_events_autoreg',
@@ -66,6 +67,9 @@ class CControllerHousekeepingEdit extends CController {
 			)),
 			'hk_events_trigger' => $this->getInput('hk_events_trigger', CHousekeepingHelper::get(
 				CHousekeepingHelper::HK_EVENTS_TRIGGER
+			)),
+			'hk_events_service' => $this->getInput('hk_events_service', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_EVENTS_SERVICE
 			)),
 			'hk_events_internal' => $this->getInput('hk_events_internal', CHousekeepingHelper::get(
 				CHousekeepingHelper::HK_EVENTS_INTERNAL

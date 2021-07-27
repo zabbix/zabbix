@@ -124,7 +124,8 @@ class CEvent extends CApiService {
 			zbx_value2array($options['value']);
 		}
 
-		if ($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER) {
+		if (($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER)
+				|| ($options['source'] == EVENT_SOURCE_SERVICE && $options['object'] == EVENT_OBJECT_SERVICE)) {
 			if ($options['value'] === null) {
 				$options['value'] = ($options['problem_time_from'] !== null && $options['problem_time_till'] !== null)
 					? [TRIGGER_VALUE_TRUE]
@@ -285,7 +286,8 @@ class CEvent extends CApiService {
 			}
 		}
 
-		if ($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER) {
+		if (($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER)
+				|| ($options['source'] == EVENT_SOURCE_SERVICE && $options['object'] == EVENT_OBJECT_SERVICE)) {
 			if ($options['problem_time_from'] !== null && $options['problem_time_till'] !== null) {
 				if ($options['value'][0] == TRIGGER_VALUE_TRUE) {
 					$sqlParts['where'][] =
@@ -325,9 +327,8 @@ class CEvent extends CApiService {
 		}
 
 		// objectids
-		if ($options['objectids'] !== null
-				&& in_array($options['object'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
-
+		if ($options['objectids'] !== null && in_array($options['object'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM,
+				EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE])) {
 			zbx_value2array($options['objectids']);
 			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
 
@@ -383,7 +384,7 @@ class CEvent extends CApiService {
 		// severities
 		if ($options['severities'] !== null) {
 			// triggers
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['object'] == EVENT_OBJECT_SERVICE) {
 				zbx_value2array($options['severities']);
 				$sqlParts['where'][] = dbConditionInt('e.severity', $options['severities']);
 			}
@@ -1031,6 +1032,9 @@ class CEvent extends CApiService {
 					break;
 				case EVENT_OBJECT_LLDRULE:
 					$api = API::DiscoveryRule();
+					break;
+				case EVENT_OBJECT_SERVICE:
+					$api = API::Service();
 					break;
 			}
 

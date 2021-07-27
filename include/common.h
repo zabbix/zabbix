@@ -227,7 +227,8 @@ zbx_item_authtype_t;
 #define EVENT_SOURCE_DISCOVERY		1
 #define EVENT_SOURCE_AUTOREGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
-#define EVENT_SOURCE_COUNT		4
+#define EVENT_SOURCE_SERVICE		4
+#define EVENT_SOURCE_COUNT		5
 
 /* event objects */
 #define EVENT_OBJECT_TRIGGER		0
@@ -236,6 +237,7 @@ zbx_item_authtype_t;
 #define EVENT_OBJECT_ZABBIX_ACTIVE	3
 #define EVENT_OBJECT_ITEM		4
 #define EVENT_OBJECT_LLDRULE		5
+#define EVENT_OBJECT_SERVICE		6
 
 /* acknowledged flags */
 #define EVENT_NOT_ACKNOWLEDGED		0
@@ -372,6 +374,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_METADATA		24
 #define CONDITION_TYPE_EVENT_TAG		25
 #define CONDITION_TYPE_EVENT_TAG_VALUE		26
+#define CONDITION_TYPE_SERVICE			27
+#define CONDITION_TYPE_SERVICE_NAME		28
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
@@ -561,7 +565,7 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_REPORTMANAGER		33
 #define ZBX_PROCESS_TYPE_REPORTWRITER		34
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
-#define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	36
+#define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
 #define ZBX_PROCESS_TYPE_COUNT		37	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 const char	*get_process_type_string(unsigned char proc_type);
@@ -680,6 +684,10 @@ const char	*zbx_trigger_state_string(unsigned char state);
 #define TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION	1
 #define TRIGGER_RECOVERY_MODE_NONE			2
 
+/* business service values */
+#define SERVICE_VALUE_OK		0
+#define SERVICE_VALUE_PROBLEM		1
+
 #define ITEM_LOGTYPE_INFORMATION	1
 #define ITEM_LOGTYPE_WARNING		2
 #define ITEM_LOGTYPE_ERROR		4
@@ -730,12 +738,12 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define OPERATION_TYPE_HOST_DISABLE	9
 #define OPERATION_TYPE_HOST_INVENTORY	10
 #define OPERATION_TYPE_RECOVERY_MESSAGE	11
-#define OPERATION_TYPE_ACK_MESSAGE	12
+#define OPERATION_TYPE_UPDATE_MESSAGE	12
 
 /* normal and recovery operations */
 #define ZBX_OPERATION_MODE_NORMAL	0
 #define ZBX_OPERATION_MODE_RECOVERY	1
-#define ZBX_OPERATION_MODE_ACK		2
+#define ZBX_OPERATION_MODE_UPDATE	2
 
 /* algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0
@@ -798,6 +806,9 @@ zbx_user_role_permission_t;
 
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
+
+#define ZBX_USER_ROLE_PERMISSION_UI_DEFAULT_ACCESS		"ui.default_access"
+#define ZBX_USER_ROLE_PERMISSION_UI_MONITORING_SERVICES		"ui.monitoring.services"
 
 /* user permissions */
 typedef enum

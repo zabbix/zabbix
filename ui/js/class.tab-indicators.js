@@ -905,7 +905,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			.querySelectorAll('#rec-table tbody tr:not(:last-child)')
 			.length;
 		count += document
-			.querySelectorAll('#ack-table tbody tr:not(:last-child)')
+			.querySelectorAll('#upd-table tbody tr:not(:last-child)')
 			.length;
 
 		return count;
@@ -914,7 +914,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node_op = document.querySelector('#op-table tbody');
 		const target_node_rec = document.querySelector('#rec-table tbody');
-		const target_node_ack = document.querySelector('#ack-table tbody');
+		const target_node_upd = document.querySelector('#upd-table tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
@@ -940,9 +940,9 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			observer_rec.observe(target_node_rec, observer_options);
 		}
 
-		if (target_node_ack) {
-			const observer_ack = new MutationObserver(observer_callback);
-			observer_ack.observe(target_node_ack, observer_options);
+		if (target_node_upd) {
+			const observer_upd = new MutationObserver(observer_callback);
+			observer_upd.observe(target_node_upd, observer_options);
 		}
 	}
 }

@@ -115,7 +115,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						]
 					],
 					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
+					'error_details' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
 				]
 			],
 			[
@@ -310,7 +310,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						]
 					],
 					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
+					'error_details' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
 				]
 			],
 			[
@@ -399,7 +399,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						]
 					],
 					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Macro "{$MACRO:regex:^[0-9].*$}" is not unique.'
+					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:^[0-9].*$}) already exists.'
 				]
 			]
 		];
@@ -585,7 +585,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						'description' => 'vault description2'
 					],
 					'title' => 'Cannot update host prototype',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "path:".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path:".'
 				]
 			],
 			[
@@ -600,7 +600,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						'description' => 'vault description3'
 					],
 					'title' => 'Cannot update host prototype',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "/path:key".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "/path:key".'
 				]
 			],
 			[
@@ -615,7 +615,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						'description' => 'vault description4'
 					],
 					'title' => 'Cannot update host prototype',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near "path:key".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path:key".'
 				]
 			],
 			[
@@ -630,7 +630,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						'description' => 'vault description5'
 					],
 					'title' => 'Cannot update host prototype',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near ":key".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near ":key".'
 				]
 			],
 			[
@@ -645,7 +645,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						'description' => 'vault description6'
 					],
 					'title' => 'Cannot update host prototype',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO7}": incorrect syntax near "path".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path".'
 				]
 			],
 			[
@@ -660,7 +660,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						'description' => 'vault description8'
 					],
 					'title' => 'Cannot update host prototype',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO8}": incorrect syntax near "/secret/path:key".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "/secret/path:key".'
 				]
 			],
 			[
@@ -675,7 +675,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						'description' => 'vault description9'
 					],
 					'title' => 'Cannot update host prototype',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO9}": cannot be empty.'
+					'message' => 'Invalid parameter "/1/macros/6/value": cannot be empty.'
 				]
 			]
 		];

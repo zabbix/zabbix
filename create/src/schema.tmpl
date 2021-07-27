@@ -583,6 +583,7 @@ FIELD		|session_key	|t_varchar(32)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|report_test_timeout|t_varchar(32)|'60s'|NOT NULL	|ZBX_NODATA
 FIELD		|dbversion_status	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|hk_events_service|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
 FIELD		|auditlog_enabled	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
@@ -1176,7 +1177,9 @@ FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NULL		|0			|-|items
 FIELD		|acknowledgeid	|t_id		|	|NULL		|0			|-|acknowledges
-UNIQUE		|1		|triggerid,itemid,escalationid
+FIELD		|servicealarmid	|t_id		|	|NULL		|0			|-|service_alarms
+FIELD		|serviceid	|t_id		|	|NULL		|0			|-|services
+UNIQUE		|1		|triggerid,itemid,serviceid,escalationid
 INDEX		|2		|eventid
 INDEX		|3		|nextcheck
 
@@ -1872,4 +1875,4 @@ INDEX		|1		|serviceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050024	|5050024
+ROW		|5050029	|5050029

@@ -331,6 +331,7 @@ typedef struct
 	int		events_internal;
 	int		events_discovery;
 	int		events_autoreg;
+	int		events_service;
 	int		services;
 	int		audit;
 	int		sessions;

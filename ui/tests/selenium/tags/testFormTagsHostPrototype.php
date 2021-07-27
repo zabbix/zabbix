@@ -69,24 +69,22 @@ class testFormTagsHostPrototype extends testFormTags {
 	/**
 	 * Test host full cloning with Host prototype.
 	 */
-	// TODO: uncomment after fix ZBX-19491
-//	public function testFormTagsHostPrototype_HostFullClone() {
-//		$this->host = 'Host with tags for cloning';
-//		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->host.':trap_discovery');
-//		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
-//		$this->executeFullCloning('host prototype', 'Host');
-//	}
+	public function testFormTagsHostPrototype_HostFullClone() {
+		$this->host = 'Host with tags for cloning';
+		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->host.':trap_discovery');
+		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
+		$this->executeFullCloning('host prototype', 'Host');
+	}
 
 	/**
 	 * Test template full cloning with Host prototype.
 	 */
-	// TODO: uncomment after fix ZBX-19491
-//	public function testFormTagsHostPrototype_TemplateFullClone() {
-//		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
-//		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
-//		$this->clone_name = '{#TEMPLATE} prototype with tags for full cloning';
-//		$this->executeFullCloning('host prototype', 'Template');
-//	}
+	public function testFormTagsHostPrototype_TemplateFullClone() {
+		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
+		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
+		$this->clone_name = '{#TEMPLATE} prototype with tags for full cloning';
+		$this->executeFullCloning('host prototype', 'Template');
+	}
 
 	/**
 	 * Test tags of inherited host prototype from template on host.

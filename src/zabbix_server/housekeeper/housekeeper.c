@@ -427,8 +427,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
 		{
 			tmp = zbx_strdup(tmp, row[2]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, &tmp,
-					MACRO_TYPE_COMMON, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
 			{
@@ -458,8 +458,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				continue;
 
 			tmp = zbx_strdup(tmp, row[3]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, &tmp,
-					MACRO_TYPE_COMMON, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
 			{
@@ -975,6 +975,11 @@ static int	housekeeping_cleanup(void)
 				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE,
 						objectid, &more);
 			}
+			else if (0 == strcmp(row[2], "serviceid"))
+			{
+				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE,
+						objectid, &more);
+			}
 		}
 		else
 			deleted += hk_table_cleanup(row[1], row[2], objectid, &more);
@@ -1067,6 +1072,9 @@ static int	housekeeping_events(int now)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &cfg.hk.events_discovery},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_AUTOREGISTRATION)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &cfg.hk.events_autoreg},
+		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_SERVICE)
+			" and events.object=" ZBX_STR(EVENT_OBJECT_SERVICE)
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_service},
 		{NULL}
 	};
 
