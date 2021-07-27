@@ -4,8 +4,8 @@
 ## Overview
 
 For Zabbix version: 5.4 and higher  
-The template to monitor Cloudflare to see your web traffic and DNS metrics.
-It works without any external scripts and uses Script item.
+The template to monitor Cloudflare to watch your web traffic and DNS metrics.
+It works without any external scripts and uses the Script item.
 
 ## Setup
 
@@ -15,8 +15,8 @@ It works without any external scripts and uses Script item.
 
 2\. Link the template to the host.
 
-3\. Customize value of {$CLOUDFLARE.API.TOKEN}, {$CLOUDFLARE.ZONE_ID} macros.  
-    Your Cloudflare API Tokens are available in your Cloudflare account under My Profile > API Tokens.  
+3\. Customize the values of {$CLOUDFLARE.API.TOKEN}, {$CLOUDFLARE.ZONE_ID} macros.  
+    Cloudflare API Tokens are available in your Cloudflare account under My Profile > API Tokens.  
     Zone ID is available in your Cloudflare account under Account Home > Site.
 
 ## Zabbix configuration
@@ -27,12 +27,12 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CLOUDFLARE.API.TOKEN} |<p>Your Cloudflare API Token</p> |`<change>` |
+|{$CLOUDFLARE.API.TOKEN} |<p>Your Cloudflare API Token.</p> |`<change>` |
 |{$CLOUDFLARE.API.URL} |<p>The URL of Cloudflare API endpoint.</p> |`https://api.cloudflare.com/client/v4` |
-|{$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN} |<p>Minimum of cached bandwidth in %</p> |`50` |
-|{$CLOUDFLARE.ERRORS.MAX.WARN} |<p>Maximum responses with errors in %</p> |`30` |
-|{$CLOUDFLARE.GET_DATA.TIMEOUT} |<p>Response timeout for Cloudflare API</p> |`3s` |
-|{$CLOUDFLARE.ZONE_ID} |<p>Your Cloudflare Site Zone ID</p> |`<change>` |
+|{$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN} |<p>Minimum of cached bandwidth in %.</p> |`50` |
+|{$CLOUDFLARE.ERRORS.MAX.WARN} |<p>Maximum responses with errors in %.</p> |`30` |
+|{$CLOUDFLARE.GET_DATA.TIMEOUT} |<p>Response timeout for Cloudflare API.</p> |`3s` |
+|{$CLOUDFLARE.ZONE_ID} |<p>Your Cloudflare Site Zone ID.</p> |`<change>` |
 
 ## Template links
 
