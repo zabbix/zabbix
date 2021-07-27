@@ -350,6 +350,7 @@ static int	DBpatch_5050017(void)
 
 	return DBadd_field("escalations", &field);
 }
+
 static int	DBpatch_5050018(void)
 {
 	const ZBX_FIELD	field = {"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
@@ -376,15 +377,29 @@ static int	DBpatch_5050021(void)
 
 static int	DBpatch_5050022(void)
 {
-	return DBdrop_table("auditlog_details");
+	const ZBX_FIELD	field = {"passwd_min_length", "8", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5050023(void)
 {
-	return DBdrop_table("auditlog");
+	const ZBX_FIELD	field = {"passwd_check_rules", "8", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5050024(void)
+{
+	return DBdrop_table("auditlog_details");
+}
+
+static int	DBpatch_5050025(void)
+{
+	return DBdrop_table("auditlog");
+}
+
+static int	DBpatch_5050026(void)
 {
 	const ZBX_TABLE table =
 		{"auditlog", "auditid", 0,
@@ -408,22 +423,22 @@ static int	DBpatch_5050024(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050025(void)
+static int	DBpatch_5050027(void)
 {
 	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
 }
 
-static int	DBpatch_5050026(void)
+static int	DBpatch_5050028(void)
 {
 	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
 }
 
-static int	DBpatch_5050027(void)
+static int	DBpatch_5050029(void)
 {
 	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
 }
 
-static int	DBpatch_5050028(void)
+static int	DBpatch_5050030(void)
 {
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
@@ -437,7 +452,7 @@ static int	DBpatch_5050028(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5050029(void)
+static int	DBpatch_5050031(void)
 {
 	const ZBX_FIELD	field = {"auditlog_enabled", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -479,5 +494,7 @@ DBPATCH_ADD(5050026, 0, 1)
 DBPATCH_ADD(5050027, 0, 1)
 DBPATCH_ADD(5050028, 0, 1)
 DBPATCH_ADD(5050029, 0, 1)
+DBPATCH_ADD(5050030, 0, 1)
+DBPATCH_ADD(5050031, 0, 1)
 
 DBPATCH_END()
