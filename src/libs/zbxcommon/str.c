@@ -6129,7 +6129,7 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
  * Return value: A pointer to the next utf-8 character.                       *
  *                                                                            *
  ******************************************************************************/
-static char	*utf8_chr_next(char *str)
+static const char	*utf8_chr_next(const char *str)
 {
 	++str;
 
@@ -6176,7 +6176,7 @@ static char	*utf8_chr_prev(char *str, const char *start)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	strchr_utf8(const char *seq, char *c)
+static int	strchr_utf8(const char *seq, const char *c)
 {
 	size_t	len, c_len;
 
@@ -6192,7 +6192,7 @@ static int	strchr_utf8(const char *seq, char *c)
 
 	while ('\0' != *seq)
 	{
-		len = utf8_chr_next((char *)seq) - seq;
+		len = utf8_chr_next(seq) - seq;
 
 		if (len == c_len && 0 == memcmp(seq, c, len))
 			return SUCCEED;
@@ -6216,7 +6216,7 @@ static int	strchr_utf8(const char *seq, char *c)
  ******************************************************************************/
 void	zbx_ltrim_utf8(char *str, const char *charlist)
 {
-	char	*next;
+	const char	*next;
 
 	for (next = str; '\0' != *next; next = utf8_chr_next(next))
 	{

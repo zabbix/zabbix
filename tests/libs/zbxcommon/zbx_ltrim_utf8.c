@@ -47,16 +47,19 @@ static const char	*read_utf8(const char *path_str, const char *path_hex)
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char		*expected, *in, *charlist;
+	const char	*expected, *charlist;
+	char		*in;
 
 	ZBX_UNUSED(state);
 
-	in = read_utf8("in.text.str", "in.text.hex");
+	in = zbx_strdup(NULL, read_utf8("in.text.str", "in.text.hex"));
 	charlist = read_utf8("in.charlist.str", "in.charlist.hex");
 
-	zbx_ltrim_utf8((char *)in, charlist);
+	zbx_ltrim_utf8(in, charlist);
 
 	expected = read_utf8("out.str", "out.hex");
 
 	zbx_mock_assert_str_eq("trimmed value", expected, in);
+	zbx_free(in);
+
 }
