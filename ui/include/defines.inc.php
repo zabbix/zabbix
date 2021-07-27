@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha1');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050021);
+define('ZABBIX_DB_VERSION',		5050023);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -134,6 +134,12 @@ define('ZBX_AUTH_FORM_ZABBIX',	0);
 define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);
 define('ZBX_AUTH_CASE_SENSITIVE',	1);
+
+// password policy
+define('PASSWD_CHECK_CASE', 0x01);
+define('PASSWD_CHECK_DIGITS', 0x02);
+define('PASSWD_CHECK_SPECIAL', 0x04);
+define('PASSWD_CHECK_SIMPLE', 0x08);
 
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
@@ -1853,6 +1859,7 @@ define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
+define('ZBX_STYLE_LIST_DASHED', 'list-dashed');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
 define('ZBX_STYLE_LIST_TABLE_ACTIONS', 'list-table-actions');
 define('ZBX_STYLE_LIST_TABLE_FOOTER', 'list-table-footer');
@@ -2032,6 +2039,7 @@ define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 // Icons.
 define('ZBX_STYLE_ICON_TEXT', 'icon-text');
 define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
+define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint');
 
 // Host interface styles.
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');

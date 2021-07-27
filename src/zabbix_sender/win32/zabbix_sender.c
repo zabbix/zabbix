@@ -31,6 +31,8 @@ const char	*help_message[] = {NULL};
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
+
 int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
 		const zabbix_sender_value_t *values, int count, char **result)
 {

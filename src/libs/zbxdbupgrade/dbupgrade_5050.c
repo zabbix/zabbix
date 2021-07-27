@@ -21,6 +21,8 @@
 #include "db.h"
 #include "dbupgrade.h"
 
+extern unsigned char	program_type;
+
 /*
  * 6.0 development database patches
  */
@@ -347,6 +349,7 @@ static int	DBpatch_5050017(void)
 
 	return DBadd_field("escalations", &field);
 }
+
 static int	DBpatch_5050018(void)
 {
 	const ZBX_FIELD	field = {"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
@@ -367,6 +370,20 @@ static int	DBpatch_5050020(void)
 static int	DBpatch_5050021(void)
 {
 	const ZBX_FIELD	field = {"hk_events_service", "1d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050022(void)
+{
+	const ZBX_FIELD	field = {"passwd_min_length", "8", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050023(void)
+{
+	const ZBX_FIELD	field = {"passwd_check_rules", "8", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -399,5 +416,7 @@ DBPATCH_ADD(5050018, 0, 1)
 DBPATCH_ADD(5050019, 0, 1)
 DBPATCH_ADD(5050020, 0, 1)
 DBPATCH_ADD(5050021, 0, 1)
+DBPATCH_ADD(5050022, 0, 1)
+DBPATCH_ADD(5050023, 0, 1)
 
 DBPATCH_END()

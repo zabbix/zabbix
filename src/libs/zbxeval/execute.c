@@ -294,21 +294,24 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 
 	/* check logical equal, not equal operators */
 
-	if (ZBX_VARIANT_DBL_VECTOR == left->type || ZBX_VARIANT_DBL_VECTOR == right->type)
+	if (ZBX_EVAL_TOKEN_OP_EQ == token->type || ZBX_EVAL_TOKEN_OP_NE == token->type)
 	{
-		*error = zbx_dsprintf(*error, "vector cannot be used with comparison operator at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
+		if (ZBX_VARIANT_DBL_VECTOR == left->type || ZBX_VARIANT_DBL_VECTOR == right->type)
+		{
+			*error = zbx_dsprintf(*error, "vector cannot be used with comparison operator at \"%s\"",
+					ctx->expression + token->loc.l);
+			return FAIL;
+		}
 
-	switch (token->type)
-	{
-		case ZBX_EVAL_TOKEN_OP_EQ:
-			value = (0 == eval_variant_compare(left, right) ? 1 : 0);
-			goto finish;
-		case ZBX_EVAL_TOKEN_OP_NE:
-			value = (0 == eval_variant_compare(left, right) ? 0 : 1);
-			goto finish;
+		switch (token->type)
+		{
+			case ZBX_EVAL_TOKEN_OP_EQ:
+				value = (0 == eval_variant_compare(left, right) ? 1 : 0);
+				goto finish;
+			case ZBX_EVAL_TOKEN_OP_NE:
+				value = (0 == eval_variant_compare(left, right) ? 0 : 1);
+				goto finish;
+		}
 	}
 
 	/* check arithmetic operators */
@@ -753,7 +756,7 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 
 		if (0 == output->values[i].data.dbl_vector->values_num)
 		{
-			*error = zbx_dsprintf(*error, "empty vector argument for function at \"%s\"",
+			*error = zbx_dsprintf(*error, "no input data for function at \"%s\"",
 					ctx->expression + token->loc.l);
 			return FAIL;
 		}
@@ -2563,6 +2566,34 @@ static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const z
 	return SUCCEED;
 }
 
+static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		i;
+	zbx_variant_t	*arg, ret_value;
+
+	if (1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	arg = &output->values[output->values_num - 1];
+
+	if (ZBX_VARIANT_DBL_VECTOR != arg->type)
+	{
+		*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
+				ctx->expression + token->loc.l);
+	}
+
+	zbx_variant_set_ui64(&ret_value, arg->data.dbl_vector->values_num);
+
+	eval_function_return(token->opt, &ret_value, output);
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: eval_execute_common_function                                     *
@@ -2726,6 +2757,8 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_varpop, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "varsamp", ZBX_CONST_STRLEN("varsamp")))
 		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_varsamp, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "count", ZBX_CONST_STRLEN("count")))
+		return eval_execute_function_count(ctx, token, output, error);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);

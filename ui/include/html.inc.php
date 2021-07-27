@@ -1035,6 +1035,20 @@ function makeErrorIcon($error) {
 }
 
 /**
+ * Renders an icon with question mark and text in hint.
+ *
+ * @param string|array|CTag $help_text
+ *
+ * @return CSpan
+ */
+function makeHelpIcon($help_text): CSpan {
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_HELP_HINT)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
+}
+
+/**
  * Renders an unknown icon like grey [i] with error message
  *
  * @param string $error

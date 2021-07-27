@@ -73,7 +73,7 @@ class testFormUserPermissions extends CWebTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => 'admin_role_check',
-				'passwd' => 'zabbix',
+				'passwd' => 'test5678',
 				'roleid' => self::$admin_roleid,
 				'usrgrps' => [
 					[

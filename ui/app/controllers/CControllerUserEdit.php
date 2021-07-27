@@ -162,6 +162,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['medias'] = $this->getInput('medias', []);
 		}
 
+		$data['password_requirements'] = $this->getPasswordRequirements();
 		$data = $this->setUserMedias($data);
 
 		$data['groups'] = $user_groups
