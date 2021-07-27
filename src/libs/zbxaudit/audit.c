@@ -546,7 +546,7 @@ void	zbx_audit_host_create_entry(int audit_action, zbx_uint64_t hostid, const ch
 		local_audit_host_entry_insert->audit_action = audit_action;
 		local_audit_host_entry_insert->resource_type = AUDIT_RESOURCE_HOST;
 		zbx_json_init(&(local_audit_host_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
-		zbx_hashset_insert(&zbx_audit, &local_audit_host_entry_insert, sizeof(local_audit_host_entry));
+		zbx_hashset_insert(&zbx_audit, &local_audit_host_entry_insert, sizeof(local_audit_host_entry_insert));
 	}
 }
 

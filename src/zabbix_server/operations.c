@@ -43,11 +43,10 @@ zbx_dcheck_source_t;
  *                                                                            *
  * Purpose: select hostid of discovered host                                  *
  *                                                                            *
- * Parameters: dhostid - discovered host id                                   *
+ * Parameters: event          - [IN] source event data                        *
+ *             hostname       - [OUT] hostname where event occured            *
  *                                                                            *
  * Return value: hostid - existing hostid, 0 - if not found                   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	select_discovered_host(const DB_EVENT *event, char **hostname)
@@ -135,7 +134,8 @@ exit:
  *                                                                            *
  * Purpose: add group to host if not added already                            *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
+ * Parameters: hostid         - [IN]  host identificator                      *
+ *             groupids       - [IN]  array of group identificators           *
  *                                                                            *
  ******************************************************************************/
 static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
@@ -210,11 +210,9 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  *                                                                            *
  * Parameters: event          - [IN] the source event                         *
  *             status         - [OUT] found or created host status            *
- *             cfg            - [IN] the global configuration data           *
+ *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  * Return value: hostid - new/existing hostid                                 *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_config_t *cfg)
@@ -652,6 +650,8 @@ clean:
  *                                                                            *
  * Purpose: checks if the event is discovery or autoregistration event        *
  *                                                                            *
+ * Parameters: event          - [IN] source event data                        *
+ *                                                                            *
  * Return value: SUCCEED - it's discovery or autoregistration event           *
  *               FAIL    - otherwise                                          *
  *                                                                            *
@@ -676,13 +676,11 @@ static int	is_discovery_or_autoregistration(const DB_EVENT *event)
  *                                                                            *
  * Purpose: add discovered host                                               *
  *                                                                            *
- * Parameters: trigger - trigger data                                         *
- *             action  - action data                                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Parameters: event          - [IN] source event data                        *
+ *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  ******************************************************************************/
-void	op_host_add(const DB_EVENT *event, zbx_config_t	*cfg)
+void	op_host_add(const DB_EVENT *event, zbx_config_t *cfg)
 {
 	int		status;
 
@@ -702,7 +700,7 @@ out:
  *                                                                            *
  * Purpose: delete host                                                       *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Parameters: event          - [IN] source event data                        *
  *                                                                            *
  ******************************************************************************/
 void	op_host_del(const DB_EVENT *event)
@@ -736,7 +734,8 @@ out:
  *                                                                            *
  * Purpose: enable discovered                                                 *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
+ * Parameters: event          - [IN] the source event                         *
+ *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  ******************************************************************************/
 void	op_host_enable(const DB_EVENT *event, zbx_config_t *cfg)
@@ -771,7 +770,8 @@ out:
  *                                                                            *
  * Purpose: disable host                                                      *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
+ * Parameters: event          - [IN] the source event                         *
+ *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  ******************************************************************************/
 void	op_host_disable(const DB_EVENT *event, zbx_config_t *cfg)
@@ -807,6 +807,7 @@ out:
  * Purpose: sets host inventory mode                                          *
  *                                                                            *
  * Parameters: event          - [IN] the source event                         *
+ *             cfg            - [IN] the global configuration data            *
  *             inventory_mode - [IN] the new inventory mode, see              *
  *                              HOST_INVENTORY_ defines                       *
  *                                                                            *
@@ -838,10 +839,9 @@ out:
  *                                                                            *
  * Purpose: add groups to discovered host                                     *
  *                                                                            *
- * Parameters: event    - [IN] event data                                     *
+ * Parameters: event    - [IN] the source event data                          *
+ *             cfg      - [IN] the global configuration data                  *
  *             groupids - [IN] IDs of groups to add                           *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	op_groups_add(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids)
@@ -868,10 +868,8 @@ out:
  *                                                                            *
  * Purpose: delete groups from discovered host                                *
  *                                                                            *
- * Parameters: event    - [IN] event data                                     *
+ * Parameters: event    - [IN] source event data                              *
  *             groupids - [IN] IDs of groups to delete                        *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
@@ -951,10 +949,9 @@ out:
  *                                                                            *
  * Purpose: link host with template                                           *
  *                                                                            *
- * Parameters: event           - [IN] event data                              *
+ * Parameters: event           - [IN] source event data                       *
+ *             cfg             - [IN] the global configuration data           *
  *             lnk_templateids - [IN] array of template IDs                   *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	op_template_add(const DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids)
@@ -986,10 +983,8 @@ out:
  *                                                                            *
  * Purpose: unlink and clear host from template                               *
  *                                                                            *
- * Parameters: event           - [IN] event data                              *
+ * Parameters: event           - [IN] source event data                       *
  *             del_templateids - [IN] array of template IDs                   *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
