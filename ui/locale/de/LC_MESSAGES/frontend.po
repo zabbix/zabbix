@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-21 11:17+0300\n"
+"POT-Creation-Date: 2021-07-23 19:52+0300\n"
 "PO-Revision-Date: 2020-09-15 08:12+0300\n"
 "Last-Translator: Joachim <joachim.schwender@web.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2156,7 +2156,7 @@ msgstr "Kann vorlagengestützte Diagramm-Prototypen nicht löschen."
 msgid "Cannot delete templated graph."
 msgstr "Kann vorlagengestütztes Diagramm nicht löschen."
 
-#: include/classes/api/services/CHostPrototype.php:1154
+#: include/classes/api/services/CHostPrototype.php:1159
 msgid "Cannot delete templated host prototype."
 msgstr "Kann vorlagenbasierten Hostprototyp nicht löschen."
 
@@ -4910,7 +4910,7 @@ msgstr "Web-Szenario löschen?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Gelöscht: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1022
+#: include/classes/api/services/CHostPrototype.php:1027
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Gelöscht: Host-Prototyp \"%1$s\" auf \"%2$s\"."
@@ -5732,7 +5732,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:855
 #: include/classes/api/services/CHost.php:1427
 #: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHostPrototype.php:950
+#: include/classes/api/services/CHostPrototype.php:955
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -7037,7 +7037,7 @@ msgstr "Gruppe für per Suchlauf entdeckte Hosts \"%1$s\"."
 msgid "Group name"
 msgstr "Gruppenname"
 
-#: include/classes/api/services/CHostPrototype.php:1112
+#: include/classes/api/services/CHostPrototype.php:1117
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Gruppen-Prototyp kann nicht auf einer per Suchlauf entdeckten Host-Gruppe \"%1$s\" basieren."
@@ -7568,12 +7568,12 @@ msgstr "Hostnetzwerke"
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:830
+#: include/classes/api/services/CHostPrototype.php:835
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Host Prototyp \"%1$s\" existiert bereits auf \"%2$s\", von einer anderen Vorlage geerbt."
 
-#: include/classes/api/services/CHostPrototype.php:818
+#: include/classes/api/services/CHostPrototype.php:823
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Host Prototyp \"%1$s\" ist bereits auf \"%2$s\" vorhanden."
@@ -9857,7 +9857,7 @@ msgstr "Italienisch (it_IT)"
 msgid "Item"
 msgstr "Datenpunkt"
 
-#: include/classes/api/services/CHostPrototype.php:1056
+#: include/classes/api/services/CHostPrototype.php:1061
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -12237,9 +12237,9 @@ msgstr "Keine Berechtigung zum Zugriff auf die Oberfläche."
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1081
-#: include/classes/api/services/CHostPrototype.php:1103
-#: include/classes/api/services/CHostPrototype.php:1137
+#: include/classes/api/services/CHostPrototype.php:1086
+#: include/classes/api/services/CHostPrototype.php:1108
+#: include/classes/api/services/CHostPrototype.php:1142
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626

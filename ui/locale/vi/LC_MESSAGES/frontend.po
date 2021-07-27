@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-21 11:17+0300\n"
+"POT-Creation-Date: 2021-07-23 19:52+0300\n"
 "PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2114,7 +2114,7 @@ msgstr "Không thể xóa kiểu đồ thị mẫu."
 msgid "Cannot delete templated graph."
 msgstr "Không thể xóa đồ thị mẫu."
 
-#: include/classes/api/services/CHostPrototype.php:1154
+#: include/classes/api/services/CHostPrototype.php:1159
 msgid "Cannot delete templated host prototype."
 msgstr "Không thể xóa kiểu host mẫu."
 
@@ -4842,7 +4842,7 @@ msgstr "Xóa web scanario?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Đã xóa: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1022
+#: include/classes/api/services/CHostPrototype.php:1027
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Đã xóa: Kiểu host \"%1$s\" trên \"%2$s\"."
@@ -5657,7 +5657,7 @@ msgstr "Loại điều kiện lọc trống cho hành động \"%1$s\"."
 #: include/classes/api/services/CHost.php:855
 #: include/classes/api/services/CHost.php:1427
 #: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHostPrototype.php:950
+#: include/classes/api/services/CHostPrototype.php:955
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -6957,7 +6957,7 @@ msgstr "Nhóm cho các host được phát hiện \"%1$s\"."
 msgid "Group name"
 msgstr "Tên nhóm"
 
-#: include/classes/api/services/CHostPrototype.php:1112
+#: include/classes/api/services/CHostPrototype.php:1117
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Kiểu nhóm không thể dựa trên một nhóm host được phát hiện \"%1$s\"."
@@ -7481,12 +7481,12 @@ msgstr "Các mạng host"
 msgid "Host prototype"
 msgstr "Kiểu máy"
 
-#: include/classes/api/services/CHostPrototype.php:830
+#: include/classes/api/services/CHostPrototype.php:835
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ các template khác."
 
-#: include/classes/api/services/CHostPrototype.php:818
+#: include/classes/api/services/CHostPrototype.php:823
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\"."
@@ -9769,7 +9769,7 @@ msgstr "Italian (it_IT)"
 msgid "Item"
 msgstr "Item"
 
-#: include/classes/api/services/CHostPrototype.php:1056
+#: include/classes/api/services/CHostPrototype.php:1061
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -12127,9 +12127,9 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1081
-#: include/classes/api/services/CHostPrototype.php:1103
-#: include/classes/api/services/CHostPrototype.php:1137
+#: include/classes/api/services/CHostPrototype.php:1086
+#: include/classes/api/services/CHostPrototype.php:1108
+#: include/classes/api/services/CHostPrototype.php:1142
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
