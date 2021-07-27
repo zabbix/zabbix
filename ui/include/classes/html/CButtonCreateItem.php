@@ -23,8 +23,19 @@ class CButtonCreateItem extends CButton {
 
 	/**
 	 * Create CButtonCreateItem instance.
+	 *
+	 * @param string $caption  Label for the button
+	 * @param array  $dropdown Items for dropdown
+	 * @param array  $dropdown['hosts'] List of hosts
+	 * @param string $dropdown['hosts'][]['hostid'] Host ID
+	 * @param bool   $dropdown['hosts'][]['disabled'] True if item is inactive
+	 * @param array  $dropdown['templates'] List of templates
+	 * @param string $dropdown['templates'][]['templateid'] Template ID
+	 * @param bool   $dropdown['templates'][]['disabled'] True if item is inactive
+	 *
+	 * @return CButtonCreateItem
 	 */
-	public function __construct(string $caption, $dropdown = []) {
+	public function __construct(string $caption, array $dropdown) {
 		$items = [];
 
 		parent::__construct('create-item', $caption . '&#8203;');
@@ -32,7 +43,7 @@ class CButtonCreateItem extends CButton {
 		foreach($dropdown['hosts'] as $host) {
 			$items[] = [
 				'label' => $host['name'],
-				'clickCallback' => '() => item_create({hostid: '.$host['hostid'].'})',
+				'clickCallback' => '() => item_create({hostid: '.json_encode($host['hostid']).'})',
 				'disabled' => $host['disabled']
 			];
 		}
@@ -40,7 +51,7 @@ class CButtonCreateItem extends CButton {
 		foreach($dropdown['templates'] as $template) {
 			$items[] = [
 				'label' => $template['name'],
-				'clickCallback' => '() => item_create({templateid: '.$template['templateid'].'})',
+				'clickCallback' => '() => item_create({templateid: '.json_encode($template['templateid']).'})',
 				'disabled' => $template['disabled']
 			];
 		}
