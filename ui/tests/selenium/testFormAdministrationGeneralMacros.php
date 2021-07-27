@@ -132,24 +132,24 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 	public static function wrongMacros() {
 		return [
-			['MACRO'],
-			['{'],
-			['{$'],
-			['{$MACRO'],
-			['}'],
-			['$}'],
-			['MACRO}'],
-			['$MACRO}'],
-			['{}'],
-			['{MACRO}'],
-			['}$MACRO{'],
-			['{$MACRO}}'],
-			['{{$MACRO}'],
-			['{{$MACRO}}'],
-			['{$}'],
-			['{$$}'],
-			['{$$MACRO}'],
-			['{$MACRO$}']
+			['MACRO', 'incorrect syntax near "MACRO"'],
+			['{', 'unexpected end of macro'],
+			['{$', 'unexpected end of macro'],
+			['{$MACRO', 'unexpected end of macro'],
+			['}', 'incorrect syntax near "}"'],
+			['$}', 'incorrect syntax near "$}"'],
+			['MACRO}', 'incorrect syntax near "MACRO}"'],
+			['$MACRO}', 'incorrect syntax near "$MACRO}"'],
+			['{}', 'incorrect syntax near "}"'],
+			['{MACRO}', 'incorrect syntax near "MACRO}"'],
+			['}$MACRO{', 'incorrect syntax near "}$MACRO{"'],
+			['{$MACRO}}', 'incorrect syntax near "}"'],
+			['{{$MACRO}', 'incorrect syntax near "{$MACRO}"'],
+			['{{$MACRO}}', 'incorrect syntax near "{$MACRO}}"'],
+			['{$}', 'incorrect syntax near "}"'],
+			['{$$}', 'incorrect syntax near "$}"'],
+			['{$$MACRO}', 'incorrect syntax near "$MACRO}"'],
+			['{$MACRO$}', 'incorrect syntax near "$}"']
 		];
 	}
 
@@ -236,7 +236,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	/**
 	 * @dataProvider wrongMacros
 	 */
-	public function testFormAdministrationGeneralMacros_CreateWrong($macro) {
+	public function testFormAdministrationGeneralMacros_CreateWrong(string $macro, string $error) {
 		$this->calculateHash();
 
 		$countGlobalMacros = CDBHelper::getCount('SELECT globalmacroid FROM globalmacro');
@@ -252,7 +252,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid parameter "/1/macro": a user macro is expected.');
+		$this->zbxTestTextPresent('Invalid parameter "/1/macro": '.$error.'.');
 
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', $this->newValue);
@@ -384,7 +384,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	/**
 	 * @dataProvider wrongMacros
 	 */
-	public function testFormAdministrationGeneralMacros_UpdateWrong($macro) {
+	public function testFormAdministrationGeneralMacros_UpdateWrong(string $macro, string $error) {
 		$this->calculateHash();
 
 		$this->openGlobalMacros();
@@ -395,7 +395,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Cannot update macros');
-		$this->zbxTestTextPresent('Invalid parameter "/1/macro": a user macro is expected.');
+		$this->zbxTestTextPresent('Invalid parameter "/1/macro": '.$error.'.');
 
 		$this->zbxTestAssertElementValue('macros_0_macro', $macro);
 		$this->zbxTestAssertElementValue('macros_0_value', $this->updValue);
@@ -892,7 +892,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description2'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "path:".'
+					'message' => 'Invalid parameter "/1/value": incorrect syntax near "path:".'
 				]
 			],
 			[
@@ -907,7 +907,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description3'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "/path:key".'
+					'message' => 'Invalid parameter "/1/value": incorrect syntax near "/path:key".'
 				]
 			],
 			[
@@ -922,7 +922,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description4'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near "path:key".'
+					'message' => 'Invalid parameter "/1/value": incorrect syntax near "path:key".'
 				]
 			],
 			[
@@ -937,7 +937,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description5'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near ":key".'
+					'message' => 'Invalid parameter "/1/value": incorrect syntax near ":key".'
 				]
 			],
 			[
@@ -952,7 +952,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description6'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO7}": incorrect syntax near "path".'
+					'message' => 'Invalid parameter "/1/value": incorrect syntax near "path".'
 				]
 			],
 			[
@@ -967,7 +967,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description8'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO8}": incorrect syntax near "/secret/path:key".'
+					'message' => 'Invalid parameter "/1/value": incorrect syntax near "/secret/path:key".'
 				]
 			],
 			[
@@ -982,7 +982,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description9'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO9}": cannot be empty.'
+					'message' => 'Invalid parameter "/1/value": cannot be empty.'
 				]
 			]
 		];

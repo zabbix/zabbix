@@ -190,7 +190,7 @@ class CIconMap extends CApiService {
 			'default_iconid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'mappings' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_REQUIRED, 'uniq' => [['inventory_link', 'expression']], 'fields' => [
 				'iconid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-				'expression' =>		['type' => API_REGEX, 'flags' => API_NOT_EMPTY | API_REQUIRED, 'length' => DB::getFieldLength('icon_mapping', 'expression')],
+				'expression' =>		['type' => API_REGEX, 'flags' => API_NOT_EMPTY | API_REQUIRED | API_ALLOW_GLOBAL_REGEX, 'length' => DB::getFieldLength('icon_mapping', 'expression')],
 				'inventory_link' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:70'],
 				'sortorder' =>		['type' => API_INT32, 'flags' => API_DEPRECATED]
 			]]
@@ -262,7 +262,7 @@ class CIconMap extends CApiService {
 			'default_iconid' =>	['type' => API_ID],
 			'mappings' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['inventory_link', 'expression']], 'fields' => [
 				'iconid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-				'expression' =>		['type' => API_REGEX, 'flags' => API_NOT_EMPTY | API_REQUIRED, 'length' => DB::getFieldLength('icon_mapping', 'expression')],
+				'expression' =>		['type' => API_REGEX, 'flags' => API_NOT_EMPTY | API_REQUIRED | API_ALLOW_GLOBAL_REGEX, 'length' => DB::getFieldLength('icon_mapping', 'expression')],
 				'inventory_link' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:70'],
 				'sortorder' =>		['type' => API_INT32, 'flags' => API_DEPRECATED]
 			]]

@@ -704,7 +704,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if ($db_httptest) {
-		$parent_templates = zbx_toHash($data['host']['parentTemplates'], 'templateid');
+		$parent_templates = getHttpTestParentTemplates($db_httptests)['templates'];
 
 		$rw_templates = $data['host']['parentTemplates']
 			? API::Template()->get([
@@ -737,6 +737,9 @@ if (isset($_REQUEST['form'])) {
 	$data['tags'] = $tags;
 	if (!$data['tags']) {
 		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+	else {
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
 	// render view

@@ -550,8 +550,13 @@ class CHttpTest extends CApiService {
 		unset($httptest);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'name']], 'fields' => [
-			'steps' =>	['type' => API_OBJECTS, 'uniq' => [['name']]]
+			'hostid' =>	['type' => API_ID],
+			'name' =>	['type' => API_STRING_UTF8],
+			'steps' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'name' =>	['type' => API_STRING_UTF8]
+			]]
 		]];
+
 		if (!CApiInputValidator::validateUniqueness($api_input_rules, $httptests, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
