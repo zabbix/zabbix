@@ -293,6 +293,24 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
 }
 
+/* SCSI device types.  Copied almost as-is from kernel header.
+ * http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/scsi/scsi.h */
+#define SCSI_TYPE_DISK			0x00
+#define SCSI_TYPE_TAPE			0x01
+#define SCSI_TYPE_PRINTER		0x02
+#define SCSI_TYPE_PROCESSOR		0x03	/* HP scanners use this */
+#define SCSI_TYPE_WORM			0x04	/* Treated as ROM by our system */
+#define SCSI_TYPE_ROM			0x05
+#define SCSI_TYPE_SCANNER		0x06
+#define SCSI_TYPE_MOD			0x07	/* Magneto-optical disk - treated as SCSI_TYPE_DISK */
+#define SCSI_TYPE_MEDIUM_CHANGER	0x08
+#define SCSI_TYPE_COMM			0x09	/* Communications device */
+#define SCSI_TYPE_RAID			0x0c
+#define SCSI_TYPE_ENCLOSURE		0x0d	/* Enclosure Services Device */
+#define SCSI_TYPE_RBC			0x0e
+#define SCSI_TYPE_OSD			0x11
+#define SCSI_TYPE_NO_LUN		0x7f
+
 int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define DEVTYPE_STR	"DEVTYPE="
@@ -321,8 +339,11 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			zbx_snprintf(tmp, sizeof(tmp), ZBX_DEV_PFX "%s", entries->d_name);
 
-			if (0 == zbx_stat(tmp, &stat_buf) && 0 != S_ISBLK(stat_buf.st_mode))
+			if (0 == lstat(tmp, &stat_buf) && 0 != S_ISBLK(stat_buf.st_mode) &&
+					0 == S_ISLNK(stat_buf.st_mode))
 			{
+				int offset = 0;
+
 				devtype_found = 0;
 				zbx_json_addobject(&j, NULL);
 				zbx_json_addstring(&j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
@@ -330,32 +351,100 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (1 == sysfs_found)
 				{
 					FILE	*f;
+					int	type;
 
-					zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/uevent",
+					zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/device/type",
 							major(stat_buf.st_rdev), minor(stat_buf.st_rdev));
 
 					if (NULL != (f = fopen(tmp, "r")))
 					{
-						while (NULL != fgets(tmp, sizeof(tmp), f))
+						if (1 == fscanf(f, "%d", &type))
 						{
-							if (0 == strncmp(tmp, DEVTYPE_STR, DEVTYPE_STR_LEN))
-							{
-								char	*p;
+							devtype_found = 1;
 
-								/* dismiss trailing \n */
-								p = tmp + strlen(tmp) - 1;
-								if ('\n' == *p)
-									*p = '\0';
-
-								devtype_found = 1;
+							switch (type) {
+							case SCSI_TYPE_DISK:
+								zbx_snprintf(tmp, sizeof(tmp), "disk");
+								break;
+							case SCSI_TYPE_TAPE:
+								zbx_snprintf(tmp, sizeof(tmp), "tape");
+								break;
+							case SCSI_TYPE_PRINTER:
+								zbx_snprintf(tmp, sizeof(tmp), "printer");
+								break;
+							case SCSI_TYPE_PROCESSOR:
+								zbx_snprintf(tmp, sizeof(tmp), "processor");
+								break;
+							case SCSI_TYPE_WORM:
+								zbx_snprintf(tmp, sizeof(tmp), "worm");
+								break;
+							case SCSI_TYPE_ROM:
+								zbx_snprintf(tmp, sizeof(tmp), "rom");
+								break;
+							case SCSI_TYPE_SCANNER:
+								zbx_snprintf(tmp, sizeof(tmp), "scanner");
+								break;
+							case SCSI_TYPE_MOD:
+								zbx_snprintf(tmp, sizeof(tmp), "mo-disk");
+								break;
+							case SCSI_TYPE_MEDIUM_CHANGER:
+								zbx_snprintf(tmp, sizeof(tmp), "changer");
+								break;
+							case SCSI_TYPE_COMM:
+								zbx_snprintf(tmp, sizeof(tmp), "comm");
+								break;
+							case SCSI_TYPE_RAID:
+								zbx_snprintf(tmp, sizeof(tmp), "raid");
+								break;
+							case SCSI_TYPE_ENCLOSURE:
+								zbx_snprintf(tmp, sizeof(tmp), "enclosure");
+								break;
+							case SCSI_TYPE_RBC:
+								zbx_snprintf(tmp, sizeof(tmp), "rbc");
+								break;
+							case SCSI_TYPE_OSD:
+								zbx_snprintf(tmp, sizeof(tmp), "osd");
+								break;
+							case SCSI_TYPE_NO_LUN:
+								zbx_snprintf(tmp, sizeof(tmp), "no-lun");
+								break;
+							default:
+								devtype_found = 0;
 								break;
 							}
 						}
 						zbx_fclose(f);
 					}
+
+					if (0 == devtype_found)
+					{
+						zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/uevent",
+								major(stat_buf.st_rdev), minor(stat_buf.st_rdev));
+
+						if (0 == devtype_found && NULL != (f = fopen(tmp, "r")))
+						{
+							while (NULL != fgets(tmp, sizeof(tmp), f))
+							{
+								if (0 == strncmp(tmp, DEVTYPE_STR, DEVTYPE_STR_LEN))
+								{
+									char	*p;
+
+									/* dismiss trailing \n */
+									p = tmp + strlen(tmp) - 1;
+									if ('\n' == *p)
+										*p = '\0';
+
+									devtype_found = 1;
+									offset = DEVTYPE_STR_LEN;
+									break;
+								}
+							}
+							zbx_fclose(f);
+						}
+					}
 				}
 
-				zbx_json_addstring(&j, "{#DEVTYPE}", 1 == devtype_found ? tmp + DEVTYPE_STR_LEN : "",
+				zbx_json_addstring(&j, "{#DEVTYPE}", 1 == devtype_found ? tmp + offset : "",
 						ZBX_JSON_TYPE_STRING);
 				zbx_json_close(&j);
 			}
