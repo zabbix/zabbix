@@ -3879,10 +3879,7 @@ z-select[disabled] button,
   background-color: #ffffff;
   border: 1px solid #383838;
   border-bottom-color: #353535;
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  max-height: 90%;
-  overflow-x: hidden;
-  overflow-y: auto; }
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
   .menu-popup:focus {
     outline: none; }
   .menu-popup li {
