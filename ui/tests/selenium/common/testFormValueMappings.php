@@ -66,7 +66,7 @@ class testFormValueMappings extends CWebTest {
 
 	private static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
 
-    private static $previous_class = null;
+	private static $previous_class = null;
 
 
 	/**
