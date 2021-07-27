@@ -68,7 +68,6 @@ class testFormValueMappings extends CWebTest {
 
 	private static $previous_class = null;
 
-
 	/**
 	 * Function that checks the layout of the Value mappings tab in Host or Template configuration forms.
 	 *
