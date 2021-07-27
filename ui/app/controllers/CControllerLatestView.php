@@ -156,6 +156,82 @@ class CControllerLatestView extends CControllerLatest {
 
 		$this->extendData($prepared_data);
 
+		$items_readonly = true;
+		$can_create_items = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+				|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+
+		$hostids = array_unique(array_keys($prepared_data['hosts']));
+		$single_hostid = (count($hostids) === 1) ? reset($hostids) : 0;
+		$create_item_dropdown = [
+			'hosts' => [],
+			'templates' => []
+		];
+
+		if ($can_create_items) {
+			$writable_templates = API::Template()->get([
+				'editable' => true,
+				'limit' => 1
+			]);
+
+			if (count($writable_templates) > 0) {
+				$items_readonly = false;
+			}
+			else {
+				$writable_hosts = API::Host()->get([
+					'editable' => true,
+					'limit' => 1
+				]);
+
+				if (count($writable_hosts) > 0) {
+					$items_readonly = false;
+				}
+			}
+
+			if (!$items_readonly && $single_hostid > 0) {
+				$host = $prepared_data['hosts'][$single_hostid];
+
+				$host_writable = API::Host()->get([
+					'hostids' => $single_hostid,
+					'editable' => true
+				]);
+
+				$host['disabled'] = count($host_writable) ? false : true;
+
+				$create_item_dropdown['hosts'][] = $host;
+
+				if ((int) $host['flags'] === ZBX_FLAG_DISCOVERY_CREATED) {
+					$host['parentTemplates'] = [];
+				}
+
+				$templateids = array_column($host['parentTemplates'], 'templateid');
+				$templateids = CTemplateHelper::getParentTemplatesRecursive([$single_hostid], 'host');
+
+				$templates = API::Template()->get([
+					'output' => ['templateid', 'name'],
+					'selectParentTemplates' => ['templateid', 'name'],
+					'templateids' => $templateids,
+					'preservekeys' => true
+				]);
+
+				$writable_templates = API::Template()->get([
+					'output' => [],
+					'templateids' => $templateids,
+					'editable' => true,
+					'preservekeys' => true
+				]);
+
+				foreach($templates as $templateid => &$value) {
+					$value['disabled'] = !array_key_exists($templateid, $writable_templates);
+					unset($value['parentTemplates']);
+				}
+				unset($value);
+
+				order_result($templates, 'name');
+
+				$create_item_dropdown['templates'] = $templates;
+			}
+		}
+
 		// display
 		$data = [
 			'filter' => $filter,
@@ -172,7 +248,11 @@ class CControllerLatestView extends CControllerLatest {
 				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 			],
-			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+			'can_create_items' => $can_create_items,
+			'items_readonly' => $items_readonly,
+			'single_hostid' => $single_hostid,
+			'create_item_dropdown' => $create_item_dropdown
 		] + $prepared_data;
 
 		if (!$data['filter']['tags']) {

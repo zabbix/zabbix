@@ -193,7 +193,11 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_Layout() {
-		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost with items']);
+		$this->page->login()->open((new Curl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', self::$hostids['testFormHost with items'])
+			->getUrl()
+		);
 		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
 		// Check tabs available in the form
 		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
@@ -727,7 +731,10 @@ class testFormHost extends CWebTest {
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 		}
 
-		$this->page->login()->open('hosts.php?form=create');
+		$this->page->login()->open((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.create')
+			->getUrl()
+		);
 		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
@@ -1340,7 +1347,11 @@ class testFormHost extends CWebTest {
 			]
 		];
 
-		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost_Update']);
+		$this->page->login()->open((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', self::$hostids['testFormHost_Update'])
+			->getUrl()
+		);
 		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
@@ -1496,7 +1507,11 @@ class testFormHost extends CWebTest {
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 		$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 
-		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost_Update']);
+		$this->page->login()->open((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', self::$hostids['testFormHost_Update'])
+			->getUrl()
+		);
 		$this->page->waitUntilReady();
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Host updated');
@@ -1574,7 +1589,11 @@ class testFormHost extends CWebTest {
 	private function cloneHost($data, $full_clone = false) {
 		$name = 'testFormHost with items';
 		$type = $full_clone ? 'Full clone' : 'Clone';
-		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids[$name]);
+		$this->page->login()->open((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', self::$hostids[$name])
+			->getUrl()
+		);
 
 		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
 		$form->setFilter(new CElementFilter(CElementFilter::VISIBLE));
@@ -1652,11 +1671,18 @@ class testFormHost extends CWebTest {
 		];
 
 		if ($data['action'] === 'Add') {
-			$this->page->login()->open('hosts.php?form=create');
+			$this->page->login()->open((new CUrl('zabbix.php'))
+				->setArgument('action', 'host.create')
+				->getUrl()
+			);
 		}
 		else {
 			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
-			$this->page->login()->open('hosts.php?form=update&hostid='.$hostid);
+			$this->page->login()->open((new CUrl('zabbix.php'))
+				->setArgument('action', 'host.edit')
+				->setArgument('hostid', $hostid)
+				->getUrl()
+			);
 		}
 
 		// Change the host data to make sure that the changes are not saved to the database after cancellation.
@@ -1674,7 +1700,11 @@ class testFormHost extends CWebTest {
 
 		// Check that the host creation page is open after cloning or full cloning.
 		if ($data['action'] === 'Clone' || $data['action'] === 'Full clone') {
-			$this->assertEquals(PHPUNIT_URL.'hosts.php', $this->page->getCurrentUrl());
+			$this->assertEquals(PHPUNIT_URL.(new CUrl('zabbix.php'))
+				->setArgument('action', 'host.create')
+				->getUrl(),
+				$this->page->getCurrentUrl()
+			);
 			$this->assertFalse($this->query('xpath:.//ul['.CXPathHelper::fromClass('filter-breadcrumb').']')->one(false)->isValid());
 			$this->assertFalse($this->query('button', ['Update', 'Clone', 'Full clone', 'Delete'])->one(false)->isValid());
 			$this->assertTrue($this->query('id', ['add', 'cancel'])->one(false)->isValid());
@@ -1721,7 +1751,11 @@ class testFormHost extends CWebTest {
 			$ids = array_column($interfaceids, 'interfaceid');
 		}
 
-		$this->page->login()->open('hosts.php?form=update&hostid='.$hostid);
+		$this->page->login()->open((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', $hostid)
+			->getUrl()
+		);
 		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 

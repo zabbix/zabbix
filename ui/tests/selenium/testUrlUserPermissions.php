@@ -308,7 +308,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'hosts.php',
+				'url' => self::HOST_LIST_PAGE,
 				'title' =>	'Configuration of hosts',
 				'header' => 'Hosts',
 				'users' => [
@@ -318,7 +318,10 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'hosts.php?groupid=0&form=Create+host',
+				'url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'host.create')
+					->setArgument('groupid', 0)
+					->getUrl(),
 				'title' =>	'Configuration of hosts',
 				'header' => 'Hosts',
 				'users' => [

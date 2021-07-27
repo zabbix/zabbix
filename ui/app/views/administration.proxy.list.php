@@ -107,7 +107,10 @@ foreach ($data['proxies'] as $proxy) {
 		}
 
 		$hosts[] = $data['allowed_ui_conf_hosts']
-			? (new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid']))->addClass($style)
+			? (new CLink($host['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'host.edit')
+				->setArgument('hostid', $host['hostid'])
+			))->addClass($style)
 			: (new CSpan($host['name']))->addClass($style);
 	}
 

@@ -25,16 +25,14 @@
 
 $scripts = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
 	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js', 'hostinterfacemanager.js',
-	'hostmacrosmanager.js'
+	'hostpopup.js', 'hostmacrosmanager.js'
 ];
 
 foreach ($scripts as $script) {
 	$this->addJsFile($script);
 }
 
-// @TODO: coordinate with Miks
-$this->addJsFile('temp.host.list.js');
-$this->includeJsFile('host.list.js.php');
+$this->includeJsFile('configuration.host.list.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
@@ -62,17 +60,13 @@ $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 	'evaltype' => $data['filter']['evaltype'],
 	'tags' => $filter_tags
 ]);
-$filter = new CFilter(
-	(new CUrl('zabbix.php'))
-		->setArgument('action', $data['action'])
-);
-
+$filter = new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['action']));
 $filter
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
-			->addItem((new CInput('hidden', 'action', $data['action'])))
+			->addVar('action', $data['action'])
 			->addRow(
 				(new CLabel(_('Host groups'), 'filter_groups__ms')),
 				(new CMultiSelect([
@@ -155,9 +149,9 @@ $widget->addItem($filter);
 // table hosts
 $form = (new CForm())->setName('hosts');
 $header_checkbox = (new CCheckBox('all_hosts'))
-	->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');");
-$show_monitored_by = ($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
-		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY);
+	->onClick("checkAll('".$form->getName()."', 'all_hosts', 'ids');");
+$show_monitored_by = ((int) $data['filter']['monitored_by'] === ZBX_MONITORED_BY_PROXY
+		|| (int) $data['filter']['monitored_by'] === ZBX_MONITORED_BY_ANY);
 $header_sortable_name = make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
 	(new CUrl('zabbix.php'))
 		->setArgument('action', $data['action'])
@@ -189,7 +183,6 @@ $table = (new CTableInfo())
 	]);
 
 $current_time = time();
-
 $interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
 
 foreach ($data['hosts'] as $host) {
@@ -199,7 +192,7 @@ foreach ($data['hosts'] as $host) {
 	if ($host['interfaces']) {
 		foreach ($interface_types as $interface_type) {
 			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
-				return ($host_interface['type'] == $interface_type);
+				return ((int) $host_interface['type'] === $interface_type);
 			});
 
 			if ($host_interfaces) {
@@ -222,24 +215,30 @@ foreach ($data['hosts'] as $host) {
 			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
 	}
-	elseif ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	elseif ((int) $host['flags'] === ZBX_FLAG_DISCOVERY_CREATED) {
 		// Discovered host which does not contain info about parent discovery rule is inaccessible for current user.
 		$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
 	}
 
 	$description[] = (new CLink(CHtml::encode($host['name']),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'host.edit')
-				->setArgument('hostid', $host['hostid'])
-		))
-			->setAttribute('data-hostid', $host['hostid'])
-			->addClass('js-edit-host');
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', $host['hostid'])
+	))
+		->setAttribute('data-hostid', $host['hostid'])
+		->addClass('js-edit-host');
 
 	$maintenance_icon = false;
+	$status_toggle_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup.massupdate.host')
+		->setArgument('ids', [$host['hostid']])
+		->setArgument('visible[status]', 1)
+		->setArgument('update', 1)
+		->setArgument('return_to', 'hosts');
 
-	if ($host['status'] == HOST_STATUS_MONITORED) {
-		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+	if ((int) $host['status'] === HOST_STATUS_MONITORED) {
+		if ((int) $host['maintenance_status'] === HOST_MAINTENANCE_STATUS_ON) {
 			if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
 				$maintenance = $data['maintenances'][$host['maintenanceid']];
 				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
@@ -254,20 +253,18 @@ foreach ($data['hosts'] as $host) {
 		$statusCaption = _('Enabled');
 		$statusClass = ZBX_STYLE_GREEN;
 		$confirm_message = _('Disable host?');
-		$status_url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.massdisable')
-			->setArgument('hosts', [$host['hostid']]);
+
+		$status_toggle_url->setArgument('status', HOST_STATUS_NOT_MONITORED);
 	}
 	else {
 		$statusCaption = _('Disabled');
-		$status_url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.massenable')
-			->setArgument('hosts', [$host['hostid']]);
 		$confirm_message = _('Enable host?');
 		$statusClass = ZBX_STYLE_RED;
+
+		$status_toggle_url->setArgument('status', HOST_STATUS_MONITORED);
 	}
 
-	$status = (new CLink($statusCaption, $status_url->getUrl()))
+	$status = (new CLink($statusCaption, $status_toggle_url->getUrl()))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass($statusClass)
 		->addConfirmation($confirm_message)
@@ -347,23 +344,26 @@ foreach ($data['hosts'] as $host) {
 
 	$info_icons = [];
 
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
+	$tls_connect = (int) $host['tls_connect'];
+	$tls_accept = (int) $host['tls_accept'];
+
+	if ((int) $host['flags'] === ZBX_FLAG_DISCOVERY_CREATED && (int) $host['hostDiscovery']['ts_delete'] !== 0) {
 		$info_icons[] = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
 	}
 
-	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE
-			&& ($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE
-			&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
-			&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
+	if ($tls_connect === HOST_ENCRYPTION_NONE
+			&& ($tls_accept & HOST_ENCRYPTION_NONE) === HOST_ENCRYPTION_NONE
+			&& ($tls_accept & HOST_ENCRYPTION_PSK) !== HOST_ENCRYPTION_PSK
+			&& ($tls_accept & HOST_ENCRYPTION_CERTIFICATE) !== HOST_ENCRYPTION_CERTIFICATE) {
 		$encryption = (new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN)))
 			->addClass(ZBX_STYLE_STATUS_CONTAINER);
 	}
 	else {
 		// Incoming encryption.
-		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
+		if ($tls_connect === HOST_ENCRYPTION_NONE) {
 			$in_encryption = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
-		elseif ($host['tls_connect'] == HOST_ENCRYPTION_PSK) {
+		elseif ($tls_connect === HOST_ENCRYPTION_PSK) {
 			$in_encryption = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
@@ -373,21 +373,21 @@ foreach ($data['hosts'] as $host) {
 		// Outgoing encryption.
 		$out_encryption = [];
 
-		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+		if (($tls_accept & HOST_ENCRYPTION_NONE) === HOST_ENCRYPTION_NONE) {
 			$out_encryption[] = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
 			$out_encryption[] = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
-		if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
+		if (($tls_accept & HOST_ENCRYPTION_PSK) === HOST_ENCRYPTION_PSK) {
 			$out_encryption[] = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
 			$out_encryption[] = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
-		if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
+		if (($tls_accept & HOST_ENCRYPTION_CERTIFICATE) === HOST_ENCRYPTION_CERTIFICATE) {
 			$out_encryption[] = (new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
@@ -408,7 +408,7 @@ foreach ($data['hosts'] as $host) {
 	}
 
 	$table->addRow([
-		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
+		new CCheckBox('ids['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
@@ -466,17 +466,31 @@ foreach ($data['hosts'] as $host) {
 	]);
 }
 
+$status_toggle_url =  (new CUrl('zabbix.php'))
+	->setArgument('action', 'popup.massupdate.host')
+	->setArgument('visible[status]', 1)
+	->setArgument('update', 1)
+	->setArgument('return_to', 'hosts');
+
 $form->addItem([
 	$table,
 	$data['paginator'],
-	new CActionButtonList('action', 'hosts', [
-		'host.massenable'  => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
-		'host.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?')],
+	new CActionButtonList('action', 'ids', [
+		'enable-hosts' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?'),
+			'redirect' => $status_toggle_url
+				->setArgument('status', HOST_STATUS_MONITORED)
+				->getUrl()
+		],
+		'disable-hosts' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?'),
+			'redirect' => $status_toggle_url
+				->setArgument('status', HOST_STATUS_NOT_MONITORED)
+				->getUrl()
+		],
 		'host.export' => [
 			'content' => new CButtonExport('export.hosts',
 				(new CUrl('zabbix.php'))
 					->setArgument('action', $data['action'])
-					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+					->setArgument('page', ((int) $data['page'] === 1) ? null : $data['page'])
 					->getUrl()
 			)
 		],
@@ -484,7 +498,6 @@ $form->addItem([
 			'content' => (new CButton('', _('Mass update')))
 				->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->removeAttribute('id')
 		],
 		'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
 	])
@@ -494,6 +507,6 @@ $widget
 	->addItem($form)
 	->show();
 
-(new CScriptTag('host_list.init();'))
+(new CScriptTag('host_popup.init();'))
 	->setOnDocumentReady()
 	->show();

@@ -64,7 +64,8 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			'tls_connect' => 'in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
 			'tls_accept' => 'ge 0|le '.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
 			'ipmi_authtype' => 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2, IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM, IPMI_AUTHTYPE_RMCP_PLUS]),
-			'ipmi_privilege' => 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER, IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM])
+			'ipmi_privilege' => 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER, IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM]),
+			'return_to' => 'in hosts'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -465,6 +466,36 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				CMessageHelper::setErrorTitle(_('Cannot update hosts'));
 
 				$result = false;
+			}
+
+			if ($this->getInput('return_to', false) === 'hosts') {
+				$enable_wanted = ((int) $this->getInput('status', HOST_STATUS_NOT_MONITORED) === HOST_STATUS_MONITORED);
+				$hosts_count = is_array($result) ? count($result['hostids']) : count($hosts);
+
+				if ($result) {
+					$messageSuccess = $enable_wanted
+						? _n('Host enabled', 'Hosts enabled', $hosts_count)
+						: _n('Host disabled', 'Hosts disabled', $hosts_count);
+
+					uncheckTableRows();
+					CMessageHelper::setSuccessTitle($messageSuccess);
+				}
+				else {
+					$messageFailed = $enable_wanted
+						? _n('Cannot enable host', 'Cannot enable hosts', $hosts_count)
+						: _n('Cannot disable host', 'Cannot disable hosts', $hosts_count);
+
+					CMessageHelper::setErrorTitle($messageFailed);
+				}
+
+				$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+					->setArgument('action', 'host.list')
+					->setArgument('page', CPagerHelper::loadPage('host.list', null))
+				);
+
+				$this->setResponse($response);
+
+				return;
 			}
 
 			if ($result) {

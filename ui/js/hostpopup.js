@@ -1,4 +1,4 @@
-const host_list = {
+const host_popup = {
 	init() {
 		this.initActionButtons();
 	},
@@ -47,4 +47,5 @@ const host_list = {
 	pauseRefresh() {},
 
 	resumeRefresh() {}
+
 };

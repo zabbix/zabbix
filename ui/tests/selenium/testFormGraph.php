@@ -202,7 +202,7 @@ class testFormGraph extends CLegacyWebTest {
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->query('button:Reset')->one()->click();
 			$this->zbxTestClickLinkTextWait($data['host']);
 			if (isset($data['templatedHost'])) {

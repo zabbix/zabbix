@@ -109,6 +109,7 @@ class CControllerHostView extends CControllerHost {
 			'filter_view' => 'monitoring.host.filter',
 			'filter_defaults' => $profile->filter_defaults,
 			'filter_tabs' => $filter_tabs,
+			'can_create_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 			'tabfilter_options' => [
 				'idx' => static::FILTER_IDX,
 				'selected' => $profile->selected,

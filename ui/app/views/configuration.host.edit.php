@@ -44,7 +44,17 @@ $data += [
 			new CSubmit('update', _('Update')),
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid')),
+			(new CButton('delete', _('Delete selected host?')))
+				->onClick("return confirm('".json_encode(_('Delete selected host?'))."')
+					? host_edit.deleteHost()
+					: false")
+				->setAttribute('data-redirect', (new CUrl('zabbix.php'))
+					->setArgument('action', 'host.massdelete')
+					->setArgument('ids', [$data['hostid']])
+					->setArgumentSID()
+					->getUrl()
+				)
+				->addClass(ZBX_STYLE_BTN_ALT),
 			new CButtonCancel()
 		]
 ];

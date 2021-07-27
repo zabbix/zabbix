@@ -320,6 +320,31 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			})
 				.then(response => response.json())
 				.then(response => form.dispatchEvent(new CustomEvent('formSubmitted', {detail: response})));
+		},
+
+		deleteHost() {
+			const form = Object.assign(document.createElement('form'), {
+				action: 'zabbix.php',
+				method: 'post',
+				style: 'display:none'
+			});
+
+			Object.entries({
+				action: 'host.massdelete',
+				'ids[0]': document.getElementById('hostid').value,
+				backurl: this.backurl || '',
+				sid: document.getElementById('sid').value
+			})
+				.forEach(([name, val]) => {
+					let input = document.createElement('input');
+					input.setAttribute('name', name);
+					input.setAttribute('value', val);
+					form.appendChild(input);
+				});
+
+			document.body.appendChild(form);
+
+			form.submit();
 		}
 	};
 </script>

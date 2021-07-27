@@ -759,7 +759,10 @@ class testFormTags extends CWebTest {
 
 		// Open host group, host or template and check object tags.
 		if ($target_type !== 'Host group') {
-			$this->page->open(($target_type === 'Host') ? 'hosts.php' : 'templates.php')->waitUntilReady();
+			$this->page->open(($target_type === 'Host')
+				? self::HOST_LIST_PAGE
+				: 'templates.php'
+			)->waitUntilReady();
 			$this->query('link', $parent)->waitUntilClickable()->one()->click();
 			$this->query('link', ucfirst($object).'s')->waitUntilClickable()->one()->click();
 			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();

@@ -175,8 +175,8 @@ $overviewFormList->addRow(_('Monitoring'),
 
 // configuration
 if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
-	$hostLink = new CLink(_('Host'), (new CUrl('hosts.php'))
-		->setArgument('form', 'update')
+	$hostLink = new CLink(_('Host'), (new CUrl('zabbix.php'))
+		->setArgument('action', 'host.edit')
 		->setArgument('hostid', $data['host']['hostid'])
 	);
 	$itemsLink = new CLink(_('Items'),

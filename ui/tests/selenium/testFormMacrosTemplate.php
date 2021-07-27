@@ -546,7 +546,13 @@ class testFormMacrosTemplate extends testFormMacros {
 			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'
 		];
-		$this->resolveSecretMacro($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
+		$this->resolveSecretMacro($macro, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', 99135)
+			->getUrl(),
+			'hosts',
+			'host'
+		);
 	}
 
 	public function getCreateVaultMacrosData() {

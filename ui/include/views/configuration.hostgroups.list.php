@@ -119,8 +119,8 @@ foreach ($this->data['groups'] as $group) {
 		}
 
 		if ($data['allowed_ui_conf_hosts']) {
-			$host_output = (new CLink($host['name'], (new CUrl('hosts.php'))
-				->setArgument('form', 'update')
+			$host_output = (new CLink($host['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'host.edit')
 				->setArgument('hostid', $host['hostid'])
 			))->addClass(ZBX_STYLE_LINK_ALT);
 		}
@@ -165,7 +165,8 @@ foreach ($this->data['groups'] as $group) {
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			$data['allowed_ui_conf_hosts']
-				? new CLink(_('Hosts'), (new CUrl('hosts.php'))
+				? new CLink(_('Hosts'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'host.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_groups', [$group['groupid']])
 				)

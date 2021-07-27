@@ -66,6 +66,7 @@ $availableJScripts = [
 	'class.widget.trigerover.js' => 'widgets/',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
+	'hostpopup.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -135,7 +136,6 @@ $availableJScripts = [
 	'monitoring.overview.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
 	'popup.operation.common.js' => 'pages/',
-	'temp.host.list.js' => '',
 ];
 
 $tranStrings = [
@@ -463,7 +463,7 @@ $js .= 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
 		foreach ($tranStrings[$file] as $origStr => $str) {
-			$js .= 'locale[\'' . $origStr . '\'] = ' . zbx_jsvalue($str) . ';';
+			$js .= 'locale[\'' . $origStr . '\'] = ' . json_encode($str) . ';';
 		}
 	}
 }

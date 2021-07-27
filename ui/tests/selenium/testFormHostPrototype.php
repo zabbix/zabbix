@@ -676,7 +676,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		// Go to host and change IPMI settings.
-		$this->zbxTestOpen('hosts.php?form=update&hostid='.self::HOST_ID);
+		$this->zbxTestOpen((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid=', self::HOST_ID)
+			->getUrl()
+		);
 		$this->zbxTestTabSwitch('IPMI');
 
 		$new_values = [
@@ -763,7 +767,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		// Go to host and change Encryption settings.
-		$this->zbxTestOpen('hosts.php?form=update&hostid='.self::HOST_ID.'&context=host');
+		$this->zbxTestOpen((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
+			->setArgument('hostid', self::HOST_ID)
+			->getUrl()
+		);
 		$this->zbxTestTabSwitch('Encryption');
 		$this->zbxTestWaitForPageToLoad();
 
@@ -981,7 +989,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($host);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($discovery_rule);

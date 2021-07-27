@@ -48,7 +48,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_CheckLayout() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
@@ -117,7 +117,7 @@ class testPageHosts extends CLegacyWebTest {
 		$sqlHostInventory = "select * from host_inventory where hostid=$hostid";
 		$oldHashHostInventory = CDBHelper::getHash($sqlHostInventory);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
@@ -143,12 +143,12 @@ class testPageHosts extends CLegacyWebTest {
 	public function testPageHosts_MassDisableAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_MONITORED." where status=".HOST_STATUS_NOT_MONITORED);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestClickButton('host.massdisable');
+		$this->zbxTestClickButton('disable-hosts');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -167,12 +167,12 @@ class testPageHosts extends CLegacyWebTest {
 
 		$hostid = $host['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
-		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
-		$this->zbxTestClickButton('host.massdisable');
+		$this->zbxTestCheckboxSelect('ids_'.$hostid);
+		$this->zbxTestClickButton('disable-hosts');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -190,12 +190,12 @@ class testPageHosts extends CLegacyWebTest {
 
 		$hostid = $host['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
-		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
-		$this->zbxTestClickButton('host.massenable');
+		$this->zbxTestCheckboxSelect('ids_'.$hostid);
+		$this->zbxTestClickButton('enable-hosts');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -208,12 +208,12 @@ class testPageHosts extends CLegacyWebTest {
 	public function testPageHosts_MassActivateAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestClickButton('host.massenable');
+		$this->zbxTestClickButton('enable-hosts');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -225,7 +225,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByName() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill($this->HostName);
@@ -237,7 +237,7 @@ class testPageHosts extends CLegacyWebTest {
 	public function testPageHosts_FilterByTemplates() {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill([
@@ -252,7 +252,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByProxy() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 
@@ -273,7 +273,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterNone() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('1928379128ksdhksdjfh');
@@ -286,7 +286,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByAllFields() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Host groups')->select($this->HostGroup);
@@ -299,7 +299,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterReset() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
@@ -683,7 +683,14 @@ class testPageHosts extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageHosts_FilterByTags($data) {
-		$this->page->login()->open('hosts.php?filter_groups%5B%5D=4&filter_host=host&filter_port=10051&&filter_set=1');
+		$this->page->login()->open(urlencode((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.list')
+			->setArgument('filter_groups[]', 4)
+			->setArgument('filter_host', 'host')
+			->setArgument('filter_port', 10051)
+			->setArgument('filter_set', 1)
+			->getUrl()
+		));
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
