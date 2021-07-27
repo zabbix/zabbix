@@ -37,26 +37,27 @@ $form = (new CForm())
 	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
-$audit_settings_tab = (new CFormList())
-	->addRow(
+$audit_grid = (new CFormGrid())
+	->addItem([
 		new CLabel(_('Enable audit logging'), 'auditlog_enabled'),
-		(new CCheckBox('auditlog_enabled'))->setChecked($data['auditlog_enabled'] == 1)
-	)
-	->addRow(
+		new CFormField((new CCheckBox('auditlog_enabled'))->setChecked($data['auditlog_enabled'] == 1))
+	])
+	->addItem([
 		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
-		(new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1)
-	)
-	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_audit'))
-			->setAsteriskMark(),
-		(new CTextBox('hk_audit', $data['hk_audit'], false, DB::getFieldLength('config', 'hk_audit')))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setEnabled($data['hk_audit_mode'] == 1)
-			->setAriaRequired()
-	);
+		new CFormField((new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1))
+	])
+	->addItem([
+		(new CLabel(_('Data storage period'), 'hk_audit'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('hk_audit', $data['hk_audit'], false, DB::getFieldLength('config', 'hk_audit')))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setEnabled($data['hk_audit_mode'] == 1)
+				->setAriaRequired()
+		)
+	]);
 
 $audit_settings_view = (new CTabView())
-	->addTab('audit-settings', _('Audit log'), $audit_settings_tab)
+	->addTab('audit-settings', _('Audit log'), $audit_grid)
 	->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[new CButton('resetDefaults', _('Reset defaults'))]
