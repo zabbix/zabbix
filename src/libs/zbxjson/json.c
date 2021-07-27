@@ -134,16 +134,24 @@ void	zbx_json_initarray(struct zbx_json *j, size_t allocate)
 	zbx_json_addarray(j, NULL);
 }
 
-void	zbx_json_clean(struct zbx_json *j)
+static void	zbx_json_setempty(struct zbx_json *j)
 {
-	assert(j);
-
 	j->buffer_offset = 0;
 	j->buffer_size = 0;
 	j->status = ZBX_JSON_EMPTY;
 	j->level = 0;
 	*j->buffer = '\0';
+}
 
+void	zbx_json_cleanarray(struct zbx_json *j)
+{
+	zbx_json_setempty(j);
+	zbx_json_addarray(j, NULL);
+}
+
+void	zbx_json_clean(struct zbx_json *j)
+{
+	zbx_json_setempty(j);
 	zbx_json_addobject(j, NULL);
 }
 

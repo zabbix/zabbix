@@ -18,41 +18,48 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormTags.php';
+require_once dirname(__FILE__).'/../common/testFormTags.php';
 
 /**
- * @backup triggers
+ * @dataSource EntitiesTags
+ * @backup hosts
  */
-class testFormTagsTrigger extends testFormTags {
+class testFormTagsHost extends testFormTags {
 
-	public $update_name = 'Trigger with tags for updating';
-	public $clone_name = 'Trigger with tags for cloning';
-	public $link = 'triggers.php?filter_set=1&filter_hostids%5B0%5D=40001';
-	public $saved_link = 'triggers.php?form=update&triggerid=';
+	public $update_name = 'Host with tags for updating';
+	public $clone_name = 'Host with tags for cloning';
+	public $link = 'hosts.php';
+	public $saved_link = 'hosts.php?form=update&hostid=';
 
 	/**
-	 * Test creating of Trigger with tags.
+	 * Test creating of Host with tags.
 	 *
 	 * @dataProvider getCreateData
 	 */
-	public function testFormTagsTrigger_Create($data) {
-		$expression = '{Simple form test host:test-item-reuse.last()}=0';
-		$this->checkTagsCreate($data, 'trigger', $expression);
+	public function testFormTagsHost_Create($data) {
+		$this->checkTagsCreate($data, 'host');
 	}
 
 	/**
-	 * Test update of Trigger with tags.
+	 * Test update of Host with tags.
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testFormTagsTrigger_Update($data) {
-		$this->checkTagsUpdate($data, 'trigger');
+	public function testFormTagsHost_Update($data) {
+		$this->checkTagsUpdate($data, 'host');
 	}
 
 	/**
-	 * Test cloning of Trigger with tags.
+	 * Test cloning of Host with tags.
 	 */
-	public function testFormTagsTrigger_Clone() {
-		$this->executeCloning('trigger', 'Clone');
+	public function testFormTagsHost_Clone() {
+		$this->executeCloning('host', 'Clone');
+	}
+
+	/**
+	 * Test full cloning of Host with tags.
+	 */
+	public function testFormTagsHost_FullClone() {
+		$this->executeCloning('host', 'Full clone');
 	}
 }

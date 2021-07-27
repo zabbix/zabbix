@@ -1,5 +1,5 @@
 
-# IES-6000 SNMP
+# ZYXEL IES-6000 SNMP
 
 ## Overview
 
@@ -27,13 +27,13 @@ No specific Zabbix configuration is required.
 |{$SNMP.TIMEOUT} |<p>The time interval for SNMP agent availability trigger expression.</p> |`5m` |
 |{$ZYXEL.ADSL.ATN.MAX} |<p>Type the maximum signal attenuation</p> |`40` |
 |{$ZYXEL.ADSL.SNR.MIN} |<p>Type the minimum signal to noise margin (0-31 dB)</p> |`8` |
-|{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES} |<p>Filter to exclude discovered slots by status.</p> |`1` |
-|{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES} |<p>Triggers will be created only for interfaces whose description contains the value of this macro</p> |`NEED TRIGGERS` |
+|{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES} |<p>Triggers will be created only for interfaces whose description contains the value of this macro</p> |`CHANGE_IF_NEEDED` |
 |{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES} |<p>Filter by discoverable interface names.</p> |`.*` |
 |{$ZYXEL.LLD.FILTER.IF.DESC.NOT_MATCHES} |<p>Filter to exclude discovered interfaces by name.</p> |`CHANGE_IF_NEEDED` |
 |{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES} |<p>Filter of discoverable link types.</p> |`.*` |
 |{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES} |<p>Filter to exclude discovered by link types.</p> |`2` |
 |{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES} |<p>Filter by discoverable slot status.</p> |`.*` |
+|{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES} |<p>Filter to exclude discovered slots by status.</p> |`1` |
 
 ## Template links
 
@@ -43,7 +43,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Slot discovery |<p>The table which contains the slot information in a chassis.</p> |SNMP |zyxel.ies6000.slot.discovery<p>**Filter**:</p>AND <p>- A: {#ZYXEL.SLOTSTATUS} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}`</p><p>- B: {#ZYXEL.SLOTSTATUS} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}`</p> |
+|Slot discovery |<p>The table which contains the slot information in a chassis.</p> |SNMP |zyxel.ies6000.slot.discovery<p>**Filter**:</p>AND <p>- A: {#ZYXEL.SLOTSTATUS} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}`</p><p>- B: {#ZYXEL.SLOTSTATUS} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}`</p> |
 |Fan discovery |<p>An entry in fanRpmTable.</p> |SNMP |zyxel.ies6000.fan.discovery |
 |Temperature discovery |<p>An entry in tempTable.</p> |SNMP |zyxel.ies6000.temp.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Voltage discovery |<p>An entry in voltageTable.</p> |SNMP |zyxel.ies6000.volt.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
@@ -91,8 +91,8 @@ There are no template links in this template.
 |Network_interfaces |ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing multicast packages |<p>MIB: IF-MIB</p><p>The total number of packets that higher-level protocols</p><p>requested be transmitted, and which were addressed to a</p><p>multicast address at this sub-layer, including those that</p><p>were discarded or not sent.  For a MAC layer protocol, this</p><p>includes both Group and Functional addresses.</p> |SNMP |zyxel.ies6000.net.if.out.multicastpkts[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Network_interfaces |ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing broadcast packages |<p>MIB: IF-MIB</p><p>The total number of packets that higher-level protocols</p><p>requested be transmitted, and which were addressed to a</p><p>broadcast address at this sub-layer, including those that</p><p>were discarded or not sent.</p> |SNMP |zyxel.ies6000.net.if.out.broadcastpkts[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Network_interfaces |ZYXEL IES-6000: Port {#SNMPINDEX}: Link speed |<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in bits per second</p> |SNMP |zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1000000`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Network_interfaces |ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming utilization |<p>Interface utilization percentage</p> |CALCULATED |zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- IN_RANGE: `0 100`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>**Expression**:</p>`last(zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]) * (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100 ` |
-|Network_interfaces |ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing utilization |<p>Interface utilization percentage</p> |CALCULATED |zyxel.ies6000.net.if.out.util[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- IN_RANGE: `0 100`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>**Expression**:</p>`last(zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]) * (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100 ` |
+|Network_interfaces |ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming utilization |<p>Interface utilization percentage</p> |CALCULATED |zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- IN_RANGE: `0 100`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return +parseFloat(value).toFixed(0); `</p><p>**Expression**:</p>`last(zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]) * (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100 ` |
+|Network_interfaces |ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing utilization |<p>Interface utilization percentage</p> |CALCULATED |zyxel.ies6000.net.if.out.util[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- IN_RANGE: `0 100`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return +parseFloat(value).toFixed(0); `</p><p>**Expression**:</p>`last(zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]) * (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100 ` |
 |Network_interfaces |ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Interface description |<p>MIB: IF-MIB</p><p>A textual string containing information about the interface</p> |SNMP |zyxel.ies6000.net.adsl.descr[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Network_interfaces |ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Interface name |<p>MIB: IF-MIB</p><p>A textual string containing information about the interface</p> |SNMP |zyxel.ies6000.net.adsl.name[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Network_interfaces |ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Operational status |<p>MIB: IF-MIB</p><p>The current operational state of the interface.</p><p>The testing(3) state indicates that no operational</p><p>packets can be passed.</p> |SNMP |zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |

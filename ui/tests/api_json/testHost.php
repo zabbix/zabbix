@@ -75,4 +75,56 @@ class testHost extends CAPITest {
 			}
 		}
 	}
+
+	public static function host_select_tags() {
+		return [
+			'Get test host tag as extend' => [
+				'params' => [
+					'hostids' => [50032],
+					'selectTags' => 'extend'
+				],
+				'expected_result' => [
+					'tags' => [
+						['tag' => 'b', 'value' => 'b']
+					]
+				]
+			],
+			'Get test host tag excluding value' => [
+				'params' => [
+					'hostids' => [50032],
+					'selectTags' => ['tag']
+				],
+				'expected_result' => [
+					'tags' => [
+						['tag' => 'b']
+					]
+				]
+			],
+			'Get test host tag excluding name' => [
+				'params' => [
+					'hostids' => [50032],
+					'selectTags' => ['value']
+				],
+				'expected_result' => [
+					'tags' => [
+						['value' => 'b']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	* @dataProvider host_select_tags
+	*/
+	public function testHost_SelectTags($params, $expected_result) {
+		$result = $this->call('host.get', $params);
+
+		foreach($result['result'] as $host) {
+			foreach($expected_result as $field => $expected_value){
+				$this->assertArrayHasKey($field, $host, 'Field should be present.');
+				$this->assertEquals($host[$field], $expected_value, 'Returned value should match.');
+			}
+		}
+	}
 }

@@ -96,7 +96,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Event MPM discovery |<p>Additional metrics if event MPM is used</p><p>https://httpd.apache.org/docs/current/mod/event.html</p> |DEPENDENT |apache.mpm.event.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerMPM`</p><p>- JAVASCRIPT: `return JSON.stringify(value === 'event' ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|Event MPM discovery |<p>Additional metrics if event MPM is used</p><p>https://httpd.apache.org/docs/current/mod/event.html</p> |DEPENDENT |apache.mpm.event.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(JSON.parse(value).ServerMPM === 'event'     ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 
 ## Items collected
 

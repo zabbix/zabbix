@@ -1250,7 +1250,7 @@ Template tooling version used: 0.38</description>
                <units>ms</units>
                <username>{$KAFKA.USER}</username>
                <password>{$KAFKA.PASSWORD}</password>
-               <description>Latency in millseconds for ZooKeeper requests from broker.</description>
+               <description>Latency in milliseconds for ZooKeeper requests from broker.</description>
                <applications>
                   <application>
                      <name>Kafka</name>

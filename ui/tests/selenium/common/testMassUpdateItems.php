@@ -1796,10 +1796,7 @@ class testMassUpdateItems extends CWebTest{
 
 		// Get item table and select items.
 		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
-		// TODO: Change this when findRows() is improved in TableElement.
-		foreach ($data as $name) {
-			$table->findRow('Name', $name)->select();
-		}
+		$table->findRows('Name', $data)->select();
 
 		// Open mass update form.
 		$this->query('button:Mass update')->one()->click();
