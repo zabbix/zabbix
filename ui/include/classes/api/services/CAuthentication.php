@@ -174,7 +174,7 @@ class CAuthentication extends CApiService {
 			'saml_encrypt_assertions' =>	['type' => API_INT32, 'in' => '0,1'],
 			'saml_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'passwd_min_length' =>			['type' => API_INT32, 'in' => '1:70', 'default' => DB::getDefault('config', 'passwd_min_length')],
-			'passwd_check_rules' =>			['type' => API_INT32, 'in' => '0:'.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE), 'default' => DB::getDefault('config', 'passwd_check_rules')],
+			'passwd_check_rules' =>			['type' => API_INT32, 'in' => '0:'.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE), 'default' => DB::getDefault('config', 'passwd_check_rules')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $auth, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
