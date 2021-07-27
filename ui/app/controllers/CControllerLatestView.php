@@ -157,8 +157,8 @@ class CControllerLatestView extends CControllerLatest {
 		$this->extendData($prepared_data);
 
 		$items_readonly = true;
-		$can_create_items = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-				|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+		$can_create_items = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+				|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 
 		$hostids = array_unique(array_keys($prepared_data['hosts']));
 		$single_hostid = (count($hostids) === 1) ? reset($hostids) : 0;
@@ -168,18 +168,23 @@ class CControllerLatestView extends CControllerLatest {
 		];
 
 		if ($can_create_items) {
-			$writable_hosts = API::Host()->get([
-				'editable' => true,
-				'limit' => 1
-			]);
-
 			$writable_templates = API::Template()->get([
 				'editable' => true,
 				'limit' => 1
 			]);
 
-			if ((count($writable_hosts) + count($writable_templates)) !== 0) {
+			if (count($writable_templates) > 0) {
 				$items_readonly = false;
+			}
+			else {
+				$writable_hosts = API::Host()->get([
+					'editable' => true,
+					'limit' => 1
+				]);
+
+				if (count($writable_hosts) > 0) {
+					$items_readonly = false;
+				}
 			}
 
 			if (!$items_readonly && $single_hostid > 0) {
@@ -187,7 +192,7 @@ class CControllerLatestView extends CControllerLatest {
 
 				$host_writable = API::Host()->get([
 					'hostids' => $single_hostid,
-					'editable' => true,
+					'editable' => true
 				]);
 
 				$host['disabled'] = count($host_writable) ? false : true;
