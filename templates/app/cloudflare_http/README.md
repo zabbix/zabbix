@@ -76,7 +76,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements) | |`max(/TEMPLATE_NAME/cloudflare.bandwidth.cached,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}` |WARNING | |
+|Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements) | |`max(/TEMPLATE_NAME/cloudflare.bandwidth.cache_hit_ratio,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}` |WARNING | |
 |Cloudflare: Ratio of non-2xx responses is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements) |<p>A large number of errors can indicate a malfunction of the site.</p> |`min(/TEMPLATE_NAME/cloudflare.requests.others_ratio,#3) > {$CLOUDFLARE.ERRORS.MAX.WARN}` |AVERAGE | |
 
 ## Feedback

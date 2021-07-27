@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-07-26T08:43:27Z'
+  date: '2021-07-27T10:10:26Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         The template to monitor Cloudflare to see your web traffic and DNS metrics. It works without any external scripts and uses Script item.
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       groups:
         -
           name: Templates/Applications
@@ -70,13 +70,6 @@ zabbix_export:
             -
               tag: type
               value: gauge
-          triggers:
-            -
-              uuid: acf573785c394924aae8ef74b2683fd1
-              expression: 'max(/Cloudflare by HTTP/cloudflare.bandwidth.cached,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}'
-              name: 'Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
-              opdata: 'Current value: {ITEM.LASTVALUE1}'
-              priority: WARNING
         -
           uuid: c5ab8cc281ff4f75bd4ada79d2c0d1e8
           name: 'Cloudflare: Cache hit ratio of bandwidth'
@@ -104,6 +97,13 @@ zabbix_export:
             -
               tag: type
               value: ratio
+          triggers:
+            -
+              uuid: acf573785c394924aae8ef74b2683fd1
+              expression: 'max(/Cloudflare by HTTP/cloudflare.bandwidth.cache_hit_ratio,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}'
+              name: 'Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
         -
           uuid: 901db6b121c7473485c91b0f27e7cf50
           name: 'Cloudflare: SSL encrypted bandwidth'
@@ -189,7 +189,7 @@ zabbix_export:
           key: cloudflare.dns.query.all
           delay: '0'
           history: 7d
-          units: conns
+          units: conn
           description: 'The amount of all DNS queries.'
           preprocessing:
             -
@@ -215,7 +215,7 @@ zabbix_export:
           key: cloudflare.dns.query.stale
           delay: '0'
           history: 7d
-          units: conns
+          units: conn
           description: 'The number of stale DNS queries.'
           preprocessing:
             -
@@ -241,7 +241,7 @@ zabbix_export:
           key: cloudflare.dns.query.uncached
           delay: '0'
           history: 7d
-          units: conns
+          units: conn
           description: 'The number of uncached DNS queries.'
           preprocessing:
             -
@@ -512,7 +512,7 @@ zabbix_export:
           key: cloudflare.pageviews.all
           delay: '0'
           history: 7d
-          units: pgs
+          units: pg
           description: 'The amount of all pageviews.'
           preprocessing:
             -
@@ -538,7 +538,7 @@ zabbix_export:
           key: cloudflare.requests.all
           delay: '0'
           history: 7d
-          units: reqs
+          units: req
           description: 'The amount of all requests.'
           preprocessing:
             -
@@ -564,7 +564,7 @@ zabbix_export:
           key: cloudflare.requests.cached
           delay: '0'
           history: 7d
-          units: reqs
+          units: req
           preprocessing:
             -
               type: JSONPATH
@@ -651,7 +651,7 @@ zabbix_export:
           key: cloudflare.requests.response_100
           delay: '0'
           history: 7d
-          units: rqs
+          units: req
           description: 'The number requests with 1xx response codes.'
           preprocessing:
             -
@@ -677,7 +677,7 @@ zabbix_export:
           key: cloudflare.requests.response_200
           delay: '0'
           history: 7d
-          units: rqs
+          units: req
           description: 'The number requests with 2xx response codes.'
           preprocessing:
             -
@@ -703,7 +703,7 @@ zabbix_export:
           key: cloudflare.requests.response_300
           delay: '0'
           history: 7d
-          units: rqs
+          units: req
           description: 'The number requests with 3xx response codes.'
           preprocessing:
             -
@@ -729,7 +729,7 @@ zabbix_export:
           key: cloudflare.requests.response_400
           delay: '0'
           history: 7d
-          units: rqs
+          units: req
           description: 'The number requests with 4xx response codes.'
           preprocessing:
             -
@@ -755,7 +755,7 @@ zabbix_export:
           key: cloudflare.requests.response_500
           delay: '0'
           history: 7d
-          units: rqs
+          units: req
           description: 'The number requests with 5xx response codes.'
           preprocessing:
             -
@@ -781,7 +781,7 @@ zabbix_export:
           key: cloudflare.requests.ssl.encrypted
           delay: '0'
           history: 7d
-          units: reqs
+          units: req
           description: 'The number of encrypted requests.'
           preprocessing:
             -
@@ -807,7 +807,7 @@ zabbix_export:
           key: cloudflare.requests.ssl.unencrypted
           delay: '0'
           history: 7d
-          units: reqs
+          units: req
           description: 'The number of unencrypted requests.'
           preprocessing:
             -
@@ -860,7 +860,7 @@ zabbix_export:
           key: cloudflare.requests.uncached
           delay: '0'
           history: 7d
-          units: reqs
+          units: req
           description: 'The number of uncached requests.'
           preprocessing:
             -
@@ -886,7 +886,6 @@ zabbix_export:
           key: cloudflare.threats.all
           delay: '0'
           history: 7d
-          units: ops
           description: 'The number of all threats.'
           preprocessing:
             -
@@ -912,7 +911,7 @@ zabbix_export:
           key: cloudflare.uniques.all
           delay: '0'
           history: 7d
-          units: conns
+          units: conn
           description: 'The number of all visitors IPs.'
           preprocessing:
             -
@@ -935,7 +934,7 @@ zabbix_export:
         -
           macro: '{$CLOUDFLARE.API.TOKEN}'
           value: '<change>'
-          description: 'Your Cloudflare API Token'
+          description: 'Your Cloudflare API Token.'
         -
           macro: '{$CLOUDFLARE.API.URL}'
           value: 'https://api.cloudflare.com/client/v4'
@@ -943,19 +942,19 @@ zabbix_export:
         -
           macro: '{$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}'
           value: '50'
-          description: 'Minimum of cached bandwidth in %'
+          description: 'Minimum of cached bandwidth in %.'
         -
           macro: '{$CLOUDFLARE.ERRORS.MAX.WARN}'
           value: '30'
-          description: 'Maximum responses with errors in %'
+          description: 'Maximum responses with errors in %.'
         -
           macro: '{$CLOUDFLARE.GET_DATA.TIMEOUT}'
           value: 3s
-          description: 'Response timeout for Cloudflare API'
+          description: 'Response timeout for Cloudflare API.'
         -
           macro: '{$CLOUDFLARE.ZONE_ID}'
           value: '<change>'
-          description: 'Your Cloudflare Site Zone ID'
+          description: 'Your Cloudflare Site Zone ID.'
       dashboards:
         -
           uuid: 51f1013e8a3d492faed27fe80b68fc53
