@@ -22,6 +22,9 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @backup users
+ */
 class testFormUserProfile extends CLegacyWebTest {
 
 	public function testFormUserProfile_SimpleUpdate() {
@@ -64,8 +67,8 @@ class testFormUserProfile extends CLegacyWebTest {
 			]],
 			[[
 				'expected' => TEST_BAD,
-				'password1' => 'abc',
-				'password2' => 'def',
+				'password1' => 'abcd1234',
+				'password2' => 'abCD1235',
 				'error_msg' => 'Both passwords must be equal.'
 			]],
 			[[
@@ -81,8 +84,8 @@ class testFormUserProfile extends CLegacyWebTest {
 			]],
 			[[
 				'expected' => TEST_GOOD,
-				'password1' => PHPUNIT_LOGIN_PWD,
-				'password2' => PHPUNIT_LOGIN_PWD
+				'password1' => 'New_PASS_123',
+				'password2' => 'New_PASS_123'
 			]]
 		];
 	}

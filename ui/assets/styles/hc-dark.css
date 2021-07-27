@@ -1870,19 +1870,13 @@ footer {
     padding: 0 5px 0 0;
     overflow-y: auto;
     font-size: 0.85em; }
-    .msg-details ul li {
-      margin-left: 1em; }
-      .msg-details ul li::before {
-        content: '\2013';
-        float: left;
-        margin-left: -1em; }
-      .msg-details ul li:only-child {
-        margin-left: 0; }
     .msg-details ul.msg-details-border {
       padding-top: .5em;
       margin: 8px 0 0;
       border-top-width: 1px;
       border-top-style: dashed; }
+  .msg-details .list-dashed li:only-child {
+    margin-left: 0; }
 
 .msg-buttons {
   margin: 10px 0 0;
@@ -5881,6 +5875,24 @@ svg {
 .icon-user-group::before {
   background-position: -339px -8px; }
 
+.icon-help-hint {
+  display: inline-block;
+  height: 14px;
+  width: 14px;
+  margin: 0 0 0 5px;
+  border-radius: 50%;
+  background-color: #dddddd;
+  position: relative;
+  line-height: 1.4; }
+  .icon-help-hint::after {
+    content: '?';
+    position: relative;
+    top: -2px;
+    left: -4px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #333333; }
+
 #expressions_list .ui-sortable-helper {
   display: table; }
 
@@ -6401,6 +6413,13 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     margin-left: 5px;
     overflow: auto;
     border: 1px dashed #666666; }
+
+.list-dashed li {
+  margin-left: 1em; }
+  .list-dashed li::before {
+    content: '\2013';
+    float: left;
+    margin-left: -1em; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
