@@ -424,4 +424,261 @@ abstract class CHostBase extends CApiService {
 			DB::insert('host_tag', $insert);
 		}
 	}
+
+	/**
+	 * Creates user macros for hosts, templates and host prototypes.
+	 *
+	 * @param array  $hosts
+	 * @param array  $hosts[]['templateid|hostid']
+	 * @param array  $hosts[]['macros']             (optional)
+	 */
+	protected function createHostMacros(array $hosts): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$ins_hostmacros = [];
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('macros', $host)) {
+				foreach ($host['macros'] as $macro) {
+					$ins_hostmacros[] = ['hostid' => $host[$id_field_name]] + $macro;
+				}
+			}
+		}
+
+		if ($ins_hostmacros) {
+			DB::insert('hostmacro', $ins_hostmacros);
+		}
+	}
+
+	/**
+	 * Adding "macros" to the each host object.
+	 *
+	 * @param array  $db_hosts
+	 *
+	 * @return array
+	 */
+	protected function getHostMacros(array $db_hosts): array {
+		foreach ($db_hosts as &$db_host) {
+			$db_host['macros'] = [];
+		}
+		unset($db_host);
+
+		$options = [
+			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'value', 'description'],
+			'filter' => ['hostid' => array_keys($db_hosts)]
+		];
+		$db_macros = DBselect(DB::makeSql('hostmacro', $options));
+
+		while ($db_macro = DBfetch($db_macros)) {
+			$hostid = $db_macro['hostid'];
+			unset($db_macro['hostid']);
+
+			$db_hosts[$hostid]['macros'][$db_macro['hostmacroid']] = $db_macro;
+		}
+
+		return $db_hosts;
+	}
+
+	/**
+	 * Checks user macros for host.update, template.update and hostprototype.update methods.
+	 *
+	 * @param array  $hosts
+	 * @param array  $hosts[]['templateid|hostid']
+	 * @param array  $hosts[]['macros']             (optional)
+	 * @param array  $db_hosts
+	 * @param array  $db_hosts[<hostid>]['macros']
+	 *
+	 * @return array Array of passed hosts/templates with padded macros data, when it's necessary.
+	 *
+	 * @throws APIException if input of host macros data is invalid.
+	 */
+	protected function validateHostMacros(array $hosts, array $db_hosts): array {
+		$hostmacro_defaults = [
+			'type' => DB::getDefault('hostmacro', 'type')
+		];
+
+		// Populating new host macro objects for correct inheritance.
+		if ($this instanceof CHostPrototype) {
+			$hostmacro_defaults['description'] = DB::getDefault('hostmacro', 'description');
+		}
+
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		foreach ($hosts as $i1 => &$host) {
+			if (!array_key_exists('macros', $host)) {
+				continue;
+			}
+
+			$db_host = $db_hosts[$host[$id_field_name]];
+			$path = '/'.($i1 + 1).'/macros';
+
+			$db_macros = array_column($db_host['macros'], 'hostmacroid', 'macro');
+			$macros = [];
+
+			foreach ($host['macros'] as $i2 => &$hostmacro) {
+				if (!array_key_exists('hostmacroid', $hostmacro)) {
+					foreach (['macro', 'value'] as $field_name) {
+						if (!array_key_exists($field_name, $hostmacro)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+								_s('the parameter "%1$s" is missing', $field_name)
+							));
+						}
+					}
+
+					$hostmacro += $hostmacro_defaults;
+				}
+				else {
+					if (!array_key_exists($hostmacro['hostmacroid'], $db_host['macros'])) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS,
+							_('No permissions to referred object or it does not exist!')
+						);
+					}
+
+					$db_hostmacro = $db_host['macros'][$hostmacro['hostmacroid']];
+					$hostmacro += array_intersect_key($db_hostmacro, array_flip(['macro', 'type']));
+
+					if ($hostmacro['type'] != $db_hostmacro['type']) {
+						if ($db_hostmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
+							$hostmacro += ['value' => ''];
+						}
+
+						if ($hostmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
+							$hostmacro += ['value' => $db_hostmacro['value']];
+						}
+					}
+
+					// Populating new host macro objects for correct inheritance.
+					if ($this instanceof CHostPrototype) {
+						$hostmacro += array_intersect_key($db_hostmacro, array_flip(['value', 'description']));
+					}
+
+					$macros[$hostmacro['hostmacroid']] = $hostmacro['macro'];
+				}
+
+				if (array_key_exists('value', $hostmacro) && $hostmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
+					if (!CApiInputValidator::validate(['type' => API_VAULT_SECRET], $hostmacro['value'],
+							$path.'/'.($i2 + 1).'/value', $error)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					}
+				}
+			}
+			unset($hostmacro);
+
+			// Checking for cross renaming of existing macros.
+			foreach ($macros as $hostmacroid => $macro) {
+				if (array_key_exists($macro, $db_macros) && bccomp($hostmacroid, $db_macros[$macro]) != 0
+						&& array_key_exists($db_macros[$macro], $macros)) {
+					$hosts = DB::select('hosts', [
+						'output' => ['name'],
+						'hostids' => $host[$id_field_name]
+					]);
+
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Macro "%1$s" already exists on "%2$s".', $macro, $hosts[0]['name'])
+					);
+				}
+			}
+
+			$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['macro']], 'fields' => [
+				'macro' =>	['type' => API_USER_MACRO]
+			]];
+
+			if (!CApiInputValidator::validateUniqueness($api_input_rules, $host['macros'], $path, $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+		unset($host);
+
+		return $hosts;
+	}
+
+	/**
+	 * Updates user macros for hosts, templates and host prototypes.
+	 *
+	 * @param array  $hosts
+	 * @param array  $hosts[]['templateid|hostid']
+	 * @param array  $hosts[]['macros']             (optional)
+	 * @param array  $db_hosts
+	 * @param array  $db_hosts[<hostid>]['macros']  An array of host macros indexed by hostmacroid.
+	 */
+	protected function updateHostMacros(array $hosts, array $db_hosts): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$ins_hostmacros = [];
+		$upd_hostmacros = [];
+		$del_hostmacroids = [];
+
+		foreach ($hosts as $host) {
+			if (!array_key_exists('macros', $host)) {
+				continue;
+			}
+
+			$db_host = $db_hosts[$host[$id_field_name]];
+
+			foreach ($host['macros'] as $hostmacro) {
+				if (array_key_exists('hostmacroid', $hostmacro)) {
+					$db_hostmacro = $db_host['macros'][$hostmacro['hostmacroid']];
+					unset($db_host['macros'][$hostmacro['hostmacroid']]);
+
+					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $hostmacro, $db_hostmacro);
+
+					if ($upd_hostmacro) {
+						$upd_hostmacros[] = [
+							'values' => $upd_hostmacro,
+							'where' => ['hostmacroid' => $hostmacro['hostmacroid']]
+						];
+					}
+				}
+				else {
+					$ins_hostmacros[] = $hostmacro + ['hostid' => $host[$id_field_name]];
+				}
+			}
+
+			$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_host['macros']));
+		}
+
+		if ($del_hostmacroids) {
+			DB::delete('hostmacro', ['hostmacroid' => $del_hostmacroids]);
+		}
+
+		if ($upd_hostmacros) {
+			DB::update('hostmacro', $upd_hostmacros);
+		}
+
+		if ($ins_hostmacros) {
+			DB::insert('hostmacro', $ins_hostmacros);
+		}
+	}
+
+	/**
+	 * Retrieves and adds additional requested data to the result set.
+	 *
+	 * @param array  $options
+	 * @param array  $result
+	 *
+	 * @return array
+	 */
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$hostids = array_keys($result);
+
+		// adding macros
+		if ($options['selectMacros'] !== null && $options['selectMacros'] !== API_OUTPUT_COUNT) {
+			$macros = API::UserMacro()->get([
+				'output' => $this->outputExtend($options['selectMacros'], ['hostid', 'hostmacroid']),
+				'hostids' => $hostids,
+				'preservekeys' => true,
+				'nopermissions' => true
+			]);
+
+			$relationMap = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
+			$macros = $this->unsetExtraFields($macros, ['hostid', 'hostmacroid'], $options['selectMacros']);
+			$result = $relationMap->mapMany($result, $macros, 'macros',
+				array_key_exists('limitSelects', $options) ? $options['limitSelects'] : null
+			);
+		}
+
+		return $result;
+	}
 }
