@@ -6145,7 +6145,8 @@ static char	*utf8_chr_next(char *str)
  *                                                                            *
  * Purpose: return pointer to the previous utf-8 character                    *
  *                                                                            *
- * Parameters: str  - [IN] the input string                                   *
+ * Parameters: str   - [IN] the input string                                  *
+ *             start - [IN] the start of the initial string                   *
  *                                                                            *
  * Return value: A pointer to the previous utf-8 character.                   *
  *                                                                            *
