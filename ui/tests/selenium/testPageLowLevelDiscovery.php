@@ -177,9 +177,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'names' => [
-						['Name' => 'Discovery rule 1'],
-						['Name' => 'Discovery rule 2'],
-						['Name' => 'Discovery rule 3']
+						'Discovery rule 1',
+						'Discovery rule 2',
+						'Discovery rule 3'
 					],
 					'message' => 'Request sent successfully',
 					'hostid' => self::HOST_ID
@@ -189,7 +189,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'names' => [
-						'Name' => 'Discovery rule 2'
+						'Discovery rule 2'
 					],
 					'message' => 'Request sent successfully',
 					'hostid' => self::HOST_ID
@@ -199,7 +199,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'names' => [
-						'Name' => 'Discovery rule 2'
+						'Discovery rule 2'
 					],
 					'disabled' => true,
 					'message' => 'Cannot send request',
@@ -211,7 +211,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'names' => [
-						'Name' => 'Discovery rule for triggers filtering'
+						'Discovery rule for triggers filtering'
 					],
 					'message' => 'Cannot send request',
 					'details' => 'Cannot send request: wrong discovery rule type.',
@@ -222,7 +222,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'names' => [
-						'Name' => 'Temp Status Discovery'
+						'Temp Status Discovery'
 					],
 					'template' => true,
 					'hostid' => 10250
@@ -241,12 +241,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].$context);
 		// Enabe all LLDs, so Check now can be send successfully.
 		$this->massChangeStatus('Enable');
-		$this->selectTableRows($data['names'], $this->selector);
+		$this->selectTableRows($data['names'], 'Name', $this->selector);
 
 		if (CTestArrayHelper::get($data, 'disabled')) {
 			$this->query('button:Disable')->one()->click();
 			$this->page->acceptAlert();
-			$this->selectTableRows($data['names'], $this->selector);
+			$this->selectTableRows($data['names'], 'Name', $this->selector);
 		}
 
 		if (CTestArrayHelper::get($data, 'template', false)) {
@@ -551,10 +551,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Hosts' => 'Host for host prototype tests',
 						'Keep lost resources period' => ''
 					],
-					'keys' =>[
-						['Key' => 'key1'],
-						['Key' => 'key2'],
-						['Key' => 'key3']
+					'keys' => [
+						'key1',
+						'key2',
+						'key3'
 					],
 					'message' => 'Discovery rules deleted',
 					'db_count' => 0
@@ -569,7 +569,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Key' => 'drule-ZBX6663-second'
 					],
 					'keys' => [
-						['Key' => 'drule-ZBX6663-second']
+						'drule-ZBX6663-second'
 					],
 					'message' => 'Cannot delete discovery rules',
 					'details' => 'Cannot delete templated items.',
@@ -588,14 +588,14 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
 		$form->submit();
-		$this->selectTableRows($data['keys'], $this->selector);
+		$this->selectTableRows($data['keys'], 'Key', $this->selector);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
 
 		foreach ($data['keys'] as $key) {
 			$count = CDBHelper::getCount('SELECT status FROM items WHERE key_='
-					.zbx_dbstr($key['Key']).' and hostid='.zbx_dbstr($data['hostid']));
+					.zbx_dbstr($key).' and hostid='.zbx_dbstr($data['hostid']));
 			$this->assertEquals($data['db_count'], $count);
 		}
 	}

@@ -636,7 +636,7 @@ zabbix_export:
           triggers:
             -
               uuid: 086e757b4a2048eabd5e91b4a0ccc07b
-              expression: '(last(/Memcached by Zabbix agent 2/memcached.version,#1)<>last(/Memcached by Zabbix agent 2/memcached.version,#2))=1 and length(last(/Memcached by Zabbix agent 2/memcached.version))>0'
+              expression: 'last(/Memcached by Zabbix agent 2/memcached.version,#1)<>last(/Memcached by Zabbix agent 2/memcached.version,#2) and length(last(/Memcached by Zabbix agent 2/memcached.version))>0'
               name: 'Memcached: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Memcached version has changed. Ack to close.'

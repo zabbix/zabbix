@@ -144,7 +144,10 @@ static void	rotate_log(const char *filename)
 {
 	zbx_stat_t		buf;
 	zbx_uint64_t		new_size;
-	static zbx_uint64_t	old_size = ZBX_MAX_UINT64; /* redirect stdout and stderr */
+	static zbx_uint64_t	old_size = ZBX_MAX_UINT64;	/* redirect stdout and stderr */
+#if !defined(_WINDOWS)
+	static zbx_uint64_t	st_ino, st_dev;
+#endif
 
 	if (0 != zbx_stat(filename, &buf))
 	{
@@ -215,6 +218,14 @@ static void	rotate_log(const char *filename)
 
 	if (old_size > new_size)
 		zbx_redirect_stdio(filename);
+#if !defined(_WINDOWS)
+	else if (st_ino != buf.st_ino || st_dev != buf.st_dev)
+	{
+		st_ino = buf.st_ino;
+		st_dev = buf.st_dev;
+		zbx_redirect_stdio(filename);
+	}
+#endif
 
 	old_size = new_size;
 }

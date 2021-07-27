@@ -173,83 +173,111 @@ var (
 			WithValidator(metric.LenValidator{Max: &maxPassLen})
 	paramDatabase = metric.NewConnParam("Database", "Database name to be used for connection.").
 			WithDefault("postgres").WithValidator(metric.LenValidator{Min: &minDBNameLen, Max: &maxDBNameLen})
+	paramTLSConnect  = metric.NewConnParam("TLSConnect", "DB connection encryption type.").WithDefault("").SessionOnly()
+	paramTLSCaFile   = metric.NewConnParam("TLSCAFile", "TLS ca file path.").WithDefault("").SessionOnly()
+	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("").SessionOnly()
+	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("").SessionOnly()
 )
 
 var metrics = metric.MetricSet{
 	keyArchiveSize: metric.New("Returns info about size of archive files.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyAutovacuum: metric.New("Returns count of autovacuum workers.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyBgwriter: metric.New("Returns JSON for sum of each type of bgwriter statistic.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyCache: metric.New("Returns cache hit percent.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyConnections: metric.New("Returns JSON for sum of each type of connection.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyCustomQuery: metric.New("Returns result of a custom query.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase,
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
 			metric.NewParam("QueryName", "Name of a custom query "+
 				"(must be equal to a name of an SQL file without an extension).").SetRequired(),
 		}, true),
 
 	keyDBStat: metric.New("Returns JSON for sum of each type of statistic.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyDBStatSum: metric.New("Returns JSON for sum of each type of statistic for all database.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyDatabaseAge: metric.New("Returns age for specific database.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyDatabasesBloating: metric.New("Returns percent of bloating tables for each database.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyDatabasesDiscovery: metric.New("Returns JSON discovery rule with names of databases.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyDatabaseSize: metric.New("Returns size in bytes for specific database.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyLocks: metric.New("Returns collect all metrics from pg_locks.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyOldestXid: metric.New("Returns age of oldest xid.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyPing: metric.New("Tests if connection is alive or not.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationCount: metric.New("Returns number of standby servers.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationLagB: metric.New("Returns replication lag with Master in byte.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationLagSec: metric.New("Returns replication lag with Master in seconds.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationProcessNameDiscovery: metric.New("Returns JSON with application name from pg_stat_replication.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationProcessInfo: metric.New("Returns flush lag, write lag and replay lag per each sender process.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationRecoveryRole: metric.New("Returns postgreSQL recovery role.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationStatus: metric.New("Returns postgreSQL replication status.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyUptime: metric.New("Returns uptime.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyWal: metric.New("Returns JSON wal by type.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
+			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 }
 
 func init() {

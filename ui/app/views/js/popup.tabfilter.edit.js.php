@@ -42,6 +42,8 @@ function tabFilterDelete(overlay) {
 	overlay.setLoading();
 	overlay.xhr = $.post(url.getUrl(), null, 'json')
 		.done((response) => {
+			const properties = {detail: {idx2: form_data['idx2']}, bubbles: true};
+
 			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 			if ('errors' in response) {
@@ -49,7 +51,7 @@ function tabFilterDelete(overlay) {
 			}
 			else {
 				overlayDialogueDestroy(overlay.dialogueid);
-				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_DELETE, {bubbles: true}));
+				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_DELETE, properties));
 			}
 		})
 		.always(() => {
@@ -67,6 +69,8 @@ function tabFilterUpdate(overlay) {
 	overlay.setLoading();
 	overlay.xhr = $.post(url.getUrl(), form_data, 'json')
 		.done((response) => {
+			const properties = {detail: response, bubbles: true};
+
 			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 			if ('errors' in response) {
@@ -74,7 +78,6 @@ function tabFilterUpdate(overlay) {
 			}
 			else {
 				overlayDialogueDestroy(overlay.dialogueid);
-				const properties = {detail: response, bubbles: true};
 				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_UPDATE, properties));
 			}
 		})

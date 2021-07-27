@@ -1032,7 +1032,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0856e13b7e7644c5b353fcfa577acb51
-              expression: '(last(/MongoDB node by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.version,#2))=1 and length(last(/MongoDB node by Zabbix Agent 2/mongodb.version))>0'
+              expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.version,#2) and length(last(/MongoDB node by Zabbix Agent 2/mongodb.version))>0'
               name: 'MongoDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB version has changed. Ack to close.'
@@ -2490,7 +2490,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f9f29647a3db426c9c303fc47cfc48eb
-                  expression: '(last(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}],#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}],#2))=1'
+                  expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}],#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}],#2)'
                   recovery_mode: NONE
                   name: 'MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})'
                   priority: WARNING

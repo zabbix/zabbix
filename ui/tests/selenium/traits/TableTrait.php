@@ -97,10 +97,11 @@ trait TableTrait {
 	/**
 	 * Select table rows.
 	 *
-	 * @param mixed $data		rows to be selected
-	 * @param string $selector	table selector
+	 * @param mixed $data			rows to be selected
+	 * @param string $column		column name
+	 * @param string $selector		table selector
 	 */
-	public function selectTableRows($data = [], $selector = 'class:list-table') {
+	public function selectTableRows( $data = [], $column = 'Name', $selector = 'class:list-table') {
 		$table = $this->query($selector)->asTable()->one();
 
 		if (!$data) {
@@ -110,7 +111,7 @@ trait TableTrait {
 			return;
 		}
 
-		$table->findRows($data)->select();
+		$table->findRows($column, $data)->select();
 	}
 
 	/**

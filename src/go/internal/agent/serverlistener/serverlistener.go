@@ -105,7 +105,7 @@ func (sl *ServerListener) Start() (err error) {
 	if sl.allowedPeers, err = zbxnet.GetAllowedPeers(sl.options.Server); err != nil {
 		return
 	}
-	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf("%s:%d", sl.bindIP, sl.options.ListenPort), sl.tlsConfig); err != nil {
+	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf("[%s]:%d", sl.bindIP, sl.options.ListenPort), sl.tlsConfig); err != nil {
 		return
 	}
 	monitor.Register(monitor.Input)
@@ -121,7 +121,7 @@ func (sl *ServerListener) Stop() {
 
 // ParseListenIP validate ListenIP value
 func ParseListenIP(options *agent.AgentOptions) (ips []string, err error) {
-	if 0 == len(options.ListenIP) {
+	if 0 == len(options.ListenIP) || options.ListenIP == "0.0.0.0" {
 		return []string{"0.0.0.0"}, nil
 	}
 	lips := getListLocalIP()

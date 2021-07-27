@@ -332,7 +332,7 @@ zabbix_export:
           triggers:
             -
               uuid: a91ff018fe4f4a1495b08adeb2b0005f
-              expression: '(last(/Template App Nginx Plus by HTTP/nginx.info.version,#1)<>last(/Template App Nginx Plus by HTTP/nginx.info.version,#2))=1 and length(last(/Template App Nginx Plus by HTTP/nginx.info.version))>0'
+              expression: 'last(/Template App Nginx Plus by HTTP/nginx.info.version,#1)<>last(/Template App Nginx Plus by HTTP/nginx.info.version,#2) and length(last(/Template App Nginx Plus by HTTP/nginx.info.version))>0'
               name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Nginx version has changed. Ack to close.'

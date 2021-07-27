@@ -18,9 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormTags.php';
+require_once dirname(__FILE__).'/../common/testFormTags.php';
 
 /**
+ * @dataSource EntitiesTags
  * @backup hosts
  */
 class testFormTagsHost extends testFormTags {
@@ -29,7 +30,6 @@ class testFormTagsHost extends testFormTags {
 	public $clone_name = 'Host with tags for cloning';
 	public $link = 'hosts.php';
 	public $saved_link = 'hosts.php?form=update&hostid=';
-	public $new_name = 'Cloned Host';
 
 	/**
 	 * Test creating of Host with tags.

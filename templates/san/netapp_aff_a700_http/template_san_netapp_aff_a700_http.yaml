@@ -188,7 +188,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+          description: 'The number of I/O operations observed at the storage object. Performance metric for write I/O operations.'
           preprocessing:
             -
               type: JSONPATH
@@ -272,7 +272,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '!iops'
-          description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+          description: 'The number of I/O operations observed at the storage object. Performance metric for write I/O operations.'
           preprocessing:
             -
               type: JSONPATH
@@ -347,7 +347,7 @@ zabbix_export:
             (last(//netapp.cluster.statistics.latency_raw.write) - last(//netapp.cluster.statistics.latency_raw.write,#2)) /
             ( last(//netapp.cluster.statistics.iops_raw.write) - last(//netapp.cluster.statistics.iops_raw.write,#2) +
             (last(//netapp.cluster.statistics.iops_raw.write) - last(//netapp.cluster.statistics.iops_raw.write,#2) = 0) ) * 0.001
-          description: 'The average latency per I/O operation in milliseconds observed at the storage object. Peformance metric for write I/O operations.'
+          description: 'The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.'
           tags:
             -
               tag: Application
@@ -420,7 +420,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '!mcs'
-          description: 'The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Peformance metric for write I/O operations.'
+          description: 'The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric for write I/O operations.'
           preprocessing:
             -
               type: JSONPATH
@@ -516,7 +516,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Throughput bytes observed at the storage object. Peformance metric for write I/O operations.'
+          description: 'Throughput bytes observed at the storage object. Performance metric for write I/O operations.'
           preprocessing:
             -
               type: JSONPATH
@@ -592,7 +592,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4a2936f068ed486f8c8a2cf2cfa7440b
-              expression: '(last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#1)<>last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#2))=1 and length(last(/NetApp AFF A700 by HTTP/netapp.cluster.version))>0'
+              expression: 'last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#1)<>last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#2) and length(last(/NetApp AFF A700 by HTTP/netapp.cluster.version))>0'
               name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: '__RESOURCE__ version has changed. Ack to close.'
@@ -682,7 +682,7 @@ zabbix_export:
               value: 'Zabbix raw items'
         -
           uuid: c677a3caf7a04710bc67b165b4152808
-          name: 'Get ehternet ports'
+          name: 'Get ethernet ports'
           type: HTTP_AGENT
           key: netapp.ports.eth.get
           history: '0'
@@ -787,9 +787,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 381eb797545d452a84d3dba43865bbed
-                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="error")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2) and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="error")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="ok")'
+                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2) and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="ok")'
                   name: '{#ID}: Chassis has something errors'
                   priority: AVERAGE
                   description: 'Something is wrong with the chassis.'
@@ -846,9 +846,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 72c1925f51c149eca27c7ddd1c81e44f
-                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])<>"present")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])<>"present")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])="present")'
+                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])="present")'
                   name: '{#DISKNAME}: Disk of the Node "{#NODENAME}" has state different from "present"'
                   priority: AVERAGE
                   description: 'Something is wrong with the disk.'
@@ -902,9 +902,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a17cb2ea98b6415d9e22e7f591d80adb
-                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="error")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2) and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="error")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="ok")'
+                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2) and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="ok")'
                   name: '{#FRUID}: FRU of the chassis "{#ID}" state is error'
                   priority: AVERAGE
                   description: 'Something is wrong with the FRU.'
@@ -1013,9 +1013,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7a4e0a681edd4db6b701b131fea0e5e4
-                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])<>"online")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])="online")'
+                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])="online")'
                   name: '{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal container state'
                   priority: AVERAGE
                   description: 'LUNs are only available when their containers are available.'
@@ -1048,9 +1048,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5b065dd69e654bee881ae60464a5c9fe
-                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])<>"online")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])="online")'
+                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])="online")'
                   name: '{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal state'
                   priority: AVERAGE
                   description: 'Normal states for a LUN are online and offline. Other states indicate errors.'
@@ -1107,7 +1107,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 34092a7ade784221ae50eb74a6fbcb5d
-                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#2))=1 and length(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}]))>0'
+                  expression: 'last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#2) and length(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}]))>0'
                   name: '{#NODENAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: '{#NODENAME} version has changed. Ack to close.'
@@ -1325,9 +1325,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0fa3a54b559349d58b616720ee33cdf5
-                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="up")'
+                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="up")'
                   name: '{#ETHPORTNAME}: Ethernet port of the Node "{#NODENAME}" is down'
                   priority: AVERAGE
                   description: 'Something is wrong with the ethernet port.'
@@ -1417,9 +1417,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a985c047b9834081bf21ae50836cef46
-                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])<>"online")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])="online")'
+                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])="online")'
                   name: '{#FCPORTNAME}: FC port of the Node "{#NODENAME}" has state different from "online"'
                   priority: AVERAGE
                   description: 'Something is wrong with the FC port.'
@@ -1501,9 +1501,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7c5695fd13a4489ca1c9772f1d3376a7
-                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])<>"running")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])<>"running")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])="running")'
+                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])="running")'
                   name: '{#SVMNAME}: SVM state is abnormal'
                   priority: AVERAGE
                   description: 'Something is wrong with the SVM.'
@@ -1657,9 +1657,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b00f339ed1a9450ba096cabababcf76e
-                  expression: '((last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])<>"online")'
+                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])<>"online")'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '((last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2))=1 and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])="online")'
+                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])="online")'
                   name: '{#VOLUMENAME}: Volume state is abnormal'
                   priority: AVERAGE
                   description: 'A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.'
@@ -1748,7 +1748,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!iops'
-              description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+              description: 'The number of I/O operations observed at the storage object. Performance metric for write I/O operations.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1832,7 +1832,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!iops'
-              description: 'The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.'
+              description: 'The number of I/O operations observed at the storage object. Performance metric for write I/O operations.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1980,7 +1980,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!mcs'
-              description: 'The raw latency in microseconds observed at the storage object. Peformance metric for write I/O operations.'
+              description: 'The raw latency in microseconds observed at the storage object. Performance metric for write I/O operations.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2076,7 +2076,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'Throughput bytes observed at the storage object. Peformance metric for write I/O operations.'
+              description: 'Throughput bytes observed at the storage object. Performance metric for write I/O operations.'
               preprocessing:
                 -
                   type: JSONPATH

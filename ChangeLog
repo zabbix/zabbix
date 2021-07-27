@@ -1,3 +1,60 @@
+Changes for 5.4.4rc1
+
+New features:
+
+Bug fixes:
+A......... [ZBX-19597] fixed error when value maps API allow to create invalid value mapping of type regexp (gcalenko)
+........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
+..F....... [ZBX-19218] fixed missed untranslated string in jsLoader (rlataria)
+A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
+A......... [ZBX-19491] fixed copying of host prototype tags when performing host full clone (miks)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.3
+
+5.4.3rc2 was released as 5.4.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.3rc2
+
+Bug fixes:
+.......P.. [ZBX-19500] fixed crash in sync_proxy_history (dgoloscapov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.3rc1
+
+New features:
+.........T [ZBXNEXT-5925] added template "Systemd by Zabbix agent 2" (ychukina)
+.........T [ZBXNEXT-6660] added template for f5 BIG-IP (abakaldin)
+.........T [ZBXNEXT-6729] added template "GridGain by JMX" (ychukina)
+
+Bug fixes:
+....I..... [ZBX-19498] fixed 'subject' being too long when {TRIGGER.NAME} is converted to {EVENT.RECOVERY.NAME} (dgoloscapov, wiper)
+........S. [ZBX-19481] fixed alerting problem while being in maintenance (dgoloscapov)
+A......... [ZBX-19536] fixed host.get with selectTags = ['tag'] call attempting to retrieve tag value(s) as well (jfreibergs)
+..F.....S. [ZBX-19081] fixed "plain text" widget height calculation when importing screen (miks)
+.......PS. [ZBX-19624] fixed incorrect vmware hv ip detection (MVekslers)
+...G...... [ZBX-19476] fixed support of short form ipv6 in ListenIP field for Zabbix agent 2 (MVekslers)
+..F....... [ZBX-19490] fixed sorting of inherited web scenario tags (Ivo)
+..F....... [ZBX-18640] fixed filter deletion when time selector tab is open on monitoring problem page (gcalenko)
+.........T [ZBX-19592] revamped trigger illogical expressions (afayantsev)
+.......PS. [ZBX-19428] fixed high CPU usage and preprocessing workers exiting with timeout when starting numerous poller, trapper and discoverer processes (vso)
+.........T [ZBX-19622] moved cisco templates one level higher (afayantsev)
+.......P.. [ZBX-19500] added avoiding of configuration cache update during ongoing transaction on proxy (dgoloscapov)
+.........T [ZBX-19588] fixed typo in metric name in Template SAN NetApp FAS3220 SNMP (abiba)
+........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
+.........T [ZBX-19230] fixed typo in Windows template (abakaldin)
+...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)
+..F....... [ZBX-19497] fixed incorrect message for value mapping of types "regex" and "range" in value map edit modal (gcalenko, vmaksimovs)
+.........T [ZBX-19586] fixed calculated item expression in "Template PHP-FPM by Zabbix agent" and "Template PHP-FPM by HTTP" (ychukina)
+.........T [ZBX-19545] fixed discovery of MPM event in Template Apache (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.2
+
+5.4.2rc2 was released as 5.4.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.4.2rc2
 
 Bug fixes:
@@ -341,6 +398,11 @@ A.F....... [ZBXNEXT-6324] moved Configuration -> Discovery to MVC (talbergs)
 A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (vmaksimovs)
 .........T [ZBXNEXT-6236] added template "Apache Kafka by JMX" (ychukina)
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.7
+
+5.2.7rc1 was released as 5.2.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.2.7rc1
@@ -872,6 +934,48 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.15rc1
+
+New features:
+
+Bug fixes:
+A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
+........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.14
+
+5.0.14rc1 was released as 5.0.14 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.14rc1
+
+New features:
+.........T [ZBXNEXT-5925] added template "Systemd by Zabbix agent 2" (ychukina)
+.........T [ZBXNEXT-6660] added template for f5 BIG-IP (abakaldin)
+.........T [ZBXNEXT-6729] added template "GridGain by JMX" (ychukina)
+
+Bug fixes:
+....I..... [ZBX-19498] fixed 'subject' being too long when {TRIGGER.NAME} is converted to {EVENT.RECOVERY.NAME} (dgoloscapov, wiper)
+A......... [ZBX-19536] fixed host.get with selectTags = ['tag'] call attempting to retrieve tag value(s) as well (jfreibergs)
+...G...... [ZBX-19476] fixed support of short form ipv6 in ListenIP field for Zabbix agent 2 (MVekslers)
+........S. [ZBX-19481] fixed alerting problem while being in maintenance (dgoloscapov)
+.........T [ZBX-19562] fixed descriptions of some keys in "Server HP iLO SNMP", removed the "Oracle by ODBC" and "Asterisk by HTTP" templates (abakaldin)
+.......PS. [ZBX-19428] fixed high CPU usage and preprocessing workers exiting with timeout when starting numerous poller, trapper and discoverer processes (vso)
+.........T [ZBX-19622] moved cisco templates one level higher (afayantsev)
+.........T [ZBX-19588] fixed typo in metric name in Template SAN NetApp FAS3220 SNMP (abiba)
+.........T [ZBX-19230] fixed typo in Windows template (abakaldin)
+...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)
+........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
+.........T [ZBX-19586] fixed calculated item expression in "Template PHP-FPM by Zabbix agent" and "Template PHP-FPM by HTTP" (ychukina)
+.........T [ZBX-19545] fixed discovery of MPM event in Template Apache (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.13
+
+5.0.13rc1 was released as 5.0.13 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.13rc1
@@ -2995,6 +3099,21 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.33rc1
+
+New features:
+
+Bug fixes:
+A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
+........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
+...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.32
+
+4.0.32rc2 was released as 4.0.32 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.32rc2
