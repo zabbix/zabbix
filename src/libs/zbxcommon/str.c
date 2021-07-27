@@ -6192,7 +6192,7 @@ static int	strchr_utf8(const char *seq, const char *c)
 
 	while ('\0' != *seq)
 	{
-		len = utf8_chr_next(seq) - seq;
+		len = (size_t)(utf8_chr_next(seq) - seq);
 
 		if (len == c_len && 0 == memcmp(seq, c, len))
 			return SUCCEED;
