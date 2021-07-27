@@ -173,7 +173,7 @@ class CControllerLatestView extends CControllerLatest {
 				'limit' => 1
 			]);
 
-			if (count($writable_templates) > 0) {
+			if ($writable_templates !== false) {
 				$items_readonly = false;
 			}
 			else {
@@ -182,7 +182,7 @@ class CControllerLatestView extends CControllerLatest {
 					'limit' => 1
 				]);
 
-				if (count($writable_hosts) > 0) {
+				if ($writable_hosts !== false) {
 					$items_readonly = false;
 				}
 			}
@@ -195,7 +195,7 @@ class CControllerLatestView extends CControllerLatest {
 					'editable' => true
 				]);
 
-				$host['disabled'] = count($host_writable) ? false : true;
+				$host['disabled'] = ($host_writable !== false) ? false : true;
 
 				$create_item_dropdown['hosts'][] = $host;
 
