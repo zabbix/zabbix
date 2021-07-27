@@ -607,7 +607,7 @@ class CTemplate extends CHostGeneral {
 
 			// if visible name is not given or empty it should be set to host name
 			if (array_key_exists('host', $template) && (!array_key_exists('name', $template)
-						|| !trim($template['name']))) {
+						|| trim($template['name']) === '')) {
 				$template['name'] = $template['host'];
 			}
 		}
