@@ -2749,17 +2749,17 @@ return [
 				'length' => 1024,
 				'default' => ''
 			],
-			'auditlog_enabled' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1'
-			],
 			'hk_events_service' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
 				'default' => '1d'
+			],
+			'auditlog_enabled' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
 			]
 		]
 	],
