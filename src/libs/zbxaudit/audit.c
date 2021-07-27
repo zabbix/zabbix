@@ -248,7 +248,7 @@ void	zbx_audit_flush(void)
 				0 != strcmp((*audit_entry)->details_json.buffer, "[{}]"))
 		{
 #define AUDIT_USERID	0
-#define AUDIT_USERNAME	""
+#define AUDIT_USERNAME	"System"
 #define AUDIT_IP	""
 			zbx_db_insert_add_values(&db_insert_audit, audit_cuid, AUDIT_USERID, AUDIT_USERNAME,
 					(int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP, (*audit_entry)->id,
