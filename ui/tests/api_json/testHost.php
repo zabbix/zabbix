@@ -241,7 +241,7 @@ class testHost extends CAPITest {
 					'tls_connect' => '1',
 					'name' => 'Host OS - Windows'
 				]
-			],
+			]
 		];
 	}
 
