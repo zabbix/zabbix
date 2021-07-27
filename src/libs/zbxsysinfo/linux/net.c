@@ -51,8 +51,8 @@ typedef struct
 	struct addrinfo	*ai_remote;
 	unsigned short	rport;
 	unsigned char	state;
-	int		prefix_sz_l;
-	int		prefix_sz_r;
+	unsigned int	prefix_sz_l;
+	unsigned int	prefix_sz_r;
 }
 net_count_info_t;
 
@@ -954,52 +954,92 @@ static int	get_proc_net_count_ipv4(const char *filename, net_count_info_t *resul
 	return SUCCEED;
 }
 
-static int	get_addr_info(const char *addr_src, char *service, struct addrinfo *hints, struct addrinfo **ai,
-		unsigned short *port, int *prefix_sz, char **error)
+static int	get_addr_info(const char *addr_in, const char *port_in, struct addrinfo *hints, struct addrinfo **ai,
+		unsigned short *port, unsigned int *prefix_sz, char **error)
 {
-	char	*cidr_sep, *addr;
-	int	ret = FAIL;
+	char		*cidr_sep, *addr;
+	const char	*service = NULL;
+	int		ret = FAIL, res, prefix_sz_local;
 
-	*prefix_sz = -1;
-	addr = zbx_strdup(NULL, addr_src);
-
-	if (NULL != (cidr_sep = strchr(addr, '/')))
+	if (NULL != addr_in && '\0' != *addr_in)
 	{
-		*cidr_sep = '\0';
+		prefix_sz_local = -1;
+		addr = zbx_strdup(NULL, addr_in);
 
-		if (FAIL == validate_cidr(addr, cidr_sep + 1, prefix_sz))
+		if (NULL != (cidr_sep = strchr(addr, '/')))
 		{
-			*error = zbx_dsprintf(*error, "Cannot validate CIDR \"%s/%s\"", addr, cidr_sep + 1);
+			*cidr_sep = '\0';
+
+			if (FAIL == validate_cidr(addr, cidr_sep + 1, &prefix_sz_local))
+			{
+				*error = zbx_dsprintf(*error, "Cannot validate CIDR \"%s/%s\"", addr, cidr_sep + 1);
+				goto err;
+			}
+		}
+		else if (FAIL == is_supported_ip(addr))
+		{
+			*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", addr_in);
 			goto err;
 		}
 	}
-	else if (FAIL == is_supported_ip(addr))
+	else
+		addr = NULL;
+
+	if (NULL != port_in && '\0' != *port_in)
 	{
-		*error = zbx_dsprintf(*error, "IP is not supported \"%s\"", addr);
-		goto err;
+		if (SUCCEED == is_ushort(port_in, port))
+		{
+			if (0 == *port)
+			{
+				*error = zbx_dsprintf(*error, "Invalid port number: 0");
+				goto err;
+			}
+		}
+		else
+			service = port_in;
 	}
 
-	if (0 != getaddrinfo(addr, service, hints, ai))
+	if (NULL == addr && NULL == service)
+		return SUCCEED;
+
+	if (EAI_SERVICE == (res = getaddrinfo(addr, service, hints, ai)))
+	{
+		*error = zbx_dsprintf(*error, "The service \"%s\" is not available for the requested socket type.",
+				port_in);
 		goto err;
+	}
+	else if (0 != res)
+	{
+		*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", addr_in);
+		goto err;
+	}
 
 #ifdef HAVE_IPV6
 	if ((*ai)->ai_family == AF_INET6)
 	{
-		if (-1 == *prefix_sz)
-			*prefix_sz = IPV6_MAX_CIDR_PREFIX;
+		if (NULL != addr && -1 == prefix_sz_local)
+			prefix_sz_local = IPV6_MAX_CIDR_PREFIX;
 
-		if (service != NULL)
-			*port = ntohs(((struct sockaddr_in6*) (*ai)->ai_addr)->sin6_port);
+		if (NULL != service)
+			*port = ntohs(((struct sockaddr_in6*)(*ai)->ai_addr)->sin6_port);
 	}
 	else
 #endif
 	{
-		if (-1 == *prefix_sz)
-			*prefix_sz = IPV4_MAX_CIDR_PREFIX;
+		if (NULL != addr && -1 == prefix_sz_local)
+			prefix_sz_local = IPV4_MAX_CIDR_PREFIX;
 
-		if (service != NULL)
-			*port = ntohs(((struct sockaddr_in*) (*ai)->ai_addr)->sin_port);
+		if (NULL != service)
+			*port = ntohs(((struct sockaddr_in*)(*ai)->ai_addr)->sin_port);
 	}
+
+	if (NULL == addr)
+	{
+		freeaddrinfo(*ai);
+		*ai = NULL;
+	}
+	else
+		*prefix_sz = (unsigned int)prefix_sz_local;
 
 	ret = SUCCEED;
 err:
@@ -1010,9 +1050,9 @@ err:
 
 static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			res, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	net_count_info_t	info;
-	char			*error = NULL, *laddr, *raddr, *lport, *rport, *state, *service;
+	char			*error = NULL, *laddr, *raddr, *lport, *rport, *state;
 	zbx_uint64_t		count = 0;
 	struct addrinfo		hints;
 
@@ -1046,84 +1086,16 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 	}
 
 	/* local address and port */
-
-	if (NULL != lport && '\0' != *lport && SUCCEED != is_ushort(lport, &info.lport))
-		service = lport;
-	else
-		service = NULL;
-
-	if (NULL != laddr && '\0' != *laddr)
+	if (SUCCEED != get_addr_info(laddr, lport, &hints, &info.ai_local, &info.lport, &info.prefix_sz_l, &error))
 	{
-		res = get_addr_info(laddr, service, &hints, &info.ai_local, &info.lport, &info.prefix_sz_l, &error);
-	}
-	else if (NULL != service)
-	{
-		res = get_addr_info("127.0.0.1", service, &hints, &info.ai_local, &info.lport, &info.prefix_sz_l,
-				&error);
-
-		if (NULL != info.ai_local)
-		{
-			freeaddrinfo(info.ai_local);
-			info.ai_local = NULL;
-		}
-	}
-	else
-		res = SUCCEED;
-
-	if (SUCCEED != res)
-	{
-		if (NULL != error)
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid first parameter: %s", error));
-		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-
-		goto err;
-	}
-
-	if (NULL != service && 0 == info.lport)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		SET_MSG_RESULT(result, error);
 		goto err;
 	}
 
 	/* remote address and port */
-
-	if (NULL != rport && '\0' != *rport && SUCCEED != is_ushort(rport, &info.rport))
-		service = rport;
-	else
-		service = NULL;
-
-	if (NULL != raddr && '\0' != *raddr)
+	if (SUCCEED != get_addr_info(raddr, rport, &hints, &info.ai_remote, &info.rport, &info.prefix_sz_r, &error))
 	{
-		res = get_addr_info(raddr, service, &hints, &info.ai_remote, &info.rport, &info.prefix_sz_r, &error);
-	}
-	else if (NULL != service)
-	{
-		res = get_addr_info("127.0.0.1", service, &hints, &info.ai_remote, &info.rport, &info.prefix_sz_r,
-				&error);
-
-		if (NULL != info.ai_remote)
-		{
-			freeaddrinfo(info.ai_remote);
-			info.ai_remote = NULL;
-		}
-	}
-	else
-		res = SUCCEED;
-
-	if (SUCCEED != res)
-	{
-		if (NULL != error)
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid third parameter: %s", error));
-		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-
-		goto err;
-	}
-
-	if (NULL != service && 0 == info.rport)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		SET_MSG_RESULT(result, error);
 		goto err;
 	}
 
@@ -1137,7 +1109,7 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 	if (SUCCEED != get_proc_net_count_ipv4(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp" : "/proc/net/udp",
 			&info, &count, &error))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		SET_MSG_RESULT(result, error);
 		goto err;
 	}
 
@@ -1145,7 +1117,7 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 	if (SUCCEED != get_proc_net_count_ipv6(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp6" : "/proc/net/udp6",
 			&info, &count, &error))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		SET_MSG_RESULT(result, error);
 		goto err;
 	}
 #endif
