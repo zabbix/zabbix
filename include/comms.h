@@ -151,9 +151,9 @@ ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name);
 int	zbx_validate_peer_list(const char *peer_list, char **error);
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list);
-int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2);
 int	validate_cidr(const char *ip, const char *cidr, void *value);
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);

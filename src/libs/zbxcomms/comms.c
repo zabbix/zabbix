@@ -2033,7 +2033,7 @@ out:
 	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes));
 }
 
-int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2)
+static int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2)
 {
 	unsigned char	netmask[16] = {0};
 	int		i, j, bytes;
@@ -2070,7 +2070,7 @@ int	subnet_match(int af, unsigned int prefix_size, const void *address1, const v
 }
 
 #ifndef HAVE_IPV6
-static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 {
 	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
 				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
@@ -2078,7 +2078,7 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 	return subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
 }
 #else
-static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 {
 	/* Network Byte Order is ensured */
 	/* IPv4-compatible, the first 96 bits are zeros */
