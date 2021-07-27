@@ -6150,12 +6150,14 @@ static char	*utf8_chr_next(char *str)
  * Return value: A pointer to the previous utf-8 character.                   *
  *                                                                            *
  ******************************************************************************/
-static char	*utf8_chr_prev(char *str)
+static char	*utf8_chr_prev(char *str, const char *start)
 {
-	--str;
-
-	while (0x80 == (0xc0 & (unsigned char)*str))
-		str--;
+	do
+	{
+		if (--str < start)
+			return NULL;
+	}
+	while (0x80 == (0xc0 & (unsigned char)*str));
 
 	return str;
 }
@@ -6247,7 +6249,7 @@ void	zbx_rtrim_utf8(char *str, const char *charlist)
 {
 	char	*prev, *last;
 
-	for (last = str + strlen(str), prev = last; ; prev = utf8_chr_prev(prev))
+	for (last = str + strlen(str), prev = last; NULL != prev; prev = utf8_chr_prev(prev, str))
 	{
 		if (SUCCEED != strchr_utf8(charlist, prev))
 			break;
