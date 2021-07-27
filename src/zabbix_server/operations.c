@@ -577,7 +577,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid",
 							"host", "name", "tls_connect", "tls_accept",
 							"tls_psk_identity", "tls_psk", NULL);
-					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, *hostname, *hostname,
+					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, hostname, hostname,
 						tls_accepted, tls_accepted, psk_identity, psk);
 
 					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
@@ -594,7 +594,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
 					zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
 							hostname);
-					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, *hostname,
+					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, hostname,
 							hostname);
 				}
 
