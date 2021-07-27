@@ -5425,6 +5425,27 @@ svg {
 	}
 }
 
+.icon-help-hint {
+	display: inline-block;
+	height: 14px;
+	width: 14px;
+	margin: 0 0 0 5px;
+	border-radius: 50%;
+	background-color: $ui-bg-selected-color;
+	position: relative;
+	line-height: 1.4;
+
+	&::after {
+		content: '?';
+		position: relative;
+		top: -2px;
+		left: -4px;
+		font-size: 10px;
+		font-weight: bold;
+		color: $btn-font-color;
+	}
+}
+
 #expressions_list .ui-sortable-helper {
 	display: table;
 }
@@ -6292,5 +6313,17 @@ z-select,
 		margin-left: 5px;
 		overflow: auto;
 		border: 1px dashed $form-border-color;
+	}
+}
+
+.list-dashed {
+	li {
+		margin-left: 1em;
+
+		&::before {
+			content: '\2013';
+			float: left;
+			margin-left: -1em;
+		}
 	}
 }

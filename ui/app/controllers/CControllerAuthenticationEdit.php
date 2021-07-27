@@ -64,7 +64,9 @@ class CControllerAuthenticationEdit extends CController {
 			'saml_sign_logout_responses' =>	'in 0,1',
 			'saml_encrypt_nameid' =>		'in 0,1',
 			'saml_encrypt_assertions' =>	'in 0,1',
-			'saml_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
+			'saml_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'passwd_min_length' =>			'int32',
+			'passwd_check_rules' =>			'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
 		];
 
 		$ret = $this->validateInput($fields);
@@ -128,7 +130,9 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES,
 			CAuthenticationHelper::SAML_ENCRYPT_NAMEID,
 			CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS,
-			CAuthenticationHelper::SAML_CASE_SENSITIVE
+			CAuthenticationHelper::SAML_CASE_SENSITIVE,
+			CAuthenticationHelper::PASSWD_MIN_LENGTH,
+			CAuthenticationHelper::PASSWD_CHECK_RULES
 		];
 		$auth = [];
 		foreach ($auth_params as $param) {
@@ -170,7 +174,9 @@ class CControllerAuthenticationEdit extends CController {
 				'saml_sign_logout_responses',
 				'saml_encrypt_nameid',
 				'saml_encrypt_assertions',
-				'saml_case_sensitive'
+				'saml_case_sensitive',
+				'passwd_min_length',
+				'passwd_check_rules'
 			]);
 
 			$data += $auth;
