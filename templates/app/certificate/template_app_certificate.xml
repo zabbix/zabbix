@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-16T11:54:18Z</date>
+   <date>2021-07-27T13:14:24Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -16,7 +16,7 @@ Zabbix agent 2 with the WebCertificate plugin requests certificate using the web
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -85,7 +85,7 @@ Template tooling version used: 0.38</description>
                      <expression>{diff()}=1</expression>
                      <name>Cert: Fingerprint has changed (new version: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
-                     <description>Cert fingerprint has changed. If you did not update the certificate, it may be meant your certificate was hacked. Ack to close.</description>
+                     <description>Cert fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -311,7 +311,7 @@ Template tooling version used: 0.38</description>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
-               <description>The certificate validation result. Possible value: valid/invalid/valid-but-self-signed</description>
+               <description>The certificate validation result. Possible values: valid/invalid/valid-but-self-signed</description>
                <applications>
                   <application>
                      <name>General</name>
