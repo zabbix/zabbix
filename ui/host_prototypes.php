@@ -176,6 +176,10 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
 	}
 
+	$macros = array_map(function($macro) {
+		return array_diff_key($macro, array_flip(['hostmacroid']));
+	}, $macros);
+
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
@@ -286,17 +290,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'groupid' => $groupId
 			];
 		}
-
-		/*
-		 * Sanitize macros array. When we clone, we have old hostmacroid.
-		 * We need delete them before we push array to API.
-		*/
-		foreach ($newHostPrototype['macros'] as &$macro) {
-			if (array_key_exists('hostmacroid', $macro)) {
-				unset($macro['hostmacroid']);
-			}
-		}
-		unset($macro);
 
 		$result = API::HostPrototype()->create($newHostPrototype);
 

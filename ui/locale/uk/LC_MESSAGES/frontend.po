@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-02 19:53+0300\n"
+"POT-Creation-Date: 2021-07-23 19:53+0300\n"
 "PO-Revision-Date: 2016-02-09 16:27+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -269,7 +269,7 @@ msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, тільки читання"
 
-#: jsLoader.php:362
+#: jsLoader.php:363
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -1033,7 +1033,7 @@ msgstr "Вирівняти елементи карти"
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:385
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
 msgid "All"
 msgstr "Все"
 
@@ -1750,7 +1750,7 @@ msgstr "Неможливо видалити"
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
-#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:381
+#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
 msgid "Cancel"
 msgstr "Скасувати та повернутись"
 
@@ -1954,7 +1954,7 @@ msgstr ""
 msgid "Cannot clone graph prototypes."
 msgstr "Не вдалося клонувати прототипи графіків."
 
-#: include/classes/api/services/CDiscoveryRule.php:2567
+#: include/classes/api/services/CDiscoveryRule.php:2568
 msgid "Cannot clone host prototypes."
 msgstr "Не вдалося клонувати прототипи вузлів мережі."
 
@@ -2265,7 +2265,7 @@ msgstr "Не вдалося видалити шаблонний прототип
 msgid "Cannot delete templated graph."
 msgstr "Не вдалося видалити шаблонний графік."
 
-#: include/classes/api/services/CHostPrototype.php:1297
+#: include/classes/api/services/CHostPrototype.php:1302
 msgid "Cannot delete templated host prototype."
 msgstr "Не вдалося видалити шаблонний прототип вузла мережі."
 
@@ -3462,7 +3462,7 @@ msgstr "Клонувати"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
-#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:374
+#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
 msgid "Close"
 msgstr "Закрити"
 
@@ -4526,7 +4526,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172
+#: include/views/inventory.host.view.php:172 jsLoader.php:337
 msgid "Dashboards"
 msgstr "Панелі"
 
@@ -4696,7 +4696,7 @@ msgstr "День в тиждень"
 msgid "Days"
 msgstr "Днів"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:365
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
 msgid "Debug"
 msgstr "Дебаг"
 
@@ -4841,7 +4841,7 @@ msgstr "Затримується на"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
 #: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
-#: jsLoader.php:176 jsLoader.php:337
+#: jsLoader.php:176 jsLoader.php:338
 msgid "Delete"
 msgstr "Видалити"
 
@@ -4870,7 +4870,7 @@ msgstr "Видалити поточну дію?"
 msgid "Delete current correlation?"
 msgstr "Видалити потчну кореляцію?"
 
-#: jsLoader.php:338
+#: jsLoader.php:339
 msgid "Delete dashboard?"
 msgstr "Видалити панель?"
 
@@ -5121,7 +5121,7 @@ msgstr "Видалити веб сценарій?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Видалено: Вузел мережі \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1165
+#: include/classes/api/services/CHostPrototype.php:1170
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Видалено: Прототип вузлів мережі \"%1$s\" з \"%2$s\"."
@@ -5627,7 +5627,7 @@ msgstr "Показати стекований графік"
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1646 include/actions.inc.php:1717
 #: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:377
+#: jsLoader.php:378
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Відображено %1$s із %2$s знайдених"
@@ -5663,7 +5663,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:216 jsLoader.php:339
+#: jsLoader.php:216 jsLoader.php:340
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Ви дійсно хочете замінити умовний вираз?"
 
@@ -5865,7 +5865,7 @@ msgstr ""
 msgid "Edit tree element"
 msgstr "Редагувати елемент дерева"
 
-#: jsLoader.php:340
+#: jsLoader.php:341
 msgid "Edit trigger"
 msgstr "Редагувати тригер"
 
@@ -5965,7 +5965,7 @@ msgstr "Пустий тип умови фільтру для дії \"%1$s\"."
 #: include/classes/api/services/CHost.php:792
 #: include/classes/api/services/CHost.php:1369
 #: include/classes/api/services/CHost.php:1898
-#: include/classes/api/services/CHostPrototype.php:1093
+#: include/classes/api/services/CHostPrototype.php:1098
 #: include/classes/api/services/CImage.php:430
 #: include/classes/api/services/CImage.php:482
 #: include/classes/api/services/CMaintenance.php:542
@@ -7048,7 +7048,7 @@ msgstr "Глобальне значення"
 msgid "Go back to %1$s"
 msgstr "Повернутись до %1$s"
 
-#: jsLoader.php:345
+#: jsLoader.php:346
 msgid "Go to"
 msgstr "Перейти до"
 
@@ -7286,7 +7286,7 @@ msgstr "Графік з таким же іменем, але іншого тип
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:346
+#: include/views/inventory.host.view.php:217 jsLoader.php:347
 msgid "Graphs"
 msgstr "Графіки"
 
@@ -7347,7 +7347,7 @@ msgstr "Група для виявлених вузлів"
 msgid "Group name"
 msgstr "Назва групи"
 
-#: include/classes/api/services/CHostPrototype.php:1255
+#: include/classes/api/services/CHostPrototype.php:1260
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Прототип групи не може бути заснований на виявленій групі вузлів мережі \"%1$s\"."
@@ -7491,7 +7491,7 @@ msgstr "Шістнадцяткове в десяткове"
 msgid "Hidden"
 msgstr "Прихована"
 
-#: jsLoader.php:366
+#: jsLoader.php:367
 msgid "Hide debug"
 msgstr "Сховати діагностичну інф."
 
@@ -7543,7 +7543,7 @@ msgstr "Підсвічувати весь рядок"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:347
+#: jsLoader.php:348
 msgid "History"
 msgstr "Історія"
 
@@ -7631,7 +7631,7 @@ msgstr "Вирівнювання по горизонталі"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:255 jsLoader.php:348 report2.php:506
+#: jsLoader.php:255 jsLoader.php:349 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Вузел мережі"
@@ -7849,12 +7849,12 @@ msgstr "Мережі вузла мережі"
 msgid "Host prototype"
 msgstr "Прототип вузла мережі"
 
-#: include/classes/api/services/CHostPrototype.php:970
+#: include/classes/api/services/CHostPrototype.php:975
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Прототип вузлів мережі \"%1$s\" вже існує в \"%2$s\", успадкований з іншого шаблону."
 
-#: include/classes/api/services/CHostPrototype.php:958
+#: include/classes/api/services/CHostPrototype.php:963
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Прототип вузлів мережі \"%1$s\" уже існую в \"%2$s\"."
@@ -7863,7 +7863,7 @@ msgstr "Прототип вузлів мережі \"%1$s\" уже існую в
 msgid "Host prototype added"
 msgstr "Прототип вузлів мережі додано"
 
-#: include/classes/api/services/CHostPrototype.php:1772
+#: include/classes/api/services/CHostPrototype.php:1777
 msgid "Host prototype cannot have more than one default interface of the same type."
 msgstr ""
 
@@ -9529,7 +9529,7 @@ msgid "Insert"
 msgstr "Вставити"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:341
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
 msgid "Insert expression"
 msgstr "Вставити вираз"
 
@@ -9771,15 +9771,15 @@ msgstr "Неправильні параметри методу."
 #: include/classes/api/services/CGraphGeneral.php:598
 #: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
-#: include/classes/api/services/CHostPrototype.php:1672
 #: include/classes/api/services/CHostPrototype.php:1677
-#: include/classes/api/services/CHostPrototype.php:1684
+#: include/classes/api/services/CHostPrototype.php:1682
 #: include/classes/api/services/CHostPrototype.php:1689
-#: include/classes/api/services/CHostPrototype.php:1700
+#: include/classes/api/services/CHostPrototype.php:1694
 #: include/classes/api/services/CHostPrototype.php:1705
-#: include/classes/api/services/CHostPrototype.php:1712
-#: include/classes/api/services/CHostPrototype.php:1718
-#: include/classes/api/services/CHostPrototype.php:1728
+#: include/classes/api/services/CHostPrototype.php:1710
+#: include/classes/api/services/CHostPrototype.php:1717
+#: include/classes/api/services/CHostPrototype.php:1723
+#: include/classes/api/services/CHostPrototype.php:1733
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CItemGeneral.php:603
 #: include/classes/api/services/CItemGeneral.php:616
@@ -10004,7 +10004,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:349
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
 msgid "Inventory"
 msgstr "Інвентаризація"
 
@@ -10056,7 +10056,7 @@ msgstr "Італійська (it_IT)"
 msgid "Item"
 msgstr "Елемент даних"
 
-#: include/classes/api/services/CHostPrototype.php:1199
+#: include/classes/api/services/CHostPrototype.php:1204
 #: include/classes/api/services/CItem.php:61
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -10198,7 +10198,7 @@ msgstr "Прототипи елементів даних оновлено"
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:371
+#: jsLoader.php:372
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10578,11 +10578,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Остання перевірка"
 
-#: jsLoader.php:352
+#: jsLoader.php:353
 msgid "Last hour graph"
 msgstr "Графік за останню годину"
 
-#: jsLoader.php:353
+#: jsLoader.php:354
 msgid "Last month graph"
 msgstr "Графік за останній місяць"
 
@@ -10612,7 +10612,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Останнє значення"
 
-#: jsLoader.php:354
+#: jsLoader.php:355
 msgid "Last week graph"
 msgstr "Графік за останній тиждень"
 
@@ -10625,11 +10625,11 @@ msgstr "Графік за останній тиждень"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:350
+#: include/views/inventory.host.view.php:149 jsLoader.php:351
 msgid "Latest data"
 msgstr "Останні дані"
 
-#: jsLoader.php:351
+#: jsLoader.php:352
 msgid "Latest values"
 msgstr "Останні значення"
 
@@ -12262,7 +12262,7 @@ msgid "No data."
 msgstr "Данні відсутні."
 
 #: include/classes/api/services/CHostInterface.php:1023
-#: include/classes/api/services/CHostPrototype.php:1765
+#: include/classes/api/services/CHostPrototype.php:1770
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Відсутній інтерфейс по замовчуванню \"%1$s\" типу у вузла мережі \"%2$s\"."
@@ -12343,7 +12343,7 @@ msgstr "Немає картинки"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:370
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
 msgid "No interface found"
 msgstr "Інтерфейсу не знайдено"
 
@@ -12486,9 +12486,9 @@ msgstr ""
 #: include/classes/api/services/CHostPrototype.php:549
 #: include/classes/api/services/CHostPrototype.php:595
 #: include/classes/api/services/CHostPrototype.php:616
-#: include/classes/api/services/CHostPrototype.php:1224
-#: include/classes/api/services/CHostPrototype.php:1246
-#: include/classes/api/services/CHostPrototype.php:1280
+#: include/classes/api/services/CHostPrototype.php:1229
+#: include/classes/api/services/CHostPrototype.php:1251
+#: include/classes/api/services/CHostPrototype.php:1285
 #: include/classes/api/services/CHousekeeping.php:169
 #: include/classes/api/services/CHttpTest.php:505
 #: include/classes/api/services/CHttpTest.php:597
@@ -13013,7 +13013,7 @@ msgstr "Вимкн"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:382
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
 #: report2.php:506
 msgid "Ok"
 msgstr "Ок"
@@ -14215,7 +14215,7 @@ msgstr "Проблема, якщо хоча б у одного із підлег
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:355 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
 msgid "Problems"
 msgstr "Проблеми"
 
@@ -15587,7 +15587,7 @@ msgstr "Скрипт оновлено"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:356
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
 msgid "Scripts"
 msgstr "Скрипти"
 
@@ -15922,7 +15922,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Встановити режим інвентарних даних вузла мережі"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:388
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
 msgid "Set new value"
 msgstr ""
 
@@ -16012,7 +16012,7 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:342
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
 msgid "Sharing"
 msgstr "Спільний доступ"
 
@@ -16624,7 +16624,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Суб'єкт"
 
-#: jsLoader.php:357
+#: jsLoader.php:358
 msgid "Submap"
 msgstr "Суб-карта"
 
@@ -17395,7 +17395,7 @@ msgstr "Час виникнення (штамп)"
 msgid "To"
 msgstr "До"
 
-#: jsLoader.php:369
+#: jsLoader.php:370
 msgid "To set a host interface select a single item type for all items"
 msgstr "Для встановлення інтерфейсу вузла мережі виберіть один тип елемента даних для всіх елементів даних"
 
@@ -17527,7 +17527,7 @@ msgstr "Динаміка"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:358
+#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
 #: services.php:355
 msgid "Trigger"
 msgstr "Тригер"
@@ -17706,11 +17706,11 @@ msgstr "Прототипи тригерів оновлено"
 msgid "Trigger severity"
 msgstr "Важливість тригера"
 
-#: jsLoader.php:343
+#: jsLoader.php:344
 msgid "Trigger status \"OK\""
 msgstr "Стан тригера \"ОК\""
 
-#: jsLoader.php:344
+#: jsLoader.php:345
 msgid "Trigger status \"Problem\""
 msgstr "Стан тригера \"Проблема\""
 
@@ -17876,7 +17876,7 @@ msgstr "НЕВІДОМО"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:359
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
 msgid "URL"
 msgstr "URL"
 
@@ -17922,7 +17922,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL повинен мати обидва поля \"name\" та \"url\" для карти мережі \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:360
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
 msgid "URLs"
 msgstr "URLи"
 
@@ -19195,7 +19195,7 @@ msgstr "Вибачте, але досягнуто максимум для зап
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:361
+#: include/views/inventory.host.view.php:219 jsLoader.php:362
 msgid "Web"
 msgstr "Веб"
 
@@ -20157,9 +20157,9 @@ msgstr "неможливо змінити"
 #: include/classes/api/services/CEvent.php:819
 #: include/classes/api/services/CHost.php:1836
 #: include/classes/api/services/CHost.php:1842
-#: include/classes/api/services/CHostPrototype.php:1678
-#: include/classes/api/services/CHostPrototype.php:1690
-#: include/classes/api/services/CHostPrototype.php:1706
+#: include/classes/api/services/CHostPrototype.php:1683
+#: include/classes/api/services/CHostPrototype.php:1695
+#: include/classes/api/services/CHostPrototype.php:1711
 #: include/classes/api/services/CItemGeneral.php:481
 #: include/classes/api/services/CItemGeneral.php:508
 #: include/classes/api/services/CItemGeneral.php:514
@@ -20801,7 +20801,7 @@ msgstr "правило низькорівневого виявлення"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:378
+#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
 msgctxt "minute short"
 msgid "m"
 msgstr "хв"
@@ -21096,7 +21096,7 @@ msgstr "вивід"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:389
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21239,7 +21239,7 @@ msgstr "короткий опис"
 #: include/classes/api/services/CHost.php:1867
 #: include/classes/api/services/CHost.php:1876
 #: include/classes/api/services/CHost.php:1882
-#: include/classes/api/services/CHostPrototype.php:1729
+#: include/classes/api/services/CHostPrototype.php:1734
 #: include/classes/api/services/CHttpTest.php:978
 #: include/classes/api/services/CHttpTest.php:1074
 #: include/classes/api/services/CItemGeneral.php:495
@@ -21354,10 +21354,10 @@ msgstr "шаблон з ID \"%1$s\" передано %2$s разів"
 #: include/classes/api/services/CDiscoveryRule.php:2019
 #: include/classes/api/services/CHost.php:1945
 #: include/classes/api/services/CHost.php:2140
-#: include/classes/api/services/CHostPrototype.php:1673
-#: include/classes/api/services/CHostPrototype.php:1685
-#: include/classes/api/services/CHostPrototype.php:1701
-#: include/classes/api/services/CHostPrototype.php:1713
+#: include/classes/api/services/CHostPrototype.php:1678
+#: include/classes/api/services/CHostPrototype.php:1690
+#: include/classes/api/services/CHostPrototype.php:1706
+#: include/classes/api/services/CHostPrototype.php:1718
 #: include/classes/api/services/CHttpTest.php:739
 #: include/classes/api/services/CReport.php:203
 #: include/classes/api/services/CReport.php:592
@@ -21512,7 +21512,7 @@ msgstr "неочікуваний кінець макросу"
 #: include/classes/api/services/CGraphGeneral.php:599
 #: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
-#: include/classes/api/services/CHostPrototype.php:1719
+#: include/classes/api/services/CHostPrototype.php:1724
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CHttpTest.php:515
 #: include/classes/api/services/CHttpTest.php:539
@@ -21606,7 +21606,7 @@ msgstr "непідтримуваний номер версії"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:390
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
 msgid "value"
 msgstr "значення"
 

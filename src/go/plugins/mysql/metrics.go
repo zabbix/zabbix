@@ -71,35 +71,42 @@ var (
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
-	paramUsername = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
-	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("")
+	paramUsername    = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
+	paramPassword    = metric.NewConnParam("Password", "User's password.").WithDefault("")
+	paramTLSConnect  = metric.NewConnParam("TLSConnect", "DB connection encryption type.").WithDefault("").SessionOnly()
+	paramTLSCaFile   = metric.NewConnParam("TLSCAFile", "TLS ca file path.").WithDefault("").SessionOnly()
+	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("").SessionOnly()
+	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("").SessionOnly()
 )
 
 var metrics = metric.MetricSet{
 	keyDatabasesDiscovery: metric.New("Returns list of databases in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyDatabaseSize: metric.New("Returns size of given database in bytes.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword,
-			metric.NewParam("Database", "Database name.").SetRequired(),
-		}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile, metric.NewParam("Database", "Database name.").SetRequired()}, false),
 
 	keyPing: metric.New("Tests if connection is alive or not.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyReplicationDiscovery: metric.New("Returns replication information in LLD format.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyReplicationSlaveStatus: metric.New("Returns replication status.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword,
-			metric.NewParam("Master", "Master host."),
-		}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile, metric.NewParam("Master", "Master host.")}, false),
 
 	keyStatusVars: metric.New("Returns values of global status variables.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyVersion: metric.New("Returns MySQL version.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 }
 
 func init() {

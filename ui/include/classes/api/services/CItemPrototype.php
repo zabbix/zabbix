@@ -422,6 +422,7 @@ class CItemPrototype extends CItemGeneral {
 		unset($item);
 		$itemids = DB::insert('items', $items);
 
+		$insertItemDiscovery = [];
 		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
 
