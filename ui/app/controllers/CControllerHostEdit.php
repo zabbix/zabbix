@@ -88,7 +88,7 @@ class CControllerHostEdit extends CController {
 		$this->host = (array) $this->host + $this->getInputValues() + $this->getHostDefaultValues();
 
 		$data = [
-			'form_action' => $this->host['hostid'] ? 'host.create' : 'host.update',
+			'form_action' => $this->host['hostid'] ? 'host.update' : 'host.create',
 			'hostid' => $this->host['hostid'],
 			'host' => $this->host,
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),

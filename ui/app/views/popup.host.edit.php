@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$data['form_name'] = 'host-form';
+
 if ($data['hostid'] == 0) {
 	$buttons = [
 		[
@@ -30,7 +32,7 @@ if ($data['hostid'] == 0) {
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return submitPopup(overlay);'
+			'action' => 'host_edit.submit(document.getElementById("'.$data['form_name'].'"));'
 		]
 	];
 }
@@ -41,7 +43,7 @@ else {
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return submitPopup(overlay);'
+			'action' => 'host_edit.submit(document.getElementById("'.$data['form_name'].'"));'
 		],
 		[
 			'title' => _('Clone'),
@@ -67,11 +69,36 @@ else {
 	];
 }
 
+$inline_js = 
+	'document.getElementById("'.$data['form_name'].'").addEventListener("formSubmitted", function (event) {'.
+		'let response = event.detail,'.
+			'overlay = overlays_stack.end(),'.
+			'$form = overlay.$dialogue.find("form");'.
+
+		'overlay.unsetLoading();'.
+		'overlay.$dialogue.find(".msg-bad, .msg-good").remove();'.
+
+		'if ("errors" in response) {'.
+			'jQuery(response.errors).insertBefore($form);'.
+		'}'.
+		'else if ("hostid" in response) {'.
+			'clearMessages();'.
+			'addMessage(makeMessageBox("good", [], response.message, true, false));'.
+
+			'overlayDialogueDestroy(overlay.dialogueid);'.
+
+			'const url = new Curl("zabbix.php", false);'.
+			'url.setArgument("action", "host.list");'.
+			'history.pushState({}, "", url.getUrl());'.
+
+			// Todo: Call refresh on ?action=host.list page;
+		'}'.
+	'});';
+
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
 	'body' => (new CPartial('configuration.host.edit.html', $data))->getOutput(),
-	'script_inline' => '',
-	'script_inline' => getPagePostJs(),
+	'script_inline' => $inline_js . getPagePostJs(),
 	'buttons' => $buttons
 ];
 

@@ -294,6 +294,32 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			document.querySelector('[for="tls_issuer"]').style.display = use_cert ? '' : 'none';
 			document.querySelector('#tls_subject').closest('div').style.display = use_cert ? '' : 'none';
 			document.querySelector('[for="tls_subject"]').style.display = use_cert ? '' : 'none';
+		},
+
+		submit(form) {
+			var fields = getFormFields(form),
+				curl = new Curl(form.getAttribute('action'));
+
+			// Trim text fields.
+			fields.host = fields.host.trim();
+			fields.visiblename = fields.visiblename.trim();
+			fields.description = fields.description.trim();
+
+			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
+
+			// Groups are not extracted properly by getFormFields.
+			fields.groups = [];
+			form.querySelectorAll('[name^="groups[]"]').forEach(group => {
+				fields.groups.push((group.name === 'groups[][new]') ? {'new': group.value} : group.value);
+			});
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: urlEncodeData(fields)
+			})
+				.then(response => response.json())
+				.then(response => form.dispatchEvent(new CustomEvent('formSubmitted', {detail: response})));
 		}
 	};
 </script>

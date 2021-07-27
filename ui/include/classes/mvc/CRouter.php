@@ -112,6 +112,7 @@ class CRouter {
 		'host.massdisable'							=> ['CControllerHostMassToggle',						null,					null],
 		'host.massdelete'							=> ['CControllerHostMassDelete',						null,					null],
 		'host.edit'									=> ['CControllerHostEdit',								'layout.htmlpage',		'configuration.host.edit'],
+		'host.create'								=> ['CControllerHostCreate',							'layout.json',			null],
 		'host.view'									=> ['CControllerHostView',								'layout.htmlpage',		'monitoring.host.view'],
 		'host.view.refresh'							=> ['CControllerHostViewRefresh',						'layout.json',			'monitoring.host.view.refresh'],
 		'hostmacros.list'							=> ['CControllerHostMacrosList',						'layout.json',			'hostmacros.list'],

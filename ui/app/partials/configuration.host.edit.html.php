@@ -28,8 +28,8 @@ $this->includeJsFile('configuration.host.edit.html.js.php');
 $readonly = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 
 $host_form = (new CForm())
-	->setId('host-form')
-	->setName('host-form')
+	->setId($data['form_name'])
+	->setName($data['form_name'])
 	->addVar('action', $data['form_action'])
 	->addVar('hostid', $data['hostid'])
 	->addItem(getMessages())

@@ -34,6 +34,7 @@ $this->addJsFile('hostinterfacemanager.js');
 $this->addJsFile('hostmacrosmanager.js');
 
 $data += [
+	'form_name' => 'host-form',
 	'buttons' => ($data['hostid'] == 0)
 		? [
 			new CSubmit('add', _('Add')),
@@ -48,8 +49,30 @@ $data += [
 		]
 ];
 
-//'script_inline' => getPagePostJs().
-//		$this->readJsFile('popup.service.edit.js.php')
+(new CScriptTag(
+	'document.getElementById("'.$data['form_name'].'").addEventListener("submit", function (event) {'.
+		'host_edit.submit(this, this.closest("main"));'.
+		'event.preventDefault();'.
+	'});'.
+
+	'document.getElementById("'.$data['form_name'].'").addEventListener("formSubmitted", event => {'.
+		'let response = event.detail;'.
+
+		'clearMessages();'.
+		'if ("errors" in response) {'.
+			'addMessage(response.errors);'.
+		'}'.
+		'else if ("hostid" in response) {'.
+			'postMessageOk(response.message);'.
+
+			'const url = new Curl("zabbix.php");'.
+			'url.setArgument("action", "host.list");'.
+			'window.location = url.getUrl();'.
+		'}'.
+	'});'
+))
+	->setOnDocumentReady()
+	->show();
 
 (new CWidget())
 	->setTitle(_('Host'))
