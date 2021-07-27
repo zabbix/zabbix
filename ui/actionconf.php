@@ -39,7 +39,8 @@ $fields = [
 										],
 	'eventsource' =>					[T_ZBX_INT, O_OPT, null,
 											IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-												EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL
+												EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
+												EVENT_SOURCE_SERVICE
 											]),
 											null
 										],
@@ -63,9 +64,9 @@ $fields = [
 	'recovery_operations' =>			[null,		O_OPT,	null,	null,		null],
 	'edit_recovery_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
 	'new_recovery_operation' =>			[null,		O_OPT,	null,	null,		null],
-	'ack_operations' =>					[null,		O_OPT,	null,	null,		null],
-	'edit_ack_operationid' =>			[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
-	'new_ack_operation' =>				[null,		O_OPT,	null,	null,		null],
+	'update_operations' =>				[null,		O_OPT,	null,	null,		null],
+	'edit_update_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
+	'new_update_operation' =>			[null,		O_OPT,	null,	null,		null],
 	'opconditions' =>					[null,		O_OPT,	null,	null,		null],
 	// actions
 	'action' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -76,7 +77,7 @@ $fields = [
 	'cancel_new_condition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_operation' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_recovery_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_ack_operation' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_update_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'pause_suppressed' =>				[T_ZBX_STR, O_OPT, null,
 											IN([ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE]),
 											null,
@@ -99,9 +100,9 @@ $fields = [
 ];
 
 $dataValid = check_fields($fields);
-$edit_ack_operationid = null;
-$new_ack_operation = getRequest('new_ack_operation', []);
-$ack_operations = getRequest('ack_operations', []);
+$edit_update_operationid = null;
+$new_update_operation = getRequest('new_update_operation', []);
+$update_operations = getRequest('update_operations', []);
 $eventsource = getRequest('eventsource', EVENT_SOURCE_TRIGGERS);
 
 if (hasRequest('actionid')) {
@@ -125,10 +126,10 @@ if (hasRequest('add') || hasRequest('update')) {
 		'esc_period' => getRequest('esc_period', DB::getDefault('actions', 'esc_period')),
 		'operations' => getRequest('operations', []),
 		'recovery_operations' => getRequest('recovery_operations', []),
-		'acknowledge_operations' => getRequest('ack_operations', [])
+		'update_operations' => getRequest('update_operations', [])
 	];
 
-	foreach (['operations', 'recovery_operations', 'acknowledge_operations'] as $operation_key) {
+	foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_key) {
 		foreach ($action[$operation_key] as &$operation) {
 			if (array_key_exists('opmessage', $operation)
 					&& !array_key_exists('default_msg', $operation['opmessage'])) {
@@ -313,18 +314,18 @@ elseif (hasRequest('add_recovery_operation') && hasRequest('new_recovery_operati
 		unset($_REQUEST['new_recovery_operation']);
 	}
 }
-elseif (hasRequest('add_ack_operation') && $new_ack_operation) {
-	$new_ack_operation['recovery'] = ACTION_ACKNOWLEDGE_OPERATION;
-	$new_ack_operation['eventsource'] = EVENT_SOURCE_TRIGGERS;
+elseif (hasRequest('add_update_operation') && $new_update_operation) {
+	$new_update_operation['recovery'] = ACTION_UPDATE_OPERATION;
+	$new_update_operation['eventsource'] = $eventsource;
 
-	if (API::Action()->validateOperationsIntegrity($new_ack_operation)) {
-		if (array_key_exists('id', $new_ack_operation)) {
-			$ack_operations[$new_ack_operation['id']] = $new_ack_operation;
+	if (API::Action()->validateOperationsIntegrity($new_update_operation)) {
+		if (array_key_exists('id', $new_update_operation)) {
+			$update_operations[$new_update_operation['id']] = $new_update_operation;
 		}
 		else {
-			$ack_operations[] = $new_ack_operation;
+			$update_operations[] = $new_update_operation;
 		}
-		$new_ack_operation = [];
+		$new_update_operation = [];
 	}
 }
 elseif (hasRequest('edit_operationid')) {
@@ -348,12 +349,12 @@ elseif (hasRequest('edit_recovery_operationid')) {
 		$_REQUEST['new_recovery_operation']['id'] = $edit_recovery_operationid;
 	}
 }
-elseif (hasRequest('edit_ack_operationid')) {
-	$edit_ack_operationid = key(getRequest('edit_ack_operationid'));
+elseif (hasRequest('edit_update_operationid')) {
+	$edit_update_operationid = key(getRequest('edit_update_operationid'));
 
-	if (array_key_exists($edit_ack_operationid, $ack_operations)) {
-		$new_ack_operation = $ack_operations[$edit_ack_operationid];
-		$new_ack_operation['id'] = $edit_ack_operationid;
+	if (array_key_exists($edit_update_operationid, $update_operations)) {
+		$new_update_operation = $update_operations[$edit_update_operationid];
+		$new_update_operation['id'] = $edit_update_operationid;
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.massenable', 'action.massdisable']) && hasRequest('g_actionid')) {
@@ -414,7 +415,7 @@ if (hasRequest('form')) {
 		'new_condition' => getRequest('new_condition', []),
 		'new_operation' => getRequest('new_operation'),
 		'new_recovery_operation' => getRequest('new_recovery_operation'),
-		'new_ack_operation' => $new_ack_operation
+		'new_update_operation' => $new_update_operation
 	];
 
 	if ($data['actionid']) {
@@ -424,7 +425,7 @@ if (hasRequest('form')) {
 			'selectRecoveryOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
 				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
 			],
-			'selectAcknowledgeOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
+			'selectUpdateOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
 				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
 			],
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
@@ -432,11 +433,6 @@ if (hasRequest('form')) {
 			'editable' => true
 		]);
 		$data['action'] = reset($data['action']);
-
-		$data['action']['recovery_operations'] = $data['action']['recoveryOperations'];
-		$data['action']['ack_operations'] = $data['action']['acknowledgeOperations'];
-		unset($data['action']['recoveryOperations'], $data['action']['acknowledgeOperations']);
-
 		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
@@ -454,7 +450,7 @@ if (hasRequest('form')) {
 		$data['action']['status'] = getRequest('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['operations'] = getRequest('operations', []);
 		$data['action']['recovery_operations'] = getRequest('recovery_operations', []);
-		$data['action']['ack_operations'] = $ack_operations;
+		$data['action']['update_operations'] = $update_operations;
 
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
 		$data['action']['filter']['formula'] = getRequest('formula');
@@ -474,7 +470,7 @@ if (hasRequest('form')) {
 		}
 	}
 
-	foreach (['operations', 'recovery_operations', 'ack_operations'] as $operations) {
+	foreach (['operations', 'recovery_operations', 'update_operations'] as $operations) {
 		foreach ($data['action'][$operations] as &$operation) {
 			if (($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 					|| $operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE
@@ -524,12 +520,12 @@ if (hasRequest('form')) {
 		$data['new_recovery_operation'] = ['operationtype' => OPERATION_TYPE_MESSAGE];
 	}
 
-	if ($data['new_ack_operation'] && !is_array($data['new_ack_operation'])) {
-		$data['new_ack_operation'] = ['operationtype' => OPERATION_TYPE_MESSAGE];
+	if ($data['new_update_operation'] && !is_array($data['new_update_operation'])) {
+		$data['new_update_operation'] = ['operationtype' => OPERATION_TYPE_MESSAGE];
 	}
-	if ($data['new_ack_operation'] && !array_key_exists('opmessage', $data['new_ack_operation'])
-			&& $data['new_ack_operation']['operationtype'] != OPERATION_TYPE_COMMAND) {
-		$data['new_ack_operation']['opmessage'] = [
+	if ($data['new_update_operation'] && !array_key_exists('opmessage', $data['new_update_operation'])
+			&& $data['new_update_operation']['operationtype'] != OPERATION_TYPE_COMMAND) {
+		$data['new_update_operation']['opmessage'] = [
 			'default_msg' => 1,
 			'mediatypeid' => 0,
 			'subject' => '',

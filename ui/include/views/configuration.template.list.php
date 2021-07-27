@@ -35,8 +35,8 @@ $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 	'tags' => $filter_tags
 ]);
 
-$filter = new CFilter(new CUrl('templates.php'));
-$filter
+$filter = (new CFilter())
+	->setResetUrl(new CUrl('templates.php'))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
@@ -51,7 +51,7 @@ $filter
 						'parameters' => [
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
-							'dstfrm' => $filter->getName(),
+							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
 							'templated_hosts' => 1,
 							'editable' => 1,
@@ -71,7 +71,7 @@ $filter
 							'srctbl' => 'templates',
 							'srcfld1' => 'hostid',
 							'srcfld2' => 'host',
-							'dstfrm' => $filter->getName(),
+							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_templates_'
 						]
 					]

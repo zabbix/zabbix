@@ -2069,6 +2069,7 @@ AC_OUTPUT([
 	src/libs/zbxdiag/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxavailability/Makefile
+	src/libs/zbxservice/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
@@ -2096,6 +2097,7 @@ AC_OUTPUT([
 	src/zabbix_server/scripts/Makefile
 	src/zabbix_server/preprocessor/Makefile
 	src/zabbix_server/availability/Makefile
+	src/zabbix_server/service/Makefile
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_proxy/Makefile

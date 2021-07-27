@@ -503,16 +503,16 @@ $icon-widget-btn: (
 	}
 }
 
-.add-child-btn {
-	background: url($sprite-path) no-repeat -206px -551px !important;
+.btn-add {
+	background: url($sprite-path) no-repeat -204px -550px !important;
 }
 
-.edit-item-btn {
-	background: url($sprite-path) no-repeat -206px -478px !important;
+.btn-edit {
+	background: url($sprite-path) no-repeat -204px -477px !important;
 }
 
-.import-items-btn {
-	background: url($sprite-path) no-repeat -206px -515px !important;
+.btn-import {
+	background: url($sprite-path) no-repeat -204px -514px !important;
 }
 
 .drag-icon {

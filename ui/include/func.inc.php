@@ -1600,7 +1600,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 				);
 		}
 
-		$list = new CList();
+		$list = (new CList())->addClass(ZBX_STYLE_LIST_DASHED);
 		if ($title !== null) {
 			$list->addClass(ZBX_STYLE_MSG_DETAILS_BORDER);
 

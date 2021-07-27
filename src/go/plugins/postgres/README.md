@@ -1,8 +1,8 @@
 # PostgreSQL plugin
 Provides native Zabbix solution for monitoring PostgreSQL (object-relational database system). 
 It can monitor several PostgreSQL instances simultaneously, remote or local to the Zabbix Agent.
-The plugin keeps connections in the open state to reduce network congestion, latency, CPU and 
-memory usage. Best for use in conjunction with the official 
+Native connection encryption is supported. The plugin keeps connections in the open state to reduce network 
+congestion, latency, CPU and memory usage. Best for use in conjunction with the official 
 [PostgreSQL template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/postgresql_agent2) 
 You can extend it or create your template for your specific needs.
 
@@ -36,12 +36,26 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
+**Plugins.Postgres.Sessions.<session_name>.TLSConnect** — Encryption type for postgres connection. "*" should be replaced with a session name.
+*Default value:* 
+*Accepted values:*  required, verify_ca, verify_full
+
+**Plugins.Postgres.Sessions.<session_name>.TLSCAFile** — Full pathname of a file containing the top-level CA(s) certificates for postgres
+*Default value:* 
+
+**Plugins.Postgres.Sessions.<session_name>.TLSCertFile** — Full pathname of a file containing the postgres certificate or certificate chain.
+*Default value:* 
+
+**Plugins.Postgres.Sessions.*.TLSKeyFile** — Full pathname of a file containing the postgres private key.
+*Default value:* 
+
 ### Configuring connection
 A connection can be configured using either keys' parameters or named sessions.     
 
 *Notes*:  
 * It is not possible to mix configuration using named sessions and keys' parameters simultaneously.
 * You can leave any connection parameter empty, a default hard-coded value will be used in the such case.
+* TLS information can be passed only with sessions.
 * Embedded URI credentials (userinfo) are forbidden and will be ignored. So, you can't pass the credentials by this:   
   
       pgsql.ping[tcp://user:password@127.0.0.1/postgres] — WRONG  
@@ -65,8 +79,8 @@ ConnString will be treated as a URI if no session with the given name is found.
 If you use ConnString as a session name, just skip the rest of the connection parameters.  
  
 #### Using named sessions
-Named sessions allow you to define specific parameters for each PostgreSQL instance. Currently, there are only four
-supported parameters: Uri, User, Password and Service.
+Named sessions allow you to define specific parameters for each PostgreSQL instance. Currently, these are the
+supported parameters: Uri, User, Password, Service, TLSConnect, TLSCAFile, TLSCertFile and TLSKeyFile. 
 It's a bit more secure way to store credentials compared to item keys or macros.  
 
 E.g: suppose you have two PostgreSQL instances: "Prod" and "Test". 
@@ -76,11 +90,19 @@ You should add the following options to the agent configuration file:
     Plugins.Postgres.Sessions.Prod.User=<UserForProd>
     Plugins.Postgres.Sessions.Prod.Password=<PasswordForProd>
     Plugins.Postgres.Sessions.Prod.Database=proddb
+    Plugins.Postgres.Sessions.Prod.TLSConnect=verify_full
+    Plugins.Postgres.Sessions.Prod.TLSCAFile=/path/to/ca_file
+    Plugins.Postgres.Sessions.Prod.TLSCertFile=/path/to/cert_file
+    Plugins.Postgres.Sessions.Prod.TLSKeyFile=/path/to/key_file
     
     Plugins.Postgres.Sessions.Test.Uri=tcp://192.168.0.1:5432
     Plugins.Postgres.Sessions.Test.User=<UserForTest>
     Plugins.Postgres.Sessions.Test.Password=<PasswordForTest>
     Plugins.Postgres.Sessions.Test.Service=testdb
+    Plugins.Postgres.Sessions.Test.TLSConnect=verify_ca
+    Plugins.Postgres.Sessions.Test.TLSCAFile=/path/to/test/ca_file
+    Plugins.Postgres.Sessions.Test.TLSCertFile=/path/to/test/cert_file
+    Plugins.Postgres.Sessions.Test.TLSKeyFile=/path/to/test/key_file
         
 Then you will be able to use these names as the 1st parameter (ConnString) in keys instead of URIs, e.g:
 

@@ -47,7 +47,8 @@ class CAuthentication extends CApiService {
 		'ldap_bind_dn', 'ldap_case_sensitive', 'ldap_bind_password', 'saml_auth_enabled', 'saml_idp_entityid',
 		'saml_sso_url', 'saml_slo_url', 'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format',
 		'saml_sign_messages', 'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
-		'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive'
+		'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive',
+		'passwd_min_length', 'passwd_check_rules'
 	];
 
 	/**
@@ -110,7 +111,8 @@ class CAuthentication extends CApiService {
 			'ldap_configured', 'ldap_port', 'ldap_case_sensitive', 'saml_auth_enabled', 'saml_idp_entityid',
 			'saml_sso_url', 'saml_slo_url', 'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format',
 			'saml_sign_messages', 'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
-			'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive'
+			'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive',
+			'passwd_min_length', 'passwd_check_rules'
 		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $auth) && $auth[$field_name] != $db_auth[$field_name]) {
@@ -156,7 +158,7 @@ class CAuthentication extends CApiService {
 			'ldap_bind_dn' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_bind_dn')],
 			'ldap_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_bind_password' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_bind_password')],
-			'saml_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
+			'saml_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED],
 			'saml_idp_entityid' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'saml_idp_entityid')],
 			'saml_sso_url' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'saml_sso_url')],
 			'saml_slo_url' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'saml_slo_url')],
@@ -170,7 +172,9 @@ class CAuthentication extends CApiService {
 			'saml_sign_logout_responses' =>	['type' => API_INT32, 'in' => '0,1'],
 			'saml_encrypt_nameid' =>		['type' => API_INT32, 'in' => '0,1'],
 			'saml_encrypt_assertions' =>	['type' => API_INT32, 'in' => '0,1'],
-			'saml_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE]
+			'saml_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
+			'passwd_min_length' =>			['type' => API_INT32, 'in' => '1:70', 'default' => DB::getDefault('config', 'passwd_min_length')],
+			'passwd_check_rules' =>			['type' => API_INT32, 'in' => '0:'.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE), 'default' => DB::getDefault('config', 'passwd_check_rules')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $auth, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

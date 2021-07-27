@@ -53,6 +53,7 @@ final class CMathFunctionData {
 		'cos' => 1,
 		'cosh' => 1,
 		'cot' => 1,
+		'count' => 1,
 		'date' => 0,
 		'dayofmonth' => 0,
 		'dayofweek' => 0,
@@ -94,6 +95,34 @@ final class CMathFunctionData {
 	];
 
 	/**
+	 * A subset of math functions for use in calculated item formulas only.
+	 *
+	 * @var array
+	 */
+	private const CALCULATED_ONLY = [
+		'count'
+	];
+
+	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'calculated' => false  Provide math functions data for use in calculated item formulas.
+	 *
+	 * @var array
+	 */
+	private $options = [
+		'calculated' => false
+	];
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+	}
+
+	/**
 	 * Check if function is known math function.
 	 *
 	 * @param string $function
@@ -101,7 +130,15 @@ final class CMathFunctionData {
 	 * @return bool
 	 */
 	public function isKnownFunction(string $function): bool {
-		return array_key_exists($function, self::PARAMETERS);
+		if (!array_key_exists($function, self::PARAMETERS)) {
+			return false;
+		}
+
+		if (!$this->options['calculated'] && in_array($function, self::CALCULATED_ONLY, true)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -114,7 +151,7 @@ final class CMathFunctionData {
 	}
 
 	/**
-	 * Check if function is aggregating it's parameters or the result of aggregating history functions.
+	 * Check if function is aggregating it's parameters.
 	 *
 	 * @static
 	 *
@@ -125,9 +162,29 @@ final class CMathFunctionData {
 	public static function isAggregating(string $function): bool {
 		switch ($function) {
 			case 'avg':
+			case 'count':
 			case 'max':
 			case 'min':
 			case 'sum':
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Check if function is only aggregating the result of aggregating history functions.
+	 *
+	 * @static
+	 *
+	 * @param string $function
+	 *
+	 * @return bool
+	 */
+	public static function isAggregatingHistOnly(string $function): bool {
+		switch ($function) {
+			case 'count':
 				return true;
 
 			default:

@@ -27,7 +27,7 @@ class CControllerPopupConditionOperations extends CControllerPopupConditionCommo
 	protected function getCheckInputs() {
 		return [
 			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-			'source' =>			'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL]),
+			'source' =>			'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]),
 			'validate' =>		'in 1',
 			'condition_type' =>	'not_empty|in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 			'operator' =>		'not_empty|in '.CONDITION_OPERATOR_EQUAL,

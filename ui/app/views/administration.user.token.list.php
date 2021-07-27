@@ -29,8 +29,8 @@ if ($data['uncheck']) {
 
 $this->includeJsFile('administration.user.token.list.js.php');
 
-$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'user.token.list')));
-$filter
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'user.token.list'))
 	->addVar('action', 'user.token.list')
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])

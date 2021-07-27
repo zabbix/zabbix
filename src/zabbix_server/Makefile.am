@@ -23,8 +23,9 @@ SUBDIRS = \
 	preprocessor \
 	availability \
 	lld \
-	reporter
-
+	reporter \
+	service 
+	
 sbin_PROGRAMS = zabbix_server
 
 noinst_LIBRARIES = libzbxserver.a
@@ -68,6 +69,7 @@ zabbix_server_LDADD = \
 	scripts/libzbxscripts.a \
 	preprocessor/libpreprocessor.a \
 	availability/libavailability.a \
+	service/libservice.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
@@ -109,7 +111,8 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver_server.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
-	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a
+	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_builddir)/src/libs/zbxservice/libzbxservice.a
 
 if HAVE_IPMI
 zabbix_server_LDADD += ipmi/libipmi.a
