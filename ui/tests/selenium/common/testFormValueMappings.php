@@ -66,6 +66,9 @@ class testFormValueMappings extends CWebTest {
 
 	private static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
 
+    private static $previous_class = null;
+
+
 	/**
 	 * Function that checks the layout of the Value mappings tab in Host or Template configuration forms.
 	 *
@@ -103,7 +106,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Check types.
 		$value_column = $row->getColumn('Value')->query('xpath:.//input')->one();
-		$dropdown = $mappings_table->query('name:mappings[1][type]')->one()->asZDropdown();
+		$dropdown = $row->query('name:mappings[1][type]')->one()->asZDropdown();
 		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
 		$this->assertEquals($types, $dropdown->getOptions()->asText());
 
@@ -814,6 +817,11 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $action	Action to be performed with value mappings.
 	 */
 	public function checkAction($data, $source, $action) {
+		if (static::$previous_class !== get_called_class()) {
+			static::$previous_class = get_called_class();
+			static::$previous_valuemap_name = static::UPDATE_VALUEMAP1;
+		}
+
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		if ($expected === TEST_BAD) {
 			$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid = v.valuemapid';
