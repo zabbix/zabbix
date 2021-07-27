@@ -134,7 +134,9 @@ class CAudit {
 			return;
 		}
 
-		if (CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) != self::AUDITLOG_ENABLE) {
+		if ((CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) != self::AUDITLOG_ENABLE)
+				&& ($resourcetype != AUDIT_RESOURCE_SETTINGS
+					&& !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
 			return;
 		}
 

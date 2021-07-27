@@ -604,15 +604,16 @@ class CTemplate extends CHostGeneral {
 
 		foreach ($templates as &$template) {
 			unset($template['macros']);
+
+			// if visible name is not given or empty it should be set to host name
+			if (array_key_exists('host', $template) && (!array_key_exists('name', $template)
+						|| !trim($template['name']))) {
+				$template['name'] = $template['host'];
+			}
 		}
 		unset($template);
 
 		foreach ($templates as $template) {
-			// if visible name is not given or empty it should be set to host name
-			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
-				$template['name'] = $template['host'];
-			}
-
 			$templateCopy = $template;
 
 			$template['templates_link'] = array_key_exists('templates', $template) ? $template['templates'] : null;
