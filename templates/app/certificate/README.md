@@ -21,7 +21,7 @@ JSON with certificate attributes.
 
 4\. Link the template to the host.
 
-5\. Customize value of {$CERT.WEBSITE.HOSTNAME} macro.
+5\. Customize the value of {$CERT.WEBSITE.HOSTNAME} macro.
 
 
 ## Zabbix configuration
@@ -48,7 +48,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|General |Cert: Validation result |<p>The certificate validation result. Possible value: valid/invalid/valid-but-self-signed</p> |DEPENDENT |cert.validation<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.value`</p> |
+|General |Cert: Validation result |<p>The certificate validation result. Possible values: valid/invalid/valid-but-self-signed</p> |DEPENDENT |cert.validation<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.value`</p> |
 |General |Cert: Last check message |<p>Last check result message.</p> |DEPENDENT |cert.message<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.message`</p> |
 |General |Cert: Version |<p>The version of the encoded certificate.</p> |DEPENDENT |cert.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.x509.version`</p> |
 |General |Cert: Serial |<p>The serial number is a positive integer assigned by the CA to each certificate. It is unique for each certificate issued by a given CA. Non-conforming CAs may issue certificates with serial numbers that are negative or zero.</p> |DEPENDENT |cert.serial<p>**Preprocessing**:</p><p>- JSONPATH: `$.x509.serial`</p> |
@@ -68,7 +68,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Cert: SSL certificate is invalid |<p>SSL certificate has expired or it is issued for another domain.</p> |`{TEMPLATE_NAME:cert.validation.str("invalid")} = 1` |HIGH | |
 |Cert: SSL certificate expires soon (less than {$CERT.NOTAFTER.MIN.WARN} days) |<p>The SSL certificate should be updated or it will become untrusted.</p> |`({TEMPLATE_NAME:cert.not_after.last()} - {TEMPLATE_NAME:cert.not_after.now()}) / 86400 < {$CERT.NOTAFTER.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Cert: SSL certificate is invalid</p> |
-|Cert: Fingerprint has changed (new version: {ITEM.VALUE}) |<p>Cert fingerprint has changed. If you did not update the certificate, it may be meant your certificate was hacked. Ack to close.</p> |`{TEMPLATE_NAME:cert.fingerprint.diff()}=1` |INFO |<p>Manual close: YES</p> |
+|Cert: Fingerprint has changed (new version: {ITEM.VALUE}) |<p>Cert fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</p> |`{TEMPLATE_NAME:cert.fingerprint.diff()}=1` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 
