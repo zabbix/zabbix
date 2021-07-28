@@ -918,10 +918,12 @@ static int	get_proc_net_count_ipv4(const char *filename, net_count_info_t *resul
 	sa_l = (struct sockaddr_in *)&sockaddr_l;
 	sa_r = (struct sockaddr_in *)&sockaddr_r;
 
+#ifdef HAVE_IPV6
 #ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
 	sockaddr_l.ss_family = sockaddr_r.ss_family = AF_INET;
 #else
 	sockaddr_l.__ss_family = sockaddr_r.__ss_family = AF_INET;
+#endif
 #endif
 
 	while (NULL != fgets(line, sizeof(line), f))
