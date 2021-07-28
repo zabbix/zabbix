@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,7 +21,7 @@
 
 class CControllerAuditSettingsUpdate extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'auditlog_enabled'	=> 'db config.auditlog_enabled|in 1',
 			'hk_audit_mode'		=> 'db config.hk_audit_mode|in 1',
@@ -54,11 +54,11 @@ class CControllerAuditSettingsUpdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$housekeeping = [CHousekeepingHelper::HK_AUDIT_MODE => $this->getInput('hk_audit_mode', 0)];
 
 		if ($housekeeping[CHousekeepingHelper::HK_AUDIT_MODE] == 1) {

@@ -28,9 +28,24 @@ class CCuid {
 	private const DECIMAL = 10;
 	private const PREFIX = 'c';
 	private const DISCRETE_VALUES = 1679616;
+
 	public const LENGTH = 25;
 
 	private static $counter = -1;
+
+	public static function generate(): string {
+		return sprintf('%s%s%s%s%s%s', self::PREFIX, self::getTimestampBlock(), self::getCounterBlock(),
+			self::getFingerprintBlock(), self::getRandomBlock(), self::getRandomBlock()
+		);
+	}
+
+	public static function isCuid(string $hash): bool {
+		return $hash[0] === self::PREFIX;
+	}
+
+	public static function checkLength(string $hash): bool {
+		return strlen($hash) === self::LENGTH;
+	}
 
 	private static function pad(string $value, int $size): string {
 		return substr(str_pad(base_convert($value, self::DECIMAL, self::BASE36), $size, '0', STR_PAD_LEFT), -$size);
@@ -76,19 +91,5 @@ class CCuid {
 
 	private static function getFingerprintBlock(): string {
 		return self::getPidSubBlock().self::getHostnameSubBlock();
-	}
-
-	public static function generate(): string {
-		return sprintf('%s%s%s%s%s%s', self::PREFIX, self::getTimestampBlock(), self::getCounterBlock(),
-			self::getFingerprintBlock(), self::getRandomBlock(), self::getRandomBlock()
-		);
-	}
-
-	public static function isCuid(string $hash): bool {
-		return $hash[0] === self::PREFIX;
-	}
-
-	public static function checkLength(string $hash): bool {
-		return strlen($hash) === self::LENGTH;
 	}
 }

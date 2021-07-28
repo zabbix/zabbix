@@ -367,6 +367,21 @@ class CPrometheusPatternParserTest extends TestCase {
 					'match' => '{label1="value1\\\\"}'
 				]
 			],
+			// Operators != and !~.
+			[
+				'{label1!="value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{label1!="value1"}'
+				]
+			],
+			[
+				'{label1!~"value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{label1!~"value1"}'
+				]
+			],
 			// partial success
 			[
 				'metric=1.e1', 0, [],
@@ -763,6 +778,27 @@ class CPrometheusPatternParserTest extends TestCase {
 			// Invalid label name using a user macro.
 			[
 				'{__{$M}__="value1"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{label1~"value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{label1!"value1"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{label1!', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

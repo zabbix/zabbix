@@ -1,0 +1,128 @@
+---
+test case: "rtrim(123, 3)"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: "3"
+out:
+  str: "12"
+---
+test case: "rtrim(123, x)"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: "x"
+out:
+  str: "123"
+---
+test case: "rtrim(123, 123)"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: "123"
+out:
+  str: ""
+---
+test case: "rtrim(123, 321)"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: "321"
+out:
+  str: ""
+---
+test case: "rtrim(123, )"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: ""
+out:
+  str: "123"
+---
+test case: "rtrim(, 123)"
+in:
+  text:
+    str: ""
+  charlist:
+    str: "123"
+out:
+  str: ""
+---
+test case: "rtrim(, )"
+in:
+  text:
+    str: ""
+  charlist:
+    str: ""
+out:
+  str: ""
+---
+test case: "rtrim(Заббикса, а)"
+in:
+  text:
+    str: "Заббикса"
+  charlist:
+    str: "а"
+out:
+  str: "Заббикс"
+---
+test case: "rtrim(Заббикса, a)"
+in:
+  text:
+    str: "Заббикса"
+  charlist:
+    str: "a"
+out:
+  str: "Заббикса"
+---
+test case: "rtrim(Заббикс, икс)"
+in:
+  text:
+    str: "Заббикс"
+  charlist:
+    str: "икс"
+out:
+  str: "Забб"
+---
+test case: "rtrim(Заббикса, а)"
+in:
+  text:
+    str: "Заббикса"
+  charlist:
+    hex: '\xd0\x00'
+out:
+  str: "Заббикса"
+---
+test case: "rtrim(Заббикса, а)"
+in:
+  text:
+    str: "Заббикса"
+  charlist:
+    hex: '\xd0\xb0\xb0\x00'
+out:
+  str: "Заббикса"
+---
+test case: "rtrim(Заббикса, а)"
+in:
+  text:
+    hex: '\xd0\x97\xd0\xb0\xd0\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\xd0\xb0\x00'
+  charlist:
+    str: "а"
+out:
+  hex: '\xd0\x97\xd0\xb0\xd0\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\x00'
+---
+test case: "rtrim(Заббикса, а)"
+in:
+  text:
+    hex: '\xd0\x97\xd0\xb0\xd0\xb1\xb1\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\xd0\xb0\x00'
+  charlist:
+    str: "а"
+out:
+  hex: '\xd0\x97\xd0\xb0\xd0\xb1\xb1\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\x00'
+...
+

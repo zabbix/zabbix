@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -71,8 +71,8 @@ class CControllerAuditLogList extends CController {
 			'auditlog_action' => CProfile::get('web.auditlog.filter.action', -1),
 			'resourceid' => CProfile::get('web.auditlog.filter.resourceid', ''),
 			'action' => $this->getAction(),
-			'actions' => $this->getActionsList(),
-			'resources' => $this->getResourcesList(),
+			'actions' => self::getActionsList(),
+			'resources' => self::getResourcesList(),
 			'timeline' => getTimeSelectorPeriod($timeselector_options),
 			'auditlogs' => [],
 			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
@@ -180,7 +180,7 @@ class CControllerAuditLogList extends CController {
 	 *
 	 * @return array
 	 */
-	static public function getActionsList(): array {
+	private static function getActionsList(): array {
 		return [
 			AUDIT_ACTION_LOGIN => _('Login'),
 			AUDIT_ACTION_LOGOUT => _('Logout'),
@@ -196,7 +196,7 @@ class CControllerAuditLogList extends CController {
 	 *
 	 * @return array
 	 */
-	static public function getResourcesList(): array {
+	private static function getResourcesList(): array {
 		return [
 			AUDIT_RESOURCE_USER => _('User'),
 			AUDIT_RESOURCE_MEDIA_TYPE => _('Media type'),
@@ -270,6 +270,7 @@ class CControllerAuditLogList extends CController {
 			}
 
 			$details = json_decode($auditlog['details'], true);
+
 			if (!$details) {
 				$auditlog['details'] = '';
 				continue;

@@ -61,7 +61,6 @@ class ApiJsonTests {
 		$suite->addTestSuite('testJSONRPC');
 		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testAction');
-		$suite->addTestSuite('testAuditLog');
 		$suite->addTestSuite('testConfiguration');
 //		$suite->addTestSuite('testDependentItems'); TODO: To be fix later
 		$suite->addTestSuite('testCorrelation');

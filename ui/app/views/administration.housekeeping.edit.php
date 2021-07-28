@@ -179,14 +179,15 @@ $house_keeper_tab
 	->addRow(new CLink(_('Audit settings'), (new CUrl('zabbix.php'))->setArgument('action', 'audit.settings.edit'))
 );
 
-
-$house_keeper_view = (new CTabView())
-	->addTab('houseKeeper', _('Housekeeping'), $house_keeper_tab)
-	->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[new CButton('resetDefaults', _('Reset defaults'))]
-	));
+$form->addItem(
+	(new CTabView())
+		->addTab('houseKeeper', _('Housekeeping'), $house_keeper_tab)
+		->setFooter(makeFormFooter(
+			new CSubmit('update', _('Update')),
+			[new CButton('resetDefaults', _('Reset defaults'))]
+		))
+);
 
 $widget
-	->addItem($form->addItem($house_keeper_view))
+	->addItem($form)
 	->show();

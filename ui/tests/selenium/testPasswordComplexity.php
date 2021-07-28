@@ -108,7 +108,7 @@ class testPasswordComplexity extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => ['Minimum password length' => '0'],
+					'fields' => ['Minimum password length' => '0']
 				]
 			],
 			[
@@ -211,7 +211,7 @@ class testPasswordComplexity extends CWebTest {
 					'hint' => "Password requirements:".
 						"\nmust be at least 8 characters long".
 						"\nmust not contain user's name, surname or username".
-						"\nmust not be one of common or context-specific passwords",
+						"\nmust not be one of common or context-specific passwords"
 				]
 			],
 			[
@@ -243,7 +243,7 @@ class testPasswordComplexity extends CWebTest {
 						"\nmust contain at least one digit (0-9)".
 						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)".
 						"\nmust not contain user's name, surname or username".
-						"\nmust not be one of common or context-specific passwords",
+						"\nmust not be one of common or context-specific passwords"
 				]
 			],
 			[
@@ -415,7 +415,7 @@ class testPasswordComplexity extends CWebTest {
 					'Password' => str_repeat('a', 35).str_repeat('A', 36),
 					'hint' => "Password requirements:".
 						"\nmust be at least 70 characters long".
-						"\nmust contain at least one lowercase and one uppercase Latin letter (A-Z, a-z)",
+						"\nmust contain at least one lowercase and one uppercase Latin letter (A-Z, a-z)"
 				]
 			],
 			[

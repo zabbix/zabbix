@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,7 +21,7 @@
 
 class CControllerHousekeepingUpdate extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'hk_trends'				=> 'db config.hk_trends|time_unit 0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
 			'hk_trends_global'		=> 'db config.hk_trends_global|in 1',
@@ -75,11 +75,11 @@ class CControllerHousekeepingUpdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$hk = [
 			CHousekeepingHelper::HK_EVENTS_MODE => $this->getInput('hk_events_mode', 0),
 			CHousekeepingHelper::HK_SERVICES_MODE => $this->getInput('hk_services_mode', 0),
