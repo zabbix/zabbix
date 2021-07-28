@@ -6,12 +6,12 @@ const host_popup = {
 	initActionButtons() {
 		document.addEventListener('click', event => {
 			if (event.target.classList.contains('js-create-host')) {
-				const options = (event.target.dataset.hostgrops !== undefined)
-					? {hostgrops: [event.target.dataset.hostgrops]}
+				const options = (event.target.dataset.hostgroups !== undefined)
+					? {groupids: JSON.parse(event.target.dataset.hostgroups)}
 					: {};
 
 				const url = new Curl('zabbix.php', false);
-				url.setArgument('action', 'host.edit');
+				url.setArgument('action', 'host.create');
 				history.pushState({}, '', url.getUrl());
 
 				this.edit(options);

@@ -41,6 +41,7 @@ $nav_items = new CList();
 if ($data['can_create_hosts']) {
 	$nav_items->addItem((new CSimpleButton(_('Create host')))
 		->addClass('js-create-host')
+		->setAttribute('data-hostgroups', json_encode($data['filter_groupids']))
 	);
 }
 

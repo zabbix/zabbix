@@ -42,7 +42,9 @@ $table->setHeader([
 $interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
 
 foreach ($data['hosts'] as $hostid => $host) {
-	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
+	$host_name = (new CLinkAction($host['name']))
+		->setMenuPopup(CMenuPopupHelper::getHost($hostid))
+		->setAttribute('data-popupedit', 1);
 
 	$interface = null;
 	if ($host['interfaces']) {

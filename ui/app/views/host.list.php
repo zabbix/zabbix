@@ -40,7 +40,7 @@ $widget = (new CWidget())
 			->addItem(
 				(new CSimpleButton(_('Create host')))
 					->addClass('js-create-host')
-					->setAttribute('data-groupids', array_keys($data['filter']['groups']))
+					->setAttribute('data-hostgroups', json_encode(array_keys($data['filter']['groups'])))
 			)
 			->addItem(
 				(new CButton('form', _('Import')))

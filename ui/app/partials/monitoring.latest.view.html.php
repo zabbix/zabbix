@@ -163,7 +163,8 @@ foreach ($data['items'] as $itemid => $item) {
 	$host = $data['hosts'][$item['hostid']];
 	$host_name = (new CLinkAction($host['name']))
 		->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
-		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
+		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']))
+		->setAttribute('data-popupedit', 1);
 
 	if ($data['filter']['show_details']) {
 
