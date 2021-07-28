@@ -490,13 +490,13 @@ void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_uint64_t hosti
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.host", hostname);
 }
 
-void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, zbx_uint64_t tls_connect,
-		zbx_uint64_t tls_accept, const char *psk_identity, const char *psk)
+void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, int tls_connect,
+		int tls_accept, const char *psk_identity, const char *psk)
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_connect", tls_connect);
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_accept", tls_accept);
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_connect", tls_connect);
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_accept", tls_accept);
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.psk_identity", psk_identity);
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.psk", psk);
 }
