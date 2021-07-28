@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
- * @dataSource scheduledReports
+ * @dataSource ScheduledReports
  * @backup report
  */
 class testPageScheduledReport extends CWebTest {
@@ -94,8 +94,10 @@ class testPageScheduledReport extends CWebTest {
 		}
 		else {
 			$popup->select('View related reports');
-			$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
+			COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->page->removeFocus();
+			// Workaround for incorrect positioning of overlay dialog in Jenkins.
+			$overlay = $this->query('xpath://h4[text()="Related reports"]/ancestor::div[@class="overlay-dialogue modal modal-popup"]')->one();
 			sleep(1);
 			$this->assertScreenshot($overlay);
 			sleep(1);

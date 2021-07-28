@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @dataSource scheduledReports
+ * @dataSource ScheduledReports
  * @backup report
  */
 class testFormScheduledReport extends CWebTest {
@@ -983,7 +983,7 @@ class testFormScheduledReport extends CWebTest {
 	 * @backupOnce report
 	 */
 	public function testFormScheduledReport_Update($data) {
-		$update_reportid = CDataHelper::get('scheduledReports.reportids.'.
+		$update_reportid = CDataHelper::get('ScheduledReports.reportids.'.
 				CTestArrayHelper::get($data, 'report', self::UPDATE_REPORT_NAME));
 		$this->page->login()->open('zabbix.php?action=scheduledreport.edit&reportid='.$update_reportid);
 
@@ -1050,7 +1050,7 @@ class testFormScheduledReport extends CWebTest {
 	 */
 	public function testFormScheduledReport_Clone($data) {
 		$this->page->login()->open('zabbix.php?action=scheduledreport.edit&reportid='.
-				CDataHelper::get('scheduledReports.reportids.'.self::TEST_REPORT_NAME));
+				CDataHelper::get('ScheduledReports.reportids.'.self::TEST_REPORT_NAME));
 		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
 
 		// Get field values from form.
@@ -1083,7 +1083,7 @@ class testFormScheduledReport extends CWebTest {
 		$this->assertEquals($expected_subscriptions, $actual_subscriptions);
 	}
 
-	public static function getСancelData() {
+	public static function getCancelData() {
 		return [
 			[
 				[
@@ -1114,7 +1114,7 @@ class testFormScheduledReport extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getСancelData
+	 * @dataProvider getCancelData
 	 */
 	public function testFormScheduledReport_Cancel($data) {
 		$old_hash = $this->getHash();
@@ -1147,7 +1147,7 @@ class testFormScheduledReport extends CWebTest {
 		}
 		else {
 			$this->page->login()->open('zabbix.php?action=scheduledreport.edit&reportid='.
-					CDataHelper::get('scheduledReports.reportids.'.self::TEST_REPORT_NAME));
+					CDataHelper::get('ScheduledReports.reportids.'.self::TEST_REPORT_NAME));
 		}
 
 		// Change report data to make sure that the changes are not saved to the database after cancellation.
@@ -1244,7 +1244,7 @@ class testFormScheduledReport extends CWebTest {
 	public function testFormScheduledReport_TestOption($data) {
 		if (array_key_exists('report', $data)) {
 			$url = 'zabbix.php?action=scheduledreport.edit&reportid='.
-					CDataHelper::get('scheduledReports.reportids.'.$data['report']);
+					CDataHelper::get('ScheduledReports.reportids.'.$data['report']);
 		}
 		else {
 			$url = 'zabbix.php?action=scheduledreport.edit';
@@ -1264,7 +1264,7 @@ class testFormScheduledReport extends CWebTest {
 	}
 
 	public function testFormScheduledReport_Delete() {
-		$reportid = CDataHelper::get('scheduledReports.reportids.Report for delete');
+		$reportid = CDataHelper::get('ScheduledReports.reportids.Report for delete');
 		$this->page->login()->open('zabbix.php?action=scheduledreport.edit&reportid='.$reportid);
 		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();

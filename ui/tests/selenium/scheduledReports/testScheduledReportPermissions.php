@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
- * @dataSource scheduledReports
+ * @dataSource ScheduledReports
  * @backup report
  * @onBefore prepareData
  */
@@ -291,7 +291,7 @@ class testScheduledReportPermissions extends CWebTest {
 		$this->query('id:dashboard-actions')->one()->waitUntilClickable()->click();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($popup->hasItems('View related reports'));
-		// "Create new report" option is not aviable in dashboard.
+		// "Create new report" option is not available in dashboard.
 		$this->assertFalse($popup->query('xpath://a[@aria-label="Create new report"]')->one(false)->isValid());
 
 		// Check report on reports list page.
@@ -637,6 +637,14 @@ class testScheduledReportPermissions extends CWebTest {
 					'name' => 'super-admin report permissions',
 					'error' => 'Cannot delete user',
 					'details' => 'User "super-admin report permissions" is user on whose behalf report "report to check the dashboard change" is created.'
+				]
+			],
+			[
+				[
+					'url' => 'user.list',
+					'name' => 'user-recipient of the report',
+					'error' => 'Cannot delete user',
+					'details' => 'User "user-recipient of the report" is report "Report for delete" recipient.'
 				]
 			],
 			[

@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class scheduledReports {
+class ScheduledReports {
 
 	/**
 	 * Create data for testFormReports test.
@@ -26,6 +26,29 @@ class scheduledReports {
 	 * @return array
 	 */
 	public static function load() {
+		CDataHelper::call('user.create', [
+			[
+				'username' => 'admin user for testFormScheduledReport',
+				'passwd' => 'zabbix',
+				'roleid' => 2,
+				'usrgrps' => [
+					[
+						'usrgrpid' => 7
+					]
+				]
+			],
+			[
+				'username' => 'user-recipient of the report',
+				'passwd' => 'zabbix',
+				'roleid' => 2,
+				'usrgrps' => [
+					[
+						'usrgrpid' => 7
+					]
+				]
+			]
+		]);
+		$userids = CDataHelper::getIds('username');
 
 		CDataHelper::call('report.create', [
 			[
@@ -114,7 +137,7 @@ class scheduledReports {
 						'exclude'=> '1'
 					],
 					[
-						'userid'=> '4',
+						'userid'=> $userids['admin user for testFormScheduledReport'],
 						'access_userid'=> '1'
 					]
 				],
@@ -126,15 +149,15 @@ class scheduledReports {
 				]
 			],
 			[
-				'userid' => '5',
+				'userid' => $userids['admin user for testFormScheduledReport'],
 				'name'=> 'Report for delete',
 				'dashboardid'=> '1',
 				'subject'=> 'subject for report delete test',
 				'message'=> 'message for report delete test',
 				'users'=> [
 					[
-						'userid'=> '5',
-						'access_userid'=> '5'
+						'userid'=> $userids['user-recipient of the report'],
+						'access_userid'=> $userids['user-recipient of the report']
 					],
 				],
 				'user_groups'=> [
@@ -144,7 +167,7 @@ class scheduledReports {
 				]
 			],
 			[
-				'userid' => '4',
+				'userid' => $userids['admin user for testFormScheduledReport'],
 				'name'=> 'Report for filter - owner admin',
 				'dashboardid'=> '1',
 				'period'=> '1',
@@ -158,7 +181,7 @@ class scheduledReports {
 				]
 			],
 			[
-				'userid' => '4',
+				'userid' => $userids['admin user for testFormScheduledReport'],
 				'name'=> 'Report for filter - expired, owner admin',
 				'dashboardid'=> '1',
 				'active_since'=> '2020-04-24',
