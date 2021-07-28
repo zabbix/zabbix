@@ -782,14 +782,14 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)'),
 				'params' => $this->param1PeriodMode,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => $this->operators
+				'operators' => ['=', '<>']
 			],
 			'monoinc' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)'),
 				'params' => $this->param1PeriodMode,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => $this->operators
+				'operators' => ['=', '<>']
 			],
 			'nodata' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
