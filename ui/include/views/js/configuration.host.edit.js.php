@@ -84,22 +84,5 @@
 		}
 
 		jQuery('input[name=tls_connect]').trigger('change');
-
-		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
-		jQuery('#hosts-form').submit(function() {
-			var tls_accept = 0x00;
-
-			if (jQuery('#tls_in_none').is(':checked')) {
-				tls_accept |= <?= HOST_ENCRYPTION_NONE ?>;
-			}
-			if (jQuery('#tls_in_psk').is(':checked')) {
-				tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
-			}
-			if (jQuery('#tls_in_cert').is(':checked')) {
-				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
-			}
-
-			jQuery('#tls_accept').val(tls_accept);
-		});
 	});
 </script>

@@ -339,7 +339,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 		var wide_popup_actions = ['popup.generic', 'dashboard.share.edit', 'dashboard.page.properties.edit',
 			'dashboard.properties.edit', 'dashboard.widget.edit', 'popup.services', 'popup.media', 'popup.lldoperation',
 				'popup.lldoverride', 'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep',
-				'popup.testtriggerexpr', 'popup.triggerwizard'
+				'popup.testtriggerexpr', 'popup.triggerwizard', 'popup.host.edit'
 			],
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',

@@ -321,7 +321,8 @@ else {
 				'srcfld2' => 'host',
 				'dstfrm' => $host_form->getName(),
 				'dstfld1' => 'add_templates_',
-				'disableids' => array_column($data['host']['parentTemplates'], 'templateid')
+//				'disable_selected' => true,
+//				'disableids' => []
 			]
 		]
 	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);

@@ -143,6 +143,12 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 						return;
 					}
 
+					var clear_tmpl = document.createElement('input');
+					clear_tmpl.setAttribute('type', 'hidden');
+					clear_tmpl.setAttribute('name', 'clear_templates[]');
+					clear_tmpl.setAttribute('value', event.target.dataset.templateid);
+					event.target.form.appendChild(clear_tmpl);
+
 					event.target.closest('tr').remove();
 				}
 			});

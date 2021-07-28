@@ -22,11 +22,12 @@
 /**
  * Controller for host creation.
  */
-class CControllerHostCreate extends CController {
+class CControllerHostUpdate extends CController {
 
 	protected function checkInput(): bool {
 
 		$fields = [
+			'hostid'			=> 'required|db hosts.hostid',
 			'host'				=> 'required|db hosts.host|not_empty',
 			'visiblename'		=> 'db hosts.name',
 			'description'		=> 'db hosts.description',
@@ -38,7 +39,6 @@ class CControllerHostCreate extends CController {
 			'tags'				=> 'array',
 			'templates'			=> 'array_db hosts.hostid',
 			'add_templates'		=> 'array_db hosts.hostid',
-			'rem_templates'		=> 'array_db hosts.hostid',
 			'clear_templates'	=> 'array_db hosts.hostid',
 			'ipmi_authtype'		=> 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
 									IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM,
@@ -81,31 +81,65 @@ class CControllerHostCreate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+			return false;
+		}
+
+		$this->host = API::Host()->get([
+			'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
+				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
+				'tls_subject', 'flags'
+			],
+			'hostids' => $this->getInput('hostid'),
+			'editable' => true
+		]);
+
+		if (!$this->host) {
+			return false;
+		}
+
+		$this->host = $this->host[0];
+
+		// TODO: remove this once fix of ZBX-19555 is delivered into dev-branch.
+		$this->host += [
+			'inventory_mode' => CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE),
+			'tls_psk' => 'tiri-piri!',
+			'tls_psk_identity' => 'tiri-piri!'
+		];
+		// end TODO.
+
+		return true;
 	}
 
 	protected function doAction(): void {
 
-		$host = array_filter([
-			'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
-			'proxy_hostid' => $this->getInput('proxy_hostid', 0),
+		$host = [
+			'hostid' => $this->host['hostid'],
+			'name' => $this->getInput('visiblename', $this->host['name']),
+			'status' => $this->getInput('status', $this->host['status']),
+			'proxy_hostid' => $this->getInput('proxy_hostid', $this->host['proxy_hostid']),
 			'groups' => $this->processHostGroups(),
 			'interfaces' => $this->processHostInterfaces(),
 			'tags' => $this->processTags(),
-			'templates' => zbx_toObject($this->getInput('add_templates', []), 'templateid'),
+			'templates' => $this->processTemplates(),
+			'clear_templates' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
 			'macros' => $this->processUserMacros(),
-			'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) == HOST_INVENTORY_DISABLED)
-				? $this->getInput('host_inventory', [])
-				: [],
-			'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
-			'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
-		]);
+			'inventory' => ($this->getInput('inventory_mode', $this->host['inventory_mode']) == HOST_INVENTORY_DISABLED)
+				? []
+				: $this->getInput('host_inventory', []),
+			'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
+			'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])
+		];
 
-		$this->getInputs($host, [
-			'host', 'visiblename', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege',
-			'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer',
-			'tls_psk_identity', 'tls_psk', 'inventory_mode'
-		]);
+		$host_properties = [
+			'host', 'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
+			'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
+		];
+		foreach ($host_properties as $prop) {
+			if ($this->getInput($prop, '') !== $this->host[$prop]) {
+				$this->getInput($prop, '');
+			}
+		}
 
 		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
 			unset($host['tls_psk'], $host['tls_psk_identity']);
@@ -121,10 +155,10 @@ class CControllerHostCreate extends CController {
 		]);
 
 		$output = [];
-		if (($hostids = API::Host()->create($host)) !== false) {
+		if (($hostids = API::Host()->update($host)) !== false) {
 			$output += [
 				'hostid' => $hostids['hostids'][0],
-				'message' => _('Host added')
+				'message' => _('Host updated')
 			];
 		}
 
@@ -137,7 +171,7 @@ class CControllerHostCreate extends CController {
 	}
 
 	/**
-	 * Prepare host interfaces for host.create method.
+	 * Prepare host interfaces for host.update method.
 	 *
 	 * @return array
 	 */
@@ -176,7 +210,7 @@ class CControllerHostCreate extends CController {
 	}
 
 	/**
-	 * Prepare host level user macros for host.create method.
+	 * Prepare host level user macros for host.update method.
 	 *
 	 * @return array
 	 */
@@ -191,7 +225,7 @@ class CControllerHostCreate extends CController {
 	}
 
 	/**
-	 * Prepare host tags for host.create method.
+	 * Prepare host tags for host.update method.
 	 *
 	 * @return array
 	 */
@@ -204,7 +238,7 @@ class CControllerHostCreate extends CController {
 	}
 
 	/**
-	 * Prepare host groups for host.create method.
+	 * Prepare host groups for host.update method.
 	 *
 	 * @return array
 	 */
@@ -233,4 +267,14 @@ class CControllerHostCreate extends CController {
 		return zbx_toObject($groups, 'groupid');
 	}
 
+	/**
+	 * Prepare templates for host.update method.
+	 *
+	 * @return array
+	 */
+	private function processTemplates(): array {
+		return zbx_toObject(array_merge($this->getInput('add_templates', []), $this->getInput('templates', [])),
+			'templateid'
+		);
+	}
 }

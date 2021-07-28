@@ -94,6 +94,14 @@ $inline_js =
 
 			// Todo: Call refresh on ?action=host.list page;
 		'}'.
+	'});'.
+
+	'$("#tabs").on("tabsactivate", (event, ui) => {'.
+		'overlays_stack.end().centerDialog();'.
+	'});'.
+
+	'$("#tabs").on("change", () => {'.
+		'overlays_stack.end().centerDialog();'.
 	'});';
 
 $output = [

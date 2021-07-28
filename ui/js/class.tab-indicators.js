@@ -49,7 +49,7 @@ class TabIndicators {
 	 */
 	getForm() {
 		const TEMPLATE = document.querySelector('#templates-form');
-		const HOST = document.querySelector('#hosts-form');
+		const HOST = document.querySelector('#host-form');
 		const AUTHENTICATION = document.querySelector('#authentication-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
 		const ITEM = document.querySelector('#item-form');
