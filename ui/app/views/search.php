@@ -23,6 +23,15 @@
  * @var CView $this
  */
 
+$scripts = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
+	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js', 'hostinterfacemanager.js',
+	'hostpopup.js', 'hostmacrosmanager.js'
+];
+
+foreach ($scripts as $script) {
+	$this->addJsFile($script);
+}
+
 $widgets = [];
 
 $table = (new CTableInfo())
@@ -48,10 +57,11 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$visible_name = make_decoration($host['name'], $data['search']);
 
 	$name_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? new CLink($visible_name, (new CUrl('zabbix.php'))
+		? (new CLink($visible_name, (new CUrl('zabbix.php'))
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $hostid)
-		)
+		))
+			->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)
 		: new CSpan($visible_name);
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -372,4 +382,8 @@ if ($data['admin']) {
 (new CWidget())
 	->setTitle(_('Search').': '.$data['search'])
 	->addItem(new CDiv($widgets))
+	->show();
+
+(new CScriptTag('host_popup.init();'))
+	->setOnDocumentReady()
 	->show();

@@ -833,39 +833,66 @@ class testFormTabIndicators extends CWebTest {
 	 * @onBeforeOnce prepareServiceData
 	 */
 	public function testFormTabIndicators_CheckServiceIndicators() {
-		$this->page->login()->open('services.php?form=1&parentname=root')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=service.list.edit')->waitUntilReady();
 
-		// Check status indicator in Dependencies tab.
-		$form = $this->query('id:services-form')->asForm()->one();
-		$form->selectTab('Dependencies');
-		$tab_selector = $form->query('xpath:.//a[text()="Dependencies"]')->one();
+		// Check status indicator in Child services tab.
+		$this->query('button:Create service')->one()->waitUntilClickable()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asForm()->one();
+		$form->selectTab('Child services');
+		$tab_selector = $form->query('xpath:.//a[text()="Child services"]')->one();
 		$this->assertTabIndicator($tab_selector, 0);
 
-		// Add service ependencies and check dependency count indicator.
-		$dependencies_field = $form->getFieldContainer('Depends on');
-		$dependencies_field->query('button:Add')->one()->click();
-		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
-		$overlay->query('id:all_services')->asCheckbox()->one()->check();
+		// Add child services and check child service count indicator.
+		$child_services_tab = $form->query('id:child-services-tab')->one();
+		$child_services_tab->query('button:Add')->one()->click();
+		$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$overlay->query('id:serviceid_all')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
-		COverlayDialogElement::ensureNotPresent();
+		$overlay->waitUntilNotVisible();
 		$this->assertTabIndicator($tab_selector, 2);
 
-		// Remove all dependencies and check count indicator.
-		$dependencies_field->query('button:Remove')->all()->click();
+		// Remove all child services and check count indicator.
+		$child_services_tab->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
 
-		// Open Time tab and check count indicator.
-		$form->selectTab('Time');
-		$tab_selector = $form->query('xpath:.//a[text()="Time"]')->one();
+		// Open SLA tab and check count indicator.
+		$form->selectTab('SLA');
+		$tab_selector = $form->query('id:tab_sla-tab')->one();
+		$this->assertTabIndicator($tab_selector, false);
+
+		// Add Show SLA and check status indicator.
+		$form->query('id:showsla')->one()->click();
+		$this->assertTabIndicator($tab_selector, true);
+
+		// Remove the Show SLA and check status indicator.
+		$form->query('id:showsla')->one()->click();
+		$this->assertTabIndicator($tab_selector, false);
+
+		// Open Tags tab and check count indicator.
+		$form->selectTab('Tags');
+		$tab_selector = $form->query('id:tab_tags-tab')->one();
 		$this->assertTabIndicator($tab_selector, 0);
 
-		// Add a time period and check count indicator.
-		$form->getField('Period type')->select('One-time downtime');
-		$form->getFieldContainer('New service time')->query('button:Add')->one()->click();
-		$this->assertTabIndicator($tab_selector, 1);
+		// Add Tags and check count indicator.
+		$tags = [
+			[
+				'tag' => '!@#$%^&*()_+<>,.\/',
+				'value' => '!@#$%^&*()_+<>,.\/'
+			],
+			[
+				'tag' => 'tag1',
+				'value' => 'value1'
+			],
+			[
+				'tag' => 'tag2'
+			]
+		];
+		$form->query('id:tags-table')->asMultifieldTable()->one()->fill($tags);
+		$this->assertTabIndicator($tab_selector, 3);
 
-		// Remove the added time period and check count indicator.
-		$form->getFieldContainer('Service times')->query('button:Remove')->one()->click();
+		// Remove the tags and check count indicator.
+		$form->query('id:tags-table')->one()->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
 	}
 
@@ -958,7 +985,7 @@ class testFormTabIndicators extends CWebTest {
 
 			case 'data_set':
 				if ($action === USER_ACTION_REMOVE) {
-					$form->query('class:remove-btn')->all()->click();
+					$form->query('class:btn-remove')->all()->click();
 				}
 				else {
 					for ($i = 0; $i < $tab['new_entries']; $i++) {

@@ -246,8 +246,8 @@ class CAlert extends CApiService {
 		}
 
 		// objectids
-		if ($options['objectids'] !== null
-				&& in_array($options['eventobject'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
+		if ($options['objectids'] !== null && in_array($options['eventobject'],
+				[EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE])) {
 			zbx_value2array($options['objectids']);
 
 			// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins

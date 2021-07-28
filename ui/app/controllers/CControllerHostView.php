@@ -29,7 +29,7 @@ class CControllerHostView extends CControllerHost {
 	protected function checkInput(): bool {
 		$fields = [
 			'name' =>					'string',
-			'groupids' =>				'array_id',
+			'groupids' =>				'array_db hosts_groups.groupid',
 			'ip' =>						'string',
 			'dns' =>					'string',
 			'port' =>					'string',
@@ -108,6 +108,7 @@ class CControllerHostView extends CControllerHost {
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'filter_view' => 'monitoring.host.filter',
 			'filter_defaults' => $profile->filter_defaults,
+			'filter_groupids' => $this->getInput('groupids', []),
 			'filter_tabs' => $filter_tabs,
 			'can_create_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 			'tabfilter_options' => [

@@ -6,24 +6,33 @@ const host_popup = {
 	initActionButtons() {
 		document.addEventListener('click', event => {
 			if (event.target.classList.contains('js-create-host')) {
-				const options = (event.target.dataset.hostgrops !== undefined)
-					? {hostgrops: [event.target.dataset.hostgrops]}
+				const options = (event.target.dataset.hostgroups !== undefined)
+					? {groupids: JSON.parse(event.target.dataset.hostgroups)}
 					: {};
 
 				const url = new Curl('zabbix.php', false);
-				url.setArgument('action', 'host.edit');
+				url.setArgument('action', 'host.create');
 				history.pushState({}, '', url.getUrl());
 
 				this.edit(options);
 			}
 			else if (event.target.classList.contains('js-edit-host')) {
-				this.edit({hostid: event.target.dataset.hostid});
+				let hostid = null;
+
+				if (event.target.hostid !== undefined && event.target.dataset.hostid !== undefined) {
+					hostid = event.target.dataset.hostid;
+				}
+				else {
+					hostid = new Curl(event.target.href).getArgument('hostid')
+				}
+
+				this.edit({hostid:  hostid});
 
 				history.pushState({}, '', event.target.getAttribute('href'));
 
 				event.preventDefault();
 			}
-		}, true);
+		}, {capture: true});
 	},
 
 	edit(options = {}) {

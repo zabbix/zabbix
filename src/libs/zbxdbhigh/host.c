@@ -647,19 +647,23 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 
 		while (NULL != (trow = DBfetch(tresult)))
 		{
-			char	*itemkey;
-
 			ZBX_STR2UINT64(graphid, trow[0]);
-			itemkey = zbx_strdup(NULL, trow[1]);
 
 			for (i = 0; i < graphs.values_num; i++)
 			{
 				graph = (zbx_template_graph_valid_t *)graphs.values[i];
 
 				if (graphid == graph->tgraphid)
-					zbx_vector_str_append(&graph->tkeys, itemkey);
-				else if (graphid == graph->hgraphid)
-					zbx_vector_str_append(&graph->hkeys, itemkey);
+				{
+					zbx_vector_str_append(&graph->tkeys, zbx_strdup(NULL, trow[1]));
+					break;
+				}
+
+				if (graphid == graph->hgraphid)
+				{
+					zbx_vector_str_append(&graph->hkeys, zbx_strdup(NULL, trow[1]));
+					break;
+				}
 			}
 		}
 		DBfree_result(tresult);
@@ -936,8 +940,6 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&selementids);
-
-	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -4809,8 +4811,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 
 			zbx_free(tmp);
 			tmp = strdup(row[4]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
-					&tmp, MACRO_TYPE_COMMON, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 				continue;
 

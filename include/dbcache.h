@@ -213,6 +213,8 @@ typedef struct
 }
 zbx_tag_t;
 
+ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
+
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -329,6 +331,7 @@ typedef struct
 	int		events_internal;
 	int		events_discovery;
 	int		events_autoreg;
+	int		events_service;
 	int		services;
 	int		audit;
 	int		sessions;

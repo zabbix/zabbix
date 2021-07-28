@@ -182,12 +182,6 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Configuration',
-					'page' => 'Services'
-				]
-			],
-			[
-				[
 					'section' => 'Administration',
 					'page' => 'General',
 					'third_level' =>

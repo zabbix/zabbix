@@ -40,7 +40,7 @@ $widget = (new CWidget())
 			->addItem(
 				(new CSimpleButton(_('Create host')))
 					->addClass('js-create-host')
-					->setAttribute('data-groupids', array_keys($data['filter']['groups']))
+					->setAttribute('data-hostgroups', json_encode(array_keys($data['filter']['groups'])))
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
@@ -77,7 +77,7 @@ $filter
 						'parameters' => [
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
-							'dstfrm' => $filter->getName(),
+							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
 							'real_hosts' => 1,
 							'editable' => 1,
@@ -97,7 +97,7 @@ $filter
 							'srctbl' => 'templates',
 							'srcfld1' => 'hostid',
 							'srcfld2' => 'host',
-							'dstfrm' => $filter->getName(),
+							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_templates_'
 						]
 					]
@@ -226,8 +226,7 @@ foreach ($data['hosts'] as $host) {
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $host['hostid'])
 	))
-		->setAttribute('data-hostid', $host['hostid'])
-		->addClass('js-edit-host');
+		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT);
 
 	$maintenance_icon = false;
 	$status_toggle_url = (new CUrl('zabbix.php'))

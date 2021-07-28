@@ -28,6 +28,8 @@
 #include "alert_manager.h"
 #include "alert_syncer.h"
 #include "alerter_protocol.h"
+#include "zbxservice.h"
+#include "service_protocol.h"
 
 #include "../../libs/zbxalgo/vectorimpl.h"
 
@@ -464,9 +466,6 @@ static int	am_db_compare_tags(const void *d1, const void *d2)
 	return strcmp(tag1->value, tag2->value);
 }
 
-ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
-ZBX_PTR_VECTOR_IMPL(tags, zbx_tag_t*)
-
 static void	tag_free(zbx_tag_t *tag)
 {
 	zbx_free(tag->tag);
@@ -669,6 +668,27 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	am_service_add_event_tags(zbx_vector_events_tags_t *events_tags)
+{
+	unsigned char	*data = NULL;
+	size_t		data_alloc = 0, data_offset = 0;
+	int		i;
+
+	for (i = 0; i < events_tags->values_num; i++)
+	{
+		zbx_event_tags_t	*event_tag = events_tags->values[i];
+
+		zbx_service_serialize_problem_tags(&data, &data_alloc, &data_offset, event_tag->eventid,
+				&event_tag->tags);
+	}
+
+	if (NULL == data)
+		return;
+
+	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS, data, data_offset);
+	zbx_free(data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: am_db_flush_results                                              *
@@ -695,18 +715,22 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 		return 0;
 	}
 
+	zbx_vector_events_tags_create(&update_events_tags);
+
 	zbx_alerter_deserialize_results(message.data, &results, &results_num);
 
 	if (0 != results_num)
 	{
-		int 		i;
+		int 		i, ret;
 		char		*sql;
 		size_t		sql_alloc = results_num * 128, sql_offset;
 		zbx_db_insert_t	db_event, db_problem;
 
 		sql = (char *)zbx_malloc(NULL, sql_alloc);
 
-		do {
+		do
+		{
+			zbx_vector_events_tags_clear_ext(&update_events_tags, event_tags_free);
 			sql_offset = 0;
 
 			DBbegin();
@@ -714,8 +738,6 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 			zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
 			zbx_db_insert_prepare(&db_problem, "problem_tag", "problemtagid", "eventid", "tag", "value",
 					NULL);
-
-			zbx_vector_events_tags_create(&update_events_tags);
 
 			for (i = 0; i < results_num; i++)
 			{
@@ -764,11 +786,11 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 			zbx_db_insert_autoincrement(&db_problem, "problemtagid");
 			zbx_db_insert_execute(&db_problem);
 			zbx_db_insert_clean(&db_problem);
-
-			zbx_vector_events_tags_clear_ext(&update_events_tags, event_tags_free);
-			zbx_vector_events_tags_destroy(&update_events_tags);
 		}
-		while (ZBX_DB_DOWN == DBcommit());
+		while (ZBX_DB_DOWN == (ret = DBcommit()));
+
+		if (ZBX_DB_OK == ret)
+			am_service_add_event_tags(&update_events_tags);
 
 		for (i = 0; i < results_num; i++)
 		{
@@ -782,6 +804,8 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 		zbx_free(sql);
 	}
 
+	zbx_vector_events_tags_clear_ext(&update_events_tags, event_tags_free);
+	zbx_vector_events_tags_destroy(&update_events_tags);
 	zbx_free(results);
 	zbx_ipc_message_clean(&message);
 

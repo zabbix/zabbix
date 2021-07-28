@@ -115,14 +115,6 @@ class CControllerHostEdit extends CController {
 			CArrayHelper::sort($data['host']['tags'], ['tag', 'value']);
 		}
 
-		// TODO: remove this once fix of ZBX-19555 is delivered into dev-branch.
-		$data['host'] += [
-			'inventory_mode' => CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE),
-			'tls_psk' => 'tiri-piri!',
-			'tls_psk_identity' => 'tiri-piri!'
-		];
-		// end TODO.
-
 		// Extend data for view.
 		$this->extendHostGroups($data['groups_ms']);
 		$this->extendLinkedTemplates($data['editable_templates']);
@@ -322,7 +314,8 @@ class CControllerHostEdit extends CController {
 			'interfaces' => [],
 			'macros' => [],
 			'inventory' => [],
-			'valuemaps' => []
+			'valuemaps' => [],
+			'inventory_mode' => CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE)
 		];
 	}
 }

@@ -52,7 +52,8 @@ if ($data['hostid'] != 0) {
 }
 
 // Add filter tab.
-$filter = (new CFilter((new CUrl('host_discovery.php'))->setArgument('context', $data['context'])))
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('host_discovery.php'))->setArgument('context', $data['context']))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addvar('context', $data['context']);
@@ -69,7 +70,7 @@ $filter_column1 = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => $filter->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
 					'enrich_parent_groups' => true
@@ -89,7 +90,7 @@ $filter_column1 = (new CFormList())
 				'parameters' => [
 					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
-					'dstfrm' => $filter->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_hostids_',
 					'editable' => true
 				]

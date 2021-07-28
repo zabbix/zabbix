@@ -441,8 +441,8 @@ class testFormUserMedia extends CWebTest {
 					'user_fields' => [
 						'Username' => 'created-user',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
 					],
 					'media_fields' => [
 						'Type' => 'SMS',

@@ -23,11 +23,21 @@
  * @var CView $this
  */
 
+$scripts = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
+	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js', 'hostinterfacemanager.js',
+	'hostpopup.js', 'hostmacrosmanager.js'
+];
+
+foreach ($scripts as $script) {
+	$this->addJsFile($script);
+}
+
 // Overview tab.
 $overviewFormList = new CFormList();
 
 $host_name = (new CLinkAction($data['host']['host']))
-	->setMenuPopup(CMenuPopupHelper::getHost($data['host']['hostid'], false));
+	->setMenuPopup(CMenuPopupHelper::getHost($data['host']['hostid'], false))
+	->setAttribute('data-popupedit', 1);
 
 if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 	if (array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {
@@ -175,10 +185,11 @@ $overviewFormList->addRow(_('Monitoring'),
 
 // configuration
 if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
-	$hostLink = new CLink(_('Host'), (new CUrl('zabbix.php'))
+	$hostLink = (new CLink(_('Host'), (new CUrl('zabbix.php'))
 		->setArgument('action', 'host.edit')
 		->setArgument('hostid', $data['host']['hostid'])
-	);
+	))
+		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT);
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('items.php'))
 			->setArgument('filter_set', '1')
@@ -269,4 +280,8 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem($hostInventoriesTab)
 	)
+	->show();
+
+(new CScriptTag('host_popup.init()'))
+	->setOnDocumentReady()
 	->show();

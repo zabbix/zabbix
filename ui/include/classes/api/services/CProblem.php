@@ -237,7 +237,7 @@ class CProblem extends CApiService {
 		// severities
 		if ($options['severities'] !== null) {
 			// triggers
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['object'] == EVENT_OBJECT_SERVICE) {
 				zbx_value2array($options['severities']);
 				$sqlParts['where'][] = dbConditionInt('p.severity', $options['severities']);
 			}
@@ -350,14 +350,14 @@ class CProblem extends CApiService {
 	 */
 	protected function validateGet(array $options) {
 		$sourceValidator = new CLimitedSetValidator([
-			'values' => [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL]
+			'values' => [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]
 		]);
 		if (!$sourceValidator->validate($options['source'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
 		}
 
 		$objectValidator = new CLimitedSetValidator([
-			'values' => [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE]
+			'values' => [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE]
 		]);
 		if (!$objectValidator->validate($options['object'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect object value.'));

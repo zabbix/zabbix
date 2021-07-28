@@ -565,6 +565,24 @@ switch ($data['method']) {
 					$result = CArrayHelper::renameObjectsKeys($dashboards, ['dashboardid' => 'id']);
 				}
 				break;
+
+			case 'services':
+				$services = API::Service()->get([
+					'output' => ['serviceid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($services) {
+					CArrayHelper::sort($services, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
+
+					if (array_key_exists('limit', $data)) {
+						$services = array_slice($services, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($services, ['serviceid' => 'id']);
+				}
+				break;
 		}
 		break;
 
