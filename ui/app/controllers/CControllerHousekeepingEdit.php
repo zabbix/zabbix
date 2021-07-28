@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,11 +21,11 @@
 
 class CControllerHousekeepingEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'hk_events_mode'			=> 'db config.hk_events_mode',
 			'hk_events_trigger'			=> 'db config.hk_events_trigger',
@@ -56,11 +56,11 @@ class CControllerHousekeepingEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'hk_events_mode' => $this->getInput('hk_events_mode', CHousekeepingHelper::get(
 				CHousekeepingHelper::HK_EVENTS_MODE

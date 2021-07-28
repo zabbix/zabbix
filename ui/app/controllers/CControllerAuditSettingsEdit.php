@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,11 +21,11 @@
 
 class CControllerAuditSettingsEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'auditlog_enabled'	=> 'db config.auditlog_enabled',
 			'hk_audit_mode'		=> 'db config.hk_audit_mode',
@@ -41,11 +41,11 @@ class CControllerAuditSettingsEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'auditlog_enabled' => $this->getInput('auditlog_enabled',
 				CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED)

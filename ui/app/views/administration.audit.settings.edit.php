@@ -31,13 +31,14 @@ $widget = (new CWidget())
 
 $form = (new CForm())
 	->setId('audit-settings')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'audit.settings.update')
-		->getUrl()
+	->setAction(
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'audit.settings.update')
+			->getUrl()
 	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
-$audit_grid = (new CFormGrid())
+$audit_settings_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable audit logging'), 'auditlog_enabled'),
 		new CFormField((new CCheckBox('auditlog_enabled'))->setChecked($data['auditlog_enabled'] == 1))
@@ -56,13 +57,15 @@ $audit_grid = (new CFormGrid())
 		)
 	]);
 
-$audit_settings_view = (new CTabView())
-	->addTab('audit-settings', _('Audit log'), $audit_grid)
-	->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[new CButton('resetDefaults', _('Reset defaults'))]
-	));
+$form->addItem(
+	(new CTabView())
+		->addTab('audit-settings', _('Audit log'), $audit_settings_tab)
+		->setFooter(makeFormFooter(
+			new CSubmit('update', _('Update')),
+			[new CButton('resetDefaults', _('Reset defaults'))]
+		))
+);
 
 $widget
-	->addItem($form->addItem($audit_settings_view))
+	->addItem($form)
 	->show();
