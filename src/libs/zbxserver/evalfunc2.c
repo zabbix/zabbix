@@ -2613,45 +2613,58 @@ static int	evaluate_MONO(zbx_variant_t *value, DC_ITEM *item, const char *parame
 		goto out;
 	}
 
-	res = 1;
+	if (0 < values.values_num)
+	{
+		res = 1;
 
-	if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-	{
-		if (MONOINC == gradient)
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
-			CHECK_MONOTONICITY(dbl, >, +ZBX_DOUBLE_EPSILON);
+			if (MONOINC == gradient)
+			{
+				CHECK_MONOTONICITY(dbl, >, +ZBX_DOUBLE_EPSILON);
+			}
+			else if (MONODEC == gradient)
+			{
+				CHECK_MONOTONICITY(dbl, <, -ZBX_DOUBLE_EPSILON);
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+			}
 		}
-		else if (MONODEC == gradient)
+		else if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
-			CHECK_MONOTONICITY(dbl, <, -ZBX_DOUBLE_EPSILON);
+			if (MONOINC == gradient)
+			{
+				CHECK_MONOTONICITY(ui64, >, 0);
+			}
+			else if (MONODEC == gradient)
+			{
+				CHECK_MONOTONICITY(ui64, <, 0);
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+			}
 		}
 		else
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 		}
-	}
-	else if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-	{
-		if (MONOINC == gradient)
-		{
-			CHECK_MONOTONICITY(ui64, >, 0);
-		}
-		else if (MONODEC == gradient)
-		{
-			CHECK_MONOTONICITY(ui64, <, 0);
-		}
-		else
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-		}
+		zbx_variant_set_ui64(value, res);
+		ret = SUCCEED;
 	}
 	else
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-	}
+		if (MONOINC == gradient)
+			zabbix_log(LOG_LEVEL_DEBUG, "result for MONOINC is empty");
+		else if (MONODEC == gradient)
+			zabbix_log(LOG_LEVEL_DEBUG, "result for MONODEC is empty");
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
 
-	zbx_variant_set_ui64(value, res);
-	ret = SUCCEED;
+		*error = zbx_strdup(*error, "not enough data");
+	}
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 	zbx_free(arg2);
