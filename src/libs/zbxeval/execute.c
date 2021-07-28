@@ -1666,13 +1666,15 @@ static int	eval_execute_function_trim(const zbx_eval_context_t *ctx, const zbx_e
 	switch (type)
 	{
 		case FUNCTION_OPTYPE_TRIM_ALL:
-			zbx_lrtrim(arg->data.str, sym->data.str);
+			zbx_ltrim_utf8(arg->data.str, sym->data.str);
+			zbx_rtrim_utf8(arg->data.str, sym->data.str);
 			break;
 		case FUNCTION_OPTYPE_TRIM_RIGHT:
-			zbx_rtrim(arg->data.str, sym->data.str);
+			zbx_rtrim_utf8(arg->data.str, sym->data.str);
 			break;
 		case FUNCTION_OPTYPE_TRIM_LEFT:
-			zbx_ltrim(arg->data.str, sym->data.str);
+			zbx_ltrim_utf8(arg->data.str, sym->data.str);
+			break;
 	}
 
 	if (2 != token->opt)
