@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-21 11:20+0300\n"
+"POT-Creation-Date: 2021-07-23 19:53+0300\n"
 "PO-Revision-Date: 2016-04-20 12:06+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -254,7 +254,7 @@ msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, sola lettura"
 
-#: jsLoader.php:362
+#: jsLoader.php:363
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -1011,7 +1011,7 @@ msgstr ""
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:385
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
 msgid "All"
 msgstr "Tutti"
 
@@ -1724,7 +1724,7 @@ msgstr ""
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
-#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:381
+#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
 msgid "Cancel"
 msgstr "Annulla"
 
@@ -1927,7 +1927,7 @@ msgstr ""
 msgid "Cannot clone graph prototypes."
 msgstr "Impossibile clonare prototipi di grafico."
 
-#: include/classes/api/services/CDiscoveryRule.php:2567
+#: include/classes/api/services/CDiscoveryRule.php:2568
 msgid "Cannot clone host prototypes."
 msgstr "Impossibile clonare prototipi host."
 
@@ -2222,7 +2222,7 @@ msgstr ""
 msgid "Cannot delete templated graph."
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:1297
+#: include/classes/api/services/CHostPrototype.php:1302
 msgid "Cannot delete templated host prototype."
 msgstr "Impossibile rimuovere prototipo host con template."
 
@@ -3386,7 +3386,7 @@ msgstr "Clona"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
-#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:374
+#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
 msgid "Close"
 msgstr "Chiudi"
 
@@ -4446,7 +4446,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172
+#: include/views/inventory.host.view.php:172 jsLoader.php:337
 msgid "Dashboards"
 msgstr ""
 
@@ -4616,7 +4616,7 @@ msgstr "Giorno della settimana"
 msgid "Days"
 msgstr "Giorni"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:365
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
 msgid "Debug"
 msgstr "Debug"
 
@@ -4761,7 +4761,7 @@ msgstr "Ritardato di"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
 #: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
-#: jsLoader.php:176 jsLoader.php:337
+#: jsLoader.php:176 jsLoader.php:338
 msgid "Delete"
 msgstr "Rimuovi"
 
@@ -4790,7 +4790,7 @@ msgstr "Rimuovere azione corrente?"
 msgid "Delete current correlation?"
 msgstr "Cancella attuale correlazione?"
 
-#: jsLoader.php:338
+#: jsLoader.php:339
 msgid "Delete dashboard?"
 msgstr ""
 
@@ -5041,7 +5041,7 @@ msgstr "Cancellare scenario web?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Rimosso: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1165
+#: include/classes/api/services/CHostPrototype.php:1170
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Rimosso: Prototipo host \"%1$s\" su \"%2$s\"."
@@ -5544,7 +5544,7 @@ msgstr "Mostra grafico stacked"
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1646 include/actions.inc.php:1717
 #: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:377
+#: jsLoader.php:378
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Visualizzati %1$s di %2$s trovate"
@@ -5580,7 +5580,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:216 jsLoader.php:339
+#: jsLoader.php:216 jsLoader.php:340
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Desideri sostituire l'espressione condizionale?"
 
@@ -5782,7 +5782,7 @@ msgstr ""
 msgid "Edit tree element"
 msgstr ""
 
-#: jsLoader.php:340
+#: jsLoader.php:341
 msgid "Edit trigger"
 msgstr "Modifica trigger"
 
@@ -5882,7 +5882,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:792
 #: include/classes/api/services/CHost.php:1369
 #: include/classes/api/services/CHost.php:1898
-#: include/classes/api/services/CHostPrototype.php:1093
+#: include/classes/api/services/CHostPrototype.php:1098
 #: include/classes/api/services/CImage.php:430
 #: include/classes/api/services/CImage.php:482
 #: include/classes/api/services/CMaintenance.php:542
@@ -6965,7 +6965,7 @@ msgstr "Valore globale"
 msgid "Go back to %1$s"
 msgstr ""
 
-#: jsLoader.php:345
+#: jsLoader.php:346
 msgid "Go to"
 msgstr "Vai a"
 
@@ -7202,7 +7202,7 @@ msgstr "Un grafico con lo stesso nome ma di un altro tipo esiste già."
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:346
+#: include/views/inventory.host.view.php:217 jsLoader.php:347
 msgid "Graphs"
 msgstr "Grafici"
 
@@ -7262,7 +7262,7 @@ msgstr "Gruppo per host discoverati"
 msgid "Group name"
 msgstr "Nome del gruppo"
 
-#: include/classes/api/services/CHostPrototype.php:1255
+#: include/classes/api/services/CHostPrototype.php:1260
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Il prototipo gruppo non può esser basato su un gruppo host discoverato \"%1$s\"."
@@ -7406,7 +7406,7 @@ msgstr "Esadecimale a decimale."
 msgid "Hidden"
 msgstr "Nascosta"
 
-#: jsLoader.php:366
+#: jsLoader.php:367
 msgid "Hide debug"
 msgstr "Nascondi debug"
 
@@ -7458,7 +7458,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:347
+#: jsLoader.php:348
 msgid "History"
 msgstr "Storico"
 
@@ -7546,7 +7546,7 @@ msgstr "Allinea in orizzontale"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:255 jsLoader.php:348 report2.php:506
+#: jsLoader.php:255 jsLoader.php:349 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
@@ -7761,12 +7761,12 @@ msgstr "Reti di host"
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:970
+#: include/classes/api/services/CHostPrototype.php:975
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Il prototipo host \"%1$s\" esiste già su \"%2$s\", ereditato da un altro template."
 
-#: include/classes/api/services/CHostPrototype.php:958
+#: include/classes/api/services/CHostPrototype.php:963
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Il prototipo host \"%1$s\" esiste già su \"%2$s\"."
@@ -7775,7 +7775,7 @@ msgstr "Il prototipo host \"%1$s\" esiste già su \"%2$s\"."
 msgid "Host prototype added"
 msgstr "Prototipo host aggiunto"
 
-#: include/classes/api/services/CHostPrototype.php:1772
+#: include/classes/api/services/CHostPrototype.php:1777
 msgid "Host prototype cannot have more than one default interface of the same type."
 msgstr ""
 
@@ -9117,9 +9117,11 @@ msgstr ""
 #: app/controllers/CControllerPopupValueMapUpdate.php:94
 #: app/controllers/CControllerPopupValueMapUpdate.php:100
 #: app/controllers/CControllerPopupValueMapUpdate.php:105
-#: app/controllers/CControllerPopupValueMapUpdate.php:113
-#: app/controllers/CControllerPopupValueMapUpdate.php:125
-#: app/controllers/CControllerPopupValueMapUpdate.php:137
+#: app/controllers/CControllerPopupValueMapUpdate.php:112
+#: app/controllers/CControllerPopupValueMapUpdate.php:117
+#: app/controllers/CControllerPopupValueMapUpdate.php:124
+#: app/controllers/CControllerPopupValueMapUpdate.php:136
+#: app/controllers/CControllerPopupValueMapUpdate.php:148
 #: app/controllers/CControllerScheduledReportCreate.php:82
 #: app/controllers/CControllerScheduledReportUpdate.php:86
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
@@ -9439,7 +9441,7 @@ msgid "Insert"
 msgstr "Inserisci"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:341
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
 msgid "Insert expression"
 msgstr "Inserire espressione"
 
@@ -9681,15 +9683,15 @@ msgstr "Parametri del metodo non validi."
 #: include/classes/api/services/CGraphGeneral.php:598
 #: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
-#: include/classes/api/services/CHostPrototype.php:1672
 #: include/classes/api/services/CHostPrototype.php:1677
-#: include/classes/api/services/CHostPrototype.php:1684
+#: include/classes/api/services/CHostPrototype.php:1682
 #: include/classes/api/services/CHostPrototype.php:1689
-#: include/classes/api/services/CHostPrototype.php:1700
+#: include/classes/api/services/CHostPrototype.php:1694
 #: include/classes/api/services/CHostPrototype.php:1705
-#: include/classes/api/services/CHostPrototype.php:1712
-#: include/classes/api/services/CHostPrototype.php:1718
-#: include/classes/api/services/CHostPrototype.php:1728
+#: include/classes/api/services/CHostPrototype.php:1710
+#: include/classes/api/services/CHostPrototype.php:1717
+#: include/classes/api/services/CHostPrototype.php:1723
+#: include/classes/api/services/CHostPrototype.php:1733
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CItemGeneral.php:603
 #: include/classes/api/services/CItemGeneral.php:616
@@ -9914,7 +9916,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:349
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
 msgid "Inventory"
 msgstr "Inventario"
 
@@ -9966,7 +9968,7 @@ msgstr "Italiano (it_IT)"
 msgid "Item"
 msgstr "Item"
 
-#: include/classes/api/services/CHostPrototype.php:1199
+#: include/classes/api/services/CHostPrototype.php:1204
 #: include/classes/api/services/CItem.php:61
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -10104,7 +10106,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:371
+#: jsLoader.php:372
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10478,11 +10480,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Ultimo controllo"
 
-#: jsLoader.php:352
+#: jsLoader.php:353
 msgid "Last hour graph"
 msgstr "Grafico dell'ultima ora"
 
-#: jsLoader.php:353
+#: jsLoader.php:354
 msgid "Last month graph"
 msgstr "Grafico ultimo mese"
 
@@ -10512,7 +10514,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Ultimo valore"
 
-#: jsLoader.php:354
+#: jsLoader.php:355
 msgid "Last week graph"
 msgstr "Grafico ultima settimana"
 
@@ -10525,11 +10527,11 @@ msgstr "Grafico ultima settimana"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:350
+#: include/views/inventory.host.view.php:149 jsLoader.php:351
 msgid "Latest data"
 msgstr "Ultimi dati"
 
-#: jsLoader.php:351
+#: jsLoader.php:352
 msgid "Latest values"
 msgstr "Ultimi valori"
 
@@ -11132,7 +11134,7 @@ msgstr "Mappato a"
 msgid "Mapping"
 msgstr ""
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:137
+#: app/controllers/CControllerPopupValueMapUpdate.php:148
 #: app/views/administration.iconmap.edit.php:124
 #: app/views/popup.valuemap.edit.php:112
 msgid "Mappings"
@@ -12153,7 +12155,7 @@ msgid "No data."
 msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:1023
-#: include/classes/api/services/CHostPrototype.php:1765
+#: include/classes/api/services/CHostPrototype.php:1770
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Nessuna interfaccia di default per tipo \"%1$s\" su \"%2$s\"."
@@ -12234,7 +12236,7 @@ msgstr "Nessuna immagine"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:370
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
 msgid "No interface found"
 msgstr "Nessuna interfaccia trovata"
 
@@ -12377,9 +12379,9 @@ msgstr ""
 #: include/classes/api/services/CHostPrototype.php:549
 #: include/classes/api/services/CHostPrototype.php:595
 #: include/classes/api/services/CHostPrototype.php:616
-#: include/classes/api/services/CHostPrototype.php:1224
-#: include/classes/api/services/CHostPrototype.php:1246
-#: include/classes/api/services/CHostPrototype.php:1280
+#: include/classes/api/services/CHostPrototype.php:1229
+#: include/classes/api/services/CHostPrototype.php:1251
+#: include/classes/api/services/CHostPrototype.php:1285
 #: include/classes/api/services/CHousekeeping.php:169
 #: include/classes/api/services/CHttpTest.php:505
 #: include/classes/api/services/CHttpTest.php:597
@@ -12905,7 +12907,7 @@ msgstr "Off"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:382
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
 #: report2.php:506
 msgid "Ok"
 msgstr "Ok"
@@ -14106,7 +14108,7 @@ msgstr "Problema, se almeno un servizio derivato ha un problema"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:355 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
 msgid "Problems"
 msgstr "Problemi"
 
@@ -15472,7 +15474,7 @@ msgstr "Script aggiornato"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:356
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
 msgid "Scripts"
 msgstr "Script"
 
@@ -15807,7 +15809,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Definisci modalita' inventario per host"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:388
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
 msgid "Set new value"
 msgstr ""
 
@@ -15897,7 +15899,7 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:342
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
 msgid "Sharing"
 msgstr "Condivisioni"
 
@@ -16509,7 +16511,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Oggetto"
 
-#: jsLoader.php:357
+#: jsLoader.php:358
 msgid "Submap"
 msgstr "Sottomappa"
 
@@ -17278,7 +17280,7 @@ msgstr "Data e ora"
 msgid "To"
 msgstr "A"
 
-#: jsLoader.php:369
+#: jsLoader.php:370
 msgid "To set a host interface select a single item type for all items"
 msgstr "Per impostare un'interfaccia host seleziona un singolo tipo di item per tutti gli itemPer impostare un'interfaccia host seleziona un singolo tipo di item per tutti gli item"
 
@@ -17410,7 +17412,7 @@ msgstr "Trend"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:358
+#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
 #: services.php:355
 msgid "Trigger"
 msgstr "Trigger"
@@ -17585,11 +17587,11 @@ msgstr "Prototipi Trigger aggiornati"
 msgid "Trigger severity"
 msgstr "Severity trigger"
 
-#: jsLoader.php:343
+#: jsLoader.php:344
 msgid "Trigger status \"OK\""
 msgstr "Trigger stato \"OK\""
 
-#: jsLoader.php:344
+#: jsLoader.php:345
 msgid "Trigger status \"Problem\""
 msgstr "Trigger con stato \"Problema\""
 
@@ -17755,7 +17757,7 @@ msgstr "SCONOSCIUT0"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:359
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
 msgid "URL"
 msgstr "URL"
 
@@ -17801,7 +17803,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL deve avere entrambe i campi \"nome\" e \"url\" per la mappa \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:360
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
 msgid "URLs"
 msgstr "URLs"
 
@@ -18771,8 +18773,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:100
 #: app/controllers/CControllerPopupValueMapUpdate.php:105
-#: app/controllers/CControllerPopupValueMapUpdate.php:113
-#: app/controllers/CControllerPopupValueMapUpdate.php:125
+#: app/controllers/CControllerPopupValueMapUpdate.php:112
+#: app/controllers/CControllerPopupValueMapUpdate.php:117
+#: app/controllers/CControllerPopupValueMapUpdate.php:124
+#: app/controllers/CControllerPopupValueMapUpdate.php:136
 #: app/partials/configuration.tags.tab.php:40
 #: app/partials/configuration.valuemap.php:32
 #: app/partials/hostmacros.list.html.php:36
@@ -19066,7 +19070,7 @@ msgstr "Siamo spiacenti, il numero massimo possibile di elementi da conservare �
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:361
+#: include/views/inventory.host.view.php:219 jsLoader.php:362
 msgid "Web"
 msgstr "Web"
 
@@ -19669,7 +19673,7 @@ msgstr "E' prevista una stringa di caratteri"
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr ""
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:114
+#: app/controllers/CControllerPopupValueMapUpdate.php:125
 #: include/classes/validators/CApiInputValidator.php:684
 msgid "a floating point value is expected"
 msgstr ""
@@ -20001,7 +20005,9 @@ msgstr ""
 #: app/controllers/CControllerPopupTriggerWizard.php:134
 #: app/controllers/CControllerPopupValueMapUpdate.php:63
 #: app/controllers/CControllerPopupValueMapUpdate.php:94
-#: app/controllers/CControllerPopupValueMapUpdate.php:137
+#: app/controllers/CControllerPopupValueMapUpdate.php:100
+#: app/controllers/CControllerPopupValueMapUpdate.php:112
+#: app/controllers/CControllerPopupValueMapUpdate.php:148
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
@@ -20024,9 +20030,9 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:819
 #: include/classes/api/services/CHost.php:1836
 #: include/classes/api/services/CHost.php:1842
-#: include/classes/api/services/CHostPrototype.php:1678
-#: include/classes/api/services/CHostPrototype.php:1690
-#: include/classes/api/services/CHostPrototype.php:1706
+#: include/classes/api/services/CHostPrototype.php:1683
+#: include/classes/api/services/CHostPrototype.php:1695
+#: include/classes/api/services/CHostPrototype.php:1711
 #: include/classes/api/services/CItemGeneral.php:481
 #: include/classes/api/services/CItemGeneral.php:508
 #: include/classes/api/services/CItemGeneral.php:514
@@ -20548,12 +20554,12 @@ msgstr ""
 msgid "invalid number of parameters in function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:106
+#: app/controllers/CControllerPopupValueMapUpdate.php:117
 #: include/classes/validators/CApiInputValidator.php:2233
 msgid "invalid range expression"
 msgstr ""
 
-#: app/controllers/CControllerPopupValueMapUpdate.php:100
+#: app/controllers/CControllerPopupValueMapUpdate.php:105
 #: include/classes/validators/CApiInputValidator.php:1603
 msgid "invalid regular expression"
 msgstr "regular expression non valida"
@@ -20668,7 +20674,7 @@ msgstr "regola discovery di basso-livello"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:378
+#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
@@ -20963,7 +20969,7 @@ msgstr "output"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:389
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21106,7 +21112,7 @@ msgstr "breve descrizione"
 #: include/classes/api/services/CHost.php:1867
 #: include/classes/api/services/CHost.php:1876
 #: include/classes/api/services/CHost.php:1882
-#: include/classes/api/services/CHostPrototype.php:1729
+#: include/classes/api/services/CHostPrototype.php:1734
 #: include/classes/api/services/CHttpTest.php:978
 #: include/classes/api/services/CHttpTest.php:1074
 #: include/classes/api/services/CItemGeneral.php:495
@@ -21221,10 +21227,10 @@ msgstr "L'ID template \"%1$s\" è passato %2$s volte"
 #: include/classes/api/services/CDiscoveryRule.php:2019
 #: include/classes/api/services/CHost.php:1945
 #: include/classes/api/services/CHost.php:2140
-#: include/classes/api/services/CHostPrototype.php:1673
-#: include/classes/api/services/CHostPrototype.php:1685
-#: include/classes/api/services/CHostPrototype.php:1701
-#: include/classes/api/services/CHostPrototype.php:1713
+#: include/classes/api/services/CHostPrototype.php:1678
+#: include/classes/api/services/CHostPrototype.php:1690
+#: include/classes/api/services/CHostPrototype.php:1706
+#: include/classes/api/services/CHostPrototype.php:1718
 #: include/classes/api/services/CHttpTest.php:739
 #: include/classes/api/services/CReport.php:203
 #: include/classes/api/services/CReport.php:592
@@ -21379,7 +21385,7 @@ msgstr "Fine della macro non valida"
 #: include/classes/api/services/CGraphGeneral.php:599
 #: include/classes/api/services/CGraphGeneral.php:721
 #: include/classes/api/services/CHostPrototype.php:322
-#: include/classes/api/services/CHostPrototype.php:1719
+#: include/classes/api/services/CHostPrototype.php:1724
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CHttpTest.php:515
 #: include/classes/api/services/CHttpTest.php:539
@@ -21473,7 +21479,7 @@ msgstr "numero versione non supportata"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:390
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
 msgid "value"
 msgstr "valore"
 
@@ -21492,7 +21498,7 @@ msgid "value \"%1$s\" not found"
 msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:71
-#: app/controllers/CControllerPopupValueMapUpdate.php:126
+#: app/controllers/CControllerPopupValueMapUpdate.php:137
 #: include/classes/api/services/CValueMap.php:571
 #: include/classes/api/services/CValueMap.php:583
 #: include/classes/validators/CApiInputValidator.php:1701

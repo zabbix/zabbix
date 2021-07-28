@@ -294,21 +294,24 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 
 	/* check logical equal, not equal operators */
 
-	if (ZBX_VARIANT_DBL_VECTOR == left->type || ZBX_VARIANT_DBL_VECTOR == right->type)
+	if (ZBX_EVAL_TOKEN_OP_EQ == token->type || ZBX_EVAL_TOKEN_OP_NE == token->type)
 	{
-		*error = zbx_dsprintf(*error, "vector cannot be used with comparison operator at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
-	}
+		if (ZBX_VARIANT_DBL_VECTOR == left->type || ZBX_VARIANT_DBL_VECTOR == right->type)
+		{
+			*error = zbx_dsprintf(*error, "vector cannot be used with comparison operator at \"%s\"",
+					ctx->expression + token->loc.l);
+			return FAIL;
+		}
 
-	switch (token->type)
-	{
-		case ZBX_EVAL_TOKEN_OP_EQ:
-			value = (0 == eval_variant_compare(left, right) ? 1 : 0);
-			goto finish;
-		case ZBX_EVAL_TOKEN_OP_NE:
-			value = (0 == eval_variant_compare(left, right) ? 0 : 1);
-			goto finish;
+		switch (token->type)
+		{
+			case ZBX_EVAL_TOKEN_OP_EQ:
+				value = (0 == eval_variant_compare(left, right) ? 1 : 0);
+				goto finish;
+			case ZBX_EVAL_TOKEN_OP_NE:
+				value = (0 == eval_variant_compare(left, right) ? 0 : 1);
+				goto finish;
+		}
 	}
 
 	/* check arithmetic operators */

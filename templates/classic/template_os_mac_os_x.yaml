@@ -171,7 +171,7 @@ zabbix_export:
           triggers:
             -
               uuid: ffb713a281a543879e4196e4207bdd62
-              expression: '(last(/macOS/system.hostname,#1)<>last(/macOS/system.hostname,#2))>0'
+              expression: 'last(/macOS/system.hostname,#1)<>last(/macOS/system.hostname,#2)'
               name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -207,7 +207,7 @@ zabbix_export:
           triggers:
             -
               uuid: 55d8650af70d4aeea56345985e454df9
-              expression: '(last(/macOS/system.uname,#1)<>last(/macOS/system.uname,#2))>0'
+              expression: 'last(/macOS/system.uname,#1)<>last(/macOS/system.uname,#2)'
               name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
         -
@@ -256,7 +256,7 @@ zabbix_export:
           triggers:
             -
               uuid: 39cfe50a3d2a46ad9a53b9ec7443ec18
-              expression: '(last(/macOS/vfs.file.cksum[/etc/passwd],#1)<>last(/macOS/vfs.file.cksum[/etc/passwd],#2))>0'
+              expression: 'last(/macOS/vfs.file.cksum[/etc/passwd],#1)<>last(/macOS/vfs.file.cksum[/etc/passwd],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -

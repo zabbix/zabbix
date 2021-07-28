@@ -967,7 +967,7 @@ zabbix_export:
           triggers:
             -
               uuid: f5f4fb1337264ac2bec6b6505dfe180b
-              expression: '(last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2))=1 and length(last(/Docker by Zabbix agent 2/docker.server_version))>0'
+              expression: 'last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0'
               name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Docker version has changed. Ack to close.'
@@ -1208,7 +1208,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ee70b91196494eccb54772b22051a456
-                  expression: '(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2))=1 and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0'
+                  expression: 'last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0'
                   name: 'Container {#NAME}: An error has occurred in the container'
                   priority: WARNING
                   description: 'Container {#NAME} has an error. Ack to close.'

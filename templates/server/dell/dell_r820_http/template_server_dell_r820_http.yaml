@@ -48,7 +48,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1aa78b67649f41418c5690637fb3216b
-              expression: '(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.firmware,#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.hw.firmware,#2))=1 and length(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.firmware))>0'
+              expression: 'last(/DELL PowerEdge R820 by HTTP/dell.server.hw.firmware,#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.hw.firmware,#2) and length(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.firmware))>0'
               name: 'Dell R820: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -109,7 +109,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0d3a4dd2772f41029e599766fff1e651
-              expression: '(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.hw.serialnumber,#2))=1 and length(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.serialnumber))>0'
+              expression: 'last(/DELL PowerEdge R820 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.hw.serialnumber,#2) and length(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.serialnumber))>0'
               name: 'Dell R820: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -960,7 +960,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 50c9fb7b16144f5d8d1cfe7e064d39d2
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (find(/DELL PowerEdge R820 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")="Down" and (last(/DELL PowerEdge R820 by HTTP/dell.server.net.if.status[{#IFNAME}],#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.net.if.status[{#IFNAME}],#2))=1)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (find(/DELL PowerEdge R820 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")="Down" and last(/DELL PowerEdge R820 by HTTP/dell.server.net.if.status[{#IFNAME}],#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.net.if.status[{#IFNAME}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'find(/DELL PowerEdge R820 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")<>"Down" or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Dell R820: {#IFNAME} Link down'
@@ -1190,7 +1190,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6a2ad425b7654a58825a5032194204bd
-                  expression: '(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2))=1 and length(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0'
+                  expression: 'last(/DELL PowerEdge R820 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R820 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R820 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0'
                   name: 'Dell R820: {#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'

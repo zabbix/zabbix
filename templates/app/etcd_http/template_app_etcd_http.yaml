@@ -46,7 +46,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7c87424c4fb34c56bc9b976755b4ec02
-              expression: '(last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2))=1 and length(last(/Etcd by HTTP/etcd.cluster.version))>0'
+              expression: 'last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0'
               name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Etcd version has changed. Ack to close.'
@@ -936,7 +936,7 @@ zabbix_export:
           triggers:
             -
               uuid: cfb2fc467b224ef694d59b5c081ed965
-              expression: '(last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2))=1 and length(last(/Etcd by HTTP/etcd.server.version))>0'
+              expression: 'last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0'
               name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Etcd version has changed. Ack to close.'
