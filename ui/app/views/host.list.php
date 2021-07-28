@@ -226,8 +226,7 @@ foreach ($data['hosts'] as $host) {
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $host['hostid'])
 	))
-		->setAttribute('data-hostid', $host['hostid'])
-		->addClass('js-edit-host');
+		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT);
 
 	$maintenance_icon = false;
 	$status_toggle_url = (new CUrl('zabbix.php'))

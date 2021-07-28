@@ -360,6 +360,9 @@ class CControllerHostList extends CController {
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
 
-		$this->setResponse(new CControllerResponseData($data));
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of hosts'));
+
+		$this->setResponse($response);
 	}
 }

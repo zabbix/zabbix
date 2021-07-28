@@ -23,6 +23,15 @@
  * @var CView $this
  */
 
+$scripts = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
+	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js', 'hostinterfacemanager.js',
+	'hostpopup.js', 'hostmacrosmanager.js'
+];
+
+foreach ($scripts as $script) {
+	$this->addJsFile($script);
+}
+
 if ($data['uncheck']) {
 	uncheckTableRows('proxy');
 }
@@ -111,11 +120,16 @@ foreach ($data['proxies'] as $proxy) {
 			? (new CLink($host['name'], (new CUrl('zabbix.php'))
 				->setArgument('action', 'host.edit')
 				->setArgument('hostid', $host['hostid'])
-			))->addClass($style)
+			))
+				->addClass($style)
+				->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)
 			: (new CSpan($host['name']))->addClass($style);
 	}
 
-	$name = new CLink($proxy['host'], 'zabbix.php?action=proxy.edit&proxyid='.$proxy['proxyid']);
+	$name = (new CLink($proxy['host'], (new CUrl('zabbix.php'))
+		->setArgument('action', 'proxy.edit')
+		->setArgument('proxyid', $proxy['proxyid'])
+	));
 
 	// encryption
 	$in_encryption = '';
@@ -184,3 +198,7 @@ $proxyForm->addItem([
 
 // append form to widget
 $widget->addItem($proxyForm)->show();
+
+(new CScriptTag('host_popup.init();'))
+	->setOnDocumentReady()
+	->show();

@@ -17,13 +17,22 @@ const host_popup = {
 				this.edit(options);
 			}
 			else if (event.target.classList.contains('js-edit-host')) {
-				this.edit({hostid: event.target.dataset.hostid});
+				let hostid = null;
+
+				if (event.target.hostid !== undefined && event.target.dataset.hostid !== undefined) {
+					hostid = event.target.dataset.hostid;
+				}
+				else {
+					hostid = new Curl(event.target.href).getArgument('hostid')
+				}
+
+				this.edit({hostid:  hostid});
 
 				history.pushState({}, '', event.target.getAttribute('href'));
 
 				event.preventDefault();
 			}
-		}, true);
+		}, {capture: true});
 	},
 
 	edit(options = {}) {
