@@ -328,11 +328,12 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				method: 'post',
 				style: 'display:none'
 			});
+			const overlay = overlays_stack.end();
 
 			Object.entries({
 				action: 'host.massdelete',
 				'ids[0]': document.getElementById('hostid').value,
-				backurl: this.backurl || '',
+				backurl: overlay.original_url || '',
 				sid: document.getElementById('sid').value
 			})
 				.forEach(([name, val]) => {

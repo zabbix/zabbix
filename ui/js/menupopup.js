@@ -231,7 +231,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 			if (options.isWriteable) {
 				if (trigger_elmnt[0].dataset.popupedit) {
-					config.url = 'javascript: host_popup.edit({hostid: ' + JSON.stringify(options.hostid) + '})'
+					config.url = 'javascript: host_popup.edit('+JSON.stringify({hostid: options.hostid})+')'
 				}
 				else {
 					var config_url = new Curl('zabbix.php', false);

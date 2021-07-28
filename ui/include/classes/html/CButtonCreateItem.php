@@ -43,7 +43,7 @@ class CButtonCreateItem extends CButton {
 		foreach($dropdown['hosts'] as $host) {
 			$items[] = [
 				'label' => $host['name'],
-				'url' => 'javascript: item_create({hostid: '.json_encode($host['hostid']).'})',
+				'url' => 'javascript: item_create('.json_encode(['hostid' => $host['hostid']]).')',
 				'disabled' => $host['disabled']
 			];
 		}
@@ -51,7 +51,7 @@ class CButtonCreateItem extends CButton {
 		foreach($dropdown['templates'] as $template) {
 			$items[] = [
 				'label' => $template['name'],
-				'url' => 'javascript: item_create({templateid: '.json_encode($template['templateid']).'})',
+				'url' => 'javascript: item_create('.json_encode(['templateid' => $template['templateid']]).')',
 				'disabled' => $template['disabled']
 			];
 		}
