@@ -489,6 +489,32 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 									"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
 						],
 						[
+							'Message type' => 'Service',
+							'Subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
+							'Message' => "Service problem started at {EVENT.TIME} on {EVENT.DATE}\n".
+								"Service problem name: {EVENT.NAME}\n".
+								"Service: {SERVICE.NAME}\n".
+								"Severity: {EVENT.SEVERITY}\n".
+								"Original problem ID: {EVENT.ID}\n\n".
+								"{SERVICE.ROOTCAUSE}"
+						],
+						[
+							'Message type' => 'Service recovery',
+							'Subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
+							'Message' => "Service \"{SERVICE.NAME}\" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
+								"Problem name: {EVENT.NAME}\n".
+								"Problem duration: {EVENT.DURATION}\n".
+								"Severity: {EVENT.SEVERITY}\n".
+								"Original problem ID: {EVENT.ID}"
+						],
+						[
+							'Message type' => 'Service update',
+							'Subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
+							'Message' => "Changed \"{SERVICE.NAME}\" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
+								"Current problem age is {EVENT.AGE}.\n\n".
+								"{SERVICE.ROOTCAUSE}"
+						],
+						[
 							'Message type' => 'Discovery',
 							'Subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
 							'Message' => "Discovery rule: {DISCOVERY.RULE.NAME}\n\n".
@@ -532,6 +558,21 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 							'Message' => 'New problem update message !@#$%^&*()_+ōš六書'
 						],
 						[
+							'Message type' => 'Service',
+							'Subject' => 'New service subject !@#$%^&*()_+ōš六書',
+							'Message' => 'New service message !@#$%^&*()_+ōš六書'
+						],
+						[
+							'Message type' => 'Service recovery',
+							'Subject' => 'New service recovery subject !@#$%^&*()_+ōš六書',
+							'Message' => 'New service recovery message !@#$%^&*()_+ōš六書'
+						],
+						[
+							'Message type' => 'Service update',
+							'Subject' => 'New service update subject !@#$%^&*()_+ōš六書',
+							'Message' => 'New service update message !@#$%^&*()_+ōš六書'
+						],
+						[
 							'Message type' => 'Discovery',
 							'Subject' => 'New discovery subject !@#$%^&*()_+ōš六書',
 							'Message' => 'New discovery message !@#$%^&*()_+ōš六書'
@@ -560,6 +601,18 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 						[
 							'Message type' => 'Problem update',
 							'Message' => 'New problem update SMS !@#$%^&*()_+ōš六書'
+						],
+						[
+							'Message type' => 'Service',
+							'Message' => 'New service SMS !@#$%^&*()_+ōš六書'
+						],
+						[
+							'Message type' => 'Service recovery',
+							'Message' => 'New service recovery SMS !@#$%^&*()_+ōš六書'
+						],
+						[
+							'Message type' => 'Service update',
+							'Message' => 'New service update SMS !@#$%^&*()_+ōš六書'
 						],
 						[
 							'Message type' => 'Discovery',
@@ -607,6 +660,36 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 							'action' => 'Add',
 							'Subject' => 'New internal problem subject !@#$%^&*()_+ōš六書',
 							'Message' => 'New internal problem message !@#$%^&*()_+ōš六書'
+						],
+						[
+							'Message type' => 'Service',
+							'action' => 'Remove temporary'
+						],
+						[
+							'Message type' => 'Service recovery',
+							'action' => 'Remove'
+						],
+						[
+							'Message type' => 'Service update',
+							'action' => 'Remove'
+						],
+						[
+							'Message type' => 'Service',
+							'action' => 'Add',
+							'Subject' => 'New service subject !@#$%^&*()_+ōš六書',
+							'Message' => 'New service message !@#$%^&*()_+ōš六書'
+						],
+						[
+							'Message type' => 'Service recovery',
+							'action' => 'Add',
+							'Subject' => 'New service subject !@#$%^&*()_+ōš六書',
+							'Message' => 'New service message !@#$%^&*()_+ōš六書'
+						],
+						[
+							'Message type' => 'Service update',
+							'action' => 'Add',
+							'Subject' => 'New service subject !@#$%^&*()_+ōš六書',
+							'Message' => 'New service message !@#$%^&*()_+ōš六書'
 						],
 						[
 							'Message type' => 'Discovery',
