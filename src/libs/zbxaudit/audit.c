@@ -31,7 +31,7 @@
 static int		audit_mode;
 static zbx_hashset_t	zbx_audit;
 
-static void append_str_json(struct zbx_json *json, const char *audit_op, const char *key, const char *val)
+static void	append_str_json(struct zbx_json *json, const char *audit_op, const char *key, const char *val)
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, audit_op, ZBX_JSON_TYPE_STRING);
@@ -39,7 +39,7 @@ static void append_str_json(struct zbx_json *json, const char *audit_op, const c
 	zbx_json_close(json);
 }
 
-static	void append_uint64_json(struct zbx_json *json, const char *audit_op, const char *key, const uint64_t val)
+static void	append_uint64_json(struct zbx_json *json, const char *audit_op, const char *key, const uint64_t val)
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, audit_op, ZBX_JSON_TYPE_STRING);
@@ -47,7 +47,7 @@ static	void append_uint64_json(struct zbx_json *json, const char *audit_op, cons
 	zbx_json_close(json);
 }
 
-static	void append_int_json(struct zbx_json *json, const char *audit_op, const char *key, int val)
+static void	append_int_json(struct zbx_json *json, const char *audit_op, const char *key, int val)
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, audit_op, ZBX_JSON_TYPE_STRING);
@@ -64,7 +64,7 @@ static void	update_str_json(struct zbx_json *json, const char *key, const char *
 	zbx_json_close(json);
 }
 
-static	void update_uint64_json(struct zbx_json *json, const char *key, uint64_t val_old, uint64_t val_new)
+static void	update_uint64_json(struct zbx_json *json, const char *key, uint64_t val_old, uint64_t val_new)
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
@@ -73,7 +73,7 @@ static	void update_uint64_json(struct zbx_json *json, const char *key, uint64_t 
 	zbx_json_close(json);
 }
 
-static	void update_int_json(struct zbx_json *json, const char *key, int val_old, int val_new)
+static void	update_int_json(struct zbx_json *json, const char *key, int val_old, int val_new)
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
@@ -82,14 +82,13 @@ static	void update_int_json(struct zbx_json *json, const char *key, int val_old,
 	zbx_json_close(json);
 }
 
-#define RETURN_IF_AUDIT_OFF()					\
-	if (ZBX_AUDITLOG_ENABLED != audit_mode)			\
-		return						\
-
+#define RETURN_IF_AUDIT_OFF()				\
+	if (ZBX_AUDITLOG_ENABLED != audit_mode)		\
+		return					\
 
 /******************************************************************************
  *                                                                            *
- * Function: auditlog_global_script                                           *
+ * Function: zbx_auditlog_global_script                                       *
  *                                                                            *
  * Purpose: record global script execution results into audit log             *
  *                                                                            *
@@ -305,7 +304,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 	append_uint64_json(&((*found_audit_entry)->details_json), audit_op, key, value);
 }
 
-#define PREPARE_UPDATE_JSON_APPEND_OP(...)				\
+#define PREPARE_UPDATE_JSON_APPEND_OP(...)					\
 	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;		\
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;	\
 										\

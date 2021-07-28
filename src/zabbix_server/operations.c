@@ -116,7 +116,7 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event, char **hostnam
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		size_t		out_alloc = 0, out_offset = 0;
+		size_t	out_alloc = 0, out_offset = 0;
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		zbx_strcpy_alloc(hostname, &out_alloc, &out_offset, row[1]);
@@ -578,10 +578,10 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 						tls_accepted, tls_accepted, psk_identity, psk);
 
 					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
-					zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid,
-							proxy_hostid, hostname);
-					zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_accepted,
-							tls_accepted, psk_identity, psk);
+					zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
+							hostname);
+					zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_accepted, tls_accepted,
+							psk_identity, psk);
 				}
 				else
 				{
@@ -626,7 +626,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 			}
-
 			DBfree_result(result2);
 out:
 			zbx_free(host_esc);
@@ -681,7 +680,7 @@ static int	is_discovery_or_autoregistration(const DB_EVENT *event)
  ******************************************************************************/
 void	op_host_add(const DB_EVENT *event, zbx_config_t *cfg)
 {
-	int		status;
+	int	status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -931,7 +930,6 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 		DBexecute("%s", sql);
 
 		zbx_audit_host_hostgroup_delete(hostid, hostname, &hostgroupids, groupids);
-
 		zbx_vector_uint64_destroy(&hostgroupids);
 	}
 	DBfree_result(result);

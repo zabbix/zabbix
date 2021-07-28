@@ -5001,10 +5001,9 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 			interfaceid, (int)version, (int)bulk, community_esc, securityname_esc, (int)securitylevel,
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc);
 
-		zbx_audit_host_update_json_add_snmp_interface(hostid, version, bulk, community_esc,
-				securityname_esc, securitylevel, authpassphrase_esc, privpassphrase_esc, authprotocol,
-				privprotocol, contextname_esc, interfaceid);
-
+		zbx_audit_host_update_json_add_snmp_interface(hostid, version, bulk, community_esc, securityname_esc,
+				securitylevel, authpassphrase_esc, privpassphrase_esc, authprotocol, privprotocol,
+				contextname_esc, interfaceid);
 	}
 	else
 	{
@@ -5025,9 +5024,9 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 			authpassphrase_esc, privpassphrase_esc, (int)authprotocol, (int)privprotocol, contextname_esc,
 			interfaceid);
 
-		zbx_audit_host_update_json_update_snmp_interface(hostid, db_version, version, db_bulk, bulk,
-				row[2], community_esc, row[3], securityname_esc, db_securitylevel, securitylevel,
-				row[5], authpassphrase_esc, row[6], privpassphrase_esc, db_authprotocol, authprotocol,
+		zbx_audit_host_update_json_update_snmp_interface(hostid, db_version, version, db_bulk, bulk, row[2],
+				community_esc, row[3], securityname_esc, db_securitylevel, securitylevel, row[5],
+				authpassphrase_esc, row[6], privpassphrase_esc, db_authprotocol, authprotocol,
 				db_privprotocol, privprotocol, row[9], contextname_esc, interfaceid);
 	}
 
