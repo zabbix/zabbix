@@ -1142,14 +1142,14 @@ class CApiService {
 	 * @param string $userid
 	 * @param string $ip
 	 */
-	protected function addAuditDetails($action, $resourcetype, $details = '', $userid = null, $ip = null) {
-		if ($userid === null) {
-			$userid = self::$userData['userid'];
-			$ip = self::$userData['userip'];
-		}
+	// protected function addAuditDetails($action, $resourcetype, $details = '', $userid = null, $ip = null) {
+	// 	if ($userid === null) {
+	// 		$userid = self::$userData['userid'];
+	// 		$ip = self::$userData['userip'];
+	// 	}
 
-		CAudit::addDetails($userid, $ip, $action, $resourcetype, $details);
-	}
+	// 	CAudit::addDetails($userid, $ip, $action, $resourcetype, $details);
+	// }
 
 	/**
 	 * Add audit records.
@@ -1160,9 +1160,7 @@ class CApiService {
 	 * @param array  $objects_old
 	 */
 	protected function addAuditBulk($action, $resourcetype, array $objects, array $objects_old = null) {
-		CAudit::addBulk(self::$userData['userid'], self::$userData['userip'], $action, $resourcetype, $objects,
-			$objects_old
-		);
+		CAudit::addBulk(self::$userData, $action, $resourcetype, $objects, $objects_old);
 	}
 
 	/**

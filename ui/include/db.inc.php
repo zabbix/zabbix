@@ -529,7 +529,8 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 		if ($tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CHAR
 				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_NCLOB
-				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_TEXT) {
+				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_TEXT
+				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CUID) {
 			continue;
 		}
 

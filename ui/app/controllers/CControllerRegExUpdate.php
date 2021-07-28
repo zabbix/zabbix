@@ -83,9 +83,9 @@ class CControllerRegExUpdate extends CController {
 			'test_string' => $this->getInput('test_string')
 		], $expressions);
 
-		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$this->getInput('name'));
-		}
+		// if ($result) {
+		// 	add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$this->getInput('name'));
+		// }
 
 		$result = DBend($result);
 

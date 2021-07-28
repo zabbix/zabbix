@@ -105,19 +105,6 @@ $house_keeper_tab = (new CFormList())
 			->setEnabled($data['hk_services_mode'] == 1)
 			->setAriaRequired()
 	)
-	->addRow((new CTag('h4', true, _('Audit')))->addClass('input-section-header'))
-	->addRow(
-		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
-		(new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1)
-	)
-	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_audit'))
-			->setAsteriskMark(),
-		(new CTextBox('hk_audit', $data['hk_audit'], false, DB::getFieldLength('config', 'hk_audit')))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setEnabled($data['hk_audit_mode'] == 1)
-			->setAriaRequired()
-	)
 	->addRow((new CTag('h4', true, _('User sessions')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
@@ -186,13 +173,21 @@ $house_keeper_tab = (new CFormList())
 			);
 	}
 
-$house_keeper_view = (new CTabView())
-	->addTab('houseKeeper', _('Housekeeping'), $house_keeper_tab)
-	->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[new CButton('resetDefaults', _('Reset defaults'))]
-	));
+
+$house_keeper_tab
+	->addRow((new CTag('h4', true, _('Audit')))->addClass('input-section-header'))
+	->addRow(new CLink(_('Audit settings'), (new CUrl('zabbix.php'))->setArgument('action', 'audit.settings.edit'))
+);
+
+$form->addItem(
+	(new CTabView())
+		->addTab('houseKeeper', _('Housekeeping'), $house_keeper_tab)
+		->setFooter(makeFormFooter(
+			new CSubmit('update', _('Update')),
+			[new CButton('resetDefaults', _('Reset defaults'))]
+		))
+);
 
 $widget
-	->addItem($form->addItem($house_keeper_view))
+	->addItem($form)
 	->show();

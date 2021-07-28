@@ -974,14 +974,14 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 
 			$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
 
-			if ($result) {
-				$item = reset($items);
-				$host = reset($item['hosts']);
+			// if ($result) {
+			// 	$item = reset($items);
+			// 	$host = reset($item['hosts']);
 
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$itemId.'] '.
-					_('Host').' ['.$host['name'].'] '._('History cleared')
-				);
-			}
+			// 	add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$itemId.'] '.
+			// 		_('Host').' ['.$host['name'].'] '._('History cleared')
+			// 	);
+			// }
 
 			$result = DBend($result);
 		}
@@ -1093,16 +1093,16 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 
 				$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
 
-				if ($result) {
-					foreach ($items as $item) {
-						$host = reset($item['hosts']);
+				// if ($result) {
+				// 	foreach ($items as $item) {
+				// 		$host = reset($item['hosts']);
 
-						add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-							_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
-								_('History cleared')
-						);
-					}
-				}
+				// 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+				// 			_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
+				// 				_('History cleared')
+				// 		);
+				// 	}
+				// }
 
 				$result = DBend($result);
 

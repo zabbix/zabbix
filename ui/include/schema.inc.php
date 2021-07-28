@@ -2766,6 +2766,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '8'
+			],
+			'auditlog_enabled' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
 			]
 		]
 	],
@@ -5027,21 +5033,31 @@ return [
 		'fields' => [
 			'auditid' => [
 				'null' => false,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25
+			],
+			'userid' => [
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'userid' => [
+			'username' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'users',
-				'ref_field' => 'userid'
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 100,
+				'default' => ''
 			],
 			'clock' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'ip' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 39,
+				'default' => ''
 			],
 			'action' => [
 				'null' => false,
@@ -5055,20 +5071,8 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'note' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
-				'default' => ''
-			],
-			'ip' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 39,
-				'default' => ''
-			],
 			'resourceid' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
@@ -5077,42 +5081,13 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
-			]
-		]
-	],
-	'auditlog_details' => [
-		'key' => 'auditdetailid',
-		'fields' => [
-			'auditdetailid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
 			],
-			'auditid' => [
+			'recordsetid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'auditlog',
-				'ref_field' => 'auditid'
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25
 			],
-			'table_name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
-			],
-			'field_name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
-			],
-			'oldvalue' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
-				'default' => ''
-			],
-			'newvalue' => [
+			'details' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''

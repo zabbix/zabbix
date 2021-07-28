@@ -314,6 +314,12 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 	}
 	else if (*offset + n >= *alloc_len)
 	{
+		if (0 == *alloc_len)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
 		while (*offset + n >= *alloc_len)
 			*alloc_len *= 2;
 		*str = (char *)zbx_realloc(*str, *alloc_len);

@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha1');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050023);
+define('ZABBIX_DB_VERSION',		5050031);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -226,17 +226,13 @@ define('AUDIT_ACTION_UPDATE',	1);
 define('AUDIT_ACTION_DELETE',	2);
 define('AUDIT_ACTION_LOGIN',	3);
 define('AUDIT_ACTION_LOGOUT',	4);
-define('AUDIT_ACTION_ENABLE',	5);
-define('AUDIT_ACTION_DISABLE',	6);
 define('AUDIT_ACTION_EXECUTE',	7);
 
 define('AUDIT_RESOURCE_USER',				0);
-define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2); // Currently not used but need for compatibility with old audit records.
 define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
 define('AUDIT_RESOURCE_HOST',				4);
 define('AUDIT_RESOURCE_ACTION',				5);
 define('AUDIT_RESOURCE_GRAPH',				6);
-define('AUDIT_RESOURCE_GRAPH_ELEMENT',		7);
 define('AUDIT_RESOURCE_USER_GROUP',			11);
 define('AUDIT_RESOURCE_TRIGGER',			13);
 define('AUDIT_RESOURCE_HOST_GROUP',			14);
@@ -1372,6 +1368,7 @@ define('API_STRINGS_UTF8',			11);
 define('API_INTS32',				12);
 define('API_FLOATS',				13);
 define('API_UINTS64',				14);
+define('API_CUIDS',					44);
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1402,6 +1399,7 @@ define('API_DATE',					40);
 define('API_NUMERIC_RANGES',		41);
 define('API_UUID',					42);
 define('API_VAULT_SECRET',			43);
+define('API_CUID',					45);
 
 // flags
 define('API_REQUIRED',					0x0001);

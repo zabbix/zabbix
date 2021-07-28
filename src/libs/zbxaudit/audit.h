@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,26 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_AUDIT_H
+#define ZABBIX_AUDIT_H
 
-// function add_audit($action, $resourcetype, $note) {
-// 	if (mb_strlen($note) > 128) {
-// 		$note = mb_substr($note, 0, 125).'...';
-// 	}
+#include "common.h"
 
-// 	$values = [
-// 		'userid' => CWebUser::$data['userid'],
-// 		'clock' => time(),
-// 		'ip' => substr(CWebUser::getIp(), 0, 39),
-// 		'action' => $action,
-// 		'resourcetype' => $resourcetype,
-// 		'note' => $note
-// 	];
+int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error);
 
-// 	try {
-// 		DB::insert('auditlog', [$values]);
-// 		return true;
-// 	}
-// 	catch (DBException $e) {
-// 		return false;
-// 	}
-// }
+#endif	/* ZABBIX_AUDIT_H */

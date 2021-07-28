@@ -1399,7 +1399,7 @@ class CUser extends CApiService {
 			'where' => ['sessionid' => $sessionid]
 		]);
 
-		$this->addAuditDetails(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER);
+		// $this->addAuditDetails(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER);
 
 		self::$userData = null;
 
@@ -1491,9 +1491,9 @@ class CUser extends CApiService {
 				'where' => ['userid' => $db_user['userid']]
 			]);
 
-			$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
-				$db_user['userip']
-			);
+			// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
+			// 	$db_user['userip']
+			// );
 
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
 					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
@@ -1510,7 +1510,7 @@ class CUser extends CApiService {
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
-		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+		// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
 
 		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
 	}
@@ -1565,7 +1565,7 @@ class CUser extends CApiService {
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
-		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+		// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
 
 		return $db_user;
 	}
