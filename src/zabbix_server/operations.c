@@ -500,11 +500,10 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 		if (NULL != (row = DBfetch(result)))
 		{
 			char			*sql = NULL;
-			zbx_uint64_t		host_proxy_hostid;
+			zbx_uint64_t		host_proxy_hostid, tls_accepted;
 			zbx_conn_flags_t	flags;
 			int			flags_int;
 			unsigned char		useip = 1;
-			int			tls_accepted;
 
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 			host_esc = DBdyn_escape_field("hosts", "host", row[1]);
@@ -527,7 +526,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 			if (ZBX_CONN_DNS == flags)
 				useip = 0;
 
-			tls_accepted = atoi(row[6]);
+			ZBX_STR2UINT64(tls_accepted, row[6]);
 
 			result2 = DBselect(
 					"select null"
