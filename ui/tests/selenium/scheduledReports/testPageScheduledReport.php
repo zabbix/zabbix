@@ -65,12 +65,12 @@ class testPageScheduledReport extends CWebTest {
 		return [
 			[
 				[
-					'name' => 'Zabbix server health'
+					'name' => 'Zabbix server'
 				]
 			],
 			[
 				[
-					'name' => 'Zabbix server',
+					'name' => 'Zabbix server health',
 					'no_reports' => true
 				]
 			]

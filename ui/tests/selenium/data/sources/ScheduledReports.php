@@ -196,7 +196,7 @@ class ScheduledReports {
 			[
 				'userid' => '1',
 				'name'=> 'Report for filter - expired',
-				'dashboardid'=> '2',
+				'dashboardid'=> '57',
 				'active_till'=> '2020-01-01',
 				'period'=> '3',
 				'cycle'=> '3',
@@ -209,7 +209,7 @@ class ScheduledReports {
 			[
 				'userid' => '1',
 				'name'=> 'Report for filter - enabled',
-				'dashboardid'=> '2',
+				'dashboardid'=> '57',
 				'period'=> '3',
 				'cycle'=> '2',
 				'users'=> [
@@ -221,7 +221,7 @@ class ScheduledReports {
 			[
 				'userid' => '1',
 				'name'=> 'Report for filter - disabled',
-				'dashboardid'=> '2',
+				'dashboardid'=> '57',
 				'period'=> '2',
 				'cycle'=> '2',
 				'users'=> [
