@@ -215,7 +215,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_config_t *cfg)
+static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_config_t *cfg, char **hostname)
 {
 	DB_RESULT		result;
 	DB_RESULT		result2;
