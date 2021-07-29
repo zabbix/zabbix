@@ -38,7 +38,7 @@ $data += [
 	'buttons' => ($data['hostid'] == 0)
 		? [
 			new CSubmit('add', _('Add')),
-			new CButtonCancel()
+			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')))
 		]
 		: [
 			new CSubmit('update', _('Update')),
@@ -55,7 +55,7 @@ $data += [
 					->getUrl()
 				)
 				->addClass(ZBX_STYLE_BTN_ALT),
-			new CButtonCancel()
+			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')))
 		]
 ];
 

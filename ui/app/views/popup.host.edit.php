@@ -88,10 +88,6 @@ $inline_js =
 
 			'overlayDialogueDestroy(overlay.dialogueid);'.
 
-			'const url = new Curl("zabbix.php", false);'.
-			'url.setArgument("action", "host.list");'.
-			'history.pushState({}, "", url.getUrl());'.
-
 			// Todo: Call refresh on ?action=host.list page;
 		'}'.
 	'});'.
