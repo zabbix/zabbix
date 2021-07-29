@@ -135,8 +135,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func getParameters(params []string) (hostname, port, dnsName string, err error) {
 	switch len(params) {
 	case 3:
-		hostname, port, err = validateURL(params[2], params[1])
-		dnsName = params[0]
+		if params[2] != "" {
+			hostname, port, err = validateURL(params[2], params[1])
+			dnsName = params[0]
+		} else {
+			hostname, port, err = validateURL(params[0], params[1])
+			dnsName = hostname
+		}
 	case 2:
 		hostname, port, err = validateURL(params[0], params[1])
 		dnsName = hostname
@@ -157,7 +162,7 @@ func validateURL(url, port string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	fmt.Println(out)
+
 	if out.Scheme() != "" && out.Scheme() != "https" {
 		return "", "", errors.New("scheme must be https")
 	}
