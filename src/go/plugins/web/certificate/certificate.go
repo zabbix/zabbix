@@ -20,24 +20,26 @@ package webcertificate
 
 import (
 	"crypto/sha1"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/big"
 	"net"
 	"time"
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
 )
 
 type Output struct {
-	X509        Cert             `json:"x509"`
-	Result      ValidationResult `json:"result"`
-	Fingerprint string           `json:"fingerprint"`
+	X509              Cert             `json:"x509"`
+	Result            ValidationResult `json:"result"`
+	Sha1Fingerprint   string           `json:"sha1_fingerprint"`
+	Sha256Fingerprint string           `json:"sha256_fingerprint"`
 }
 
 type CertTime struct {
@@ -47,14 +49,14 @@ type CertTime struct {
 
 type Cert struct {
 	Version            int      `json:"version"`
-	Serial             *big.Int `json:"serial"`
+	Serial             string   `json:"serial_number"`
 	SignatureAlgorithm string   `json:"signature_algorithm"`
 	Issuer             string   `json:"issuer"`
 	NotBefore          CertTime `json:"not_before"`
 	NotAfter           CertTime `json:"not_after"`
 	Subject            string   `json:"subject"`
-	AlternativeNames   []string `json:"alternative_names"`
 	PublicKeyAlgorithm string   `json:"public_key_algorithm"`
+	AlternativeNames   []string `json:"alternative_names"`
 }
 
 type ValidationResult struct {
@@ -87,19 +89,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, plugin.UnsupportedMetricError
 	}
 
-	hostname, port, ip, dnsName, err := getParameters(params)
+	hostname, port, dnsName, err := getParameters(params)
 	if err != nil {
-		return nil, err
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
-	var connection string
-	if ip == "" {
-		connection = fmt.Sprintf("%s:%s", hostname, port)
-	} else {
-		connection = fmt.Sprintf("%s:%s", ip, port)
-	}
-
-	cert, err := getCertificatesPEM(connection, p.options.Timeout)
+	cert, err := getCertificatesPEM(fmt.Sprintf("%s:%s", hostname, port), p.options.Timeout)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
@@ -109,10 +104,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	cert.KeyUsage = x509.KeyUsageCertSign
 
 	o.X509 = Cert{
-		cert.Version, cert.SerialNumber, cert.SignatureAlgorithm.String(), cert.Issuer.ToRDNSequence().String(),
+		cert.Version, fmt.Sprintf("%x", cert.SerialNumber.Bytes()), cert.SignatureAlgorithm.String(), cert.Issuer.ToRDNSequence().String(),
 		CertTime{cert.NotBefore.Format(time.RFC822), cert.NotBefore.Unix()},
 		CertTime{cert.NotAfter.Format(time.RFC822), cert.NotAfter.Unix()}, cert.Subject.ToRDNSequence().String(),
-		cert.DNSNames, cert.PublicKeyAlgorithm.String(),
+		cert.PublicKeyAlgorithm.String(), cert.DNSNames,
 	}
 
 	if _, err := cert.Verify(x509.VerifyOptions{DNSName: dnsName}); err != nil {
@@ -126,7 +121,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		o.Result = ValidationResult{"valid", "certificate verified successfully"}
 	}
 
-	o.Fingerprint = fmt.Sprintf("%x", sha1.Sum(cert.Raw))
+	o.Sha1Fingerprint = fmt.Sprintf("%x", sha1.Sum(cert.Raw))
+	o.Sha256Fingerprint = fmt.Sprintf("%x", sha256.Sum256(cert.Raw))
 
 	b, err := json.Marshal(o)
 	if err != nil {
@@ -136,38 +132,45 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return string(b), nil
 }
 
-func getParameters(params []string) (hostname, port, ip, dnsName string, err error) {
+func getParameters(params []string) (hostname, port, dnsName string, err error) {
 	switch len(params) {
 	case 3:
-		ip = params[2]
-		port = params[1]
-		hostname = params[0]
-		dnsName = hostname
+		hostname, port, err = validateURL(params[2], params[1])
+		dnsName = params[0]
 	case 2:
-		port = params[1]
-		hostname = params[0]
+		hostname, port, err = validateURL(params[0], params[1])
 		dnsName = hostname
 	case 1:
-		address := params[0]
-		dnsName = address
-
-		addr := net.ParseIP(address)
-		if addr != nil {
-			ip = address
-		} else {
-			hostname = address
-		}
+		hostname, port, err = validateURL(params[0], "")
+		dnsName = hostname
+	case 0:
+		err = zbxerr.ErrorTooFewParameters
 	default:
-		err = zbxerr.ErrorInvalidParams
-
-		return
-	}
-
-	if port == "" {
-		port = "443"
+		err = zbxerr.ErrorTooManyParameters
 	}
 
 	return
+}
+
+func validateURL(url, port string) (string, string, error) {
+	out, err := uri.New(url, &uri.Defaults{Port: port, Scheme: "https"})
+	if err != nil {
+		return "", "", err
+	}
+	fmt.Println(out)
+	if out.Scheme() != "" && out.Scheme() != "https" {
+		return "", "", errors.New("scheme must be https")
+	}
+
+	if out.Port() != "" && port != "" && out.Port() != port {
+		return "", "", errors.New("port set incorrectly")
+	}
+
+	if out.Port() == "" && port == "" {
+		return out.Host(), "443", nil
+	}
+
+	return out.Host(), out.Port(), nil
 }
 
 func getCertificatesPEM(address string, timeout int) (*x509.Certificate, error) {
