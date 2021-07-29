@@ -121,7 +121,7 @@ class CControllerHostCreate extends CController {
 		]);
 
 		$output = [];
-		if (($hostids = API::Host()->create($host)) !== false) {
+		if (($hostids = API::Host()->create($host)) !== false && $this->createValueMaps((int) $hostids['hostids'][0])) {
 			$output += [
 				'hostid' => $hostids['hostids'][0],
 				'message' => _('Host added')
@@ -233,4 +233,22 @@ class CControllerHostCreate extends CController {
 		return zbx_toObject($groups, 'groupid');
 	}
 
+	/**
+	 * Create valuemaps.
+	 *
+	 * @param int $hostid
+	 *
+	 * @return bool
+	 */
+	private function createValueMaps(int $hostid): bool {
+		$valuemaps = array_map(function ($valuemap) use ($hostid) {
+			return $valuemap + ['hostid' => $hostid];
+		}, $this->getInput('valuemaps', []));
+
+		if ($valuemaps && !API::ValueMap()->create($valuemaps)) {
+			return false;
+		}
+
+		return true;
+	}
 }
