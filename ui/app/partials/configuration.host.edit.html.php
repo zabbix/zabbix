@@ -232,7 +232,7 @@ $host_tab = (new CFormGrid())
 		]).
 	');'.
 	'hostInterfaceManager.render();'.
-	(($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) ? 'HostInterfaceManager.makeReadonly();' : '')
+	(($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) ? 'hostInterfaceManager.makeReadonly();' : '')
 ))
 	->setOnDocumentReady()
 	->show();
