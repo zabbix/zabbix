@@ -26,7 +26,9 @@ SERVER_tests = \
 	zbx_tm_sub \
 	zbx_tm_round_up \
 	zbx_tm_round_down \
-	zbx_get_report_nextcheck
+	zbx_get_report_nextcheck \
+	zbx_ltrim_utf8 \
+	zbx_rtrim_utf8
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -481,4 +483,35 @@ zbx_get_report_nextcheck_LDADD += @SERVER_LIBS@
 zbx_get_report_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_get_report_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_ltrim_utf8
+
+zbx_ltrim_utf8_SOURCES = \
+	zbx_ltrim_utf8.c \
+	$(COMMON_SRC_FILES)
+
+zbx_ltrim_utf8_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_ltrim_utf8_LDADD += @SERVER_LIBS@
+
+zbx_ltrim_utf8_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_ltrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_ltrim_utf8
+
+zbx_rtrim_utf8_SOURCES = \
+	zbx_rtrim_utf8.c \
+	$(COMMON_SRC_FILES)
+
+zbx_rtrim_utf8_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_rtrim_utf8_LDADD += @SERVER_LIBS@
+
+zbx_rtrim_utf8_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_rtrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
 endif

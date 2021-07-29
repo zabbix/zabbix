@@ -24,6 +24,17 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
+// Session is a general structure for storing sessions' configuration.
+type Session struct {
+	URI         string `conf:"name=Uri,optional"`
+	Password    string `conf:"optional"`
+	User        string `conf:"optional"`
+	TLSConnect  string `conf:"name=TLSConnect,optional"`
+	TLSCAFile   string `conf:"name=TLSCAFile,optional"`
+	TLSCertFile string `conf:"name=TLSCertFile,optional"`
+	TLSKeyFile  string `conf:"name=TLSKeyFile,optional"`
+}
+
 // PluginOptions option from config file
 type PluginOptions struct {
 	// Timeout is the maximum time in seconds for waiting when a connection has to be established.
@@ -38,7 +49,7 @@ type PluginOptions struct {
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]conf.Session `conf:"optional"`
+	Sessions map[string]Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.

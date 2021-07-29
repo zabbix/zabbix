@@ -201,6 +201,9 @@ class CApiInputValidator {
 
 			case API_UUID:
 				return self::validateUuid($rule, $data, $path, $error);
+
+			case API_VAULT_SECRET:
+				return self::validateVaultSecret($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -259,6 +262,7 @@ class CApiInputValidator {
 			case API_DATE:
 			case API_NUMERIC_RANGES:
 			case API_UUID:
+			case API_VAULT_SECRET:
 				return true;
 
 			case API_OBJECT:
@@ -1467,8 +1471,10 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ((new CUserMacroParser())->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a user macro is expected'));
+		$user_macro_parser = new CUserMacroParser();
+
+		if ($user_macro_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $user_macro_parser->getError());
 			return false;
 		}
 
@@ -1575,7 +1581,7 @@ class CApiInputValidator {
 	 * Regular expression validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_GLOBAL_REGEX
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -1595,7 +1601,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($data !== '' && $data[0] === '@') {
+		if (($flags & API_ALLOW_GLOBAL_REGEX) && $data !== '' && $data[0] === '@') {
 			return true;
 		}
 
@@ -1709,11 +1715,43 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Returns macro without spaces and curly braces.
+	 *
+	 * "{$MACRO}" => "MACRO"
+	 * "{$MACRO:}" => "MACRO:context:"
+	 * "{$MACRO: /var}" => "MACRO:context:/var"
+	 * "{$MACRO: /"var"}" => "MACRO:context:/var"
+	 * "{$MACRO:regex: ^[a-z]+}" => "MACRO:regex:^[a-z]+"
+	 *
+	 * @param string $macro
+	 *
+	 * @return string
+	 */
+	public static function trimMacro(string $macro): string {
+		$user_macro_parser = new CUserMacroParser();
+
+		$user_macro_parser->parse($macro);
+
+		$macro = $user_macro_parser->getMacro();
+		$context = $user_macro_parser->getContext();
+		$regex = $user_macro_parser->getRegex();
+
+		if ($context !== null) {
+			$macro .= ':context:'.$context;
+		}
+		elseif ($regex !== null) {
+			$macro .= ':regex:'.$regex;
+		}
+
+		return $macro;
+	}
+
+	/**
 	 * Array of objects uniqueness validator.
 	 *
 	 * @param array  $rule
 	 * @param array  $rule['uniq']    (optional) subsets of unique fields ([['hostid', 'name'], [...]])
-	 * @param array  $rule['fields']  (optional)
+	 * @param array  $rule['fields']
 	 * @param array  $data
 	 * @param string $path
 	 * @param string $error
@@ -1742,15 +1780,19 @@ class CApiInputValidator {
 
 						$values[] = $object[$field_name];
 
+						$value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
+							? self::trimMacro($object[$field_name])
+							: $object[$field_name];
+
 						if ($level < count($field_names)) {
-							if (!array_key_exists($object[$field_name], $_uniq)) {
-								$_uniq[$object[$field_name]] = [];
+							if (!array_key_exists($value, $_uniq)) {
+								$_uniq[$value] = [];
 							}
 
-							$_uniq = &$_uniq[$object[$field_name]];
+							$_uniq = &$_uniq[$value];
 						}
 						else {
-							if (array_key_exists($object[$field_name], $_uniq)) {
+							if (array_key_exists($value, $_uniq)) {
 								$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
 								$error = _s('Invalid parameter "%1$s": %2$s.', $subpath, _s('value %1$s already exists',
 									'('.implode(', ', $field_names).')=('.implode(', ', $values).')'
@@ -1758,7 +1800,7 @@ class CApiInputValidator {
 								return false;
 							}
 
-							$_uniq[$object[$field_name]] = true;
+							$_uniq[$value] = true;
 						}
 
 						$level++;
@@ -1767,14 +1809,12 @@ class CApiInputValidator {
 			}
 		}
 
-		if (array_key_exists('fields', $rule)) {
-			foreach ($data as $index => $object) {
-				foreach ($rule['fields'] as $field_name => $field_rule) {
-					if (array_key_exists($field_name, $object)) {
-						$subpath = ($path === '/' ? $path : $path.'/').($index + 1).'/'.$field_name;
-						if (!self::validateDataUniqueness($field_rule, $object[$field_name], $subpath, $error)) {
-							return false;
-						}
+		foreach ($data as $index => $object) {
+			foreach ($rule['fields'] as $field_name => $field_rule) {
+				if (array_key_exists($field_name, $object)) {
+					$subpath = ($path === '/' ? $path : $path.'/').($index + 1).'/'.$field_name;
+					if (!self::validateDataUniqueness($field_rule, $object[$field_name], $subpath, $error)) {
+						return false;
 					}
 				}
 			}
@@ -2271,6 +2311,37 @@ class CApiInputValidator {
 		}
 
 		$data = strtolower($data);
+
+		return true;
+	}
+
+	/**
+	 * User vault secret.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateVaultSecret($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$vault_secret_parser = new CVaultSecretParser();
+
+		if ($vault_secret_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $vault_secret_parser->getError());
+			return false;
+		}
 
 		return true;
 	}

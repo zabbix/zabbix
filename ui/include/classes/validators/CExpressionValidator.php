@@ -173,8 +173,9 @@ class CExpressionValidator extends CValidator {
 					if ($options['calculated'] && $options['aggregating']) {
 						if ($parent_token === null
 								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
-								|| !$this->math_function_data->isAggregating($parent_token['data']['function'])
-								|| count($parent_token['data']['parameters']) != 1) {
+								|| !CMathFunctionData::isAggregating($parent_token['data']['function'])
+								|| count($parent_token['data']['parameters']) != 1
+								|| count($parent_token['data']['parameters'][0]['data']['tokens']) != 1) {
 							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
 							return false;
@@ -184,7 +185,7 @@ class CExpressionValidator extends CValidator {
 					break;
 
 				case CExpressionParserResult::TOKEN_TYPE_EXPRESSION:
-					if (!$this->validateRecursively($parameter['data']['tokens'], $parent_token)) {
+					if (!$this->validateRecursively($token['data']['tokens'], null)) {
 						return false;
 					}
 
@@ -220,7 +221,7 @@ class CExpressionValidator extends CValidator {
 					return true;
 
 				case CExpressionParserResult::TOKEN_TYPE_EXPRESSION:
-					return self::hasHistoryFunctions($parameter['data']['tokens']);
+					return self::hasHistoryFunctions($token['data']['tokens']);
 			}
 		}
 

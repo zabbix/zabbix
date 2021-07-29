@@ -328,6 +328,10 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
 	}
 
+	$macros = array_map(function($macro) {
+		return array_diff_key($macro, array_flip(['hostmacroid']));
+	}, $macros);
+
 	unset($_REQUEST['hostid'], $_REQUEST['flags']);
 }
 elseif (hasRequest('add') || hasRequest('update')) {
