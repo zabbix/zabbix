@@ -38,31 +38,13 @@ $this->includeJsFile('monitoring.latest.view.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
-$nav_items = new CList();
-
-if ($data['can_create_items']) {
-	$create_item_button = new CButtonCreateItem(_('Create item'), $data['create_item_dropdown']);
-
-	if ($data['items_readonly']) {
-		$create_item_button->setAttribute('disabled', true);
-	}
-
-	if ($data['single_hostid'] === 0) {
-		$create_item_button
-			->setAttribute('disabled', true)
-			->setAttribute('title', _('Select single host first'));
-	}
-
-	$nav_items->addItem($create_item_button);
-}
-
-$nav_items->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CTag('nav', true, $nav_items))
-		->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {

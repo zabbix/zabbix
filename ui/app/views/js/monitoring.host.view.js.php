@@ -111,9 +111,6 @@
 			doRefresh: function(body) {
 				this.getCurrentForm().replaceWith(body);
 			},
-			updateCreateHostButton: function(groupids) {
-				$('.js-create-host').attr('data-hostgroups', JSON.stringify(groupids));
-			},
 			bindDataEvents: function(deferred) {
 				var that = this;
 
@@ -132,7 +129,6 @@
 				this.clearLoading();
 				this.removeMessages();
 				this.doRefresh(response.body);
-				this.updateCreateHostButton(response.groupids);
 
 				if ('messages' in response) {
 					this.addMessages(response.messages);
