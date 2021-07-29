@@ -84,32 +84,32 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 			[
 				'Name' => 'Aktīvs токен - 頑張って',
 				'Expires at' => 'Never',
-				'Created at' => '2021-01-01 00:00:01',
-				'Last accessed at' => '2021-01-01 00:00:04',
+				'Created at' => '01/01/2021 12:00:01 AM',
+				'Last accessed at' => '01/01/2021 12:00:04 AM',
 				'Status' => 'Disabled'
 
 			],
 			[
 				'Name' => 'Expired token for admin',
-				'Expires at' => '2021-01-01 00:06:00',
-				'Created at' => '2021-01-01 00:00:01',
-				'Last accessed at' => '2021-01-01 00:00:03',
+				'Expires at' => '01/01/2021 12:06:00 AM',
+				'Created at' => '01/01/2021 12:00:01 AM',
+				'Last accessed at' => '01/01/2021 12:00:03 AM',
 				'Status' => 'Enabled'
 
 			],
 			[
 				'Name' => 'Future token for admin',
-				'Expires at' => date('Y-m-d H:i:s', self::$timestamp + 864000),
-				'Created at' => '2021-01-01 00:00:01',
-				'Last accessed at' => '2021-01-01 00:00:02',
+				'Expires at' => date('m/d/Y h:i:s A', self::$timestamp + 864000),
+				'Created at' => '01/01/2021 12:00:01 AM',
+				'Last accessed at' => '01/01/2021 12:00:02 AM',
 				'Status' => 'Enabled'
 
 			],
 			[
 				'Name' => 'Token that will expire in 2 days',
-				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
-				'Created at' => '2021-01-01 00:00:01',
-				'Last accessed at' => '2021-01-01 00:00:05',
+				'Expires at' => date('m/d/Y h:i:s A', self::$timestamp),
+				'Created at' => '01/01/2021 12:00:01 AM',
+				'Last accessed at' => '01/01/2021 12:00:05 AM',
 				'Status' => 'Disabled'
 
 			]
@@ -275,7 +275,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'sort_field' => 'Expires at',
 					'expected' => [
 						'Never',
-						'2021-01-01 00:06:00',
+						'01/01/2021 12:06:00 AM',
 						'2 days in the future',
 						'12 days in the future'
 					]
@@ -285,10 +285,10 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 				[
 					'sort_field' => 'Last accessed at',
 					'expected' => [
-						'2021-01-01 00:00:02',
-						'2021-01-01 00:00:03',
-						'2021-01-01 00:00:04',
-						'2021-01-01 00:00:05'
+						'01/01/2021 12:00:02 AM',
+						'01/01/2021 12:00:03 AM',
+						'01/01/2021 12:00:04 AM',
+						'01/01/2021 12:00:05 AM'
 					]
 				]
 			],
@@ -314,10 +314,10 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 		if ($data['sort_field'] === 'Expires at') {
 			foreach ($data['expected'] as $i => $value) {
 				if ($value === '2 days in the future') {
-					$data['expected'][$i] = date('Y-m-d H:i:s', self::$timestamp);
+					$data['expected'][$i] = date('m/d/Y h:i:s A', self::$timestamp);
 				}
 				elseif ($value === '12 days in the future') {
-					$data['expected'][$i] = date('Y-m-d H:i:s', self::$timestamp + 864000);
+					$data['expected'][$i] = date('m/d/Y h:i:s A', self::$timestamp + 864000);
 				}
 			}
 		}

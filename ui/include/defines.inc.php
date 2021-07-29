@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha1');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050031);
+define('ZABBIX_DB_VERSION',		5050034);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1590,7 +1590,7 @@ define('ZBX_VALID_WARNING',	2);
 define('LANG_DEFAULT', 'default');
 
 // the default language
-define('ZBX_DEFAULT_LANG', 'en_GB');
+define('ZBX_DEFAULT_LANG', 'en_US');
 
 // user default time zone
 define('TIMEZONE_DEFAULT', 'default');

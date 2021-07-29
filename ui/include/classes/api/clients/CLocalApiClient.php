@@ -161,7 +161,7 @@ class CLocalApiClient extends CApiClient {
 	 */
 	protected function authenticate($auth) {
 		if (zbx_empty($auth)) {
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised.'));
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
 		if (strlen($auth) == 64) {
@@ -189,7 +189,7 @@ class CLocalApiClient extends CApiClient {
 
 		if (!$api_tokens) {
 			usleep(10000);
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised.'));
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
 		[['expires_at' => $expires_at, 'userid' => $userid, 'tokenid' => $tokenid]] = $api_tokens;
@@ -215,7 +215,7 @@ class CLocalApiClient extends CApiClient {
 		$debug_mode = GROUP_DEBUG_MODE_DISABLED;
 		while ($db_usrgrp = DBfetch($db_usrgrps)) {
 			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
-				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised.'));
+				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 
 			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

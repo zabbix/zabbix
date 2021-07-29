@@ -512,7 +512,7 @@ function get_hostgroup_by_groupid($groupid) {
 		return $groups;
 	}
 
-	error(_s('No host groups with groupid "%1$s".', $groupid));
+	error(_s('No host groups with group ID "%1$s".', $groupid));
 
 	return false;
 }
@@ -555,7 +555,7 @@ function get_host_by_hostid($hostid, $no_error_message = 0) {
 	}
 
 	if ($no_error_message == 0) {
-		error(_s('No host with hostid "%1$s".', $hostid));
+		error(_s('No host with host ID "%1$s".', $hostid));
 	}
 
 	return false;

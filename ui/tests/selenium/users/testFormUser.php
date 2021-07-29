@@ -445,7 +445,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Оверлорд',
 						'Name' => 'Антон Антонович',
-						'Surname' => 'Антонов',
+						'Last name' => 'Антонов',
 						'Groups' => ['Zabbix administrators'],
 						'Password' => 'абвгдеЁж',
 						'Password (once again)' => 'абвгдеЁж',
@@ -466,7 +466,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Detailed user',
 						'Name' => 'Bugs',
-						'Surname' => 'Bunny',
+						'Last name' => 'Bunny',
 						'Groups' => [
 							'Selenium user group in configuration',
 							'Zabbix administrators'
@@ -561,7 +561,7 @@ class testFormUser extends CWebTest {
 		$form_update = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 
 		// Verify that fields are updated.
-		$check_fields = ['Username', 'Name', 'Surname', 'Language', 'Theme', 'Refresh', 'Rows per page', 'URL (after login)'];
+		$check_fields = ['Username', 'Name', 'Last name', 'Language', 'Theme', 'Refresh', 'Rows per page', 'URL (after login)'];
 		foreach ($check_fields as $field_name) {
 			if (array_key_exists($field_name, $data['fields'])) {
 				$this->assertEquals($data['fields'][$field_name], $form_update->getField($field_name)->getValue());
@@ -881,7 +881,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Updated_user_1',
 						'Name' => 'Test_Name',
-						'Surname' => 'Test_Surname',
+						'Last name' => 'Test_Surname',
 						'Groups' => [
 							'Selenium user group in configuration'
 						],
@@ -905,7 +905,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Updated_user',
 						'Name' => 'Road',
-						'Surname' => 'Runner',
+						'Last name' => 'Runner',
 						'Groups' => [
 							'Selenium user group in configuration'
 						],

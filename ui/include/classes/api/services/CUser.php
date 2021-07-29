@@ -1387,7 +1387,7 @@ class CUser extends CApiService {
 		]);
 
 		if (!$db_sessions) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot log out.'));
 		}
 
 		DB::delete('sessions', [
