@@ -172,8 +172,8 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 	event.objectid = trigger->triggerid;
 	event.trigger = *trigger;
 
-	substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &trigger->description,
-			MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+	substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			&trigger->description, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 	if (SUCCEED == *historical)
 	{
@@ -319,8 +319,8 @@ static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *s
 
 		name = zbx_strdup(NULL, trigger->description);
 
-		substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &name,
-				MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+		substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				&name, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		name_esc = DBdyn_escape_string_len(name, EVENT_NAME_LEN);
 

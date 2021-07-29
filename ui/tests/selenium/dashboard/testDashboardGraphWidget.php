@@ -142,7 +142,7 @@ class testDashboardGraphWidget extends CWebTest {
 			case 'Data set':
 				// Remove data set.
 				if (CTestArrayHelper::get($data, 'remove_data_set', false)) {
-					$form->query('xpath://button[@class="remove-btn"]')->one()->click();
+					$form->query('xpath://button[@class="btn-remove"]')->one()->click();
 				}
 				break;
 

@@ -170,7 +170,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'host_and_template_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
+					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
 			[

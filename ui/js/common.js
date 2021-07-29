@@ -337,16 +337,16 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var overlay = overlays_stack.getById(dialogueid);
 	if (!overlay) {
 		var wide_popup_actions = ['popup.generic', 'dashboard.share.edit', 'dashboard.page.properties.edit',
-			'dashboard.properties.edit', 'dashboard.widget.edit', 'popup.services', 'popup.media', 'popup.lldoperation',
+				'dashboard.properties.edit', 'dashboard.widget.edit', 'popup.media', 'popup.lldoperation',
 				'popup.lldoverride', 'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep',
 				'popup.testtriggerexpr', 'popup.triggerwizard'
 			],
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
-				'popup.mediatype.message', 'popup.scriptexec', 'popup.scheduledreport.test'
+				'popup.mediatype.message', 'popup.scriptexec', 'popup.scheduledreport.test', 'popup.service.edit'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
-				'popup.massupdate.triggerprototype'
+				'popup.massupdate.triggerprototype', 'popup.massupdate.service'
 			],
 			preprocessing_popup_actions = ['popup.massupdate.item', 'popup.massupdate.itemprototype'],
 			dialogue_class = '';
@@ -450,14 +450,9 @@ function acknowledgePopUp(options, trigger_elmnt) {
 		history.replaceState({}, '', url.getUrl());
 	});
 
-	var close = function(e, dialogue) {
-		if (dialogue.dialogueid === overlay.dialogueid) {
-			history.replaceState({}, '', backurl);
-			$.unsubscribe('overlay.close', close);
-		}
-	};
-
-	$.subscribe('overlay.close', close);
+	overlay.$dialogue[0].addEventListener('overlay.close', () => {
+		history.replaceState({}, '', backurl);
+	}, {once: true});
 
 	return overlay;
 }
@@ -971,8 +966,7 @@ Function.prototype.bindAsEventListener = function (context) {
 	};
 };
 
-function openMassupdatePopup(elem, popup_name) {
-	const data = {};
+function openMassupdatePopup(elem, popup_name, data = {}) {
 	const form = elem.closest('form');
 
 	data['ids'] = [...form.querySelectorAll('tbody input:checked')].map((input) => input.value);
@@ -995,5 +989,5 @@ function openMassupdatePopup(elem, popup_name) {
 			break;
 	}
 
-	return PopUp(popup_name, data, null, this);
+	return PopUp(popup_name, data, null, elem);
 }

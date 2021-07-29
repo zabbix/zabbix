@@ -227,7 +227,8 @@ zbx_item_authtype_t;
 #define EVENT_SOURCE_DISCOVERY		1
 #define EVENT_SOURCE_AUTOREGISTRATION	2
 #define EVENT_SOURCE_INTERNAL		3
-#define EVENT_SOURCE_COUNT		4
+#define EVENT_SOURCE_SERVICE		4
+#define EVENT_SOURCE_COUNT		5
 
 /* event objects */
 #define EVENT_OBJECT_TRIGGER		0
@@ -236,6 +237,7 @@ zbx_item_authtype_t;
 #define EVENT_OBJECT_ZABBIX_ACTIVE	3
 #define EVENT_OBJECT_ITEM		4
 #define EVENT_OBJECT_LLDRULE		5
+#define EVENT_OBJECT_SERVICE		6
 
 /* acknowledged flags */
 #define EVENT_NOT_ACKNOWLEDGED		0
@@ -372,6 +374,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_METADATA		24
 #define CONDITION_TYPE_EVENT_TAG		25
 #define CONDITION_TYPE_EVENT_TAG_VALUE		26
+#define CONDITION_TYPE_SERVICE			27
+#define CONDITION_TYPE_SERVICE_NAME		28
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
@@ -392,6 +396,10 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 /* maintenance tag operators */
 #define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
 #define ZBX_MAINTENANCE_TAG_OPERATOR_LIKE	2
+
+/* service problem tag operators */
+#define ZBX_SERVICE_TAG_OPERATOR_EQUAL	0
+#define ZBX_SERVICE_TAG_OPERATOR_LIKE	2
 
 /* maintenance tag evaluation types */
 #define MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
@@ -431,13 +439,15 @@ zbx_graph_yaxis_types_t;
 #define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
 /* runtime control options */
-#define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
-#define ZBX_SECRETS_RELOAD	"secrets_reload"
-#define ZBX_HOUSEKEEPER_EXECUTE	"housekeeper_execute"
-#define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
-#define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
-#define ZBX_SNMP_CACHE_RELOAD	"snmp_cache_reload"
-#define ZBX_DIAGINFO		"diaginfo"
+#define ZBX_CONFIG_CACHE_RELOAD		"config_cache_reload"
+#define ZBX_SERVICE_CACHE_RELOAD	"service_cache_reload"
+#define ZBX_SECRETS_RELOAD		"secrets_reload"
+#define ZBX_HOUSEKEEPER_EXECUTE		"housekeeper_execute"
+#define ZBX_LOG_LEVEL_INCREASE		"log_level_increase"
+#define ZBX_LOG_LEVEL_DECREASE		"log_level_decrease"
+#define ZBX_SNMP_CACHE_RELOAD		"snmp_cache_reload"
+#define ZBX_DIAGINFO			"diaginfo"
+#define ZBX_TRIGGER_HOUSEKEEPER_EXECUTE "trigger_housekeeper_execute"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -519,42 +529,44 @@ zbx_group_status_type_t;
 const char	*get_program_type_string(unsigned char program_type);
 
 /* process type */
-#define ZBX_PROCESS_TYPE_POLLER		0
-#define ZBX_PROCESS_TYPE_UNREACHABLE	1
-#define ZBX_PROCESS_TYPE_IPMIPOLLER	2
-#define ZBX_PROCESS_TYPE_PINGER		3
-#define ZBX_PROCESS_TYPE_JAVAPOLLER	4
-#define ZBX_PROCESS_TYPE_HTTPPOLLER	5
-#define ZBX_PROCESS_TYPE_TRAPPER	6
-#define ZBX_PROCESS_TYPE_SNMPTRAPPER	7
-#define ZBX_PROCESS_TYPE_PROXYPOLLER	8
-#define ZBX_PROCESS_TYPE_ESCALATOR	9
-#define ZBX_PROCESS_TYPE_HISTSYNCER	10
-#define ZBX_PROCESS_TYPE_DISCOVERER	11
-#define ZBX_PROCESS_TYPE_ALERTER	12
-#define ZBX_PROCESS_TYPE_TIMER		13
-#define ZBX_PROCESS_TYPE_HOUSEKEEPER	14
-#define ZBX_PROCESS_TYPE_DATASENDER	15
-#define ZBX_PROCESS_TYPE_CONFSYNCER	16
-#define ZBX_PROCESS_TYPE_HEARTBEAT	17
-#define ZBX_PROCESS_TYPE_SELFMON	18
-#define ZBX_PROCESS_TYPE_VMWARE		19
-#define ZBX_PROCESS_TYPE_COLLECTOR	20
-#define ZBX_PROCESS_TYPE_LISTENER	21
-#define ZBX_PROCESS_TYPE_ACTIVE_CHECKS	22
-#define ZBX_PROCESS_TYPE_TASKMANAGER	23
-#define ZBX_PROCESS_TYPE_IPMIMANAGER	24
-#define ZBX_PROCESS_TYPE_ALERTMANAGER	25
-#define ZBX_PROCESS_TYPE_PREPROCMAN	26
-#define ZBX_PROCESS_TYPE_PREPROCESSOR	27
-#define ZBX_PROCESS_TYPE_LLDMANAGER	28
-#define ZBX_PROCESS_TYPE_LLDWORKER	29
-#define ZBX_PROCESS_TYPE_ALERTSYNCER	30
-#define ZBX_PROCESS_TYPE_HISTORYPOLLER	31
-#define ZBX_PROCESS_TYPE_AVAILMAN	32
-#define ZBX_PROCESS_TYPE_REPORTMANAGER	33
-#define ZBX_PROCESS_TYPE_REPORTWRITER	34
-#define ZBX_PROCESS_TYPE_COUNT		35	/* number of process types */
+#define ZBX_PROCESS_TYPE_POLLER			0
+#define ZBX_PROCESS_TYPE_UNREACHABLE		1
+#define ZBX_PROCESS_TYPE_IPMIPOLLER		2
+#define ZBX_PROCESS_TYPE_PINGER			3
+#define ZBX_PROCESS_TYPE_JAVAPOLLER		4
+#define ZBX_PROCESS_TYPE_HTTPPOLLER		5
+#define ZBX_PROCESS_TYPE_TRAPPER		6
+#define ZBX_PROCESS_TYPE_SNMPTRAPPER		7
+#define ZBX_PROCESS_TYPE_PROXYPOLLER		8
+#define ZBX_PROCESS_TYPE_ESCALATOR		9
+#define ZBX_PROCESS_TYPE_HISTSYNCER		10
+#define ZBX_PROCESS_TYPE_DISCOVERER		11
+#define ZBX_PROCESS_TYPE_ALERTER		12
+#define ZBX_PROCESS_TYPE_TIMER			13
+#define ZBX_PROCESS_TYPE_HOUSEKEEPER		14
+#define ZBX_PROCESS_TYPE_DATASENDER		15
+#define ZBX_PROCESS_TYPE_CONFSYNCER		16
+#define ZBX_PROCESS_TYPE_HEARTBEAT		17
+#define ZBX_PROCESS_TYPE_SELFMON		18
+#define ZBX_PROCESS_TYPE_VMWARE			19
+#define ZBX_PROCESS_TYPE_COLLECTOR		20
+#define ZBX_PROCESS_TYPE_LISTENER		21
+#define ZBX_PROCESS_TYPE_ACTIVE_CHECKS		22
+#define ZBX_PROCESS_TYPE_TASKMANAGER		23
+#define ZBX_PROCESS_TYPE_IPMIMANAGER		24
+#define ZBX_PROCESS_TYPE_ALERTMANAGER		25
+#define ZBX_PROCESS_TYPE_PREPROCMAN		26
+#define ZBX_PROCESS_TYPE_PREPROCESSOR		27
+#define ZBX_PROCESS_TYPE_LLDMANAGER		28
+#define ZBX_PROCESS_TYPE_LLDWORKER		29
+#define ZBX_PROCESS_TYPE_ALERTSYNCER		30
+#define ZBX_PROCESS_TYPE_HISTORYPOLLER		31
+#define ZBX_PROCESS_TYPE_AVAILMAN		32
+#define ZBX_PROCESS_TYPE_REPORTMANAGER		33
+#define ZBX_PROCESS_TYPE_REPORTWRITER		34
+#define ZBX_PROCESS_TYPE_SERVICEMAN		35
+#define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
+#define ZBX_PROCESS_TYPE_COUNT		37	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 const char	*get_process_type_string(unsigned char proc_type);
 int		get_process_type_by_name(const char *proc_type_str);
@@ -672,6 +684,10 @@ const char	*zbx_trigger_state_string(unsigned char state);
 #define TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION	1
 #define TRIGGER_RECOVERY_MODE_NONE			2
 
+/* business service values */
+#define SERVICE_VALUE_OK		0
+#define SERVICE_VALUE_PROBLEM		1
+
 #define ITEM_LOGTYPE_INFORMATION	1
 #define ITEM_LOGTYPE_WARNING		2
 #define ITEM_LOGTYPE_ERROR		4
@@ -722,12 +738,12 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define OPERATION_TYPE_HOST_DISABLE	9
 #define OPERATION_TYPE_HOST_INVENTORY	10
 #define OPERATION_TYPE_RECOVERY_MESSAGE	11
-#define OPERATION_TYPE_ACK_MESSAGE	12
+#define OPERATION_TYPE_UPDATE_MESSAGE	12
 
 /* normal and recovery operations */
 #define ZBX_OPERATION_MODE_NORMAL	0
 #define ZBX_OPERATION_MODE_RECOVERY	1
-#define ZBX_OPERATION_MODE_ACK		2
+#define ZBX_OPERATION_MODE_UPDATE	2
 
 /* algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0
@@ -791,6 +807,9 @@ zbx_user_role_permission_t;
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
 
+#define ZBX_USER_ROLE_PERMISSION_UI_DEFAULT_ACCESS		"ui.default_access"
+#define ZBX_USER_ROLE_PERMISSION_UI_MONITORING_SERVICES		"ui.monitoring.services"
+
 /* user permissions */
 typedef enum
 {
@@ -805,6 +824,7 @@ typedef struct
 	zbx_uint64_t	userid;
 	zbx_user_type_t	type;
 	zbx_uint64_t	roleid;
+	char		*username;
 }
 zbx_user_t;
 
@@ -946,13 +966,15 @@ typedef enum
 }
 zbx_task_t;
 
-#define ZBX_RTC_LOG_LEVEL_INCREASE	1
-#define ZBX_RTC_LOG_LEVEL_DECREASE	2
-#define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
-#define ZBX_RTC_CONFIG_CACHE_RELOAD	8
-#define ZBX_RTC_SNMP_CACHE_RELOAD	9
-#define ZBX_RTC_DIAGINFO		10
-#define ZBX_RTC_SECRETS_RELOAD		11
+#define ZBX_RTC_LOG_LEVEL_INCREASE		1
+#define ZBX_RTC_LOG_LEVEL_DECREASE		2
+#define ZBX_RTC_HOUSEKEEPER_EXECUTE		3
+#define ZBX_RTC_CONFIG_CACHE_RELOAD		8
+#define ZBX_RTC_SNMP_CACHE_RELOAD		9
+#define ZBX_RTC_DIAGINFO			10
+#define ZBX_RTC_SECRETS_RELOAD			11
+#define ZBX_RTC_SERVICE_CACHE_RELOAD		12
+#define ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE	13
 
 typedef enum
 {
@@ -1001,9 +1023,9 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_SCOPE_MASK	0x0000ff00
 #define ZBX_RTC_DATA_MASK	0xffff0000
 
-#define ZBX_RTC_GET_MSG(task)	(int)((task & ZBX_RTC_MSG_MASK) >> ZBX_RTC_MSG_SHIFT)
-#define ZBX_RTC_GET_SCOPE(task)	(int)((task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
-#define ZBX_RTC_GET_DATA(task)	(int)((task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
+#define ZBX_RTC_GET_MSG(task)	(int)(((unsigned int)task & ZBX_RTC_MSG_MASK) >> ZBX_RTC_MSG_SHIFT)
+#define ZBX_RTC_GET_SCOPE(task)	(int)(((unsigned int)task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
+#define ZBX_RTC_GET_DATA(task)	(int)(((unsigned int)task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
 
 #define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
 	(data << ZBX_RTC_DATA_SHIFT))
@@ -1645,9 +1667,6 @@ char	*zbx_create_token(zbx_uint64_t seed);
 
 int	zbx_str_extract(const char *text, size_t len, char **value);
 
-#define AUDIT_ACTION_EXECUTE	7
-#define AUDIT_RESOURCE_SCRIPT	25
-
 typedef enum
 {
 	ZBX_TIME_UNIT_UNKNOWN,
@@ -1691,6 +1710,14 @@ int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
 
+/* audit logging mode */
+#define ZBX_AUDITLOG_DISABLED	0
+#define ZBX_AUDITLOG_ENABLED	1
+
+/* includes terminating '\0' */
+#define CUID_LEN	26
+void	zbx_new_cuid(char *cuid);
+
 /* report scheduling */
 
 #define ZBX_REPORT_CYCLE_DAILY		0
@@ -1704,5 +1731,9 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 /* */
 char	*zbx_substr(const char *src, size_t left, size_t right);
 char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
+
+/* UTF-8 trimming */
+void	zbx_ltrim_utf8(char *str, const char *charlist);
+void	zbx_rtrim_utf8(char *str, const char *charlist);
 
 #endif

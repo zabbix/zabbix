@@ -584,6 +584,14 @@ class CPage {
 		$this->query('id:password')->one()->fill($password);
 		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
+
+		// Make sure that logged in page is opened.
+		try {
+			$this->query('xpath://aside[@class="sidebar"]//a[text()="User settings"]')->exists();
+		}
+		catch (\Exception $ex) {
+			throw new \Exception('"User settings" menu is not found on page. Probably user is not logged in.');
+		}
 	}
 
 	/**

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -71,13 +71,14 @@ class CControllerAuditLogList extends CController {
 			'auditlog_action' => CProfile::get('web.auditlog.filter.action', -1),
 			'resourceid' => CProfile::get('web.auditlog.filter.resourceid', ''),
 			'action' => $this->getAction(),
-			'actions' => $this->getActionsList(),
-			'resources' => $this->getResourcesList(),
+			'actions' => self::getActionsList(),
+			'resources' => self::getResourcesList(),
 			'timeline' => getTimeSelectorPeriod($timeselector_options),
 			'auditlogs' => [],
 			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
 		];
 		$users = [];
+		$usernames = [];
 		$filter = [];
 
 		if (array_key_exists((int) $data['auditlog_action'], $data['actions'])) {
@@ -93,10 +94,9 @@ class CControllerAuditLogList extends CController {
 		}
 
 		$params = [
-			'output' => ['auditid', 'userid', 'clock', 'action', 'resourcetype', 'note', 'ip', 'resourceid',
-				'resourcename'
+			'output' => ['auditid', 'userid', 'username', 'clock', 'action', 'resourcetype', 'ip', 'resourceid',
+				'resourcename', 'details'
 			],
-			'selectDetails' => ['table_name', 'field_name', 'oldvalue', 'newvalue'],
 			'filter' => $filter,
 			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN,
@@ -114,7 +114,8 @@ class CControllerAuditLogList extends CController {
 		if ($data['userids']) {
 			$users = API::User()->get([
 				'output' => ['userid', 'username', 'name', 'surname'],
-				'userids' => $data['userids']
+				'userids' => $data['userids'],
+				'preservekeys' => true
 			]);
 
 			$data['userids'] = $this->sanitizeUsersForMultiselect($users);
@@ -123,6 +124,10 @@ class CControllerAuditLogList extends CController {
 				$params['userids'] = array_column($users, 'userid');
 				$data['auditlogs'] = API::AuditLog()->get($params);
 			}
+
+			$users = array_map(function(array $value): string {
+				return $value['username'];
+			}, $users);
 		}
 		else {
 			$data['auditlogs'] = API::AuditLog()->get($params);
@@ -132,14 +137,28 @@ class CControllerAuditLogList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		if (!$users) {
-			$users = API::User()->get([
-				'output' => ['userid', 'username'],
-				'userids' => array_column($data['auditlogs'], 'userid', 'userid')
+		$data['auditlogs'] = $this->sanitizeDetails($data['auditlogs']);
+
+		if (!$users && $data['auditlogs']) {
+			$db_users = API::User()->get([
+				'output' => ['username'],
+				'userids' => array_unique(array_column($data['auditlogs'], 'userid')),
+				'preservekeys' => true
 			]);
+
+			$users = [];
+			foreach ($data['auditlogs'] as $auditlog) {
+				if (!array_key_exists($auditlog['userid'], $db_users)) {
+					$usernames[$auditlog['userid']] = $auditlog['username'];
+					continue;
+				}
+
+				$users[$auditlog['userid']] = $db_users[$auditlog['userid']]['username'];
+			}
 		}
 
-		$data['users'] = array_column($users, 'username', 'userid');
+		$data['users'] = $users;
+		$data['usernames'] = $usernames;
 
 		natsort($data['actions']);
 		natsort($data['resources']);
@@ -161,15 +180,13 @@ class CControllerAuditLogList extends CController {
 	 *
 	 * @return array
 	 */
-	static public function getActionsList(): array {
+	private static function getActionsList(): array {
 		return [
 			AUDIT_ACTION_LOGIN => _('Login'),
 			AUDIT_ACTION_LOGOUT => _('Logout'),
 			AUDIT_ACTION_ADD => _('Add'),
 			AUDIT_ACTION_UPDATE => _('Update'),
 			AUDIT_ACTION_DELETE => _('Delete'),
-			AUDIT_ACTION_ENABLE => _('Enable'),
-			AUDIT_ACTION_DISABLE => _('Disable'),
 			AUDIT_ACTION_EXECUTE => _('Execute')
 		];
 	}
@@ -179,17 +196,15 @@ class CControllerAuditLogList extends CController {
 	 *
 	 * @return array
 	 */
-	static public function getResourcesList(): array {
+	private static function getResourcesList(): array {
 		return [
 			AUDIT_RESOURCE_USER => _('User'),
-			AUDIT_RESOURCE_ZABBIX_CONFIG => _('Configuration of Zabbix'),
 			AUDIT_RESOURCE_MEDIA_TYPE => _('Media type'),
 			AUDIT_RESOURCE_HOST => _('Host'),
 			AUDIT_RESOURCE_HOST_PROTOTYPE => _('Host prototype'),
 			AUDIT_RESOURCE_ACTION => _('Action'),
 			AUDIT_RESOURCE_GRAPH => _('Graph'),
 			AUDIT_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
-			AUDIT_RESOURCE_GRAPH_ELEMENT => _('Graph element'),
 			AUDIT_RESOURCE_USER_GROUP => _('User group'),
 			AUDIT_RESOURCE_TRIGGER => _('Trigger'),
 			AUDIT_RESOURCE_TRIGGER_PROTOTYPE => _('Trigger prototype'),
@@ -239,12 +254,50 @@ class CControllerAuditLogList extends CController {
 	}
 
 	private function sanitizeUsersForMultiselect(array $users): array {
-		$users = array_map(function (array $value): array {
+		$users = array_map(function(array $value): array {
 			return ['id' => $value['userid'], 'name' => getUserFullname($value)];
 		}, $users);
 
 		CArrayHelper::sort($users, ['name']);
 
 		return $users;
+	}
+
+	private function sanitizeDetails(array $auditlogs): array {
+		foreach ($auditlogs as &$auditlog) {
+			if ($auditlog['action'] != AUDIT_ACTION_UPDATE && $auditlog['action'] != AUDIT_ACTION_EXECUTE) {
+				continue;
+			}
+
+			$details = json_decode($auditlog['details'], true);
+
+			if (!$details) {
+				$auditlog['details'] = '';
+				continue;
+			}
+
+			$auditlog['details'] = $this->formatDetails($details, $auditlog['action']);
+		}
+		unset($auditlog);
+
+		return $auditlogs;
+	}
+
+	private function formatDetails(array $details, string $action): string {
+		$new_details = [];
+		foreach ($details as $key => $detail) {
+			switch ($action) {
+				case AUDIT_ACTION_UPDATE:
+					$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
+					break;
+				case AUDIT_ACTION_EXECUTE:
+					$new_details[] = sprintf('%s: %s', $key, $detail[1]);
+					break;
+			}
+		}
+
+		natsort($new_details);
+
+		return implode("\n", $new_details);
 	}
 }

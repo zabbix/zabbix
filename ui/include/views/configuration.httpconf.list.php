@@ -81,7 +81,8 @@ $filter_column_right = (new CFormList())->addRow(_('Tags'),
 	])
 );
 
-$filter = (new CFilter((new CUrl('httpconf.php'))->setArgument('context', $data['context'])))
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('httpconf.php'))->setArgument('context', $data['context']))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addvar('context', $data['context'])

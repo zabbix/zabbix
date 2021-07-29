@@ -1,0 +1,64 @@
+.service-info {
+	display: grid;
+	grid-template-columns: min-content auto min-content;
+	row-gap: 10px;
+	column-gap: 10px;
+	margin: -10px 0;
+	padding: 10px 10px;
+	border-left: 4px solid $green;
+
+	.service-info-label {
+
+		&::after {
+			content: ':';
+		}
+	}
+
+	.service-info-value {
+		grid-column: 2 / -1;
+	}
+
+	.service-name {
+		grid-column: 1 / 3;
+		margin: 5px 0;
+		font-size: $font-h2-size;
+	}
+
+	.service-actions {
+		align-items: end;
+	}
+
+	.service-status {
+		display: inline-block;
+		padding: 0 4px;
+		border-radius: 3px;
+		background-color: $green;
+		color: $white;
+	}
+
+	@each $severity-type, $color in (
+		na-bg: $alt-blue-grey,
+		info-bg: $alt-dark-blue,
+		average-bg: $alt-orange,
+		warning-bg: $alt-yellow,
+		high-bg: $alt-dark-orange,
+		disaster-bg: $alt-red,
+	) {
+		// Dynamically generated classes:
+		//  .service-status-na-bg
+		//  .service-status-normal-bg
+		//  .service-status-info-bg
+		//  .service-status-average-bg
+		//  .service-status-warning-bg
+		//  .service-status-high-bg
+		//  .service-status-disaster-bg
+		&.service-status-#{$severity-type} {
+			border-color: var(--severity-color-#{$severity-type});
+
+			.service-status {
+				background-color: var(--severity-color-#{$severity-type});
+				color: darken($color, 45%);
+			}
+		}
+	}
+}

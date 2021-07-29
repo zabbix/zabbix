@@ -78,7 +78,8 @@ $filter_column_right = (new CFormList())
 		)
 	);
 
-(new CFilter((new CUrl('overview.php'))->setArgument('type', SHOW_DATA)))
+(new CFilter())
+	->setResetUrl((new CUrl('overview.php'))->setArgument('type', SHOW_DATA))
 	->addVar('type', SHOW_DATA)
 	->addFilterTab(_('Filter'), [$filter_column_left, $filter_column_right])
 	->setProfile($data['profileIdx'])

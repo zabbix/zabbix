@@ -215,16 +215,6 @@ class CControllerPopupTriggerWizard extends CController {
 							error(_('Cannot add trigger'));
 						}
 					}
-
-					if ($result['triggerids']) {
-						DBstart();
-
-						add_audit($audit_action, AUDIT_RESOURCE_TRIGGER,
-							_('Trigger').' ['.$triggerid.'] ['.$trigger['description'].']'
-						);
-
-						DBend(true);
-					}
 				}
 				else {
 					error(_s('Field "%1$s" is mandatory.', 'expressions'));

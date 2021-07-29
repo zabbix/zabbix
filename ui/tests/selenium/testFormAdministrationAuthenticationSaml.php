@@ -269,7 +269,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 			[
 				[
 					'username' => 'admin-zabbix',
-					'url' => 'services.php',
+					'url' => 'zabbix.php?action=service.list',
 					// Remove the 'regular_login' flag when ZBX-17663 is fixed.
 					'regular_login' => true,
 					'header' => 'Services'

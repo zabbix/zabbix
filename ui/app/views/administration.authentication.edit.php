@@ -26,7 +26,7 @@
 $this->addJsFile('class.tab-indicators.js');
 $this->includeJsFile('administration.authentication.edit.js.php');
 
-// Authentication general fields and HTTP authentication fields.
+// Authentication general, HTTP authentication and password policy fields.
 $auth_tab = (new CFormList('list_auth'))
 	->addRow(new CLabel(_('Default authentication'), 'authentication_type'),
 		(new CRadioButtonList('authentication_type', (int) $data['authentication_type']))
@@ -35,6 +35,75 @@ $auth_tab = (new CFormList('list_auth'))
 			->addValue(_('LDAP'), ZBX_AUTH_LDAP)
 			->setModern(true)
 			->removeId()
+	)
+	->addRow((new CTag('h4', true, _('Password policy')))->addClass('input-section-header'))
+	->addRow(new CLabel(_('Minimum password length'), 'passwd_min_length'),
+		(new CNumericBox('passwd_min_length', $data['passwd_min_length'], 2, false, false, false))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(
+		new CLabel([_('Password must contain'),
+			makeHelpIcon([
+				_('Password requirements:'),
+				(new CList(
+					[
+						new CListItem([
+							_('must contain at least one lowercase and one uppercase Latin letter'),
+							' (', (new CSpan('A-Z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ', ',
+							(new CSpan('a-z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+						]),
+						new CListItem([
+							_('must contain at least one digit'),
+							' (', (new CSpan('0-9'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+						]),
+						new CListItem([
+							_('must contain at least one special character'),
+							' (', (new CSpan(
+								' !"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'))->addClass(ZBX_STYLE_MONOSPACE_FONT
+							), ')'
+						])
+					]
+				))->addClass(ZBX_STYLE_LIST_DASHED)
+			])
+		]),
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem(
+				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_CASE))
+					->setLabel(_('an uppercase and a lowercase Latin letter'))
+					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_CASE) == PASSWD_CHECK_CASE)
+					->setUncheckedValue(0x00)
+					->setId('passwd_check_rules_case')
+			)
+			->addItem(
+				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_DIGITS))
+					->setLabel(_('a digit'))
+					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_DIGITS) == PASSWD_CHECK_DIGITS)
+					->setUncheckedValue(0x00)
+					->setId('passwd_check_rules_digits')
+			)
+			->addItem(
+				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SPECIAL))
+					->setLabel(_('a special character'))
+					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SPECIAL) == PASSWD_CHECK_SPECIAL)
+					->setUncheckedValue(0x00)
+					->setId('passwd_check_rules_special')
+			)
+	)
+	->addRow(
+		new CLabel([_('Avoid easy-to-guess passwords'),
+			makeHelpIcon([
+				_('Password requirements:'),
+				(new CList([
+					_("must not contain user's name, surname or username"),
+					_('must not be one of common or context-specific passwords')
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
+			])
+		], 'passwd_check_rules_simple'),
+		(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SIMPLE))
+			->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SIMPLE) == PASSWD_CHECK_SIMPLE)
+			->setUncheckedValue(0x00)
+			->setId('passwd_check_rules_simple')
 	);
 
 // HTTP authentication fields.

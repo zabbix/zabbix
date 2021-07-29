@@ -55,7 +55,6 @@ class CControllerImageDelete extends CController {
 		$result = API::Image()->delete((array) $this->image['imageid']);
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$this->image['name'].'] deleted');
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $this->getInput('imagetype'))

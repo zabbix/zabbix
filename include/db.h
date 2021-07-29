@@ -341,6 +341,15 @@ DB_TRIGGER;
 
 typedef struct
 {
+	zbx_uint64_t		serviceid;
+	char			*name;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_ptr_t	events;
+}
+DB_SERVICE;
+
+typedef struct
+{
 	zbx_uint64_t		eventid;
 	DB_TRIGGER		trigger;
 	zbx_uint64_t		objectid;
@@ -463,6 +472,8 @@ typedef struct
 	zbx_uint64_t		eventid;
 	zbx_uint64_t		r_eventid;
 	zbx_uint64_t		acknowledgeid;
+	zbx_uint64_t		servicealarmid;
+	zbx_uint64_t		serviceid;
 	int			nextcheck;
 	int			esc_step;
 	zbx_escalation_status_t	status;
@@ -492,6 +503,14 @@ typedef struct
 	int		new_severity;
 }
 DB_ACKNOWLEDGE;
+
+typedef struct
+{
+	zbx_uint64_t	service_alarmid;
+	int		value;
+	int		clock;
+}
+zbx_service_alarm_t;
 
 int	DBinit(char **error);
 void	DBdeinit(void);
@@ -613,12 +632,6 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
-
-int	DBupdate_itservices(const zbx_vector_ptr_t *trigger_diff);
-int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
-
-int	zbx_create_itservices_lock(char **error);
-void	zbx_destroy_itservices_lock(void);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
@@ -767,9 +780,23 @@ zbx_interface_availability_t;
 
 ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *)
 
+typedef struct
+{
+	zbx_uint64_t		eventid;
+	int			clock;
+	int			ns;
+	int			value;
+	int			severity;
+
+	zbx_vector_ptr_t	tags;
+}
+zbx_event_t;
+
 void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
+void	zbx_user_init(zbx_user_t *user);
+void	zbx_user_free(zbx_user_t *user);
 
 typedef struct
 {

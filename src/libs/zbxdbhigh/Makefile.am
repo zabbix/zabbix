@@ -15,7 +15,6 @@ libzbxdbhigh_a_SOURCES = \
 	export.c \
 	host.c \
 	item.c \
-	itservices.c \
 	lld_macro.c \
 	maintenance.c \
 	proxy.c \

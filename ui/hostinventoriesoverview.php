@@ -150,7 +150,8 @@ $select_groupby = (new CSelect('filter_groupby'))
 (new CWidget())
 	->setTitle(_('Host inventory overview'))
 	->addItem(
-		(new CFilter(new CUrl('hostinventoriesoverview.php')))
+		(new CFilter())
+			->setResetUrl(new CUrl('hostinventoriesoverview.php'))
 			->setProfile('web.hostinventoriesoverview.filter')
 			->setActiveTab(CProfile::get('web.hostinventoriesoverview.filter.active', 1))
 			->addFilterTab(_('Filter'), [

@@ -53,12 +53,14 @@ class testGraphLinking extends CIntegrationTest {
 	const GRAPH_YMAX_TYPE = 2;
 	const GRAPH_YMIN_TYPE = 1;
 
-	const GRAPH_ITEM_COLOR = '00AA00';
+	const GRAPH_ITEM_COLOR = '00AA';
 
 	const NUMBER_OF_TEMPLATES = 5;
 	const NUMBER_OF_GRAPHS_PER_TEMPLATE = 5;
 
 	private static $templateids = array();
+	private static $stringids = array();
+	private static $colors = array();
 
 	public function createTemplates() {
 
@@ -91,9 +93,10 @@ class testGraphLinking extends CIntegrationTest {
 				]
 			]
 		]);
+		$ep = json_encode($response, JSON_PRETTY_PRINT);
 
-		$this->assertArrayHasKey('actionids', $response['result']);
-		$this->assertEquals(1, count($response['result']['actionids']));
+		$this->assertArrayHasKey('actionids', $response['result'], $ep);
+		$this->assertEquals(1, count($response['result']['actionids']), $ep);
 
 		$templateids_for_api_call = [];
 		foreach (self::$templateids as $entry) {
@@ -113,9 +116,10 @@ class testGraphLinking extends CIntegrationTest {
 				]
 			]
 		]);
+		$ep = json_encode($response, JSON_PRETTY_PRINT);
 
-		$this->assertArrayHasKey('actionids', $response['result']);
-		$this->assertEquals(1, count($response['result']['actionids']));
+		$this->assertArrayHasKey('actionids', $response['result'], $ep);
+		$this->assertEquals(1, count($response['result']['actionids']), $ep);
 	}
 
 	/**
@@ -123,15 +127,26 @@ class testGraphLinking extends CIntegrationTest {
 	*/
 	public function prepareData() {
 
+		$z = 'a';
+		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_GRAPHS_PER_TEMPLATE; $i++)
+		{
+			array_push(self::$stringids, $z);
+			array_push(self::$colors, dechex(16 + $i));
+			$z++;
+		}
+		sort(self::$stringids);
+
 		$this->createTemplates();
+
+		$itemids = array();
 
 		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_GRAPHS_PER_TEMPLATE; $i++) {
 			$templ_counter = floor($i / self::NUMBER_OF_TEMPLATES);
 			$templateid_loc = self::$templateids[$templ_counter];
 			$response = $this->call('item.create', [
 				'hostid' => $templateid_loc,
-				'name' => self::ITEM_NAME_PRE . "_" . $i,
-				'key_' => self::ITEM_KEY_PRE . "_" . $i,
+				'name' => self::ITEM_NAME_PRE . "_" . self::$stringids[$i],
+				'key_' => self::ITEM_KEY_PRE . "_" . self::$stringids[$i],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]);
@@ -139,11 +154,16 @@ class testGraphLinking extends CIntegrationTest {
 			$this->assertArrayHasKey('itemids', $response['result']);
 			$this->assertEquals(1, count($response['result']['itemids']));
 			$itemid = $response['result']['itemids'][0];
+			array_push($itemids, $itemid);
+		}
+		sort($itemids);
+
+		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_GRAPHS_PER_TEMPLATE; $i++) {
 
 			$response = $this->call('graph.create', [
 				'height' => self::GRAPH_HEIGHT + $i,
 				'width' => self::GRAPH_WIDTH + $i,
-				'name' => self::GRAPH_NAME_PRE . '_' . $i,
+				'name' => self::GRAPH_NAME_PRE . '_' . self::$stringids[$i],
 				'graphtype' => self::GRAPH_TYPE,
 				'percent_left' => self::GRAPH_PERCENT_LEFT + $i,
 				'percent_right' => self::GRAPH_PERCENT_RIGHT - $i,
@@ -153,14 +173,14 @@ class testGraphLinking extends CIntegrationTest {
 				'show_triggers' => self::GRAPH_SHOW_TRIGGERS,
 				'yaxismax' => self::GRAPH_YAXISMAX + $i,
 				'yaxismin' => self::GRAPH_YAXISMIN + $i,
-				'ymax_itemid' => $itemid,
+				'ymax_itemid' => $itemids[$i],
 				'ymax_type' => self::GRAPH_YMAX_TYPE,
 				'ymin_type' => self::GRAPH_YMIN_TYPE,
 
 				'gitems' => [
 					[
-						'itemid' => $itemid,
-						'color' => self::GRAPH_ITEM_COLOR
+						'itemid' => $itemids[$i],
+						'color' => self::GRAPH_ITEM_COLOR . self::$colors[$i]
 					]
 				]
 			]);
@@ -172,7 +192,7 @@ class testGraphLinking extends CIntegrationTest {
 	}
 
 	/**
-	* Component configuration provider for agent related tests.
+	* Component configuration provider for server related tests.
 	*
 	* @return array
 	*/
@@ -213,7 +233,7 @@ class testGraphLinking extends CIntegrationTest {
 		$this->assertArrayHasKey('host', $response['result'][0]);
 		$hostid = $response['result'][0]['hostid'];
 
-		$response = $this->call('item.get', ['hostids' => $hostid]);
+		$response = $this->call('item.get', ['hostids' => $hostid,'search' => ['key_' => self::ITEM_KEY_PRE]]);
 		$this->assertArrayHasKey(0, $response['result']);
 		$item_data = $response['result'];
 
@@ -248,41 +268,42 @@ class testGraphLinking extends CIntegrationTest {
 				'selectGraphItems'
 			],
 			'selectFunctions' => 'extend',
-			'sortfield' => 'graphid'
+			'sortfield' => 'name'
 		]
 		);
 
 		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_GRAPHS_PER_TEMPLATE,
-							count($response['result']));
+				count($response['result']));
 
 		$i = 0;
 		foreach ($response['result'] as $entry) {
+			$ep = json_encode($response, JSON_PRETTY_PRINT);
 
-			$this->assertEquals($entry['height'], self::GRAPH_HEIGHT + $i);
-			$this->assertEquals($entry['width'], self::GRAPH_WIDTH + $i);
-			$this->assertEquals($entry['name'], self::GRAPH_NAME_PRE . '_' . $i);
-			$this->assertEquals($entry['graphtype'], self::GRAPH_TYPE);
-			$this->assertEquals($entry['percent_left'], self::GRAPH_PERCENT_LEFT + $i);
-			$this->assertEquals($entry['percent_right'], self::GRAPH_PERCENT_RIGHT - $i);
-			$this->assertEquals($entry['show_3d'], self::GRAPH_SHOW_3D);
-			$this->assertEquals($entry['show_legend'], self::GRAPH_SHOW_LEGEND);
-			$this->assertEquals($entry['show_work_period'], self::GRAPH_SHOW_WORK_PERIOD);
-			$this->assertEquals($entry['show_triggers'], self::GRAPH_SHOW_TRIGGERS);
-			$this->assertEquals($entry['yaxismax'], self::GRAPH_YAXISMAX + $i);
-			$this->assertEquals($entry['yaxismin'], self::GRAPH_YAXISMIN + $i);
-			$this->assertEquals($entry['ymax_itemid'], $itemids[$i]);
-			$this->assertEquals($entry['ymax_type'], self::GRAPH_YMAX_TYPE);
-			$this->assertEquals($entry['ymin_type'], self::GRAPH_YMIN_TYPE);
+			$this->assertEquals($entry['height'], self::GRAPH_HEIGHT + $i, $ep);
+			$this->assertEquals($entry['width'], self::GRAPH_WIDTH + $i, $ep);
+			$this->assertEquals($entry['name'], self::GRAPH_NAME_PRE . '_' . self::$stringids[$i], $ep);
+			$this->assertEquals($entry['graphtype'], self::GRAPH_TYPE, $ep);
+			$this->assertEquals($entry['percent_left'], self::GRAPH_PERCENT_LEFT + $i, $ep);
+			$this->assertEquals($entry['percent_right'], self::GRAPH_PERCENT_RIGHT - $i, $ep);
+			$this->assertEquals($entry['show_3d'], self::GRAPH_SHOW_3D, $ep);
+			$this->assertEquals($entry['show_legend'], self::GRAPH_SHOW_LEGEND, $ep);
+			$this->assertEquals($entry['show_work_period'], self::GRAPH_SHOW_WORK_PERIOD, $ep);
+			$this->assertEquals($entry['show_triggers'], self::GRAPH_SHOW_TRIGGERS, $ep);
+			$this->assertEquals($entry['yaxismax'], self::GRAPH_YAXISMAX + $i, $ep);
+			$this->assertEquals($entry['yaxismin'], self::GRAPH_YAXISMIN + $i, $ep);
+			$this->assertEquals($entry['ymax_type'], self::GRAPH_YMAX_TYPE, $ep);
+			$this->assertEquals($entry['ymin_type'], self::GRAPH_YMIN_TYPE, $ep);
 
 			$graph_item_response = $this->call('graphitem.get', [
 				'output' => 'extend',
 				'graphids' => $entry['graphid']
 			]);
+			$ep = json_encode($graph_item_response, JSON_PRETTY_PRINT);
 
-			$this->assertArrayHasKey(0, $graph_item_response['result']);
-			$this->assertArrayHasKey('itemid', $graph_item_response['result'][0]);
-			$this->assertEquals($graph_item_response['result'][0]['itemid'], $itemids[$i]);
-			$this->assertEquals($graph_item_response['result'][0]['color'], self::GRAPH_ITEM_COLOR);
+			$this->assertArrayHasKey(0, $graph_item_response['result'], $ep);
+			$this->assertArrayHasKey('itemid', $graph_item_response['result'][0], $ep);
+			$this->assertEquals($graph_item_response['result'][0]['color'],
+					self::GRAPH_ITEM_COLOR . self::$colors[$i], $ep);
 
 			$i++;
 		}
@@ -303,7 +324,7 @@ class testGraphLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'End of DBregister_host_active():SUCCEED'
 		]);
-
+		sleep(10);
 		$this->checkGraphsCreate();
 		self::stopComponent(self::COMPONENT_AGENT);
 	}

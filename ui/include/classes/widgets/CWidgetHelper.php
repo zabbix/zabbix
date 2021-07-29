@@ -70,10 +70,22 @@ class CWidgetHelper {
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 			->addItem(
-				(new CScriptTag('$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());'))
-					->setOnDocumentReady()
-			);
+				(new CScriptTag('
+					$("z-select#type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());
 
+					document
+						.getElementById("widget-dialogue-form")
+						.addEventListener("change", (e) => {
+							const is_trimmable = e.target.matches(
+								\'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])\'
+							);
+
+							if (is_trimmable) {
+								e.target.value = e.target.value.trim();
+							}
+						}, {capture: true});
+				'))->setOnDocumentReady()
+			);
 
 		if ($field_rf_rate !== null) {
 			$form_list->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
@@ -661,7 +673,7 @@ class CWidgetHelper {
 				(new CDiv(
 					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_REMOVE_BTN)
+						->addClass(ZBX_STYLE_BTN_REMOVE)
 						->removeId()
 				))
 					->addClass(ZBX_STYLE_COLUMN_5)
@@ -872,7 +884,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#overrides-row",'.
 					'beforeRow: ".overrides-foot",'.
-					'remove: ".'.ZBX_STYLE_REMOVE_BTN.'",'.
+					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
 					'add: "#override-add",'.
 					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
 				'})'.
@@ -1013,7 +1025,7 @@ class CWidgetHelper {
 				(new CDiv([
 					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_REMOVE_BTN)
+						->addClass(ZBX_STYLE_BTN_REMOVE)
 						->removeId()
 				]))->addClass(ZBX_STYLE_COLUMN_5)
 			]))
@@ -1257,7 +1269,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#dataset-row",'.
 					'beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",'.
-					'remove: ".'.ZBX_STYLE_REMOVE_BTN.'",'.
+					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
 					'add: "#dataset-add",'.
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.
