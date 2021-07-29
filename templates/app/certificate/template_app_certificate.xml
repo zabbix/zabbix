@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-27T13:14:24Z</date>
+   <date>2021-07-29T10:49:17Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -55,40 +55,6 @@ Template tooling version used: 0.39</description>
                <master_item>
                   <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
                </master_item>
-            </item>
-            <item>
-               <name>Cert: Fingerprint</name>
-               <type>DEPENDENT</type>
-               <key>cert.fingerprint</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>0</trends>
-               <status>ENABLED</status>
-               <value_type>CHAR</value_type>
-               <description>The Certificate Signature (Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.</description>
-               <applications>
-                  <application>
-                     <name>General</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.fingerprint</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
-               </master_item>
-               <triggers>
-                  <trigger>
-                     <expression>{diff()}=1</expression>
-                     <name>Cert: Fingerprint has changed (new version: {ITEM.VALUE})</name>
-                     <priority>INFO</priority>
-                     <description>Cert fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>Cert: Issuer</name>
@@ -230,7 +196,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>Cert: Serial</name>
                <type>DEPENDENT</type>
-               <key>cert.serial</key>
+               <key>cert.serial_number</key>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -245,12 +211,46 @@ Template tooling version used: 0.39</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.x509.serial</params>
+                     <params>$.x509.serial_number</params>
                   </step>
                </preprocessing>
                <master_item>
                   <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
                </master_item>
+            </item>
+            <item>
+               <name>Cert: Fingerprint</name>
+               <type>DEPENDENT</type>
+               <key>cert.sha1_fingerprint</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.sha1_fingerprint</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1</expression>
+                     <name>Cert: Fingerprint has changed (new version: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>Cert fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>Cert: Signature algorithm</name>
