@@ -113,39 +113,39 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Name' => 'Admin: aktīvs токен - 頑張って',
 				'User' => 'Admin (Zabbix Administrator)',
 				'Expires at' => 'Never',
-				'Created at' => '2021-01-01 00:00:01',
+				'Created at' => '01/01/2021 12:00:01 AM',
 				'Created by user' => 'Admin (Zabbix Administrator)',
-				'Last accessed at' => '2021-01-01 00:00:04',
+				'Last accessed at' => '01/01/2021 12:00:04 AM',
 				'Status' => 'Disabled'
 
 			],
 			[
 				'Name' => 'Admin: expired token for admin',
 				'User' => 'Admin (Zabbix Administrator)',
-				'Expires at' => '2021-01-01 00:06:00',
-				'Created at' => '2021-01-01 00:00:01',
+				'Expires at' => '01/01/2021 12:06:00 AM',
+				'Created at' => '01/01/2021 12:00:01 AM',
 				'Created by user' => 'Admin (Zabbix Administrator)',
-				'Last accessed at' => '2021-01-01 00:00:03',
+				'Last accessed at' => '01/01/2021 12:00:03 AM',
 				'Status' => 'Enabled'
 
 			],
 			[
 				'Name' => 'Admin: future token for admin',
 				'User' => 'Admin (Zabbix Administrator)',
-				'Expires at' => '2026-12-31 23:59:59',
-				'Created at' => '2021-01-01 00:00:01',
+				'Expires at' => '12/31/2026 11:59:59 PM',
+				'Created at' => '01/01/2021 12:00:01 AM',
 				'Created by user' => 'Admin (Zabbix Administrator)',
-				'Last accessed at' => '2021-01-01 00:00:02',
+				'Last accessed at' => '01/01/2021 12:00:02 AM',
 				'Status' => 'Enabled'
 
 			],
 			[
 				'Name' => 'Admin: token for filter-create',
 				'User' => 'filter-create',
-				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
-				'Created at' => '2021-01-01 00:00:01',
+				'Expires at' => date('m/d/Y h:i:s A', self::$timestamp),
+				'Created at' => '01/01/2021 12:00:01 AM',
 				'Created by user' => 'Admin (Zabbix Administrator)',
-				'Last accessed at' => '2021-01-01 00:00:05',
+				'Last accessed at' => '01/01/2021 12:00:05 AM',
 				'Status' => 'Disabled'
 
 			],
@@ -153,39 +153,39 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Name' => 'filter-create: aktīvs токен - 頑張って',
 				'User' => 'filter-create',
 				'Expires at' => 'Never',
-				'Created at' => '2021-01-01 00:00:01',
+				'Created at' => '01/01/2021 12:00:01 AM',
 				'Created by user' => 'filter-create',
-				'Last accessed at' => '2021-01-01 00:00:08',
+				'Last accessed at' => '01/01/2021 12:00:08 AM',
 				'Status' => 'Disabled'
 
 			],
 			[
 				'Name' => 'filter-create: expired token for filter-create',
 				'User' => 'filter-create',
-				'Expires at' => '2021-01-01 00:06:00',
-				'Created at' => '2021-01-01 00:00:01',
+				'Expires at' => '01/01/2021 12:06:00 AM',
+				'Created at' => '01/01/2021 12:00:01 AM',
 				'Created by user' => 'filter-create',
-				'Last accessed at' => '2021-01-01 00:00:07',
+				'Last accessed at' => '01/01/2021 12:00:07 AM',
 				'Status' => 'Enabled'
 
 			],
 			[
 				'Name' => 'filter-create: future token for filter-create',
 				'User' => 'filter-create',
-				'Expires at' => '2026-12-31 23:59:59',
-				'Created at' => '2021-01-01 00:00:01',
+				'Expires at' => '12/31/2026 11:59:59 PM',
+				'Created at' => '01/01/2021 12:00:01 AM',
 				'Created by user' => 'filter-create',
-				'Last accessed at' => '2021-01-01 00:00:06',
+				'Last accessed at' => '01/01/2021 12:00:06 AM',
 				'Status' => 'Enabled'
 
 			],
 			[
 				'Name' => 'filter-create: token for Admin',
 				'User' => 'Admin (Zabbix Administrator)',
-				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
-				'Created at' => '2021-01-01 00:00:01',
+				'Expires at' => date('m/d/Y h:i:s A', self::$timestamp),
+				'Created at' => '01/01/2021 12:00:01 AM',
 				'Created by user' => 'filter-create',
-				'Last accessed at' => '2021-01-01 00:00:09',
+				'Last accessed at' => '01/01/2021 12:00:09 AM',
 				'Status' => 'Disabled'
 
 			]
@@ -480,12 +480,12 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 					'expected' => [
 						'Never',
 						'Never',
-						'2021-01-01 00:06:00',
-						'2021-01-01 00:06:00',
+						'01/01/2021 12:06:00 AM',
+						'01/01/2021 12:06:00 AM',
 						'change_to_timestamp',
 						'change_to_timestamp',
-						'2026-12-31 23:59:59',
-						'2026-12-31 23:59:59'
+						'12/31/2026 11:59:59 PM',
+						'12/31/2026 11:59:59 PM'
 					]
 				]
 			],
@@ -508,14 +508,14 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				[
 					'sort_field' => 'Last accessed at',
 					'expected' => [
-						'2021-01-01 00:00:02',
-						'2021-01-01 00:00:03',
-						'2021-01-01 00:00:04',
-						'2021-01-01 00:00:05',
-						'2021-01-01 00:00:06',
-						'2021-01-01 00:00:07',
-						'2021-01-01 00:00:08',
-						'2021-01-01 00:00:09'
+						'01/01/2021 12:00:02 AM',
+						'01/01/2021 12:00:03 AM',
+						'01/01/2021 12:00:04 AM',
+						'01/01/2021 12:00:05 AM',
+						'01/01/2021 12:00:06 AM',
+						'01/01/2021 12:00:07 AM',
+						'01/01/2021 12:00:08 AM',
+						'01/01/2021 12:00:09 AM'
 					]
 				]
 			],
@@ -545,7 +545,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 		if ($data['sort_field'] === 'Expires at') {
 			foreach ($data['expected'] as $i => $value) {
 				if ($value === 'change_to_timestamp') {
-					$data['expected'][$i] = date('Y-m-d H:i:s', self::$timestamp);
+					$data['expected'][$i] = date('m/d/Y h:i:s A', self::$timestamp);
 				}
 			}
 		}

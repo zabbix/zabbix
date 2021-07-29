@@ -604,15 +604,16 @@ class CTemplate extends CHostGeneral {
 
 		foreach ($templates as &$template) {
 			unset($template['macros']);
+
+			// if visible name is not given or empty it should be set to host name
+			if (array_key_exists('host', $template) && (!array_key_exists('name', $template)
+						|| trim($template['name']) === '')) {
+				$template['name'] = $template['host'];
+			}
 		}
 		unset($template);
 
 		foreach ($templates as $template) {
-			// if visible name is not given or empty it should be set to host name
-			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
-				$template['name'] = $template['host'];
-			}
-
 			$templateCopy = $template;
 
 			$template['templates_link'] = array_key_exists('templates', $template) ? $template['templates'] : null;
@@ -626,6 +627,8 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$this->updateTags(array_column($templates, 'tags', 'templateid'));
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE, $templates, $db_templates);
 
 		return ['templateids' => array_column($templates, 'templateid')];
 	}
@@ -649,8 +652,8 @@ class CTemplate extends CHostGeneral {
 		]];
 
 		$db_templates = $this->get([
-			'output' => ['templateid'],
-			'templateids' => zbx_objectValues($templates, 'templateid'),
+			'output' => ['templateid', 'host', 'name', 'description'],
+			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);

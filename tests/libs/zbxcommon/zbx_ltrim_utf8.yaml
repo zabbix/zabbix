@@ -1,0 +1,146 @@
+---
+test case: "ltrim(123, 1)"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: "1"
+out:
+  str: "23"
+---
+test case: "ltrim(123, x)"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: "x"
+out:
+  str: "123"
+---
+test case: "ltrim(123, 123)"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: "123"
+out:
+  str: ""
+---
+test case: "ltrim(123, 321)"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: "321"
+out:
+  str: ""
+---
+test case: "ltrim(123, )"
+in:
+  text:
+    str: "123"
+  charlist:
+    str: ""
+out:
+  str: "123"
+---
+test case: "ltrim(, 123)"
+in:
+  text:
+    str: ""
+  charlist:
+    str: "123"
+out:
+  str: ""
+---
+test case: "ltrim(, )"
+in:
+  text:
+    str: ""
+  charlist:
+    str: ""
+out:
+  str: ""
+---
+test case: "ltrim(аЗаббикс, а)"
+in:
+  text:
+    str: "аЗаббикс"
+  charlist:
+    str: "а"
+out:
+  str: "Заббикс"
+---
+test case: "ltrim(аЗаббикс, a)"
+in:
+  text:
+    str: "аЗаббикс"
+  charlist:
+    str: "a"
+out:
+  str: "аЗаббикс"
+---
+test case: "ltrim(аЗаббикс, аЗб)"
+in:
+  text:
+    str: "аЗаббикс"
+  charlist:
+    str: "аЗб"
+out:
+  str: "икс"
+---
+test case: "ltrim(123, 1)"
+in:
+  text:
+    hex: '\x31\x32\x33\x00'
+  charlist:
+    hex: '\x31\x00'
+out:
+  str: "23"
+---
+test case: "ltrim(аЗаббикс, а)"
+in:
+  text:
+    str: "аЗаббикс"
+  charlist:
+    hex: '\xd0\x00'
+out:
+  str: "аЗаббикс"
+---
+test case: "ltrim(аЗаббикс, а)"
+in:
+  text:
+    str: "аЗаббикс"
+  charlist:
+    hex: '\xd0\xb0\xb0\x00'
+out:
+  str: "аЗаббикс"
+---
+test case: "ltrim(аЗаббикс, а)"
+in:
+  text:
+    hex: '\xd0\xb0\xd0\x97\xd0\xb0\xd0\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\x00'
+  charlist:
+    str: "а"
+out:
+  hex: '\xd0\x97\xd0\xb0\xd0\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\x00'
+---
+test case: "ltrim(аЗаббикс, а)"
+in:
+  text:
+    hex: '\xd0\xb0\xd0\x97\xd0\xb0\xd0\xb1\xb1\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\x00'
+  charlist:
+    str: "а"
+out:
+  hex: '\xd0\x97\xd0\xb0\xd0\xb1\xb1\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\x00'
+---
+test case: "ltrim(аЗаббикс, а) with BOM"
+in:
+  text:
+    hex: '\xFF\xFE\xd0\xb0\xd0\x97\xd0\xb0\xd0\xb1\xb1\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\x00'
+  charlist:
+    str: "а"
+out:
+  hex: '\xFF\xFE\xd0\xb0\xd0\x97\xd0\xb0\xd0\xb1\xb1\xd0\xb1\xd0\xb8\xd0\xba\xd1\x81\x00'
+...
+

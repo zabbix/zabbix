@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * @deprecated - use CFormGrid instead.
+ */
 class CFormList extends CList {
 
 	protected $editable = true;

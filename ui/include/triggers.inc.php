@@ -265,7 +265,7 @@ function get_trigger_by_triggerid($triggerid) {
 	if (!empty($db_trigger)) {
 		return $db_trigger;
 	}
-	error(_s('No trigger with triggerid "%1$s".', $triggerid));
+	error(_s('No trigger with trigger ID "%1$s".', $triggerid));
 
 	return false;
 }

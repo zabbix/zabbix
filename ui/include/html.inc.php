@@ -144,13 +144,13 @@ function get_icon($type, $params = []) {
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)
-					->setTitle(_('Remove from favourites'))
+					->setTitle(_('Remove from favorites'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_ADD_FAV)
-					->setTitle(_('Add to favourites'))
+					->setTitle(_('Add to favorites'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setId('addrm_fav');
@@ -838,6 +838,10 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'housekeeping.edit')
 		->getUrl();
 
+	$audit_settings_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'audit.settings.edit')
+		->getUrl();
+
 	$image_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'image.list')
 		->getUrl();
@@ -875,17 +879,18 @@ function getAdministrationGeneralSubmenu() {
 	return [
 		'main_section' => [
 			'items' => array_filter([
-				$gui_url          => _('GUI'),
-				$autoreg_url      => _('Autoregistration'),
-				$housekeeping_url => _('Housekeeping'),
-				$image_url        => _('Images'),
-				$iconmap_url      => _('Icon mapping'),
-				$regex_url        => _('Regular expressions'),
-				$macros_url       => _('Macros'),
-				$trigdisplay_url  => _('Trigger displaying options'),
-				$modules_url      => _('Modules'),
-				$tokens_url       => $can_access_tokens ? _('API tokens') : null,
-				$miscconfig_url   => _('Other')
+				$gui_url            => _('GUI'),
+				$autoreg_url        => _('Autoregistration'),
+				$housekeeping_url   => _('Housekeeping'),
+				$audit_settings_url => _('Audit log'),
+				$image_url          => _('Images'),
+				$iconmap_url        => _('Icon mapping'),
+				$regex_url          => _('Regular expressions'),
+				$macros_url         => _('Macros'),
+				$trigdisplay_url    => _('Trigger displaying options'),
+				$modules_url        => _('Modules'),
+				$tokens_url         => $can_access_tokens ? _('API tokens') : null,
+				$miscconfig_url     => _('Other')
 			])
 		]
 	];

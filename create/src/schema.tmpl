@@ -560,7 +560,7 @@ FIELD		|saml_sign_logout_responses	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_encrypt_nameid	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_encrypt_assertions|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_case_sensitive	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|default_lang		|t_varchar(5)	|'en_GB'|NOT NULL	|ZBX_NODATA
+FIELD		|default_lang		|t_varchar(5)	|'en_US'|NOT NULL	|ZBX_NODATA
 FIELD		|default_timezone	|t_varchar(50)	|'system'|NOT NULL	|ZBX_NODATA
 FIELD		|login_attempts	|t_integer	|'5'	|NOT NULL	|ZBX_NODATA
 FIELD		|login_block	|t_varchar(32)	|'30s'	|NOT NULL	|ZBX_NODATA
@@ -586,6 +586,7 @@ FIELD		|dbversion_status	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_service|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
 FIELD		|passwd_min_length	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
 FIELD		|passwd_check_rules	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
+FIELD		|auditlog_enabled	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1095,27 +1096,20 @@ INDEX		|2		|eventid
 INDEX		|3		|clock
 
 TABLE|auditlog|auditid|0
-FIELD		|auditid	|t_id		|	|NOT NULL	|0
-FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
+FIELD		|auditid	|t_cuid		|	|NOT NULL	|0
+FIELD		|userid		|t_id		|	|NULL		|0
+FIELD		|username	|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|note		|t_varchar(128) |''	|NOT NULL	|0
-FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
-FIELD		|resourceid	|t_id		|	|NULL		|0
+FIELD		|resourceid	|t_id		|	|NOT NULL	|0
 FIELD		|resourcename	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|recordsetid	|t_cuid		|	|NOT NULL	|0
+FIELD		|details	|t_text		|''	|NOT NULL	|0
 INDEX		|1		|userid,clock
 INDEX		|2		|clock
 INDEX		|3		|resourcetype,resourceid
-
-TABLE|auditlog_details|auditdetailid|0
-FIELD		|auditdetailid	|t_id		|	|NOT NULL	|0
-FIELD		|auditid	|t_id		|	|NOT NULL	|0			|1|auditlog
-FIELD		|table_name	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|field_name	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|oldvalue	|t_text		|''	|NOT NULL	|0
-FIELD		|newvalue	|t_text		|''	|NOT NULL	|0
-INDEX		|1		|auditid
 
 TABLE|service_alarms|servicealarmid|0
 FIELD		|servicealarmid	|t_id		|	|NOT NULL	|0
@@ -1883,4 +1877,4 @@ INDEX		|1		|serviceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050023	|5050023
+ROW		|5050034	|5050034

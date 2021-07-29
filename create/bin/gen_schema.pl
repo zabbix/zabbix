@@ -40,7 +40,8 @@ my %c = (
 	"t_serial"	=>	"ZBX_TYPE_UINT",
 	"t_shorttext"	=>	"ZBX_TYPE_SHORTTEXT",
 	"t_time"	=>	"ZBX_TYPE_INT",
-	"t_varchar"	=>	"ZBX_TYPE_CHAR"
+	"t_varchar"	=>	"ZBX_TYPE_CHAR",
+	"t_cuid"	=>	"ZBX_TYPE_CUID"
 );
 
 $c{"before"} = "/*
@@ -95,7 +96,8 @@ my %mysql = (
 	"t_serial"	=>	"bigint unsigned",
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
-	"t_varchar"	=>	"varchar"
+	"t_varchar"	=>	"varchar",
+	"t_cuid"	=>	"varchar(25)"
 );
 
 my %oracle = (
@@ -115,7 +117,8 @@ my %oracle = (
 	"t_serial"	=>	"number(20)",
 	"t_shorttext"	=>	"nvarchar2(2048)",
 	"t_time"	=>	"number(10)",
-	"t_varchar"	=>	"nvarchar2"
+	"t_varchar"	=>	"nvarchar2",
+	"t_cuid"	=>	"nvarchar2(25)"
 );
 
 my %postgresql = (
@@ -135,7 +138,8 @@ my %postgresql = (
 	"t_serial"	=>	"bigserial",
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
-	"t_varchar"	=>	"varchar"
+	"t_varchar"	=>	"varchar",
+	"t_cuid"	=>	"varchar(25)"
 );
 
 my %sqlite3 = (
@@ -155,7 +159,8 @@ my %sqlite3 = (
 	"t_serial"	=>	"integer",
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
-	"t_varchar"	=>	"varchar"
+	"t_varchar"	=>	"varchar",
+	"t_cuid"	=>	"varchar(25)"
 );
 
 sub rtrim($)
@@ -249,7 +254,6 @@ sub process_field
 {
 	my $line = $_[0];
 	my $type_2;
-
 	newstate("field");
 
 	my $name = "";
@@ -268,7 +272,6 @@ sub process_field
 	if ($output{"type"} eq "code")
 	{
 		$type = $output{$type_short};
-
 		if ($type eq "ZBX_TYPE_CHAR")
 		{
 			for ($length)
@@ -287,6 +290,10 @@ sub process_field
 		elsif ($type eq "ZBX_TYPE_LONGTEXT")
 		{
 			$length = "ZBX_TYPE_LONGTEXT_LEN";
+		}
+		elsif ($type eq "ZBX_TYPE_CUID")
+		{
+			$length = 0;
 		}
 		else
 		{
