@@ -94,10 +94,10 @@ class testPageScheduledReport extends CWebTest {
 		}
 		else {
 			$popup->select('View related reports');
-			COverlayDialogElement::find()->waitUntilReady()->one();
+			$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->page->removeFocus();
 			// Workaround for incorrect positioning of overlay dialog in Jenkins.
-			$overlay = $this->query('xpath://h4[text()="Related reports"]/ancestor::div[@class="overlay-dialogue modal modal-popup"]')->one();
+			CElementQuery::getDriver()->executeScript('document.getElementsByClassName("wrapper")[0].scrollTo(0, 0)');
 			sleep(1);
 			$this->assertScreenshot($overlay);
 			sleep(1);
