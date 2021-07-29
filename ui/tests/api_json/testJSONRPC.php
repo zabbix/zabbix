@@ -62,8 +62,8 @@ class testJSONRPC extends CAPITest {
 					'jsonrpc' => '2.0',
 					'error' => [
 						'code' => -32600,
-						'message' => 'Invalid Request.',
-						'data' => 'The received JSON is not a valid JSON-RPC Request.'
+						'message' => 'Invalid request.',
+						'data' => 'The received JSON is not a valid JSON-RPC request.'
 					],
 					'id' => null
 				]
@@ -75,8 +75,8 @@ class testJSONRPC extends CAPITest {
 					'jsonrpc' => '2.0',
 					'error' => [
 						'code' => -32600,
-						'message' => 'Invalid Request.',
-						'data' => 'The received JSON is not a valid JSON-RPC Request.'
+						'message' => 'Invalid request.',
+						'data' => 'The received JSON is not a valid JSON-RPC request.'
 					],
 					'id' => null
 				]
@@ -88,7 +88,7 @@ class testJSONRPC extends CAPITest {
 					'jsonrpc' => '2.0',
 					'error' => [
 						'code' => -32600,
-						'message' => 'Invalid Request.',
+						'message' => 'Invalid request.',
 						'data' => 'Invalid parameter "/jsonrpc": a character string is expected.'
 					],
 					'id' => null
@@ -101,7 +101,7 @@ class testJSONRPC extends CAPITest {
 					'jsonrpc' => '2.0',
 					'error' => [
 						'code' => -32600,
-						'message' => 'Invalid Request.',
+						'message' => 'Invalid request.',
 						'data' => 'Invalid parameter "/jsonrpc": value must be one of 2.0.'
 					],
 					'id' => null
@@ -114,7 +114,7 @@ class testJSONRPC extends CAPITest {
 					'jsonrpc' => '2.0',
 					'error' => [
 						'code' => -32600,
-						'message' => 'Invalid Request.',
+						'message' => 'Invalid request.',
 						'data' => 'Invalid parameter "/method": a character string is expected.'
 					],
 					'id' => null
@@ -127,7 +127,7 @@ class testJSONRPC extends CAPITest {
 					'jsonrpc' => '2.0',
 					'error' => [
 						'code' => -32600,
-						'message' => 'Invalid Request.',
+						'message' => 'Invalid request.',
 						'data' => 'Invalid parameter "/params": an array or object is expected.'
 					],
 					'id' => null
@@ -140,7 +140,7 @@ class testJSONRPC extends CAPITest {
 					'jsonrpc' => '2.0',
 					'error' => [
 						'code' => -32600,
-						'message' => 'Invalid Request.',
+						'message' => 'Invalid request.',
 						'data' => 'Invalid parameter "/auth": a character string is expected.'
 					],
 					'id' => 1
@@ -153,7 +153,7 @@ class testJSONRPC extends CAPITest {
 					'jsonrpc' => '2.0',
 					'error' => [
 						'code' => -32600,
-						'message' => 'Invalid Request.',
+						'message' => 'Invalid request.',
 						'data' => 'Invalid parameter "/id": a string, number or null value is expected.'
 					],
 					'id' => null
@@ -167,7 +167,7 @@ class testJSONRPC extends CAPITest {
 						'jsonrpc' => '2.0',
 						'error' => [
 							'code' => -32600,
-							'message' => 'Invalid Request.',
+							'message' => 'Invalid request.',
 							'data' => 'Invalid parameter "/": an array is expected.'
 						],
 						'id' => null
@@ -182,7 +182,7 @@ class testJSONRPC extends CAPITest {
 						'jsonrpc' => '2.0',
 						'error' => [
 							'code' => -32600,
-							'message' => 'Invalid Request.',
+							'message' => 'Invalid request.',
 							'data' => 'Invalid parameter "/": an array is expected.'
 						],
 						'id' => null
@@ -191,7 +191,7 @@ class testJSONRPC extends CAPITest {
 						'jsonrpc' => '2.0',
 						'error' => [
 							'code' => -32600,
-							'message' => 'Invalid Request.',
+							'message' => 'Invalid request.',
 							'data' => 'Invalid parameter "/": an array is expected.'
 						],
 						'id' => null
@@ -200,7 +200,7 @@ class testJSONRPC extends CAPITest {
 						'jsonrpc' => '2.0',
 						'error' => [
 							'code' => -32600,
-							'message' => 'Invalid Request.',
+							'message' => 'Invalid request.',
 							'data' => 'Invalid parameter "/": an array is expected.'
 						],
 						'id' => null
@@ -271,7 +271,7 @@ class testJSONRPC extends CAPITest {
 					'jsonrpc' => '2.0',
 					'error' =>[
 						'code' => -32600,
-						'message' => 'Invalid Request.',
+						'message' => 'Invalid request.',
 						'data' => 'Invalid parameter "/": unexpected parameter "foo".'
 					],
 					'id' => 1
@@ -298,7 +298,7 @@ class testJSONRPC extends CAPITest {
 						'jsonrpc' => '2.0',
 						'error' => [
 							'code' => -32600,
-							'message' => 'Invalid Request.',
+							'message' => 'Invalid request.',
 							'data' => 'Invalid parameter "/": the parameter "jsonrpc" is missing.'
 						],
 						'id' => 2
@@ -307,7 +307,7 @@ class testJSONRPC extends CAPITest {
 						'jsonrpc' => '2.0',
 						'error' => [
 							'code' => -32600,
-							'message' => 'Invalid Request.',
+							'message' => 'Invalid request.',
 							'data' => 'Invalid parameter "/": the parameter "params" is missing.'
 						],
 						'id' => 3
@@ -316,7 +316,7 @@ class testJSONRPC extends CAPITest {
 						'jsonrpc' => '2.0',
 						'error' => [
 							'code' => -32600,
-							'message' => 'Invalid Request.',
+							'message' => 'Invalid request.',
 							'data' => 'Invalid parameter "/": an array is expected.'
 						],
 						'id' => null
