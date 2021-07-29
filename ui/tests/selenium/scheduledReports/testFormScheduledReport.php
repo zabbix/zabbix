@@ -519,6 +519,18 @@ class testFormScheduledReport extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Name' => '  Report with leading and trailing spaces  ',
+						'Subject' => '  test.trim  ',
+						'Message' => '  test.trim  ',
+						'Description' => '  test.trim  ',
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'Remove default subscriber and add new user group',
 						'Start date' => '2019-05-06'
 					],
@@ -1319,6 +1331,10 @@ class testFormScheduledReport extends CWebTest {
 		if ($data['expected'] === TEST_GOOD) {
 			if ($action === 'dashboard') {
 				COverlayDialogElement::ensureNotPresent();
+			}
+			// Trim trailing and leading spaces in expected values before comparison.
+			if (CTestArrayHelper::get($data, 'trim', false)) {
+				$data['fields'] = array_map('trim', $data['fields']);
 			}
 			$name = CTestArrayHelper::get($data, 'fields.Name', self::UPDATE_REPORT_NAME);
 			$this->assertEquals(1, CDBHelper::getCount('SELECT null FROM report WHERE name='.zbx_dbstr($name)));
