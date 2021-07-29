@@ -282,7 +282,7 @@ class testEscalations extends CIntegrationTest {
 	 *   maintenance on
 	 *   event -> alert
 	 *   recovery -> alert
-	 * 
+	 *
 	 * @backup alerts,history,history_uint,maintenances,events,problem
 	 */
 	public function testEscalations_checkScenario1() {
@@ -346,7 +346,7 @@ class testEscalations extends CIntegrationTest {
 	 *   event -> alert
 	 *   maintenance on
 	 *   recovery -> alert
-	 * 
+	 *
 	 * @backup actions,alerts,history_uint,maintenances
 	 */
 	public function testEscalations_checkScenario2() {
@@ -412,7 +412,7 @@ class testEscalations extends CIntegrationTest {
 	 *   event -> nothing
 	 *   maintenance off -> alert
 	 *   recovery -> alert
-	 * 
+	 *
 	 * @backup actions,alerts,history_uint,maintenances
 	 */
 	public function testEscalations_checkScenario3() {
@@ -680,7 +680,7 @@ class testEscalations extends CIntegrationTest {
 
 	/**
 	 * Test unfinished webhook
-	 * 
+	 *
 	 * @backup actions, alerts, history_uint, media_type, users, media, events, problem
 	 */
 	public function testEscalations_checkUnfinishedAlerts() {
@@ -691,8 +691,8 @@ class testEscalations extends CIntegrationTest {
 var params = JSON.parse(value);
 
 if (!(params.event_value === '0' || params.event_update_status === '1')) {
-  var now = new Date().getTime();
-  while (new Date().getTime() < now + 3000) { /* do nothing */ }
+	var now = new Date().getTime();
+	while (new Date().getTime() < now + 3000) { /* do nothing */ }
 }
 
 return {};
