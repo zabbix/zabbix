@@ -21,13 +21,18 @@
 
 class CControllerHintBox extends CController {
 
+	/**
+	 * @var array
+	 */
+	protected $event;
+
 	protected function init() {
 		$this->disableSIDvalidation();
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in eventlist',
+			'type' => 'required|in eventlist,eventactions',
 			'data' => 'required|array'
 		];
 
@@ -55,6 +60,12 @@ class CControllerHintBox extends CController {
 					'tag_priority' => 'required|string'
 				];
 				break;
+
+			case 'eventactions':
+				$fields = [
+					'eventid' => 'required|db events.eventid'
+				];
+				break;
 		}
 
 		$validator = new CNewValidator($data, $fields);
@@ -66,6 +77,20 @@ class CControllerHintBox extends CController {
 			switch ($this->getInput('type')) {
 				case 'eventlist':
 					$ret = $this->validateInputFilterTags();
+					break;
+
+				case 'eventactions':
+					$this->event = API::Event()->get([
+						'output' => ['eventid', 'r_eventid', 'clock'],
+						'select_acknowledges' => ['userid', 'action', 'message', 'clock', 'new_severity',
+							'old_severity'
+						],
+						'eventids' => (array) $data['eventid']
+					]);
+
+					$this->event = reset($this->event);
+
+					$ret = (bool) $this->event;
 					break;
 			}
 		}
@@ -96,13 +121,43 @@ class CControllerHintBox extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
 		switch ($this->getInput('type')) {
 			case 'eventlist':
 				$hint_data = self::getHintDataEventList($this->getInput('data'));
+				break;
+
+			case 'eventactions':
+				$actions = getEventDetailsActions($this->event);
+
+				$users = $actions['userids']
+					? API::User()->get([
+						'output' => ['alias', 'name', 'surname'],
+						'userids' => array_keys($actions['userids']),
+						'preservekeys' => true
+					])
+					: [];
+
+				$mediatypes = $actions['mediatypeids']
+					? API::MediaType()->get([
+						'output' => ['description'],
+						'mediatypeids' => array_keys($actions['mediatypeids']),
+						'preservekeys' => true
+					])
+					: [];
+
+				$hint_data = [
+					'actions' => $actions['actions'],
+					'users' => $users,
+					'mediatypes' => $mediatypes,
+					'config' => select_config(),
+					'foot_note' => ($actions['count'] > ZBX_WIDGET_ROWS)
+						? _s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $actions['count'])
+						: null
+				];
 				break;
 
 			default:
@@ -112,7 +167,10 @@ class CControllerHintBox extends CController {
 		$output = [];
 
 		if ($hint_data !== null) {
-			$output['data'] = $hint_data;
+			$output = [
+				'type' => $this->getInput('type'),
+				'data' => $hint_data
+			];
 		}
 
 		$this->setResponse(new CControllerResponseData($output));

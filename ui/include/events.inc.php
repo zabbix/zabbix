@@ -315,11 +315,6 @@ function make_small_eventlist(array $startEvent) {
 		'userids' => array_keys($actions['userids']),
 		'preservekeys' => true
 	]);
-	$mediatypes = API::Mediatype()->get([
-		'output' => ['name', 'maxattempts'],
-		'mediatypeids' => array_keys($actions['mediatypeids']),
-		'preservekeys' => true
-	]);
 
 	foreach ($events as $event) {
 		$duration = ($event['r_eventid'] != 0)
@@ -374,7 +369,7 @@ function make_small_eventlist(array $startEvent) {
 			zbx_date2age($event['clock']),
 			$duration,
 			$problem_update_link,
-			makeEventActionsIcons($event['eventid'], $actions['data'], $mediatypes, $users, $severity_config)
+			makeEventActionsIcons($event['eventid'], $actions['data'], $users, $severity_config)
 		]);
 	}
 
@@ -575,4 +570,218 @@ function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
 		default:
 			return $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
 	}
+}
+
+/**
+ * Create a table with trigger events and, if defined, trigger description and a clickable URL.
+ *
+ * @param array  $data
+ * @param array  $data['trigger']                        Trigger configuration details.
+ * @param string $data['trigger']['triggerid']
+ * @param array  $data['trigger']['comments']
+ * @param array  $data['trigger']['url']
+ * @param bool   $data['show_timeline']                  Either to show timeline in output.
+ * @param int    $data['show_tags']                      Maximum number of tags to display.
+ * @param array  $data['problems']                       List of problems.
+ * @param string $data['problems'][]['eventid']
+ * @param array  $data['problems'][]['tags']
+ * @param string $data['problems'][]['tags'][]['tag']
+ * @param string $data['problems'][]['tags'][]['value']
+ * @param array  $data['filter_tags']                    An array of tag filtering data.
+ * @param string $data['filter_tags'][]['tag']
+ * @param int    $data['filter_tags'][]['operator']
+ * @param string $data['filter_tags'][]['value']
+ * @param int    $data['tag_name_format']
+ * @param string $data['tag_priority']                   A list of comma-separated tag names.
+ * @param string $data['backurl']                        Backurl for problem update link.
+ *
+ * @return CDiv
+ */
+function makeEventList(array $data): CDiv {
+	// Show trigger description and URL.
+	$div = new CDiv();
+
+	if ($data['trigger']['comments'] !== '') {
+		$div->addItem(
+			(new CDiv())
+				->addItem(zbx_str2links($data['trigger']['comments']))
+				->addClass(ZBX_STYLE_OVERLAY_DESCR)
+				->addStyle('max-width: 500px')
+		);
+	}
+
+	if ($data['trigger']['url'] !== '') {
+		$trigger_url = CHtmlUrlValidator::validate($data['trigger']['url'], false)
+			? $data['trigger']['url']
+			: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
+					zbx_jsvalue($data['trigger']['url'], false, false)).
+				'\');';
+
+		$div->addItem(
+			(new CDiv())
+				->addItem(new CLink(CHtml::encode($data['trigger']['url']), $trigger_url))
+				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
+				->addStyle('max-width: 500px')
+		);
+	}
+
+	// sort field indicator
+	$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN);
+
+	if ($data['show_timeline']) {
+		$header = [
+			(new CColHeader([_('Time'), $sort_div]))->addClass(ZBX_STYLE_RIGHT),
+			(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH),
+			(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH)
+		];
+	}
+	else {
+		$header = [[_('Time'), $sort_div]];
+	}
+
+	// Show events.
+	$table = (new CTableInfo())
+		->setHeader(array_merge($header, [
+			_('Recovery time'),
+			_('Status'),
+			_('Duration'),
+			_('Ack'),
+			($data['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) ? _('Tags') : null
+		]));
+
+	$today = strtotime('today');
+	$last_clock = 0;
+
+	if ($data['problems'] && $data['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) {
+		$tags = makeTags($data['problems'], true, 'eventid', $data['show_tags'], $data['filter_tags'],
+			$data['tag_name_format'], $data['tag_priority']
+		);
+	}
+
+	$url_details = (new CUrl('tr_events.php'))
+		->setArgument('triggerid', $data['trigger']['triggerid'])
+		->setArgument('eventid', '');
+
+	foreach ($data['problems'] as $problem) {
+		if ($problem['r_eventid'] != 0) {
+			$value = TRIGGER_VALUE_FALSE;
+			$value_str = _('RESOLVED');
+			$value_clock = $problem['r_clock'];
+		}
+		else {
+			$in_closing = false;
+
+			foreach ($problem['acknowledges'] as $acknowledge) {
+				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+					$in_closing = true;
+					break;
+				}
+			}
+
+			$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
+			$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
+			$value_clock = $in_closing ? time() : $problem['clock'];
+		}
+
+		$url_details->setArgument('eventid', $problem['eventid']);
+
+		$cell_clock = ($problem['clock'] >= $today)
+			? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
+			: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
+		$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+		if ($problem['r_eventid'] != 0) {
+			$cell_r_clock = ($problem['r_clock'] >= $today)
+				? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
+				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
+			$cell_r_clock = (new CCol(new CLink($cell_r_clock, $url_details)))
+				->addClass(ZBX_STYLE_NOWRAP)
+				->addClass(ZBX_STYLE_RIGHT);
+		}
+		else {
+			$cell_r_clock = '';
+		}
+
+		$cell_status = new CSpan($value_str);
+
+		// Add colors and blinking to span depending on configuration and trigger parameters.
+		addTriggerValueStyle($cell_status, $value, $value_clock, $problem['acknowledged'] == EVENT_ACKNOWLEDGED);
+
+		if ($data['show_timeline']) {
+			if ($last_clock != 0) {
+				CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
+			}
+			$last_clock = $problem['clock'];
+
+			$row = [
+				$cell_clock->addClass(ZBX_STYLE_TIMELINE_DATE),
+				(new CCol())
+					->addClass(ZBX_STYLE_TIMELINE_AXIS)
+					->addClass(ZBX_STYLE_TIMELINE_DOT),
+				(new CCol())->addClass(ZBX_STYLE_TIMELINE_TD)
+			];
+		}
+		else {
+			$row = [
+				$cell_clock
+					->addClass(ZBX_STYLE_NOWRAP)
+					->addClass(ZBX_STYLE_RIGHT)
+			];
+		}
+
+		// Create acknowledge link.
+		$problem_update_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'acknowledge.edit')
+			->setArgument('eventids', [$problem['eventid']])
+			->setArgument('backurl', $data['backurl'])
+			->getUrl();
+
+		$acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
+		$problem_update_link = (new CLink($acknowledged ? _('Yes') : _('No'), $problem_update_url))
+			->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			->addClass(ZBX_STYLE_LINK_ALT);
+
+		$table->addRow(array_merge($row, [
+			$cell_r_clock,
+			$cell_status,
+			(new CCol(
+				($problem['r_eventid'] != 0)
+					? zbx_date2age($problem['clock'], $problem['r_clock'])
+					: zbx_date2age($problem['clock'])
+			))
+				->addClass(ZBX_STYLE_NOWRAP),
+			$problem_update_link,
+			($data['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) ? $tags[$problem['eventid']] : null
+		]));
+	}
+
+	$div->addItem($table);
+
+	return $div;
+}
+
+/**
+ * Create a list with event actions to show in popup.
+ *
+ * @param array  $data
+ * @param string $data['foot_note']
+ * @param array  $data['actions']
+ * @param array  $data['users']
+ * @param array  $data['mediatypes']
+ * @param array  $data['config']
+ *
+ * @return CObject
+ */
+function makeEventActionsList(array $data): CObject {
+	$foot_note = $data['foot_note']
+		? (new CDiv(
+			(new CDiv(
+				(new CDiv($data['foot_note']))
+					->addClass(ZBX_STYLE_TABLE_STATS)
+			))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+		))->addClass(ZBX_STYLE_TABLE_PAGING)
+		: null;
+
+	return new CObject([
+		makeEventActionsTable($data['actions'], $data['users'], $data['mediatypes'], $data['config']), $foot_note
+	]);
 }
