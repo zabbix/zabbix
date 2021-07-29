@@ -10,11 +10,11 @@ const host_popup = {
 					? {groupids: JSON.parse(event.target.dataset.hostgroups)}
 					: {};
 
+				this.edit(options, {'backurl': window.location.href});
+
 				const url = new Curl('zabbix.php', false);
 				url.setArgument('action', 'host.create');
 				history.pushState({}, '', url.getUrl());
-
-				this.edit(options, {'backurl': window.location.href});
 			}
 			else if (event.target.classList.contains('js-edit-host')) {
 				let hostid = null;
