@@ -115,6 +115,7 @@ class CControllerHostUpdate extends CController {
 
 		$host = [
 			'hostid' => $this->host['hostid'],
+			'host' => $this->getInput('host', $this->host['host']),
 			'name' => $this->getInput('visiblename', $this->host['name']),
 			'status' => $this->getInput('status', $this->host['status']),
 			'proxy_hostid' => $this->getInput('proxy_hostid', $this->host['proxy_hostid']),
@@ -132,12 +133,12 @@ class CControllerHostUpdate extends CController {
 		];
 
 		$host_properties = [
-			'host', 'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-			'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
+			'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_subject',
+			'tls_issuer', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
 		];
 		foreach ($host_properties as $prop) {
 			if ($this->getInput($prop, '') !== $this->host[$prop]) {
-				$this->getInput($prop, '');
+				$host[$prop] = $this->getInput($prop, '');
 			}
 		}
 
@@ -149,10 +150,6 @@ class CControllerHostUpdate extends CController {
 				&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
 			unset($host['tls_issuer'], $host['tls_subject']);
 		}
-
-		$host = CArrayHelper::renameKeys($host, [
-			'visiblename' => 'name'
-		]);
 
 		$output = [];
 		if (($hostids = API::Host()->update($host)) !== false) {
