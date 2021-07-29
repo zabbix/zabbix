@@ -94,7 +94,7 @@ class CControllerHostCreate extends CController {
 			'tags' => $this->processTags(),
 			'templates' => zbx_toObject($this->getInput('add_templates', []), 'templateid'),
 			'macros' => $this->processUserMacros(),
-			'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) == HOST_INVENTORY_DISABLED)
+			'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) != HOST_INVENTORY_DISABLED)
 				? $this->getInput('host_inventory', [])
 				: [],
 			'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
@@ -103,8 +103,8 @@ class CControllerHostCreate extends CController {
 
 		$this->getInputs($host, [
 			'host', 'visiblename', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege',
-			'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer',
-			'tls_psk_identity', 'tls_psk', 'inventory_mode'
+			'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk',
+			'inventory_mode'
 		]);
 
 		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {

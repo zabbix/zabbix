@@ -125,9 +125,9 @@ class CControllerHostUpdate extends CController {
 			'templates' => $this->processTemplates(),
 			'clear_templates' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
 			'macros' => $this->processUserMacros(),
-			'inventory' => ($this->getInput('inventory_mode', $this->host['inventory_mode']) == HOST_INVENTORY_DISABLED)
-				? []
-				: $this->getInput('host_inventory', []),
+			'inventory' => ($this->getInput('inventory_mode', $this->host['inventory_mode']) != HOST_INVENTORY_DISABLED)
+				? $this->getInput('host_inventory', [])
+				: [],
 			'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
 			'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])
 		];
