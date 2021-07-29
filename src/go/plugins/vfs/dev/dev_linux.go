@@ -41,6 +41,7 @@ const (
 	sysBlkdevLocation = "/sys/dev/block/"
 	devtypePrefix     = "DEVTYPE="
 	diskstatLocation  = "/proc/diskstats"
+	devTypeRom        = 5
 )
 
 type devRecord struct {
@@ -61,23 +62,45 @@ func (p *Plugin) getDiscovery() (out string, err error) {
 
 	devs := make([]*devRecord, 0)
 	for _, entry := range entries {
+		bypass := 0
 		if stat, tmperr := os.Stat(devLocation + entry.Name()); tmperr == nil {
 			if stat.Mode()&os.ModeType == os.ModeDevice {
 				dev := &devRecord{Name: entry.Name()}
 				if sysfs {
 					rdev := stat.Sys().(*syscall.Stat_t).Rdev
-					filename := fmt.Sprintf("%s%d:%d/uevent", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
-					if file, tmperr := os.Open(filename); tmperr == nil {
-						scanner := bufio.NewScanner(file)
-						for scanner.Scan() {
-							if strings.HasPrefix(scanner.Text(), devtypePrefix) {
-								dev.Type = scanner.Text()[len(devtypePrefix):]
+					if lstat, tmperr := os.Lstat(devLocation + entry.Name()); tmperr == nil {
+						filename := fmt.Sprintf("%s%d:%d/device/type", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
+						if file, tmperr := os.Open(filename); tmperr == nil {
+							var devtype int
+
+							if _, tmperr = fmt.Fscanf(file, "%d\n", &devtype); tmperr == nil {
+								if devtype == devTypeRom {
+									dev.Type = "rom"
+									if lstat.Mode()&os.ModeSymlink != 0 {
+										bypass = 1
+									}
+								}
 							}
+							file.Close()
 						}
-						file.Close()
+					}
+
+					if dev.Type == "" {
+						filename := fmt.Sprintf("%s%d:%d/uevent", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
+						if file, tmperr := os.Open(filename); tmperr == nil {
+							scanner := bufio.NewScanner(file)
+							for scanner.Scan() {
+								if strings.HasPrefix(scanner.Text(), devtypePrefix) {
+									dev.Type = scanner.Text()[len(devtypePrefix):]
+								}
+							}
+							file.Close()
+						}
 					}
 				}
-				devs = append(devs, dev)
+				if bypass == 0 {
+					devs = append(devs, dev)
+				}
 			}
 		}
 	}
