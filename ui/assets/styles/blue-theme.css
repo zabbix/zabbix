@@ -5460,8 +5460,8 @@ svg {
   .columns-wrapper.columns-3 > div,
   .columns-wrapper.columns-3 > li {
     display: block;
-    flex: 0 0 33.33333%;
-    max-width: 33.33333%; }
+    flex: 0 0 33.3333333333%;
+    max-width: 33.3333333333%; }
   .columns-wrapper .column-5 {
     flex: 0 0 5%;
     max-width: 5%; }
@@ -6000,8 +6000,8 @@ svg {
     border-radius: 50%;
     background: #0275b8; }
   .range-control.range-control-focus .range-control-thumb {
-    margin-top: -6.66667px;
-    margin-left: -6.66667px;
+    margin-top: -6.6666666667px;
+    margin-left: -6.6666666667px;
     background: #0275b8;
     border: 2px solid #0395ea; }
   .range-control.range-control-focus .range-control-progress {
@@ -6468,3 +6468,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     content: '\2013';
     float: left;
     margin-left: -1em; }
+
+.js-edit-host b, .js-edit-host strong {
+  pointer-events: none; }
