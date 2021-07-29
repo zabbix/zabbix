@@ -485,9 +485,6 @@ static int	DBpatch_5050034(void)
 {
 	const ZBX_FIELD	field = {"default_lang", "en_US", NULL, NULL, 5, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	return DBset_default("config", &field);
 }
 #endif
