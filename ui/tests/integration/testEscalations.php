@@ -24,9 +24,10 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for action notifications
  *
  * @required-components server, agent
+ * @backup items,actions,triggers,alerts
  * @hosts test_actions
  */
-class testActions extends CIntegrationTest {
+class testEscalations extends CIntegrationTest {
 
 	private static $hostid;
 	private static $trapper_itemid;
@@ -170,7 +171,7 @@ class testActions extends CIntegrationTest {
 
 		// Create internal action
 		$response = $this->call('action.create', [
-			'esc_period' => '1h',
+			'esc_period' => '1m',
 			'eventsource' => 3,
 			'status' => 0,
 			'filter' => [
@@ -228,9 +229,9 @@ class testActions extends CIntegrationTest {
 	}
 
 	/**
-	 * @backup actions,alerts,history
+	 * @backup actions,alerts,history_uint,history,problem,events
 	 */
-	public function testActions_disabledAction() {
+	public function testEscalations_disabledAction() {
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
 			'status' => 1
@@ -252,9 +253,9 @@ class testActions extends CIntegrationTest {
 	}
 
 	/**
-	 * @backup alerts,triggers,history
+	 * @backup alerts,triggers,history_uint,history,problem,events
 	 */
-	public function testActions_disabledTrigger() {
+	public function testEscalations_disabledTrigger() {
 		$response = $this->call('trigger.update', [
 			'triggerid' => self::$triggerid,
 			'status' => 1
@@ -276,9 +277,145 @@ class testActions extends CIntegrationTest {
 	}
 
 	/**
-	 * @backup actions,alerts,history,maintenances
+	 * Test maintenance scenario:
+	 *   disable pause_suppressed
+	 *   maintenance on
+	 *   event -> alert
+	 *   recovery -> alert
+	 * 
+	 * @backup alerts,history,history_uint,maintenances,events,problem
 	 */
-	public function testActions_checkSuppressedProblem() {
+	public function testEscalations_checkScenario1() {
+		$this->reloadConfigurationCache();
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+		// Create maintenance period
+		self::$maint_start_tm = time();
+		$maint_end_tm = self::$maint_start_tm + 60 * 2;
+
+		$response = $this->call('maintenance.create', [
+			'name' => 'Test maintenance',
+			'groupids' => [],
+			'hostids' => [self::$hostid],
+			'active_since' => self::$maint_start_tm,
+			'active_till' => $maint_end_tm,
+			'tags_evaltype' => 0,
+			'timeperiods' => [
+				[
+					'day' => '1',
+					'dayofweek' => '0',
+					'every' => '1',
+					'month' => '0',
+					'period' => '300',
+					'start_date' => self::$maint_start_tm,
+					'start_time' => '0',
+					'timeperiod_type' => '0'
+				]
+			]
+		]);
+		$this->assertArrayHasKey('maintenanceids', $response['result']);
+		$this->assertEquals(1, count($response['result']['maintenanceids']));
+		$maintenance_id = $response['result']['maintenanceids'][0];
+
+		$response = $this->call('action.get', [
+		]);
+		var_dump($response);
+
+		$this->reloadConfigurationCache();
+		sleep(60);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
+
+		$response = $this->call('alert.get', [
+			'actionids' => [self::$trigger_actionid]
+		]);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals(0, $response['result'][0]['p_eventid']);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+		sleep(2);
+
+		$response = $this->call('alert.get', [
+			'actionids' => [self::$trigger_actionid]
+		]);
+		$this->assertArrayHasKey(1, $response['result']);
+		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
+	}
+
+	/**
+	 * Test maintenance scenario:
+	 *   event -> alert
+	 *   maintenance on
+	 *   recovery -> alert
+	 * 
+	 * @backup actions,alerts,history_uint,maintenances
+	 */
+	public function testEscalations_checkScenario2() {
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+		$response = $this->call('action.update', [
+			'actionid' => self::$trigger_actionid,
+			'pause_suppressed' => 1
+		]);
+		// Create maintenance period
+		self::$maint_start_tm = time() + 10;
+		$maint_end_tm = self::$maint_start_tm + 60 * 2;
+
+		$response = $this->call('maintenance.create', [
+			'name' => 'Test maintenance',
+			'groupids' => [],
+			'hostids' => [self::$hostid],
+			'active_since' => self::$maint_start_tm,
+			'active_till' => $maint_end_tm,
+			'tags_evaltype' => 0,
+			'timeperiods' => [
+				[
+					'day' => '1',
+					'dayofweek' => '0',
+					'every' => '1',
+					'month' => '0',
+					'period' => '300',
+					'start_date' => self::$maint_start_tm,
+					'start_time' => '0',
+					'timeperiod_type' => '0'
+				]
+			]
+		]);
+		$this->assertArrayHasKey('maintenanceids', $response['result']);
+		$this->assertEquals(1, count($response['result']['maintenanceids']));
+		$maintenance_id = $response['result']['maintenanceids'][0];
+
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
+		sleep(2);
+
+		$response = $this->call('alert.get', [
+			'actionids' => [self::$trigger_actionid]
+		]);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals(0, $response['result'][0]['p_eventid']);
+
+		sleep(60);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+		sleep(2);
+
+		$response = $this->call('alert.get', [
+			'actionids' => [self::$trigger_actionid]
+		]);
+		$this->assertArrayHasKey(1, $response['result']);
+		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
+	}
+
+	/**
+	 * Test maintenance scenario:
+	 *   maintenance on
+	 *   event -> nothing
+	 *   maintenance off -> alert
+	 *   recovery -> alert
+	 * 
+	 * @backup actions,alerts,history_uint,maintenances
+	 */
+	public function testEscalations_checkScenario3() {
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
 			'pause_suppressed' => 1
@@ -312,74 +449,184 @@ class testActions extends CIntegrationTest {
 		$maintenance_id = $response['result']['maintenanceids'][0];
 
 		$this->reloadConfigurationCache();
-		sleep(61);
+		sleep(60);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
 		sleep(2);
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
-		sleep(2);
-
-		// Check if there are no alerts for this action
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
 		]);
 		$this->assertEmpty($response['result']);
-	}
 
-	/**
-	 * @backup actions,alerts,history,items,maintenances
-	 */
-	public function testActions_checkNonSuppressedProblem() {
-		// Create maintenance period
-		self::$maint_start_tm = time();
-
-		$maint_end_tm = self::$maint_start_tm + 60 * 2;
-
-		$response = $this->call('maintenance.create', [
-			'name' => 'Test maintenance',
-			'groupids' => [],
-			'hostids' => [self::$hostid],
-			'active_since' => self::$maint_start_tm,
-			'active_till' => $maint_end_tm,
-			'tags_evaltype' => 0,
-			'timeperiods' => [
-				[
-					'day' => '1',
-					'dayofweek' => '0',
-					'every' => '1',
-					'month' => '0',
-					'period' => '300',
-					'start_date' => self::$maint_start_tm,
-					'start_time' => '0',
-					'timeperiod_type' => '0'
-				]
-			]
+		$response = $this->call('maintenance.delete', [
+			$maintenance_id
 		]);
 		$this->assertArrayHasKey('maintenanceids', $response['result']);
-		$this->assertEquals(1, count($response['result']['maintenanceids']));
-
+		$this->assertEquals($maintenance_id, $response['result']['maintenanceids'][0]);
 		$this->reloadConfigurationCache();
 
-		sleep(61);
-
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(2);
+		sleep(60);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 		sleep(2);
 
-		// Check if there are 2 alerts for this action
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
 		]);
-		$this->assertCount(2, $response['result']);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals(0, $response['result'][0]['p_eventid']);
+
+		sleep(2);
+
+		$response = $this->call('alert.get', [
+			'actionids' => [self::$trigger_actionid]
+		]);
+		$this->assertArrayHasKey(1, $response['result']);
+		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
 	}
 
 	/**
-	 * @backup actions, alerts, history, items
+	 * Test cancelled escalation (disabled trigger)
+	 *
+	 * @backup actions,alerts,events,problem,history_uint,hosts,users
 	 */
-	public function testActions_checkInternalDisabledItem() {
+	public function testEscalations_checkScenario4() {
+		$response = $this->call('action.update', [
+			'actionid' => self::$trigger_actionid,
+			'operations' => [
+				[
+					'esc_period' => '1m',
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'evaltype' => 0,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => 1,
+						'message' => 'Problem',
+						'subject' => 'Problem'
+					],
+					'opmessage_grp' => [['usrgrpid' => 7]]
+				],
+				[
+					'esc_period' => '1m',
+					'esc_step_from' => 2,
+					'esc_step_to' => 2,
+					'evaltype' => 0,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => 1,
+						'message' => 'Problem',
+						'subject' => 'Problem'
+					],
+					'opmessage_grp' => [['usrgrpid' => 7]]
+				]
+			],
+		]);
+
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+		$response = $this->call('user.update', [
+			'userid' => 1,
+			'user_medias' => [
+				[
+					'mediatypeid' => 1,
+					'sendto' => 'test@local.local'
+				]
+			]
+		]);
+		$this->assertArrayHasKey('userids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['userids']);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
+
+		$response = $this->call('trigger.update', [
+			'triggerid' => self::$triggerid,
+			'status' => 1
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertEquals(1, count($response['result']['triggerids']));
+
+		$this->reloadConfigurationCache();
+
+		sleep(60);
+
+		$response = $this->call('alert.get', [
+			'actionids' => [self::$trigger_actionid]
+		]);
+		$esc_msg = 'NOTE: Escalation cancelled';
+		$this->assertArrayHasKey(1, $response['result']);
+		$this->assertEquals(0, strncmp($esc_msg, $response['result'][1]['message'], strlen($esc_msg)));
+
+	}
+
+	/**
+	 * Test normal escalation with multiple escalations steps
+	 *
+	 * @backup alerts,actions
+	 */
+	public function testEscalations_checkScenario5() {
+		$this->reloadConfigurationCache();
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+
+		$response = $this->call('action.update', [
+			'actionid' => self::$trigger_actionid,
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'evaltype' => 0,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => 0,
+						'message' => 'Problem',
+						'subject' => 'Problem'
+					],
+					'opmessage_grp' => [['usrgrpid' => 7]]
+				],
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 2,
+					'esc_step_to' => 2,
+					'evaltype' => 0,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => 0,
+						'message' => 'Problem',
+						'subject' => 'Problem'
+					],
+					'opmessage_grp' => [['usrgrpid' => 7]]
+				]
+			],
+		]);
+
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
+		sleep(61);
+
+		$response = $this->call('alert.get', [
+			'output' => 'extend',
+			'actionsids' => [self::$trigger_actionid],
+			]
+		);
+		$this->assertCount(2, $response['result']);
+		$this->assertEquals(1, $response['result'][0]['esc_step']);
+		$this->assertEquals(2, $response['result'][1]['esc_step']);
+	}
+
+	/**
+	 * @backup alerts, history_uint, items
+	 */
+	public function testEscalations_checkInternalDisabledItem() {
 		$this->reloadConfigurationCache();
 
 		$this->assertTrue(@unlink(self::ITEM_UNSUPP_FILENAME) !== false);
@@ -404,9 +651,9 @@ class testActions extends CIntegrationTest {
 	}
 
 	/**
-	 * @backup actions, alerts, history, items
+	 * @backup alerts, history_uint, items
 	 */
-	public function testActions_checkInternalDeletedItem() {
+	public function testEscalations_checkInternalDeletedItem() {
 		$this->assertTrue(@file_put_contents(self::ITEM_UNSUPP_FILENAME, 'text') !== false);
 		// Create action
 		$this->reloadConfigurationCache();
@@ -432,21 +679,56 @@ class testActions extends CIntegrationTest {
 	}
 
 	/**
-	 * @backup actions, alerts, history
+	 * Test unfinished webhook
+	 * 
+	 * @backup actions, alerts, history_uint, media_type, users, media, events, problem
 	 */
-	public function testActions_checkUnfinishedAlerts() {
-		// Create script
-		$response = $this->call('script.create', ['command' => 'sleep 5',
-			'execute_on' => '1',
-			'groupid' => '0',
-			'host_access' => '2',
-			'name' => 'Long executing script',
-			'type' => '0',
-			'usrgrpid' => '7'
+	public function testEscalations_checkUnfinishedAlerts() {
+		$this->reloadConfigurationCache();
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+		// Create webhook mediatype
+		$script_code = <<<HEREDOC
+var params = JSON.parse(value);
+
+if (!(params.event_value === '0' || params.event_update_status === '1')) {
+  var now = new Date().getTime();
+  while (new Date().getTime() < now + 3000) { /* do nothing */ }
+}
+
+return {};
+HEREDOC;
+		$response = $this->call('mediatype.create', [
+			'script' => $script_code,
+			'name' => 'Long executing webhook',
+			'timeout' => '30s',
+			'type' => MEDIA_TYPE_WEBHOOK,
+			'parameters' => [
+				[
+					'name' => 'event_value',
+					'value' => '{EVENT.VALUE}',
+				],
+				[
+					'name' => 'event_update_status',
+					'value' => '{EVENT.SOURCE}',
+				]
+			],
+			'content_type' => 1
 		]);
-		$this->assertArrayHasKey('scriptids', $response['result']);
-		$this->assertEquals(1, count($response['result']['scriptids']));
-		$scriptid = $response['result']['scriptids'][0];
+		$this->assertArrayHasKey('mediatypeids', $response['result']);
+		$this->assertEquals(1, count($response['result']['mediatypeids']));
+		$mediatypeid = $response['result']['mediatypeids'][0];
+
+		$response = $this->call('user.update', [
+			'userid' => 1,
+			'user_medias' => [
+				[
+					'mediatypeid' => $mediatypeid,
+					'sendto' => 'q'
+				]
+			]
+		]);
+		$this->assertArrayHasKey('userids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['userids']);
 
 		// Create action
 		$response = $this->call('action.create', [
@@ -470,40 +752,27 @@ class testActions extends CIntegrationTest {
 					'esc_step_from' => 1,
 					'esc_step_to' => 1,
 					'evaltype' => 0,
-					'operationtype' => OPERATION_TYPE_COMMAND,
-					'opcommand' => [
-						'authtype' => ITEM_AUTHTYPE_PASSWORD,
-						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
-						'scriptid' => $scriptid,
-						'type' => ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => $mediatypeid,
+						'subject' => 's',
+						'message' => 's',
 					],
-					'opcommand_grp' => [],
-					'opcommand_hst' => [
-						[
-							'hostid' => '0',
-							'opcommand_hstid' => '1'
-						]
-					]
+					'opmessage_grp' => [['usrgrpid' => 7]],
 				]
 			],
 			'pause_suppressed' => 0,
 			'recovery_operations' => [
 				[
 					'evaltype' => 0,
-					'operationtype' => OPERATION_TYPE_COMMAND,
-					'opcommand' => [
-						'authtype' => ITEM_AUTHTYPE_PASSWORD,
-						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
-						'scriptid' => $scriptid,
-						'type' => ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
+					'operationtype' => OPERATION_TYPE_RECOVERY_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => 0,
+						'subject' => 's',
+						'message' => 's',
 					],
-					'opcommand_grp' => [],
-					'opcommand_hst' => [
-						[
-							'hostid' => '0',
-							'opcommand_hstid' => '1'
-						]
-					]
 				]
 			]
 		]);
@@ -512,30 +781,26 @@ class testActions extends CIntegrationTest {
 		$actionid = $response['result']['actionids'];
 
 		$this->reloadConfigurationCache();
+		sleep(1);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(2);
-
-		// Action is not yet completed
-		$response = $this->call('alert.get', [
-			'actionids' => $actionid
-		]);
-		$this->assertEmpty($response['result']);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
-		sleep(4);
+
+		sleep(5);
 
 		// Check if there are 2 alerts for this action
 		$response = $this->call('alert.get', [
 			'actionids' => $actionid
 		]);
 		$this->assertCount(2, $response['result']);
+		$this->assertFalse(abs($response['result'][0]['clock'] - $response['result'][1]['clock']) < 4);
 	}
 
 	/**
-	 * @backup actions, alerts, history
+	 * @backup actions, alerts, history_uint
 	 */
-	public function testActions_triggerDependency() {
+	public function testEscalations_triggerDependency() {
 		// Create trigger
 		$response = $this->call('trigger.create', [
 			'description' => 'Dependent trigger',
