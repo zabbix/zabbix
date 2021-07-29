@@ -174,7 +174,7 @@ class CJsonRpc {
 			'-32600' => [
 				'code' => -32600,
 				'message' => _('Invalid request.'),
-				'data' => _('The received JSON is not a valid JSON-RPC Request.')
+				'data' => _('The received JSON is not a valid JSON-RPC request.')
 			],
 			'-32601' => [
 				'code' => -32601,
