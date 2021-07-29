@@ -161,7 +161,7 @@ class CRouter {
 		'popup.condition.operations'				=> ['CControllerPopupConditionOperations',				'layout.json',			'popup.condition.common'],
 		'popup.discovery.check'						=> ['CControllerPopupDiscoveryCheck',					'layout.json',			'popup.discovery.check'],
 		'popup.generic'								=> ['CControllerPopupGeneric',							'layout.json',			'popup.generic'],
-		'popup.host.edit'							=> ['CControllerPopupHostEdit',							'layout.json',			'popup.host.edit'],
+		'popup.host.edit'							=> ['CControllerHostEdit',								'layout.json',			'popup.host.edit'],
 		'popup.httpstep'							=> ['CControllerPopupHttpStep',							'layout.json',			'popup.httpstep'],
 		'popup.import'								=> ['CControllerPopupImport',							'layout.json',			'popup.import'],
 		'popup.import.compare'						=> ['CControllerPopupImportCompare',					'layout.json',			'popup.import.compare'],
