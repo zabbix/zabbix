@@ -36,6 +36,8 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 
 int	__wrap_DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	__wrap_DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
+void	__wrap_zbx_user_init(zbx_user_t *user);
+void	__wrap_zbx_user_free(zbx_user_t *user);
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
@@ -102,6 +104,16 @@ int	__wrap_DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_u
 	user->userid = 0;
 
 	return SUCCEED;
+}
+
+void	__wrap_zbx_user_init(zbx_user_t *user)
+{
+	user->username = NULL;
+}
+
+void	__wrap_zbx_user_free(zbx_user_t *user)
+{
+	zbx_free(user->username);
 }
 
 void	zbx_mock_test_entry(void **state)

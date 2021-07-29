@@ -43,10 +43,12 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 		return;
 	}
 
+	zbx_user_init(&user);
+
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
 		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
-		return;
+		goto out;
 	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
@@ -56,13 +58,14 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 		error = zbx_dsprintf(NULL, "cannot find tag: %s", ZBX_PROTO_TAG_DATA);
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zbx_free(error);
-
-		return;
+		goto out;
 	}
 
 	zbx_report_test(&jp_data, user.userid, &j);
 	zbx_tcp_send_bytes_to(sock, j.buffer, j.buffer_size, CONFIG_TIMEOUT);
 	zbx_json_clean(&j);
+out:
+	zbx_user_free(&user);
 }
 
 /******************************************************************************
@@ -96,6 +99,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_user_init(&user);
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
@@ -208,6 +212,7 @@ fail:
 	zbx_free(debug);
 	zbx_json_free(&json);
 
+	zbx_user_free(&user);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 

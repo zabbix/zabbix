@@ -55,10 +55,10 @@ class CControllerUserUnblock extends CController {
 		if ($result) {
 			foreach ($users as $user) {
 				info('User '.$user['username'].' unblocked');
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER,
-					'Unblocked user username ['.$user['username'].'] name ['.$user['name'].'] surname ['.
-					$user['surname'].']'
-				);
+				// add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER,
+				// 	'Unblocked user username ['.$user['username'].'] name ['.$user['name'].'] surname ['.
+				// 	$user['surname'].']'
+				// );
 			}
 		}
 

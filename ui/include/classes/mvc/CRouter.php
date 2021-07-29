@@ -58,6 +58,8 @@ class CRouter {
 		'action.operation.get'						=> ['CControllerActionOperationGet',					'layout.json',			null],
 		'action.operation.validate'					=> ['CControllerActionOperationValidate',				'layout.json',			null],
 		'auditlog.list'								=> ['CControllerAuditLogList',							'layout.htmlpage',		'reports.auditlog.list'],
+		'audit.settings.edit'						=> ['CControllerAuditSettingsEdit',						'layout.htmlpage',		'administration.audit.settings.edit'],
+		'audit.settings.update'						=> ['CControllerAuditSettingsUpdate',					null,					null],
 		'authentication.edit'						=> ['CControllerAuthenticationEdit',					'layout.htmlpage',		'administration.authentication.edit'],
 		'authentication.update'						=> ['CControllerAuthenticationUpdate',					null,					null],
 		'autoreg.edit'								=> ['CControllerAutoregEdit',							'layout.htmlpage',		'administration.autoreg.edit'],

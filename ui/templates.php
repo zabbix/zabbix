@@ -276,10 +276,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$result = API::Template()->update($template);
 
-			if ($result) {
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
-			}
-			else {
+			if (!$result) {
 				throw new Exception();
 			}
 		}

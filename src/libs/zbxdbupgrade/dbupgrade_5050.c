@@ -340,6 +340,7 @@ static int	DBpatch_5050016(void)
 	}
 out:
 	DBfree_result(result);
+
 	return ret;
 }
 
@@ -388,6 +389,75 @@ static int	DBpatch_5050023(void)
 	return DBadd_field("config", &field);
 }
 
+static int	DBpatch_5050024(void)
+{
+	return DBdrop_table("auditlog_details");
+}
+
+static int	DBpatch_5050025(void)
+{
+	return DBdrop_table("auditlog");
+}
+
+static int	DBpatch_5050026(void)
+{
+	const ZBX_TABLE table =
+		{"auditlog", "auditid", 0,
+			{
+				{"auditid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"ip", "", NULL, NULL, 39, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"action", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"resourcetype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"resourcename", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"recordsetid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+				{"details", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050027(void)
+{
+	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
+}
+
+static int	DBpatch_5050028(void)
+{
+	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
+}
+
+static int	DBpatch_5050029(void)
+{
+	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
+}
+
+static int	DBpatch_5050030(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog' and field_name='auditid'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog_details' and field_name='auditdetailid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050031(void)
+{
+	const ZBX_FIELD	field = {"auditlog_enabled", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
 #endif
 
 DBPATCH_START(5050)
@@ -418,5 +488,13 @@ DBPATCH_ADD(5050020, 0, 1)
 DBPATCH_ADD(5050021, 0, 1)
 DBPATCH_ADD(5050022, 0, 1)
 DBPATCH_ADD(5050023, 0, 1)
+DBPATCH_ADD(5050024, 0, 1)
+DBPATCH_ADD(5050025, 0, 1)
+DBPATCH_ADD(5050026, 0, 1)
+DBPATCH_ADD(5050027, 0, 1)
+DBPATCH_ADD(5050028, 0, 1)
+DBPATCH_ADD(5050029, 0, 1)
+DBPATCH_ADD(5050030, 0, 1)
+DBPATCH_ADD(5050031, 0, 1)
 
 DBPATCH_END()
