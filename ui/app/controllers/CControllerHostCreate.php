@@ -36,10 +36,7 @@ class CControllerHostCreate extends CController {
 			'mainInterfaces'	=> 'array',
 			'groups'			=> 'required|array',
 			'tags'				=> 'array',
-			'templates'			=> 'array_db hosts.hostid',
 			'add_templates'		=> 'array_db hosts.hostid',
-			'rem_templates'		=> 'array_db hosts.hostid',
-			'clear_templates'	=> 'array_db hosts.hostid',
 			'ipmi_authtype'		=> 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
 									IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM,
 									IPMI_AUTHTYPE_RMCP_PLUS
