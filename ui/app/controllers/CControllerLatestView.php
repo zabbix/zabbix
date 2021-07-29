@@ -159,8 +159,7 @@ class CControllerLatestView extends CControllerLatest {
 		$items_readonly = true;
 		$can_create_items = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 				|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
-
-		$hostids = array_unique(array_keys($prepared_data['hosts']));
+		$hostids = array_keys($prepared_data['hosts']);
 		$single_hostid = (count($hostids) === 1) ? reset($hostids) : 0;
 		$create_item_dropdown = [
 			'hosts' => [],

@@ -60,8 +60,10 @@ $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 	'evaltype' => $data['filter']['evaltype'],
 	'tags' => $filter_tags
 ]);
-$filter = new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['action']));
-$filter
+$action_url = (new CUrl('zabbix.php'))->setArgument('action', $data['action']);
+
+$filter = (new CFilter($action_url))
+	->setResetUrl($action_url)
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
@@ -152,15 +154,11 @@ $header_checkbox = (new CCheckBox('all_hosts'))
 	->onClick("checkAll('".$form->getName()."', 'all_hosts', 'ids');");
 $show_monitored_by = ((int) $data['filter']['monitored_by'] === ZBX_MONITORED_BY_PROXY
 		|| (int) $data['filter']['monitored_by'] === ZBX_MONITORED_BY_ANY);
-$header_sortable_name = make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
-	(new CUrl('zabbix.php'))
-		->setArgument('action', $data['action'])
-		->getUrl()
+$header_sortable_name = make_sorting_header(_('Name'), 'name',
+	$data['sortField'], $data['sortOrder'], $action_url->getUrl()
 );
-$header_sortable_status = make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder'],
-	(new CUrl('zabbix.php'))
-		->setArgument('action', $data['action'])
-		->getUrl()
+$header_sortable_status = make_sorting_header(_('Status'), 'status',
+	$data['sortField'], $data['sortOrder'], $action_url->getUrl()
 );
 
 $table = (new CTableInfo())
@@ -486,11 +484,9 @@ $form->addItem([
 				->getUrl()
 		],
 		'host.export' => [
-			'content' => new CButtonExport('export.hosts',
-				(new CUrl('zabbix.php'))
-					->setArgument('action', $data['action'])
-					->setArgument('page', ((int) $data['page'] === 1) ? null : $data['page'])
-					->getUrl()
+			'content' => new CButtonExport('export.hosts', $action_url
+				->setArgument('page', ((int) $data['page'] === 1) ? null : $data['page'])
+				->getUrl()
 			)
 		],
 		'popup.massupdate.host' => [
