@@ -24,11 +24,11 @@ class CControllerPopupTriggerExpr extends CController {
 	private $metrics = [];
 	private $param1SecCount = [];
 	private $param1Period = [];
-	private $param1PeriodMode = [];
 	private $param1Sec = [];
 	private $param1Str = [];
 	private $param2SecCount = [];
 	private $param2SecMode = [];
+	private $param2SecCountMode = [];
 	private $param3SecVal = [];
 	private $param_find = [];
 	private $param3SecPercent = [];
