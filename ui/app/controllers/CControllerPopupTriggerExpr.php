@@ -102,12 +102,13 @@ class CControllerPopupTriggerExpr extends CController {
 			'last' => [
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
+				'M' => $this->metrics,
 				'A' => true
 			],
-			'period_shift' => [
-				'C' => _('Period shift'),
+			'shift' => [
+				'C' => _('Time shift'),
 				'T' => T_ZBX_INT,
-				'A' => true
+				'A' => false
 			],
 			'mode' => [
 				'C' => 'Mode',
