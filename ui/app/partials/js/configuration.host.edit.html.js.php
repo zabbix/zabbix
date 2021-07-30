@@ -335,6 +335,20 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			document.querySelector('[for="tls_issuer"]').style.display = use_cert ? '' : 'none';
 			document.querySelector('#tls_subject').closest('div').style.display = use_cert ? '' : 'none';
 			document.querySelector('[for="tls_subject"]').style.display = use_cert ? '' : 'none';
+
+			// Update tls_accept.
+			let tls_accept = 0x00;
+			if (document.querySelector('[name="tls_in_none"]').checked) {
+				tls_accept |= <?= HOST_ENCRYPTION_NONE ?>;
+			}
+			if (document.querySelector('[name="tls_in_psk"]').checked) {
+				tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
+			}
+			if (document.querySelector('[name="tls_in_cert"]').checked) {
+				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
+			}
+
+			document.getElementById('tls_accept').value = tls_accept;
 		},
 
 		submit(form) {
@@ -347,6 +361,11 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			fields.description = fields.description.trim();
 
 			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
+
+			if (document.querySelector('#change_psk')) {
+				delete fields.tls_psk_identity;
+				delete fields.tls_psk;
+			}
 
 			// Groups are not extracted properly by getFormFields.
 			fields.groups = [];
@@ -382,6 +401,11 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			form.querySelectorAll('[name^="groups[]"]').forEach(group => {
 				fields.groups.push(group.value);
 			});
+
+			if (document.querySelector('#change_psk')) {
+				delete fields.tls_psk_identity;
+				delete fields.tls_psk;
+			}
 
 			delete fields.action;
 			delete fields.sid;

@@ -32,8 +32,8 @@ $host_form = (new CForm())
 	->setName($data['form_name'])
 	->addVar('action', $data['form_action'])
 	->addVar('hostid', $data['hostid'])
-	->addVar('full_clone_hostid', $data['full_clone_hostid'])
-	->addItem(getMessages())
+	->addVar('clone_hostid', $data['clone_hostid'])
+	->addVar('full_clone', $data['full_clone'])
 	->addItem((new CInput('submit'))->addStyle('display: none;'));
 
 // Host tab.
@@ -491,6 +491,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 }
 
 // Encryption tab.
+$is_psk_set = ($data['host']['tls_connect'] = HOST_ENCRYPTION_PSK || $data['host']['tls_accept'] & HOST_ENCRYPTION_PSK);
 $encryption_tab = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
@@ -506,7 +507,7 @@ $encryption_tab = (new CFormGrid())
 	])
 	->addItem([
 		new CLabel(_('Connections from host')),
-		new CFormField(
+		new CFormField([
 			(new CList())
 				->addItem(
 					(new CCheckBox('tls_in_none'))
@@ -525,11 +526,12 @@ $encryption_tab = (new CFormGrid())
 						->setChecked(($data['host']['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE))
 						->setLabel(_('Certificate'))
 						->setEnabled(!$readonly)
-				)
-		)
+				),
+			new CInput('hidden', 'tls_accept', $data['host']['tls_accept'])
+		])
 	])
 	->addItem(
-		($data['hostid'] && ($data['host']['tls_connect'] & HOST_ENCRYPTION_PSK))
+		(($data['hostid'] || $data['clone_hostid']) && $is_psk_set)
 		? [
 			(new CLabel(_('PSK'), 'change_psk'))->setAsteriskMark(),
 			new CFormField(
@@ -544,7 +546,7 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('tls_psk_identity', $data['host']['tls_psk_identity'], false, DB::getFieldLength('hosts', 'tls_psk_identity')))
+			(new CTextBox('tls_psk_identity', '', false, DB::getFieldLength('hosts', 'tls_psk_identity')))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAriaRequired()
 		)
@@ -552,7 +554,7 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('tls_psk', $data['host']['tls_psk'], false, DB::getFieldLength('hosts', 'tls_psk')))
+			(new CTextBox('tls_psk', '', false, DB::getFieldLength('hosts', 'tls_psk')))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAriaRequired()
 				->disableAutocomplete()

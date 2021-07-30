@@ -34,11 +34,11 @@ class CControllerHostEdit extends CController {
 	protected $host;
 
 	/**
-	 * Full clone hostid.
+	 * Clone hostid.
 	 *
 	 * @var ?int
 	 */
-	protected $full_clone_hostid;
+	protected $clone_hostid;
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -79,8 +79,6 @@ class CControllerHostEdit extends CController {
 										(0 | HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
 			'tls_subject'		=> 'db hosts.tls_subject',
 			'tls_issuer'		=> 'db hosts.tls_issuer',
-			'tls_psk_identity'	=> 'db hosts.tls_psk_identity',
-			'tls_psk'			=> 'db hosts.tls_psk',
 			'inventory_mode'	=> 'db host_inventory.inventory_mode|in '.implode(',', [HOST_INVENTORY_DISABLED,
 										HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC
 									]),
@@ -89,7 +87,7 @@ class CControllerHostEdit extends CController {
 			'valuemaps'			=> 'array'
 		];
 
-		$ret = ($this->validateInput($fields) && $this->checkFullCloneSource());
+		$ret = ($this->validateInput($fields) && $this->checkCloneSourceHostId());
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -98,8 +96,17 @@ class CControllerHostEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkFullCloneSource() {
-		return !($this->hasInput('full_clone') && !$this->hasInput('hostid'));
+	/**
+	 * Check if source hostid is given to clone host.
+	 *
+	 * @return bool
+	 */
+	protected function checkCloneSourceHostId(): bool {
+		if ($this->hasInput('clone') || $this->hasInput('full_clone')) {
+			return $this->hasInput('hostid');
+		}
+
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
@@ -108,9 +115,8 @@ class CControllerHostEdit extends CController {
 		}
 
 		if ($this->hasInput('hostid')) {
-			$this->full_clone_hostid = $this->hasInput('full_clone') ? $this->getInput('hostid') : null;
-
 			if ($this->hasInput('full_clone') || $this->hasInput('clone')) {
+				$this->clone_hostid = $this->getInput('hostid');
 				$this->host = [['hostid' => null]];
 			}
 			else {
@@ -147,7 +153,8 @@ class CControllerHostEdit extends CController {
 		$data = [
 			'form_action' => $this->host['hostid'] ? 'host.update' : 'host.create',
 			'hostid' => $this->host['hostid'],
-			'full_clone_hostid' => $this->full_clone_hostid,
+			'full_clone' => $this->hasInput('full_clone') ? 1 : null,
+			'clone_hostid' => $this->clone_hostid,
 			'host' => $this->host,
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'user' => [
@@ -340,7 +347,7 @@ class CControllerHostEdit extends CController {
 
 			$this->getInputs($inputs, [
 				'host', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-				'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk', 'tags', 'inventory_mode',
+				'ipmi_password', 'tls_connect', 'tls_accept', 'tls_subject', 'tls_issuer', 'tags', 'inventory_mode',
 				'host_inventory'
 			]);
 
@@ -407,8 +414,6 @@ class CControllerHostEdit extends CController {
 			'tls_accept' => HOST_ENCRYPTION_NONE,
 			'tls_issuer' => '',
 			'tls_subject' => '',
-			'tls_psk_identity' => '',
-			'tls_psk' => '',
 			'tags' => [],
 			'groups' => [],
 			'parentTemplates' => [],

@@ -61,7 +61,8 @@ class CControllerHostCreate extends CController {
 			'host_inventory'	=> 'array',
 			'macros'			=> 'array',
 			'valuemaps'			=> 'array',
-			'full_clone_hostid' => 'db hosts.hostid'
+			'full_clone'		=> 'in 1',
+			'clone_hostid'		=> 'db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -81,10 +82,10 @@ class CControllerHostCreate extends CController {
 	protected function checkPermissions(): bool {
 		$ret = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 
-		if ($ret && $this->hasInput('full_clone_hostid')) {
+		if ($ret && $this->hasInput('clone_hostid')) {
 			$hosts = API::Host()->get([
 				'output' => [],
-				'hostids' => $this->getInput('full_clone_hostid')
+				'hostids' => $this->getInput('clone_hostid')
 			]);
 
 			if (!$hosts) {
@@ -131,12 +132,16 @@ class CControllerHostCreate extends CController {
 			'visiblename' => 'name'
 		]);
 
-		$src_hostid = $this->getInput('full_clone_hostid', false);
+		$full_clone = $this->hasInput('full_clone');
+		$src_hostid = $this->getInput('clone_hostid', false);
+		if ($src_hostid) {
+			$host = $this->extendHostClone($host, (int) $src_hostid);
+		}
 		$output = [];
 
 		if (($hostids = API::Host()->create($host)) !== false
 				&& $this->createValueMaps((int) $hostids['hostids'][0])
-				&& (!$src_hostid || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
+				&& (!$full_clone || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
 			$output += [
 				'hostid' => $hostids['hostids'][0],
 				'message' => _('Host added')
@@ -149,6 +154,30 @@ class CControllerHostCreate extends CController {
 
 		// Set response.
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+	}
+
+	/**
+	 * Copy write-only fields from source host to the new host. Used to clone host.
+	 *
+	 * @param array $host
+	 * @param int   $src_hostid
+	 *
+	 * @return array
+	 */
+	private function extendHostClone(array $host, int $src_hostid): array {
+		if ($host['tls_connect'] == HOST_ENCRYPTION_PSK || ($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+			// Add values to PSK fields from cloned host.
+			$clone_hosts = API::Host()->get([
+				'output' => ['tls_psk_identity', 'tls_psk'],
+				'hostids' => $src_hostid,
+				'editable' => true
+			]);
+
+			$host['tls_psk_identity'] = $this->getInput('tls_psk_identity', $clone_hosts[0]['tls_psk_identity']);
+			$host['tls_psk'] = $this->getInput('tls_psk', $clone_hosts[0]['tls_psk']);
+		}
+
+		return $host;
 	}
 
 	/**
