@@ -369,7 +369,7 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 
 			curl.setArgument('action', 'host.massdelete');
 			curl.setArgument('ids', [document.getElementById('hostid').value]);
-			curl.setArgument('back_url', overlay.original_url || '');
+			curl.setArgument('back_url', overlay?.original_url || '');
 
 			redirect(curl.getUrl(), 'post');
 		}

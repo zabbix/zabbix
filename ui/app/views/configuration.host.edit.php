@@ -34,8 +34,8 @@ $data += [
 			new CSubmit('update', _('Update')),
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			(new CButton('delete', _('Delete selected host?')))
-				->onClick("return confirm('".json_encode(_('Delete selected host?'))."')
+			(new CButton('delete', _('Delete')))
+				->onClick("return confirm(".json_encode(_('Delete selected host?')).")
 					? host_edit.deleteHost()
 					: false")
 				->setAttribute('data-redirect', (new CUrl('zabbix.php'))
