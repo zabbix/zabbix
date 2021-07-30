@@ -125,13 +125,21 @@ class CControllerHostUpdate extends CController {
 
 		$host_properties = [
 			'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_subject',
-			'tls_issuer', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
+			'tls_issuer', 'inventory_mode'
 		];
 
 		foreach ($host_properties as $prop) {
 			if (!array_key_exists($prop, $this->host) || $this->getInput($prop, '') !== $this->host[$prop]) {
 				$host[$prop] = $this->getInput($prop, '');
 			}
+		}
+
+		if ($this->hasInput('tls_psk_identity')) {
+			$host['tls_psk_identity'] = $this->getInput('tls_psk_identity');
+		}
+
+		if ($this->hasInput('tls_psk')) {
+			$host['tls_psk'] = $this->getInput('tls_psk');
 		}
 
 		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
