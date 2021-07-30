@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-23 19:52+0300\n"
+"POT-Creation-Date: 2021-07-30 11:56+0300\n"
 "PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -339,7 +339,7 @@ msgstr "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 msgid "<sub-menu/sub-menu/...>script"
 msgstr "<sub-menu/sub-menu/...>tập lệnh"
 
-#: include/classes/widgets/CWidgetHelper.php:770
+#: include/classes/widgets/CWidgetHelper.php:784
 msgid "ADD OVERRIDE"
 msgstr "Thêm đè lên"
 
@@ -599,7 +599,7 @@ msgstr "Kích hoạt"
 #: app/views/popup.maintenance.period.php:189 app/views/popup.media.php:52
 #: app/views/popup.media.php:127 app/views/popup.mediatype.message.php:95
 #: app/views/popup.triggerwizard.php:110 app/views/popup.triggerwizard.php:144
-#: include/classes/widgets/CWidgetHelper.php:502 include/forms.inc.php:1474
+#: include/classes/widgets/CWidgetHelper.php:516 include/forms.inc.php:1474
 #: include/forms.inc.php:2017 include/views/configuration.action.edit.php:130
 #: include/views/configuration.action.edit.php:314
 #: include/views/configuration.action.edit.php:400
@@ -729,7 +729,7 @@ msgstr "Thêm các mục thiếu"
 msgid "Add multiple maps"
 msgstr "Thêm nhiều bản đồ"
 
-#: include/classes/widgets/CWidgetHelper.php:1197
+#: include/classes/widgets/CWidgetHelper.php:1211
 msgid "Add new data set"
 msgstr "Đặt lại dữ liệu mới"
 
@@ -737,7 +737,7 @@ msgstr "Đặt lại dữ liệu mới"
 msgid "Add new interface"
 msgstr "Thêm giao diện mới"
 
-#: include/classes/widgets/CWidgetHelper.php:724
+#: include/classes/widgets/CWidgetHelper.php:738
 msgid "Add new override"
 msgstr "Ghi đè"
 
@@ -825,15 +825,15 @@ msgstr "Tên máy chủ agent. Trả về kiểu string"
 msgid "Agent interfaces"
 msgstr "Giao diện agent"
 
-#: include/classes/widgets/CWidgetHelper.php:1136
+#: include/classes/widgets/CWidgetHelper.php:1150
 msgid "Aggregate"
 msgstr "Tổng hợp"
 
-#: include/classes/widgets/CWidgetHelper.php:1108
+#: include/classes/widgets/CWidgetHelper.php:1122
 msgid "Aggregation function"
 msgstr "Chức năng tổng hợp"
 
-#: include/classes/widgets/CWidgetHelper.php:1127
+#: include/classes/widgets/CWidgetHelper.php:1141
 msgid "Aggregation interval"
 msgstr "Chu kỳ tổng hợp"
 
@@ -1396,9 +1396,9 @@ msgstr "Màu nền"
 msgid "Background image"
 msgstr "Ảnh nền"
 
-#: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:789
-#: include/classes/widgets/CWidgetHelper.php:1038
+#: include/classes/widgets/CWidgetHelper.php:760
+#: include/classes/widgets/CWidgetHelper.php:803
+#: include/classes/widgets/CWidgetHelper.php:1052
 msgid "Bar"
 msgstr "Thanh"
 
@@ -1406,8 +1406,8 @@ msgstr "Thanh"
 msgid "Base DN"
 msgstr "DN cơ sở"
 
-#: include/classes/widgets/CWidgetHelper.php:772
-#: include/classes/widgets/CWidgetHelper.php:1029
+#: include/classes/widgets/CWidgetHelper.php:786
+#: include/classes/widgets/CWidgetHelper.php:1043
 msgid "Base colour"
 msgstr "Màu cơ bản"
 
@@ -1826,11 +1826,11 @@ msgstr "Không thể xóa lịch sử"
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr "Không thể xóa lịch sử: ít nhất 1 mục không thuộc thiết bị được giám sát"
 
-#: include/classes/api/services/CDiscoveryRule.php:2446
+#: include/classes/api/services/CDiscoveryRule.php:2448
 msgid "Cannot clone graph prototypes."
 msgstr "Không thể sao chép kiểu đồ thị."
 
-#: include/classes/api/services/CDiscoveryRule.php:2500
+#: include/classes/api/services/CDiscoveryRule.php:2502
 msgid "Cannot clone host prototypes."
 msgstr "Không thể sao chép kiểu host."
 
@@ -3275,7 +3275,7 @@ msgid "Close problem"
 msgstr "Đóng vấn đề"
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:970 jsLoader.php:248
+#: include/classes/widgets/CWidgetHelper.php:984 jsLoader.php:248
 #: jsLoader.php:253
 msgid "Collapse"
 msgstr "Thu hẹp"
@@ -3633,9 +3633,9 @@ msgstr "Chúc mừng! Bạn đã cài đặt thành công Zabbix frontend."
 msgid "Connect to"
 msgstr "Kết nối tới"
 
-#: include/classes/widgets/CWidgetHelper.php:752
-#: include/classes/widgets/CWidgetHelper.php:827
-#: include/classes/widgets/CWidgetHelper.php:1087
+#: include/classes/widgets/CWidgetHelper.php:766
+#: include/classes/widgets/CWidgetHelper.php:841
+#: include/classes/widgets/CWidgetHelper.php:1101
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "Đã kết nối"
@@ -3727,8 +3727,8 @@ msgstr "Liên lạc"
 #: app/views/js/monitoring.problem.view.js.php:49
 #: app/views/monitoring.host.view.php:65
 #: app/views/monitoring.problem.view.php:255
-#: include/classes/widgets/CWidgetHelper.php:480
-#: include/classes/widgets/CWidgetHelper.php:526
+#: include/classes/widgets/CWidgetHelper.php:494
+#: include/classes/widgets/CWidgetHelper.php:540
 #: include/views/configuration.host.list.php:66
 #: include/views/configuration.maintenance.edit.php:158
 #: include/views/configuration.maintenance.edit.php:179
@@ -4298,7 +4298,7 @@ msgstr "Dữ liệu không được mã hóa chính xác."
 msgid "Data overview"
 msgstr "Tổng quan dữ liệu"
 
-#: include/classes/widgets/CWidgetHelper.php:1142
+#: include/classes/widgets/CWidgetHelper.php:1156
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
 #: include/classes/widgets/views/widget.svggraph.form.view.php:288
 msgid "Data set"
@@ -4530,8 +4530,8 @@ msgstr "Trễ bởi"
 #: app/views/administration.valuemap.list.php:99
 #: app/views/monitoring.dashboard.list.php:85
 #: include/classes/html/CButtonDelete.php:25
-#: include/classes/widgets/CWidgetHelper.php:663
-#: include/classes/widgets/CWidgetHelper.php:1015 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:677
+#: include/classes/widgets/CWidgetHelper.php:1029 include/services.inc.php:118
 #: include/views/configuration.action.list.php:151
 #: include/views/configuration.application.list.php:149
 #: include/views/configuration.correlation.list.php:132
@@ -5385,12 +5385,12 @@ msgstr "Tải xuống tệp tin cấu hình"
 msgid "Downtime"
 msgstr "Thời gian down"
 
-#: include/classes/widgets/CWidgetHelper.php:742
-#: include/classes/widgets/CWidgetHelper.php:786
-#: include/classes/widgets/CWidgetHelper.php:787
-#: include/classes/widgets/CWidgetHelper.php:788
-#: include/classes/widgets/CWidgetHelper.php:789
-#: include/classes/widgets/CWidgetHelper.php:1033
+#: include/classes/widgets/CWidgetHelper.php:756
+#: include/classes/widgets/CWidgetHelper.php:800
+#: include/classes/widgets/CWidgetHelper.php:801
+#: include/classes/widgets/CWidgetHelper.php:802
+#: include/classes/widgets/CWidgetHelper.php:803
+#: include/classes/widgets/CWidgetHelper.php:1047
 msgid "Draw"
 msgstr "Vẽ"
 
@@ -5505,7 +5505,7 @@ msgstr "Item động"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Mỗi URL cần có một tên duy nhất. Xin chắc chắn chỉ có một URl có tên"
 
-#: include/classes/widgets/CWidgetHelper.php:1141
+#: include/classes/widgets/CWidgetHelper.php:1155
 msgid "Each item"
 msgstr "Mỗi mục"
 
@@ -5912,8 +5912,8 @@ msgstr "English (en_US)"
 #: app/views/js/monitoring.problem.view.js.php:50
 #: app/views/monitoring.host.view.php:66
 #: app/views/monitoring.problem.view.php:256
-#: include/classes/widgets/CWidgetHelper.php:481
-#: include/classes/widgets/CWidgetHelper.php:527
+#: include/classes/widgets/CWidgetHelper.php:495
+#: include/classes/widgets/CWidgetHelper.php:541
 #: include/views/configuration.host.list.php:67
 #: include/views/configuration.maintenance.edit.php:159
 #: include/views/configuration.maintenance.edit.php:180
@@ -6082,7 +6082,7 @@ msgid "Execution confirmation"
 msgstr "Thực hiện xá nhận"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:970 jsLoader.php:249
+#: include/classes/widgets/CWidgetHelper.php:984 jsLoader.php:249
 #: jsLoader.php:252
 msgid "Expand"
 msgstr "Mở rộng"
@@ -6346,19 +6346,19 @@ msgstr "Kích cỡ tệp tin (byte). Trả về kiểu integer"
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Thông tin thời gian tập tin. Trả về kiểu integer (dấu thời gian Unix)"
 
-#: include/classes/widgets/CWidgetHelper.php:748
-#: include/classes/widgets/CWidgetHelper.php:803
-#: include/classes/widgets/CWidgetHelper.php:804
-#: include/classes/widgets/CWidgetHelper.php:805
-#: include/classes/widgets/CWidgetHelper.php:806
-#: include/classes/widgets/CWidgetHelper.php:807
-#: include/classes/widgets/CWidgetHelper.php:808
-#: include/classes/widgets/CWidgetHelper.php:809
-#: include/classes/widgets/CWidgetHelper.php:810
-#: include/classes/widgets/CWidgetHelper.php:811
-#: include/classes/widgets/CWidgetHelper.php:812
-#: include/classes/widgets/CWidgetHelper.php:813
-#: include/classes/widgets/CWidgetHelper.php:1067
+#: include/classes/widgets/CWidgetHelper.php:762
+#: include/classes/widgets/CWidgetHelper.php:817
+#: include/classes/widgets/CWidgetHelper.php:818
+#: include/classes/widgets/CWidgetHelper.php:819
+#: include/classes/widgets/CWidgetHelper.php:820
+#: include/classes/widgets/CWidgetHelper.php:821
+#: include/classes/widgets/CWidgetHelper.php:822
+#: include/classes/widgets/CWidgetHelper.php:823
+#: include/classes/widgets/CWidgetHelper.php:824
+#: include/classes/widgets/CWidgetHelper.php:825
+#: include/classes/widgets/CWidgetHelper.php:826
+#: include/classes/widgets/CWidgetHelper.php:827
+#: include/classes/widgets/CWidgetHelper.php:1081
 msgid "Fill"
 msgstr "Điền"
 
@@ -10336,9 +10336,9 @@ msgstr "Latvian (lv_LV)"
 msgid "Layout"
 msgstr "Bố cục"
 
-#: include/classes/widgets/CWidgetHelper.php:755
-#: include/classes/widgets/CWidgetHelper.php:830
-#: include/classes/widgets/CWidgetHelper.php:1098
+#: include/classes/widgets/CWidgetHelper.php:769
+#: include/classes/widgets/CWidgetHelper.php:844
+#: include/classes/widgets/CWidgetHelper.php:1112
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:70
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:86
@@ -10374,9 +10374,9 @@ msgstr "Lịch sử"
 msgid "Limit for search and filter results"
 msgstr "Tìm kiếm/lọc các yếu tố giới hạn"
 
-#: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:786
-#: include/classes/widgets/CWidgetHelper.php:1035 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:757
+#: include/classes/widgets/CWidgetHelper.php:800
+#: include/classes/widgets/CWidgetHelper.php:1049 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:346
 #: include/views/js/monitoring.sysmaps.js.php:395
 #: include/views/js/monitoring.sysmaps.js.php:764
@@ -11259,11 +11259,11 @@ msgstr "Thiếu trường \"tên\" cho kiểu đồ thị."
 msgid "Missing \"name\" field for graph."
 msgstr "Thiếu trường \"tên\" cho đồ thị."
 
-#: include/classes/widgets/CWidgetHelper.php:750
-#: include/classes/widgets/CWidgetHelper.php:826
-#: include/classes/widgets/CWidgetHelper.php:827
-#: include/classes/widgets/CWidgetHelper.php:828
-#: include/classes/widgets/CWidgetHelper.php:1082
+#: include/classes/widgets/CWidgetHelper.php:764
+#: include/classes/widgets/CWidgetHelper.php:840
+#: include/classes/widgets/CWidgetHelper.php:841
+#: include/classes/widgets/CWidgetHelper.php:842
+#: include/classes/widgets/CWidgetHelper.php:1096
 msgid "Missing data"
 msgstr "Thiếu dữ liệu"
 
@@ -12283,9 +12283,9 @@ msgstr "Không có cờ boolean bị phản đối."
 #: app/views/monitoring.problem.view.php:280
 #: app/views/monitoring.problem.view.php:291
 #: app/views/monitoring.problem.view.php:308
-#: include/classes/widgets/CWidgetHelper.php:751
-#: include/classes/widgets/CWidgetHelper.php:826
-#: include/classes/widgets/CWidgetHelper.php:1086
+#: include/classes/widgets/CWidgetHelper.php:765
+#: include/classes/widgets/CWidgetHelper.php:840
+#: include/classes/widgets/CWidgetHelper.php:1100
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:140
 #: include/classes/widgets/forms/CWidgetFormProblems.php:118
 #: include/classes/widgets/forms/CWidgetFormProblems.php:140
@@ -13547,24 +13547,24 @@ msgstr "Vui lòng nhập tên máy chủ hoặc địa chỉ IP máy chủ và s
 msgid "Please select two elements"
 msgstr "Xin vui lòng lựa chọn 2 phần tử"
 
-#: include/classes/widgets/CWidgetHelper.php:749
-#: include/classes/widgets/CWidgetHelper.php:815
-#: include/classes/widgets/CWidgetHelper.php:816
-#: include/classes/widgets/CWidgetHelper.php:817
-#: include/classes/widgets/CWidgetHelper.php:818
-#: include/classes/widgets/CWidgetHelper.php:819
-#: include/classes/widgets/CWidgetHelper.php:820
-#: include/classes/widgets/CWidgetHelper.php:821
-#: include/classes/widgets/CWidgetHelper.php:822
-#: include/classes/widgets/CWidgetHelper.php:823
-#: include/classes/widgets/CWidgetHelper.php:824
-#: include/classes/widgets/CWidgetHelper.php:1050
+#: include/classes/widgets/CWidgetHelper.php:763
+#: include/classes/widgets/CWidgetHelper.php:829
+#: include/classes/widgets/CWidgetHelper.php:830
+#: include/classes/widgets/CWidgetHelper.php:831
+#: include/classes/widgets/CWidgetHelper.php:832
+#: include/classes/widgets/CWidgetHelper.php:833
+#: include/classes/widgets/CWidgetHelper.php:834
+#: include/classes/widgets/CWidgetHelper.php:835
+#: include/classes/widgets/CWidgetHelper.php:836
+#: include/classes/widgets/CWidgetHelper.php:837
+#: include/classes/widgets/CWidgetHelper.php:838
+#: include/classes/widgets/CWidgetHelper.php:1064
 msgid "Point size"
 msgstr "Kích cỡ điểm"
 
-#: include/classes/widgets/CWidgetHelper.php:744
-#: include/classes/widgets/CWidgetHelper.php:787
-#: include/classes/widgets/CWidgetHelper.php:1036
+#: include/classes/widgets/CWidgetHelper.php:758
+#: include/classes/widgets/CWidgetHelper.php:801
+#: include/classes/widgets/CWidgetHelper.php:1050
 #: include/views/js/monitoring.sysmaps.js.php:416
 msgid "Points"
 msgstr "Điểm"
@@ -14241,8 +14241,8 @@ msgstr "Lệnh từ xa"
 #: app/views/monitoring.problem.view.php:262
 #: app/views/popup.lldoperation.php:152 app/views/popup.lldoverride.php:136
 #: app/views/popup.media.php:45 app/views/popup.media.php:110
-#: include/classes/widgets/CWidgetHelper.php:490
-#: include/classes/widgets/CWidgetHelper.php:534 include/forms.inc.php:1454
+#: include/classes/widgets/CWidgetHelper.php:504
+#: include/classes/widgets/CWidgetHelper.php:548 include/forms.inc.php:1454
 #: include/forms.inc.php:1986 include/views/configuration.action.edit.php:94
 #: include/views/configuration.action.edit.php:268
 #: include/views/configuration.action.edit.php:296
@@ -14660,9 +14660,9 @@ msgstr "Trả về tỉ lệ mất gói tin ping ICMP."
 msgid "Revert changes"
 msgstr "Hoàn nguyên thay đổi"
 
-#: include/classes/widgets/CWidgetHelper.php:756
-#: include/classes/widgets/CWidgetHelper.php:831
-#: include/classes/widgets/CWidgetHelper.php:1099
+#: include/classes/widgets/CWidgetHelper.php:770
+#: include/classes/widgets/CWidgetHelper.php:845
+#: include/classes/widgets/CWidgetHelper.php:1113
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/configuration.graph.edit.js.php:148
 #: include/views/js/monitoring.sysmaps.js.php:36
@@ -15250,8 +15250,8 @@ msgstr "Tên bảo mật"
 #: app/views/popup.condition.common.php:398 app/views/popup.generic.php:646
 #: app/views/popup.services.php:132 app/views/popup.triggerexpr.php:73
 #: include/classes/html/CMultiSelect.php:86
-#: include/classes/widgets/CWidgetHelper.php:357
-#: include/classes/widgets/CWidgetHelper.php:573 include/forms.inc.php:260
+#: include/classes/widgets/CWidgetHelper.php:371
+#: include/classes/widgets/CWidgetHelper.php:587 include/forms.inc.php:260
 #: include/views/configuration.graph.edit.php:202
 #: include/views/configuration.graph.edit.php:289
 #: include/views/configuration.item.edit.php:96
@@ -16019,9 +16019,9 @@ msgstr "Tốc độ"
 msgid "Stacked"
 msgstr "Xếp chồng"
 
-#: include/classes/widgets/CWidgetHelper.php:745
-#: include/classes/widgets/CWidgetHelper.php:788
-#: include/classes/widgets/CWidgetHelper.php:1037
+#: include/classes/widgets/CWidgetHelper.php:759
+#: include/classes/widgets/CWidgetHelper.php:802
+#: include/classes/widgets/CWidgetHelper.php:1051
 msgid "Staircase"
 msgstr "Staircase"
 
@@ -16935,9 +16935,9 @@ msgstr "Chu kỳ thời gian"
 #: app/controllers/CControllerPopupTriggerExpr.php:169
 #: app/controllers/CControllerPopupTriggerExpr.php:183
 #: app/controllers/CControllerPopupTriggerExpr.php:212
-#: include/classes/widgets/CWidgetHelper.php:757
-#: include/classes/widgets/CWidgetHelper.php:833
-#: include/classes/widgets/CWidgetHelper.php:1102
+#: include/classes/widgets/CWidgetHelper.php:771
+#: include/classes/widgets/CWidgetHelper.php:847
+#: include/classes/widgets/CWidgetHelper.php:1116
 msgid "Time shift"
 msgstr "Di chuyển mốc thời gian"
 
@@ -17046,19 +17046,19 @@ msgstr "Chuyển đổi kết quả truy vấn SQL thành một mảng JSON đ�
 msgid "Transform SQL query result into a JSON array."
 msgstr "Chuyển đổi kết quả truy vấn SQL thành một mảng JSON."
 
-#: include/classes/widgets/CWidgetHelper.php:747
-#: include/classes/widgets/CWidgetHelper.php:791
-#: include/classes/widgets/CWidgetHelper.php:792
-#: include/classes/widgets/CWidgetHelper.php:793
-#: include/classes/widgets/CWidgetHelper.php:794
-#: include/classes/widgets/CWidgetHelper.php:795
-#: include/classes/widgets/CWidgetHelper.php:796
-#: include/classes/widgets/CWidgetHelper.php:797
-#: include/classes/widgets/CWidgetHelper.php:798
-#: include/classes/widgets/CWidgetHelper.php:799
-#: include/classes/widgets/CWidgetHelper.php:800
-#: include/classes/widgets/CWidgetHelper.php:801
-#: include/classes/widgets/CWidgetHelper.php:1058
+#: include/classes/widgets/CWidgetHelper.php:761
+#: include/classes/widgets/CWidgetHelper.php:805
+#: include/classes/widgets/CWidgetHelper.php:806
+#: include/classes/widgets/CWidgetHelper.php:807
+#: include/classes/widgets/CWidgetHelper.php:808
+#: include/classes/widgets/CWidgetHelper.php:809
+#: include/classes/widgets/CWidgetHelper.php:810
+#: include/classes/widgets/CWidgetHelper.php:811
+#: include/classes/widgets/CWidgetHelper.php:812
+#: include/classes/widgets/CWidgetHelper.php:813
+#: include/classes/widgets/CWidgetHelper.php:814
+#: include/classes/widgets/CWidgetHelper.php:815
+#: include/classes/widgets/CWidgetHelper.php:1072
 msgid "Transparency"
 msgstr "Công khai"
 
@@ -17066,9 +17066,9 @@ msgstr "Công khai"
 msgid "Transport error."
 msgstr "Lỗi đường truyền."
 
-#: include/classes/widgets/CWidgetHelper.php:753
-#: include/classes/widgets/CWidgetHelper.php:828
-#: include/classes/widgets/CWidgetHelper.php:1090
+#: include/classes/widgets/CWidgetHelper.php:767
+#: include/classes/widgets/CWidgetHelper.php:842
+#: include/classes/widgets/CWidgetHelper.php:1104
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "Coi là 0"
@@ -18797,19 +18797,19 @@ msgstr "Khi hoạt động"
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widget quá nhỏ so với số lượng cột và hàng được chỉ định."
 
-#: graphs.php:44 include/classes/widgets/CWidgetHelper.php:741
-#: include/classes/widgets/CWidgetHelper.php:774
-#: include/classes/widgets/CWidgetHelper.php:775
-#: include/classes/widgets/CWidgetHelper.php:776
-#: include/classes/widgets/CWidgetHelper.php:777
-#: include/classes/widgets/CWidgetHelper.php:778
-#: include/classes/widgets/CWidgetHelper.php:779
-#: include/classes/widgets/CWidgetHelper.php:780
-#: include/classes/widgets/CWidgetHelper.php:781
-#: include/classes/widgets/CWidgetHelper.php:782
-#: include/classes/widgets/CWidgetHelper.php:783
-#: include/classes/widgets/CWidgetHelper.php:784
-#: include/classes/widgets/CWidgetHelper.php:1042
+#: graphs.php:44 include/classes/widgets/CWidgetHelper.php:755
+#: include/classes/widgets/CWidgetHelper.php:788
+#: include/classes/widgets/CWidgetHelper.php:789
+#: include/classes/widgets/CWidgetHelper.php:790
+#: include/classes/widgets/CWidgetHelper.php:791
+#: include/classes/widgets/CWidgetHelper.php:792
+#: include/classes/widgets/CWidgetHelper.php:793
+#: include/classes/widgets/CWidgetHelper.php:794
+#: include/classes/widgets/CWidgetHelper.php:795
+#: include/classes/widgets/CWidgetHelper.php:796
+#: include/classes/widgets/CWidgetHelper.php:797
+#: include/classes/widgets/CWidgetHelper.php:798
+#: include/classes/widgets/CWidgetHelper.php:1056
 #: include/views/configuration.graph.edit.php:91
 #: include/views/configuration.graph.list.php:137
 #: include/views/js/monitoring.sysmaps.js.php:117
@@ -18991,10 +18991,10 @@ msgstr "Giá trị cực tiểu trục Y"
 msgid "Y axis side"
 msgstr "Trục bên Y"
 
-#: include/classes/widgets/CWidgetHelper.php:754
-#: include/classes/widgets/CWidgetHelper.php:830
-#: include/classes/widgets/CWidgetHelper.php:831
-#: include/classes/widgets/CWidgetHelper.php:1096
+#: include/classes/widgets/CWidgetHelper.php:768
+#: include/classes/widgets/CWidgetHelper.php:844
+#: include/classes/widgets/CWidgetHelper.php:845
+#: include/classes/widgets/CWidgetHelper.php:1110
 msgid "Y-axis"
 msgstr "Trục Y"
 
@@ -19901,8 +19901,8 @@ msgstr "máy chủ"
 msgid "host group"
 msgstr "nhóm máy chủ"
 
-#: include/classes/widgets/CWidgetHelper.php:616
-#: include/classes/widgets/CWidgetHelper.php:976
+#: include/classes/widgets/CWidgetHelper.php:630
+#: include/classes/widgets/CWidgetHelper.php:990
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr "mẫu máy chủ"
@@ -20037,8 +20037,8 @@ msgstr "item"
 msgid "item \"%1$s\" on host \"%2$s\" is not monitored"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:636
-#: include/classes/widgets/CWidgetHelper.php:993
+#: include/classes/widgets/CWidgetHelper.php:650
+#: include/classes/widgets/CWidgetHelper.php:1007
 msgid "item pattern"
 msgstr "item mẫu"
 
@@ -20240,7 +20240,7 @@ msgstr "không có dữ liệu"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr "nodata() - Không nhận được dữ liệu trong khoảng thời gian T (1 - đúng, 0 - sai), Chế độ (nghiêm ngặt - bỏ qua thời gian trễ proxy trong việc gửi dữ liệu)"
 
-#: include/classes/widgets/CWidgetHelper.php:1104 include/graphs.inc.php:74
+#: include/classes/widgets/CWidgetHelper.php:1118 include/graphs.inc.php:74
 msgid "none"
 msgstr "không"
 
@@ -20487,8 +20487,8 @@ msgstr "thông tin được cung cấp không phải là duy nhất"
 #: app/views/monitoring.host.view.php:62
 #: app/views/monitoring.problem.view.php:252
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/widgets/CWidgetHelper.php:475
-#: include/classes/widgets/CWidgetHelper.php:522 include/forms.inc.php:1979
+#: include/classes/widgets/CWidgetHelper.php:489
+#: include/classes/widgets/CWidgetHelper.php:536 include/forms.inc.php:1979
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.maintenance.edit.php:176
 #: include/views/configuration.template.list.php:47
@@ -20683,8 +20683,8 @@ msgstr "số phiên bản không được hỗ trợ"
 #: app/views/popup.itemtestedit.view.php:82
 #: include/classes/html/CMacroValue.php:121
 #: include/classes/html/CMacroValue.php:129
-#: include/classes/widgets/CWidgetHelper.php:485
-#: include/classes/widgets/CWidgetHelper.php:530
+#: include/classes/widgets/CWidgetHelper.php:499
+#: include/classes/widgets/CWidgetHelper.php:544
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
 #: include/forms.inc.php:1984
