@@ -42,6 +42,7 @@ const (
 	devtypePrefix     = "DEVTYPE="
 	diskstatLocation  = "/proc/diskstats"
 	devTypeRom        = 5
+	devTypeRomString  = "rom"
 )
 
 type devRecord struct {
@@ -63,19 +64,22 @@ func (p *Plugin) getDiscovery() (out string, err error) {
 	devs := make([]*devRecord, 0)
 	for _, entry := range entries {
 		bypass := 0
-		if stat, tmperr := os.Stat(devLocation + entry.Name()); tmperr == nil {
+		devname := devLocation + entry.Name()
+		if stat, tmperr := os.Stat(devname); tmperr == nil {
 			if stat.Mode()&os.ModeType == os.ModeDevice {
 				dev := &devRecord{Name: entry.Name()}
 				if sysfs {
 					rdev := stat.Sys().(*syscall.Stat_t).Rdev
-					if lstat, tmperr := os.Lstat(devLocation + entry.Name()); tmperr == nil {
-						filename := fmt.Sprintf("%s%d:%d/device/type", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
+					dirname := fmt.Sprintf("%s%d:%d/", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
+
+					if lstat, tmperr := os.Lstat(devname); tmperr == nil {
+						filename := dirname + "/device/type"
 						if file, tmperr := os.Open(filename); tmperr == nil {
 							var devtype int
 
 							if _, tmperr = fmt.Fscanf(file, "%d\n", &devtype); tmperr == nil {
 								if devtype == devTypeRom {
-									dev.Type = "rom"
+									dev.Type = devTypeRomString
 									if lstat.Mode()&os.ModeSymlink != 0 {
 										bypass = 1
 									}
@@ -86,7 +90,7 @@ func (p *Plugin) getDiscovery() (out string, err error) {
 					}
 
 					if dev.Type == "" {
-						filename := fmt.Sprintf("%s%d:%d/uevent", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
+						filename := dirname + "uevent"
 						if file, tmperr := os.Open(filename); tmperr == nil {
 							scanner := bufio.NewScanner(file)
 							for scanner.Scan() {
