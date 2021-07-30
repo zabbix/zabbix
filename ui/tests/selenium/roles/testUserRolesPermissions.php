@@ -112,12 +112,12 @@ class testUserRolesPermissions extends CWebTest {
 			// Map creation/edit.
 			[
 				[
-					'buttons' => [
+					'page_buttons' => [
 						'Create map',
 						'Import',
 						'Delete'
 					],
-					'button_texts' => [
+					'form_button' => [
 						'Edit map'
 					],
 					'list_link' => 'sysmaps.php',
@@ -129,11 +129,11 @@ class testUserRolesPermissions extends CWebTest {
 			// Dashboard creation/edit.
 			[
 				[
-					'buttons' => [
+					'page_buttons' => [
 						'Create dashboard',
 						'Delete'
 					],
-					'button_texts' => [
+					'form_button' => [
 						'Edit dashboard'
 					],
 					'list_link' => 'zabbix.php?action=dashboard.list',
@@ -146,11 +146,11 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'maintenance' => true,
-					'buttons' => [
+					'page_buttons' => [
 						'Create maintenance period',
 						'Delete'
 					],
-					'button_texts' => [
+					'form_button' => [
 						'Update',
 						'Clone',
 						'Delete',
@@ -166,13 +166,13 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'report' => true,
-					'buttons' => [
+					'page_buttons' => [
 						'Create report',
 						'Enable',
 						'Disable',
 						'Delete'
 					],
-					'button_texts' => [
+					'form_button' => [
 						'Update',
 						'Clone',
 						'Test',
@@ -199,16 +199,15 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			$this->page->open($data['list_link']);
 
-			foreach ($data['buttons'] as $button) {
-				$this->query('class:list-table')->asTable()->waitUntilReady()->one()->getRow(0)->select();
+			$this->query('class:list-table')->asTable()->waitUntilReady()->one()->getRow(0)->select();
+			foreach ($data['page_buttons'] as $button) {
 				$this->assertTrue($this->query('button', $button)->one()->isEnabled($action_status));
 			}
-			$this->page->open((array_key_exists('report', $data))
-					? 'zabbix.php?action=scheduledreport.edit&reportid='.self::$reportid
-					: $data['action_link']);
-			$this->page->waitUntilReady();
+			$this->page->open((array_key_exists('report', $data)) ? 'zabbix.php?action=scheduledreport.edit&reportid='.
+					self::$reportid : $data['action_link']
+			)->waitUntilReady();
 
-			foreach ($data['button_texts'] as $text) {
+			foreach ($data['form_button'] as $text) {
 				$this->assertTrue($this->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));
 			}
 
@@ -264,7 +263,7 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag')
-					->query('link', 'No')->one()->click();
+					->query('link', 'No')->one()->waitUntilCLickable()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
 			$this->changeRoleRule([$data['action'] => ($action_status === true) ? false : true]);
@@ -298,7 +297,6 @@ class testUserRolesPermissions extends CWebTest {
 
 			// Problem widget in dashboard.
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
-			$this->page->waitUntilReady();
 			$table = $this->query('xpath:(//table[@class="list-table"])[10]')->waitUntilVisible()->asTable()->one();
 			$this->assertTrue($table->query('xpath://*[text()="No"]')->one()->isClickable($action_status));
 
@@ -312,7 +310,8 @@ class testUserRolesPermissions extends CWebTest {
 
 			// Overview page.
 			$this->page->open('overview.php?type=0')->waitUntilReady();
-			$this->query('class:list-table')->asTable()->one()->query('xpath://td[@class="disaster-bg cursor-pointer"]')->one()->click();
+			$this->query('class:list-table')->asTable()->one()->query('xpath://td[@class="disaster-bg cursor-pointer"]')
+					->one()->click();
 			$this->page->waitUntilReady();
 
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
@@ -434,8 +433,7 @@ class testUserRolesPermissions extends CWebTest {
 		$this->query('button:Scan directory')->one()->click();
 		$this->query('class:list-table')->asTable()->one()->findRows(['Name' => '5th Module'])->select();
 		$this->query('button:Enable')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
+		$this->page->acceptAlert()->waitUntilReady();
 
 		foreach ([true, false] as $action_status) {
 			$page_number = $this->query('xpath://ul[@class="menu-main"]/li/a')->count();
@@ -1029,8 +1027,8 @@ class testUserRolesPermissions extends CWebTest {
 				$main_section->waitUntilReady()->one()->click();
 				$element = $this->query('xpath://a[text()="'.$data['section'].'"]/../ul[@class="submenu"]')->one();
 				CElementQuery::wait()->until(function () use ($element) {
-				return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
-						' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
+					return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
+							' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
 				});
 			}
 
@@ -1146,8 +1144,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		foreach ([true, false] as $action_status) {
 			if ($action_status) {
-				$this->page->open('zabbix.php?action=user.token.list');
-				$this->page->waitUntilReady();
+				$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
 				$this->changeRoleRule(['Manage API tokens' => false]);
 			}
 			else {
@@ -1169,10 +1166,8 @@ class testUserRolesPermissions extends CWebTest {
 			$this->query('button:Go to "'.$page.'"')->one()->waitUntilClickable()->click();
 
 			if ($page === 'Dashboard') {
-				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl()->waitUntilReady());
 			}
-
-			$this->page->waitUntilReady();
 		}
 	}
 
@@ -1182,17 +1177,17 @@ class testUserRolesPermissions extends CWebTest {
 	 * @param array $action		action with true/false status or UI section with page
 	 */
 	private function changeRoleRule($action) {
-		$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$super_roleid);
-		$this->page->waitUntilReady();
+		$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$super_roleid)->waitUntilReady();
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 		$form->fill($action);
 		$form->submit();
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'User role updated');
 	}
 
 	private function clickSignout() {
 		$this->query('xpath://a[@class="icon-signout"]')->waitUntilPresent()->one()->click();
-		$this->query('button:Sign in')->waitUntilVisible()->one();
 		$this->page->waitUntilReady();
+		$this->query('button:Sign in')->waitUntilVisible()->one();
 	}
 }
