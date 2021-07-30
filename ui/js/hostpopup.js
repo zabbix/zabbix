@@ -10,11 +10,11 @@ const host_popup = {
 					? {groupids: JSON.parse(event.target.dataset.hostgroups)}
 					: {};
 
+				this.edit(options, {'backurl': window.location.href});
+
 				const url = new Curl('zabbix.php', false);
 				url.setArgument('action', 'host.create');
 				history.pushState({}, '', url.getUrl());
-
-				this.edit(options);
 			}
 			else if (event.target.classList.contains('js-edit-host')) {
 				let hostid = null;
@@ -26,7 +26,7 @@ const host_popup = {
 					hostid = new Curl(event.target.href).getArgument('hostid')
 				}
 
-				this.edit({hostid:  hostid});
+				this.edit({hostid:  hostid}, {'backurl': window.location.href});
 
 				history.pushState({}, '', event.target.getAttribute('href'));
 
@@ -35,10 +35,10 @@ const host_popup = {
 		}, {capture: true});
 	},
 
-	edit(options = {}) {
+	edit(host_data = {}, options) {
 		this.pauseRefresh();
 
-		const overlay = PopUp('popup.host.edit', options, 'host_edit', document.activeElement);
+		const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			postMessageOk(e.detail.title);
@@ -50,7 +50,10 @@ const host_popup = {
 			// reload || refresh;
 		});
 
-		overlay.$dialogue[0].addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
+		overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			history.pushState({}, '', options.backurl);
+			this.resumeRefresh()
+		}, {once: true});
 	},
 
 	pauseRefresh() {},

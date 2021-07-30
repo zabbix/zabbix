@@ -1,4 +1,3 @@
-<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,8 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_AUDIT_H
+#define ZABBIX_AUDIT_H
 
-/**
- * Configuration host edit controller for popup form.
- */
-final class CControllerPopupHostEdit extends CControllerHostEdit {}
+#include "common.h"
+
+int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
+		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		const char *output, const char *error);
+
+#endif	/* ZABBIX_AUDIT_H */

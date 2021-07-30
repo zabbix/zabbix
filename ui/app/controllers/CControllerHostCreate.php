@@ -36,10 +36,7 @@ class CControllerHostCreate extends CController {
 			'mainInterfaces'	=> 'array',
 			'groups'			=> 'required|array',
 			'tags'				=> 'array',
-			'templates'			=> 'array_db hosts.hostid',
 			'add_templates'		=> 'array_db hosts.hostid',
-			'rem_templates'		=> 'array_db hosts.hostid',
-			'clear_templates'	=> 'array_db hosts.hostid',
 			'ipmi_authtype'		=> 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
 									IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM,
 									IPMI_AUTHTYPE_RMCP_PLUS
@@ -94,7 +91,7 @@ class CControllerHostCreate extends CController {
 			'tags' => $this->processTags(),
 			'templates' => zbx_toObject($this->getInput('add_templates', []), 'templateid'),
 			'macros' => $this->processUserMacros(),
-			'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) == HOST_INVENTORY_DISABLED)
+			'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) != HOST_INVENTORY_DISABLED)
 				? $this->getInput('host_inventory', [])
 				: [],
 			'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
@@ -103,8 +100,8 @@ class CControllerHostCreate extends CController {
 
 		$this->getInputs($host, [
 			'host', 'visiblename', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege',
-			'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer',
-			'tls_psk_identity', 'tls_psk', 'inventory_mode'
+			'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk',
+			'inventory_mode'
 		]);
 
 		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
@@ -121,7 +118,7 @@ class CControllerHostCreate extends CController {
 		]);
 
 		$output = [];
-		if (($hostids = API::Host()->create($host)) !== false) {
+		if (($hostids = API::Host()->create($host)) !== false && $this->createValueMaps((int) $hostids['hostids'][0])) {
 			$output += [
 				'hostid' => $hostids['hostids'][0],
 				'message' => _('Host added')
@@ -233,4 +230,22 @@ class CControllerHostCreate extends CController {
 		return zbx_toObject($groups, 'groupid');
 	}
 
+	/**
+	 * Create valuemaps.
+	 *
+	 * @param int $hostid
+	 *
+	 * @return bool
+	 */
+	private function createValueMaps(int $hostid): bool {
+		$valuemaps = array_map(function ($valuemap) use ($hostid) {
+			return $valuemap + ['hostid' => $hostid];
+		}, $this->getInput('valuemaps', []));
+
+		if ($valuemaps && !API::ValueMap()->create($valuemaps)) {
+			return false;
+		}
+
+		return true;
+	}
 }

@@ -112,9 +112,9 @@ class CControllerHostUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-
 		$host = [
 			'hostid' => $this->host['hostid'],
+			'host' => $this->getInput('host', $this->host['host']),
 			'name' => $this->getInput('visiblename', $this->host['name']),
 			'status' => $this->getInput('status', $this->host['status']),
 			'proxy_hostid' => $this->getInput('proxy_hostid', $this->host['proxy_hostid']),
@@ -124,20 +124,20 @@ class CControllerHostUpdate extends CController {
 			'templates' => $this->processTemplates(),
 			'clear_templates' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
 			'macros' => $this->processUserMacros(),
-			'inventory' => ($this->getInput('inventory_mode', $this->host['inventory_mode']) == HOST_INVENTORY_DISABLED)
-				? []
-				: $this->getInput('host_inventory', []),
+			'inventory' => ($this->getInput('inventory_mode', $this->host['inventory_mode']) != HOST_INVENTORY_DISABLED)
+				? $this->getInput('host_inventory', [])
+				: [],
 			'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
 			'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])
 		];
 
 		$host_properties = [
-			'host', 'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-			'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
+			'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_subject',
+			'tls_issuer', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
 		];
 		foreach ($host_properties as $prop) {
 			if ($this->getInput($prop, '') !== $this->host[$prop]) {
-				$this->getInput($prop, '');
+				$host[$prop] = $this->getInput($prop, '');
 			}
 		}
 
@@ -150,12 +150,8 @@ class CControllerHostUpdate extends CController {
 			unset($host['tls_issuer'], $host['tls_subject']);
 		}
 
-		$host = CArrayHelper::renameKeys($host, [
-			'visiblename' => 'name'
-		]);
-
 		$output = [];
-		if (($hostids = API::Host()->update($host)) !== false) {
+		if (($hostids = API::Host()->update($host)) !== false && $this->processValueMaps()) {
 			$output += [
 				'hostid' => $hostids['hostids'][0],
 				'message' => _('Host updated')
@@ -276,5 +272,46 @@ class CControllerHostUpdate extends CController {
 		return zbx_toObject(array_merge($this->getInput('add_templates', []), $this->getInput('templates', [])),
 			'templateid'
 		);
+	}
+
+	/**
+	 * Save valuemaps.
+	 *
+	 * @return bool
+	 */
+	private function processValueMaps(): bool {
+		$valuemaps = $this->getInput('valuemaps', []);
+		$ins_valuemaps = [];
+		$upd_valuemaps = [];
+
+		$del_valuemapids = API::ValueMap()->get([
+			'output' => [],
+			'hostids' => $this->host['hostid'],
+			'preservekeys' => true
+		]);
+
+		foreach ($valuemaps as $valuemap) {
+			if (array_key_exists('valuemapid', $valuemap)) {
+				$upd_valuemaps[] = $valuemap;
+				unset($del_valuemapids[$valuemap['valuemapid']]);
+			}
+			else {
+				$ins_valuemaps[] = $valuemap + ['hostid' => $this->host['hostid']];
+			}
+		}
+
+		if ($upd_valuemaps && !API::ValueMap()->update($upd_valuemaps)) {
+			return false;
+		}
+
+		if ($ins_valuemaps && !API::ValueMap()->create($ins_valuemaps)) {
+			return false;
+		}
+
+		if ($del_valuemapids && !API::ValueMap()->delete(array_keys($del_valuemapids))) {
+			return false;
+		}
+
+		return true;
 	}
 }

@@ -4054,6 +4054,180 @@ class CApiInputValidatorTest extends TestCase {
 				'2fdcb2e2995080b2bba202067f730136',
 				'/uuid',
 				'Invalid parameter "/uuid": UUIDv4 is expected.'
+			],
+			[
+				['type' => API_CUIDS],
+				[],
+				'/',
+				[]
+			],
+			[
+				['type' => API_CUIDS, 'flags' => API_ALLOW_NULL],
+				null,
+				'/',
+				null
+			],
+			[
+				['type' => API_CUIDS],
+				['ckr3d7iou000wld1pcx24d56a', 'ckr3d7iou000vld1pie3h3gj8', 'ckr3d7iou000uld1p4xdyp4md'],
+				'/',
+				['ckr3d7iou000wld1pcx24d56a', 'ckr3d7iou000vld1pie3h3gj8', 'ckr3d7iou000uld1p4xdyp4md']
+			],
+			[
+				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
+				'ckr3d7iov0013ld1pbi9r18dg',
+				'/',
+				['ckr3d7iov0013ld1pbi9r18dg']
+			],
+			[
+				['type' => API_CUIDS],
+				'',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
+				'',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_CUIDS],
+				true,
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_CUIDS],
+				null,
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
+				null,
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_CUIDS],
+				'ckr3d7iov0013ld1pbi9r18dg',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
+				'skr3d7iov0013ld1pbi9r18dg',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
+				'Ckr3d7iov0013ld1pbi9r18dg',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_CUIDS, 'flags' => API_NORMALIZE],
+				'ckr3d7iov0013ld1pbi9r18d',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_CUIDS],
+				['ckr3d7iou000wld1pcx24d56a', 'akr3d7iou000vld1pie3h3gj8', 'ckr3d7iou000uld1p4xdyp4md'],
+				'/',
+				'Invalid parameter "/2": CUID is expected.'
+			],
+			[
+				['type' => API_CUIDS],
+				['ckr3d7iou000wld1pcx24d56a', 'ckr3d7iou000vld1pie3h3gj8123', 'ckr3d7iou000uld1p4xdyp4md'],
+				'/',
+				'Invalid parameter "/2": must be 25 characters long.'
+			],
+			[
+				['type' => API_CUIDS],
+				[1, 'ckr3d7iou000vld1pie3h3gj8123', 'ckr3d7iou000uld1p4xdyp4md'],
+				'/',
+				'Invalid parameter "/1": a character string is expected.'
+			],
+			[
+				['type' => API_CUIDS],
+				[true, 'ckr3d7iou000vld1pie3h3gj8123', 'ckr3d7iou000uld1p4xdyp4md'],
+				'/',
+				'Invalid parameter "/1": a character string is expected.'
+			],
+			[
+				['type' => API_CUIDS],
+				[null, 'ckr3d7iou000vld1pie3h3gj8123', 'ckr3d7iou000uld1p4xdyp4md'],
+				'/',
+				'Invalid parameter "/1": a character string is expected.'
+			],
+			[
+				['type' => API_CUIDS, 'uniq' => true],
+				['ckr3d7iou000wld1pcx24d56a', 'ckr3d7iou000vld1pie3h3gj8', 'ckr3d7iou000uld1p4xdyp4md'],
+				'/',
+				['ckr3d7iou000wld1pcx24d56a', 'ckr3d7iou000vld1pie3h3gj8', 'ckr3d7iou000uld1p4xdyp4md']
+			],
+			[
+				['type' => API_CUIDS, 'uniq' => true],
+				['ckr3d7iou000wld1pcx24d56a', 'ckr3d7iou000wld1pcx24d56a', 'ckr3d7iou000uld1p4xdyp4md'],
+				'/',
+				'Invalid parameter "/2": value (ckr3d7iou000wld1pcx24d56a) already exists.'
+			],
+			[
+				['type' => API_CUID],
+				'ckr3d7iou000wld1pcx24d56a',
+				'/',
+				'ckr3d7iou000wld1pcx24d56a'
+			],
+			[
+				['type' => API_CUID],
+				'Skr3d7iou000wld1pcx24d56a',
+				'/',
+				'Invalid parameter "/": CUID is expected.'
+			],
+			[
+				['type' => API_CUID],
+				'Ckr3d7iou000wld1pcx24d56a',
+				'/',
+				'Invalid parameter "/": CUID is expected.'
+			],
+			[
+				['type' => API_CUID],
+				'ckr3d7iou000wld1pcx24d56a2',
+				'/',
+				'Invalid parameter "/": must be 25 characters long.'
+			],
+			[
+				['type' => API_CUID],
+				'ckr3d7iou000wld1pcx24d56',
+				'/',
+				'Invalid parameter "/": must be 25 characters long.'
+			],
+			[
+				['type' => API_CUID],
+				'ckr3d7iou000wld1pcx24d56ā',
+				'/',
+				'Invalid parameter "/": must be 25 characters long.'
+			],
+			[
+				['type' => API_CUID],
+				1,
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_CUID],
+				true,
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_CUID],
+				null,
+				'/',
+				'Invalid parameter "/": a character string is expected.'
 			]
 		];
 	}

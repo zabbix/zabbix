@@ -87,9 +87,9 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'Action' => 'Update',
 						'ID' => 1,
 						'Details' => [
-							'config.tls_accept: 1 => 2',
-							'config.tls_psk_identity: ****** => ******',
-							'config.tls_psk: ****** => ******'
+							'autoregistration.tls_accept: 1 => 2',
+							'autoregistration.tls_psk: ****** => ******',
+							'autoregistration.tls_psk_identity: ****** => ******'
 						]
 					]
 				]
@@ -105,7 +105,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'Resource' => 'Autoregistration',
 						'Action' => 'Update',
 						'ID' => 1,
-						'Details' => ['config.tls_accept: 2 => 3']
+						'Details' => ['autoregistration.tls_accept: 2 => 3']
 					]
 				]
 			],
@@ -121,9 +121,9 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'Action' => 'Update',
 						'ID' => 1,
 						'Details' => [
-							'config.tls_accept: 3 => 1',
-							'config.tls_psk_identity: ****** => ******',
-							'config.tls_psk: ****** => ******'
+							'autoregistration.tls_accept: 3 => 1',
+							'autoregistration.tls_psk: ****** => ******',
+							'autoregistration.tls_psk_identity: ****** => ******'
 						]
 					]
 				]

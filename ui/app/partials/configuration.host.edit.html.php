@@ -232,7 +232,7 @@ $host_tab = (new CFormGrid())
 		]).
 	');'.
 	'hostInterfaceManager.render();'.
-	(($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) ? 'HostInterfaceManager.makeReadonly();' : '')
+	(($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) ? 'hostInterfaceManager.makeReadonly();' : '')
 ))
 	->setOnDocumentReady()
 	->show();
@@ -296,7 +296,7 @@ else {
 		$linked_template_table->addRow([
 			[
 				$template_link,
-				(new CVar('templates[' . $template['templateid'] . ']', $template['templateid']))->removeId()
+				(new CVar('templates[]', $template['templateid']))->removeId()
 			],
 			(new CCol(
 				new CHorList([
@@ -321,8 +321,7 @@ else {
 				'srcfld2' => 'host',
 				'dstfrm' => $host_form->getName(),
 				'dstfld1' => 'add_templates_',
-//				'disable_selected' => true,
-//				'disableids' => []
+				'disableids' => array_column($data['host']['parentTemplates'], 'templateid')
 			]
 		]
 	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);

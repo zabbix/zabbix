@@ -30,12 +30,15 @@ static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *v
 	{													\
 		vector->values_num = 0;										\
 		vector->values_alloc = 32;									\
-		vector->values = (__type *)vector->mem_malloc_func(NULL, vector->values_alloc * sizeof(__type));		\
+		vector->values = (__type *)vector->mem_malloc_func(NULL, (size_t)vector->values_alloc *		\
+				sizeof(__type));								\
 	}													\
 	else if (vector->values_num == vector->values_alloc)							\
 	{													\
-		vector->values_alloc = MAX(vector->values_alloc + 1, vector->values_alloc * ZBX_VECTOR_ARRAY_GROWTH_FACTOR); \
-		vector->values = (__type *)vector->mem_realloc_func(vector->values, vector->values_alloc * sizeof(__type)); \
+		vector->values_alloc = MAX(vector->values_alloc + 1, vector->values_alloc *			\
+				ZBX_VECTOR_ARRAY_GROWTH_FACTOR);						\
+		vector->values = (__type *)vector->mem_realloc_func(vector->values,				\
+				(size_t)vector->values_alloc * sizeof(__type));					\
 	}													\
 }														\
 														\
@@ -91,8 +94,8 @@ void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __typ
 void	zbx_vector_ ## __id ## _append_array(zbx_vector_ ## __id ## _t *vector, __type const *values,		\
 									int values_num)				\
 {														\
-	zbx_vector_ ## __id ## _reserve(vector, vector->values_num + values_num);				\
-	memcpy(vector->values + vector->values_num, values, values_num * sizeof(__type));			\
+	zbx_vector_ ## __id ## _reserve(vector, (size_t)(vector->values_num + values_num));			\
+	memcpy(vector->values + vector->values_num, values, (size_t)values_num * sizeof(__type));		\
 	vector->values_num = vector->values_num + values_num;							\
 }														\
 														\
@@ -117,13 +120,13 @@ void	zbx_vector_ ## __id ## _remove(zbx_vector_ ## __id ## _t *vector, int index
 														\
 	vector->values_num--;											\
 	memmove(&vector->values[index], &vector->values[index + 1],						\
-			sizeof(__type) * (vector->values_num - index));						\
+			sizeof(__type) * (size_t)(vector->values_num - index));					\
 }														\
 														\
 void	zbx_vector_ ## __id ## _sort(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
 {														\
 	if (2 <= vector->values_num)										\
-		qsort(vector->values, vector->values_num, sizeof(__type), compare_func);			\
+		qsort(vector->values, (size_t)vector->values_num, sizeof(__type), compare_func);		\
 }														\
 														\
 void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
@@ -173,7 +176,8 @@ int	zbx_vector_ ## __id ## _bsearch(const zbx_vector_ ## __id ## _t *vector, con
 {														\
 	__type	*ptr;												\
 														\
-	ptr = (__type *)zbx_bsearch(&value, vector->values, vector->values_num, sizeof(__type), compare_func);	\
+	ptr = (__type *)zbx_bsearch(&value, vector->values, (size_t)vector->values_num, sizeof(__type),		\
+			compare_func);										\
 														\
 	if (NULL != ptr)											\
 		return (int)(ptr - vector->values);								\
@@ -240,7 +244,7 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 		if (0 < deleted++)										\
 		{												\
 			memmove(&left->values[block_start - deleted + 1], &left->values[block_start],		\
-							(left_index - 1 - block_start) * sizeof(__type));	\
+					(size_t)(left_index - 1 - block_start) * sizeof(__type));		\
 		}												\
 														\
 		block_start = left_index;									\
@@ -249,7 +253,7 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 	if (0 < deleted)											\
 	{													\
 		memmove(&left->values[block_start - deleted], &left->values[block_start],			\
-							(left->values_num - block_start) * sizeof(__type));	\
+				(size_t)(left->values_num - block_start) * sizeof(__type));			\
 		left->values_num -= deleted;									\
 	}													\
 }														\
@@ -259,7 +263,8 @@ void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t s
 	if ((int)size > vector->values_alloc)									\
 	{													\
 		vector->values_alloc = (int)size;								\
-		vector->values = (__type *)vector->mem_realloc_func(vector->values, vector->values_alloc * sizeof(__type)); \
+		vector->values = (__type *)vector->mem_realloc_func(vector->values,				\
+				(size_t)vector->values_alloc * sizeof(__type));					\
 	}													\
 }														\
 														\
@@ -272,7 +277,8 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 														\
 ZBX_VECTOR_IMPL(__id, __type)											\
 														\
-void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func)	\
+void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
+		zbx_ ## __id ## _free_func_t free_func)								\
 {														\
 	if (0 != vector->values_num)										\
 	{													\

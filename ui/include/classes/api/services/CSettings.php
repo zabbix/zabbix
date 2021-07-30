@@ -52,7 +52,7 @@ class CSettings extends CApiService {
 		'snmptrap_logging', 'default_lang', 'default_timezone', 'login_attempts', 'login_block', 'validate_uri_schemes',
 		'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 		'max_overview_table_size', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
-		'item_test_timeout', 'url', 'report_test_timeout'
+		'item_test_timeout', 'url', 'report_test_timeout', 'auditlog_enabled'
 	];
 
 	/**
@@ -162,7 +162,7 @@ class CSettings extends CApiService {
 		$field_names = ['search_limit', 'max_in_table', 'server_check_interval', 'show_technical_errors',
 			'custom_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style',
 			'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging', 'login_attempts',
-			'validate_uri_schemes', 'iframe_sandboxing_enabled', 'max_overview_table_size'
+			'validate_uri_schemes', 'iframe_sandboxing_enabled', 'max_overview_table_size', 'auditlog_enabled'
 		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $settings) && $settings[$field_name] != $db_settings[$field_name]) {
@@ -253,7 +253,8 @@ class CSettings extends CApiService {
 			'script_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'url' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'url')],
-			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300']
+			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
+			'auditlog_enabled' =>				['type' => API_INT32, 'in' => '0,1']
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

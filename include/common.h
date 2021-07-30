@@ -824,6 +824,7 @@ typedef struct
 	zbx_uint64_t	userid;
 	zbx_user_type_t	type;
 	zbx_uint64_t	roleid;
+	char		*username;
 }
 zbx_user_t;
 
@@ -1666,9 +1667,6 @@ char	*zbx_create_token(zbx_uint64_t seed);
 
 int	zbx_str_extract(const char *text, size_t len, char **value);
 
-#define AUDIT_ACTION_EXECUTE	7
-#define AUDIT_RESOURCE_SCRIPT	25
-
 typedef enum
 {
 	ZBX_TIME_UNIT_UNKNOWN,
@@ -1712,6 +1710,14 @@ int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
 
+/* audit logging mode */
+#define ZBX_AUDITLOG_DISABLED	0
+#define ZBX_AUDITLOG_ENABLED	1
+
+/* includes terminating '\0' */
+#define CUID_LEN	26
+void	zbx_new_cuid(char *cuid);
+
 /* report scheduling */
 
 #define ZBX_REPORT_CYCLE_DAILY		0
@@ -1725,5 +1731,9 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 /* */
 char	*zbx_substr(const char *src, size_t left, size_t right);
 char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
+
+/* UTF-8 trimming */
+void	zbx_ltrim_utf8(char *str, const char *charlist);
+void	zbx_rtrim_utf8(char *str, const char *charlist);
 
 #endif

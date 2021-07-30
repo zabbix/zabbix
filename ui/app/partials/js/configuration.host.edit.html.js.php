@@ -137,6 +137,7 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 					}
 
 					event.target.closest('tr').remove();
+					this.resetNewTemplatesField();
 				}
 				else if (event.target.classList.contains('js-tmpl-unlink-and-clear')) {
 					if (event.target.dataset.templateid === undefined) {
@@ -150,8 +151,42 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 					event.target.form.appendChild(clear_tmpl);
 
 					event.target.closest('tr').remove();
+					this.resetNewTemplatesField();
 				}
 			});
+		},
+
+		resetNewTemplatesField() {
+			var $old_ms = $('#add_templates_'),
+				$new_ms = $('<div>'),
+				linked_templates = [],
+				data = $old_ms.multiSelect('getData');
+
+			document.querySelectorAll('[name="templates[]').forEach(i => {
+				linked_templates.push(i.value);
+			});
+
+			$('#add_templates_').parent().html($new_ms);
+
+			$new_ms
+				.addClass('multiselect active')
+				.css('width', '<?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px')
+				.attr('id', 'add_templates_')
+				.multiSelectHelper({
+					object_name: 'templates',
+					name: 'add_templates[]',
+					data: data,
+					popup: {
+						parameters: {
+							srctbl: 'templates',
+							srcfld1: 'hostid',
+							dstfrm: '<?= $data['form_name'] ?>',
+							dstfld1: 'add_templates_',
+							multiselect: '1',
+							disableids: linked_templates
+						}
+					}
+				});
 		},
 
 		initMacrosTab() {
