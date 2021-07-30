@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 12:03+0300\n"
+"POT-Creation-Date: 2021-07-30 19:55+0300\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -17740,11 +17740,11 @@ msgstr ""
 msgid "Ukrainian (uk_UA)"
 msgstr "烏克蘭語 (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:245
+#: include/classes/core/CConfigFile.php:249
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:254
+#: include/classes/core/CConfigFile.php:258
 msgid "Unable to create the configuration file."
 msgstr ""
 
@@ -17771,7 +17771,7 @@ msgstr ""
 msgid "Unable to load settings API parameters."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:250
+#: include/classes/core/CConfigFile.php:254
 msgid "Unable to overwrite the existing configuration file."
 msgstr ""
 
