@@ -24,7 +24,7 @@ class CControllerHostList extends CController {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'page'                => 'ge 1',
 			'tags'                => 'array',
@@ -55,11 +55,11 @@ class CControllerHostList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		if (hasRequest('filter_set')) {
 			CProfile::update('web.hosts.filter_ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hosts.filter_dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
@@ -85,6 +85,7 @@ class CControllerHostList extends CController {
 				$filter_tags['values'][] = $filter_tag['value'];
 				$filter_tags['operators'][] = $filter_tag['operator'];
 			}
+
 			CProfile::updateArray('web.hosts.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.hosts.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.hosts.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
@@ -125,9 +126,14 @@ class CControllerHostList extends CController {
 			];
 		}
 
-		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
-		$tags = $this->getInput('tags', []);
+		if (!$filter['tags']) {
+			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+		}
+		else {
+			CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
+		}
 
+		$tags = $this->getInput('tags', []);
 		foreach ($tags as $key => $tag) {
 			// remove empty new tag lines
 			if ($tag['tag'] === '' && $tag['value'] === '') {
