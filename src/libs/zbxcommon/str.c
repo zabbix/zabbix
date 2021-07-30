@@ -3050,8 +3050,8 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
  *     force_quote - [IN] if non zero then context quoting is enforced        *
  *                                                                            *
  * Return value:                                                              *
- *     A string containing quoted macro context. This string must be freed by *
- *     the caller.                                                            *
+ *     A string containing quoted macro context on success, otherwise NULL    *
+ *     if context ends with '\'. This string must be freed by the caller.     *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)

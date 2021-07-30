@@ -5600,9 +5600,12 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
  *                                                                            *
  * Purpose: expand discovery macro in user macro context                      *
  *                                                                            *
- * Parameters: data      - [IN/OUT] the expression containing lld macro       *
- *             token     - [IN/OUT] the token with user macro location data   *
- *             jp_row    - [IN] discovery data                                *
+ * Parameters: data          - [IN/OUT] the expression containing lld macro   *
+ *             token         - [IN/OUT] the token with user macro location    *
+ *                                      data                                  *
+ *             jp_row        - [IN] discovery data                            *
+ *             error         - [OUT]error buffer                              *
+ *             max_error_len - [IN] the size of error buffer                  *
  *                                                                            *
  ******************************************************************************/
 static int	process_user_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
@@ -5636,7 +5639,11 @@ static int	process_user_macro_token(char **data, zbx_token_t *token, const struc
 	}
 	else
 	{
-		zbx_snprintf(error, max_error_len, "quoted context \"%s\" cannot end with '\\' character", context);
+		if (NULL != error)
+		{
+			zbx_snprintf(error, max_error_len, "quoted context \"%s\" cannot end with '\\' character",
+					context);
+		}
 		ret = FAIL;
 	}
 
