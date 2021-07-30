@@ -33,17 +33,63 @@ class CControllerHostEdit extends CController {
 	 */
 	protected $host;
 
+	/**
+	 * Full clone hostid.
+	 *
+	 * @var ?int
+	 */
+	protected $full_clone_hostid;
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'hostid' => 'db hosts.hostid',
-			'groupids' => 'array_db hosts_groups.groupid'
+			'hostid'			=> 'db hosts.hostid',
+			'groupids'			=> 'array_db hosts_groups.groupid',
+			'clone'				=> 'in 1',
+			'full_clone'		=> 'in 1',
+			'host'				=> 'db hosts.host',
+			'visiblename'		=> 'db hosts.name',
+			'description'		=> 'db hosts.description',
+			'status'			=> 'db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
+										HOST_STATUS_NOT_MONITORED
+									]),
+			'proxy_hostid'		=> 'db hosts.proxy_hostid',
+			'interfaces'		=> 'array',
+			'mainInterfaces'	=> 'array',
+			'groups'			=> 'array',
+			'tags'				=> 'array',
+			'templates'			=> 'array_db hosts.hostid',
+			'add_templates'		=> 'array_db hosts.hostid',
+			'ipmi_authtype'		=> 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
+										IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM,
+										IPMI_AUTHTYPE_RMCP_PLUS
+									]),
+			'ipmi_privilege'	=> 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER,
+										IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM
+									]),
+			'ipmi_username'		=> 'db hosts.ipmi_username',
+			'ipmi_password'		=> 'db hosts.ipmi_password',
+			'tls_connect'		=> 'db hosts.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK,
+										HOST_ENCRYPTION_CERTIFICATE
+									]),
+			'tls_accept'		=> 'db hosts.tls_accept|ge 0|le '.
+										(0 | HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
+			'tls_subject'		=> 'db hosts.tls_subject',
+			'tls_issuer'		=> 'db hosts.tls_issuer',
+			'tls_psk_identity'	=> 'db hosts.tls_psk_identity',
+			'tls_psk'			=> 'db hosts.tls_psk',
+			'inventory_mode'	=> 'db host_inventory.inventory_mode|in '.implode(',', [HOST_INVENTORY_DISABLED,
+										HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC
+									]),
+			'host_inventory'	=> 'array',
+			'macros'			=> 'array',
+			'valuemaps'			=> 'array'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = ($this->validateInput($fields) && $this->checkFullCloneSource());
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -52,26 +98,37 @@ class CControllerHostEdit extends CController {
 		return $ret;
 	}
 
+	protected function checkFullCloneSource() {
+		return !($this->hasInput('full_clone') && !$this->hasInput('hostid'));
+	}
+
 	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
 			return false;
 		}
 
 		if ($this->hasInput('hostid')) {
-			$this->host = API::Host()->get([
-				'output' => API_OUTPUT_EXTEND,
-				'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
-				'selectGroups' => ['groupid'],
-				'selectHostDiscovery' => ['parent_hostid'],
-				'selectInterfaces' => API_OUTPUT_EXTEND,
-				'selectInventory' => API_OUTPUT_EXTEND,
-				'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
-				'selectParentTemplates' => ['templateid', 'name'],
-				'selectTags' => API_OUTPUT_EXTEND,
-				'selectValueMaps' => API_OUTPUT_EXTEND,
-				'hostids' => $this->getInput('hostid'),
-				'editable' => true
-			]);
+			$this->full_clone_hostid = $this->hasInput('full_clone') ? $this->getInput('hostid') : null;
+
+			if ($this->hasInput('full_clone') || $this->hasInput('clone')) {
+				$this->host = [['hostid' => null]];
+			}
+			else {
+				$this->host = API::Host()->get([
+					'output' => API_OUTPUT_EXTEND,
+					'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
+					'selectGroups' => ['groupid'],
+					'selectHostDiscovery' => ['parent_hostid'],
+					'selectInterfaces' => API_OUTPUT_EXTEND,
+					'selectInventory' => API_OUTPUT_EXTEND,
+					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
+					'selectParentTemplates' => ['templateid', 'name'],
+					'selectTags' => API_OUTPUT_EXTEND,
+					'selectValueMaps' => API_OUTPUT_EXTEND,
+					'hostids' => $this->getInput('hostid'),
+					'editable' => true
+				]);
+			}
 
 			if (!$this->host) {
 				return false;
@@ -90,6 +147,7 @@ class CControllerHostEdit extends CController {
 		$data = [
 			'form_action' => $this->host['hostid'] ? 'host.update' : 'host.create',
 			'hostid' => $this->host['hostid'],
+			'full_clone_hostid' => $this->full_clone_hostid,
 			'host' => $this->host,
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'user' => [
@@ -267,20 +325,64 @@ class CControllerHostEdit extends CController {
 	}
 
 	/**
-	 * Returns array with host input values.
+	 * Returns array with post input values.
 	 *
 	 * @return array
 	 */
 	protected function getInputValues(): array {
-		$values = [];
+		$inputs = [];
 
-		if (!$this->host && $this->hasInput('groupids')) {
-			$values['groups'] = array_map(function ($groupid) {
-				return ['groupid' => $groupid];
-			}, $this->getInput('groupids'));
+		if ($this->hasInput('clone') || $this->hasInput('full_clone')) {
+			$inputs['groups'] = zbx_toObject($this->getInput('groups', []), 'groupid');
+
+			$inputs['name'] = $this->getInput('visiblename', '');
+			$inputs['inventory'] = $this->getInput('host_inventory', []);
+
+			$this->getInputs($inputs, [
+				'host', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+				'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk', 'tags', 'inventory_mode',
+				'host_inventory'
+			]);
+
+			$field_add_templates = $this->getInput('add_templates', []);
+			$field_templates = $this->getInput('templates', []);
+			$linked_templates = API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => array_merge($field_add_templates, $field_templates),
+				'preservekeys' => true
+			]);
+
+			$inputs['macros'] = array_map(function ($macro) {
+				unset($macro['hostmacroid']);
+
+				return $macro;
+			}, $this->getInput('macros', []));
+
+			$inputs['valuemaps'] = array_map(function ($valuemap) {
+				unset($valuemap['valuemapid']);
+
+				return $valuemap;
+			}, $this->getInput('valuemaps', []));
+
+			$inputs['interfaces'] = array_map(function ($interface) {
+				unset($interface['interfaceid']);
+
+				return $interface;
+			}, $this->getInput('interfaces', []));
+
+			$inputs['parentTemplates'] = array_intersect_key($linked_templates, array_flip($field_templates));
+			$inputs['add_templates'] = array_map(function ($tmpl) {
+				return CArrayHelper::renameKeys($tmpl, ['templateid' => 'id']);
+			}, array_intersect_key($linked_templates, array_flip($field_add_templates)));
+		}
+		elseif (!$this->host) {
+			// Prefill host groups when creating a new host.
+			$inputs['groups'] = $this->hasInput('groupids')
+				? zbx_toObject($this->getInput('groupids'), 'groupid')
+				: [];
 		}
 
-		return $values;
+		return $inputs;
 	}
 
 	/**

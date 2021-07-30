@@ -47,17 +47,15 @@ else {
 		],
 		[
 			'title' => _('Clone'),
-			'class' => 'btn-alt',
+			'class' => 'btn-alt js-clone-host',
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'return clone(overlay);'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Full clone'),
-			'class' => 'btn-alt',
+			'class' => 'btn-alt js-full-clone-host',
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'return fullClone(overlay);'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete selected host?'),
@@ -98,7 +96,33 @@ $inline_js =
 
 	'$("#tabs").on("change", () => {'.
 		'overlays_stack.end().centerDialog();'.
-	'});';
+	'});'.
+
+	'var cloneBtn = document.querySelector(".js-clone-host");'.
+	'if (cloneBtn) {'.
+		'cloneBtn.addEventListener("click", function () {'.
+			'var $form = overlays_stack.end().$dialogue.find("form"),'.
+				'curl = curl = new Curl(null, false);'.
+
+			'curl.setArgument("clone", 1);'.
+
+			'PopUp("popup.host.edit", {...host_edit.getCloneData($form[0]), "clone": 1}, "host_edit");'.
+			'history.pushState({}, "", curl.getUrl());'.
+		'});'.
+	'}'.
+
+	'var fullCloneBtn = document.querySelector(".js-full-clone-host");'.
+	'if (fullCloneBtn) {'.
+		'fullCloneBtn.addEventListener("click", function () {'.
+			'var $form = overlays_stack.end().$dialogue.find("form"),'.
+				'curl = curl = new Curl(null, false);'.
+
+			'curl.setArgument("full_clone", 1);'.
+
+			'PopUp("popup.host.edit", {...host_edit.getCloneData($form[0]), "full_clone": 1}, "host_edit");'.
+			'history.pushState({}, "", curl.getUrl());'.
+		'});'.
+	'}';
 
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),

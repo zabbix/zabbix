@@ -387,6 +387,21 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			document.body.appendChild(form);
 
 			form.submit();
+		},
+
+		getCloneData(form) {
+			var fields = getFormFields(form);
+
+			// Groups are not extracted properly by getFormFields.
+			fields.groups = [];
+			form.querySelectorAll('[name^="groups[]"]').forEach(group => {
+				fields.groups.push(group.value);
+			});
+
+			delete fields.action;
+			delete fields.sid;
+
+			return fields;
 		}
 	};
 </script>
