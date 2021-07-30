@@ -3088,6 +3088,12 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 		*ptr_buffer++ = *context++;
 	}
 
+	if ('\\' == *(ptr_buffer - 1))
+	{
+		zbx_free(buffer);
+		return NULL;
+	}
+
 	*ptr_buffer++ = '"';
 	*ptr_buffer++ = '\0';
 

@@ -5605,17 +5605,17 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
  *             jp_row    - [IN] discovery data                                *
  *                                                                            *
  ******************************************************************************/
-static void	process_user_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths)
+static int	process_user_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths,  char *error, size_t max_error_len)
 {
-	int			force_quote;
+	int			force_quote, ret;
 	size_t			context_r;
 	char			*context, *context_esc;
 	zbx_token_user_macro_t	*macro = &token->data.user_macro;
 
 	/* user macro without context, nothing to replace */
 	if (0 == token->data.user_macro.context.l)
-		return;
+		return SUCCEED;
 
 	force_quote = ('"' == (*data)[macro->context.l]);
 	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
@@ -5624,15 +5624,25 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, const stru
 	substitute_lld_macros(&context, jp_row, lld_macro_paths, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO, NULL,
 			0);
 
-	context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
+	if (NULL != (context_esc = zbx_user_macro_quote_context_dyn(context, force_quote)))
+	{
+		context_r = macro->context.r;
+		zbx_replace_string(data, macro->context.l, &context_r, context_esc);
 
-	context_r = macro->context.r;
-	zbx_replace_string(data, macro->context.l, &context_r, context_esc);
+		token->loc.r += context_r - macro->context.r;
 
-	token->loc.r += context_r - macro->context.r;
+		zbx_free(context_esc);
+		ret = SUCCEED;
+	}
+	else
+	{
+		zbx_snprintf(error, max_error_len, "quoted context \"%s\" cannot end with '\\' character", context);
+		ret = FAIL;
+	}
 
-	zbx_free(context_esc);
 	zbx_free(context);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -5999,7 +6009,8 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, cons
 					pos = token.loc.r;
 					break;
 				case ZBX_TOKEN_USER_MACRO:
-					process_user_macro_token(data, &token, jp_row, lld_macro_paths);
+					ret = process_user_macro_token(data, &token, jp_row, lld_macro_paths, error,
+							max_error_len);
 					pos = token.loc.r;
 					break;
 				case ZBX_TOKEN_SIMPLE_MACRO:
