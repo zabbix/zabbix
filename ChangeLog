@@ -2168,6 +2168,8 @@ Changes for 4.0.33rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
+..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
 A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
 ........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
 ...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)
