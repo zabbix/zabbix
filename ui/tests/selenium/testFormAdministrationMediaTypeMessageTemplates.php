@@ -32,7 +32,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			' ORDER BY mt.mediatypeid';
 
 	public static function prepareMediaTypeMessageTemplatesData() {
-		 CDataHelper::call('mediatype.create', [
+		CDataHelper::call('mediatype.create', [
 			[
 				'name'=> 'Email (HTML) Service',
 				'type'=> 0,
@@ -61,32 +61,32 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				]
 			],
 			[
-				 'name'=> 'Email Service',
-				 'type'=> 0,
-				 'smtp_server' => 'apimail@company.com',
-				 'smtp_helo'=> 'zabbix.com',
-				 'smtp_email'=> 'zabbix@company.com',
-				 'message_templates' => [
-					 [
-						 'eventsource' => 4,
-						 'recovery' => 0,
-						 'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
-						 'message' => '<b>Service problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br><b>Service problem name:</b> {EVENT.NAME}<br><b>Service:</b> {SERVICE.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br><br>{SERVICE.ROOTCAUSE}'
-					 ],
-					 [
-						 'eventsource' => 4,
-						 'recovery' => 1,
-						 'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
-						 'message' => '<b>Service "{SERVICE.NAME}" has been resolved</b> at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> {EVENT.DURATION}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
-					 ],
-					 [
-						 'eventsource' => 4,
-						 'recovery' => 2,
-						 'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
-						 'message' => '<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is {EVENT.AGE}.<br><br>{SERVICE.ROOTCAUSE}'
-					 ]
-				 ]
-			 ]
+				'name'=> 'Email Service',
+				'type'=> 0,
+				'smtp_server' => 'apimail@company.com',
+				'smtp_helo'=> 'zabbix.com',
+				'smtp_email'=> 'zabbix@company.com',
+				'message_templates' => [
+					[
+						'eventsource' => 4,
+						'recovery' => 0,
+						'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
+						'message' => '<b>Service problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br><b>Service problem name:</b> {EVENT.NAME}<br><b>Service:</b> {SERVICE.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br><br>{SERVICE.ROOTCAUSE}'
+					],
+					[
+						'eventsource' => 4,
+						'recovery' => 1,
+						'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
+						'message' => '<b>Service "{SERVICE.NAME}" has been resolved</b> at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> {EVENT.DURATION}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
+					],
+					[
+						'eventsource' => 4,
+						'recovery' => 2,
+						'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
+						'message' => '<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is {EVENT.AGE}.<br><br>{SERVICE.ROOTCAUSE}'
+					]
+				]
+			]
 		]);
 
 		CDataHelper::call('mediatype.create', [
