@@ -971,11 +971,11 @@ abstract class CGraphGeneral extends CApiService {
 		foreach ($graphs as $graphid => $graph) {
 			$same_name_graphs[$graph['name']][] = $graphid;
 
-			if ($graph['ymin_itemid'] > 0) {
+			if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid'] > 0) {
 				$itemids[$graph['ymin_itemid']] = true;
 			}
 
-			if ($graph['ymax_itemid'] > 0) {
+			if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid'] > 0) {
 				$itemids[$graph['ymax_itemid']] = true;
 			}
 
@@ -1200,11 +1200,11 @@ abstract class CGraphGeneral extends CApiService {
 
 				$_graph['uuid'] = '';
 
-				if ($_graph['ymin_itemid'] != 0) {
+				if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $_graph['ymin_itemid'] != 0) {
 					$_graph['ymin_itemid'] = $item_links[$_graph['ymin_itemid']][$hostid];
 				}
 
-				if ($_graph['ymax_itemid'] != 0) {
+				if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $_graph['ymax_itemid'] != 0) {
 					$_graph['ymax_itemid'] = $item_links[$_graph['ymax_itemid']][$hostid];
 				}
 
