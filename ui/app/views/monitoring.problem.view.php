@@ -77,7 +77,6 @@ if ($data['action'] === 'problem.view') {
 	$this->addJsFile('class.calendar.js');
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('flickerfreescreen.js');
-	$this->addJsFile('multiselect.js');
 	$this->addJsFile('layout.mode.js');
 	$this->addJsFile('class.tabfilter.js');
 	$this->addJsFile('class.tabfilteritem.js');

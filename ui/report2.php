@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 
 $page['title'] = _('Availability report');
 $page['file'] = 'report2.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'multiselect.js', 'report2.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'report2.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';

@@ -24,7 +24,6 @@
  */
 
 $this->includeJsFile('administration.miscconfig.edit.js.php');
-$this->addJsFile('multiselect.js');
 
 $widget = (new CWidget())
 	->setTitle(_('Other configuration parameters'))

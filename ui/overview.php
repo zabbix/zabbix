@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['layout.mode.js', 'multiselect.js', 'monitoring.overview.js', 'class.tagfilteritem.js'];
+$page['scripts'] = ['layout.mode.js', 'monitoring.overview.js', 'class.tagfilteritem.js'];
 $page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 define('ZBX_PAGE_DO_REFRESH', 1);

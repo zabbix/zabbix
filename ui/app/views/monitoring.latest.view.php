@@ -23,11 +23,8 @@
  * @var CView $this
  */
 
-$scripts = ['class.calendar.js', 'gtlc.js', 'layout.mode.js'];
-
-foreach($scripts as $script) {
-	$this->addJsFile($script);
-}
+$this->addJsFile('layout.mode.js');
+$this->addJsFile('class.tagfilteritem.js');
 
 $this->includeJsFile('monitoring.latest.view.js.php');
 

@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmaps.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['multiselect.js', 'class.tab-indicators.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

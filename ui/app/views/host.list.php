@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('configuration.host.list.js.php');
 
 $widget = (new CWidget())
@@ -41,16 +42,6 @@ $widget = (new CWidget())
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
-$filter_tags = $data['filter']['tags'];
-
-if (!$filter_tags) {
-	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
-}
-
-$filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
-	'evaltype' => $data['filter']['evaltype'],
-	'tags' => $filter_tags
-]);
 $action_url = (new CUrl('zabbix.php'))->setArgument('action', $data['action']);
 
 $filter = (new CFilter($action_url))
@@ -134,7 +125,10 @@ $filter = (new CFilter($action_url))
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
-			->addRow(_('Tags'), $filter_tags_table)
+			->addRow(_('Tags'), CTagFilterFieldHelper::getTagFilterField([
+				'evaltype' => $data['filter']['evaltype'],
+				'tags' => $data['filter']['tags']
+			]))
 	]);
 
 $widget->addItem($filter);
