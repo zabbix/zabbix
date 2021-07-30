@@ -32,8 +32,8 @@ $data += [
 		]
 		: [
 			new CSubmit('update', _('Update')),
-			new CSubmit('clone', _('Clone')),
-			new CSubmit('full_clone', _('Full clone')),
+			new CButton('clone', _('Clone')),
+			new CButton('full_clone', _('Full clone')),
 			(new CButton('delete', _('Delete')))
 				->onClick("return confirm(".json_encode(_('Delete selected host?')).")
 					? host_edit.deleteHost()
@@ -51,7 +51,7 @@ $data += [
 
 (new CScriptTag(
 	'document.getElementById("'.$data['form_name'].'").addEventListener("submit", function (event) {'.
-		'host_edit.submit(this, this.closest("main"));'.
+		'host_edit.submit(this);'.
 		'event.preventDefault();'.
 	'});'.
 
@@ -69,7 +69,41 @@ $data += [
 			'url.setArgument("action", "host.list");'.
 			'window.location = url.getUrl();'.
 		'}'.
-	'});'
+	'});'.
+
+	'var cloneBtn = document.getElementById("clone");'.
+	'if (cloneBtn) {'.
+		'cloneBtn.addEventListener("click", function () {'.
+			'var curl = new Curl("zabbix.php", false),'.
+				'fields = host_edit.getCloneData(this.form);'.
+
+			'curl.setArgument("action", "host.edit");'.
+			'curl.setArgument("clone", 1);'.
+
+			'for (const [k, v] of Object.entries(fields)) {'.
+				'curl.setArgument(k, v);'.
+			'}'.
+
+			'redirect(curl.getUrl(), "post");'.
+		'});'.
+	'}'.
+
+	'var fullCloneBtn = document.getElementById("full_clone");'.
+	'if (fullCloneBtn) {'.
+		'fullCloneBtn.addEventListener("click", function () {'.
+			'var curl = new Curl("zabbix.php", false),'.
+				'fields = host_edit.getCloneData(this.form);'.
+
+			'curl.setArgument("action", "host.edit");'.
+			'curl.setArgument("full_clone", 1);'.
+
+			'for (const [k, v] of Object.entries(fields)) {'.
+				'curl.setArgument(k, v);'.
+			'}'.
+
+			'redirect(curl.getUrl(), "post");'.
+		'});'.
+	'}'
 ))
 	->setOnDocumentReady()
 	->show();

@@ -32,6 +32,7 @@ $host_form = (new CForm())
 	->setName($data['form_name'])
 	->addVar('action', $data['form_action'])
 	->addVar('hostid', $data['hostid'])
+	->addVar('full_clone_hostid', $data['full_clone_hostid'])
 	->addItem(getMessages())
 	->addItem((new CInput('submit'))->addStyle('display: none;'));
 
@@ -314,6 +315,7 @@ else {
 	$add_templates_ms = (new CMultiSelect([
 		'name' => 'add_templates[]',
 		'object_name' => 'templates',
+		'data' => array_key_exists('add_templates', $data['host']) ? $data['host']['add_templates'] : [],
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'templates',

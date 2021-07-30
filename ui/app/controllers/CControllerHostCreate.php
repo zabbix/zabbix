@@ -60,7 +60,8 @@ class CControllerHostCreate extends CController {
 								]),
 			'host_inventory'	=> 'array',
 			'macros'			=> 'array',
-			'valuemaps'			=> 'array'
+			'valuemaps'			=> 'array',
+			'full_clone_hostid' => 'db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -78,7 +79,20 @@ class CControllerHostCreate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		$ret = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+
+		if ($ret && $this->hasInput('full_clone_hostid')) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => $this->getInput('full_clone_hostid')
+			]);
+
+			if (!$hosts) {
+				$ret = false;
+			}
+		}
+
+		return $ret;
 	}
 
 	protected function doAction(): void {
@@ -117,8 +131,12 @@ class CControllerHostCreate extends CController {
 			'visiblename' => 'name'
 		]);
 
+		$src_hostid = $this->getInput('full_clone_hostid', false);
 		$output = [];
-		if (($hostids = API::Host()->create($host)) !== false && $this->createValueMaps((int) $hostids['hostids'][0])) {
+
+		if (($hostids = API::Host()->create($host)) !== false
+				&& $this->createValueMaps((int) $hostids['hostids'][0])
+				&& (!$src_hostid || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
 			$output += [
 				'hostid' => $hostids['hostids'][0],
 				'message' => _('Host added')
@@ -244,6 +262,82 @@ class CControllerHostCreate extends CController {
 
 		if ($valuemaps && !API::ValueMap()->create($valuemaps)) {
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Copy http tests, items, triggers, discovery rules and graphs from source host to target host.
+	 *
+	 * @param int $src_hostid  Source hostid.
+	 * @param int $hostid      Target hostid.
+	 *
+	 * @return bool
+	 */
+	private function copyFromCloneSourceHost(int $src_hostid, int $hostid): bool {
+
+		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
+		if (!copyHttpTests($src_hostid, $hostid)) {
+			return false;
+		}
+
+		if (!copyItems($src_hostid, $hostid)) {
+			return false;
+		}
+
+		// Copy triggers.
+		$db_triggers = API::Trigger()->get([
+			'output' => ['triggerid'],
+			'hostids' => $src_hostid,
+			'inherited' => false,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
+
+		if ($db_triggers && !copyTriggersToHosts(array_column($db_triggers, 'triggerid'), $hostid, $src_hostid)) {
+			return false;
+		}
+
+		// Copy discovery rules.
+		$db_discovery_rules = API::DiscoveryRule()->get([
+			'output' => ['itemid'],
+			'hostids' => $src_hostid,
+			'inherited' => false
+		]);
+
+		if ($db_discovery_rules) {
+			$copy_discovery_rules = API::DiscoveryRule()->copy([
+				'discoveryids' => array_column($db_discovery_rules, 'itemid'),
+				'hostids' => [$hostid]
+			]);
+
+			if (!$copy_discovery_rules) {
+				return false;
+			}
+		}
+
+		// Copy graphs.
+		$db_graphs = API::Graph()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => ['hostid'],
+			'selectItems' => ['type'],
+			'hostids' => $src_hostid,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+			'inherited' => false
+		]);
+
+		foreach ($db_graphs as $db_graph) {
+			if (count($db_graph['hosts']) > 1) {
+				continue;
+			}
+
+			if (httpItemExists($db_graph['items'])) {
+				continue;
+			}
+
+			if (!copyGraphToHost($db_graph['graphid'], $hostid)) {
+				return false;
+			}
 		}
 
 		return true;
