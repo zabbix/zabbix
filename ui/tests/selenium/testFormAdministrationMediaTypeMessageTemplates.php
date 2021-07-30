@@ -840,8 +840,9 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 							'action' => 'Add',
 							'Subject' => 'New service subject !@#$%^&*()_+ōš六書',
 							'Message' => 'New service message !@#$%^&*()_+ōš六書'
-						],
-					]
+						]
+					],
+					'rows' => 3
 				]
 			]
 		];
