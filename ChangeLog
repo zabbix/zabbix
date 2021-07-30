@@ -1,8 +1,17 @@
 Changes for 5.0.15rc1
 
 New features:
+...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.D........ [ZBX-18523] added documentation for Hostname parameter in sender (dgoloscapov)
+..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
+...G...... [ZBX-19116] fixed system.cpu.util for agent2 not working in non-English Windows (arimdjonoks)
+..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
+A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
+...G...... [ZBX-19732] fixed Zabbix agent2 not starting when ListenIP is set to 0.0.0.0 (vso)
+.........T [ZBX-19692] fixed issues with Zyxel templates (abakaldin)
+A......... [ZBX-19124] fixed PHP runtime errors when passed incorrect value for "output" option (Sasha)
 A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
 ........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
 
