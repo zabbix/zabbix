@@ -201,7 +201,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 						'User' => 'Admin',
 						'Description' => 'Token that is already expired when created',
 						'Set expiration date and time' => true,
-						'Expires at' => '01/01/2038 12:00:00 AM',
+						'Expires at' => '2038-01-01 00:00:00',
 						'Enabled' => true
 					],
 					'already_expired' => true,
@@ -216,7 +216,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 						'User' => 'Admin',
 						'Description' => 'Token that will expire only in 2038',
 						'Set expiration date and time' => true,
-						'Expires at' => '01/01/2038 12:00:00 AM',
+						'Expires at' => '2038-01-01 00:00:00',
 						'Enabled' => true
 					],
 					'full_name' => 'Admin (Zabbix Administrator)'
