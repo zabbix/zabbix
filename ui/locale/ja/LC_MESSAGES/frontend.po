@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 11:57+0300\n"
+"POT-Creation-Date: 2021-07-30 19:53+0300\n"
 "PO-Revision-Date: 2021-06-14 04:53+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -17643,11 +17643,11 @@ msgstr "UUIDv4で指定してください"
 msgid "Ukrainian (uk_UA)"
 msgstr "ウクライナ語 (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:245
+#: include/classes/core/CConfigFile.php:249
 msgid "Unable to change configuration file permissions to 0600."
 msgstr "設定ファイルのパーミッションを0600に変更できません。"
 
-#: include/classes/core/CConfigFile.php:254
+#: include/classes/core/CConfigFile.php:258
 msgid "Unable to create the configuration file."
 msgstr "設定ファイルが作成できません。"
 
@@ -17674,7 +17674,7 @@ msgstr "ハウスキーピングAPIの引数が読み込めません。"
 msgid "Unable to load settings API parameters."
 msgstr "設定APIの引数が読み込めません。"
 
-#: include/classes/core/CConfigFile.php:250
+#: include/classes/core/CConfigFile.php:254
 msgid "Unable to overwrite the existing configuration file."
 msgstr "設定ファイルが上書きできません。"
 
