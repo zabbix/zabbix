@@ -23,7 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('class.cviewswitcher.js');
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Discovery rules'));

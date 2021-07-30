@@ -24,7 +24,6 @@
  */
 
 $this->includeJsFile('administration.usergroup.edit.js.php');
-$this->addJsFile('class.tab-indicators.js');
 
 $widget = (new CWidget())->setTitle(_('User groups'));
 

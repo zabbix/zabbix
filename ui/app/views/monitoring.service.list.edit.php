@@ -31,7 +31,6 @@ if ($data['uncheck']) {
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.calendar.js');
-$this->addJsFile('class.tab-indicators.js');
 
 $this->includeJsFile('monitoring.service.list.js.php');
 

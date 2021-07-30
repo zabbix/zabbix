@@ -28,7 +28,6 @@ $this->includeJsFile(($data['action'] === 'user.edit')
 	? 'administration.user.edit.js.php'
 	: 'administration.userprofile.edit.js.php'
 );
-$this->addJsFile('class.tab-indicators.js');
 
 $widget = new CWidget();
 

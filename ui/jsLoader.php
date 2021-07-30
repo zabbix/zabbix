@@ -133,7 +133,7 @@ $availableJScripts = [
 	'setup.js' => 'pages/',
 	'monitoring.overview.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
-	'popup.operation.common.js' => 'pages/',
+	'popup.operation.common.js' => 'pages/'
 ];
 
 $tranStrings = [
@@ -433,7 +433,17 @@ if (empty($_GET['files'])) {
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',
-		'init.js'
+		'init.js',
+		'inputsecret.js',
+		'macrovalue.js',
+		'multiselect.js',
+		'class.cverticalaccordion.js',
+		'class.cviewswitcher.js',
+		'class.tab-indicators.js',
+		'hostinterfacemanager.js',
+		'hostmacrosmanager.js',
+		'hostpopup.js',
+		'textareaflexible.js'
 	];
 
 	require_once dirname(__FILE__).'/include/defines.inc.php';
@@ -460,39 +470,21 @@ else {
 	$files = $_GET['files'];
 }
 
-// Mix in scripts used for host popup functionality to all views (with layout).
-if (!array_key_exists('showGuiMessaging', $_GET)) {
-	$files = array_merge($files, ['inputsecret.js', 'macrovalue.js', 'multiselect.js',  'class.tabfilteritem.js',
-		'class.tab-indicators.js', 'class.tabfilter.js', 'class.tagfilteritem.js', 'class.cverticalaccordion.js',
-		'class.cviewswitcher.js', 'hostinterfacemanager.js', 'hostmacrosmanager.js', 'hostpopup.js',
-		'textareaflexible.js'
-	]);
-}
-
 $js .= 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
+
 foreach ($files as $file) {
-	if (isset($tranStrings[$file])) {
+	if (array_key_exists($file, $tranStrings)) {
 		foreach ($tranStrings[$file] as $origStr => $str) {
 			$js .= 'locale[\'' . $origStr . '\'] = ' . json_encode($str) . ';';
 		}
 	}
 }
 
-$files_included = [];
 foreach ($files as $file) {
-	if (isset($availableJScripts[$file])) {
-		if (array_key_exists($file, $files_included)) {
-			continue;
-		}
-
+	if (array_key_exists($file, $availableJScripts)) {
 		$js .= file_get_contents('js/'.$availableJScripts[$file].$file)."\n";
-		$files_included[$file] = true;
-	}
-	else {
-		throw new Exception($file.' not found in availableJScripts');
 	}
 }
-unset($files_included);
 
 $etag = md5($js);
 /**

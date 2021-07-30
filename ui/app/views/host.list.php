@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('configuration.host.list.js.php');
 
 $widget = (new CWidget())

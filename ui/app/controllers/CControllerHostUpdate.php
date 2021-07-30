@@ -88,7 +88,7 @@ class CControllerHostUpdate extends CController {
 		$this->host = API::Host()->get([
 			'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
 				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
-				'tls_subject', 'flags'
+				'tls_subject', 'flags', 'inventory_mode'
 			],
 			'hostids' => $this->getInput('hostid'),
 			'editable' => true
@@ -99,14 +99,6 @@ class CControllerHostUpdate extends CController {
 		}
 
 		$this->host = $this->host[0];
-
-		// TODO: remove this once fix of ZBX-19555 is delivered into dev-branch.
-		$this->host += [
-			'inventory_mode' => CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE),
-			'tls_psk' => 'tiri-piri!',
-			'tls_psk_identity' => 'tiri-piri!'
-		];
-		// end TODO.
 
 		return true;
 	}
@@ -135,8 +127,9 @@ class CControllerHostUpdate extends CController {
 			'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_subject',
 			'tls_issuer', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
 		];
+
 		foreach ($host_properties as $prop) {
-			if ($this->getInput($prop, '') !== $this->host[$prop]) {
+			if (!array_key_exists($prop, $this->host) || $this->getInput($prop, '') !== $this->host[$prop]) {
 				$host[$prop] = $this->getInput($prop, '');
 			}
 		}

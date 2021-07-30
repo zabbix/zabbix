@@ -26,9 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'items.js', 'class.tab-indicators.js',
-	'class.tagfilteritem.js'
-];
+$page['scripts'] = ['multilineinput.js', 'items.js', 'class.tagfilteritem.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
