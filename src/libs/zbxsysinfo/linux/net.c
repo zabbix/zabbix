@@ -989,16 +989,26 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 
 	if (NULL != port_in && '\0' != *port_in)
 	{
-		if (SUCCEED == is_ushort(port_in, port))
+		if (SUCCEED != is_ushort(port_in, port))
 		{
-			if (0 == *port)
+			size_t	i, len;
+
+			len = strlen(port_in);
+
+			for (i = 0; i < len; i++)
 			{
-				*error = zbx_dsprintf(*error, "Invalid port number: 0");
+				if (0 == isdigit(*(port_in + i)))
+					break;
+			}
+
+			if (i == len)
+			{
+				*error = zbx_dsprintf(*error, "Invalid port number: %s", port_in);
 				goto err;
 			}
-		}
-		else
+
 			service = port_in;
+		}
 	}
 
 	if (NULL == addr && NULL == service)
