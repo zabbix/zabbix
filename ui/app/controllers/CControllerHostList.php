@@ -126,12 +126,7 @@ class CControllerHostList extends CController {
 			];
 		}
 
-		if (!$filter['tags']) {
-			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
-		}
-		else {
-			CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
-		}
+		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
 		$tags = $this->getInput('tags', []);
 		foreach ($tags as $key => $tag) {

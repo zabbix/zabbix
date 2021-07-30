@@ -44,6 +44,10 @@ $widget = (new CWidget())
 
 $action_url = (new CUrl('zabbix.php'))->setArgument('action', $data['action']);
 
+if (!$data['filter']['tags']) {
+	$data['filter']['tags'] = $filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
+
 $filter = (new CFilter($action_url))
 	->setResetUrl($action_url)
 	->setProfile($data['profileIdx'])
