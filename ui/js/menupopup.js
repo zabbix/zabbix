@@ -230,15 +230,13 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			};
 
 			if (options.isWriteable) {
-				if (trigger_elmnt[0].dataset.popupedit) {
-					config.url = 'javascript: host_popup.edit('+JSON.stringify({hostid: options.hostid})+')'
-				}
-				else {
-					var config_url = new Curl('zabbix.php', false);
-					config_url.setArgument('action', 'host.edit');
-					config_url.setArgument('hostid', options.hostid);
-					config.url = config_url.getUrl();
-				}
+				var config_url = new Curl('zabbix.php', false);
+
+				config_url.setArgument('action', 'host.edit');
+				config_url.setArgument('hostid', options.hostid);
+
+				config.class = 'js-edit-host';
+				config.url = config_url.getUrl();
 			}
 			else {
 				config.disabled = true;

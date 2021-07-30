@@ -433,7 +433,6 @@ if (empty($_GET['files'])) {
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',
-		'init.js',
 		'inputsecret.js',
 		'macrovalue.js',
 		'multiselect.js',
@@ -443,7 +442,8 @@ if (empty($_GET['files'])) {
 		'hostinterfacemanager.js',
 		'hostmacrosmanager.js',
 		'hostpopup.js',
-		'textareaflexible.js'
+		'textareaflexible.js',
+		'init.js'
 	];
 
 	require_once dirname(__FILE__).'/include/defines.inc.php';

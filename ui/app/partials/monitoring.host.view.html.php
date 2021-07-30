@@ -43,8 +43,7 @@ $interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JM
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$host_name = (new CLinkAction($host['name']))
-		->setMenuPopup(CMenuPopupHelper::getHost($hostid))
-		->setAttribute('data-popupedit', 1);
+		->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 
 	$interface = null;
 	if ($host['interfaces']) {
