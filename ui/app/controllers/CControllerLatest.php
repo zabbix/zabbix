@@ -49,8 +49,7 @@ abstract class CControllerLatest extends CController {
 
 		// Select hosts for subsequent selection of items.
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'status', 'flags'],
-			'selectParentTemplates' => ['templateid'],
+			'output' => ['hostid', 'name', 'status'],
 			'groupids' => $groupids,
 			'hostids' => $filter['hostids'] ? $filter['hostids'] : null,
 			'monitored_hosts' => true,

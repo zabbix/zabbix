@@ -26,9 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of templates');
 $page['file'] = 'templates.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js', 'macrovalue.js',
-	'class.tab-indicators.js', 'class.tagfilteritem.js', 'hostmacrosmanager.js'
-];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

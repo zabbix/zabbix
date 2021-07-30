@@ -23,16 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
-$this->addJsFile('inputsecret.js');
-$this->addJsFile('macrovalue.js');
-$this->addJsFile('textareaflexible.js');
-$this->addJsFile('class.cviewswitcher.js');
-$this->addJsFile('class.cverticalaccordion.js');
-$this->addJsFile('class.tab-indicators.js');
-$this->addJsFile('hostinterfacemanager.js');
-$this->addJsFile('hostmacrosmanager.js');
-
 $data += [
 	'form_name' => 'host-form',
 	'buttons' => ($data['hostid'] == 0)

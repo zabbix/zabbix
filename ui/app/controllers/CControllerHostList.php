@@ -26,8 +26,8 @@ class CControllerHostList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'action'              => 'in host.list',
 			'page'                => 'ge 1',
+			'tags'                => 'array',
 			// filter
 			'filter_set'          => 'in 1',
 			'filter_rst'          => 'in 1',
@@ -61,22 +61,22 @@ class CControllerHostList extends CController {
 
 	protected function doAction() {
 		if (hasRequest('filter_set')) {
-			CProfile::update('web.hosts.filter_ip', getRequest('filter_ip', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.hosts.filter_dns', getRequest('filter_dns', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.hosts.filter_host', getRequest('filter_host', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.hosts.filter_port', getRequest('filter_port', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.hosts.filter_monitored_by', getRequest('filter_monitored_by', ZBX_MONITORED_BY_ANY),
+			CProfile::update('web.hosts.filter_ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hosts.filter_dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hosts.filter_host', $this->getInput('filter_host', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hosts.filter_port', $this->getInput('filter_port', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hosts.filter_monitored_by', $this->getInput('filter_monitored_by', ZBX_MONITORED_BY_ANY),
 				PROFILE_TYPE_INT
 			);
-			CProfile::updateArray('web.hosts.filter_templates', getRequest('filter_templates', []), PROFILE_TYPE_ID);
-			CProfile::updateArray('web.hosts.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
-			CProfile::updateArray('web.hosts.filter_proxyids', getRequest('filter_proxyids', []), PROFILE_TYPE_ID);
-			CProfile::update('web.hosts.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
+			CProfile::updateArray('web.hosts.filter_templates', $this->getInput('filter_templates', []), PROFILE_TYPE_ID);
+			CProfile::updateArray('web.hosts.filter_groups', $this->getInput('filter_groups', []), PROFILE_TYPE_ID);
+			CProfile::updateArray('web.hosts.filter_proxyids', $this->getInput('filter_proxyids', []), PROFILE_TYPE_ID);
+			CProfile::update('web.hosts.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 				PROFILE_TYPE_INT
 			);
 
 			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
-			foreach (getRequest('filter_tags', []) as $filter_tag) {
+			foreach ($this->getInput('filter_tags', []) as $filter_tag) {
 				if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
 					continue;
 				}
@@ -90,7 +90,6 @@ class CControllerHostList extends CController {
 			CProfile::updateArray('web.hosts.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 		}
 		elseif (hasRequest('filter_rst')) {
-			DBstart();
 			CProfile::delete('web.hosts.filter_ip');
 			CProfile::delete('web.hosts.filter_dns');
 			CProfile::delete('web.hosts.filter_host');
@@ -103,7 +102,6 @@ class CControllerHostList extends CController {
 			CProfile::deleteIdx('web.hosts.filter.tags.tag');
 			CProfile::deleteIdx('web.hosts.filter.tags.value');
 			CProfile::deleteIdx('web.hosts.filter.tags.operator');
-			DBend();
 		}
 
 		$filter = [
@@ -126,9 +124,9 @@ class CControllerHostList extends CController {
 				'operator' => CProfile::get('web.hosts.filter.tags.operator', null, $i)
 			];
 		}
-		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
-		$tags = getRequest('tags', []);
+		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
+		$tags = $this->getInput('tags', []);
 
 		foreach ($tags as $key => $tag) {
 			// remove empty new tag lines
@@ -146,11 +144,11 @@ class CControllerHostList extends CController {
 			}
 		}
 
-		$sort_field = getRequest('sort', CProfile::get('web.'.$this->getAction().'.sort', 'name'));
-		$sort_order = getRequest('sortorder', CProfile::get('web.'.$this->getAction().'.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.hosts.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.hosts.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.'.$this->getAction().'.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.'.$this->getAction().'.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		// Get host groups.
 		$filter['groups'] = $filter['groups']
@@ -222,7 +220,7 @@ class CControllerHostList extends CController {
 
 		// pager
 		if (hasRequest('page')) {
-			$page_num = getRequest('page');
+			$page_num = $this->getInput('page');
 		}
 		elseif (isRequestMethod('get') && !hasRequest('cancel')) {
 			$page_num = 1;
