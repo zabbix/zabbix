@@ -27,6 +27,7 @@ $this->addJsFile('layout.mode.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('class.tabfilter.js');
+$this->addJsFile('class.tabfilteritem.js');
 $this->addJsFile('class.tagfilteritem.js');
 
 $this->enableLayoutModes();
