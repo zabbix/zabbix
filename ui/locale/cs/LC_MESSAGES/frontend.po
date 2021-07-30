@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 11:56+0300\n"
+"POT-Creation-Date: 2021-07-30 19:52+0300\n"
 "PO-Revision-Date: 2021-03-19 17:58+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -17732,11 +17732,11 @@ msgstr "URL"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrajinsky (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:196
+#: include/classes/core/CConfigFile.php:200
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:205
+#: include/classes/core/CConfigFile.php:209
 msgid "Unable to create the configuration file."
 msgstr "Nelze vytvořit konfigurační soubor."
 
@@ -17747,7 +17747,7 @@ msgstr "Nelze vytvořit konfigurační soubor."
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:201
+#: include/classes/core/CConfigFile.php:205
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Nelze přepsat existující konfigurační soubor."
 

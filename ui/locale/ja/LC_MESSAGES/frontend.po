@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 11:56+0300\n"
+"POT-Creation-Date: 2021-07-30 19:52+0300\n"
 "PO-Revision-Date: 2021-06-14 04:52+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -17529,11 +17529,11 @@ msgstr "URL"
 msgid "Ukrainian (uk_UA)"
 msgstr "ウクライナ語 (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:196
+#: include/classes/core/CConfigFile.php:200
 msgid "Unable to change configuration file permissions to 0600."
 msgstr "設定ファイルのパーミッションを0600に変更できません。"
 
-#: include/classes/core/CConfigFile.php:205
+#: include/classes/core/CConfigFile.php:209
 msgid "Unable to create the configuration file."
 msgstr "設定ファイルが作成できません。"
 
@@ -17544,7 +17544,7 @@ msgstr "設定ファイルが作成できません。"
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr "現在のZabbixデータベースのバージョン：%1$sを判断できません。"
 
-#: include/classes/core/CConfigFile.php:201
+#: include/classes/core/CConfigFile.php:205
 msgid "Unable to overwrite the existing configuration file."
 msgstr "設定ファイルが上書きできません。"
 
