@@ -23,15 +23,6 @@
  * @var CView $this
  */
 
-$scripts = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
-	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js', 'hostinterfacemanager.js',
-	'hostpopup.js', 'hostmacrosmanager.js'
-];
-
-foreach ($scripts as $script) {
-	$this->addJsFile($script);
-}
-
 // Overview tab.
 $overviewFormList = new CFormList();
 

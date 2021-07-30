@@ -23,12 +23,7 @@
  * @var CView $this
  */
 
-$scripts = [
-	'class.calendar.js', 'class.cverticalaccordion.js', 'class.cviewswitcher.js', 'class.tabfilter.js',
-	'class.tabfilteritem.js', 'class.tagfilteritem.js', 'class.tab-indicators.js', 'gtlc.js', 'hostinterfacemanager.js',
-	'hostmacrosmanager.js', 'hostpopup.js', 'inputsecret.js', 'macrovalue.js',  'menupopup.js', 'multiselect.js',
-	'layout.mode.js', 'textareaflexible.js'
-];
+$scripts = ['class.calendar.js', 'gtlc.js', 'layout.mode.js'];
 
 foreach($scripts as $script) {
 	$this->addJsFile($script);

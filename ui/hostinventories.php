@@ -25,10 +25,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
-$page['scripts'] = ['layout.mode.js', 'multiselect.js', 'multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js',
-	'class.cverticalaccordion.js', 'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js', 'class.tagfilteritem.js',
-	'hostinterfacemanager.js', 'hostpopup.js', 'hostmacrosmanager.js'
-];
 
 $hostId = getRequest('hostid', 0);
 

@@ -66,14 +66,16 @@ $pageHeader
 		->getUrl()
 	);
 
+$jsloader_url = (new CUrl('jsLoader.php'))
+	->setArgument('ver', ZABBIX_VERSION)
+	->setArgument('lang', $data['user']['lang']);
+
 if ($scripts) {
-	$pageHeader->addJsFile((new CUrl('jsLoader.php'))
-		->setArgument('ver', ZABBIX_VERSION)
-		->setArgument('lang', $data['user']['lang'])
-		->setArgument('files', $scripts)
-		->getUrl()
-	);
+	$jsloader_url->setArgument('files', $scripts);
 }
-$pageHeader->display();
+
+$pageHeader
+	->addJsFile($jsloader_url->getUrl())
+	->display();
 
 echo '<body lang="'.CWebUser::getLang().'">';

@@ -23,16 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
-$this->addJsFile('inputsecret.js');
-$this->addJsFile('macrovalue.js');
-$this->addJsFile('textareaflexible.js');
-$this->addJsFile('class.cviewswitcher.js');
-$this->addJsFile('class.cverticalaccordion.js');
-$this->addJsFile('class.tab-indicators.js');
-$this->addJsFile('hostinterfacemanager.js');
-$this->addJsFile('hostmacrosmanager.js');
-
 $data += [
 	'form_name' => 'host-form',
 	'buttons' => ($data['hostid'] == 0)
@@ -44,8 +34,8 @@ $data += [
 			new CSubmit('update', _('Update')),
 			new CButton('clone', _('Clone')),
 			new CButton('full_clone', _('Full clone')),
-			(new CButton('delete', _('Delete selected host?')))
-				->onClick("return confirm('".json_encode(_('Delete selected host?'))."')
+			(new CButton('delete', _('Delete')))
+				->onClick("return confirm(".json_encode(_('Delete selected host?')).")
 					? host_edit.deleteHost()
 					: false")
 				->setAttribute('data-redirect', (new CUrl('zabbix.php'))

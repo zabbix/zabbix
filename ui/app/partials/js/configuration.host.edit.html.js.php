@@ -364,29 +364,14 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 		},
 
 		deleteHost() {
-			const form = Object.assign(document.createElement('form'), {
-				action: 'zabbix.php',
-				method: 'post',
-				style: 'display:none'
-			});
+			const curl = new Curl('zabbix.php', false);
 			const overlay = overlays_stack.end();
 
-			Object.entries({
-				action: 'host.massdelete',
-				'ids[0]': document.getElementById('hostid').value,
-				backurl: overlay.original_url || '',
-				sid: document.getElementById('sid').value
-			})
-				.forEach(([name, val]) => {
-					let input = document.createElement('input');
-					input.setAttribute('name', name);
-					input.setAttribute('value', val);
-					form.appendChild(input);
-				});
+			curl.setArgument('action', 'host.massdelete');
+			curl.setArgument('ids', [document.getElementById('hostid').value]);
+			curl.setArgument('back_url', overlay?.original_url || '');
 
-			document.body.appendChild(form);
-
-			form.submit();
+			redirect(curl.getUrl(), 'post');
 		},
 
 		getCloneData(form) {

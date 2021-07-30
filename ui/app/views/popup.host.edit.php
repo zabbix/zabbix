@@ -58,7 +58,7 @@ else {
 			'isSubmit' => false
 		],
 		[
-			'title' => _('Delete selected host?'),
+			'title' => _('Delete'),
 			'confirmation' => _('Delete selected host?'),
 			'class' => 'btn-alt',
 			'keepOpen' => true,

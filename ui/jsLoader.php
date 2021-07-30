@@ -460,6 +460,15 @@ else {
 	$files = $_GET['files'];
 }
 
+// Mix in scripts used for host popup functionality to all views (with layout).
+if (!array_key_exists('showGuiMessaging', $_GET)) {
+	$files = array_merge($files, ['inputsecret.js', 'macrovalue.js', 'multiselect.js',  'class.tabfilteritem.js',
+		'class.tab-indicators.js', 'class.tabfilter.js', 'class.tagfilteritem.js', 'class.cverticalaccordion.js',
+		'class.cviewswitcher.js', 'hostinterfacemanager.js', 'hostmacrosmanager.js', 'hostpopup.js',
+		'textareaflexible.js'
+	]);
+}
+
 $js .= 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
@@ -469,15 +478,21 @@ foreach ($files as $file) {
 	}
 }
 
+$files_included = [];
 foreach ($files as $file) {
 	if (isset($availableJScripts[$file])) {
+		if (array_key_exists($file, $files_included)) {
+			continue;
+		}
+
 		$js .= file_get_contents('js/'.$availableJScripts[$file].$file)."\n";
+		$files_included[$file] = true;
 	}
 	else {
 		throw new Exception($file.' not found in availableJScripts');
 	}
 }
-
+unset($files_included);
 
 $etag = md5($js);
 /**
