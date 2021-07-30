@@ -125,8 +125,23 @@ A......... [ZBX-8999] fixed exporting of images separately from other objects (I
 Changes for 5.4.4rc1
 
 New features:
+A.F....... [ZBXNEXT-6528,ZBXNEXT-6569] improved performance of graphs and graphs prototypes configuration process (rlataria, Sasha, vmaksimovs)
+...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
+A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 
 Bug fixes:
+.D........ [ZBX-18523] added documentation for Hostname parameter in sender (dgoloscapov)
+..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
+...G...... [ZBX-19116] fixed system.cpu.util for agent2 not working in non-English Windows (arimdjonoks)
+........S. [ZBX-19524] added UTF-8 support to trigger trim functions (wiper)
+A......... [ZBX-19555] fixed inventory_mode parameter not being returned for host.get with output=extend (jfreibergs)
+..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
+..F....... [ZBX-19547] fixed displaying inherited tags for web scenarios (jfreibergs)
+A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
+..F....... [ZBX-19711] fixed loose validation of aggregated functions in calculated item formulas (averza, wiper)
+...G...... [ZBX-19732] fixed Zabbix agent2 not starting when ListenIP is set to 0.0.0.0 (vso)
+.........T [ZBX-19692] fixed issues with Zyxel templates (abakaldin)
+A......... [ZBX-19124] fixed PHP runtime errors when passed incorrect value for "output" option (Sasha)
 A......... [ZBX-19597] fixed error when value maps API allow to create invalid value mapping of type regexp (gcalenko)
 ........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
 ..F....... [ZBX-19218] fixed missed untranslated string in jsLoader (rlataria)
