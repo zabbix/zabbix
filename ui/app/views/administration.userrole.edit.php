@@ -23,7 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
 $this->includeJsFile('administration.userrole.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('User roles'));

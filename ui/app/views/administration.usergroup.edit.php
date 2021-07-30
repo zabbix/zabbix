@@ -242,5 +242,3 @@ else {
 $form->addItem($tabs);
 $widget->addItem($form);
 $widget->show();
-
-$this->addJsFile('multiselect.js');

@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of trigger prototypes');
 $page['file'] = 'trigger_prototypes.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.tab-indicators.js'];
+$page['scripts'] = ['class.tab-indicators.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
