@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-02 19:53+0300\n"
+"POT-Creation-Date: 2021-07-30 11:57+0300\n"
 "PO-Revision-Date: 2014-09-24 14:37+0300\n"
 "Last-Translator: maxhq <jens@jebecs.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -254,7 +254,7 @@ msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, schreibgeschützt"
 
-#: jsLoader.php:362
+#: jsLoader.php:363
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -367,7 +367,7 @@ msgstr ""
 msgid "<sub-menu/sub-menu/...>"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:770
+#: include/classes/widgets/CWidgetHelper.php:782
 msgid "ADD OVERRIDE"
 msgstr ""
 
@@ -753,7 +753,7 @@ msgstr "Aktiv bis"
 #: app/views/popup.triggerwizard.php:116 app/views/popup.triggerwizard.php:150
 #: app/views/popup.valuemap.edit.php:60 app/views/popup.valuemap.edit.php:128
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
-#: include/classes/widgets/CWidgetHelper.php:518 include/forms.inc.php:1476
+#: include/classes/widgets/CWidgetHelper.php:530 include/forms.inc.php:1476
 #: include/forms.inc.php:2040 include/views/configuration.action.edit.php:133
 #: include/views/configuration.action.edit.php:304
 #: include/views/configuration.action.edit.php:386
@@ -857,7 +857,7 @@ msgstr ""
 msgid "Add multiple maps"
 msgstr "Füge mehrere Karten hinzu"
 
-#: include/classes/widgets/CWidgetHelper.php:1197
+#: include/classes/widgets/CWidgetHelper.php:1209
 msgid "Add new data set"
 msgstr "Neuen Datensatz hinzufügen"
 
@@ -866,7 +866,7 @@ msgstr "Neuen Datensatz hinzufügen"
 msgid "Add new interface"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:724
+#: include/classes/widgets/CWidgetHelper.php:736
 msgid "Add new override"
 msgstr ""
 
@@ -973,7 +973,7 @@ msgstr "Betreuer Rechnername. Gibt String zurück"
 msgid "Agent interfaces"
 msgstr "Agent-Schnittstellen"
 
-#: include/classes/widgets/CWidgetHelper.php:1136
+#: include/classes/widgets/CWidgetHelper.php:1148
 msgid "Aggregate"
 msgstr ""
 
@@ -981,11 +981,11 @@ msgstr ""
 msgid "Aggregate functions"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1108
+#: include/classes/widgets/CWidgetHelper.php:1120
 msgid "Aggregation function"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1127
+#: include/classes/widgets/CWidgetHelper.php:1139
 msgid "Aggregation interval"
 msgstr ""
 
@@ -1012,7 +1012,7 @@ msgstr "Kartenelemente ausrichten"
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:385
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
 msgid "All"
 msgstr "Alle"
 
@@ -1508,9 +1508,9 @@ msgstr "Hintergrundfarbe"
 msgid "Background image"
 msgstr "Hintergrundbild"
 
-#: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:789
-#: include/classes/widgets/CWidgetHelper.php:1038
+#: include/classes/widgets/CWidgetHelper.php:758
+#: include/classes/widgets/CWidgetHelper.php:801
+#: include/classes/widgets/CWidgetHelper.php:1050
 msgid "Bar"
 msgstr "Balken"
 
@@ -1518,8 +1518,8 @@ msgstr "Balken"
 msgid "Base DN"
 msgstr "Base-DN"
 
-#: include/classes/widgets/CWidgetHelper.php:772
-#: include/classes/widgets/CWidgetHelper.php:1029
+#: include/classes/widgets/CWidgetHelper.php:784
+#: include/classes/widgets/CWidgetHelper.php:1041
 msgid "Base colour"
 msgstr "Grundfarbe"
 
@@ -1731,7 +1731,7 @@ msgstr "Kann nicht entfernt werden"
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
-#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:381
+#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -1740,15 +1740,15 @@ msgstr "Abbrechen"
 msgid "Cannot add API token"
 msgstr ""
 
-#: include/classes/api/services/CGraph.php:707
-#: include/classes/api/services/CGraph.php:721
-#: include/classes/api/services/CGraph.php:735
+#: include/classes/api/services/CGraph.php:517
+#: include/classes/api/services/CGraph.php:531
+#: include/classes/api/services/CGraph.php:545
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "Kann nicht-numerischen Datenpunkt \"%1$s\" nicht zu Diagramm \"%2$s\" hinzufügen."
 
-#: include/classes/api/services/CGraphPrototype.php:672
-#: include/classes/api/services/CGraphPrototype.php:736
+#: include/classes/api/services/CGraphPrototype.php:471
+#: include/classes/api/services/CGraphPrototype.php:535
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "Kann nicht-numerischen Datenpunkt \"%1$s\" nicht zu Diagrammprototyp \"%2$s\" hinzufügen."
@@ -1793,11 +1793,11 @@ msgstr "Kann Diagrammprototyp nicht hinzufügen"
 msgid "Cannot add group"
 msgstr "Kann Gruppe nicht hinzufügen"
 
-#: hosts.php:359
+#: hosts.php:363
 msgid "Cannot add host"
 msgstr "Kann Host nicht hinzufügen"
 
-#: host_prototypes.php:303
+#: host_prototypes.php:296
 msgid "Cannot add host prototype"
 msgstr "Kann Hostprototyp nicht hinzufügen"
 
@@ -1877,7 +1877,7 @@ msgstr "Kann Dienst nicht hinzufügen"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Kann keine Unter-Karte hinzufügen. Maximale Tiefe erreicht."
 
-#: templates.php:209
+#: templates.php:213
 msgid "Cannot add template"
 msgstr "Kann Vorlage nicht hinzufügen"
 
@@ -1931,11 +1931,11 @@ msgstr "Kann Verlauf nicht leeren"
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:2512
+#: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "Kann Diagramm-Vorlagen nicht klonen."
 
-#: include/classes/api/services/CDiscoveryRule.php:2567
+#: include/classes/api/services/CDiscoveryRule.php:2570
 msgid "Cannot clone host prototypes."
 msgstr "Kann Hostprototypen nicht klonen."
 
@@ -1989,7 +1989,7 @@ msgstr[1] "Kann Auslöser nicht kopieren"
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "Kann den Auslöser \"%1$s:%2$s\" nicht kopieren, weil er mehrere Hosts im Ausdruck hat."
 
-#: include/classes/api/services/CHostPrototype.php:288
+#: include/classes/api/services/CHostPrototype.php:291
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
 msgstr "Kann Hostprototyp nicht auf via Suchlauf entdecktem Host \"%1$s\" erstellen."
@@ -2100,11 +2100,11 @@ msgid_plural "Cannot delete groups"
 msgstr[0] "Kann Gruppe nicht löschen"
 msgstr[1] "Kann Gruppen nicht löschen"
 
-#: hosts.php:646 hosts.php:667
+#: hosts.php:650 hosts.php:671
 msgid "Cannot delete host"
 msgstr "Kann Host nicht löschen"
 
-#: include/classes/api/services/CHost.php:1405
+#: include/classes/api/services/CHost.php:1355
 #, fuzzy, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2118,7 +2118,7 @@ msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" mu
 msgstr[0] "Kann die Host-Gruppe nicht löschen da die Wartung \"%1$s\" mindestens einen Host oder Host-Gruppe enthalten muss."
 msgstr[1] "Kann die ausgewählten Hosts-Gruppen nicht löschen da die Wartung \"%1$s\" mindestens einen Host oder Host-Gruppe enthalten muss."
 
-#: host_prototypes.php:149 host_prototypes.php:355
+#: host_prototypes.php:149 host_prototypes.php:348
 msgid "Cannot delete host prototypes"
 msgstr "Kann Hostprototypen nicht löschen"
 
@@ -2135,7 +2135,7 @@ msgstr "Kann Bild nicht löschen"
 msgid "Cannot delete interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1192
+#: include/classes/api/services/CHost.php:1142
 msgid "Cannot delete inventory."
 msgstr "Kann Inventar nicht löschen."
 
@@ -2218,23 +2218,23 @@ msgstr "Kann ausgewählte Aktionen nicht löschen"
 msgid "Cannot delete service"
 msgstr "Kann Dienst nicht löschen"
 
-#: templates.php:432 templates.php:446 templates.php:479
+#: templates.php:436 templates.php:450 templates.php:483
 msgid "Cannot delete template"
 msgstr "Kann Vorlage nicht löschen"
 
-#: include/classes/api/services/CGraphPrototype.php:578
+#: include/classes/api/services/CGraphPrototype.php:374
 msgid "Cannot delete templated graph prototype."
 msgstr "Kann vorlagengestützte Diagramm-Prototypen nicht löschen."
 
-#: include/classes/api/services/CGraph.php:564
+#: include/classes/api/services/CGraph.php:374
 msgid "Cannot delete templated graph."
 msgstr "Kann vorlagengestütztes Diagramm nicht löschen."
 
-#: include/classes/api/services/CHostPrototype.php:1297
+#: include/classes/api/services/CHostPrototype.php:1311
 msgid "Cannot delete templated host prototype."
 msgstr "Kann vorlagenbasierten Hostprototyp nicht löschen."
 
-#: include/classes/api/services/CItemPrototype.php:654
+#: include/classes/api/services/CItemPrototype.php:655
 msgid "Cannot delete templated item prototype."
 msgstr "Kann vorlagenbasierten Datenpunkt-Prototyp nicht löschen"
 
@@ -2256,7 +2256,7 @@ msgstr "Kann vorlagenbasierten Auslöser \"%1$s:%2$s\" nicht löschen."
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:605
+#: include/classes/api/services/CHttpTest.php:610
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Kann vorlagenbasiertes Web-Szenario \"%1$s\" nicht löschen."
@@ -2324,7 +2324,7 @@ msgstr[0] "Kann Suchlaufregel nicht deaktivieren"
 msgstr[1] "Kann Suchlaufregeln nicht deaktivieren"
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
-#: hosts.php:699
+#: hosts.php:703
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Kann Host nicht deaktivieren"
@@ -2402,7 +2402,7 @@ msgstr[0] "Kann Suchlaufregel nicht aktivieren"
 msgstr[1] "Kann Suchlaufregeln nicht aktivieren"
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
-#: hosts.php:698
+#: hosts.php:702
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Kann Host nicht aktivieren"
@@ -2482,7 +2482,7 @@ msgstr ""
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Kann Host \"%1$s\" nicht finden, der in Karte \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:1190
+#: include/classes/import/CConfigurationImport.php:1206
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kann Hostgruppe \"%1$s\" nicht finden für Hostprototyp \"%2$s\" der Suchlaufregel \"%3$s\" auf \"%4$s\"."
@@ -2505,47 +2505,47 @@ msgstr "Kann Symbol \"%1$s\" nicht finden, das in Karte \"%2$s\" verwendet wird.
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Kann Symbolzuordnung \"%1$s\" nicht finden, die in Karte \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:932
+#: include/classes/import/CConfigurationImport.php:948
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:701
+#: include/classes/import/CConfigurationImport.php:717
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1084
+#: include/classes/import/CConfigurationImport.php:1100
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1602
+#: include/classes/import/CConfigurationImport.php:1631
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Kann Datenpunkt \"%1$s\" nicht finden. Genutzt auf \"%2$s\" als Y-Achse, MAX Wert des Diagramms \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1374
+#: include/classes/import/CConfigurationImport.php:1403
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Kann Datenpunkt \"%1$s\" nicht finden. Genutzt auf \"%2$s\" als Y-Achsen MAX Wert für Diagramm-Prototyp \"%3$s\", in Suchlaufregel \"%4$s\" auf \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1584
+#: include/classes/import/CConfigurationImport.php:1613
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Kann Datenpunkt \"%1$s\" nicht finden. Genutzt auf \"%2$s\" als Y-Achsen MIN Wert für Diagramm \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1353
+#: include/classes/import/CConfigurationImport.php:1382
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Kann Element \"%1$s\" nicht finden. Genutzt auf \"%2$s\" als Y-Achsen MIN Wert für Diagramm Prototyp \"%3$s\", in Suchlaufregel \"%4$s\" auf \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1622
+#: include/classes/import/CConfigurationImport.php:1651
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Keine Wertezuordnung \"%1$s\" gefunden, für Datenpunkt \"%2$s\" auf \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1395
+#: include/classes/import/CConfigurationImport.php:1424
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Keine Wertezuordnung \"%1$s\" auf \"%2$s\" gefunden, für Datenpunktvorlage \"%3$s\" der Suchlaufregel \"%4$s\" auf \"%5$s\"."
@@ -2560,12 +2560,12 @@ msgstr ""
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Kann Karte \"%1$s\" nicht finden, die in Karte \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:1213
+#: include/classes/import/CConfigurationImport.php:1229
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kann Hostgruppe \"%1$s\" nicht finden für Hostprototyp \"%2$s\" der Suchlaufregel \"%3$s\" auf \"%4$s\"."
 
-#: include/classes/import/CConfigurationImport.php:982
+#: include/classes/import/CConfigurationImport.php:998
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2576,12 +2576,12 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Kann Auslöser \"%1$s\" nicht finden, der in Karte \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:714
+#: include/classes/import/CConfigurationImport.php:730
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Keine Wertezuordnung \"%1$s\" gefunden, für Datenpunkt \"%2$s\" auf \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1100
+#: include/classes/import/CConfigurationImport.php:1116
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Keine Wertezuordnung \"%1$s\" gefunden, für Datenpunktvorlage \"%2$s\" der Suchlaufregel \"%3$s\" auf \"%4$s\"."
@@ -2594,7 +2594,7 @@ msgstr "Kann Baum nicht formatieren. Überprüfen Sie die logische Struktur in d
 msgid "Cannot format tree."
 msgstr "Kann Baum nicht formatieren."
 
-#: include/classes/api/services/CTemplate.php:946
+#: include/classes/api/services/CTemplate.php:968
 msgid "Cannot have empty visible template name."
 msgstr "Kann keinen leeren Anzeigenamen haben."
 
@@ -2610,12 +2610,12 @@ msgstr[1] "Kann Vorlage nicht importieren \"%1$s\", verknüpfte Vorlagen \"%2$s\
 msgid "Cannot insert trigger expression"
 msgstr "Kann Auslöser Ausdruck nicht einfügen"
 
-#: include/classes/api/services/CHost.php:1170
+#: include/classes/api/services/CHost.php:1120
 msgid "Cannot link template"
 msgstr "Kann Vorlage nicht verbinden"
 
-#: include/classes/api/services/CTemplate.php:1033
-#: include/classes/api/services/CTemplate.php:1047
+#: include/classes/api/services/CTemplate.php:1055
+#: include/classes/api/services/CTemplate.php:1069
 msgid "Cannot link template."
 msgstr "Kann Vorlage nicht verknüpfen"
 
@@ -2631,19 +2631,19 @@ msgstr[1] ""
 msgid "Cannot logout."
 msgstr "Abmelden nicht möglich."
 
-#: include/classes/api/services/CHost.php:1036
+#: include/classes/api/services/CHost.php:986
 msgid "Cannot mass update host name."
 msgstr "Massenänderung nicht möglich für Hostnamen."
 
-#: include/classes/api/services/CTemplate.php:1171
+#: include/classes/api/services/CTemplate.php:1193
 msgid "Cannot mass update template name."
 msgstr "Massenänderung von Vorlagenname nicht möglich."
 
-#: include/classes/api/services/CHost.php:1022
+#: include/classes/api/services/CHost.php:972
 msgid "Cannot mass update visible host name."
 msgstr "Massenänderung nicht möglich für sichtbare Hostnamen."
 
-#: include/classes/api/services/CTemplate.php:1136
+#: include/classes/api/services/CTemplate.php:1158
 msgid "Cannot mass update visible template name."
 msgstr "Massenänderung von sichtbarem Vorlagenname nicht möglich."
 
@@ -2723,12 +2723,12 @@ msgstr "Kann Anfrage nicht senden: %1$s."
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
 msgstr "Kann \"%1$s\"\" für Aktion \"%2$s\" nicht setzen."
 
-#: include/classes/api/services/CGraphGeneral.php:507
+#: include/classes/api/services/CGraphGeneral.php:529
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
 msgstr "Kann \"%1$s\" für Diagramm \"%2$s\" nicht setzen."
 
-#: include/classes/api/services/CGraphGeneral.php:514
+#: include/classes/api/services/CGraphGeneral.php:536
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Kann \"%1$s\"\" für Diagramm-Prototypen \"%2$s\" nicht setzen."
@@ -2738,9 +2738,9 @@ msgstr "Kann \"%1$s\"\" für Diagramm-Prototypen \"%2$s\" nicht setzen."
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Kann \"%1$s\" nicht setzen für Datenpunkt \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1087
-#: include/classes/api/services/CHost.php:2029
-#: include/classes/api/services/CHost.php:2189
+#: include/classes/api/services/CHost.php:1037
+#: include/classes/api/services/CHost.php:1997
+#: include/classes/api/services/CHost.php:2200
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Kann Inventarfeld nicht setzen wegen deaktivierter Inventarfunktion."
 
@@ -2771,12 +2771,12 @@ msgstr[1] "Kann Benutzer nicht entsperren"
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Kann Web-Szenarien nicht trennen und leeren."
 
-#: include/classes/api/services/CHost.php:1145
+#: include/classes/api/services/CHost.php:1095
 msgid "Cannot unlink template"
 msgstr "Kann Vorlage nicht trennen"
 
-#: include/classes/api/services/CTemplate.php:998
-#: include/classes/api/services/CTemplate.php:1021
+#: include/classes/api/services/CTemplate.php:1020
+#: include/classes/api/services/CTemplate.php:1043
 msgid "Cannot unlink template."
 msgstr "Kann Vorlage nicht trennen."
 
@@ -2791,12 +2791,12 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "\"%1$s\" nicht aktualisierbar für Aktion \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:693
+#: include/classes/api/services/CGraphGeneral.php:715
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
 msgstr "\"%1$s\" nicht aktualisierbar für Diagramm \"%2$s\"."
 
-#: include/classes/api/services/CGraphGeneral.php:698
+#: include/classes/api/services/CGraphGeneral.php:720
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "\"%1$s\" nicht aktualisierbar für Diagramm-Prototyp \"%2$s\"."
@@ -2816,7 +2816,7 @@ msgstr "\"%1$s\" nicht aktualisierbar für vorlagebasierten Auslöser \"%2$s\"."
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "\"%1$s\" kann für vorlagebasierten Auslöser-Prototyp \"%2$s\" nicht aktualisiert werden."
 
-#: include/classes/api/services/CHost.php:2166
+#: include/classes/api/services/CHost.php:2177
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Kann \"%1$s\"\" für einen entdeckten Host \"%2$s\" nicht aktualisieren."
@@ -2843,7 +2843,7 @@ msgstr "\"Bild-Typ\" kann für Bild \"%1$s\" nicht aktualisiert werden."
 msgid "Cannot update API token"
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:65
+#: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
 msgstr "Per Suchlauf entdecktes Diagramm nicht aktualisierbar."
 
@@ -2913,21 +2913,21 @@ msgstr "Kann Gruppe nicht ändern"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Kann Gruppen für per Suchlauf entdeckten Host \"%1$s\" nicht aktualisieren."
 
-#: hosts.php:343
+#: hosts.php:347
 msgid "Cannot update host"
 msgstr "Kann Host nicht ändern"
 
-#: include/classes/api/services/CHost.php:984
+#: include/classes/api/services/CHost.php:934
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Verschlüsselungseinstellung kann nicht aktualisiert werden. Verbindungseinstellungen für beide Richtungen sollte angegeben werden."
 
-#: host_prototypes.php:278 host_prototypes.php:319 host_prototypes.php:340
+#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:333
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Kann Host-Prototyp nicht aktualisieren"
 msgstr[1] "Kann Host-Prototypen nicht aktualisieren"
 
-#: app/controllers/CControllerPopupMassupdateHost.php:465
+#: app/controllers/CControllerPopupMassupdateHost.php:423
 msgid "Cannot update hosts"
 msgstr "Kann Hosts nicht ändern"
 
@@ -3029,21 +3029,21 @@ msgid "Cannot update service"
 msgstr "Kann Dienst nicht ändern"
 
 #: include/classes/api/services/CHttpTest.php:538
-#: include/classes/api/services/CHttpTest.php:738
+#: include/classes/api/services/CHttpTest.php:743
 #, c-format
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "Schritt für vorlagebasiertes Web-Szenario \"%1$s\": %2$s nicht aktualisierbar."
 
-#: templates.php:213
+#: templates.php:217
 msgid "Cannot update template"
 msgstr "Kann Vorlage nicht ändern"
 
-#: app/controllers/CControllerPopupMassupdateTemplate.php:384
+#: app/controllers/CControllerPopupMassupdateTemplate.php:341
 msgid "Cannot update templates"
 msgstr "Kann Vorlagen nicht aktualisieren"
 
-#: include/classes/api/services/CTemplate.php:897
-#: include/classes/api/services/CTemplate.php:1232
+#: include/classes/api/services/CTemplate.php:919
+#: include/classes/api/services/CTemplate.php:1254
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Kann Vorlagen für per Suchlauf entdeckten Host \"%1$s\" nicht aktualisieren."
@@ -3394,7 +3394,7 @@ msgstr "Klonen"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
-#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:374
+#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
 msgid "Close"
 msgstr "Schließen"
 
@@ -3424,7 +3424,7 @@ msgid "Close problems"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:970 jsLoader.php:298
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:298
 #: jsLoader.php:303
 msgid "Collapse"
 msgstr "Einklappen"
@@ -3748,9 +3748,9 @@ msgstr "Herzlichen Glückwunsch! Sie haben das Zabbix Frontend erfolgreich insta
 msgid "Connect to"
 msgstr "Verbinden mit"
 
-#: include/classes/widgets/CWidgetHelper.php:752
-#: include/classes/widgets/CWidgetHelper.php:827
-#: include/classes/widgets/CWidgetHelper.php:1087
+#: include/classes/widgets/CWidgetHelper.php:764
+#: include/classes/widgets/CWidgetHelper.php:839
+#: include/classes/widgets/CWidgetHelper.php:1099
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "Verbunden"
@@ -3837,8 +3837,8 @@ msgstr "Kontakt"
 #: app/partials/monitoring.problem.filter.php:360
 #: include/classes/helpers/CTagFilterFieldHelper.php:69
 #: include/classes/helpers/CTagFilterFieldHelper.php:124
-#: include/classes/widgets/CWidgetHelper.php:479
-#: include/classes/widgets/CWidgetHelper.php:545
+#: include/classes/widgets/CWidgetHelper.php:491
+#: include/classes/widgets/CWidgetHelper.php:557
 #: include/views/configuration.maintenance.edit.php:156
 #: include/views/configuration.maintenance.edit.php:178
 #: include/views/js/configuration.maintenance.edit.js.php:33
@@ -4397,7 +4397,7 @@ msgid "Dashboard"
 msgstr "Dashboard"
 
 #: include/classes/api/services/CDashboard.php:390
-#: include/classes/api/services/CTemplateDashboard.php:429
+#: include/classes/api/services/CTemplateDashboard.php:433
 #, c-format
 msgid "Dashboard \"%1$s\" already exists."
 msgstr "Dashboard \"%1$s\" existiert bereits."
@@ -4457,7 +4457,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172
+#: include/views/inventory.host.view.php:172 jsLoader.php:337
 msgid "Dashboards"
 msgstr "Dashboards"
 
@@ -4484,7 +4484,7 @@ msgstr "Daten sind nicht ordnungsgemäß codiert."
 msgid "Data overview"
 msgstr "Datenübersicht"
 
-#: include/classes/widgets/CWidgetHelper.php:1142
+#: include/classes/widgets/CWidgetHelper.php:1154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
 #: include/classes/widgets/views/widget.svggraph.form.view.php:290
 msgid "Data set"
@@ -4628,7 +4628,7 @@ msgstr "Wochentag"
 msgid "Days"
 msgstr "Tage"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:365
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
 msgid "Debug"
 msgstr "Debug"
 
@@ -4757,8 +4757,8 @@ msgstr "Verspätung"
 #: app/views/popup.tabfilter.edit.php:71
 #: app/views/reports.scheduledreport.list.php:95
 #: include/classes/html/CButtonDelete.php:25
-#: include/classes/widgets/CWidgetHelper.php:663
-#: include/classes/widgets/CWidgetHelper.php:1015 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:675
+#: include/classes/widgets/CWidgetHelper.php:1027 include/services.inc.php:118
 #: include/views/configuration.action.list.php:161
 #: include/views/configuration.graph.list.php:239
 #: include/views/configuration.host.discovery.list.php:332
@@ -4773,7 +4773,7 @@ msgstr "Verspätung"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
 #: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
-#: jsLoader.php:176 jsLoader.php:337
+#: jsLoader.php:176 jsLoader.php:338
 msgid "Delete"
 msgstr "Löschen"
 
@@ -4802,7 +4802,7 @@ msgstr "Aktuelle Aktion löschen?"
 msgid "Delete current correlation?"
 msgstr "Aktuelle Korrelation löschen?"
 
-#: jsLoader.php:338
+#: jsLoader.php:339
 msgid "Delete dashboard?"
 msgstr "Dashboard löschen?"
 
@@ -5048,17 +5048,17 @@ msgstr "Auslöser löschen?"
 msgid "Delete web scenario?"
 msgstr "Web-Szenario löschen?"
 
-#: include/classes/api/services/CHost.php:1544
+#: include/classes/api/services/CHost.php:1494
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Gelöscht: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1165
+#: include/classes/api/services/CHostPrototype.php:1179
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Gelöscht: Host-Prototyp \"%1$s\" auf \"%2$s\"."
 
-#: include/classes/api/services/CTemplate.php:863
+#: include/classes/api/services/CTemplate.php:885
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Gelöscht: Vorlage \"%1$s\"."
@@ -5558,7 +5558,7 @@ msgstr "Gestapeltes Diagramm angezeigt"
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1646 include/actions.inc.php:1717
 #: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:377
+#: jsLoader.php:378
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Zeige %1$s von %2$s gefundenen"
@@ -5594,7 +5594,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:216 jsLoader.php:339
+#: jsLoader.php:216 jsLoader.php:340
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Wollen Sie den bedingten Ausdruck ersetzen?"
 
@@ -5604,8 +5604,8 @@ msgstr "Wollen Sie den bedingten Ausdruck ersetzen?"
 #: app/partials/monitoring.problem.filter.php:363
 #: include/classes/helpers/CTagFilterFieldHelper.php:72
 #: include/classes/helpers/CTagFilterFieldHelper.php:127
-#: include/classes/widgets/CWidgetHelper.php:482
-#: include/classes/widgets/CWidgetHelper.php:548
+#: include/classes/widgets/CWidgetHelper.php:494
+#: include/classes/widgets/CWidgetHelper.php:560
 msgid "Does not contain"
 msgstr ""
 
@@ -5615,8 +5615,8 @@ msgstr ""
 #: app/partials/monitoring.problem.filter.php:362
 #: include/classes/helpers/CTagFilterFieldHelper.php:71
 #: include/classes/helpers/CTagFilterFieldHelper.php:126
-#: include/classes/widgets/CWidgetHelper.php:481
-#: include/classes/widgets/CWidgetHelper.php:547
+#: include/classes/widgets/CWidgetHelper.php:493
+#: include/classes/widgets/CWidgetHelper.php:559
 msgid "Does not equal"
 msgstr ""
 
@@ -5626,8 +5626,8 @@ msgstr ""
 #: app/partials/monitoring.problem.filter.php:361
 #: include/classes/helpers/CTagFilterFieldHelper.php:70
 #: include/classes/helpers/CTagFilterFieldHelper.php:125
-#: include/classes/widgets/CWidgetHelper.php:480
-#: include/classes/widgets/CWidgetHelper.php:546
+#: include/classes/widgets/CWidgetHelper.php:492
+#: include/classes/widgets/CWidgetHelper.php:558
 msgid "Does not exist"
 msgstr ""
 
@@ -5666,12 +5666,12 @@ msgstr "Konfigurationsdatei herunterladen"
 msgid "Downtime"
 msgstr "Downtime"
 
-#: include/classes/widgets/CWidgetHelper.php:742
-#: include/classes/widgets/CWidgetHelper.php:786
-#: include/classes/widgets/CWidgetHelper.php:787
-#: include/classes/widgets/CWidgetHelper.php:788
-#: include/classes/widgets/CWidgetHelper.php:789
-#: include/classes/widgets/CWidgetHelper.php:1033
+#: include/classes/widgets/CWidgetHelper.php:754
+#: include/classes/widgets/CWidgetHelper.php:798
+#: include/classes/widgets/CWidgetHelper.php:799
+#: include/classes/widgets/CWidgetHelper.php:800
+#: include/classes/widgets/CWidgetHelper.php:801
+#: include/classes/widgets/CWidgetHelper.php:1045
 msgid "Draw"
 msgstr ""
 
@@ -5707,14 +5707,14 @@ msgstr "Abhängigkeits-Duplikat bei Auslöser \"%1$s\"."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Doppelte Abhängigkeiten im Auslöser-Prototyp \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1964
-#: include/classes/api/services/CHost.php:2218
+#: include/classes/api/services/CHost.php:1932
+#: include/classes/api/services/CHost.php:2229
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1971
-#: include/classes/api/services/CHost.php:2238
+#: include/classes/api/services/CHost.php:1939
+#: include/classes/api/services/CHost.php:2249
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
@@ -5757,7 +5757,7 @@ msgstr "Dynamische Datenpunkte"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Jede URL sollte einzigartig sein. Bitte überprüfen Sie, dass nur eine URL existiert namens"
 
-#: include/classes/widgets/CWidgetHelper.php:1141
+#: include/classes/widgets/CWidgetHelper.php:1153
 msgid "Each item"
 msgstr ""
 
@@ -5796,7 +5796,7 @@ msgstr ""
 msgid "Edit tree element"
 msgstr "Baum-Element bearbeiten"
 
-#: jsLoader.php:340
+#: jsLoader.php:341
 msgid "Edit trigger"
 msgstr "Bearbeite Auslöser"
 
@@ -5845,12 +5845,12 @@ msgstr "E-Mail"
 msgid "Empty"
 msgstr "Leer"
 
-#: include/classes/api/services/CHttpTest.php:1024
+#: include/classes/api/services/CHttpTest.php:1029
 #, c-format
 msgid "Empty SSL certificate file for web scenario \"%1$s\"."
 msgstr "Leere SSL-Zertifikat-Datei für Web-Szenario \"%1$s\"."
 
-#: include/classes/api/services/CHttpTest.php:1018
+#: include/classes/api/services/CHttpTest.php:1023
 #, c-format
 msgid "Empty SSL key file for web scenario \"%1$s\"."
 msgstr "SSL Schlüsseldatei leer für Web Szenario \"%1$s\"."
@@ -5896,10 +5896,10 @@ msgstr ""
 #: include/classes/api/services/CHostGeneral.php:164
 #: include/classes/api/services/CHostInterface.php:584
 #: include/classes/api/services/CHostInterface.php:628
-#: include/classes/api/services/CHost.php:792
-#: include/classes/api/services/CHost.php:1369
-#: include/classes/api/services/CHost.php:1898
-#: include/classes/api/services/CHostPrototype.php:1093
+#: include/classes/api/services/CHost.php:1319
+#: include/classes/api/services/CHost.php:1850
+#: include/classes/api/services/CHost.php:2075
+#: include/classes/api/services/CHostPrototype.php:1107
 #: include/classes/api/services/CImage.php:430
 #: include/classes/api/services/CImage.php:482
 #: include/classes/api/services/CMaintenance.php:542
@@ -5912,11 +5912,8 @@ msgstr ""
 #: include/classes/api/services/CService.php:378
 #: include/classes/api/services/CService.php:442
 #: include/classes/api/services/CService.php:510
-#: include/classes/api/services/CTemplate.php:682
+#: include/classes/api/services/CTemplate.php:704
 #: include/classes/api/services/CTrigger.php:798
-#: include/classes/api/services/CUserMacro.php:506
-#: include/classes/api/services/CUserMacro.php:554
-#: include/classes/api/services/CUserMacro.php:655
 msgid "Empty input parameter."
 msgstr "Leerer Eingabe-Parameter."
 
@@ -6155,13 +6152,13 @@ msgstr "Englisch (en_GB)"
 msgid "English (en_US)"
 msgstr "Englisch (en_US)"
 
-#: include/classes/api/services/CGraphGeneral.php:618
+#: include/classes/api/services/CGraphGeneral.php:640
 #: include/classes/api/services/CHostGroup.php:757
-#: include/classes/api/services/CHostPrototype.php:341
+#: include/classes/api/services/CHostPrototype.php:344
 #: include/classes/api/services/CHttpTest.php:390
 #: include/classes/api/services/CItemGeneral.php:634
 #: include/classes/api/services/CTemplateDashboard.php:323
-#: include/classes/api/services/CTemplate.php:580
+#: include/classes/api/services/CTemplate.php:588
 #: include/classes/api/services/CTriggerGeneral.php:685
 #: include/classes/api/services/CValueMap.php:451
 #, c-format
@@ -6174,8 +6171,8 @@ msgstr ""
 #: app/partials/monitoring.problem.filter.php:359
 #: include/classes/helpers/CTagFilterFieldHelper.php:68
 #: include/classes/helpers/CTagFilterFieldHelper.php:123
-#: include/classes/widgets/CWidgetHelper.php:478
-#: include/classes/widgets/CWidgetHelper.php:544
+#: include/classes/widgets/CWidgetHelper.php:490
+#: include/classes/widgets/CWidgetHelper.php:556
 #: include/views/configuration.maintenance.edit.php:157
 #: include/views/configuration.maintenance.edit.php:179
 #: include/views/js/configuration.maintenance.edit.js.php:34
@@ -6365,13 +6362,13 @@ msgstr "Ausführbestätigung"
 #: app/partials/monitoring.problem.filter.php:358
 #: include/classes/helpers/CTagFilterFieldHelper.php:67
 #: include/classes/helpers/CTagFilterFieldHelper.php:122
-#: include/classes/widgets/CWidgetHelper.php:477
-#: include/classes/widgets/CWidgetHelper.php:543
+#: include/classes/widgets/CWidgetHelper.php:489
+#: include/classes/widgets/CWidgetHelper.php:555
 msgid "Exists"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:970 jsLoader.php:299
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:299
 #: jsLoader.php:302
 msgid "Expand"
 msgstr "Erweitern"
@@ -6547,7 +6544,7 @@ msgstr ""
 msgid "Failed to update dashboard properties."
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:625
+#: include/classes/api/services/CTemplate.php:624
 msgid "Failed to update template."
 msgstr "Fehler beim Aktualisieren der Vorlage."
 
@@ -6599,8 +6596,8 @@ msgstr "Feld \"%1$s\" darf nicht NULL sein."
 #: include/classes/api/services/CDRule.php:528
 #: include/classes/api/services/CDRule.php:538
 #: include/classes/api/services/CHostGroup.php:1003
-#: include/classes/api/services/CHost.php:942
-#: include/classes/api/services/CTemplate.php:925
+#: include/classes/api/services/CHost.php:892
+#: include/classes/api/services/CTemplate.php:947
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
 #, c-format
@@ -6647,7 +6644,7 @@ msgstr "Das Feld \"%1$s\" ist für den Medientyp \"%2$s\" erforderlich."
 msgid "Field \"%1$s\" must be missing."
 msgstr "Feld \"%1$s\" muss fehlen."
 
-#: include/classes/api/services/CTemplate.php:484
+#: include/classes/api/services/CTemplate.php:492
 msgid "Field \"host\" is mandatory."
 msgstr "\"host\" ist ein Pflichtfeld."
 
@@ -6679,19 +6676,19 @@ msgstr "Dateigröße in Bytes. Gibt Ganzzahl zurück"
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Datei-Zeitstempel. Gibt Ganzzahl zurück (Unix Zeitstempel)"
 
-#: include/classes/widgets/CWidgetHelper.php:748
-#: include/classes/widgets/CWidgetHelper.php:803
-#: include/classes/widgets/CWidgetHelper.php:804
-#: include/classes/widgets/CWidgetHelper.php:805
-#: include/classes/widgets/CWidgetHelper.php:806
-#: include/classes/widgets/CWidgetHelper.php:807
-#: include/classes/widgets/CWidgetHelper.php:808
-#: include/classes/widgets/CWidgetHelper.php:809
-#: include/classes/widgets/CWidgetHelper.php:810
-#: include/classes/widgets/CWidgetHelper.php:811
-#: include/classes/widgets/CWidgetHelper.php:812
-#: include/classes/widgets/CWidgetHelper.php:813
-#: include/classes/widgets/CWidgetHelper.php:1067
+#: include/classes/widgets/CWidgetHelper.php:760
+#: include/classes/widgets/CWidgetHelper.php:815
+#: include/classes/widgets/CWidgetHelper.php:816
+#: include/classes/widgets/CWidgetHelper.php:817
+#: include/classes/widgets/CWidgetHelper.php:818
+#: include/classes/widgets/CWidgetHelper.php:819
+#: include/classes/widgets/CWidgetHelper.php:820
+#: include/classes/widgets/CWidgetHelper.php:821
+#: include/classes/widgets/CWidgetHelper.php:822
+#: include/classes/widgets/CWidgetHelper.php:823
+#: include/classes/widgets/CWidgetHelper.php:824
+#: include/classes/widgets/CWidgetHelper.php:825
+#: include/classes/widgets/CWidgetHelper.php:1079
 msgid "Fill"
 msgstr ""
 
@@ -6983,7 +6980,7 @@ msgstr ""
 msgid "Go back to %1$s"
 msgstr "Zurück zu %1$s"
 
-#: jsLoader.php:345
+#: jsLoader.php:346
 msgid "Go to"
 msgstr "Gehe zu"
 
@@ -7043,44 +7040,28 @@ msgstr "Linie (Gradient)"
 msgid "Graph"
 msgstr "Diagramm"
 
-#: include/classes/api/services/CGraph.php:434
-#: include/classes/api/services/CGraphPrototype.php:442
+#: include/classes/api/services/CGraphGeneral.php:1123
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "Diagramm \"%1$s\" existiert schon auf \"%2$s\" (geerbt aus anderer Vorlage)."
 
-#: include/classes/api/services/CGraph.php:455
-#: include/classes/api/services/CGraph.php:462
-#: include/classes/api/services/CGraphPrototype.php:468
-#: include/classes/api/services/CGraphPrototype.php:475
+#: include/classes/api/services/CGraphGeneral.php:1171
+#: include/classes/api/services/CGraphGeneral.php:1181
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "Diagramm \"%1$s\" existiert schon auf \"%2$s\" (Unterschiedliche Elemente)."
 
-#: include/classes/api/services/CGraph.php:409
-#: include/classes/api/services/CGraphPrototype.php:417
+#: include/classes/api/services/CGraphGeneral.php:1129
+#, c-format
+msgid "Graph \"%1$s\" already exists on \"%2$s\" as a graph created from graph prototype."
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:1032
+#: include/classes/api/services/CGraphGeneral.php:1240
 #: include/graphs.inc.php:444
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "Diagramm \"%1$s\" existiert bereits auf \"%2$s\"."
-
-#: include/classes/api/services/CGraph.php:371
-#: include/classes/api/services/CGraphPrototype.php:372
-#, c-format
-msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr "Diagramm \"%1$s\" kann nicht vererbt werden. Benötigte Datenpunkte (für Ymax-Wert) sind in \"%2$s\" nicht vorhanden."
-
-#: include/classes/api/services/CGraph.php:379
-#: include/classes/api/services/CGraphPrototype.php:381
-#, c-format
-msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr "Diagramm \"%1$s\" kann nicht vererbt werden. Benötigte Datenpunkte (für Ymin-Wert) sind in \"%2$s\" nicht vorhanden."
-
-#: include/classes/api/services/CGraph.php:365
-#: include/classes/api/services/CGraphPrototype.php:366
-#, c-format
-msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr "Diagramm \"%1$s\" kann nicht vererbt werden. Benötigte Datenpunkte sind in \"%2$s\" nicht vorhanden."
 
 #: include/classes/api/services/CGraph.php:36
 #, c-format
@@ -7119,12 +7100,12 @@ msgstr "Diagrammelement"
 msgid "Graph prototype"
 msgstr "Diagramm-Prototyp"
 
-#: include/classes/api/services/CGraphPrototype.php:769
+#: include/classes/api/services/CGraphPrototype.php:568
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Diagramm-Prototyp \"%1$s\" enthält Datenpunkt-Prototypen aus mehreren Suchlaufregeln."
 
-#: include/classes/api/services/CGraphPrototype.php:775
+#: include/classes/api/services/CGraphPrototype.php:574
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
 msgstr "Diagramm-Prototyp \"%1$s\" benötigt mindestens einen Datenpunkt-Prototypen."
@@ -7187,17 +7168,10 @@ msgstr "Diagramm aktualisiert"
 msgid "Graph with ID \"%1$s\" is not available."
 msgstr "Diagramm mit der ID \"%1$s\" ist nicht verfügbar."
 
-#: include/classes/api/services/CGraphGeneral.php:831
+#: include/classes/api/services/CGraphGeneral.php:853
 #, c-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Diagramm namens \"%1$s\" existiert bereits (ggf. als Diagrammprototyp)."
-
-#: include/classes/api/services/CGraph.php:416
-#: include/classes/api/services/CGraph.php:437
-#: include/classes/api/services/CGraphPrototype.php:424
-#: include/classes/api/services/CGraphPrototype.php:445
-msgid "Graph with same name but other type exist."
-msgstr "Namensgleiches Diagramm anderen Typs existiert bereits."
 
 #: app/controllers/CControllerPopupGeneric.php:262
 #: app/controllers/CControllerPopupImportCompare.php:166
@@ -7220,7 +7194,7 @@ msgstr "Namensgleiches Diagramm anderen Typs existiert bereits."
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:346
+#: include/views/inventory.host.view.php:217 jsLoader.php:347
 msgid "Graphs"
 msgstr "Diagramme"
 
@@ -7280,7 +7254,7 @@ msgstr "Gruppe für entdeckte Hosts"
 msgid "Group name"
 msgstr "Gruppenname"
 
-#: include/classes/api/services/CHostPrototype.php:1255
+#: include/classes/api/services/CHostPrototype.php:1269
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Gruppen-Prototyp kann nicht auf einer per Suchlauf entdeckten Host-Gruppe \"%1$s\" basieren."
@@ -7426,7 +7400,7 @@ msgstr "Hexadezimal in dezimal"
 msgid "Hidden"
 msgstr "Versteckt"
 
-#: jsLoader.php:366
+#: jsLoader.php:367
 msgid "Hide debug"
 msgstr "Debug ausblenden"
 
@@ -7479,7 +7453,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:347
+#: jsLoader.php:348
 msgid "History"
 msgstr "Verlauf"
 
@@ -7567,22 +7541,22 @@ msgstr "Horizontale Ausrichtung"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:255 jsLoader.php:348 report2.php:506
+#: jsLoader.php:255 jsLoader.php:349 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
 msgstr[1] "Host"
 
-#: include/classes/api/services/CHost.php:1049
-#: include/classes/api/services/CTemplate.php:516
+#: include/classes/api/services/CHost.php:999
+#: include/classes/api/services/CTemplate.php:524
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Host \"%1$s\" existiert bereits."
 
 #: include/classes/api/services/CHostGroup.php:1561
-#: include/classes/api/services/CHost.php:1008
-#: include/classes/api/services/CHost.php:1935
+#: include/classes/api/services/CHost.php:958
+#: include/classes/api/services/CHost.php:1897
 #: include/classes/api/services/CHost.php:2130
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
@@ -7602,7 +7576,7 @@ msgstr "Host-IP"
 msgid "Host access"
 msgstr "Zugriffstyp"
 
-#: hosts.php:358
+#: hosts.php:362
 msgid "Host added"
 msgstr "Hosts hinzugefügt"
 
@@ -7623,19 +7597,19 @@ msgstr "Host kann nicht mehr als eine Standardschnittstelle gleichen Typs haben.
 msgid "Host count"
 msgstr "Anzahl der Hosts"
 
-#: hosts.php:646 hosts.php:667
+#: hosts.php:650 hosts.php:671
 msgid "Host deleted"
 msgstr "Host gelöscht"
 
 #: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:194
-#: hosts.php:696
+#: hosts.php:700
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Host deaktiviert"
 msgstr[1] "Hosts deaktiviert"
 
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
-#: hosts.php:695
+#: hosts.php:699
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Host aktiviert"
@@ -7783,21 +7757,21 @@ msgstr "Hostnetzwerke"
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:970
+#: include/classes/api/services/CHostPrototype.php:976
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Host Prototyp \"%1$s\" existiert bereits auf \"%2$s\", von einer anderen Vorlage geerbt."
 
-#: include/classes/api/services/CHostPrototype.php:958
+#: include/classes/api/services/CHostPrototype.php:964
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Host Prototyp \"%1$s\" ist bereits auf \"%2$s\" vorhanden."
 
-#: host_prototypes.php:303
+#: host_prototypes.php:296
 msgid "Host prototype added"
 msgstr "Host-Prototyp hinzugefügt"
 
-#: include/classes/api/services/CHostPrototype.php:1772
+#: include/classes/api/services/CHostPrototype.php:1757
 msgid "Host prototype cannot have more than one default interface of the same type."
 msgstr ""
 
@@ -7809,7 +7783,7 @@ msgstr "Host-Prototyp gelöscht"
 msgid "Host prototype macros"
 msgstr ""
 
-#: host_prototypes.php:278 host_prototypes.php:319 host_prototypes.php:339
+#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:332
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Host-Prototyp aktualisiert"
@@ -7833,7 +7807,7 @@ msgstr "Hostprototyp mit Anzeigename \"%1$s\" existiert bereits in Suchlauf \"%2
 msgid "Host prototypes"
 msgstr "Host-Prototypen"
 
-#: host_prototypes.php:355
+#: host_prototypes.php:348
 msgid "Host prototypes deleted"
 msgstr "Host-Prototypen gelöscht"
 
@@ -7849,11 +7823,11 @@ msgstr "Subnetzmaske des Hosts"
 msgid "Host time"
 msgstr "Systemzeit"
 
-#: include/classes/api/services/CHost.php:871
+#: include/classes/api/services/CHost.php:821
 msgid "Host update failed."
 msgstr "Änderung des Hosts fehlgeschlagen."
 
-#: hosts.php:342
+#: hosts.php:346
 msgid "Host updated"
 msgstr "Host geändert"
 
@@ -7862,17 +7836,17 @@ msgstr "Host geändert"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "Host mit ID \"%1$s\" ist nicht verfügbar."
 
-#: include/classes/api/services/CHost.php:2060
-#: include/classes/api/services/CHost.php:2299
-#: include/classes/api/services/CTemplate.php:1197
+#: include/classes/api/services/CHost.php:2028
+#: include/classes/api/services/CHost.php:2310
+#: include/classes/api/services/CTemplate.php:1219
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Mit dem gleichen Namen \"%1$s\" bereits vorhanden ist."
 
-#: include/classes/api/services/CHost.php:2066
-#: include/classes/api/services/CHost.php:2306
-#: include/classes/api/services/CTemplate.php:542
-#: include/classes/api/services/CTemplate.php:1162
+#: include/classes/api/services/CHost.php:2034
+#: include/classes/api/services/CHost.php:2317
+#: include/classes/api/services/CTemplate.php:550
+#: include/classes/api/services/CTemplate.php:1184
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Host mit identischen, sichtbarem Namen \"%1$s\" bereits vorhanden."
@@ -7930,7 +7904,7 @@ msgstr "Hosts"
 msgid "Hosts location"
 msgstr "Hoststandort"
 
-#: app/controllers/CControllerPopupMassupdateHost.php:472
+#: app/controllers/CControllerPopupMassupdateHost.php:430
 msgid "Hosts updated"
 msgstr "Hosts geändert"
 
@@ -8255,7 +8229,7 @@ msgid "Inaccessible graph prototype"
 msgstr "Unzugänglicher Diagramm-Prototyp"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:317
-#: host_prototypes.php:474
+#: host_prototypes.php:467
 msgid "Inaccessible group"
 msgstr "Unerreichbare Gruppe"
 
@@ -8554,11 +8528,11 @@ msgstr "Der Funktion wurden falsche/fehlerhafte Argumente übergeben"
 #: include/classes/api/services/CHostInterface.php:1112
 #: include/classes/api/services/CHostInterface.php:1129
 #: include/classes/api/services/CHostInterface.php:1146
-#: include/classes/api/services/CHost.php:1333
-#: include/classes/api/services/CHost.php:2014
-#: include/classes/api/services/CHost.php:2206
-#: include/classes/api/services/CHostPrototype.php:588
-#: include/classes/api/services/CHostPrototype.php:609
+#: include/classes/api/services/CHost.php:1283
+#: include/classes/api/services/CHost.php:1982
+#: include/classes/api/services/CHost.php:2217
+#: include/classes/api/services/CHostPrototype.php:595
+#: include/classes/api/services/CHostPrototype.php:616
 #: include/classes/api/services/CItemGeneral.php:272
 #: include/classes/api/services/CItemGeneral.php:1222
 #: include/classes/api/services/CItemGeneral.php:1259
@@ -8607,9 +8581,9 @@ msgstr "Falscher Massenwert für die Schnittstelle."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Unzulässiger Wert für berechnete SLA bei Service \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1031
-#: include/classes/api/services/CHost.php:1923
-#: include/classes/api/services/CHost.php:2212
+#: include/classes/api/services/CHost.php:981
+#: include/classes/api/services/CHost.php:1885
+#: include/classes/api/services/CHost.php:2223
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
@@ -8620,8 +8594,8 @@ msgstr ""
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Unzulässige Zeichen im Proxynamen \"%1$s\"."
 
-#: include/classes/api/services/CTemplate.php:494
-#: include/classes/api/services/CTemplate.php:1207
+#: include/classes/api/services/CTemplate.php:502
+#: include/classes/api/services/CTemplate.php:1229
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Unzulässige Zeichen im Vorlagennamen \"%1$s\"."
@@ -8760,8 +8734,8 @@ msgstr "Unzulässiger Bildindex."
 #: include/classes/api/services/CAction.php:2798
 #: include/classes/api/services/CAction.php:2810
 #: include/classes/api/services/CHostInterface.php:675
-#: include/classes/api/services/CHost.php:1014
-#: include/classes/api/services/CHost.php:1917
+#: include/classes/api/services/CHost.php:964
+#: include/classes/api/services/CHost.php:1879
 #: include/classes/api/services/CHost.php:2116
 #: include/classes/api/services/CImage.php:442
 #: include/classes/api/services/CImage.php:487
@@ -8769,8 +8743,8 @@ msgstr "Unzulässiger Bildindex."
 #: include/classes/api/services/CProxy.php:719
 #: include/classes/api/services/CProxy.php:763
 #: include/classes/api/services/CProxy.php:785
-#: include/classes/api/services/CTemplate.php:489
-#: include/classes/api/services/CTemplate.php:662
+#: include/classes/api/services/CTemplate.php:497
+#: include/classes/api/services/CTemplate.php:671
 #: include/classes/api/services/CTrigger.php:803
 msgid "Incorrect input parameters."
 msgstr "Falsche Eingabeparameter."
@@ -8785,8 +8759,8 @@ msgstr ""
 msgid "Incorrect interface port \"%1$s\" provided."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2035
-#: include/classes/api/services/CHost.php:2195
+#: include/classes/api/services/CHost.php:2003
+#: include/classes/api/services/CHost.php:2206
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
 msgstr ""
@@ -8795,7 +8769,7 @@ msgstr ""
 msgid "Incorrect inventory mode in action operation."
 msgstr "Falscher Inventar-Modus in Aktion."
 
-#: include/classes/api/services/CGraphGeneral.php:297
+#: include/classes/api/services/CGraphGeneral.php:319
 msgid "Incorrect item for axis value."
 msgstr "Unzulässiger Datenpunkt für Achswert."
 
@@ -8922,8 +8896,8 @@ msgstr "Falsche Sortierreihenfolge für Dienst \"%1$s\"."
 msgid "Incorrect source value."
 msgstr "Falscher Quellwert."
 
-#: include/classes/api/services/CHost.php:2006
-#: include/classes/api/services/CHost.php:2161
+#: include/classes/api/services/CHost.php:1974
+#: include/classes/api/services/CHost.php:2172
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Falscher Status für Host \"%1$s\"."
@@ -8933,7 +8907,7 @@ msgstr "Falscher Status für Host \"%1$s\"."
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Falscher Status für Dienst \"%1$s\"."
 
-#: include/classes/api/services/CHttpTest.php:732
+#: include/classes/api/services/CHttpTest.php:737
 msgid "Incorrect templated web scenario step count."
 msgstr "Falsche Schrittzahl in Web Szenario Vorlage."
 
@@ -9188,23 +9162,23 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:778
 #: include/classes/api/services/CEvent.php:819
 #: include/classes/api/services/CEvent.php:876
-#: include/classes/api/services/CHost.php:972
-#: include/classes/api/services/CHost.php:1815
-#: include/classes/api/services/CHost.php:1821
-#: include/classes/api/services/CHost.php:1836
-#: include/classes/api/services/CHost.php:1842
-#: include/classes/api/services/CHost.php:1847
-#: include/classes/api/services/CHost.php:1853
-#: include/classes/api/services/CHost.php:1861
-#: include/classes/api/services/CHost.php:1867
-#: include/classes/api/services/CHost.php:1876
-#: include/classes/api/services/CHost.php:1882
-#: include/classes/api/services/CHost.php:1944
-#: include/classes/api/services/CHost.php:2000
+#: include/classes/api/services/CHost.php:922
+#: include/classes/api/services/CHost.php:1765
+#: include/classes/api/services/CHost.php:1771
+#: include/classes/api/services/CHost.php:1786
+#: include/classes/api/services/CHost.php:1792
+#: include/classes/api/services/CHost.php:1797
+#: include/classes/api/services/CHost.php:1803
+#: include/classes/api/services/CHost.php:1811
+#: include/classes/api/services/CHost.php:1817
+#: include/classes/api/services/CHost.php:1826
+#: include/classes/api/services/CHost.php:1832
+#: include/classes/api/services/CHost.php:1906
+#: include/classes/api/services/CHost.php:1968
 #: include/classes/api/services/CHost.php:2139
-#: include/classes/api/services/CHost.php:2155
-#: include/classes/api/services/CHttpTest.php:978
-#: include/classes/api/services/CHttpTest.php:1074
+#: include/classes/api/services/CHost.php:2166
+#: include/classes/api/services/CHttpTest.php:983
+#: include/classes/api/services/CHttpTest.php:1079
 #: include/classes/api/services/CItemGeneral.php:229
 #: include/classes/api/services/CItemGeneral.php:470
 #: include/classes/api/services/CItemGeneral.php:481
@@ -9258,8 +9232,8 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:2528
 #: include/classes/api/services/CItem.php:834
 #: include/classes/api/services/CItem.php:842
-#: include/classes/api/services/CItemPrototype.php:717
-#: include/classes/api/services/CItemPrototype.php:725
+#: include/classes/api/services/CItemPrototype.php:718
+#: include/classes/api/services/CItemPrototype.php:726
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMapElement.php:85
@@ -9298,7 +9272,7 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:823
 #: include/classes/api/services/CProxy.php:831
 #: include/classes/api/services/CSettings.php:312
-#: include/classes/api/services/CTemplate.php:449
+#: include/classes/api/services/CTemplate.php:450
 #: include/classes/api/services/CTriggerGeneral.php:148
 #: include/classes/api/services/CTriggerGeneral.php:156
 #: include/classes/api/services/CTriggerGeneral.php:437
@@ -9317,18 +9291,18 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:177
 #: include/classes/helpers/CSvgGraphHelper.php:372
 #: include/classes/helpers/CSvgGraphHelper.php:384
-#: include/classes/import/CConfigurationImport.php:727
-#: include/classes/import/CConfigurationImport.php:822
-#: include/classes/import/CConfigurationImport.php:859
-#: include/classes/import/CConfigurationImport.php:960
-#: include/classes/import/CConfigurationImport.php:1114
-#: include/classes/import/CConfigurationImport.php:2657
-#: include/classes/import/CConfigurationImport.php:2761
-#: include/classes/import/CConfigurationImport.php:2771
-#: include/classes/import/CConfigurationImport.php:2798
-#: include/classes/import/CConfigurationImport.php:2813
-#: include/classes/import/CConfigurationImport.php:2822
-#: include/classes/import/CConfigurationImport.php:2828
+#: include/classes/import/CConfigurationImport.php:743
+#: include/classes/import/CConfigurationImport.php:838
+#: include/classes/import/CConfigurationImport.php:875
+#: include/classes/import/CConfigurationImport.php:976
+#: include/classes/import/CConfigurationImport.php:1130
+#: include/classes/import/CConfigurationImport.php:2686
+#: include/classes/import/CConfigurationImport.php:2790
+#: include/classes/import/CConfigurationImport.php:2800
+#: include/classes/import/CConfigurationImport.php:2827
+#: include/classes/import/CConfigurationImport.php:2842
+#: include/classes/import/CConfigurationImport.php:2851
+#: include/classes/import/CConfigurationImport.php:2857
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -9462,7 +9436,7 @@ msgid "Insert"
 msgstr "Einfügen"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:341
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
 msgid "Insert expression"
 msgstr "Ausdruck einfügen"
 
@@ -9541,8 +9515,8 @@ msgid "Internal data storage period"
 msgstr "Speicherdauer interner Daten"
 
 #: include/classes/api/helpers/CApiHostHelper.php:90
-#: include/classes/api/services/CGraphGeneral.php:522
-#: include/classes/api/services/CGraphGeneral.php:705
+#: include/classes/api/services/CGraphGeneral.php:544
+#: include/classes/api/services/CGraphGeneral.php:727
 #: include/classes/api/services/CTriggerGeneral.php:1035
 #: include/classes/api/services/CTriggerGeneral.php:1162
 #: include/classes/api/services/CTriggerGeneral.php:1267
@@ -9629,11 +9603,6 @@ msgstr "Ungültige E-Mail Adresse \"%1$s\"."
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Ungültige E-Mail Adresse \"%1$s\" für Medientyp mit ID \"%1$s\"."
 
-#: include/classes/api/services/CUserMacro.php:829
-#, c-format
-msgid "Invalid hostid for macro \"%1$s\"."
-msgstr "Ungültige hostid für Makro \"%1$s\"."
-
 #: app/controllers/CControllerPopupLldOperation.php:177
 #: app/controllers/CControllerPopupLldOperation.php:182
 #: app/controllers/CControllerPopupLldOperation.php:195
@@ -9668,11 +9637,6 @@ msgstr "Ungültiger Schlüssel \"%1$s\" für Datenpunkt-Prototyp \"%2$s\"auf \"%
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Ungültiger Schlüssel \"%1$s\": %2$s."
 
-#: include/classes/api/services/CUserMacro.php:770
-#, c-format
-msgid "Invalid macro \"%1$s\": %2$s."
-msgstr "Ungültiges Makro \"%1$s\": %2$s."
-
 #: include/classes/api/services/CService.php:212
 #: include/classes/api/services/CService.php:383
 #: include/classes/api/services/CService.php:1214
@@ -9701,18 +9665,19 @@ msgstr "Ungültige Methoden-Parameter."
 #: include/classes/api/services/CDiscoveryRule.php:1992
 #: include/classes/api/services/CDiscoveryRule.php:2010
 #: include/classes/api/services/CDiscoveryRule.php:2018
-#: include/classes/api/services/CGraphGeneral.php:598
-#: include/classes/api/services/CGraphGeneral.php:721
-#: include/classes/api/services/CHostPrototype.php:322
-#: include/classes/api/services/CHostPrototype.php:1672
-#: include/classes/api/services/CHostPrototype.php:1677
-#: include/classes/api/services/CHostPrototype.php:1684
-#: include/classes/api/services/CHostPrototype.php:1689
-#: include/classes/api/services/CHostPrototype.php:1700
-#: include/classes/api/services/CHostPrototype.php:1705
-#: include/classes/api/services/CHostPrototype.php:1712
-#: include/classes/api/services/CHostPrototype.php:1718
-#: include/classes/api/services/CHostPrototype.php:1728
+#: include/classes/api/services/CGraphGeneral.php:620
+#: include/classes/api/services/CGraphGeneral.php:743
+#: include/classes/api/services/CHostBase.php:522
+#: include/classes/api/services/CHostPrototype.php:325
+#: include/classes/api/services/CHostPrototype.php:1657
+#: include/classes/api/services/CHostPrototype.php:1662
+#: include/classes/api/services/CHostPrototype.php:1669
+#: include/classes/api/services/CHostPrototype.php:1674
+#: include/classes/api/services/CHostPrototype.php:1685
+#: include/classes/api/services/CHostPrototype.php:1690
+#: include/classes/api/services/CHostPrototype.php:1697
+#: include/classes/api/services/CHostPrototype.php:1703
+#: include/classes/api/services/CHostPrototype.php:1713
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CItemGeneral.php:603
 #: include/classes/api/services/CItemGeneral.php:616
@@ -9735,111 +9700,113 @@ msgstr "Ungültige Methoden-Parameter."
 #: include/classes/api/services/CReport.php:617
 #: include/classes/api/services/CScript.php:1025
 #: include/classes/api/services/CScript.php:1031
-#: include/classes/api/services/CTemplate.php:656
+#: include/classes/api/services/CTemplate.php:665
 #: include/classes/api/services/CTriggerGeneral.php:665
 #: include/classes/api/services/CTriggerGeneral.php:1815
 #: include/classes/api/services/CTriggerGeneral.php:1834
 #: include/classes/api/services/CUser.php:846
 #: include/classes/api/services/CUser.php:857
 #: include/classes/api/services/CValueMap.php:432
-#: include/classes/api/services/CValueMap.php:577
-#: include/classes/api/services/CValueMap.php:587
+#: include/classes/api/services/CValueMap.php:581
+#: include/classes/api/services/CValueMap.php:591
 #: include/classes/helpers/CDashboardHelper.php:368
 #: include/classes/helpers/CDashboardHelper.php:388
 #: include/classes/helpers/CDashboardHelper.php:396
 #: include/classes/helpers/CDashboardHelper.php:406
-#: include/classes/validators/CApiInputValidator.php:302
-#: include/classes/validators/CApiInputValidator.php:307
-#: include/classes/validators/CApiInputValidator.php:312
-#: include/classes/validators/CApiInputValidator.php:339
-#: include/classes/validators/CApiInputValidator.php:352
-#: include/classes/validators/CApiInputValidator.php:363
-#: include/classes/validators/CApiInputValidator.php:393
-#: include/classes/validators/CApiInputValidator.php:454
-#: include/classes/validators/CApiInputValidator.php:461
-#: include/classes/validators/CApiInputValidator.php:493
-#: include/classes/validators/CApiInputValidator.php:498
-#: include/classes/validators/CApiInputValidator.php:540
-#: include/classes/validators/CApiInputValidator.php:545
-#: include/classes/validators/CApiInputValidator.php:579
-#: include/classes/validators/CApiInputValidator.php:584
-#: include/classes/validators/CApiInputValidator.php:625
-#: include/classes/validators/CApiInputValidator.php:630
-#: include/classes/validators/CApiInputValidator.php:684
-#: include/classes/validators/CApiInputValidator.php:718
-#: include/classes/validators/CApiInputValidator.php:723
-#: include/classes/validators/CApiInputValidator.php:779
-#: include/classes/validators/CApiInputValidator.php:812
-#: include/classes/validators/CApiInputValidator.php:817
-#: include/classes/validators/CApiInputValidator.php:858
-#: include/classes/validators/CApiInputValidator.php:863
-#: include/classes/validators/CApiInputValidator.php:868
-#: include/classes/validators/CApiInputValidator.php:904
-#: include/classes/validators/CApiInputValidator.php:959
-#: include/classes/validators/CApiInputValidator.php:966
-#: include/classes/validators/CApiInputValidator.php:993
-#: include/classes/validators/CApiInputValidator.php:1038
-#: include/classes/validators/CApiInputValidator.php:1065
-#: include/classes/validators/CApiInputValidator.php:1070
-#: include/classes/validators/CApiInputValidator.php:1077
-#: include/classes/validators/CApiInputValidator.php:1108
-#: include/classes/validators/CApiInputValidator.php:1153
-#: include/classes/validators/CApiInputValidator.php:1158
-#: include/classes/validators/CApiInputValidator.php:1196
-#: include/classes/validators/CApiInputValidator.php:1201
-#: include/classes/validators/CApiInputValidator.php:1206
-#: include/classes/validators/CApiInputValidator.php:1251
-#: include/classes/validators/CApiInputValidator.php:1260
-#: include/classes/validators/CApiInputValidator.php:1266
-#: include/classes/validators/CApiInputValidator.php:1294
-#: include/classes/validators/CApiInputValidator.php:1304
-#: include/classes/validators/CApiInputValidator.php:1310
-#: include/classes/validators/CApiInputValidator.php:1348
-#: include/classes/validators/CApiInputValidator.php:1360
-#: include/classes/validators/CApiInputValidator.php:1369
-#: include/classes/validators/CApiInputValidator.php:1376
-#: include/classes/validators/CApiInputValidator.php:1381
-#: include/classes/validators/CApiInputValidator.php:1423
-#: include/classes/validators/CApiInputValidator.php:1440
-#: include/classes/validators/CApiInputValidator.php:1466
-#: include/classes/validators/CApiInputValidator.php:1471
-#: include/classes/validators/CApiInputValidator.php:1495
-#: include/classes/validators/CApiInputValidator.php:1500
-#: include/classes/validators/CApiInputValidator.php:1526
-#: include/classes/validators/CApiInputValidator.php:1533
-#: include/classes/validators/CApiInputValidator.php:1560
-#: include/classes/validators/CApiInputValidator.php:1567
-#: include/classes/validators/CApiInputValidator.php:1594
-#: include/classes/validators/CApiInputValidator.php:1603
-#: include/classes/validators/CApiInputValidator.php:1640
-#: include/classes/validators/CApiInputValidator.php:1656
-#: include/classes/validators/CApiInputValidator.php:1667
-#: include/classes/validators/CApiInputValidator.php:1700
-#: include/classes/validators/CApiInputValidator.php:1755
-#: include/classes/validators/CApiInputValidator.php:1842
-#: include/classes/validators/CApiInputValidator.php:1847
-#: include/classes/validators/CApiInputValidator.php:1874
-#: include/classes/validators/CApiInputValidator.php:1884
-#: include/classes/validators/CApiInputValidator.php:1916
-#: include/classes/validators/CApiInputValidator.php:1928
-#: include/classes/validators/CApiInputValidator.php:1960
-#: include/classes/validators/CApiInputValidator.php:1971
-#: include/classes/validators/CApiInputValidator.php:1994
-#: include/classes/validators/CApiInputValidator.php:2009
-#: include/classes/validators/CApiInputValidator.php:2062
-#: include/classes/validators/CApiInputValidator.php:2072
-#: include/classes/validators/CApiInputValidator.php:2082
-#: include/classes/validators/CApiInputValidator.php:2106
-#: include/classes/validators/CApiInputValidator.php:2113
-#: include/classes/validators/CApiInputValidator.php:2135
-#: include/classes/validators/CApiInputValidator.php:2155
-#: include/classes/validators/CApiInputValidator.php:2185
-#: include/classes/validators/CApiInputValidator.php:2190
-#: include/classes/validators/CApiInputValidator.php:2226
-#: include/classes/validators/CApiInputValidator.php:2233
-#: include/classes/validators/CApiInputValidator.php:2258
-#: include/classes/validators/CApiInputValidator.php:2263
-#: include/classes/validators/CApiInputValidator.php:2269
+#: include/classes/validators/CApiInputValidator.php:306
+#: include/classes/validators/CApiInputValidator.php:311
+#: include/classes/validators/CApiInputValidator.php:316
+#: include/classes/validators/CApiInputValidator.php:343
+#: include/classes/validators/CApiInputValidator.php:356
+#: include/classes/validators/CApiInputValidator.php:367
+#: include/classes/validators/CApiInputValidator.php:397
+#: include/classes/validators/CApiInputValidator.php:458
+#: include/classes/validators/CApiInputValidator.php:465
+#: include/classes/validators/CApiInputValidator.php:497
+#: include/classes/validators/CApiInputValidator.php:502
+#: include/classes/validators/CApiInputValidator.php:544
+#: include/classes/validators/CApiInputValidator.php:549
+#: include/classes/validators/CApiInputValidator.php:583
+#: include/classes/validators/CApiInputValidator.php:588
+#: include/classes/validators/CApiInputValidator.php:629
+#: include/classes/validators/CApiInputValidator.php:634
+#: include/classes/validators/CApiInputValidator.php:688
+#: include/classes/validators/CApiInputValidator.php:722
+#: include/classes/validators/CApiInputValidator.php:727
+#: include/classes/validators/CApiInputValidator.php:783
+#: include/classes/validators/CApiInputValidator.php:816
+#: include/classes/validators/CApiInputValidator.php:821
+#: include/classes/validators/CApiInputValidator.php:862
+#: include/classes/validators/CApiInputValidator.php:867
+#: include/classes/validators/CApiInputValidator.php:872
+#: include/classes/validators/CApiInputValidator.php:908
+#: include/classes/validators/CApiInputValidator.php:963
+#: include/classes/validators/CApiInputValidator.php:970
+#: include/classes/validators/CApiInputValidator.php:997
+#: include/classes/validators/CApiInputValidator.php:1042
+#: include/classes/validators/CApiInputValidator.php:1069
+#: include/classes/validators/CApiInputValidator.php:1074
+#: include/classes/validators/CApiInputValidator.php:1081
+#: include/classes/validators/CApiInputValidator.php:1112
+#: include/classes/validators/CApiInputValidator.php:1157
+#: include/classes/validators/CApiInputValidator.php:1162
+#: include/classes/validators/CApiInputValidator.php:1200
+#: include/classes/validators/CApiInputValidator.php:1205
+#: include/classes/validators/CApiInputValidator.php:1210
+#: include/classes/validators/CApiInputValidator.php:1255
+#: include/classes/validators/CApiInputValidator.php:1264
+#: include/classes/validators/CApiInputValidator.php:1270
+#: include/classes/validators/CApiInputValidator.php:1298
+#: include/classes/validators/CApiInputValidator.php:1308
+#: include/classes/validators/CApiInputValidator.php:1314
+#: include/classes/validators/CApiInputValidator.php:1352
+#: include/classes/validators/CApiInputValidator.php:1364
+#: include/classes/validators/CApiInputValidator.php:1373
+#: include/classes/validators/CApiInputValidator.php:1380
+#: include/classes/validators/CApiInputValidator.php:1385
+#: include/classes/validators/CApiInputValidator.php:1427
+#: include/classes/validators/CApiInputValidator.php:1444
+#: include/classes/validators/CApiInputValidator.php:1470
+#: include/classes/validators/CApiInputValidator.php:1477
+#: include/classes/validators/CApiInputValidator.php:1501
+#: include/classes/validators/CApiInputValidator.php:1506
+#: include/classes/validators/CApiInputValidator.php:1532
+#: include/classes/validators/CApiInputValidator.php:1539
+#: include/classes/validators/CApiInputValidator.php:1566
+#: include/classes/validators/CApiInputValidator.php:1573
+#: include/classes/validators/CApiInputValidator.php:1600
+#: include/classes/validators/CApiInputValidator.php:1609
+#: include/classes/validators/CApiInputValidator.php:1646
+#: include/classes/validators/CApiInputValidator.php:1662
+#: include/classes/validators/CApiInputValidator.php:1673
+#: include/classes/validators/CApiInputValidator.php:1706
+#: include/classes/validators/CApiInputValidator.php:1797
+#: include/classes/validators/CApiInputValidator.php:1882
+#: include/classes/validators/CApiInputValidator.php:1887
+#: include/classes/validators/CApiInputValidator.php:1914
+#: include/classes/validators/CApiInputValidator.php:1924
+#: include/classes/validators/CApiInputValidator.php:1956
+#: include/classes/validators/CApiInputValidator.php:1968
+#: include/classes/validators/CApiInputValidator.php:2000
+#: include/classes/validators/CApiInputValidator.php:2011
+#: include/classes/validators/CApiInputValidator.php:2034
+#: include/classes/validators/CApiInputValidator.php:2049
+#: include/classes/validators/CApiInputValidator.php:2102
+#: include/classes/validators/CApiInputValidator.php:2112
+#: include/classes/validators/CApiInputValidator.php:2122
+#: include/classes/validators/CApiInputValidator.php:2146
+#: include/classes/validators/CApiInputValidator.php:2153
+#: include/classes/validators/CApiInputValidator.php:2175
+#: include/classes/validators/CApiInputValidator.php:2195
+#: include/classes/validators/CApiInputValidator.php:2225
+#: include/classes/validators/CApiInputValidator.php:2230
+#: include/classes/validators/CApiInputValidator.php:2266
+#: include/classes/validators/CApiInputValidator.php:2273
+#: include/classes/validators/CApiInputValidator.php:2298
+#: include/classes/validators/CApiInputValidator.php:2303
+#: include/classes/validators/CApiInputValidator.php:2309
+#: include/classes/validators/CApiInputValidator.php:2335
+#: include/classes/validators/CApiInputValidator.php:2342
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:130
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
@@ -9851,7 +9818,7 @@ msgstr "Ungültiger Parameter \"%1$s\": %2$s."
 msgid "Invalid params."
 msgstr "Ungültige Parameter."
 
-#: include/classes/api/services/CHttpTest.php:781
+#: include/classes/api/services/CHttpTest.php:786
 #, c-format
 msgid "Invalid response code \"%1$s\"."
 msgstr "Ungültiger Antwort-Code \"%1$s\"."
@@ -9922,26 +9889,15 @@ msgstr "Ungültige Marker \"%1$s\": %2$s."
 msgid "Invalid time period."
 msgstr "Ungültige Zeitspanne."
 
-#: include/classes/api/services/CUserMacro.php:783
-#, c-format
-msgid "Invalid type for macro \"%1$s\"."
-msgstr ""
-
-#: include/classes/api/services/CUserMacro.php:803
-#: include/classes/api/services/CUserMacro.php:811
-#, c-format
-msgid "Invalid value for macro \"%1$s\": %2$s."
-msgstr ""
-
 #: app/views/popup.massupdate.host.php:301
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:349
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
 msgid "Inventory"
 msgstr "Inventar"
 
-#: include/classes/api/services/CHost.php:1211
+#: include/classes/api/services/CHost.php:1161
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -9989,7 +9945,7 @@ msgstr "Italienisch (it_IT)"
 msgid "Item"
 msgstr "Datenpunkt"
 
-#: include/classes/api/services/CHostPrototype.php:1199
+#: include/classes/api/services/CHostPrototype.php:1213
 #: include/classes/api/services/CItem.php:61
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -10127,7 +10083,7 @@ msgstr "Datenpunkt-Prototypen aktualisiert"
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:371
+#: jsLoader.php:372
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10502,11 +10458,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Letzte Überprüfung"
 
-#: jsLoader.php:352
+#: jsLoader.php:353
 msgid "Last hour graph"
 msgstr "Diagramm der letzten Stunde"
 
-#: jsLoader.php:353
+#: jsLoader.php:354
 msgid "Last month graph"
 msgstr "Diagramm des letzten Monats"
 
@@ -10536,7 +10492,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Aktueller Wert"
 
-#: jsLoader.php:354
+#: jsLoader.php:355
 msgid "Last week graph"
 msgstr "Diagramm der letzten Woche"
 
@@ -10549,11 +10505,11 @@ msgstr "Diagramm der letzten Woche"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:350
+#: include/views/inventory.host.view.php:149 jsLoader.php:351
 msgid "Latest data"
 msgstr "Aktuelle Daten"
 
-#: jsLoader.php:351
+#: jsLoader.php:352
 msgid "Latest values"
 msgstr "Aktuellste Werte"
 
@@ -10566,9 +10522,9 @@ msgstr "Lettisch (lv_LV)"
 msgid "Layout"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:755
-#: include/classes/widgets/CWidgetHelper.php:830
-#: include/classes/widgets/CWidgetHelper.php:1098
+#: include/classes/widgets/CWidgetHelper.php:767
+#: include/classes/widgets/CWidgetHelper.php:842
+#: include/classes/widgets/CWidgetHelper.php:1110
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:85
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:101
@@ -10611,9 +10567,9 @@ msgstr ""
 msgid "Limit for search and filter results"
 msgstr "Grenzen für Suche/Filter-Ergebnisse "
 
-#: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:786
-#: include/classes/widgets/CWidgetHelper.php:1035 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:755
+#: include/classes/widgets/CWidgetHelper.php:798
+#: include/classes/widgets/CWidgetHelper.php:1047 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:362
 #: include/views/js/monitoring.sysmaps.js.php:411
 #: include/views/js/monitoring.sysmaps.js.php:780
@@ -10911,25 +10867,16 @@ msgstr "MD5-Prüfsumme der Datei. Rückgabewert Zeichenkette (MD5-Hash der Datei
 msgid "Macro"
 msgstr "Makro"
 
-#: include/classes/api/services/CUserMacro.php:1024
+#: include/classes/api/services/CHostBase.php:577
+#: include/classes/api/services/CUserMacro.php:668
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "Makro \"%1$s\" existiert bereits auf \"%2$s\"."
 
-#: include/classes/api/services/CUserMacro.php:446
+#: include/classes/api/services/CUserMacro.php:420
 #, c-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "Makro \"%1$s\" existiert bereits."
-
-#: include/classes/api/services/CUserMacro.php:926
-#, c-format
-msgid "Macro \"%1$s\" is not unique."
-msgstr "Makro \"%1$s\" ist nicht einzigartig."
-
-#: include/classes/api/services/CUserMacro.php:1048
-#, c-format
-msgid "Macro with hostmacroid \"%1$s\" does not exist."
-msgstr "Es existiert kein Makro mit hostmacroid \"%1$s\"."
 
 #: app/partials/massupdate.macros.tab.php:120
 #: app/views/administration.macros.edit.php:33
@@ -11197,9 +11144,9 @@ msgstr "Markieren"
 msgid "Mask"
 msgstr "Maske"
 
-#: app/controllers/CControllerPopupMassupdateHost.php:487
+#: app/controllers/CControllerPopupMassupdateHost.php:445
 #: app/controllers/CControllerPopupMassupdateItem.php:405
-#: app/controllers/CControllerPopupMassupdateTemplate.php:406
+#: app/controllers/CControllerPopupMassupdateTemplate.php:363
 #: app/controllers/CControllerPopupMassupdateTrigger.php:234
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/views/configuration.host.list.php:444
@@ -11534,12 +11481,8 @@ msgstr[1] "Anzuzeigende Mindestzeit ist %1$s Minutne."
 msgid "Minutes"
 msgstr "Minuten"
 
-#: include/classes/api/services/CGraphGeneral.php:81
-msgid "Missing \"gitemid\" field for item."
-msgstr ""
-
-#: include/classes/api/services/CGraphGeneral.php:462
-#: include/classes/api/services/CGraphGeneral.php:648
+#: include/classes/api/services/CGraphGeneral.php:484
+#: include/classes/api/services/CGraphGeneral.php:670
 msgid "Missing \"itemid\" field for item."
 msgstr "Feld \"itemid\" fehlt bei Datenpunkt."
 
@@ -11551,11 +11494,11 @@ msgstr "Fehlendes \"Namen\" Feld für den Diagramm-Prototypen"
 msgid "Missing \"name\" field for graph."
 msgstr "Feld \"name\" fehlt bei Diagramm."
 
-#: include/classes/widgets/CWidgetHelper.php:750
-#: include/classes/widgets/CWidgetHelper.php:826
-#: include/classes/widgets/CWidgetHelper.php:827
-#: include/classes/widgets/CWidgetHelper.php:828
-#: include/classes/widgets/CWidgetHelper.php:1082
+#: include/classes/widgets/CWidgetHelper.php:762
+#: include/classes/widgets/CWidgetHelper.php:838
+#: include/classes/widgets/CWidgetHelper.php:839
+#: include/classes/widgets/CWidgetHelper.php:840
+#: include/classes/widgets/CWidgetHelper.php:1094
 msgid "Missing data"
 msgstr "Fehlende Daten"
 
@@ -11704,7 +11647,7 @@ msgstr ""
 msgid "More than 10 minutes"
 msgstr "Mehr als 10 Minuten"
 
-#: include/classes/api/services/CGraphGeneral.php:844
+#: include/classes/api/services/CGraphGeneral.php:866
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
 msgstr "Es existiert mehr als ein Diagramm namens \"%1$s\" auf dem Host."
@@ -12178,7 +12121,7 @@ msgid "No data."
 msgstr "Keine Daten."
 
 #: include/classes/api/services/CHostInterface.php:1023
-#: include/classes/api/services/CHostPrototype.php:1765
+#: include/classes/api/services/CHostPrototype.php:1750
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Keine Standardschnittstelle für Typ \"%1$s\" bei \"%2$s\"."
@@ -12228,11 +12171,6 @@ msgstr "Keine Diagramme hinzugefügt."
 msgid "No host IDs given."
 msgstr "Keine Host-IDs angegeben."
 
-#: include/classes/api/services/CUserMacro.php:825
-#, c-format
-msgid "No host given for macro \"%1$s\"."
-msgstr "Kein Host angegeben für Makro \"%1$s\"."
-
 #: include/hosts.inc.php:515
 #, c-format
 msgid "No host groups with groupid \"%1$s\"."
@@ -12259,7 +12197,7 @@ msgstr "Kein Bild"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:370
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
 msgid "No interface found"
 msgstr "Keine Schnittstelle gefunden"
 
@@ -12374,14 +12312,15 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:802
 #: include/classes/api/services/CEvent.php:841
 #: include/classes/api/services/CEvent.php:866
-#: include/classes/api/services/CGraphGeneral.php:71
-#: include/classes/api/services/CGraphGeneral.php:93
-#: include/classes/api/services/CGraph.php:559
-#: include/classes/api/services/CGraph.php:693
-#: include/classes/api/services/CGraphPrototype.php:573
-#: include/classes/api/services/CGraphPrototype.php:658
-#: include/classes/api/services/CGraphPrototype.php:720
+#: include/classes/api/services/CGraphGeneral.php:78
+#: include/classes/api/services/CGraphGeneral.php:90
+#: include/classes/api/services/CGraph.php:369
+#: include/classes/api/services/CGraph.php:503
+#: include/classes/api/services/CGraphPrototype.php:369
+#: include/classes/api/services/CGraphPrototype.php:457
+#: include/classes/api/services/CGraphPrototype.php:519
 #: include/classes/api/services/CHostBase.php:56
+#: include/classes/api/services/CHostBase.php:533
 #: include/classes/api/services/CHostGeneral.php:66
 #: include/classes/api/services/CHostGroup.php:790
 #: include/classes/api/services/CHostGroup.php:894
@@ -12395,21 +12334,21 @@ msgstr ""
 #: include/classes/api/services/CHostInterface.php:595
 #: include/classes/api/services/CHostInterface.php:870
 #: include/classes/api/services/CHostInterface.php:899
-#: include/classes/api/services/CHost.php:1338
-#: include/classes/api/services/CHost.php:1373
-#: include/classes/api/services/CHost.php:1989
+#: include/classes/api/services/CHost.php:1288
+#: include/classes/api/services/CHost.php:1323
+#: include/classes/api/services/CHost.php:1957
 #: include/classes/api/services/CHost.php:2122
-#: include/classes/api/services/CHostPrototype.php:549
-#: include/classes/api/services/CHostPrototype.php:595
-#: include/classes/api/services/CHostPrototype.php:616
-#: include/classes/api/services/CHostPrototype.php:1224
-#: include/classes/api/services/CHostPrototype.php:1246
-#: include/classes/api/services/CHostPrototype.php:1280
+#: include/classes/api/services/CHostPrototype.php:543
+#: include/classes/api/services/CHostPrototype.php:602
+#: include/classes/api/services/CHostPrototype.php:623
+#: include/classes/api/services/CHostPrototype.php:1238
+#: include/classes/api/services/CHostPrototype.php:1260
+#: include/classes/api/services/CHostPrototype.php:1294
 #: include/classes/api/services/CHousekeeping.php:169
 #: include/classes/api/services/CHttpTest.php:505
-#: include/classes/api/services/CHttpTest.php:597
-#: include/classes/api/services/CHttpTest.php:684
-#: include/classes/api/services/CHttpTest.php:744
+#: include/classes/api/services/CHttpTest.php:602
+#: include/classes/api/services/CHttpTest.php:689
+#: include/classes/api/services/CHttpTest.php:749
 #: include/classes/api/services/CIconMap.php:285
 #: include/classes/api/services/CIconMap.php:528
 #: include/classes/api/services/CImage.php:354
@@ -12420,7 +12359,7 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:329
 #: include/classes/api/services/CItemGeneral.php:344
 #: include/classes/api/services/CItem.php:763
-#: include/classes/api/services/CItemPrototype.php:647
+#: include/classes/api/services/CItemPrototype.php:648
 #: include/classes/api/services/CMaintenance.php:270
 #: include/classes/api/services/CMaintenance.php:299
 #: include/classes/api/services/CMaintenance.php:312
@@ -12459,10 +12398,10 @@ msgstr ""
 #: include/classes/api/services/CTask.php:477
 #: include/classes/api/services/CTemplateDashboard.php:291
 #: include/classes/api/services/CTemplateDashboard.php:378
-#: include/classes/api/services/CTemplate.php:887
+#: include/classes/api/services/CTemplate.php:909
 #: include/classes/api/services/CToken.php:372
-#: include/classes/api/services/CToken.php:435
-#: include/classes/api/services/CToken.php:472
+#: include/classes/api/services/CToken.php:439
+#: include/classes/api/services/CToken.php:476
 #: include/classes/api/services/CTriggerGeneral.php:1062
 #: include/classes/api/services/CTrigger.php:649
 #: include/classes/api/services/CTrigger.php:696
@@ -12473,9 +12412,11 @@ msgstr ""
 #: include/classes/api/services/CTriggerPrototype.php:711
 #: include/classes/api/services/CUserGroup.php:336
 #: include/classes/api/services/CUserGroup.php:884
-#: include/classes/api/services/CUserMacro.php:391
-#: include/classes/api/services/CUserMacro.php:491
-#: include/classes/api/services/CUserMacro.php:878
+#: include/classes/api/services/CUserMacro.php:353
+#: include/classes/api/services/CUserMacro.php:463
+#: include/classes/api/services/CUserMacro.php:550
+#: include/classes/api/services/CUserMacro.php:742
+#: include/classes/api/services/CUserMacro.php:804
 #: include/classes/api/services/CUser.php:541
 #: include/classes/api/services/CUser.php:1179
 #: include/classes/api/services/CValueMap.php:299
@@ -12533,7 +12474,7 @@ msgstr "Keine Auslöser definiert."
 msgid "No value"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:929
+#: include/classes/validators/CApiInputValidator.php:933
 msgid "Non-boolean flags are deprecated."
 msgstr "Nicht boolesche Markierungen sind veraltet."
 
@@ -12546,9 +12487,9 @@ msgstr "Nicht boolesche Markierungen sind veraltet."
 #: app/views/administration.proxy.list.php:123
 #: app/views/administration.proxy.list.php:136
 #: app/views/administration.usergroup.edit.php:135
-#: include/classes/widgets/CWidgetHelper.php:751
-#: include/classes/widgets/CWidgetHelper.php:826
-#: include/classes/widgets/CWidgetHelper.php:1086
+#: include/classes/widgets/CWidgetHelper.php:763
+#: include/classes/widgets/CWidgetHelper.php:838
+#: include/classes/widgets/CWidgetHelper.php:1098
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:140
 #: include/classes/widgets/forms/CWidgetFormProblems.php:118
 #: include/classes/widgets/forms/CWidgetFormProblems.php:140
@@ -12931,7 +12872,7 @@ msgstr "Aus"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:382
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
 #: report2.php:506
 msgid "Ok"
 msgstr "Ok"
@@ -13573,7 +13514,7 @@ msgstr "Parameter"
 #: include/classes/api/services/CUser.php:485
 #: include/classes/api/services/CUser.php:532
 #: include/classes/api/services/CUser.php:1417
-#: include/classes/validators/CApiInputValidator.php:989
+#: include/classes/validators/CApiInputValidator.php:993
 #, c-format
 msgid "Parameter \"%1$s\" is deprecated."
 msgstr "Parameter \"%1$s\" ist veraltet."
@@ -13833,24 +13774,24 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "Bitte zwei Elemente auswählen"
 
-#: include/classes/widgets/CWidgetHelper.php:749
-#: include/classes/widgets/CWidgetHelper.php:815
-#: include/classes/widgets/CWidgetHelper.php:816
-#: include/classes/widgets/CWidgetHelper.php:817
-#: include/classes/widgets/CWidgetHelper.php:818
-#: include/classes/widgets/CWidgetHelper.php:819
-#: include/classes/widgets/CWidgetHelper.php:820
-#: include/classes/widgets/CWidgetHelper.php:821
-#: include/classes/widgets/CWidgetHelper.php:822
-#: include/classes/widgets/CWidgetHelper.php:823
-#: include/classes/widgets/CWidgetHelper.php:824
-#: include/classes/widgets/CWidgetHelper.php:1050
+#: include/classes/widgets/CWidgetHelper.php:761
+#: include/classes/widgets/CWidgetHelper.php:827
+#: include/classes/widgets/CWidgetHelper.php:828
+#: include/classes/widgets/CWidgetHelper.php:829
+#: include/classes/widgets/CWidgetHelper.php:830
+#: include/classes/widgets/CWidgetHelper.php:831
+#: include/classes/widgets/CWidgetHelper.php:832
+#: include/classes/widgets/CWidgetHelper.php:833
+#: include/classes/widgets/CWidgetHelper.php:834
+#: include/classes/widgets/CWidgetHelper.php:835
+#: include/classes/widgets/CWidgetHelper.php:836
+#: include/classes/widgets/CWidgetHelper.php:1062
 msgid "Point size"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:744
-#: include/classes/widgets/CWidgetHelper.php:787
-#: include/classes/widgets/CWidgetHelper.php:1036
+#: include/classes/widgets/CWidgetHelper.php:756
+#: include/classes/widgets/CWidgetHelper.php:799
+#: include/classes/widgets/CWidgetHelper.php:1048
 #: include/views/js/monitoring.sysmaps.js.php:432
 msgid "Points"
 msgstr "Punkte"
@@ -14138,7 +14079,7 @@ msgstr "Problem, wenn mindestens ein untergeordneter Dienst Probleme hat"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:355 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
 msgid "Problems"
 msgstr "Probleme"
 
@@ -14581,8 +14522,8 @@ msgstr "Befehl ausführen"
 #: app/views/popup.media.php:110 app/views/popup.valuemap.edit.php:91
 #: include/classes/helpers/CTagFilterFieldHelper.php:82
 #: include/classes/helpers/CTagFilterFieldHelper.php:135
-#: include/classes/widgets/CWidgetHelper.php:506
-#: include/classes/widgets/CWidgetHelper.php:559 include/forms.inc.php:1456
+#: include/classes/widgets/CWidgetHelper.php:518
+#: include/classes/widgets/CWidgetHelper.php:571 include/forms.inc.php:1456
 #: include/forms.inc.php:2004 include/views/configuration.action.edit.php:97
 #: include/views/configuration.action.edit.php:258
 #: include/views/configuration.action.edit.php:286
@@ -15031,9 +14972,9 @@ msgstr ""
 msgid "Revert changes"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:756
-#: include/classes/widgets/CWidgetHelper.php:831
-#: include/classes/widgets/CWidgetHelper.php:1099
+#: include/classes/widgets/CWidgetHelper.php:768
+#: include/classes/widgets/CWidgetHelper.php:843
+#: include/classes/widgets/CWidgetHelper.php:1111
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/configuration.graph.edit.js.php:148
 #: include/views/js/monitoring.sysmaps.js.php:36
@@ -15507,7 +15448,7 @@ msgstr "Skript geändert"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:356
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
 msgid "Scripts"
 msgstr "Skripte"
 
@@ -15580,7 +15521,7 @@ msgstr ""
 #: app/views/popup.condition.common.php:398 app/views/popup.generic.php:638
 #: app/views/popup.massupdate.item.php:421 app/views/popup.services.php:132
 #: app/views/popup.triggerexpr.php:76 include/classes/html/CMultiSelect.php:86
-#: include/classes/widgets/CWidgetHelper.php:359
+#: include/classes/widgets/CWidgetHelper.php:371
 #: include/views/configuration.graph.edit.php:207
 #: include/views/configuration.graph.edit.php:294
 #: include/views/configuration.item.edit.php:101
@@ -15842,7 +15783,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr ""
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:388
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
 msgid "Set new value"
 msgstr ""
 
@@ -15932,7 +15873,7 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:342
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
 msgid "Sharing"
 msgstr "Teilen"
 
@@ -16283,9 +16224,9 @@ msgstr "Geschwindigkeit"
 msgid "Stacked"
 msgstr "Gestapelt"
 
-#: include/classes/widgets/CWidgetHelper.php:745
-#: include/classes/widgets/CWidgetHelper.php:788
-#: include/classes/widgets/CWidgetHelper.php:1037
+#: include/classes/widgets/CWidgetHelper.php:757
+#: include/classes/widgets/CWidgetHelper.php:800
+#: include/classes/widgets/CWidgetHelper.php:1049
 msgid "Staircase"
 msgstr ""
 
@@ -16548,7 +16489,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Subjekt"
 
-#: jsLoader.php:357
+#: jsLoader.php:358
 msgid "Submap"
 msgstr "Unter-Karte"
 
@@ -16844,16 +16785,16 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Vorlage"
 
-#: include/classes/api/services/CHost.php:1060
-#: include/classes/api/services/CTemplate.php:506
+#: include/classes/api/services/CHost.php:1010
+#: include/classes/api/services/CTemplate.php:514
 #: include/classes/import/importers/CTemplateImporter.php:79
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Vorlage \"%1$s\" existiert bereits."
 
 #: include/classes/api/services/CHostGroup.php:1566
-#: include/classes/api/services/CTemplate.php:440
-#: include/classes/api/services/CTemplate.php:1129
+#: include/classes/api/services/CTemplate.php:441
+#: include/classes/api/services/CTemplate.php:1151
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr ""
@@ -16863,7 +16804,7 @@ msgstr ""
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Vorlage \"%1$s\" für Host \"%2$s\" existiert nicht."
 
-#: templates.php:208
+#: templates.php:212
 msgid "Template added"
 msgstr "Vorlage angelegt"
 
@@ -16883,7 +16824,7 @@ msgstr ""
 msgid "Template dashboards"
 msgstr ""
 
-#: templates.php:432 templates.php:446 templates.php:479
+#: templates.php:436 templates.php:450 templates.php:483
 msgid "Template deleted"
 msgstr "Vorlage gelöscht"
 
@@ -16907,7 +16848,7 @@ msgstr "Vorlagenname"
 msgid "Template trigger"
 msgstr "Vorlagen-Auslöser"
 
-#: templates.php:212
+#: templates.php:216
 msgid "Template updated"
 msgstr "Vorlage geändert"
 
@@ -16915,17 +16856,17 @@ msgstr "Vorlage geändert"
 msgid "Template value"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2081
-#: include/classes/api/services/CHost.php:2324
-#: include/classes/api/services/CTemplate.php:1184
+#: include/classes/api/services/CHost.php:2049
+#: include/classes/api/services/CHost.php:2335
+#: include/classes/api/services/CTemplate.php:1206
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2087
-#: include/classes/api/services/CHost.php:2332
-#: include/classes/api/services/CTemplate.php:529
-#: include/classes/api/services/CTemplate.php:1149
+#: include/classes/api/services/CHost.php:2055
+#: include/classes/api/services/CHost.php:2343
+#: include/classes/api/services/CTemplate.php:537
+#: include/classes/api/services/CTemplate.php:1171
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr ""
@@ -16963,7 +16904,7 @@ msgstr "Vorlagen"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Vorlage \"%1$s\" getrennt von Host \"%2$s\"."
 
-#: app/controllers/CControllerPopupMassupdateTemplate.php:391
+#: app/controllers/CControllerPopupMassupdateTemplate.php:348
 msgid "Templates updated"
 msgstr ""
 
@@ -17279,9 +17220,9 @@ msgstr "Zeitspanne"
 #: app/controllers/CControllerPopupTriggerExpr.php:188
 #: app/controllers/CControllerPopupTriggerExpr.php:207
 #: app/controllers/CControllerPopupTriggerExpr.php:236
-#: include/classes/widgets/CWidgetHelper.php:757
-#: include/classes/widgets/CWidgetHelper.php:833
-#: include/classes/widgets/CWidgetHelper.php:1102
+#: include/classes/widgets/CWidgetHelper.php:769
+#: include/classes/widgets/CWidgetHelper.php:845
+#: include/classes/widgets/CWidgetHelper.php:1114
 msgid "Time shift"
 msgstr "Zeitverschiebung"
 
@@ -17320,7 +17261,7 @@ msgstr "Zeitstempel"
 msgid "To"
 msgstr "Bis"
 
-#: jsLoader.php:369
+#: jsLoader.php:370
 msgid "To set a host interface select a single item type for all items"
 msgstr "Zur Festlegung der Hostschnittstelle wählen Sie nur Datenpunkt eines Typs"
 
@@ -17392,19 +17333,19 @@ msgstr "Forme SQL Anfrageergebnis für einen low-level Suchlauf in ein JSON Arra
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:747
-#: include/classes/widgets/CWidgetHelper.php:791
-#: include/classes/widgets/CWidgetHelper.php:792
-#: include/classes/widgets/CWidgetHelper.php:793
-#: include/classes/widgets/CWidgetHelper.php:794
-#: include/classes/widgets/CWidgetHelper.php:795
-#: include/classes/widgets/CWidgetHelper.php:796
-#: include/classes/widgets/CWidgetHelper.php:797
-#: include/classes/widgets/CWidgetHelper.php:798
-#: include/classes/widgets/CWidgetHelper.php:799
-#: include/classes/widgets/CWidgetHelper.php:800
-#: include/classes/widgets/CWidgetHelper.php:801
-#: include/classes/widgets/CWidgetHelper.php:1058
+#: include/classes/widgets/CWidgetHelper.php:759
+#: include/classes/widgets/CWidgetHelper.php:803
+#: include/classes/widgets/CWidgetHelper.php:804
+#: include/classes/widgets/CWidgetHelper.php:805
+#: include/classes/widgets/CWidgetHelper.php:806
+#: include/classes/widgets/CWidgetHelper.php:807
+#: include/classes/widgets/CWidgetHelper.php:808
+#: include/classes/widgets/CWidgetHelper.php:809
+#: include/classes/widgets/CWidgetHelper.php:810
+#: include/classes/widgets/CWidgetHelper.php:811
+#: include/classes/widgets/CWidgetHelper.php:812
+#: include/classes/widgets/CWidgetHelper.php:813
+#: include/classes/widgets/CWidgetHelper.php:1070
 msgid "Transparency"
 msgstr ""
 
@@ -17412,9 +17353,9 @@ msgstr ""
 msgid "Transport error."
 msgstr "Transportfehler."
 
-#: include/classes/widgets/CWidgetHelper.php:753
-#: include/classes/widgets/CWidgetHelper.php:828
-#: include/classes/widgets/CWidgetHelper.php:1090
+#: include/classes/widgets/CWidgetHelper.php:765
+#: include/classes/widgets/CWidgetHelper.php:840
+#: include/classes/widgets/CWidgetHelper.php:1102
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr ""
@@ -17452,7 +17393,7 @@ msgstr "Trends"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:358
+#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
 #: services.php:355
 msgid "Trigger"
 msgstr "Auslöser"
@@ -17467,7 +17408,7 @@ msgstr "Auslöser \"%1$s\" existiert bereits für \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1801
+#: include/classes/import/CConfigurationImport.php:1830
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Auslöser \"%1$s\" hängt ab von Auslöser \"%2$s\", welcher nicht existiert."
@@ -17577,7 +17518,7 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1482
+#: include/classes/import/CConfigurationImport.php:1511
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
@@ -17627,11 +17568,11 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "Auslöserpriorität"
 
-#: jsLoader.php:343
+#: jsLoader.php:344
 msgid "Trigger status \"OK\""
 msgstr "Auslöser Status \"OK\""
 
-#: jsLoader.php:344
+#: jsLoader.php:345
 msgid "Trigger status \"Problem\""
 msgstr ""
 
@@ -17797,7 +17738,7 @@ msgstr "UNBEKANNT"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:359
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
 msgid "URL"
 msgstr "URL"
 
@@ -17843,12 +17784,12 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:360
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
 msgid "URLs"
 msgstr "URLs"
 
-#: include/classes/validators/CApiInputValidator.php:2263
-#: include/classes/validators/CApiInputValidator.php:2269
+#: include/classes/validators/CApiInputValidator.php:2303
+#: include/classes/validators/CApiInputValidator.php:2309
 msgid "UUIDv4 is expected"
 msgstr ""
 
@@ -18189,7 +18130,7 @@ msgstr ""
 msgid "Updated"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1306
+#: include/classes/api/services/CHost.php:1256
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr ""
@@ -18404,12 +18345,6 @@ msgstr "Benutzergruppen"
 #: include/classes/api/services/CUser.php:1186
 msgid "User is not allowed to delete himself."
 msgstr "Benutzer darf sich nicht selbst löschen."
-
-#: include/classes/api/services/CUserMacro.php:564
-#: include/classes/api/services/CUserMacro.php:762
-#, c-format
-msgid "User macro missing parameters: %1$s"
-msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -19070,7 +19005,7 @@ msgstr ""
 msgid "Visible name"
 msgstr "Sichtbarer Name"
 
-#: include/classes/api/services/CHost.php:2230
+#: include/classes/api/services/CHost.php:2241
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Sichtbarer Name darf nicht leer sein wenn der Hostname fehlt."
 
@@ -19112,7 +19047,7 @@ msgstr "Leider wurde die maximale mögliche Anzahl von Elementen zur Erinnerung 
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:361
+#: include/views/inventory.host.view.php:219 jsLoader.php:362
 msgid "Web"
 msgstr "Web"
 
@@ -19135,7 +19070,7 @@ msgstr ""
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHttpTest.php:709
+#: include/classes/api/services/CHttpTest.php:714
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
 msgstr ""
@@ -19214,19 +19149,19 @@ msgstr ""
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
 
-#: graphs.php:44 include/classes/widgets/CWidgetHelper.php:741
-#: include/classes/widgets/CWidgetHelper.php:774
-#: include/classes/widgets/CWidgetHelper.php:775
-#: include/classes/widgets/CWidgetHelper.php:776
-#: include/classes/widgets/CWidgetHelper.php:777
-#: include/classes/widgets/CWidgetHelper.php:778
-#: include/classes/widgets/CWidgetHelper.php:779
-#: include/classes/widgets/CWidgetHelper.php:780
-#: include/classes/widgets/CWidgetHelper.php:781
-#: include/classes/widgets/CWidgetHelper.php:782
-#: include/classes/widgets/CWidgetHelper.php:783
-#: include/classes/widgets/CWidgetHelper.php:784
-#: include/classes/widgets/CWidgetHelper.php:1042
+#: graphs.php:44 include/classes/widgets/CWidgetHelper.php:753
+#: include/classes/widgets/CWidgetHelper.php:786
+#: include/classes/widgets/CWidgetHelper.php:787
+#: include/classes/widgets/CWidgetHelper.php:788
+#: include/classes/widgets/CWidgetHelper.php:789
+#: include/classes/widgets/CWidgetHelper.php:790
+#: include/classes/widgets/CWidgetHelper.php:791
+#: include/classes/widgets/CWidgetHelper.php:792
+#: include/classes/widgets/CWidgetHelper.php:793
+#: include/classes/widgets/CWidgetHelper.php:794
+#: include/classes/widgets/CWidgetHelper.php:795
+#: include/classes/widgets/CWidgetHelper.php:796
+#: include/classes/widgets/CWidgetHelper.php:1054
 #: include/views/configuration.graph.edit.php:96
 #: include/views/configuration.graph.list.php:150
 #: include/views/js/monitoring.sysmaps.js.php:117
@@ -19296,17 +19231,11 @@ msgstr ""
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Falsche Felder für Abhängigkeit des Dienstes \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1911
+#: include/classes/api/services/CHost.php:1873
 #: include/classes/api/services/CHost.php:2110
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Falsche Felder für Host \"%1$s\"."
-
-#: include/classes/api/services/CUserMacro.php:519
-#: include/classes/api/services/CUserMacro.php:595
-#, c-format
-msgid "Wrong fields for macro \"%1$s\"."
-msgstr "Falsche Felder für Makro \"%1$s\"."
 
 #: include/classes/api/services/CMapElement.php:310
 msgid "Wrong fields for map link."
@@ -19395,7 +19324,7 @@ msgstr "Maximalwert Y-Achse"
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
-#: include/classes/api/services/CGraphGeneral.php:321
+#: include/classes/api/services/CGraphGeneral.php:343
 #: include/classes/graphdraw/CLineGraphDraw.php:1872
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Der Maximalwert der Y-Achse muss größer sein als der Minimalwert."
@@ -19408,10 +19337,10 @@ msgstr "Mindestwert Y-Achse"
 msgid "Y axis side"
 msgstr "Y-Achse"
 
-#: include/classes/widgets/CWidgetHelper.php:754
-#: include/classes/widgets/CWidgetHelper.php:830
-#: include/classes/widgets/CWidgetHelper.php:831
-#: include/classes/widgets/CWidgetHelper.php:1096
+#: include/classes/widgets/CWidgetHelper.php:766
+#: include/classes/widgets/CWidgetHelper.php:842
+#: include/classes/widgets/CWidgetHelper.php:843
+#: include/classes/widgets/CWidgetHelper.php:1108
 msgid "Y-axis"
 msgstr ""
 
@@ -19547,8 +19476,8 @@ msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:79
 #: include/classes/api/services/CCorrelation.php:481
-#: include/classes/api/services/CHost.php:898
-#: include/classes/api/services/CHost.php:963
+#: include/classes/api/services/CHost.php:848
+#: include/classes/api/services/CHost.php:913
 #: include/classes/api/services/CIconMap.php:185
 #: include/classes/api/services/CIconMap.php:256
 #: include/classes/api/services/CMaintenance.php:535
@@ -19563,18 +19492,18 @@ msgstr ""
 #: include/classes/api/services/CScript.php:965
 #: include/classes/api/services/CTask.php:49
 #: include/classes/api/services/CTask.php:247
-#: include/classes/api/services/CTemplate.php:469
-#: include/classes/api/services/CTemplate.php:651
-#: include/classes/api/services/CTemplate.php:693
-#: include/classes/api/services/CTemplate.php:1121
-#: include/classes/api/services/CTemplate.php:1227
+#: include/classes/api/services/CTemplate.php:477
+#: include/classes/api/services/CTemplate.php:660
+#: include/classes/api/services/CTemplate.php:715
+#: include/classes/api/services/CTemplate.php:1143
+#: include/classes/api/services/CTemplate.php:1249
 #: include/classes/api/services/CToken.php:188
 #: include/classes/api/services/CToken.php:304
-#: include/classes/api/services/CToken.php:414
-#: include/classes/api/services/CToken.php:456
-#: include/classes/api/services/CUserMacro.php:262
-#: include/classes/api/services/CUserMacro.php:366
-#: include/classes/api/services/CUserMacro.php:474
+#: include/classes/api/services/CToken.php:418
+#: include/classes/api/services/CToken.php:460
+#: include/classes/api/services/CUserMacro.php:271
+#: include/classes/api/services/CUserMacro.php:331
+#: include/classes/api/services/CUserMacro.php:447
 msgid "You do not have permission to perform this operation."
 msgstr "Sie haben keine Berechtigung, diese Operation durchzuführen."
 
@@ -19694,59 +19623,59 @@ msgstr ""
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1971
+#: include/classes/validators/CApiInputValidator.php:2011
 msgid "a DNS name is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:904
+#: include/classes/validators/CApiInputValidator.php:908
 msgid "a boolean is expected"
 msgstr "boolescher Wert erwartet"
 
 #: include/classes/api/services/CUser.php:846
 #: include/classes/import/validators/CXmlValidatorGeneral.php:269
 #: include/classes/validators/CActionCondValidator.php:184
-#: include/classes/validators/CApiInputValidator.php:302
+#: include/classes/validators/CApiInputValidator.php:306
 #: include/classes/validators/CEventCorrCondValidator.php:91
 #: include/classes/validators/CNewValidator.php:326
 msgid "a character string is expected"
 msgstr "Zeichenfolge erwartet"
 
-#: include/classes/validators/CApiInputValidator.php:2185
+#: include/classes/validators/CApiInputValidator.php:2225
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:125
-#: include/classes/validators/CApiInputValidator.php:684
+#: include/classes/validators/CApiInputValidator.php:688
 msgid "a floating point value is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:394
+#: include/classes/validators/CApiInputValidator.php:398
 #: include/classes/validators/CNewValidator.php:313
 msgid "a hexadecimal colour code (6 symbols) is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1500
+#: include/classes/validators/CApiInputValidator.php:1506
 msgid "a low-level discovery macro is expected"
 msgstr "ein low-level Suchlauf-Makro wird erwartet"
 
-#: include/classes/validators/CApiInputValidator.php:1381
+#: include/classes/validators/CApiInputValidator.php:1385
 #: include/validate.inc.php:194
 msgid "a number has too many fractional digits"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:858
-#: include/classes/validators/CApiInputValidator.php:1360
-#: include/classes/validators/CApiInputValidator.php:1994
+#: include/classes/validators/CApiInputValidator.php:862
+#: include/classes/validators/CApiInputValidator.php:1364
+#: include/classes/validators/CApiInputValidator.php:2034
 #: include/validate.inc.php:175
 msgid "a number is expected"
 msgstr "Nummer erwartet"
 
-#: include/classes/validators/CApiInputValidator.php:545
-#: include/classes/validators/CApiInputValidator.php:584
-#: include/classes/validators/CApiInputValidator.php:868
-#: include/classes/validators/CApiInputValidator.php:1369
-#: include/classes/validators/CApiInputValidator.php:1376
-#: include/classes/validators/CApiInputValidator.php:1667
+#: include/classes/validators/CApiInputValidator.php:549
+#: include/classes/validators/CApiInputValidator.php:588
+#: include/classes/validators/CApiInputValidator.php:872
+#: include/classes/validators/CApiInputValidator.php:1373
+#: include/classes/validators/CApiInputValidator.php:1380
+#: include/classes/validators/CApiInputValidator.php:1673
 #: include/validate.inc.php:183 include/validate.inc.php:189
 msgid "a number is too large"
 msgstr "eine Zahl ist zu groß"
@@ -19763,7 +19692,7 @@ msgstr "ein numerischer Wert erwartet"
 msgid "a relative time is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:2155
+#: include/classes/validators/CApiInputValidator.php:2195
 msgid "a string, number or null value is expected"
 msgstr ""
 
@@ -19771,27 +19700,23 @@ msgstr ""
 msgid "a time is expected"
 msgstr "Zeitangabe erwartet"
 
-#: include/classes/validators/CApiInputValidator.php:1567
+#: include/classes/validators/CApiInputValidator.php:1573
 #: include/classes/validators/CNewValidator.php:285
 msgid "a time period is expected"
 msgstr "Zeitspanne erwartet"
 
-#: include/classes/validators/CApiInputValidator.php:1533
+#: include/classes/validators/CApiInputValidator.php:1539
 #: include/validate.inc.php:221
 msgid "a time range is expected"
 msgstr ""
 
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupLldOperation.php:154
-#: include/classes/validators/CApiInputValidator.php:1656
+#: include/classes/validators/CApiInputValidator.php:1662
 #: include/classes/validators/CNewValidator.php:524
 #: include/validate.inc.php:213 include/validate.inc.php:594
 msgid "a time unit is expected"
 msgstr "Zeiteinheit erwartet"
-
-#: include/classes/validators/CApiInputValidator.php:1471
-msgid "a user macro is expected"
-msgstr "ein Benutzermakro wird erwartet"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:282
 msgid "abs() - Absolute value"
@@ -19837,7 +19762,7 @@ msgstr "alle"
 msgid "all media"
 msgstr "Alle Medien"
 
-#: include/classes/validators/CApiInputValidator.php:1928
+#: include/classes/validators/CApiInputValidator.php:1968
 msgid "an IP address is expected"
 msgstr ""
 
@@ -19861,22 +19786,22 @@ msgstr ""
 #: include/classes/import/validators/C54XmlValidator.php:2561
 #: include/classes/import/validators/C54XmlValidator.php:2600
 #: include/classes/import/validators/CXmlValidatorGeneral.php:283
-#: include/classes/validators/CApiInputValidator.php:493
-#: include/classes/validators/CApiInputValidator.php:625
-#: include/classes/validators/CApiInputValidator.php:718
-#: include/classes/validators/CApiInputValidator.php:812
-#: include/classes/validators/CApiInputValidator.php:959
-#: include/classes/validators/CApiInputValidator.php:1153
-#: include/classes/validators/CApiInputValidator.php:1196
+#: include/classes/validators/CApiInputValidator.php:497
+#: include/classes/validators/CApiInputValidator.php:629
+#: include/classes/validators/CApiInputValidator.php:722
+#: include/classes/validators/CApiInputValidator.php:816
+#: include/classes/validators/CApiInputValidator.php:963
+#: include/classes/validators/CApiInputValidator.php:1157
+#: include/classes/validators/CApiInputValidator.php:1200
 msgid "an array is expected"
 msgstr "ein Array wird erwartet"
 
-#: include/classes/validators/CApiInputValidator.php:1038
-#: include/classes/validators/CApiInputValidator.php:1108
+#: include/classes/validators/CApiInputValidator.php:1042
+#: include/classes/validators/CApiInputValidator.php:1112
 msgid "an array or a character string is expected"
 msgstr "ein Array oder eine Zeichenfolge wird erwartet"
 
-#: include/classes/validators/CApiInputValidator.php:2135
+#: include/classes/validators/CApiInputValidator.php:2175
 msgid "an array or object is expected"
 msgstr ""
 
@@ -19885,8 +19810,8 @@ msgstr ""
 msgid "an empty string is expected"
 msgstr "eine leere Zeichenfolge wird erwartet"
 
-#: include/classes/api/services/CHost.php:1848
-#: include/classes/validators/CApiInputValidator.php:1071
+#: include/classes/api/services/CHost.php:1798
+#: include/classes/validators/CApiInputValidator.php:1075
 msgid "an even number of hexadecimal characters is expected"
 msgstr "eine gerade Anzahl von hexadezimalen Zeichen wird erwartet"
 
@@ -19894,11 +19819,11 @@ msgstr "eine gerade Anzahl von hexadezimalen Zeichen wird erwartet"
 msgid "an explicit time is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:540
+#: include/classes/validators/CApiInputValidator.php:544
 msgid "an integer is expected"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:579
+#: include/classes/validators/CApiInputValidator.php:583
 msgid "an unsigned integer is expected"
 msgstr ""
 
@@ -20070,11 +19995,11 @@ msgstr "nicht änderbar"
 #: include/classes/api/services/CDRule.php:364
 #: include/classes/api/services/CDRule.php:547
 #: include/classes/api/services/CEvent.php:819
-#: include/classes/api/services/CHost.php:1836
-#: include/classes/api/services/CHost.php:1842
-#: include/classes/api/services/CHostPrototype.php:1678
-#: include/classes/api/services/CHostPrototype.php:1690
-#: include/classes/api/services/CHostPrototype.php:1706
+#: include/classes/api/services/CHost.php:1786
+#: include/classes/api/services/CHost.php:1792
+#: include/classes/api/services/CHostPrototype.php:1663
+#: include/classes/api/services/CHostPrototype.php:1675
+#: include/classes/api/services/CHostPrototype.php:1691
 #: include/classes/api/services/CItemGeneral.php:481
 #: include/classes/api/services/CItemGeneral.php:508
 #: include/classes/api/services/CItemGeneral.php:514
@@ -20105,13 +20030,12 @@ msgstr "nicht änderbar"
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:470
-#: include/classes/api/services/CUserMacro.php:803
 #: include/classes/api/services/CUser.php:697
 #: include/classes/api/services/CUser.php:857
-#: include/classes/import/CConfigurationImport.php:728
-#: include/classes/import/CConfigurationImport.php:961
-#: include/classes/import/CConfigurationImport.php:1115
-#: include/classes/import/CConfigurationImport.php:2799
+#: include/classes/import/CConfigurationImport.php:744
+#: include/classes/import/CConfigurationImport.php:977
+#: include/classes/import/CConfigurationImport.php:1131
+#: include/classes/import/CConfigurationImport.php:2828
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -20125,14 +20049,14 @@ msgstr "nicht änderbar"
 #: include/classes/validators/CActionCondValidator.php:174
 #: include/classes/validators/CActionCondValidator.php:180
 #: include/classes/validators/CActionCondValidator.php:190
-#: include/classes/validators/CApiInputValidator.php:312
-#: include/classes/validators/CApiInputValidator.php:498
-#: include/classes/validators/CApiInputValidator.php:630
-#: include/classes/validators/CApiInputValidator.php:723
-#: include/classes/validators/CApiInputValidator.php:817
-#: include/classes/validators/CApiInputValidator.php:863
-#: include/classes/validators/CApiInputValidator.php:1158
-#: include/classes/validators/CApiInputValidator.php:1201
+#: include/classes/validators/CApiInputValidator.php:316
+#: include/classes/validators/CApiInputValidator.php:502
+#: include/classes/validators/CApiInputValidator.php:634
+#: include/classes/validators/CApiInputValidator.php:727
+#: include/classes/validators/CApiInputValidator.php:821
+#: include/classes/validators/CApiInputValidator.php:867
+#: include/classes/validators/CApiInputValidator.php:1162
+#: include/classes/validators/CApiInputValidator.php:1205
 #: include/classes/validators/CEventCorrCondValidator.php:55
 #: include/classes/validators/CEventCorrCondValidator.php:61
 #: include/classes/validators/CEventCorrCondValidator.php:67
@@ -20183,7 +20107,7 @@ msgid "circular dependency is not allowed"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2270
-#: include/classes/import/CConfigurationImport.php:2814
+#: include/classes/import/CConfigurationImport.php:2843
 msgid "circular item dependency is not allowed"
 msgstr "zirkuläre Datenpunkt Abhängigkeit ist nicht zulässig"
 
@@ -20296,7 +20220,7 @@ msgstr "absteigend"
 msgid "description"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1440
+#: include/classes/validators/CApiInputValidator.php:1444
 msgid "directory cannot be empty"
 msgstr ""
 
@@ -20458,8 +20382,8 @@ msgstr "Host"
 msgid "host group"
 msgstr "Host-Gruppe"
 
-#: include/classes/widgets/CWidgetHelper.php:616
-#: include/classes/widgets/CWidgetHelper.php:976
+#: include/classes/widgets/CWidgetHelper.php:628
+#: include/classes/widgets/CWidgetHelper.php:988
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr ""
@@ -20525,7 +20449,7 @@ msgstr "falsche Syntax bei \"%1$s\""
 
 #: include/classes/validators/CExpressionValidator.php:123
 #: include/classes/validators/CExpressionValidator.php:149
-#: include/classes/validators/CExpressionValidator.php:178
+#: include/classes/validators/CExpressionValidator.php:179
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
@@ -20553,7 +20477,7 @@ msgstr ""
 msgid "invalid address range \"%1$s\""
 msgstr "Ungültige Adressbereich \"%1$s\""
 
-#: include/classes/validators/CApiInputValidator.php:307
+#: include/classes/validators/CApiInputValidator.php:311
 msgid "invalid byte sequence in UTF-8"
 msgstr "ungültigen Byte-Sequenz in UTF-8"
 
@@ -20582,11 +20506,11 @@ msgstr ""
 msgid "invalid history storage period"
 msgstr "Ungültige Speicherdauer für historische Daten"
 
-#: include/classes/validators/CApiInputValidator.php:1260
+#: include/classes/validators/CApiInputValidator.php:1264
 msgid "invalid host group name"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1304
+#: include/classes/validators/CApiInputValidator.php:1308
 msgid "invalid host name"
 msgstr ""
 
@@ -20597,12 +20521,12 @@ msgid "invalid number of parameters in function \"%1$s\""
 msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:117
-#: include/classes/validators/CApiInputValidator.php:2233
+#: include/classes/validators/CApiInputValidator.php:2273
 msgid "invalid range expression"
 msgstr ""
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:105
-#: include/classes/validators/CApiInputValidator.php:1603
+#: include/classes/validators/CApiInputValidator.php:1609
 msgid "invalid regular expression"
 msgstr "Ungültiger regulärer Ausdruck"
 
@@ -20630,7 +20554,7 @@ msgstr ""
 msgid "is less than or equals"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:1847
+#: include/classes/validators/CApiInputValidator.php:1887
 msgid "is not enclosed in {} or is malformed"
 msgstr "ist nicht in {} eingeschlossen oder falsch formatiert"
 
@@ -20643,8 +20567,8 @@ msgstr "Datenpunkt"
 msgid "item \"%1$s\" on host \"%2$s\" is not monitored"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:636
-#: include/classes/widgets/CWidgetHelper.php:993
+#: include/classes/widgets/CWidgetHelper.php:648
+#: include/classes/widgets/CWidgetHelper.php:1005
 msgid "item pattern"
 msgstr ""
 
@@ -20716,7 +20640,7 @@ msgstr "Suchlaufregel"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:378
+#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
@@ -20793,8 +20717,8 @@ msgid "maximum dependent items count reached"
 msgstr "maximale Anzahl abhängiger Datenpunkte erreicht"
 
 #: include/classes/api/services/CItemGeneral.php:2350
-#: include/classes/import/CConfigurationImport.php:2762
-#: include/classes/import/CConfigurationImport.php:2829
+#: include/classes/import/CConfigurationImport.php:2791
+#: include/classes/import/CConfigurationImport.php:2858
 msgid "maximum number of dependency levels reached"
 msgstr "maximale Anzahl von Abhängigkeitsebenen erreicht"
 
@@ -20819,8 +20743,8 @@ msgstr "min."
 msgid "min() - Minimum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1854
-#: include/classes/validators/CApiInputValidator.php:1065
+#: include/classes/api/services/CHost.php:1804
+#: include/classes/validators/CApiInputValidator.php:1069
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "die Mindestlänge beträgt %1$s Zeichen"
@@ -20839,7 +20763,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
 
-#: include/classes/validators/CApiInputValidator.php:2258
+#: include/classes/validators/CApiInputValidator.php:2298
 #, c-format
 msgid "must be %1$s characters long"
 msgstr ""
@@ -20861,8 +20785,8 @@ msgstr "muss ein gültiger LDAP-Benutzer sein"
 msgid "must be between \"%1$s\" and \"%2$s\""
 msgstr "muss zwischen \"%1$s\" und \"%2$s\" liegen"
 
-#: include/classes/validators/CApiInputValidator.php:1267
-#: include/classes/validators/CApiInputValidator.php:1311
+#: include/classes/validators/CApiInputValidator.php:1271
+#: include/classes/validators/CApiInputValidator.php:1315
 msgid "must contain at least one low-level discovery macro"
 msgstr ""
 
@@ -20880,7 +20804,7 @@ msgstr "Name"
 msgid "new"
 msgstr "neu"
 
-#: hosts.php:989 templates.php:633
+#: hosts.php:993 templates.php:637
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "neu"
@@ -20918,7 +20842,7 @@ msgstr ""
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1104 include/graphs.inc.php:74
+#: include/classes/widgets/CWidgetHelper.php:1116 include/graphs.inc.php:74
 msgid "none"
 msgstr ""
 
@@ -21012,7 +20936,7 @@ msgstr "Leistung"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:389
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21151,13 +21075,13 @@ msgid "short description"
 msgstr "Kurzbeschreibung"
 
 #: include/classes/api/services/CAutoregistration.php:163
-#: include/classes/api/services/CHost.php:1861
-#: include/classes/api/services/CHost.php:1867
-#: include/classes/api/services/CHost.php:1876
-#: include/classes/api/services/CHost.php:1882
-#: include/classes/api/services/CHostPrototype.php:1729
-#: include/classes/api/services/CHttpTest.php:978
-#: include/classes/api/services/CHttpTest.php:1074
+#: include/classes/api/services/CHost.php:1811
+#: include/classes/api/services/CHost.php:1817
+#: include/classes/api/services/CHost.php:1826
+#: include/classes/api/services/CHost.php:1832
+#: include/classes/api/services/CHostPrototype.php:1714
+#: include/classes/api/services/CHttpTest.php:983
+#: include/classes/api/services/CHttpTest.php:1079
 #: include/classes/api/services/CItemGeneral.php:495
 #: include/classes/api/services/CItemGeneral.php:533
 #: include/classes/api/services/CItemGeneral.php:1415
@@ -21174,7 +21098,7 @@ msgstr "Kurzbeschreibung"
 #: include/classes/api/services/CProxy.php:824
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
-#: include/classes/api/services/CValueMap.php:579
+#: include/classes/api/services/CValueMap.php:583
 #: include/classes/validators/CActionCondValidator.php:145
 msgid "should be empty"
 msgstr "Sollte leer sein"
@@ -21244,8 +21168,8 @@ msgstr ""
 #: include/classes/api/services/CUserGroup.php:470
 #: include/classes/helpers/CTagFilterFieldHelper.php:63
 #: include/classes/helpers/CTagFilterFieldHelper.php:117
-#: include/classes/widgets/CWidgetHelper.php:494
-#: include/classes/widgets/CWidgetHelper.php:538 include/forms.inc.php:1996
+#: include/classes/widgets/CWidgetHelper.php:506
+#: include/classes/widgets/CWidgetHelper.php:550 include/forms.inc.php:1996
 #: include/views/configuration.maintenance.edit.php:174
 #: include/views/js/configuration.maintenance.edit.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:60
@@ -21268,24 +21192,25 @@ msgstr "Vorlagen ID \"%1$s\" kommt %2$s mal vor"
 #: include/classes/api/services/CDiscoveryRule.php:1650
 #: include/classes/api/services/CDiscoveryRule.php:2011
 #: include/classes/api/services/CDiscoveryRule.php:2019
-#: include/classes/api/services/CHost.php:1945
+#: include/classes/api/services/CHostBase.php:523
+#: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CHost.php:2140
-#: include/classes/api/services/CHostPrototype.php:1673
-#: include/classes/api/services/CHostPrototype.php:1685
-#: include/classes/api/services/CHostPrototype.php:1701
-#: include/classes/api/services/CHostPrototype.php:1713
-#: include/classes/api/services/CHttpTest.php:739
+#: include/classes/api/services/CHostPrototype.php:1658
+#: include/classes/api/services/CHostPrototype.php:1670
+#: include/classes/api/services/CHostPrototype.php:1686
+#: include/classes/api/services/CHostPrototype.php:1698
+#: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CReport.php:203
 #: include/classes/api/services/CReport.php:592
 #: include/classes/api/services/CReport.php:598
 #: include/classes/api/services/CScript.php:1025
-#: include/classes/api/services/CTemplate.php:450
-#: include/classes/api/services/CValueMap.php:574
+#: include/classes/api/services/CTemplate.php:451
+#: include/classes/api/services/CValueMap.php:578
 #: include/classes/helpers/CDashboardHelper.php:369
 #: include/classes/helpers/CDashboardHelper.php:390
 #: include/classes/helpers/CDashboardHelper.php:398
 #: include/classes/helpers/CDashboardHelper.php:408
-#: include/classes/validators/CApiInputValidator.php:994
+#: include/classes/validators/CApiInputValidator.php:998
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr "der Parameter \"%1$s\" fehlt"
@@ -21387,7 +21312,7 @@ msgstr ""
 msgid "type here to search"
 msgstr "Hier klicken um zu suchen"
 
-#: include/classes/validators/CApiInputValidator.php:1884
+#: include/classes/validators/CApiInputValidator.php:1924
 msgid "unacceptable URL"
 msgstr ""
 
@@ -21425,20 +21350,20 @@ msgstr "unerwartetes Ende des Makros"
 #: include/classes/api/services/CDiscoveryRule.php:1702
 #: include/classes/api/services/CDiscoveryRule.php:1725
 #: include/classes/api/services/CDiscoveryRule.php:1744
-#: include/classes/api/services/CGraphGeneral.php:599
-#: include/classes/api/services/CGraphGeneral.php:721
-#: include/classes/api/services/CHostPrototype.php:322
-#: include/classes/api/services/CHostPrototype.php:1719
+#: include/classes/api/services/CGraphGeneral.php:621
+#: include/classes/api/services/CGraphGeneral.php:743
+#: include/classes/api/services/CHostPrototype.php:325
+#: include/classes/api/services/CHostPrototype.php:1704
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CHttpTest.php:515
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CItemGeneral.php:604
 #: include/classes/api/services/CItemGeneral.php:616
 #: include/classes/api/services/CScript.php:1031
-#: include/classes/api/services/CTemplate.php:656
+#: include/classes/api/services/CTemplate.php:665
 #: include/classes/api/services/CTriggerGeneral.php:666
 #: include/classes/api/services/CValueMap.php:432
-#: include/classes/validators/CApiInputValidator.php:966
+#: include/classes/validators/CApiInputValidator.php:970
 #, c-format
 msgid "unexpected parameter \"%1$s\""
 msgstr "unerwarteter Parameter \"%1$s\""
@@ -21458,8 +21383,8 @@ msgstr "unerwarteter Text \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:743
 #: include/classes/api/services/CEvent.php:877
-#: include/classes/api/services/CHost.php:1816
-#: include/classes/api/services/CHost.php:1822
+#: include/classes/api/services/CHost.php:1766
+#: include/classes/api/services/CHost.php:1772
 #: include/classes/api/services/CItemGeneral.php:1271
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
@@ -21507,8 +21432,8 @@ msgstr "nicht unterstützte Version"
 #: include/classes/helpers/CTagFilterFieldHelper.php:131
 #: include/classes/html/CMacroValue.php:131
 #: include/classes/html/CMacroValue.php:148
-#: include/classes/widgets/CWidgetHelper.php:500
-#: include/classes/widgets/CWidgetHelper.php:554
+#: include/classes/widgets/CWidgetHelper.php:512
+#: include/classes/widgets/CWidgetHelper.php:566
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
 #: include/forms.inc.php:2001
@@ -21522,7 +21447,7 @@ msgstr "nicht unterstützte Version"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:390
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
 msgid "value"
 msgstr "Wert"
 
@@ -21531,49 +21456,50 @@ msgstr "Wert"
 msgid "value \"%1$s\" already exists"
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:823
-#: include/classes/import/CConfigurationImport.php:860
-#: include/classes/import/CConfigurationImport.php:2658
-#: include/classes/import/CConfigurationImport.php:2772
-#: include/classes/import/CConfigurationImport.php:2823
+#: include/classes/import/CConfigurationImport.php:839
+#: include/classes/import/CConfigurationImport.php:876
+#: include/classes/import/CConfigurationImport.php:2687
+#: include/classes/import/CConfigurationImport.php:2801
+#: include/classes/import/CConfigurationImport.php:2852
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "Wert \"%1$s\" nicht gefunden"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:71
 #: app/controllers/CControllerPopupValueMapUpdate.php:137
-#: include/classes/api/services/CValueMap.php:571
-#: include/classes/api/services/CValueMap.php:583
-#: include/classes/validators/CApiInputValidator.php:1701
-#: include/classes/validators/CApiInputValidator.php:1755
+#: include/classes/api/services/CValueMap.php:575
+#: include/classes/api/services/CValueMap.php:587
+#: include/classes/validators/CApiInputValidator.php:1707
+#: include/classes/validators/CApiInputValidator.php:1797
 #, c-format
 msgid "value %1$s already exists"
 msgstr "Wert %1$s ist bereits vorhanden"
 
 #: include/classes/api/services/CTriggerGeneral.php:1815
 #: include/classes/api/services/CTriggerGeneral.php:1835
-#: include/classes/validators/CApiInputValidator.php:339
-#: include/classes/validators/CApiInputValidator.php:461
-#: include/classes/validators/CApiInputValidator.php:1077
-#: include/classes/validators/CApiInputValidator.php:1206
-#: include/classes/validators/CApiInputValidator.php:1251
-#: include/classes/validators/CApiInputValidator.php:1294
-#: include/classes/validators/CApiInputValidator.php:1348
-#: include/classes/validators/CApiInputValidator.php:1423
-#: include/classes/validators/CApiInputValidator.php:1466
-#: include/classes/validators/CApiInputValidator.php:1495
-#: include/classes/validators/CApiInputValidator.php:1526
-#: include/classes/validators/CApiInputValidator.php:1560
-#: include/classes/validators/CApiInputValidator.php:1594
-#: include/classes/validators/CApiInputValidator.php:1640
-#: include/classes/validators/CApiInputValidator.php:1842
-#: include/classes/validators/CApiInputValidator.php:1874
-#: include/classes/validators/CApiInputValidator.php:1916
-#: include/classes/validators/CApiInputValidator.php:1960
-#: include/classes/validators/CApiInputValidator.php:2009
-#: include/classes/validators/CApiInputValidator.php:2062
-#: include/classes/validators/CApiInputValidator.php:2106
-#: include/classes/validators/CApiInputValidator.php:2226
+#: include/classes/validators/CApiInputValidator.php:343
+#: include/classes/validators/CApiInputValidator.php:465
+#: include/classes/validators/CApiInputValidator.php:1081
+#: include/classes/validators/CApiInputValidator.php:1210
+#: include/classes/validators/CApiInputValidator.php:1255
+#: include/classes/validators/CApiInputValidator.php:1298
+#: include/classes/validators/CApiInputValidator.php:1352
+#: include/classes/validators/CApiInputValidator.php:1427
+#: include/classes/validators/CApiInputValidator.php:1470
+#: include/classes/validators/CApiInputValidator.php:1501
+#: include/classes/validators/CApiInputValidator.php:1532
+#: include/classes/validators/CApiInputValidator.php:1566
+#: include/classes/validators/CApiInputValidator.php:1600
+#: include/classes/validators/CApiInputValidator.php:1646
+#: include/classes/validators/CApiInputValidator.php:1882
+#: include/classes/validators/CApiInputValidator.php:1914
+#: include/classes/validators/CApiInputValidator.php:1956
+#: include/classes/validators/CApiInputValidator.php:2000
+#: include/classes/validators/CApiInputValidator.php:2049
+#: include/classes/validators/CApiInputValidator.php:2102
+#: include/classes/validators/CApiInputValidator.php:2146
+#: include/classes/validators/CApiInputValidator.php:2266
+#: include/classes/validators/CApiInputValidator.php:2335
 msgid "value is too long"
 msgstr "Wert ist zu lang"
 
@@ -21583,7 +21509,7 @@ msgstr "Wert ist zu lang"
 msgid "value must be %1$s"
 msgstr ""
 
-#: include/classes/validators/CApiInputValidator.php:2191
+#: include/classes/validators/CApiInputValidator.php:2231
 #, c-format
 msgid "value must be between \"%1$s\" and \"%2$s\""
 msgstr ""
@@ -21604,9 +21530,9 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1734
 #: include/classes/api/services/CDiscoveryRule.php:1756
 #: include/classes/api/services/CEvent.php:779
-#: include/classes/api/services/CHost.php:973
-#: include/classes/api/services/CHost.php:2001
-#: include/classes/api/services/CHost.php:2156
+#: include/classes/api/services/CHost.php:923
+#: include/classes/api/services/CHost.php:1969
+#: include/classes/api/services/CHost.php:2167
 #: include/classes/api/services/CMapElement.php:86
 #: include/classes/api/services/CMap.php:682
 #: include/classes/api/services/CMap.php:688
@@ -21616,8 +21542,8 @@ msgstr ""
 #: include/classes/api/services/CReport.php:612
 #: include/classes/import/validators/C52XmlValidator.php:2582
 #: include/classes/import/validators/C54XmlValidator.php:2595
-#: include/classes/validators/CApiInputValidator.php:455
-#: include/classes/validators/CApiInputValidator.php:780
+#: include/classes/validators/CApiInputValidator.php:459
+#: include/classes/validators/CApiInputValidator.php:784
 #: include/classes/validators/CNewValidator.php:517
 #: include/validate.inc.php:587
 #, c-format

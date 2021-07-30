@@ -22,6 +22,9 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/FilterTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
+/**
+ * @dataSource TagFilter
+ */
 class testPageHosts extends CLegacyWebTest {
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
@@ -313,7 +316,7 @@ class testPageHosts extends CLegacyWebTest {
 					],
 					'result' => [
 						[
-							'Name' => 'Simple form test host',
+							'Name' => 'Host for tags filtering',
 							'Tags' => [
 								'selector' => 'class:tag',
 								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
@@ -331,24 +334,24 @@ class testPageHosts extends CLegacyWebTest {
 					],
 					'result' => [
 						[
-							'Name' => 'Host with tags for cloning',
+							'Name' => 'Host for tags filtering',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+							]
+						],
+						[
+							'Name' => 'Host for tags filtering - clone',
 							'Tags' => [
 								'selector' => 'class:tag',
 								'text' => ['tag: host', 'action: clone']
 							]
 						],
 						[
-							'Name' => 'Host with tags for updating',
+							'Name' => 'Host for tags filtering - update',
 							'Tags' => [
 								'selector' => 'class:tag',
 								'text' => ['tag: host', 'action: update']
-							]
-						],
-						[
-							'Name' => 'Simple form test host',
-							'Tags' => [
-								'selector' => 'class:tag',
-								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
 							]
 						]
 					]
@@ -362,9 +365,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Contains', 'value' => 'HOST']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning', 'Templates' => ''],
-						['Name' => 'Host with tags for updating', 'Templates' => ''],
-						['Name' => 'Simple form test host', 'Templates' => 'Form test template']
+						['Name' => 'Host for tags filtering', 'Templates' => 'Template for tags filtering'],
+						['Name' => 'Host for tags filtering - clone', 'Templates' => ''],
+						['Name' => 'Host for tags filtering - update', 'Templates' => '']
 					]
 				]
 			],
@@ -375,7 +378,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Equals', 'value' => 'HOST']
 					],
 					'result' => [
-						['Name' => 'Simple form test host']
+						['Name' => 'Host for tags filtering']
 					]
 				]
 			],
@@ -386,9 +389,9 @@ class testPageHosts extends CLegacyWebTest {
 							['name' => 'action', 'operator' => 'Contains']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
-						['Name' => 'Simple form test host']
+						['Name' => 'Host for tags filtering'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update']
 					]
 				]
 			],
@@ -408,11 +411,11 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Exists']
 					],
 					'result' => [
-						['Name' => 'Simple form test host']
+						['Name' => 'Host for tags filtering']
 					]
 				]
 			],
-						[
+			[
 				[
 					'evaluation_type' => 'Or',
 					'tags' => [
@@ -420,9 +423,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Exists']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
-						['Name' => 'Simple form test host']
+						['Name' => 'Host for tags filtering'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update']
 					]
 				]
 			],
@@ -433,7 +436,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Exists']
 					],
 					'result' => [
-						['Name' => 'Simple form test host']
+						['Name' => 'Host for tags filtering']
 					]
 				]
 			],
@@ -444,9 +447,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'action', 'operator' => 'Exists']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
-						['Name' => 'Simple form test host']
+						['Name' => 'Host for tags filtering'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update']
 					]
 				]
 			],
@@ -457,8 +460,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not exist']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update'],
+						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
 					]
@@ -471,8 +475,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not exist']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update'],
+						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
 					]
@@ -486,8 +491,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Does not exist']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update'],
+						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
 					]
@@ -501,6 +507,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Does not exist']
 					],
 					'result' => [
+						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
 					]
@@ -513,8 +520,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update'],
+						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
 					]
@@ -527,8 +535,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update'],
+						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
 					]
@@ -541,8 +550,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Does not equal']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
+						['Name' => 'Host for tags filtering'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update'],
 						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
@@ -557,7 +567,8 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'action', 'operator' => 'Does not equal', 'value' => 'simple']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
 					]
@@ -571,7 +582,8 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'action', 'operator' => 'Does not equal', 'value' => 'simple']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
 					]
@@ -584,7 +596,8 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone']
 					],
 					'result' => [
-						['Name' => 'Host with tags for updating'],
+						['Name' => 'Host for tags filtering'],
+						['Name' => 'Host for tags filtering - update'],
 						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
@@ -598,7 +611,8 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone']
 					],
 					'result' => [
-						['Name' => 'Host with tags for updating'],
+						['Name' => 'Host for tags filtering'],
+						['Name' => 'Host for tags filtering - update'],
 						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
@@ -613,6 +627,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Does not contain', 'value' => 'ho']
 					],
 					'result' => [
+						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
 					]
@@ -626,7 +641,8 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Does not contain', 'value' => 'ho']
 					],
 					'result' => [
-						['Name' => 'Host with tags for updating'],
+						['Name' => 'Host for tags filtering'],
+						['Name' => 'Host for tags filtering - update'],
 						['Name' => 'Simple form test host'],
 						['Name' => 'SLA reports host'],
 						['Name' => 'Template inheritance test host']
@@ -641,7 +657,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Equals', 'value' => 'host']
 					],
 					'result' => [
-						['Name' => 'Host with tags for updating']
+						['Name' => 'Host for tags filtering - update']
 					]
 				]
 			],
@@ -653,8 +669,8 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Exists']
 					],
 					'result' => [
-						['Name' => 'Host with tags for updating'],
-						['Name' => 'Simple form test host']
+						['Name' => 'Host for tags filtering'],
+						['Name' => 'Host for tags filtering - update']
 					]
 				]
 			]
