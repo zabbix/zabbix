@@ -23,7 +23,7 @@ class CControllerHostMassDelete extends CController {
 	protected function checkInput() {
 		$fields = [
 			'ids'       => 'required|array_db hosts.hostid',
-			'backurl'   => 'string'
+			'back_url'   => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -65,7 +65,7 @@ class CControllerHostMassDelete extends CController {
 			CMessageHelper::setErrorTitle(_('Cannot delete host'));
 		}
 
-		$redirect = $this->getInput('backurl', '');
+		$redirect = $this->getInput('back_url', '');
 		if (!$redirect) {
 			$redirect = (new CUrl('zabbix.php'))
 				->setArgument('action', 'host.list')

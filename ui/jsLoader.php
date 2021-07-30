@@ -462,7 +462,7 @@ else {
 
 // Mix in scripts used for host popup functionality to all views (with layout).
 if (!array_key_exists('showGuiMessaging', $_GET)) {
-	$files = array_merge($files, ['inputsecret.js', 'macrovalue.js', 'multiselect.js',  'class.tabfilteritem.js', 
+	$files = array_merge($files, ['inputsecret.js', 'macrovalue.js', 'multiselect.js',  'class.tabfilteritem.js',
 		'class.tab-indicators.js', 'class.tabfilter.js', 'class.tagfilteritem.js', 'class.cverticalaccordion.js',
 		'class.cviewswitcher.js', 'hostinterfacemanager.js', 'hostmacrosmanager.js', 'hostpopup.js',
 		'textareaflexible.js'
