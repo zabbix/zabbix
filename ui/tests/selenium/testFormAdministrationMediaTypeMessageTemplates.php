@@ -805,45 +805,6 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					],
 					'rows' => 4
 				]
-			],
-			// Remove part of old and add new message templates for services
-			[
-				[
-					'media_type' => 'Email (HTML) Service',
-					'message_templates' => [
-						[
-							'Message type' => 'Service',
-							'action' => 'Remove temporary'
-						],
-						[
-							'Message type' => 'Service recovery',
-							'action' => 'Remove'
-						],
-						[
-							'Message type' => 'Service update',
-							'action' => 'Remove'
-						],
-						[
-							'Message type' => 'Service',
-							'action' => 'Add',
-							'Subject' => 'New service subject !@#$%^&*()_+ōš六書',
-							'Message' => 'New service message !@#$%^&*()_+ōš六書'
-						],
-						[
-							'Message type' => 'Service recovery',
-							'action' => 'Add',
-							'Subject' => 'New service subject !@#$%^&*()_+ōš六書',
-							'Message' => 'New service message !@#$%^&*()_+ōš六書'
-						],
-						[
-							'Message type' => 'Service update',
-							'action' => 'Add',
-							'Subject' => 'New service subject !@#$%^&*()_+ōš六書',
-							'Message' => 'New service message !@#$%^&*()_+ōš六書'
-						]
-					],
-					'rows' => 3
-				]
 			]
 		];
 	}
