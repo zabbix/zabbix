@@ -130,7 +130,7 @@ static void	zbx_cuid_init(void)
 	for (i = 0; i < hostname_len; i++)
 		hostname_num = hostname_num + (size_t)hostname[i];
 
-	from_decimal(host_block, 10, hostname_num);
+	from_decimal(host_block, CUID_BASE_36, hostname_num);
 	pad(host_block, CUID_HOSTNAME_BLOCK_SIZE);
 	zbx_free(hostname);
 }
@@ -185,6 +185,6 @@ void	zbx_new_cuid(char *cuid)
 	from_decimal(rand_block_2, CUID_BASE_36, (size_t)rand());
 	pad(rand_block_2, CUID_BLOCK_SIZE);
 
-	zbx_snprintf(fingerprint, sizeof(fingerprint), "%s%s", host_block, pid_block);
+	zbx_snprintf(fingerprint, sizeof(fingerprint), "%s%s", pid_block, host_block);
 	zbx_snprintf(cuid, CUID_LEN, "c%s%s%s%s%s", timestamp, counter, fingerprint, rand_block_1, rand_block_2);
 }
