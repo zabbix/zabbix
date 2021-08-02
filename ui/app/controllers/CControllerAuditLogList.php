@@ -265,19 +265,10 @@ class CControllerAuditLogList extends CController {
 
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
-			if ($auditlog['action'] != AUDIT_ACTION_UPDATE && $auditlog['action'] != AUDIT_ACTION_ADD
-					&& $auditlog['action'] != AUDIT_ACTION_EXECUTE) {
-				continue;
+			if (in_array($auditlog['action'], [AUDIT_ACTION_UPDATE, AUDIT_ACTION_ADD, AUDIT_ACTION_EXECUTE])) {
+				$details = json_decode($auditlog['details'], true);
+				$auditlog['details'] = is_array($details) ? $this->formatDetails($details, $auditlog['action']) : '';
 			}
-
-			$details = json_decode($auditlog['details'], true);
-
-			if (!$details) {
-				$auditlog['details'] = '';
-				continue;
-			}
-
-			$auditlog['details'] = $this->formatDetails($details, $auditlog['action']);
 		}
 		unset($auditlog);
 
