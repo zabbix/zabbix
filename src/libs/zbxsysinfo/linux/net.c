@@ -997,7 +997,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 
 			for (i = 0; i < len; i++)
 			{
-				if (0 == isdigit(*(port_in + i)))
+				if ((0 == isdigit(*(port_in + i))) && (0 < i || '-' != *port_in))
 					break;
 			}
 
