@@ -734,7 +734,7 @@ INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, 
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, posts, headers) VALUES (15079, 15002, 0, 'testInheritance'     , 'key-item-inheritance'     , '30s', 3, '', '', '', '');
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid, posts, headers) VALUES (15080, 15001, 0, 'testInheritance'     , 'key-item-inheritance'     , '30s', 3, '', '', 15000, 15079, '', '');
 
--- testFormItem.Preprocessing
+-- testFormItem.Preprocessing Inheritance test template->testInheritanceItemPreprocessing
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (125,15093,1,1,'123');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (126,15093,2,2,'abc');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (127,15093,3,3,'def');
@@ -756,8 +756,15 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (181,15
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (182,15093,17,18,'regular expression pattern for error matching
 test output');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (183,15093,18,20,'7');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (77000,15093,19,25,'1
+2');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (77001,15093,20,24,'.
+/
+1');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (77002,15093,21,21,'test script');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (77003,15093,22,23,'metric');
 
-
+-- Template inheritance test host->testInheritanceItemPreprocessing
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (136,15094,1,1,'123');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (137,15094,2,2,'abc');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (138,15094,3,3,'def');
@@ -780,6 +787,13 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (175,15
 test output');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (176,15094,18,20,'7');
 
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (777000,15094,19,25,'1
+2');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (777001,15094,20,24,'.
+/
+1');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (777002,15094,21,21,'test script');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (777003,15094,22,23,'metric');
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments)             VALUES (99000, '{99729}=0', 'testInheritanceTrigger1', '');
@@ -1110,26 +1124,26 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (300003, 300003, 99102, 1, 1, 'FF5555', 0, 2, 0);
 
 -- testFormDiscoveryRule.SimpleUpdate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 133700, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 133701, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 133702, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 133703, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 43700, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 43701, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 43702, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 43703, 1,  50, '', '', 40011, '', '');
 
 -- testFormItemPrototype.SimpleUpdate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormDiscoveryRule', 'discovery-rule-form', 40001, 4, 133800, 1,  50, '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule', 'discovery-rule-form', 40001, 4, 133800, 1,  50, '', '', 40011, '', '');
 
 -- testFormItemPrototype.SimpleUpdate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemPrototype1', 'item-prototype-form1', 40001, 3, 23800, 2, 5, '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemPrototype1', 'item-prototype-form1', 40001, 3, 23800, 2, 5, '', '', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (501, 23800, 133800);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemPrototype2', 'item-prototype-form2', 40001, 3, 23801, 2, 5, '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemPrototype2', 'item-prototype-form2', 40001, 3, 23801, 2, 5, '', '', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (502, 23801, 133800);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemPrototype3', 'item-prototype-form3', 40001, 3, 23802, 2, 5, '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemPrototype3', 'item-prototype-form3', 40001, 3, 23802, 2, 5, '', '', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (503, 23802, 133800);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemPrototype4', 'item-prototype-form4', 40001, 3, 23803, 2, 5, '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemPrototype4', 'item-prototype-form4', 40001, 3, 23803, 2, 5, '', '', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (504, 23803, 133800);
 
 -- testFormTriggerPrototype.SimpleCreate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, posts, headers) VALUES ('testFormItemReuse', 'item-prototype-reuse', 40001, 3, 23804, 2, 5, '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemReuse', 'item-prototype-reuse', 40001, 3, 23804, 2, 5, '', '', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (505, 23804, 133800);
 
 -- testFormTriggerPrototype.SimpleUpdate
