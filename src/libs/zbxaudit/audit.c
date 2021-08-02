@@ -244,7 +244,7 @@ void	zbx_audit_flush(void)
 	{
 		zbx_new_cuid(audit_cuid);
 		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
-				0 != strcmp((*audit_entry)->details_json.buffer, "[{}]"))
+				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
 #define AUDIT_USERID	0
 #define AUDIT_USERNAME	"System"
