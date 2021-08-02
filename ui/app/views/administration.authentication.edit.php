@@ -127,7 +127,7 @@ $http_tab = (new CFormList('list_http'))
 			->setEnabled($data['http_auth_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(new CLabel(_('Case sensitive login'), 'http_case_sensitive'),
+	->addRow(new CLabel(_('Case-sensitive login'), 'http_case_sensitive'),
 		(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
 			->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 			->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
@@ -189,7 +189,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(new CLabel(_('Case sensitive login'), 'ldap_case_sensitive'),
+	->addRow(new CLabel(_('Case-sensitive login'), 'ldap_case_sensitive'),
 		(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
 			->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 			->setEnabled($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
@@ -312,7 +312,7 @@ $saml_tab = (new CFormList('list_saml'))
 				->setEnabled($data['saml_enabled'])
 			)
 	)
-	->addRow(new CLabel(_('Case sensitive login'), 'saml_case_sensitive'),
+	->addRow(new CLabel(_('Case-sensitive login'), 'saml_case_sensitive'),
 		(new CCheckBox('saml_case_sensitive'))
 			->setChecked($data['saml_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)

@@ -75,7 +75,7 @@ if ($data['action'] === 'user.edit') {
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('users', 'name'))
 		)
-		->addRow(_('Surname'),
+		->addRow(_('Last name'),
 			(new CTextBox('surname', $data['surname']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('users', 'surname'))

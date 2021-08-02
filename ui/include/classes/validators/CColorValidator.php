@@ -29,8 +29,8 @@ class CColorValidator extends CStringValidator {
 	public $regex = '/^[0-9a-f]{6}$/i';
 
 	public function __construct(array $options = []) {
-		$this->messageRegex = _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).');
-		$this->messageEmpty = _('Empty colour.');
+		$this->messageRegex = _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).');
+		$this->messageEmpty = _('Empty color.');
 
 		parent::__construct($options);
 	}

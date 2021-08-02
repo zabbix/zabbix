@@ -1,1 +1,0 @@
-A......... [ZBX-19555] fixed inventory_mode parameter not being returned for host.get with output=extend (jfreibergs)

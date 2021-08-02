@@ -43,7 +43,7 @@ if (isset($_GET['lang'])) {
 		textdomain('frontend');
 	}
 	// numeric Locale to default
-	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8']);
+	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252']);
 }
 
 // available scripts 'scriptFileName' => 'path relative to js/'
@@ -277,7 +277,7 @@ $tranStrings = [
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
-		'S_COLOR_IS_NOT_CORRECT' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
+		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).')
 	],
 	'class.notifications.js' => [
 		'S_PROBLEM_ON' => _('Problem on'),
@@ -292,7 +292,7 @@ $tranStrings = [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
 	'class.coverride.js' => [
-		'S_COLOR' => _('colour'),
+		'S_COLOR' => _('color'),
 		'S_TIME_SHIFT' => _('time shift')
 	],
 	'class.cverticalaccordion.js' => [
@@ -329,7 +329,7 @@ $tranStrings = [
 		'Added, %1$s' => _x('Added, %1$s', 'screen reader'),
 		'Removed, %1$s' => _x('Removed, %1$s', 'screen reader'),
 		'%1$s, read only' => _x('%1$s, read only', 'screen reader'),
-		'Can not be removed' => _x('Can not be removed', 'screen reader'),
+		'Cannot be removed' => _x('Cannot be removed', 'screen reader'),
 		'Selected, %1$s in position %2$d of %3$d' => _x('Selected, %1$s in position %2$d of %3$d', 'screen reader'),
 		'Selected, %1$s, read only, in position %2$d of %3$d' => _x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
 		'More than %1$d matches for %2$s found' => _x('More than %1$d matches for %2$s found', 'screen reader'),

@@ -3009,7 +3009,7 @@ class CAction extends CApiService {
 						$operations_to_validate[] = $operation;
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action "operationid".'));
 					}
 				}
 			}
@@ -3027,7 +3027,7 @@ class CAction extends CApiService {
 						$operations_to_validate[] = $recovery_operation;
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action "operationid".'));
 					}
 				}
 			}
@@ -3064,7 +3064,7 @@ class CAction extends CApiService {
 						$operations_to_validate[] = $update_operation;
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect update action operationid.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect update action "operationid".'));
 					}
 				}
 			}

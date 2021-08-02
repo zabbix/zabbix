@@ -458,6 +458,35 @@ static int	DBpatch_5050031(void)
 
 	return DBadd_field("config", &field);
 }
+
+static int	DBpatch_5050032(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update config set default_lang='en_US' where default_lang='en_GB'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050033(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update users set lang='en_US' where lang='en_GB'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050034(void)
+{
+	const ZBX_FIELD	field = {"default_lang", "en_US", NULL, NULL, 5, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
 #endif
 
 DBPATCH_START(5050)
@@ -496,5 +525,8 @@ DBPATCH_ADD(5050028, 0, 1)
 DBPATCH_ADD(5050029, 0, 1)
 DBPATCH_ADD(5050030, 0, 1)
 DBPATCH_ADD(5050031, 0, 1)
+DBPATCH_ADD(5050032, 0, 1)
+DBPATCH_ADD(5050033, 0, 1)
+DBPATCH_ADD(5050034, 0, 1)
 
 DBPATCH_END()

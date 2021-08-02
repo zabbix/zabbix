@@ -144,13 +144,13 @@ function get_icon($type, $params = []) {
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)
-					->setTitle(_('Remove from favourites'))
+					->setTitle(_('Remove from favorites'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_ADD_FAV)
-					->setTitle(_('Add to favourites'))
+					->setTitle(_('Add to favorites'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setId('addrm_fav');

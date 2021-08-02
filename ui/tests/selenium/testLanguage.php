@@ -65,12 +65,12 @@ class testLanguage extends CWebTest {
 			[
 				[
 					'field' => [
-						'Язык по умолчанию' => 'Английский (en_GB)'
+						'Язык по умолчанию' => 'Английский (en_US)'
 					],
 					'message' => 'Настройки обновлены',
 					'page_title' => 'Configuration of GUI',
 					'body_lang' => 'en',
-					'defaultdb_lang' => 'en_GB',
+					'defaultdb_lang' => 'en_US',
 					'info' => self::INFO,
 					'login_info' => [
 							'name' => 'Username',
@@ -124,21 +124,21 @@ class testLanguage extends CWebTest {
 					'body_lang' => 'ru',
 					'menu_lang' => 'en',
 					'userdb_lang' => 'ru_RU',
-					'defaultdb_lang' => 'en_GB',
+					'defaultdb_lang' => 'en_US',
 					'info' => self::INFO
 				]
 			],
 			[
 				[
 					'field' => [
-						'Язык' => 'Английский (en_GB)'
+						'Язык' => 'Английский (en_US)'
 					],
 					'message' => 'Пользователь обновлен',
 					'page_title' => 'Dashboard',
 					'body_lang' => 'en',
 					'menu_lang' => 'en',
-					'userdb_lang' => 'en_GB',
-					'defaultdb_lang' => 'en_GB',
+					'userdb_lang' => 'en_US',
+					'defaultdb_lang' => 'en_US',
 					'info' => self::INFO_RUS
 				]
 			],
@@ -152,7 +152,7 @@ class testLanguage extends CWebTest {
 					'body_lang' => 'en',
 					'menu_lang' => 'en',
 					'userdb_lang' => 'default',
-					'defaultdb_lang' => 'en_GB',
+					'defaultdb_lang' => 'en_US',
 					'info' => self::INFO
 				]
 			]
@@ -205,7 +205,7 @@ class testLanguage extends CWebTest {
 					'page_title' => 'Панель',
 					'body_lang' => 'ru',
 					'userdb_lang' => 'ru_RU',
-					'defaultdb_lang' => 'en_GB'
+					'defaultdb_lang' => 'en_US'
 				]
 			],
 			[
@@ -222,7 +222,7 @@ class testLanguage extends CWebTest {
 					'page_title' => 'Dashboard',
 					'body_lang' => 'en',
 					'userdb_lang' => 'default',
-					'defaultdb_lang' => 'en_GB'
+					'defaultdb_lang' => 'en_US'
 				]
 			],
 			[
@@ -234,12 +234,12 @@ class testLanguage extends CWebTest {
 						],
 						'Password' => 'test5678',
 						'Password (once again)' => 'test5678',
-						'Language' => 'English (en_GB)'
+						'Language' => 'English (en_US)'
 					],
 					'page_title' => 'Dashboard',
 					'body_lang' => 'en',
-					'userdb_lang' => 'en_GB',
-					'defaultdb_lang' => 'en_GB'
+					'userdb_lang' => 'en_US',
+					'defaultdb_lang' => 'en_US'
 				]
 			]
 		];

@@ -403,7 +403,7 @@ class CApiInputValidator {
 
 		if (preg_match('/^[0-9a-f]{6}$/i', $data) !== 1) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_('a hexadecimal colour code (6 symbols) is expected')
+				_('a hexadecimal color code (6 symbols) is expected')
 			);
 			return false;
 		}

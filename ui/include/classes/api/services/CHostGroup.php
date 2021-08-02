@@ -792,7 +792,7 @@ class CHostGroup extends CApiService {
 			}
 			if ($db_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host group "%1$s" is internal and can not be deleted.', $db_groups[$groupid]['name'])
+					_s('Host group "%1$s" is internal and cannot be deleted.', $db_groups[$groupid]['name'])
 				);
 			}
 		}

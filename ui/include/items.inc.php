@@ -739,7 +739,7 @@ function get_item_by_itemid($itemid) {
 	if ($db_items) {
 		return $db_items;
 	}
-	error(_s('No item with itemid="%1$s".', $itemid));
+	error(_s('No item with item ID "%1$s".', $itemid));
 	return false;
 }
 
