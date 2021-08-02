@@ -131,7 +131,7 @@ func Test_getHostAndPort(t *testing.T) {
 	}{
 		{"+full", args{"https://example.com:443", "443"}, "example.com", "443", false},
 		{"+empty_port", args{"example.com:443", ""}, "example.com", "443", false},
-		{"+empty_port", args{"example.com", ""}, "example.com", "443", false},
+		{"+no_port", args{"example.com", ""}, "example.com", "443", false},
 		{"-port_mismatch", args{"example.com:443", "332"}, "", "", true},
 	}
 	for _, tt := range tests {
