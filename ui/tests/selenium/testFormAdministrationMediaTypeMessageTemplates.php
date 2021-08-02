@@ -25,21 +25,20 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
  *
  * @onBefore prepareMediaTypeMessageTemplatesData
  */
-class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
-{
+class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
+
 	// SQL query to get message_template and media_type tables to compare hash values.
 	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_message mtm ON mt.mediatypeid=mtm.mediatypeid'.
-	' ORDER BY mt.mediatypeid';
+			' ORDER BY mt.mediatypeid';
 
-	public static function prepareMediaTypeMessageTemplatesData()
-	{
+	public static function prepareMediaTypeMessageTemplatesData() {
 		CDataHelper::call('mediatype.create', [
 			[
-				'name' => 'Email (HTML) Service',
-				'type' => 0,
+				'name'=> 'Email (HTML) Service',
+				'type'=> 0,
 				'smtp_server' => 'apimail@company.com',
-				'smtp_helo' => 'zabbix.com',
-				'smtp_email' => 'zabbix@company.com',
+				'smtp_helo'=> 'zabbix.com',
+				'smtp_email'=> 'zabbix@company.com',
 				'message_templates' => [
 					[
 						'eventsource' => 4,
@@ -68,11 +67,11 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 				]
 			],
 			[
-				'name' => 'Email Service',
-				'type' => 0,
+				'name'=> 'Email Service',
+				'type'=> 0,
 				'smtp_server' => 'apimail@company.com',
-				'smtp_helo' => 'zabbix.com',
-				'smtp_email' => 'zabbix@company.com',
+				'smtp_helo'=> 'zabbix.com',
+				'smtp_email'=> 'zabbix@company.com',
 				'message_templates' => [
 					[
 						'eventsource' => 4,
@@ -103,9 +102,9 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 		]);
 //		TODO join two calls in one when ZBX-19752 will be resolved
 		CDataHelper::call('mediatype.create', [
-			'name' => 'SMS Service',
-			'type' => 2,
-			'gsm_modem' => 'test',
+			'name'=> 'SMS Service',
+			'type'=> 2,
+			'gsm_modem'=> 'test',
 			'message_templates' => [
 				[
 					'eventsource' => 4,
@@ -126,8 +125,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 		]);
 	}
 
-	public function testFormAdministrationMediaTypeMessageTemplates_Layout()
-	{
+	public function testFormAdministrationMediaTypeMessageTemplates_Layout() {
 		// Open a new media type configuration form and switch to Message templates tab.
 		$this->openMediaTypeTemplates('new');
 
@@ -138,7 +136,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 		$this->assertEquals(1, $templates_list->getRows()->count());
 		// Check that media type configuration form buttons are clickable from Message templates tab.
 		$this->assertEquals(2, $this->query('id', ['add', 'cancel'])->all()
-			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 		// Check message template configuration form.
 		$templates_list->query('button:Add')->one()->click();
@@ -151,7 +149,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 		$this->assertEquals(65535, $form->getField('Message')->getAttribute('maxlength'));
 		// Check that both buttons in the media type template configuration form are clickable.
 		$this->assertEquals(2, $overlay->query('button', ['Add', 'Cancel'])->all()
-			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 		// Add a "Problem" message template and check that corresponding row is added in Message templates table.
 		$form->submit();
@@ -161,7 +159,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 
 		// Check that both buttons in column Actions are clickable.
 		$this->assertEquals(2, $row->getColumn('Actions')->query('button', ['Edit', 'Remove'])->all()
-			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 		// Check that it is possible to edit a newly created message template.
 		$row->query('button:Edit')->one()->click();
@@ -173,8 +171,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 		$this->assertEquals(1, $templates_list->getRows()->count());
 	}
 
-	public function getDefaultMessageTemplateData()
-	{
+	public function getDefaultMessageTemplateData() {
 		return [
 			// Default messages for plain text Email media type
 			[
@@ -189,30 +186,30 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'Message type' => 'Problem',
 							'Subject' => 'Problem: {EVENT.NAME}',
 							'Message' => "Problem started at {EVENT.TIME} on {EVENT.DATE}\n".
-								"Problem name: {EVENT.NAME}\n".
-								"Host: {HOST.NAME}\n".
-								"Severity: {EVENT.SEVERITY}\n".
-								"Operational data: {EVENT.OPDATA}\n".
-								"Original problem ID: {EVENT.ID}\n".
-								"{TRIGGER.URL}"
+									"Problem name: {EVENT.NAME}\n".
+									"Host: {HOST.NAME}\n".
+									"Severity: {EVENT.SEVERITY}\n".
+									"Operational data: {EVENT.OPDATA}\n".
+									"Original problem ID: {EVENT.ID}\n".
+									"{TRIGGER.URL}"
 						],
 						[
 							'Message type' => 'Problem recovery',
 							'Subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
 							'Message' => "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-								"Problem name: {EVENT.NAME}\n".
-								"Problem duration: {EVENT.DURATION}\n".
-								"Host: {HOST.NAME}\n".
-								"Severity: {EVENT.SEVERITY}\n".
-								"Original problem ID: {EVENT.ID}\n".
-								"{TRIGGER.URL}"
+									"Problem name: {EVENT.NAME}\n".
+									"Problem duration: {EVENT.DURATION}\n".
+									"Host: {HOST.NAME}\n".
+									"Severity: {EVENT.SEVERITY}\n".
+									"Original problem ID: {EVENT.ID}\n".
+									"{TRIGGER.URL}"
 						],
 						[
 							'Message type' => 'Problem update',
 							'Subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
 							'Message' => "{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
-								"{EVENT.UPDATE.MESSAGE}\n\n".
-								"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
+									"{EVENT.UPDATE.MESSAGE}\n\n".
+									"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
 						],
 						[
 							'Message type' => 'Service',
@@ -245,21 +242,21 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'Message type' => 'Discovery',
 							'Subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
 							'Message' => "Discovery rule: {DISCOVERY.RULE.NAME}\n\n".
-								"Device IP: {DISCOVERY.DEVICE.IPADDRESS}\n".
-								"Device DNS: {DISCOVERY.DEVICE.DNS}\n".
-								"Device status: {DISCOVERY.DEVICE.STATUS}\n".
-								"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\n".
-								"Device service name: {DISCOVERY.SERVICE.NAME}\n".
-								"Device service port: {DISCOVERY.SERVICE.PORT}\n".
-								"Device service status: {DISCOVERY.SERVICE.STATUS}\n".
-								"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
+									"Device IP: {DISCOVERY.DEVICE.IPADDRESS}\n".
+									"Device DNS: {DISCOVERY.DEVICE.DNS}\n".
+									"Device status: {DISCOVERY.DEVICE.STATUS}\n".
+									"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\n".
+									"Device service name: {DISCOVERY.SERVICE.NAME}\n".
+									"Device service port: {DISCOVERY.SERVICE.PORT}\n".
+									"Device service status: {DISCOVERY.SERVICE.STATUS}\n".
+									"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
 						],
 						[
 							'Message type' => 'Autoregistration',
 							'Subject' => 'Autoregistration: {HOST.HOST}',
 							'Message' => "Host name: {HOST.HOST}\n".
-								"Host IP: {HOST.IP}\n".
-								"Agent port: {HOST.PORT}"
+									"Host IP: {HOST.IP}\n".
+									"Agent port: {HOST.PORT}"
 						],
 						[
 							'Message type' => 'Internal problem',
@@ -287,18 +284,18 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'Message type' => 'Problem',
 							'Subject' => 'Problem: {EVENT.NAME}',
 							'Message' => '<b>Problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br><b>Problem name:</b> '.
-								'{EVENT.NAME}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br>'.
-								'<b>Operational data:</b> {EVENT.OPDATA}<br><b>Original problem ID:</b> '.
-								'{EVENT.ID}<br>{TRIGGER.URL}'
+									'{EVENT.NAME}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br>'.
+									'<b>Operational data:</b> {EVENT.OPDATA}<br><b>Original problem ID:</b> '.
+									'{EVENT.ID}<br>{TRIGGER.URL}'
 
 						],
 						[
 							'Message type' => 'Problem recovery',
 							'Subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
 							'Message' => '<b>Problem has been resolved</b> at {EVENT.RECOVERY.TIME} on '.
-								'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem '.
-								'duration:</b> {EVENT.DURATION}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> '.
-								'{EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}'
+									'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem '.
+									'duration:</b> {EVENT.DURATION}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> '.
+									'{EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}'
 
 
 						],
@@ -306,8 +303,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'Message type' => 'Problem update',
 							'Subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
 							'Message' => '<b>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem</b> at {EVENT.UPDATE.DATE} '.
-								'{EVENT.UPDATE.TIME}.<br>{EVENT.UPDATE.MESSAGE}<br><br><b>Current problem status:'.
-								'</b> {EVENT.STATUS}<br><b>Age:</b> {EVENT.AGE}<br><b>Acknowledged:</b> {EVENT.ACK.STATUS}.'
+									'{EVENT.UPDATE.TIME}.<br>{EVENT.UPDATE.MESSAGE}<br><br><b>Current problem status:'.
+									'</b> {EVENT.STATUS}<br><b>Age:</b> {EVENT.AGE}<br><b>Acknowledged:</b> {EVENT.ACK.STATUS}.'
 						],
 						[
 							'Message type' => 'Service',
@@ -336,18 +333,18 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'Message type' => 'Discovery',
 							'Subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
 							'Message' => '<b>Discovery rule:</b> {DISCOVERY.RULE.NAME}<br><br><b>Device IP:</b> '.
-								'{DISCOVERY.DEVICE.IPADDRESS}<br><b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>'.
-								'<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br><b>Device uptime:</b> '.
-								'{DISCOVERY.DEVICE.UPTIME}<br><br><b>Device service name:</b> {DISCOVERY.SERVICE.NAME}'.
-								'<br><b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br><b>Device service '.
-								'status:</b> {DISCOVERY.SERVICE.STATUS}<br><b>Device service uptime:</b> '.
-								'{DISCOVERY.SERVICE.UPTIME}'
+									'{DISCOVERY.DEVICE.IPADDRESS}<br><b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>'.
+									'<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br><b>Device uptime:</b> '.
+									'{DISCOVERY.DEVICE.UPTIME}<br><br><b>Device service name:</b> {DISCOVERY.SERVICE.NAME}'.
+									'<br><b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br><b>Device service '.
+									'status:</b> {DISCOVERY.SERVICE.STATUS}<br><b>Device service uptime:</b> '.
+									'{DISCOVERY.SERVICE.UPTIME}'
 						],
 						[
 							'Message type' => 'Autoregistration',
 							'Subject' => 'Autoregistration: {HOST.HOST}',
 							'Message' => '<b>Host name:</b> {HOST.HOST}<br><b>Host IP:</b> {HOST.IP}<br><b>Agent port:'.
-								'</b> {HOST.PORT}'
+									'</b> {HOST.PORT}'
 						],
 						[
 							'Message type' => 'Internal problem',
@@ -373,19 +370,19 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 						[
 							'Message type' => 'Problem',
 							'Message' => "{EVENT.SEVERITY}: {EVENT.NAME}\n".
-								"Host: {HOST.NAME}\n".
-								"{EVENT.DATE} {EVENT.TIME}"
+									"Host: {HOST.NAME}\n".
+									"{EVENT.DATE} {EVENT.TIME}"
 						],
 						[
 							'Message type' => 'Problem recovery',
 							'Message' => "Resolved in {EVENT.DURATION}: {EVENT.NAME}\n".
-								"Host: {HOST.NAME}\n".
-								"{EVENT.DATE} {EVENT.TIME}"
+									"Host: {HOST.NAME}\n".
+									"{EVENT.DATE} {EVENT.TIME}"
 						],
 						[
 							'Message type' => 'Problem update',
 							'Message' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem in {EVENT.AGE} at '.
-								'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}'
+									'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}'
 						],
 						[
 							'Message type' => 'Service',
@@ -409,8 +406,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 						[
 							'Message type' => 'Autoregistration',
 							'Message' => "Autoregistration: {HOST.HOST}\n".
-								"Host IP: {HOST.IP}\n".
-								"Agent port: {HOST.PORT}"
+									"Host IP: {HOST.IP}\n".
+									"Agent port: {HOST.PORT}"
 						],
 						[
 							'Message type' => 'Internal problem',
@@ -429,8 +426,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 	/**
 	 * @dataProvider getDefaultMessageTemplateData
 	 */
-	public function testFormAdministrationMediaTypeMessageTemplates_DefaultMessageContent($data)
-	{
+	public function testFormAdministrationMediaTypeMessageTemplates_DefaultMessageContent($data) {
 		// Open a new media type configuration form and switch to Message templates tab.
 		$this->openMediaTypeTemplates('new', $data['media_type']);
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
@@ -461,12 +457,13 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 			$templates_list->invalidate();
 			if ($i === $last) {
 				$this->assertFalse($templates_list->query('button:Add (message type limit reached)')->one()->isEnabled());
-			} else {
+			}
+			else {
 				$templates_list->query('button:Add')->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$form->invalidate();
 				$disabled_options = $form->getField('Message type')->getOptions()->filter(
-					new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled'])
+						new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled'])
 				)->asText();
 				$this->assertContains($template['Message type'], $disabled_options);
 				COverlayDialogElement::find()->one()->close();
@@ -474,8 +471,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 		}
 	}
 
-	public function getUpdateMessageTemplateData()
-	{
+	public function getUpdateMessageTemplateData() {
 		return [
 			// Change message format from plain text to HTML
 			[
@@ -489,18 +485,18 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'Message type' => 'Problem',
 							'Subject' => 'Problem: {EVENT.NAME}',
 							'Message' => '<b>Problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br><b>Problem name:</b> '.
-								'{EVENT.NAME}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br>'.
-								'<b>Operational data:</b> {EVENT.OPDATA}<br><b>Original problem ID:</b> '.
-								'{EVENT.ID}<br>{TRIGGER.URL}'
+									'{EVENT.NAME}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br>'.
+									'<b>Operational data:</b> {EVENT.OPDATA}<br><b>Original problem ID:</b> '.
+									'{EVENT.ID}<br>{TRIGGER.URL}'
 
 						],
 						[
 							'Message type' => 'Problem recovery',
 							'Subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
 							'Message' => '<b>Problem has been resolved</b> at {EVENT.RECOVERY.TIME} on '.
-								'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem '.
-								'duration:</b> {EVENT.DURATION}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> '.
-								'{EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}'
+									'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem '.
+									'duration:</b> {EVENT.DURATION}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> '.
+									'{EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}'
 
 
 						],
@@ -508,25 +504,25 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'Message type' => 'Problem update',
 							'Subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
 							'Message' => '<b>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem</b> at {EVENT.UPDATE.DATE} '.
-								'{EVENT.UPDATE.TIME}.<br>{EVENT.UPDATE.MESSAGE}<br><br><b>Current problem status:'.
-								'</b> {EVENT.STATUS}<br><b>Age:</b> {EVENT.AGE}<br><b>Acknowledged:</b> {EVENT.ACK.STATUS}.'
+									'{EVENT.UPDATE.TIME}.<br>{EVENT.UPDATE.MESSAGE}<br><br><b>Current problem status:'.
+									'</b> {EVENT.STATUS}<br><b>Age:</b> {EVENT.AGE}<br><b>Acknowledged:</b> {EVENT.ACK.STATUS}.'
 						],
 						[
 							'Message type' => 'Discovery',
 							'Subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
 							'Message' => '<b>Discovery rule:</b> {DISCOVERY.RULE.NAME}<br><br><b>Device IP:</b> '.
-								'{DISCOVERY.DEVICE.IPADDRESS}<br><b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>'.
-								'<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br><b>Device uptime:</b> '.
-								'{DISCOVERY.DEVICE.UPTIME}<br><br><b>Device service name:</b> {DISCOVERY.SERVICE.NAME}'.
-								'<br><b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br><b>Device service '.
-								'status:</b> {DISCOVERY.SERVICE.STATUS}<br><b>Device service uptime:</b> '.
-								'{DISCOVERY.SERVICE.UPTIME}'
+									'{DISCOVERY.DEVICE.IPADDRESS}<br><b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>'.
+									'<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br><b>Device uptime:</b> '.
+									'{DISCOVERY.DEVICE.UPTIME}<br><br><b>Device service name:</b> {DISCOVERY.SERVICE.NAME}'.
+									'<br><b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br><b>Device service '.
+									'status:</b> {DISCOVERY.SERVICE.STATUS}<br><b>Device service uptime:</b> '.
+									'{DISCOVERY.SERVICE.UPTIME}'
 						],
 						[
 							'Message type' => 'Autoregistration',
 							'Subject' => 'Autoregistration: {HOST.HOST}',
 							'Message' => '<b>Host name:</b> {HOST.HOST}<br><b>Host IP:</b> {HOST.IP}<br><b>Agent port:'.
-								'</b> {HOST.PORT}'
+									'</b> {HOST.PORT}'
 						]
 					]
 				]
@@ -578,9 +574,9 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'Message type' => 'Service',
 							'Subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
 							'Message' => '<b>Service problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br>'.
-								'<b>Service problem name:</b> {EVENT.NAME}<br><b>Service:</b> {SERVICE.NAME}<br>'.
-								'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br><br>'.
-								'{SERVICE.ROOTCAUSE}'
+									'<b>Service problem name:</b> {EVENT.NAME}<br><b>Service:</b> {SERVICE.NAME}<br>'.
+									'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br><br>'.
+									'{SERVICE.ROOTCAUSE}'
 						],
 						[
 							'Message type' => 'Service recovery',
@@ -611,50 +607,50 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'Message type' => 'Problem',
 							'Subject' => 'Problem: {EVENT.NAME}',
 							'Message' => "Problem started at {EVENT.TIME} on {EVENT.DATE}\n".
-								"Problem name: {EVENT.NAME}\n".
-								"Host: {HOST.NAME}\n".
-								"Severity: {EVENT.SEVERITY}\n".
-								"Operational data: {EVENT.OPDATA}\n".
-								"Original problem ID: {EVENT.ID}\n".
-								"{TRIGGER.URL}"
+									"Problem name: {EVENT.NAME}\n".
+									"Host: {HOST.NAME}\n".
+									"Severity: {EVENT.SEVERITY}\n".
+									"Operational data: {EVENT.OPDATA}\n".
+									"Original problem ID: {EVENT.ID}\n".
+									"{TRIGGER.URL}"
 						],
 						[
 							'Message type' => 'Problem recovery',
 							'Subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
 							'Message' => "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-								"Problem name: {EVENT.NAME}\n".
-								"Problem duration: {EVENT.DURATION}\n".
-								"Host: {HOST.NAME}\n".
-								"Severity: {EVENT.SEVERITY}\n".
-								"Original problem ID: {EVENT.ID}\n".
-								"{TRIGGER.URL}"
+									"Problem name: {EVENT.NAME}\n".
+									"Problem duration: {EVENT.DURATION}\n".
+									"Host: {HOST.NAME}\n".
+									"Severity: {EVENT.SEVERITY}\n".
+									"Original problem ID: {EVENT.ID}\n".
+									"{TRIGGER.URL}"
 						],
 						[
 							'Message type' => 'Problem update',
 							'Subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
 							'Message' => "{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
-								"{EVENT.UPDATE.MESSAGE}\n\n".
-								"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
+									"{EVENT.UPDATE.MESSAGE}\n\n".
+									"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
 						],
 						[
 							'Message type' => 'Discovery',
 							'Subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
 							'Message' => "Discovery rule: {DISCOVERY.RULE.NAME}\n\n".
-								"Device IP: {DISCOVERY.DEVICE.IPADDRESS}\n".
-								"Device DNS: {DISCOVERY.DEVICE.DNS}\n".
-								"Device status: {DISCOVERY.DEVICE.STATUS}\n".
-								"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\n".
-								"Device service name: {DISCOVERY.SERVICE.NAME}\n".
-								"Device service port: {DISCOVERY.SERVICE.PORT}\n".
-								"Device service status: {DISCOVERY.SERVICE.STATUS}\n".
-								"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
+									"Device IP: {DISCOVERY.DEVICE.IPADDRESS}\n".
+									"Device DNS: {DISCOVERY.DEVICE.DNS}\n".
+									"Device status: {DISCOVERY.DEVICE.STATUS}\n".
+									"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\n".
+									"Device service name: {DISCOVERY.SERVICE.NAME}\n".
+									"Device service port: {DISCOVERY.SERVICE.PORT}\n".
+									"Device service status: {DISCOVERY.SERVICE.STATUS}\n".
+									"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
 						],
 						[
 							'Message type' => 'Autoregistration',
 							'Subject' => 'Autoregistration: {HOST.HOST}',
 							'Message' => "Host name: {HOST.HOST}\n".
-								"Host IP: {HOST.IP}\n".
-								"Agent port: {HOST.PORT}"
+									"Host IP: {HOST.IP}\n".
+									"Agent port: {HOST.PORT}"
 						]
 					]
 				]
@@ -804,19 +800,19 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 							'action' => 'Skip',
 							'Subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
 							'Message' => '<b>Discovery rule:</b> {DISCOVERY.RULE.NAME}<br><br><b>Device IP:</b> '.
-								'{DISCOVERY.DEVICE.IPADDRESS}<br><b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>'.
-								'<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br><b>Device uptime:</b> '.
-								'{DISCOVERY.DEVICE.UPTIME}<br><br><b>Device service name:</b> {DISCOVERY.SERVICE.NAME}'.
-								'<br><b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br><b>Device service '.
-								'status:</b> {DISCOVERY.SERVICE.STATUS}<br><b>Device service uptime:</b> '.
-								'{DISCOVERY.SERVICE.UPTIME}'
+									'{DISCOVERY.DEVICE.IPADDRESS}<br><b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>'.
+									'<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br><b>Device uptime:</b> '.
+									'{DISCOVERY.DEVICE.UPTIME}<br><br><b>Device service name:</b> {DISCOVERY.SERVICE.NAME}'.
+									'<br><b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br><b>Device service '.
+									'status:</b> {DISCOVERY.SERVICE.STATUS}<br><b>Device service uptime:</b> '.
+									'{DISCOVERY.SERVICE.UPTIME}'
 						],
 						[
 							'Message type' => 'Autoregistration',
 							'action' => 'Skip',
 							'Subject' => 'Autoregistration: {HOST.HOST}',
 							'Message' => '<b>Host name:</b> {HOST.HOST}<br><b>Host IP:</b> {HOST.IP}<br><b>Agent port:'.
-								'</b> {HOST.PORT}'
+									'</b> {HOST.PORT}'
 						]
 					],
 					'rows' => 4
@@ -829,15 +825,15 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 	 * @dataProvider getUpdateMessageTemplateData
 	 * @backup media_type
 	 */
-	public function testFormAdministrationMediaTypeMessageTemplates_Update($data)
-	{
+	public function testFormAdministrationMediaTypeMessageTemplates_Update($data) {
 		// Open configuration of an existing media type, update its format if needed and switch to Message templates tab.
 		$this->openMediaTypeTemplates($data['media_type'], CTestArrayHelper::get($data, 'media_type_fields'));
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		// Edit the list of existing message templates or remove all message templates if corresponding key exists.
 		if (array_key_exists('remove_all', $data)) {
 			$templates_list->query('button:Remove')->all()->click();
-		} else {
+		}
+		else {
 			$this->modifyMessageTemplates($data);
 		}
 		$this->query('id:media-type-form')->asForm()->one()->submit();
@@ -849,16 +845,16 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 		if (array_key_exists('remove_all', $data)) {
 			// Check that only the row with "Add" button is present after removing all message templates.
 			$this->assertEquals(1, $templates_list->getRows()->count());
-		} else {
+		}
+		else {
 			$this->assertEquals(CTestArrayHelper::get($data, 'rows', count($data['message_templates'])),
-				$templates_list->getRows()->count() - 1
+					$templates_list->getRows()->count() - 1
 			);
 			$this->checkMessageTemplates($data, $templates_list);
 		}
 	}
 
-	public function testFormAdministrationMediaTypeMessageTemplates_SimpleUpdate()
-	{
+	public function testFormAdministrationMediaTypeMessageTemplates_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash($this->sql);
 		// Update "Problem" message template of Email media type without making any changes.
 		$this->openMediaTypeTemplates('Email');
@@ -871,8 +867,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testFormAdministrationMediaTypeMessageTemplates_Cancel()
-	{
+	public function testFormAdministrationMediaTypeMessageTemplates_Cancel() {
 		$old_hash = CDBHelper::getHash($this->sql);
 		// Open Email (HTML) media type, modify "Problem" message template and remove "Discovery" message template.
 		$this->openMediaTypeTemplates('Email (HTML)');
@@ -897,8 +892,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 	/**
 	 * Function that modifies, adds or removes message templates according to the action defined in data provider.
 	 */
-	private function modifyMessageTemplates($data)
-	{
+	private function modifyMessageTemplates($data) {
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		foreach ($data['message_templates'] as $template) {
 			switch (CTestArrayHelper::get($template, 'action', 'Edit')) {
@@ -926,8 +920,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 	/**
 	 * Function that checks if the manipulations with the corresponding media type template took place.
 	 */
-	private function checkMessageTemplates($data, $templates_list)
-	{
+	private function checkMessageTemplates($data, $templates_list) {
 		foreach ($data['message_templates'] as $template) {
 			$action = CTestArrayHelper::get($template, 'action', 'Edit');
 			unset($template['action']);
@@ -953,11 +946,11 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest
 	/**
 	 * Function creates new or opens existing media type, modifies media type parameters and opens message templates tab.
 	 */
-	private function openMediaTypeTemplates($media_type, $media_type_fields = null)
-	{
+	private function openMediaTypeTemplates($media_type, $media_type_fields = null) {
 		if ($media_type === 'new') {
 			$this->page->login()->open('zabbix.php?action=mediatype.edit')->waitUntilReady();
-		} else {
+		}
+		else {
 			$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
 			$this->query('link', $media_type)->one()->WaitUntilClickable()->click();
 		}
