@@ -402,8 +402,9 @@ class CHistFunctionValidatorTest extends TestCase {
 			['monodec(/host/key, #2147483647)', [], ['rc' => true, 'error' => null]],
 			['monodec(/host/key, 2147483647)', [], ['rc' => true, 'error' => null]],
 			['monodec(/host/key, #256,)', [], ['rc' => true, 'error' => null]],
-			['monodec(/host/key, #256, "weak")', [], ['rc' => false, 'error' => 'invalid third parameter in function "monodec"']],
 			['monodec(/host/key, #256, "")', [], ['rc' => false, 'error' => 'invalid third parameter in function "monodec"']],
+			['monodec(/host/key, #256, "test")', [], ['rc' => false, 'error' => 'invalid third parameter in function "monodec"']],
+			['monodec(/host/key, #256, "weak")', [], ['rc' => true, 'error' => null]],
 			['monodec(/host/key, #256, "strict")', [], ['rc' => true, 'error' => null]],
 
 			['monoinc(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "monoinc"']],
@@ -421,8 +422,9 @@ class CHistFunctionValidatorTest extends TestCase {
 			['monoinc(/host/key, #2147483647)', [], ['rc' => true, 'error' => null]],
 			['monoinc(/host/key, 2147483647)', [], ['rc' => true, 'error' => null]],
 			['monoinc(/host/key, #256,)', [], ['rc' => true, 'error' => null]],
-			['monoinc(/host/key, #256, "weak")', [], ['rc' => false, 'error' => 'invalid third parameter in function "monoinc"']],
 			['monoinc(/host/key, #256, "")', [], ['rc' => false, 'error' => 'invalid third parameter in function "monoinc"']],
+			['monoinc(/host/key, #256, "test")', [], ['rc' => false, 'error' => 'invalid third parameter in function "monoinc"']],
+			['monoinc(/host/key, #256, "weak")', [], ['rc' => true, 'error' => null]],
 			['monoinc(/host/key, #256, "strict")', [], ['rc' => true, 'error' => null]],
 
 			['nodata(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "nodata"']],

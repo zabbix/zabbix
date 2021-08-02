@@ -147,12 +147,12 @@ final class CHistFunctionData {
 		'monodec' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
-			['rules' => [['type' => 'regexp', 'pattern' => '/^(strict)$/']], 'required' => false]
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(weak|strict)$/']], 'required' => false]
 		],
 		'monoinc' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
-			['rules' => [['type' => 'regexp', 'pattern' => '/^(strict)$/']], 'required' => false]
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(weak|strict)$/']], 'required' => false]
 		],
 		'nodata' => [
 			['rules' => [['type' => 'query']]],
