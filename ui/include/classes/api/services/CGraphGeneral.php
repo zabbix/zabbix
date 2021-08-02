@@ -1194,11 +1194,11 @@ abstract class CGraphGeneral extends CApiService {
 
 				$_graph['uuid'] = '';
 
-				if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $_graph['ymin_itemid'] != 0) {
+				if ($_graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $_graph['ymin_itemid'] != 0) {
 					$_graph['ymin_itemid'] = $item_links[$_graph['ymin_itemid']][$hostid];
 				}
 
-				if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $_graph['ymax_itemid'] != 0) {
+				if ($_graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $_graph['ymax_itemid'] != 0) {
 					$_graph['ymax_itemid'] = $item_links[$_graph['ymax_itemid']][$hostid];
 				}
 
