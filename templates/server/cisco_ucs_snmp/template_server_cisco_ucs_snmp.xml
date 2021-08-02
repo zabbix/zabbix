@@ -1056,7 +1056,7 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
             </mapping>
             <mapping>
                <value>83</value>
-               <newvalue>decomissioning</newvalue>
+               <newvalue>decommissioning</newvalue>
             </mapping>
             <mapping>
                <value>84</value>
@@ -1205,7 +1205,7 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
             </mapping>
             <mapping>
                <value>101</value>
-               <newvalue>decomissioning</newvalue>
+               <newvalue>decommissioning</newvalue>
             </mapping>
             <mapping>
                <value>201</value>

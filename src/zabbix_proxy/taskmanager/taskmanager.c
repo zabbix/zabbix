@@ -418,10 +418,6 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-#ifdef HAVE_NETSNMP
-	zbx_init_snmp();
-#endif
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif

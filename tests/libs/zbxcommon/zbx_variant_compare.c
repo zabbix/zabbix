@@ -109,6 +109,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+	ZBX_DOUBLE_EPSILON = 0.000001;
+
 	mock_read_variant("in.value1", &value1);
 	mock_read_variant("in.value2", &value2);
 
