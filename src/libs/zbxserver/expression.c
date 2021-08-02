@@ -5613,7 +5613,7 @@ static int	process_user_macro_token(char **data, zbx_token_t *token, const struc
 {
 	int			force_quote, ret;
 	size_t			context_r;
-	char			*context, *context_esc;
+	char			*context, *context_esc, *errmsg = NULL;
 	zbx_token_user_macro_t	*macro = &token->data.user_macro;
 
 	/* user macro without context, nothing to replace */
@@ -5627,7 +5627,7 @@ static int	process_user_macro_token(char **data, zbx_token_t *token, const struc
 	substitute_lld_macros(&context, jp_row, lld_macro_paths, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO, NULL,
 			0);
 
-	if (NULL != (context_esc = zbx_user_macro_quote_context_dyn(context, force_quote)))
+	if (NULL != (context_esc = zbx_user_macro_quote_context_dyn(context, force_quote, &errmsg)))
 	{
 		context_r = macro->context.r;
 		zbx_replace_string(data, macro->context.l, &context_r, context_esc);
@@ -5639,11 +5639,8 @@ static int	process_user_macro_token(char **data, zbx_token_t *token, const struc
 	}
 	else
 	{
-		if (NULL != error)
-		{
-			zbx_snprintf(error, max_error_len, "quoted context \"%s\" cannot end with '\\' character",
-					context);
-		}
+		zbx_strlcpy(error, errmsg, max_error_len);
+		zbx_free(errmsg);
 		ret = FAIL;
 	}
 
