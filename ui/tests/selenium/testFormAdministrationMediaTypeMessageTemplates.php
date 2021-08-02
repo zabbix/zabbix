@@ -34,8 +34,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 	public static function prepareMediaTypeMessageTemplatesData() {
 		CDataHelper::call('mediatype.create', [
 			[
-				'name'=> 'Email (HTML) Service',
-				'type'=> 0,
+				'name' => 'Email (HTML) Service',
+				'type' => 0,
 				'smtp_server' => 'apimail@company.com',
 				'smtp_helo' => 'zabbix.com',
 				'smtp_email' => 'zabbix@company.com',
@@ -100,11 +100,11 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				]
 			]
 		]);
-//		TODO join two calls in one when ZBX-19752 will be resolved
+		// TODO: join two calls in one when ZBX-19752 will be resolved.
 		CDataHelper::call('mediatype.create', [
 			'name' => 'SMS Service',
 			'type' => 2,
-			'gsm_modem'=> 'test',
+			'gsm_modem' => 'test',
 			'message_templates' => [
 				[
 					'eventsource' => 4,
