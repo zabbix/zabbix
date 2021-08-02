@@ -659,6 +659,8 @@ static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx
 
 	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
 		length = ZBX_SIZE_T_MAX;
+	else if (ZBX_TYPE_CUID == field->type)
+		length = CUID_LEN;
 	else
 		length = field->length;
 
@@ -2980,7 +2982,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
 		zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
 	}
-
 #ifdef HAVE_MYSQL
 	/* MySQL workaround - explicitly add missing text fields with '' default value */
 	for (field = (const ZBX_FIELD *)self->table->fields; NULL != field->name; field++)
@@ -2991,6 +2992,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
+			case ZBX_TYPE_CUID:
 				if (FAIL != zbx_vector_ptr_search(&self->fields, (void *)field,
 						ZBX_DEFAULT_PTR_COMPARE_FUNC))
 				{
@@ -2999,7 +3001,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 
 				zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ',');
 				zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
-
 				zbx_strcpy_alloc(&sql_values, &sql_values_alloc, &sql_values_offset, ",''");
 				break;
 		}
@@ -3577,10 +3578,19 @@ out:
 int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
 {
 	int		ret = FAIL;
-	DB_RESULT	result;
+	DB_RESULT	result = NULL;
 	DB_ROW		row;
+	time_t		t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
+
+	t = time(NULL);
+
+	if ((time_t) - 1 == t)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to get time: %s", __func__, zbx_strerror(errno));
+		goto out;
+	}
 
 	if (NULL == (result = DBselect(
 			"select u.userid,u.roleid,u.username,r.type"
@@ -3590,7 +3600,8 @@ int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *
 				" and u.roleid=r.roleid"
 				" and t.status=%d"
 				" and (t.expires_at=%d or t.expires_at > %lu)",
-			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES, time(NULL))))
+			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES,
+			(unsigned long)t)))
 	{
 		goto out;
 	}
