@@ -936,32 +936,6 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Item Prometeus to JSON unsupported label operator !=',
-						'Key' => 'json-prometeus-unsupported-label-operator-1'
-					],
-					'preprocessing' => [
-						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!="regex_pattern"}']
-					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Item Prometeus to JSON unsupported label operator !~',
-						'Key' => 'json-prometeus-unsupported-label-operator-2'
-					],
-					'preprocessing' => [
-						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!~"<regex>"}']
-					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
 						'Name' => 'Item Prometeus to JSON duplicate metric condition',
 						'Key' => 'json-duplicate-metric-condition'
 					],
@@ -1247,6 +1221,30 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name="{$LABEL_VALUE}"}']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON unsupported label operator !=',
+						'Key' => 'json-prometeus-unsupported-label-operator-1'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!="regex_pattern"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus to JSON unsupported label operator !~',
+						'Key' => 'json-prometeus-unsupported-label-operator-2'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!~"<regex>"}']
+					]
+				]
 			]
 		];
 	}
@@ -1383,32 +1381,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}=<1']
-					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Item Prometeus unsupported label operator !=',
-						'Key' => 'prometeus-unsupported-label-operator-1'
-					],
-					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!="regex_pattern"}']
-					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Item Prometeus unsupported label operator !~',
-						'Key' => 'prometeus-unsupported-label-operator-2'
-					],
-					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"<regex>"}']
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
@@ -1739,6 +1711,30 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name="{$LABEL_VALUE}"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus unsupported label operator !=',
+						'Key' => 'prometeus-unsupported-label-operator-1'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!="regex_pattern"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus unsupported label operator !~',
+						'Key' => 'prometeus-unsupported-label-operator-2'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"<regex>"}']
 					]
 				]
 			]

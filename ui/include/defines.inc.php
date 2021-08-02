@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha1');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050031);
+define('ZABBIX_DB_VERSION',		5050034);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -265,6 +265,12 @@ define('AUDIT_RESOURCE_TEMPLATE_DASHBOARD',	43);
 define('AUDIT_RESOURCE_USER_ROLE',			44);
 define('AUDIT_RESOURCE_AUTH_TOKEN',			45);
 define('AUDIT_RESOURCE_SCHEDULED_REPORT',	46);
+
+define('AUIDT_DETAILS_ACTION_ADD',		'add');
+define('AUIDT_DETAILS_ACTION_UPDATE',	'update');
+define('AUIDT_DETAILS_ACTION_DELETE',	'delete');
+define('AUIDT_DETAILS_ACTION_ATTACH',	'attach');
+define('AUIDT_DETAILS_ACTION_DETACH',	'detach');
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -1590,7 +1596,7 @@ define('ZBX_VALID_WARNING',	2);
 define('LANG_DEFAULT', 'default');
 
 // the default language
-define('ZBX_DEFAULT_LANG', 'en_GB');
+define('ZBX_DEFAULT_LANG', 'en_US');
 
 // user default time zone
 define('TIMEZONE_DEFAULT', 'default');

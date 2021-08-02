@@ -230,7 +230,7 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Username'),
 					_x('Name', 'user first name'),
-					_('Surname')
+					_('Last name')
 				]
 			],
 			'items' => [

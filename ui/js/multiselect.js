@@ -691,7 +691,7 @@ jQuery(function($) {
 										$aria_live.text(aria_text);
 									}
 									else {
-										$aria_live.text(t('Can not be removed'));
+										$aria_live.text(t('Cannot be removed'));
 									}
 								}
 								else if (e.which == KEY_BACKSPACE) {

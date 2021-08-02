@@ -60,8 +60,8 @@ static void	update_str_json(struct zbx_json *json, const char *key, const char *
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, NULL, val_old, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, NULL, val_new, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, NULL, val_old, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(json);
 }
 
@@ -69,8 +69,8 @@ static void	update_uint64_json(struct zbx_json *json, const char *key, uint64_t 
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(json, NULL, val_old);
 	zbx_json_adduint64(json, NULL, val_new);
+	zbx_json_adduint64(json, NULL, val_old);
 	zbx_json_close(json);
 }
 
@@ -78,8 +78,8 @@ static void	update_int_json(struct zbx_json *json, const char *key, int val_old,
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(json, NULL, val_old);
 	zbx_json_addint64(json, NULL, val_new);
+	zbx_json_addint64(json, NULL, val_old);
 	zbx_json_close(json);
 }
 
@@ -245,7 +245,7 @@ void	zbx_audit_flush(void)
 	{
 		zbx_new_cuid(audit_cuid);
 		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
-				0 != strcmp((*audit_entry)->details_json.buffer, "[{}]"))
+				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
 #define AUDIT_USERID	0
 #define AUDIT_USERNAME	"System"
