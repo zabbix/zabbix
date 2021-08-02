@@ -29,6 +29,89 @@
 #include "graph_linking.h"
 #include "../zbxalgo/vectorimpl.h"
 
+typedef struct
+{
+	zbx_uint64_t	id;
+	char		*name;
+}
+zbx_id_name_pair_t;
+
+
+
+static zbx_hash_t	zbx_ids_names_hash_func(const void *data)
+{
+	const zbx_id_name_pair_t	*id_name_pair_entry = (const zbx_id_name_pair_t *)data;
+
+	return  ZBX_DEFAULT_UINT64_HASH_ALGO(&(id_name_pair_entry->id), sizeof(id_name_pair_entry->id),
+			ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	zbx_ids_names_compare_func(const void *d1, const void *d2)
+{
+	const zbx_id_name_pair_t	*id_name_pair_entry_1 = (const zbx_id_name_pair_t *)d1;
+	const zbx_id_name_pair_t	*id_name_pair_entry_2 = (const zbx_id_name_pair_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(id_name_pair_entry_1->id, id_name_pair_entry_2->id);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBselect_ids_names                                                *
+ *                                                                            *
+ * Parameters: sql - [IN] sql statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ ******************************************************************************/
+void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names)
+{
+	int		i;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id;
+	zbx_hashset_t	ids_names;
+
+#define	IDS_NAMES_HASHSET_DEF_SIZE	100
+	zbx_hashset_create(&ids_names, IDS_NAMES_HASHSET_DEF_SIZE,
+			zbx_ids_names_hash_func,
+			zbx_ids_names_compare_func);
+#undef IDS_NAMES_HASHSET_DEF_SIZE
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_id_name_pair_t	local_id_name_pair;
+
+		ZBX_STR2UINT64(id, row[0]);
+		zbx_vector_uint64_append(ids, id);
+		//zbx_vector_str_append(names, zbx_strdup(NULL, row[1]));
+		local_id_name_pair.id = id;
+		local_id_name_pair.name = row[1];
+		zbx_hashset_insert(&ids_names, &local_id_name_pair, sizeof(local_id_name_pair));
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (i = 0; i < ids->values_num; i++)
+	{
+		zbx_id_name_pair_t	*found, temp_t;
+		temp_t.id = ids->values[i];
+		if (NULL != (found =  (zbx_id_name_pair_t *)zbx_hashset_search(&ids_names, &temp_t)))
+		{
+		  zbx_vector_str_append(names, found->name);
+		}
+		else
+		{
+		  THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+	//zbx_ids_names_clean(&ids_names);
+	zbx_hashset_destroy(&ids_names);
+}
+
 typedef struct _zbx_template_graph_valid_t zbx_template_graph_valid_t;
 ZBX_PTR_VECTOR_DECL(graph_valid_ptr, zbx_template_graph_valid_t *)
 
@@ -1357,6 +1440,8 @@ static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeid
 	size_t			sql_alloc = 0, sql_offset;
 	zbx_vector_uint64_t	groupids;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	if (0 == del_group_prototypeids->values_num)
 		return;
 
@@ -1380,6 +1465,8 @@ static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeid
 
 	zbx_vector_uint64_destroy(&groupids);
 	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1396,24 +1483,30 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
 	zbx_vector_uint64_t	hostids, group_prototypeids;
+	zbx_vector_str_t	hostnames;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == host_prototypeids->values_num)
-		return;
+		goto out;
 
 	/* delete discovered hosts */
 
 	zbx_vector_uint64_create(&hostids);
+	zbx_vector_str_create(&hostnames);
+	//zbx_vector_ids_names_create(&host_ids_names);
 	zbx_vector_uint64_create(&group_prototypeids);
 
 	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hostid from host_discovery where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hd.hostid,h.name from host_discovery hd, hosts h "
+			 "where hd.hostid=h.hostid");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_hostid",
 			host_prototypeids->values, host_prototypeids->values_num);
 
-	DBselect_uint64(sql, &hostids);
+	DBselect_ids_names(sql, &hostids, &hostnames);
 
 	if (0 != hostids.values_num)
-		DBdelete_hosts(&hostids);
+	  DBdelete_hosts(&hostids, &hostnames);
 
 	/* delete group prototypes */
 
@@ -1437,7 +1530,10 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 
 	zbx_vector_uint64_destroy(&group_prototypeids);
 	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_str_destroy(&hostnames);
 	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1873,6 +1969,7 @@ ZBX_PTR_VECTOR_IMPL(interfaces, zbx_interfaces_prototype_t *)
 typedef struct
 {
 	zbx_uint64_t		templateid;		/* link to parent template */
+	zbx_uint64_t		old_templateid;
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		itemid;			/* discovery rule id */
 	zbx_vector_uint64_t	lnk_templateids;	/* list of templates which should be linked */
@@ -1882,14 +1979,19 @@ typedef struct
 	zbx_vector_interfaces_t	interfaces;		/* list of interfaces */
 	char			*host;
 	char			*name;
+	char			*old_name;
 	unsigned char		status;
+	unsigned char		old_status;
 #define ZBX_FLAG_HPLINK_UPDATE_NAME			0x01
 #define ZBX_FLAG_HPLINK_UPDATE_STATUS			0x02
 #define ZBX_FLAG_HPLINK_UPDATE_DISCOVER			0x04
 #define ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES	0x08
+#define ZBX_FLAG_HPLINK_UPDATE_TEMPLATEID		0x10
 	unsigned char		flags;
 	unsigned char		discover;
+	unsigned char		old_discover;
 	unsigned char		custom_interfaces;
+	unsigned char		old_custom_interfaces;
 }
 zbx_host_prototype_t;
 
@@ -1986,6 +2088,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 	zbx_vector_uint64_t	itemids;
 	zbx_host_prototype_t	*host_prototype;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&itemids);
 
 	/* selects host prototypes from templates */
@@ -2061,15 +2165,35 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 				if (host_prototype->itemid == itemid && 0 == strcmp(host_prototype->host, row[2]))
 				{
+					host_prototype->old_templateid = host_prototype->hostid;
 					ZBX_STR2UINT64(host_prototype->hostid, row[1]);
+					zabbix_log(LOG_LEVEL_INFORMATION, "AGS COMPARING NAME: ->%s<-, and row[3]: ->%s<-",
+							host_prototype->name, row[3]);
+
+					zabbix_log(LOG_LEVEL_INFORMATION, "AGS2 COMPARING STATUS: ->%d<-, and row[3]: ->%d<-",
+							host_prototype->old_status, atoi(row[4]));
+
 					if (0 != strcmp(host_prototype->name, row[3]))
+					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_NAME;
+						host_prototype->old_name = zbx_strdup(NULL, host_prototype->name);
+					}
 					if (host_prototype->status != (status = (unsigned char)atoi(row[4])))
+					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_STATUS;
+						host_prototype->old_status = host_prototype->status;
+					}
 					if (host_prototype->discover != (unsigned char)atoi(row[5]))
+					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_DISCOVER;
+						host_prototype->old_discover = host_prototype->discover;
+					}
 					if (host_prototype->custom_interfaces != (unsigned char)atoi(row[6]))
+					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES;
+						host_prototype->old_custom_interfaces =
+								host_prototype->custom_interfaces;
+					}
 					break;
 				}
 			}
@@ -2083,6 +2207,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 	/* sort by templateid */
 	zbx_vector_ptr_sort(host_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2108,6 +2234,8 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 	zbx_uint64_t		hostid, templateid, hosttemplateid;
 	zbx_host_prototype_t	*host_prototype;
 	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -2207,6 +2335,8 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 	zbx_vector_uint64_destroy(&hostids);
 
 	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2521,6 +2651,8 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 	zbx_macros_prototype_t	*hostmacro;
 	int			i;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&hostids);
 
 	/* select list of macros prototypes which should be linked to host prototypes */
@@ -2631,6 +2763,8 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2656,6 +2790,8 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 	zbx_host_prototype_t	*host_prototype;
 	zbx_db_tag_t		*tag;
 	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -2776,6 +2912,8 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2808,6 +2946,8 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 	zbx_host_prototype_t		*host_prototype;
 	zbx_interfaces_prototype_t	*interface;
 	int				i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -2989,6 +3129,8 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3121,6 +3263,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	zbx_db_insert_t			db_insert, db_insert_hdiscovery, db_insert_gproto,
 					db_insert_hmacro, db_insert_tag, db_insert_iface, db_insert_snmp;
 	zbx_vector_db_tag_ptr_t		upd_tags;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_db_tag_ptr_create(&upd_tags);
 
@@ -3292,33 +3436,62 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					(int)ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid,
 					(int)host_prototype->discover, (int)host_prototype->custom_interfaces);
 
+			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_ADD, host_prototype->hostid,
+					host_prototype->name);
+
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
+
+			zbx_audit_host_prototype_update_json_add_details(host_prototype->hostid,
+					host_prototype->templateid, host_prototype->name, (int)host_prototype->status,
+					(int)host_prototype->discover, (int)host_prototype->custom_interfaces);
 		}
 		else
 		{
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hosts set templateid=" ZBX_FS_UI64,
 					host_prototype->templateid);
+
+			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
+					host_prototype->name);
+
+			zbx_audit_host_prototype_update_json_update_templateid(host_prototype->hostid,
+					host_prototype->old_templateid, host_prototype->templateid);
+
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_NAME))
 			{
 				name_esc = DBdyn_escape_string(host_prototype->name);
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",name='%s'", name_esc);
+				zbx_audit_host_prototype_update_json_update_name(host_prototype->hostid,
+						host_prototype->old_name, name_esc);
 				zbx_free(name_esc);
 			}
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_STATUS))
 			{
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",status=%d",
 						host_prototype->status);
+
+				zbx_audit_host_prototype_update_json_update_status(host_prototype->hostid,
+						host_prototype->old_status, host_prototype->status);
+
 			}
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_DISCOVER))
 			{
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",discover=%d",
 						host_prototype->discover);
+				zbx_audit_host_prototype_update_json_update_discover(host_prototype->hostid,
+						host_prototype->old_discover, host_prototype->discover);
 			}
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES))
 			{
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",custom_interfaces=%d",
 						host_prototype->custom_interfaces);
+				zbx_audit_host_prototype_update_json_update_custom_interfaces(host_prototype->hostid,
+						host_prototype->old_custom_interfaces,
+						host_prototype->custom_interfaces);
 			}
+
+			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
+					host_prototype->name);
+
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
 		}
@@ -3349,6 +3522,9 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 						" where group_prototypeid=" ZBX_FS_UI64 ";\n",
 						group_prototype->templateid, group_prototype->group_prototypeid);
 			}
+
+			zbx_audit_host_prototype_update_json_add_group_details(host_prototype->hostid,
+					group_prototype->name, group_prototype->groupid, group_prototype->templateid);
 		}
 
 		for (j = 0; j < host_prototype->hostmacros.values_num; j++)
@@ -3413,9 +3589,9 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			if (0 == interface->interfaceid)
 			{
 				interface->interfaceid = interfaceid++;
-				zbx_db_insert_add_values(&db_insert_iface, interface->interfaceid, host_prototype->hostid,
-						(int)interface->main, (int)interface->type, (int)interface->useip,
-						interface->ip, interface->dns, interface->port);
+				zbx_db_insert_add_values(&db_insert_iface, interface->interfaceid,
+						host_prototype->hostid, (int)interface->main, (int)interface->type,
+						(int)interface->useip, interface->ip, interface->dns, interface->port);
 			}
 			else if (0 != (interface->flags & ZBX_FLAG_HPMACRO_UPDATE))
 			{
@@ -3593,6 +3769,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	}
 
 	zbx_vector_db_tag_ptr_destroy(&upd_tags);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3612,6 +3790,8 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
 		zbx_db_insert_t *db_insert_htemplates)
 {
 	zbx_vector_ptr_t	host_prototypes;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* only regular hosts can have host prototypes */
 	if (SUCCEED != DBis_regular_host(hostid))
@@ -3652,6 +3832,8 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
 
 	DBhost_prototypes_clean(&host_prototypes);
 	zbx_vector_ptr_destroy(&host_prototypes);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 typedef struct
@@ -4547,7 +4729,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	zbx_uint64_t		hosttemplateid;
 	int			i, res = SUCCEED;
 	char			*template_names, err[MAX_STRING_LEN];
-	zbx_db_insert_t 	*db_insert_htemplates;
+	zbx_db_insert_t	*db_insert_htemplates;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4600,7 +4782,10 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	zbx_db_insert_prepare(db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid", "templateid", NULL);
 
 	for (i = 0; i < lnk_templateids->values_num; i++)
+	{
 		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid++, hostid, lnk_templateids->values[i]);
+		zbx_audit_host_update_json_add_parent_template(hostid, lnk_templateids->values[i]);
+	}
 
 	DBcopy_template_items(hostid, lnk_templateids);
 	DBcopy_template_host_prototypes(hostid, lnk_templateids, db_insert_htemplates);
@@ -4631,7 +4816,94 @@ clean:
  * Parameters: hostids - [IN] host identificators from database               *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
+void	DBdelete_hosts(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames)
+{
+	zbx_vector_uint64_t	itemids, httptestids, selementids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != DBlock_hostids(hostids))
+		goto out;
+
+	zbx_vector_uint64_create(&httptestids);
+	zbx_vector_uint64_create(&selementids);
+
+	/* delete web tests */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select httptestid"
+			" from httptest"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+
+	DBselect_uint64(sql, &httptestids);
+
+	DBdelete_httptests(&httptestids);
+
+	zbx_vector_uint64_destroy(&httptestids);
+
+	/* delete items -> triggers -> graphs */
+
+	zbx_vector_uint64_create(&itemids);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select itemid"
+			" from items"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+
+	DBselect_uint64(sql, &itemids);
+
+	DBdelete_items(&itemids);
+
+	zbx_vector_uint64_destroy(&itemids);
+
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* delete host from maps */
+	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST, hostids);
+	if (0 != selementids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmaps_elements where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "selementid", selementids.values,
+				selementids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
+
+	/* delete action conditions */
+	for (i = 0; i < hostids->values_num; i++)
+		DBdelete_action_conditions(CONDITION_TYPE_HOST, hostids->values[i]);
+
+	/* delete host */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&selementids);
+
+	for (i = 0; i < hostids->values_num; i++)
+		zbx_audit_host_del(hostids->values[i], hostnames->values[i]);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * temporary function until audit for lld is complete                         *
+ ******************************************************************************/
+void	DBdelete_hosts_for_lld(zbx_vector_uint64_t *hostids)
 {
 	zbx_vector_uint64_t	itemids, httptestids, selementids;
 	char			*sql = NULL;
@@ -4721,31 +4993,33 @@ out:
  * Parameters: hostids - [IN] host identificators from database               *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames)
 {
-	zbx_vector_uint64_t	host_prototypeids;
+	zbx_vector_uint64_t	host_prototype_ids;
+	zbx_vector_str_t	host_prototype_names;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_uint64_create(&host_prototypeids);
+	zbx_vector_uint64_create(&host_prototype_ids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hd.hostid"
-			" from items i,host_discovery hd"
-			" where i.itemid=hd.parent_itemid"
+			" from items i,host_discovery hd, hosts h"
+			" where hd.hostid=h.hostid and i.itemid=hd.parent_itemid"
 				" and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
 
-	DBselect_uint64(sql, &host_prototypeids);
+	//DBselect_uint64(sql, &host_prototype_ids);
+	DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names);
 
-	DBdelete_host_prototypes(&host_prototypeids);
+	DBdelete_host_prototypes(&host_prototype_ids);
 
 	zbx_free(sql);
-	zbx_vector_uint64_destroy(&host_prototypeids);
+	zbx_vector_uint64_destroy(&host_prototype_ids);
 
-	DBdelete_hosts(hostids);
+	DBdelete_hosts(hostids, hostnames);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

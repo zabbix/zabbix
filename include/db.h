@@ -42,6 +42,20 @@ extern int	CONFIG_DBPORT;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 
+/* typedef struct */
+/* { */
+/* 	zbx_uint64_t	id; */
+/* 	char		*name; */
+/* } */
+/* zbx_id_name_pair_t; */
+
+/* ZBX_PTR_VECTOR_DECL(ids_names, zbx_id_name_pair_t*) */
+/* ZBX_PTR_VECTOR_IMPL(ids_names, zbx_id_name_pair_t*) */
+
+/* void	DBselect_ids_names(const char *sql, zbx_vector_id_name_pair_t *ids); */
+
+void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
+
 typedef enum
 {
 	GRAPH_TYPE_NORMAL = 0,
@@ -630,8 +644,10 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
-void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
-void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
+
+void	DBdelete_hosts(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames);
+void	DBdelete_hosts_for_lld(zbx_vector_uint64_t *hostids);
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);

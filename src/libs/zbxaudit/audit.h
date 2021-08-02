@@ -83,8 +83,24 @@ void	zbx_audit_host_update_json_update_inventory_mode(zbx_uint64_t hostid, int i
 void	zbx_audit_host_update_json_update_host_status(zbx_uint64_t hostid, int host_status_old,
 		int host_status_new);
 void	zbx_audit_host_create_entry(int audit_action, zbx_uint64_t hostid, const char *name);
+void	zbx_audit_host_prototype_create_entry(int audit_action, zbx_uint64_t hostid, const char *name);
 void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid);
 void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
 		zbx_vector_uint64_t *groupids);
 void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname);
+
+void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid, const char *name,
+		int status, int discover, int custom_interfaces);
+void	zbx_audit_host_prototype_update_json_update_templateid(zbx_uint64_t hostid, zbx_uint64_t old_templateid,
+		zbx_uint64_t new_templateid);
+void	zbx_audit_host_prototype_update_json_update_name(zbx_uint64_t hostid, const char *old_name,
+		 const char *new_name);
+void	zbx_audit_host_prototype_update_json_update_status(zbx_uint64_t hostid, int old_status, int new_status);
+void	zbx_audit_host_prototype_update_json_update_discover(zbx_uint64_t hostid, int old_discover,
+		int new_discover);
+void	zbx_audit_host_prototype_update_json_update_custom_interfaces(zbx_uint64_t hostid, int old_custom_interfaces,
+		int new_custom_interfaces);
+void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, const char* name,
+		zbx_uint64_t groupid, zbx_uint64_t templateid);
+void	zbx_audit_host_update_json_add_parent_template(zbx_uint64_t hostid, zbx_uint64_t templateid);
 #endif	/* ZABBIX_AUDIT_H */

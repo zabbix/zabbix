@@ -215,7 +215,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_config_t *cfg, char **hostname)
+static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_config_t *cfg)
 {
 	DB_RESULT		result;
 	DB_RESULT		result2;
@@ -704,6 +704,7 @@ out:
 void	op_host_del(const DB_EVENT *event)
 {
 	zbx_vector_uint64_t	hostids;
+	zbx_vector_str_t	hostnames;
 	zbx_uint64_t		hostid;
 	char			*hostname = NULL;
 
@@ -717,8 +718,11 @@ void	op_host_del(const DB_EVENT *event)
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_append(&hostids, hostid);
-	DBdelete_hosts_with_prototypes(&hostids);
+	zbx_vector_str_create(&hostnames);
+	zbx_vector_str_append(&hostnames, hostname);
+	DBdelete_hosts_with_prototypes(&hostids, &hostnames);
 	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_str_destroy(&hostnames);
 
 	zbx_audit_host_del(hostid, hostname);
 out:

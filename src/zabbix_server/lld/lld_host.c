@@ -3314,7 +3314,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 
 		DBbegin();
 
-		DBdelete_hosts(&del_hostids);
+		DBdelete_hosts_for_lld(&del_hostids);
 
 		DBcommit();
 	}
