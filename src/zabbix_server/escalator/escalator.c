@@ -1093,6 +1093,21 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			goto fail;
 		}
 
+		/* get host details */
+
+		if (0 == host.hostid)
+		{
+			/* target is "Current host" */
+			if (SUCCEED != (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
+							sizeof(error))))
+			{
+				goto fail;
+			}
+		}
+
+		if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			goto skip;
+
 		if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
 		{
 			zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
@@ -1101,17 +1116,10 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			goto fail;
 		}
 
-		/* get host details */
-
-		if (0 != host.hostid)	/* target is from "Host" list or "Host group" list */
+		if ('\0' == *host.host)
 		{
-			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			{
-				goto skip;
-			}
+			/* target is from "Host" list or "Host group" list */
 
-			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 			strscpy(host.host, row[2]);
 			host.tls_connect = (unsigned char)atoi(row[17]);
 #ifdef HAVE_OPENIPMI
@@ -1127,17 +1135,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 		}
-		else if (SUCCEED == (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
-				sizeof(error))))	/* target is "Current host" */
-		{
-			if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			{
-				goto skip;
-			}
 
-			zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
-		}
+		zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 
 		/* substitute macros in script body and webhook parameters */
 
