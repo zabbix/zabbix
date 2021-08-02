@@ -18,24 +18,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormPreprocessingClone.php';
+require_once dirname(__FILE__).'/../common/testFormPreprocessingClone.php';
 
 /**
- * Test of cloning template with preprocessing steps in items.
+ * Test of cloning host with preprocessing steps in items.
  *
  * @backup hosts, items
  */
-class testFormPreprocessingCloneTemplate extends testFormPreprocessingClone {
+class testFormPreprocessingCloneHost extends testFormPreprocessingClone {
 
-	public $hostid = 15000;				// Inheritance test template.
-	public $itemid = 15000;				// itemInheritance.
-	public $lldid = 15011;				// testInheritanceDiscoveryRule.
-	public $item_prototypeid = 15021;	// itemDiscovery.
+	public $hostid = 40001;				// Simple form test host.
+	public $itemid = 99102;				// StestFormItem.
+	public $lldid = 133800;				// testFormDiscoveryRule.
+	public $item_prototypeid = 23800;	// testFormItemPrototype1.
 
 	/**
 	 * @onBefore prepareLLDPreprocessing, prepareItemPreprocessing, prepareItemPrototypePreprocessing
 	 */
-	public function testFormPreprocessingCloneTemplate_FullCloneTemplate() {
-		$this->executeCloning(true);
+	public function testFormPreprocessingCloneHost_FullCloneHost() {
+		$this->executeCloning();
 	}
 }
