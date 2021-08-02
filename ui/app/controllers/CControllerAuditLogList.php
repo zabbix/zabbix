@@ -287,7 +287,7 @@ class CControllerAuditLogList extends CController {
 						case AUIDT_DETAILS_ACTION_ATTACH:
 						case AUIDT_DETAILS_ACTION_DETACH:
 							$new_details[] = sprintf('%s: %s (%s)', $key, $detail[1],
-								($detail[0] === 'attach') ? _('Attached') : _('Detached')
+								($detail[0] === AUIDT_DETAILS_ACTION_ATTACH) ? _('Attached') : _('Detached')
 							);
 							break;
 						case AUIDT_DETAILS_ACTION_ADD:
