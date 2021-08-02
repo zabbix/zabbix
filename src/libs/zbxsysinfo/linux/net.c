@@ -780,7 +780,7 @@ out:
 	return ret;
 }
 
-static unsigned char	get_connection_state(const char *name)
+static unsigned char	get_connection_state_tcp(const char *name)
 {
 	unsigned char	state;
 
@@ -806,6 +806,20 @@ static unsigned char	get_connection_state(const char *name)
 		state = 10;
 	else if (0 == strcmp(name, "closing"))
 		state = 11;
+	else
+		state = 0;
+
+	return state;
+}
+
+static unsigned char	get_connection_state_udp(const char *name)
+{
+	unsigned char	state;
+
+	if (0 == strcmp(name, "established"))
+		state = 1;
+	else if (0 == strcmp(name, "unconn"))
+		state = 7;
 	else
 		state = 0;
 
@@ -1112,7 +1126,8 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 	}
 
 	/* connection state */
-	if (NULL != state && '\0' != *state && 0 == (info.state = get_connection_state(state)))
+	if (NULL != state && '\0' != *state && 0 == (info.state = (NET_CONN_TYPE_TCP ==
+			conn_type ? get_connection_state_tcp(state) : get_connection_state_udp(state))))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
