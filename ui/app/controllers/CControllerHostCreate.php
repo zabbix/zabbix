@@ -69,11 +69,14 @@ class CControllerHostCreate extends CController {
 
 		if (!$ret) {
 			$output = [];
+
 			if (($messages = getMessages()) !== null) {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))
+				->disableView()
+			);
 		}
 
 		return $ret;
@@ -134,13 +137,15 @@ class CControllerHostCreate extends CController {
 
 		$full_clone = $this->hasInput('full_clone');
 		$src_hostid = $this->getInput('clone_hostid', false);
+
 		if ($src_hostid) {
 			$host = $this->extendHostClone($host, (int) $src_hostid);
 		}
-		$output = [];
 
-		if (($hostids = API::Host()->create($host)) !== false
-				&& $this->createValueMaps((int) $hostids['hostids'][0])
+		$output = [];
+		$hostids = API::Host()->create($host);
+
+		if ($hostids !== false && $this->createValueMaps((int) $hostids['hostids'][0])
 				&& (!$full_clone || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
 			$output += [
 				'hostid' => $hostids['hostids'][0],
@@ -152,8 +157,9 @@ class CControllerHostCreate extends CController {
 			$output['errors'] = $messages->toString();
 		}
 
-		// Set response.
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+		$response = (new CControllerResponseData(['main_block' => json_encode($output)]))
+			->disableView();
+		$this->setResponse($response);
 	}
 
 	/**
@@ -173,8 +179,10 @@ class CControllerHostCreate extends CController {
 				'editable' => true
 			]);
 
-			$host['tls_psk_identity'] = $this->getInput('tls_psk_identity', $clone_hosts[0]['tls_psk_identity']);
-			$host['tls_psk'] = $this->getInput('tls_psk', $clone_hosts[0]['tls_psk']);
+			if ($clone_hosts !== false) {
+				$host['tls_psk_identity'] = $this->getInput('tls_psk_identity', $clone_hosts[0]['tls_psk_identity']);
+				$host['tls_psk'] = $this->getInput('tls_psk', $clone_hosts[0]['tls_psk']);
+			}
 		}
 
 		return $host;
@@ -186,11 +194,9 @@ class CControllerHostCreate extends CController {
 	 * @return array
 	 */
 	private function processHostInterfaces(): array {
-		// Process host interfaces.
 		$interfaces = $this->getInput('interfaces', []);
 
 		foreach ($interfaces as $key => $interface) {
-			// Process SNMP interface fields.
 			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 				if (!array_key_exists('details', $interface)) {
 					$interface['details'] = [];
@@ -253,9 +259,8 @@ class CControllerHostCreate extends CController {
 	 * @return array
 	 */
 	private function processHostGroups(): array {
-		// Add new group.
-		$groups = $this->getInput('groups', []);
 		$new_groups = [];
+		$groups = $this->getInput('groups', []);
 
 		foreach ($groups as $idx => $group) {
 			if (is_array($group) && array_key_exists('new', $group)) {

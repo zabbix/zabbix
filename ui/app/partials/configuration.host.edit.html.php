@@ -491,7 +491,9 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 }
 
 // Encryption tab.
-$is_psk_set = ($data['host']['tls_connect'] = HOST_ENCRYPTION_PSK || $data['host']['tls_accept'] & HOST_ENCRYPTION_PSK);
+$tls_accept = (int) $data['host']['tls_accept'];
+$is_psk_set = ((int) $data['host']['tls_connect'] = HOST_ENCRYPTION_PSK || $tls_accept & HOST_ENCRYPTION_PSK);
+
 $encryption_tab = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
@@ -511,23 +513,23 @@ $encryption_tab = (new CFormGrid())
 			(new CList())
 				->addItem(
 					(new CCheckBox('tls_in_none'))
-						->setChecked(($data['host']['tls_accept'] & HOST_ENCRYPTION_NONE))
+						->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
 						->setLabel(_('No encryption'))
 						->setEnabled(!$readonly)
 				)
 				->addItem(
 					(new CCheckBox('tls_in_psk'))
-						->setChecked(($data['host']['tls_accept'] & HOST_ENCRYPTION_PSK))
+						->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
 						->setLabel(_('PSK'))
 						->setEnabled(!$readonly)
 				)
 				->addItem(
 					(new CCheckBox('tls_in_cert'))
-						->setChecked(($data['host']['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE))
+						->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
 						->setLabel(_('Certificate'))
 						->setEnabled(!$readonly)
 				),
-			new CInput('hidden', 'tls_accept', $data['host']['tls_accept'])
+			new CInput('hidden', 'tls_accept', $tls_accept)
 		])
 	])
 	->addItem(

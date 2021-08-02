@@ -177,6 +177,13 @@ class CControllerHostEdit extends CController {
 			$data['host']['tags'][] = ['tag' => '', 'value' => ''];
 		}
 		else {
+			foreach($data['host']['tags'] as &$tag) {
+				if (!array_key_exists('value', $tag)) {
+					$tag['value'] = '';
+				}
+			};
+			unset($tag);
+
 			CArrayHelper::sort($data['host']['tags'], ['tag', 'value']);
 		}
 
@@ -187,7 +194,6 @@ class CControllerHostEdit extends CController {
 		$this->extendProxies($data['proxies']);
 		$this->extendInventory($data['inventory_items'], $data['inventory_fields']);
 
-		// Set response.
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of host'));
 		$this->setResponse($response);

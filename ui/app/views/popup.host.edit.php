@@ -24,8 +24,9 @@
  */
 
 $data['form_name'] = 'host-form';
+$data['popup_form'] = true;
 
-if ($data['hostid'] == 0) {
+if ((int) $data['hostid'] === 0) {
 	$buttons = [
 		[
 			'title' => _('Add'),
@@ -68,66 +69,10 @@ else {
 	];
 }
 
-$inline_js =
-	'document.getElementById("'.$data['form_name'].'").addEventListener("formSubmitted", function (event) {'.
-		'let response = event.detail,'.
-			'overlay = overlays_stack.end(),'.
-			'$form = overlay.$dialogue.find("form");'.
-
-		'overlay.unsetLoading();'.
-		'overlay.$dialogue.find(".msg-bad, .msg-good").remove();'.
-
-		'if ("errors" in response) {'.
-			'jQuery(response.errors).insertBefore($form);'.
-		'}'.
-		'else if ("hostid" in response) {'.
-			'clearMessages();'.
-			'addMessage(makeMessageBox("good", [], response.message, true, false));'.
-
-			'overlayDialogueDestroy(overlay.dialogueid);'.
-
-			// Todo: Call refresh on ?action=host.list page;
-		'}'.
-	'});'.
-
-	'$("#tabs").on("tabsactivate", (event, ui) => {'.
-		'overlays_stack.end().centerDialog();'.
-	'});'.
-
-	'$("#tabs").on("change", () => {'.
-		'overlays_stack.end().centerDialog();'.
-	'});'.
-
-	'var cloneBtn = document.querySelector(".js-clone-host");'.
-	'if (cloneBtn) {'.
-		'cloneBtn.addEventListener("click", function () {'.
-			'var $form = overlays_stack.end().$dialogue.find("form"),'.
-				'curl = curl = new Curl(null, false);'.
-
-			'curl.setArgument("clone", 1);'.
-
-			'PopUp("popup.host.edit", {...host_edit.getCloneData($form[0]), "clone": 1}, "host_edit");'.
-			'history.pushState({}, "", curl.getUrl());'.
-		'});'.
-	'}'.
-
-	'var fullCloneBtn = document.querySelector(".js-full-clone-host");'.
-	'if (fullCloneBtn) {'.
-		'fullCloneBtn.addEventListener("click", function () {'.
-			'var $form = overlays_stack.end().$dialogue.find("form"),'.
-				'curl = curl = new Curl(null, false);'.
-
-			'curl.setArgument("full_clone", 1);'.
-
-			'PopUp("popup.host.edit", {...host_edit.getCloneData($form[0]), "full_clone": 1}, "host_edit");'.
-			'history.pushState({}, "", curl.getUrl());'.
-		'});'.
-	'}';
-
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
 	'body' => (new CPartial('configuration.host.edit.html', $data))->getOutput(),
-	'script_inline' => $inline_js . getPagePostJs(),
+	'script_inline' => getPagePostJs().'; setupHostPopup();',
 	'buttons' => $buttons
 ];
 

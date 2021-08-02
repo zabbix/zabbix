@@ -413,4 +413,137 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			return fields;
 		}
 	};
+
+
+	<?php if (!array_key_exists('popup_form', $data)): ?>
+		document.addEventListener('DOMContentLoaded', () => {
+			const form = document.getElementById('<?= $data['form_name'] ?>');
+
+			form.addEventListener('submit', event => {
+				event.preventDefault();
+				host_edit.submit(form);
+			});
+
+			form.addEventListener('formSubmitted', event => {
+				let response = event.detail;
+
+				clearMessages();
+
+				if ('errors' in response) {
+					addMessage(response.errors);
+				}
+				else if ('hostid' in response) {
+					const curl = new Curl('zabbix.php');
+
+					postMessageOk(response.message);
+					curl.setArgument('action', 'host.list');
+					window.location = curl.getUrl();
+				}
+			});
+
+			var cloneBtn = document.getElementById('clone');
+			var fullCloneBtn = document.getElementById('full_clone');
+
+			function cloneHandler(operation_type) {
+				return function() {
+					var curl = new Curl('zabbix.php', false),
+						fields = host_edit.getCloneData(form);
+
+					curl.setArgument('action', 'host.edit');
+					curl.setArgument(operation_type, 1);
+
+					for (const [k, v] of Object.entries(fields)) {
+						curl.setArgument(k, v);
+					}
+
+					redirect(curl.getUrl(), 'post');
+				};
+			}
+
+			if (cloneBtn) {
+				cloneBtn.addEventListener('click', cloneHandler('clone'));
+			}
+
+			if (fullCloneBtn) {
+				fullCloneBtn.addEventListener('click', cloneHandler('full_clone'));
+			}
+		});
+	<?php else: ?>
+		function setupHostPopup() {
+			document.getElementById('<?= $data['form_name'] ?>').addEventListener('formSubmitted', event => {
+				let response = event.detail,
+					overlay = overlays_stack.end(),
+					$form = overlay.$dialogue.find('form');
+
+				overlay.unsetLoading();
+				overlay.$dialogue.find('.msg-bad, .msg-good').remove();
+
+				if ('errors' in response) {
+					jQuery(response.errors).insertBefore($form);
+				}
+				else if ('hostid' in response) {
+					clearMessages();
+					addMessage(response.message);
+
+					overlayDialogueDestroy(overlay.dialogueid);
+
+					let current_curl = new Curl(location.href, false);
+					if (current_curl.getArgument('action') === 'host.list') {
+						// Todo: refresh lists
+						alert('todo: refresh host.list or [name="filter_set"] while keeping messages')
+					}
+					else {
+						let filter_btn = document.querySelector('[name="filter_apply"]');
+
+						if (filter_btn) {
+							filter_btn.click();
+						}
+					}
+				}
+			});
+
+			$('#tabs').on('tabsactivate', (event, ui) => {
+				overlays_stack.end().centerDialog();
+			});
+
+			$('#tabs').on('change', () => {
+				overlays_stack.end().centerDialog();
+			});
+
+			var cloneBtn = document.querySelector('.js-clone-host');
+			var fullCloneBtn = document.querySelector('.js-full-clone-host');
+
+			function popupCloneHandler(operation_type) {
+				return function() {
+					var $form = overlays_stack.end().$dialogue.find('form'),
+						curl = curl = new Curl(null, false);
+
+					curl.setArgument(operation_type, 1);
+
+					let params = {...host_edit.getCloneData($form[0])};
+					params[operation_type] = 1;
+
+					PopUp('popup.host.edit', params, 'host_edit');
+					history.replaceState({}, '', curl.getUrl());
+				};
+			}
+
+			if (cloneBtn) {
+				cloneBtn.addEventListener('click', popupCloneHandler('clone'));
+			}
+
+			if (fullCloneBtn) {
+				fullCloneBtn.addEventListener('click', popupCloneHandler('full_clone'));
+			};
+
+			window.addEventListener('popstate', event => {
+				const overlay = overlays_stack.end();
+
+				if (overlay) {
+					overlayDialogueDestroy(overlay.dialogueid);
+				}
+			}, {once: true});
+		}
+	<?php endif; ?>
+
 </script>

@@ -70,7 +70,7 @@ const host_popup = {
 		});
 
 		overlay.$dialogue[0].addEventListener('overlay.close', () => {
-			history.pushState({}, '', options.backurl);
+			history.replaceState({}, '', options.backurl);
 			this.resumeRefresh()
 		}, {once: true});
 	},

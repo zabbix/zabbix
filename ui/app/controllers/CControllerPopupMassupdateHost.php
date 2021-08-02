@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'ids' => 'required|array',
 			'update' => 'in 1',
@@ -84,7 +84,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		$hosts = API::Host()->get([
 			'output' => [],
 			'hostids' => $this->getInput('ids'),
@@ -94,7 +94,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 		return count($hosts) > 0;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		if ($this->hasInput('update')) {
 			$output = [];
 			$hostids = $this->getInput('ids');

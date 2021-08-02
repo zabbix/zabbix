@@ -70,6 +70,7 @@ class CControllerHostUpdate extends CController {
 
 		if (!$ret) {
 			$output = [];
+
 			if (($messages = getMessages()) !== null) {
 				$output['errors'] = $messages->toString();
 			}
@@ -134,13 +135,7 @@ class CControllerHostUpdate extends CController {
 			}
 		}
 
-		if ($this->hasInput('tls_psk_identity')) {
-			$host['tls_psk_identity'] = $this->getInput('tls_psk_identity');
-		}
-
-		if ($this->hasInput('tls_psk')) {
-			$host['tls_psk'] = $this->getInput('tls_psk');
-		}
+		$this->getInputs($host, ['tls_psk_identity', 'tls_psk']);
 
 		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
 			unset($host['tls_psk'], $host['tls_psk_identity']);
@@ -152,19 +147,25 @@ class CControllerHostUpdate extends CController {
 		}
 
 		$output = [];
-		if (($hostids = API::Host()->update($host)) !== false && $this->processValueMaps()) {
+		$hostids = API::Host()->update($host);
+
+		if ($hostids !== false && $this->processValueMaps()) {
 			$output += [
 				'hostid' => $hostids['hostids'][0],
-				'message' => _('Host updated')
+				'message' => makeMessageBox(true, [], _('Host updated'), true, false)->toString()
 			];
-		}
+		} else {
+			$errors = getMessages(false, _('Cannot update host'), true);
 
-		if (($messages = getMessages()) !== null) {
-			$output['errors'] = $messages->toString();
+			if ($errors !== null) {
+				$output['errors'] = $errors->toString();
+			}
 		}
 
 		// Set response.
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))
+			->disableView()
+		);
 	}
 
 	/**
@@ -173,12 +174,10 @@ class CControllerHostUpdate extends CController {
 	 * @return array
 	 */
 	private function processHostInterfaces(): array {
-		// Process host interfaces.
 		$interfaces = $this->getInput('interfaces', []);
 
 		foreach ($interfaces as $key => $interface) {
-			// Process SNMP interface fields.
-			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+			if ((int) $interface['type'] === INTERFACE_TYPE_SNMP) {
 				if (!array_key_exists('details', $interface)) {
 					$interface['details'] = [];
 				}
@@ -240,9 +239,8 @@ class CControllerHostUpdate extends CController {
 	 * @return array
 	 */
 	private function processHostGroups(): array {
-		// Add new group.
-		$groups = $this->getInput('groups', []);
 		$new_groups = [];
+		$groups = $this->getInput('groups', []);
 
 		foreach ($groups as $idx => $group) {
 			if (is_array($group) && array_key_exists('new', $group)) {
