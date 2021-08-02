@@ -18,7 +18,52 @@
 **/
 package webcertificate
 
-import "testing"
+import (
+	"testing"
+
+	"zabbix.com/pkg/uri"
+)
+
+func Test_getParameters(t *testing.T) {
+	type args struct {
+		params []string
+	}
+	tests := []struct {
+		name         string
+		args         args
+		wantHostname string
+		wantPort     string
+		wantDomain   string
+		wantErr      bool
+	}{
+		{"+only_hostname", args{[]string{"example.com"}}, "example.com", "443", "example.com", false},
+		{"+only_ip", args{[]string{"127.0.0.1"}}, "127.0.0.1", "443", "127.0.0.1", false},
+		{"+full", args{[]string{"example.com", "443", "127.0.0.1"}}, "127.0.0.1", "443", "example.com", false},
+		{"+empty_port", args{[]string{"example.com", "", "127.0.0.1"}}, "127.0.0.1", "443", "example.com", false},
+		{"+empty_port_and_ip", args{[]string{"example.com", "", ""}}, "example.com", "443", "example.com", false},
+		{"-too_many_params", args{[]string{"example.com", "443", "127.0.0.1", "foobar"}}, "", "", "", true},
+		{"-too_few_params", args{[]string{}}, "", "", "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotHostname, gotPort, gotDomain, err := getParameters(tt.args.params)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getParameters() error = %v, wantErr %v", err, tt.wantErr)
+
+				return
+			}
+			if gotHostname != tt.wantHostname {
+				t.Errorf("getParameters() gotHostname = %v, want %v", gotHostname, tt.wantHostname)
+			}
+			if gotPort != tt.wantPort {
+				t.Errorf("getParameters() gotPort = %v, want %v", gotPort, tt.wantPort)
+			}
+			if gotDomain != tt.wantDomain {
+				t.Errorf("getParameters() gotDomain = %v, want %v", gotDomain, tt.wantDomain)
+			}
+		})
+	}
+}
 
 func Test_validateURL(t *testing.T) {
 	type args struct {
@@ -56,16 +101,53 @@ func Test_validateURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, err := validateURL(tt.args.url, tt.args.port)
+			got, got1, err := parseURL(tt.args.url, tt.args.port)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("validateURL() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("parseURL() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			if got != tt.host {
-				t.Errorf("validateURL() got = %v, want %v", got, tt.host)
+				t.Errorf("parseURL() got = %v, want %v", got, tt.host)
 			}
 			if got1 != tt.port {
-				t.Errorf("validateURL() got1 = %v, want %v", got1, tt.port)
+				t.Errorf("parseURL() got1 = %v, want %v", got1, tt.port)
+			}
+		})
+	}
+}
+
+func Test_getHostAndPort(t *testing.T) {
+	type args struct {
+		rawUri string
+		port   string
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantHost string
+		wantPort string
+		wantErr  bool
+	}{
+		{"+full", args{"https://example.com:443", "443"}, "example.com", "443", false},
+		{"+empty_port", args{"example.com:443", ""}, "example.com", "443", false},
+		{"+empty_port", args{"example.com", ""}, "example.com", "443", false},
+		{"-port_mismatch", args{"example.com:443", "332"}, "", "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u, _ := uri.New(tt.args.rawUri, nil)
+			got, got1, err := getHostAndPort(u, tt.args.port)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getHostAndPort() error = %v, wantErr %v", err, tt.wantErr)
+
+				return
+			}
+			if got != tt.wantHost {
+				t.Errorf("getHostAndPort() host = %v, want %v", got, tt.wantHost)
+			}
+			if got1 != tt.wantPort {
+				t.Errorf("getHostAndPort() port = %v, want %v", got1, tt.wantPort)
 			}
 		})
 	}
