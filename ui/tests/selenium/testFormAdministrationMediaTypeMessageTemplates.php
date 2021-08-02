@@ -37,73 +37,73 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				'name'=> 'Email (HTML) Service',
 				'type'=> 0,
 				'smtp_server' => 'apimail@company.com',
-				'smtp_helo'=> 'zabbix.com',
-				'smtp_email'=> 'zabbix@company.com',
+				'smtp_helo' => 'zabbix.com',
+				'smtp_email' => 'zabbix@company.com',
 				'message_templates' => [
 					[
 						'eventsource' => 4,
 						'recovery' => 0,
 						'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
 						'message' => '<b>Service problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br>'.
-							'<b>Service problem name:</b> {EVENT.NAME}<br><b>Service:</b> {SERVICE.NAME}<br><b>'.
-							'Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br><br>{SERVICE.ROOTCAUSE}'
+								'<b>Service problem name:</b> {EVENT.NAME}<br><b>Service:</b> {SERVICE.NAME}<br><b>'.
+								'Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br><br>{SERVICE.ROOTCAUSE}'
 					],
 					[
 						'eventsource' => 4,
 						'recovery' => 1,
 						'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
 						'message' => '<b>Service "{SERVICE.NAME}" has been resolved</b> at {EVENT.RECOVERY.TIME} on '.
-							'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> '.
-							'{EVENT.DURATION}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
+								'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> '.
+								'{EVENT.DURATION}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
 					],
 					[
 						'eventsource' => 4,
 						'recovery' => 2,
 						'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
 						'message' => '<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at '.
-							'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is {EVENT.AGE}.<br>'.
-							'<br>{SERVICE.ROOTCAUSE}'
+								'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is {EVENT.AGE}.<br>'.
+								'<br>{SERVICE.ROOTCAUSE}'
 					]
 				]
 			],
 			[
-				'name'=> 'Email Service',
-				'type'=> 0,
+				'name' => 'Email Service',
+				'type' => 0,
 				'smtp_server' => 'apimail@company.com',
-				'smtp_helo'=> 'zabbix.com',
-				'smtp_email'=> 'zabbix@company.com',
+				'smtp_helo' => 'zabbix.com',
+				'smtp_email' => 'zabbix@company.com',
 				'message_templates' => [
 					[
 						'eventsource' => 4,
 						'recovery' => 0,
 						'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
 						'message' => '<b>Service problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br><b>Service '.
-							'problem name:</b> {EVENT.NAME}<br><b>Service:</b> {SERVICE.NAME}<br><b>Severity:</b> '.
-							'{EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br><br>{SERVICE.ROOTCAUSE}'
+								'problem name:</b> {EVENT.NAME}<br><b>Service:</b> {SERVICE.NAME}<br><b>Severity:</b> '.
+								'{EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br><br>{SERVICE.ROOTCAUSE}'
 					],
 					[
 						'eventsource' => 4,
 						'recovery' => 1,
 						'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
 						'message' => '<b>Service "{SERVICE.NAME}" has been resolved</b> at {EVENT.RECOVERY.TIME} on '.
-							'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> '.
-							'{EVENT.DURATION}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
+								'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> '.
+								'{EVENT.DURATION}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
 					],
 					[
 						'eventsource' => 4,
 						'recovery' => 2,
 						'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
 						'message' => '<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at '.
-							'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is {EVENT.AGE}.<br>'.
-							'<br>{SERVICE.ROOTCAUSE}'
+								'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is {EVENT.AGE}.<br>'.
+								'<br>{SERVICE.ROOTCAUSE}'
 					]
 				]
 			]
 		]);
 //		TODO join two calls in one when ZBX-19752 will be resolved
 		CDataHelper::call('mediatype.create', [
-			'name'=> 'SMS Service',
-			'type'=> 2,
+			'name' => 'SMS Service',
+			'type' => 2,
 			'gsm_modem'=> 'test',
 			'message_templates' => [
 				[
@@ -215,28 +215,28 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 							'Message type' => 'Service',
 							'Subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
 							'Message' => "Service problem started at {EVENT.TIME} on {EVENT.DATE}\n".
-								"Service problem name: {EVENT.NAME}\n".
-								"Service: {SERVICE.NAME}\n".
-								"Severity: {EVENT.SEVERITY}\n".
-								"Original problem ID: {EVENT.ID}\n\n".
-								"{SERVICE.ROOTCAUSE}"
+									"Service problem name: {EVENT.NAME}\n".
+									"Service: {SERVICE.NAME}\n".
+									"Severity: {EVENT.SEVERITY}\n".
+									"Original problem ID: {EVENT.ID}\n\n".
+									"{SERVICE.ROOTCAUSE}"
 						],
 						[
 							'Message type' => 'Service recovery',
 							'Subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
 							'Message' => 'Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on '.
-								"{EVENT.RECOVERY.DATE}\nProblem name: {EVENT.NAME}\n".
-								"Problem duration: {EVENT.DURATION}\n".
-								"Severity: {EVENT.SEVERITY}\n".
-								"Original problem ID: {EVENT.ID}"
+									"{EVENT.RECOVERY.DATE}\nProblem name: {EVENT.NAME}\n".
+									"Problem duration: {EVENT.DURATION}\n".
+									"Severity: {EVENT.SEVERITY}\n".
+									"Original problem ID: {EVENT.ID}"
 						],
 						[
 							'Message type' => 'Service update',
 							'Subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
 							'Message' => "Changed \"{SERVICE.NAME}\" service status to {EVENT.UPDATE.SEVERITY} at ".
-								"{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
-								"Current problem age is {EVENT.AGE}.\n\n".
-								"{SERVICE.ROOTCAUSE}"
+									"{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
+									"Current problem age is {EVENT.AGE}.\n\n".
+									"{SERVICE.ROOTCAUSE}"
 						],
 						[
 							'Message type' => 'Discovery',
@@ -310,24 +310,24 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 							'Message type' => 'Service',
 							'Subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
 							'Message' => '<b>Service problem started</b> at {EVENT.TIME} on {EVENT.DATE}'.
-								'<br><b>Service problem name:</b> {EVENT.NAME}<br><b>Service:</b> '.
-								'{SERVICE.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original '.
-								'problem ID:</b> {EVENT.ID}<br><br>{SERVICE.ROOTCAUSE}'
+									'<br><b>Service problem name:</b> {EVENT.NAME}<br><b>Service:</b> '.
+									'{SERVICE.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original '.
+									'problem ID:</b> {EVENT.ID}<br><br>{SERVICE.ROOTCAUSE}'
 						],
 						[
 							'Message type' => 'Service recovery',
 							'Subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
 							'Message' => '<b>Service "{SERVICE.NAME}" has been resolved</b> at {EVENT.RECOVERY.TIME} on '.
-								'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br>'.
-								'<b>Problem duration:</b> {EVENT.DURATION}<br>'.
-								'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
+									'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br>'.
+									'<b>Problem duration:</b> {EVENT.DURATION}<br>'.
+									'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
 						],
 						[
 							'Message type' => 'Service update',
 							'Subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
 							'Message' => '<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at '.
-								'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is {EVENT.AGE}.'.
-								'<br><br>{SERVICE.ROOTCAUSE}'
+									'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is {EVENT.AGE}.'.
+									'<br><br>{SERVICE.ROOTCAUSE}'
 						],
 						[
 							'Message type' => 'Discovery',
@@ -387,17 +387,17 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 						[
 							'Message type' => 'Service',
 							'Message' => "{EVENT.NAME}\n".
-								'{EVENT.DATE} {EVENT.TIME}'
+									'{EVENT.DATE} {EVENT.TIME}'
 						],
 						[
 							'Message type' => 'Service recovery',
 							'Message' => "{EVENT.NAME}\n".
-								'{EVENT.DATE} {EVENT.TIME}'
+									'{EVENT.DATE} {EVENT.TIME}'
 						],
 						[
 							'Message type' => 'Service update',
 							'Message' => "{EVENT.NAME}\n".
-								'{EVENT.DATE} {EVENT.TIME}'
+									'{EVENT.DATE} {EVENT.TIME}'
 						],
 						[
 							'Message type' => 'Discovery',
@@ -539,25 +539,25 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 							'Message type' => 'Service',
 							'Subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
 							'Message' => "Service problem started at {EVENT.TIME} on {EVENT.DATE}\n".
-								"Service problem name: {EVENT.NAME}\n".
-								"Service: {SERVICE.NAME}\n".
-								"Severity: {EVENT.SEVERITY}\n".
-								"Original problem ID: {EVENT.ID}\n\n".
-								"{SERVICE.ROOTCAUSE}"
+									"Service problem name: {EVENT.NAME}\n".
+									"Service: {SERVICE.NAME}\n".
+									"Severity: {EVENT.SEVERITY}\n".
+									"Original problem ID: {EVENT.ID}\n\n".
+									"{SERVICE.ROOTCAUSE}"
 						],
 						[
 							'Message type' => 'Service recovery',
 							'Subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
 							'Message' => 'Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on '.
-								"{EVENT.RECOVERY.DATE}\nProblem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\n".
-								"Severity: {EVENT.SEVERITY}\nOriginal problem ID: {EVENT.ID}"
+									"{EVENT.RECOVERY.DATE}\nProblem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\n".
+									"Severity: {EVENT.SEVERITY}\nOriginal problem ID: {EVENT.ID}"
 						],
 						[
 							'Message type' => 'Service update',
 							'Subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
 							'Message' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at '.
-								"{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\nCurrent problem age is {EVENT.AGE}.\n\n".
-								"{SERVICE.ROOTCAUSE}"
+									"{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\nCurrent problem age is {EVENT.AGE}.\n\n".
+									"{SERVICE.ROOTCAUSE}"
 						]
 					]
 				]
@@ -582,15 +582,15 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 							'Message type' => 'Service recovery',
 							'Subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
 							'Message' => '<b>Service "{SERVICE.NAME}" has been resolved</b> at {EVENT.RECOVERY.TIME} on '.
-								'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> '.
-								'{EVENT.DURATION}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
+									'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> '.
+									'{EVENT.DURATION}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}'
 						],
 						[
 							'Message type' => 'Service update',
 							'Subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
 							'Message' => '<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at '.
-								'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is '.
-								'{EVENT.AGE}.<br><br>{SERVICE.ROOTCAUSE}'
+									'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is '.
+									'{EVENT.AGE}.<br><br>{SERVICE.ROOTCAUSE}'
 						]
 					]
 				]
