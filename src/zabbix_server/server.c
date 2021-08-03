@@ -383,7 +383,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	else if (local_server_num <= (server_count += CONFIG_IPMIMANAGER_FORKS))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_IPMIMANAGER;
-		*local_process_num = local_server_num - server_count + CONFIG_TASKMANAGER_FORKS;
+		*local_process_num = local_server_num - server_count + CONFIG_IPMIMANAGER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
 	{
