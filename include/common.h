@@ -1736,4 +1736,5 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
 
+void	pad(char *input, size_t input_alloc, size_t pad_size, char fill_char);
 #endif
