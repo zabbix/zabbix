@@ -487,6 +487,59 @@ static int	DBpatch_5050034(void)
 
 	return DBset_default("config", &field);
 }
+
+static int	DBpatch_5050035(void)
+{
+	const ZBX_FIELD	field = {"weight", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050036(void)
+{
+	const ZBX_FIELD	field = {"status_up", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050037(void)
+{
+	const ZBX_FIELD	field = {"status_up_value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050038(void)
+{
+	const ZBX_TABLE table =
+		{"service_status_rule", "service_status_ruleid", 0,
+			{
+				{"service_status_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"limit_value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"limit_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"new_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050039(void)
+{
+	return DBcreate_index("service_status_rule", "service_status_rule_1", "serviceid", 0);
+}
+
+static int	DBpatch_5050040(void)
+{
+	const ZBX_FIELD	field = {"serviceid", NULL, "services", "serviceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("service_status_rule", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -528,5 +581,11 @@ DBPATCH_ADD(5050031, 0, 1)
 DBPATCH_ADD(5050032, 0, 1)
 DBPATCH_ADD(5050033, 0, 1)
 DBPATCH_ADD(5050034, 0, 1)
+DBPATCH_ADD(5050035, 0, 1)
+DBPATCH_ADD(5050036, 0, 1)
+DBPATCH_ADD(5050037, 0, 1)
+DBPATCH_ADD(5050038, 0, 1)
+DBPATCH_ADD(5050039, 0, 1)
+DBPATCH_ADD(5050040, 0, 1)
 
 DBPATCH_END()

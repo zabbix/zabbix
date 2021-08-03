@@ -757,6 +757,9 @@ FIELD		|algorithm	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|showsla	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|goodsla	|t_double	|'99.9'	|NOT NULL	|0
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|weight		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|status_up	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|status_up_value|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|services_links|linkid|ZBX_DATA
 FIELD		|linkid		|t_id		|	|NOT NULL	|0
@@ -1874,7 +1877,16 @@ FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|serviceid
 
+TABLE|service_status_rule|service_status_ruleid|ZBX_DATA
+FIELD		|service_status_ruleid|t_id	|	|NOT NULL	|0
+FIELD		|serviceid	|t_id		|	|NOT NULL	|0		|1|services|serviceid
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|limit_value	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|limit_status	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|new_status	|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|serviceid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050034	|5050034
+ROW		|5050040	|5050040
