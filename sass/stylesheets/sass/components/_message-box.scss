@@ -174,25 +174,19 @@
 		font-size: $font-msg-reset-size;
 		@extend %webkit-scrollbar;
 
-		li {
-			margin-left: 1em;
-
-			&::before {
-				content: '\2013';
-				float: left;
-				margin-left: -1em;
-			}
-
-			&:only-child {
-				margin-left: 0;
-			}
-		}
-
 		&.msg-details-border {
 			padding-top: .5em;
 			margin: 8px 0 0;
 			border-top-width: 1px;
 			border-top-style: dashed;
+		}
+	}
+
+	.list-dashed {
+		li {
+			&:only-child {
+				margin-left: 0;
+			}
 		}
 	}
 }

@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$filter = new CFilter((new CUrl('items.php'))->setArgument('context', $data['context']));
+$filter = (new CFilter())->setResetUrl((new CUrl('items.php'))->setArgument('context', $data['context']));
 $filter_column_1 = new CFormList();
 $filter_column_2 = new CFormList();
 $filter_column_3 = new CFormList();
@@ -61,7 +61,7 @@ $filter_column_1
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => $filter->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
 					'enrich_parent_groups' => true
@@ -81,7 +81,7 @@ $filter_column_1
 				'parameters' => [
 					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
-					'dstfrm' => $filter->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_hostids_',
 					'editable' => true
 				]
@@ -105,7 +105,7 @@ if ($data['filter_data']['hosts']) {
 				'parameters' => [
 					'srctbl' => 'valuemap_names',
 					'srcfld1' => 'valuemapid',
-					'dstfrm' => $filter->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_valuemapids_',
 					'hostids' => array_column($data['filter_data']['hosts'], 'id'),
 					'with_inherited' => true,

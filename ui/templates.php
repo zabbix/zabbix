@@ -188,6 +188,10 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
 	}
 
+	$macros = array_map(function($macro) {
+		return array_diff_key($macro, array_flip(['hostmacroid']));
+	}, $macros);
+
 	if (hasRequest('clone')) {
 		unset($_REQUEST['templateid']);
 	}
@@ -272,10 +276,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$result = API::Template()->update($template);
 
-			if ($result) {
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
-			}
-			else {
+			if (!$result) {
 				throw new Exception();
 			}
 		}

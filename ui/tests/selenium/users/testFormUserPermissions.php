@@ -73,7 +73,7 @@ class testFormUserPermissions extends CWebTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => 'admin_role_check',
-				'passwd' => 'zabbix',
+				'passwd' => 'test5678',
 				'roleid' => self::$admin_roleid,
 				'usrgrps' => [
 					[
@@ -451,7 +451,7 @@ class testFormUserPermissions extends CWebTest {
 		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 		$this->query('button:Scan directory')->one()->click();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$table->findRows(['Name' => '4th Module'])->select();
+		$table->findRows('Name', ['4th Module'])->select();
 		$this->query('button:Enable')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();

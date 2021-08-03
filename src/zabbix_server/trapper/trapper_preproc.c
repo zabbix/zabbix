@@ -64,6 +64,8 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 	size_t			size;
 	zbx_timespec_t		ts_now;
 
+	zbx_user_init(&user);
+
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
@@ -219,6 +221,8 @@ out:
 
 	zbx_free(step_params);
 	zbx_free(error_handler_params);
+
+	zbx_user_free(&user);
 
 	return ret;
 }

@@ -29,13 +29,14 @@
 		var $form = $('form#housekeeping');
 
 		$form.on('submit', function() {
-			$form.trimValues(['#hk_events_trigger', '#hk_events_internal', '#hk_events_discovery', '#hk_events_autoreg',
-				'#hk_services', '#hk_audit', '#hk_sessions', '#hk_history', '#hk_trends'
+			$form.trimValues(['#hk_events_trigger', '#hk_events_service', '#hk_events_internal', '#hk_events_discovery',
+				'#hk_events_autoreg', '#hk_services', '#hk_sessions', '#hk_history', '#hk_trends'
 			]);
 		});
 
 		$('#hk_events_mode').change(function() {
 			$('#hk_events_trigger').prop('disabled', !this.checked);
+			$('#hk_events_service').prop('disabled', !this.checked);
 			$('#hk_events_internal').prop('disabled', !this.checked);
 			$('#hk_events_discovery').prop('disabled', !this.checked);
 			$('#hk_events_autoreg').prop('disabled', !this.checked);
@@ -43,10 +44,6 @@
 
 		$('#hk_services_mode').change(function() {
 			$('#hk_services').prop('disabled', !this.checked);
-		});
-
-		$('#hk_audit_mode').change(function() {
-			$('#hk_audit').prop('disabled', !this.checked);
 		});
 
 		$('#hk_sessions_mode').change(function() {
@@ -91,6 +88,7 @@
 								)
 								.change();
 							$('#hk_events_trigger').val("<?= DB::getDefault('config', 'hk_events_trigger') ?>");
+							$('#hk_events_service').val("<?= DB::getDefault('config', 'hk_events_service') ?>");
 							$('#hk_events_internal').val("<?= DB::getDefault('config', 'hk_events_internal') ?>");
 							$('#hk_events_discovery').val("<?= DB::getDefault('config', 'hk_events_discovery') ?>");
 							$('#hk_events_autoreg').val("<?= DB::getDefault('config', 'hk_events_autoreg') ?>");
@@ -100,14 +98,6 @@
 								)
 								.change();
 							$('#hk_services').val("<?= DB::getDefault('config', 'hk_services') ?>");
-
-							// audit
-							$('#hk_audit_mode')
-								.prop('checked',
-									<?= (DB::getDefault('config', 'hk_audit_mode') == 1) ? 'true' : 'false' ?>
-								)
-								.change();
-							$('#hk_audit').val("<?= DB::getDefault('config', 'hk_audit') ?>");
 
 							// user sessions
 							$('#hk_sessions_mode')

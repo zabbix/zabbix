@@ -124,6 +124,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 		case ZBX_TYPE_TEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
 			break;
+		case ZBX_TYPE_CUID:
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%d)", ZBX_TYPE_CHAR_STR, CUID_LEN - 1);
+			break;
 		default:
 			assert(0);
 	}
@@ -787,6 +790,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(5010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5030)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5040)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -811,6 +815,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(5020), "5.2 maintenance"},
 	{DBPATCH_VERSION(5030), "5.4 development"},
 	{DBPATCH_VERSION(5040), "5.4 maintenance"},
+	{DBPATCH_VERSION(5050), "6.0 development"},
 	{NULL}
 };
 

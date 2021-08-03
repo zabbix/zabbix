@@ -37,6 +37,18 @@ type Session struct {
 
 	// Database of PostgreSQL server.
 	Database string `conf:"optional"`
+
+	// Connection type of PostgreSQL server.
+	TLSConnect string `conf:"name=TLSConnect,optional"`
+
+	// Certificate Authority filepath for PostgreSQL server.
+	TLSCAFile string `conf:"name=TLSCAFile,optional"`
+
+	// Certificate filepath for PostgreSQL server.
+	TLSCertFile string `conf:"name=TLSCertFile,optional"`
+
+	// Key filepath for PostgreSQL server.
+	TLSKeyFile string `conf:"name=TLSKeyFile,optional"`
 }
 
 // PluginOptions are options for PostgreSQL connection.

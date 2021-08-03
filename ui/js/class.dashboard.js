@@ -1159,7 +1159,10 @@ class CDashboard extends CBaseComponent {
 
 		if (!this._is_edit_widget_properties_cancel_subscribed) {
 			this._is_edit_widget_properties_cancel_subscribed = true;
-			$.subscribe('overlay.close', this._events.editWidgetPropertiesCancel);
+
+			overlay.$dialogue[0].addEventListener('overlay.close', this._events.editWidgetPropertiesCancel,
+				{once: true}
+			);
 		}
 	}
 
@@ -1900,13 +1903,10 @@ class CDashboard extends CBaseComponent {
 				}
 			},
 
-			editWidgetPropertiesCancel: (e, data) => {
-				if (data.dialogueid === 'widget_properties') {
-					this._cancelEditingWidgetProperties();
+			editWidgetPropertiesCancel: () => {
+				this._cancelEditingWidgetProperties();
 
-					$.unsubscribe('overlay.close', this._events.editWidgetPropertiesCancel);
-					this._is_edit_widget_properties_cancel_subscribed = false;
-				}
+				this._is_edit_widget_properties_cancel_subscribed = false;
 			}
 		};
 	}

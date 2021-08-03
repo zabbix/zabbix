@@ -31,6 +31,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['foo(/host/key)', [], ['rc' => false, 'error' => 'unknown function "foo"']],
 			['avg_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "avg_foreach"']],
 			['count_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "count_foreach"']],
+			['exists_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "exists_foreach"']],
 			['last_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "last_foreach"']],
 			['max_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "max_foreach"']],
 			['min_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "min_foreach"']],
@@ -238,6 +239,9 @@ class CHistFunctionValidatorTest extends TestCase {
 			['fuzzytime(/host/key, 24856d)', [], ['rc' => false, 'error' => 'invalid second parameter in function "fuzzytime"']],
 			['fuzzytime(/host/key, 3551w)', [], ['rc' => false, 'error' => 'invalid second parameter in function "fuzzytime"']],
 			['fuzzytime(/host/key, 1h,)', [], ['rc' => false, 'error' => 'invalid number of parameters in function "fuzzytime"']],
+
+			['item_count(/host/key)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['item_count(/host/key,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "item_count"']],
 
 			['kurtosis(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "kurtosis"']],
 			['kurtosis(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "kurtosis"']],
@@ -658,6 +662,9 @@ class CHistFunctionValidatorTest extends TestCase {
 			['avg_foreach(/host/key, {$MACRO})', ['usermacros' => true, 'calculated' => true], ['rc' => true, 'error' => null]],
 			['avg_foreach(/host/key, {#LLDMACRO})', ['lldmacros' => true, 'calculated' => true], ['rc' => true, 'error' => null]],
 			['avg_foreach(/host/key, 1d,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "avg_foreach"']],
+
+			['exists_foreach(/host/key)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['exists_foreach(/host/key,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "exists_foreach"']],
 
 			['last_foreach(/host/key)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key,)', ['calculated' => true], ['rc' => true, 'error' => null]],

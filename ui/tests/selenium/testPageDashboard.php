@@ -71,8 +71,8 @@ class testPageDashboard extends CLegacyWebTest {
 				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
 				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
 			}
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Favourite graphs');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favourite maps');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Favorite graphs');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favorite maps');
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Problems');
 			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Problems by severity']");
 			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Local']");
@@ -102,20 +102,20 @@ class testPageDashboard extends CLegacyWebTest {
 		$filter->getField('Graphs')->select($this->graphCpu);
 		$filter->submit();
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
+		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favorites');
 		$this->zbxTestClickWait('addrm_fav');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//button[@id="addrm_fav" and @title="Remove from favourites"]'));
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//button[@id="addrm_fav" and @title="Remove from favorites"]'));
+		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favorites');
 
 		$filter->query('button:Reset')->one()->click();
 		$filter->invalidate();
 		$filter->getField('Graphs')->select($this->graphMemory);
 		$filter->submit();
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
+		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favorites');
 		$this->zbxTestClickWait('addrm_fav');
-		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favourites']);
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
+		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
+		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favorites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 		$this->zbxTestAssertElementText('//div[@class="dashboard-grid"]/div[8]//a[@href="zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D='.$this->graphCpuId.'&filter_set=1"]', 'ЗАББИКС Сервер: '.$this->graphCpu);
@@ -152,10 +152,10 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Maps');
 		$this->zbxTestClickLinkTextWait($this->mapTest);
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
+		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favorites');
 		$this->zbxTestClickWait('addrm_fav');
-		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favourites']);
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
+		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
+		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favorites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 		$this->zbxTestAssertElementText('//div[@class="dashboard-grid-widget-container"]/div[2]//a[@href="zabbix.php?action=map.view&sysmapid='.$this->mapTestId.'"]', $this->mapTest);
@@ -164,7 +164,7 @@ class testPageDashboard extends CLegacyWebTest {
 
 	public function testPageDashboard_RemoveFavouriteMaps() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
-		$widget_content = CDashboardElement::find()->one()->getWidget('Favourite maps')->getContent();
+		$widget_content = CDashboardElement::find()->one()->getWidget('Favorite maps')->getContent();
 		$favourite_maps = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.
 				zbx_dbstr('web.favorite.sysmapids')));
 

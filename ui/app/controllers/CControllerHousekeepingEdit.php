@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,21 +21,20 @@
 
 class CControllerHousekeepingEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'hk_events_mode'			=> 'db config.hk_events_mode',
 			'hk_events_trigger'			=> 'db config.hk_events_trigger',
+			'hk_events_service'			=> 'db config.hk_events_service',
 			'hk_events_internal'		=> 'db config.hk_events_internal',
 			'hk_events_discovery'		=> 'db config.hk_events_discovery',
 			'hk_events_autoreg'			=> 'db config.hk_events_autoreg',
 			'hk_services_mode'			=> 'db config.hk_services_mode',
 			'hk_services'				=> 'db config.hk_services',
-			'hk_audit_mode'				=> 'db config.hk_audit_mode',
-			'hk_audit'					=> 'db config.hk_audit',
 			'hk_sessions_mode'			=> 'db config.hk_sessions_mode',
 			'hk_sessions'				=> 'db config.hk_sessions',
 			'hk_history_mode'			=> 'db config.hk_history_mode',
@@ -57,17 +56,20 @@ class CControllerHousekeepingEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'hk_events_mode' => $this->getInput('hk_events_mode', CHousekeepingHelper::get(
 				CHousekeepingHelper::HK_EVENTS_MODE
 			)),
 			'hk_events_trigger' => $this->getInput('hk_events_trigger', CHousekeepingHelper::get(
 				CHousekeepingHelper::HK_EVENTS_TRIGGER
+			)),
+			'hk_events_service' => $this->getInput('hk_events_service', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_EVENTS_SERVICE
 			)),
 			'hk_events_internal' => $this->getInput('hk_events_internal', CHousekeepingHelper::get(
 				CHousekeepingHelper::HK_EVENTS_INTERNAL
@@ -82,10 +84,6 @@ class CControllerHousekeepingEdit extends CController {
 				CHousekeepingHelper::HK_SERVICES_MODE
 			)),
 			'hk_services' => $this->getInput('hk_services', CHousekeepingHelper::get(CHousekeepingHelper::HK_SERVICES)),
-			'hk_audit_mode' => $this->getInput('hk_audit_mode', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_AUDIT_MODE
-			)),
-			'hk_audit' => $this->getInput('hk_audit', CHousekeepingHelper::get(CHousekeepingHelper::HK_AUDIT)),
 			'hk_sessions_mode' => $this->getInput('hk_sessions_mode', CHousekeepingHelper::get(
 				CHousekeepingHelper::HK_SESSIONS_MODE
 			)),

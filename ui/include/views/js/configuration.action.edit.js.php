@@ -117,7 +117,7 @@
 			var row = jQuery('#recovery_operations_' + index);
 		}
 		else {
-			var row = jQuery('#ack_operations_' + index);
+			var row = jQuery('#update_operations_' + index);
 		}
 
 		var rowParent = row.parent();
@@ -152,9 +152,9 @@
 
 	jQuery(document).ready(function() {
 		var remove_operationid = function() {
-			var operationid_RegExp = /^(operations|recovery_operations|ack_operations)\[\d+\]\[operationid\]$/;
+			var operationid_RegExp = /^(operations|recovery_operations|update_operations)\[\d+\]\[operationid\]$/;
 
-			jQuery('input[name^=operations], input[name^=recovery_operations], input[name^=ack_operations]')
+			jQuery('input[name^=operations], input[name^=recovery_operations], input[name^=update_operations]')
 				.each(function() {
 					if ($(this).attr('name').match(operationid_RegExp)) {
 						$(this).remove();
@@ -482,7 +482,7 @@
 			this.$mediatype_default.appendTo($wrapper);
 		}
 		else if (props.recovery_phase == operation_details.ACTION_OPERATION
-				|| props.recovery_phase == operation_details.ACTION_ACKNOWLEDGE_OPERATION) {
+				|| props.recovery_phase == operation_details.ACTION_UPDATE_OPERATION) {
 			this.$mediatype_only.appendTo($wrapper);
 		}
 
@@ -1123,8 +1123,8 @@
 		if (this.recovery_phase == operation_details.ACTION_RECOVERY_OPERATION) {
 			recovery_prefix = 'recovery_';
 		}
-		else if (this.recovery_phase == operation_details.ACTION_ACKNOWLEDGE_OPERATION) {
-			recovery_prefix = 'ack_';
+		else if (this.recovery_phase == operation_details.ACTION_UPDATE_OPERATION) {
+			recovery_prefix = 'update_';
 		}
 
 		const form = document.forms['action.edit'];
@@ -1152,9 +1152,8 @@
 		 * @param {Node}   target          Popup opener the focus will be returned to.
 		 * @param {number} actionid        Current actionid.
 		 * @param {string} eventsource     One of: EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
-		 *                                 EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL.
-		 * @param {string} recovery_phase  One of: ACTION_OPERATION, ACTION_RECOVERY_OPERATION,
-		 *                                 ACTION_ACKNOWLEDGE_OPERATION.
+		 *                                 EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE.
+		 * @param {string} recovery_phase  One of: ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION.
 		 * @param {object} operation       (optional) Current operation object.
 		 */
 		open(target, actionid, eventsource, recovery_phase, operation) {
@@ -1178,7 +1177,7 @@
 	window.operation_details.OPERATION_TYPE_GROUP_ADD                  = <?= OPERATION_TYPE_GROUP_ADD ?>;
 	window.operation_details.OPERATION_TYPE_COMMAND                    = <?= OPERATION_TYPE_COMMAND ?>;
 	window.operation_details.OPERATION_TYPE_MESSAGE                    = <?= OPERATION_TYPE_MESSAGE ?>;
-	window.operation_details.ACTION_ACKNOWLEDGE_OPERATION              = <?= ACTION_ACKNOWLEDGE_OPERATION ?>;
+	window.operation_details.ACTION_UPDATE_OPERATION                   = <?= ACTION_UPDATE_OPERATION ?>;
 	window.operation_details.ACTION_RECOVERY_OPERATION                 = <?= ACTION_RECOVERY_OPERATION ?>;
 	window.operation_details.ACTION_OPERATION                          = <?= ACTION_OPERATION ?>;
 	window.operation_details.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION = <?= ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION ?>;

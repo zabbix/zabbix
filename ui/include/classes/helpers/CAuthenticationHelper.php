@@ -37,6 +37,8 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const LDAP_HOST = 'ldap_host';
 	public const LDAP_PORT = 'ldap_port';
 	public const LDAP_SEARCH_ATTRIBUTE = 'ldap_search_attribute';
+	public const PASSWD_CHECK_RULES = 'passwd_check_rules';
+	public const PASSWD_MIN_LENGTH = 'passwd_min_length';
 	public const SAML_AUTH_ENABLED = 'saml_auth_enabled';
 	public const SAML_CASE_SENSITIVE = 'saml_case_sensitive';
 	public const SAML_ENCRYPT_ASSERTIONS = 'saml_encrypt_assertions';

@@ -1729,5 +1729,31 @@ in:
 out:
   result: SUCCEED
   output: 3.5180249088e+11
+---
+test case: 'Check != operator'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.23456
+    cpu_usage_system{cpu="cpu0",host="host1"} 7.891011
+  params: cpu_usage_system{cpu!="cpu-total"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 7.891011
+---
+test case: 'Check !~ operator'
+in:
+  data: |
+    # HELP cpu_usage_system Telegraf collected metric
+    # TYPE cpu_usage_system gauge
+    cpu_usage_system{cpu="cpu-total",host="host1"} 1.23456
+    cpu_usage_system{cpu="cpu0",host="host1"} 7.891011
+  params: cpu_usage_system{cpu!~"total$"}
+  value_type: ""
+out:
+  result: SUCCEED
+  output: 7.891011
 ...
 

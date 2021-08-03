@@ -241,7 +241,7 @@ class CProxy extends CApiService {
 		$proxyids = DB::insert('hosts', $proxies);
 
 		$hostUpdate = [];
-		foreach ($proxies as $key => $proxy) {
+		foreach ($proxies as $key => &$proxy) {
 			if (!empty($proxy['hosts'])) {
 				$hostUpdate[] = [
 					'values' => ['proxy_hostid' => $proxyids[$key]],
@@ -257,9 +257,14 @@ class CProxy extends CApiService {
 					self::exception(ZBX_API_ERROR_INTERNAL, _('Proxy interface creation failed.'));
 				}
 			}
+
+			$proxy['proxyid'] = $proxyids[$key];
 		}
+		unset($proxy);
 
 		DB::update('hosts', $hostUpdate);
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_PROXY, $proxies);
 
 		return ['proxyids' => $proxyids];
 	}
@@ -292,7 +297,7 @@ class CProxy extends CApiService {
 
 		$db_proxies = $this->get([
 			'output' => ['proxyid', 'hostid', 'host', 'status', 'tls_connect', 'tls_accept', 'tls_issuer',
-				'tls_subject'
+				'tls_subject', 'description', 'proxy_address'
 			],
 			'proxyids' => $proxyids,
 			'editable' => true,
@@ -405,6 +410,8 @@ class CProxy extends CApiService {
 		DB::update('hosts', $proxyUpdate);
 		DB::update('hosts', $hostUpdate);
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_PROXY, $proxies, $db_proxies);
+
 		return ['proxyids' => $proxyids];
 	}
 
@@ -490,7 +497,7 @@ class CProxy extends CApiService {
 		]);
 
 		if ($db_hosts) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" is monitored with proxy "%2$s".',
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" is monitored by proxy "%2$s".',
 				$db_hosts[0]['name'], $proxies[$db_hosts[0]['proxy_hostid']]['host']
 			));
 		}
@@ -817,7 +824,10 @@ class CProxy extends CApiService {
 			}
 
 			if (array_key_exists('proxy_address', $proxy)) {
-				switch (array_key_exists('status', $proxy) ? $proxy['status'] : $db_proxy['status']) {
+				$proxy_status = array_key_exists('status', $proxy)
+					? $proxy['status']
+					: $db_proxies[$proxy['proxyid']]['status'];
+				switch ($proxy_status) {
 					case HOST_STATUS_PROXY_PASSIVE:
 						if ($proxy['proxy_address'] !== '') {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',

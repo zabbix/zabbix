@@ -176,7 +176,7 @@ else {
 			->show();
 	}
 	else {
-		error(_('Cannot format Tree. Check logic structure in service links.'));
+		error(_('Cannot format tree. Check logic structure in service links.'));
 	}
 }
 

@@ -69,7 +69,7 @@ class CMessageElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getLines() {
-		return $this->query('xpath:./div[@class="msg-details"]/ul/li')->all();
+		return $this->query('xpath://div[@class="msg-details"]//li')->all();
 	}
 
 	/**

@@ -193,6 +193,8 @@ static int	hc_get_history_compression_age(void);
 ZBX_PTR_VECTOR_DECL(item_tag, zbx_tag_t)
 ZBX_PTR_VECTOR_IMPL(item_tag, zbx_tag_t)
 
+ZBX_PTR_VECTOR_IMPL(tags, zbx_tag_t*)
+
 /******************************************************************************
  *                                                                            *
  * Function: DCget_stats_all                                                  *
@@ -2989,7 +2991,6 @@ static void	sync_proxy_history(int *total_num, int *more)
 
 		zbx_vector_ptr_clear(&history_items);
 		zbx_vector_ptr_clear_ext(&item_diff, zbx_default_mem_free_func);
-		zbx_vector_ptr_destroy(&item_diff);
 
 		/* Exit from sync loop if we have spent too much time here */
 		/* unless we are doing full sync. This is done to allow    */
@@ -2997,6 +2998,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 	}
 	while (ZBX_SYNC_MORE == *more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
 
+	zbx_vector_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&history_items);
 }
 
@@ -3210,16 +3212,16 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 						zbx_db_save_trigger_changes(&trigger_diff);
 
 					if (ZBX_DB_OK == (txn_error = DBcommit()))
-					{
 						DCconfig_triggers_apply_changes(&trigger_diff);
-						DBupdate_itservices(&trigger_diff);
-					}
 					else
 						zbx_clean_events();
 
 					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 				}
 				while (ZBX_DB_DOWN == txn_error);
+
+				if (ZBX_DB_OK == txn_error)
+					zbx_events_update_itservices();
 			}
 		}
 

@@ -6,4 +6,6 @@ libzbxhousekeeper_a_SOURCES = \
 	housekeeper.c \
 	housekeeper.h \
 	history_compress.c \
-	history_compress.h
+	history_compress.h \
+	problem_housekeeper.c \
+	problem_housekeeper.h

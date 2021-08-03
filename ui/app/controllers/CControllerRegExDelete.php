@@ -58,13 +58,13 @@ class CControllerRegExDelete extends CController {
 		$regexpids = zbx_objectValues($this->db_regexes, 'regexpid');
 		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regexpids));
 
-		if ($result) {
-			foreach ($this->db_regexes as $regex) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP,
-					'Id ['.$regex['regexpid'].'] '._('Name').' ['.$regex['name'].']'
-				);
-			}
-		}
+		// if ($result) {
+		// 	foreach ($this->db_regexes as $regex) {
+		// 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP,
+		// 			'Id ['.$regex['regexpid'].'] '._('Name').' ['.$regex['name'].']'
+		// 		);
+		// 	}
+		// }
 
 		$result = DBend($result);
 
