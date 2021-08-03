@@ -42,6 +42,46 @@
 
 static char	host_block[HOST_TMP_36_BASE_BUF_LEN];
 
+/******************************************************************************
+ *                                                                            *
+ * Function: pad                                                              *
+ *                                                                            *
+ * Purpose: modify string in-place to the specified length as required by     *
+ *          CUID algorithm                                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     input       - [IN/OUT] input string and result                         *
+ *     input_alloc - [IN] buffer size where the input string is stored. It    *
+ *                   should be larger than 'pad_size'.                        *
+ *     pad_size    - [IN] target length                                       *
+ *     fill_char   - [IN] character used to fill target string if there are   *
+ *                   not enough existing characters                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	pad(char *input, size_t input_alloc, size_t pad_size, char fill_char)
+{
+	size_t	input_len;
+
+	if (pad_size == (input_len = strlen(input)))
+		return;
+
+	if (pad_size > input_len)	/* make string longer by prepending fill_char s */
+	{
+		if (pad_size + 1 > input_alloc || input_len + 1 > input_alloc)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return;
+		}
+
+		memmove(input + pad_size - input_len, input, input_len);
+		memset(input, fill_char, pad_size - input_len);
+	}
+	else				/* make string shorter by keeping only last characters */
+		memmove(input, input + input_len - pad_size, pad_size);
+
+	input[pad_size] = '\0';
+}
+
 static char	base36_digit(size_t num)
 {
 	if (num <= 9)
