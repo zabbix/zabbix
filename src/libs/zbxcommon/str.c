@@ -6271,5 +6271,3 @@ void	zbx_rtrim_utf8(char *str, const char *charlist)
 
 	*last = '\0';
 }
-
-
