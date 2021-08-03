@@ -274,6 +274,7 @@ class testUserRolesPermissions extends CWebTest {
 	 * Check that Acknowledge link is disabled after all problem actions is disabled.
 	 */
 	public function testUserRolesPermissions_ProblemActionsAll() {
+		$problem_host = 'Host for triggers filtering';
 		$context_before = [
 			'Problems',
 			'Acknowledge',
@@ -292,20 +293,25 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			// Problem page.
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$problem_row = $this->query('class:list-table')->asTable()->one()->findRow('Time', '2020-10-23 18:23:48');
-			$this->assertTrue($problem_row->query('xpath://*[text()="No"]')->one()->isClickable($action_status));
+			$problem_row = $this->query('class:list-table')->asTable()->one()->findRow('Host', $problem_host);
+			$this->assertEquals($action_status, $problem_row->getColumn('Ack')->query('xpath:.//*[text()="No"]')
+					->one()->isAttributePresent('onclick'));
 
 			// Problem widget in dashboard.
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
-			$table = $this->query('xpath:(//table[@class="list-table"])[10]')->waitUntilVisible()->asTable()->one();
-			$this->assertTrue($table->query('xpath://*[text()="No"]')->one()->isClickable($action_status));
+			$dashboard = CDashboardElement::find()->one();
+			$widget_row = $dashboard->getWidget('Problems')->query('class:list-table')->asTable()->one()
+					->findRow('Host', $problem_host);
+			$this->assertEquals($action_status, $widget_row->getColumn('Ack')->query('xpath:.//*[text()="No"]')
+					->one()->isAttributePresent('onclick'));
 
 			// Event details page.
 			$this->page->open('tr_events.php?triggerid=99251&eventid=93')->waitUntilReady();
 
-			foreach (['2', '5'] as $table_number) {
-				$table = $this->query('xpath:(//*[@class="list-table"])['.$table_number.']')->asTable()->one();
-				$this->assertTrue($table->query('xpath://*[text()="No"]')->one()->isClickable($action_status));
+			foreach (['Event details', 'Event list [previous 20]'] as $table_name) {
+				$table = $this->query('xpath://h4[text()="'.$table_name.'"]/../..//table')->asTable()->one();
+				$this->assertEquals($action_status, $table->query('xpath:.//*[text()="No"]')
+						->one()->isAttributePresent('onclick'));
 			}
 
 			// Overview page.
@@ -431,9 +437,10 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->userLogin('user_for_role', 'zabbix');
 		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 		$this->query('button:Scan directory')->one()->click();
-		$this->query('class:list-table')->asTable()->one()->findRows(['Name' => '5th Module'])->select();
+		$this->query('class:list-table')->asTable()->one()->findRows('Name', '5th Module')->select();
 		$this->query('button:Enable')->one()->click();
-		$this->page->acceptAlert()->waitUntilReady();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
 
 		foreach ([true, false] as $action_status) {
 			$page_number = $this->query('xpath://ul[@class="menu-main"]/li/a')->count();
@@ -1145,6 +1152,7 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			if ($action_status) {
 				$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
+				$this->assertContains('zabbix.php?action=user.token.list', $this->page->getCurrentUrl());
 				$this->changeRoleRule(['Manage API tokens' => false]);
 			}
 			else {
@@ -1166,7 +1174,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->query('button:Go to "'.$page.'"')->one()->waitUntilClickable()->click();
 
 			if ($page === 'Dashboard') {
-				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl()->waitUntilReady());
+				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
 		}
 	}
