@@ -842,6 +842,8 @@ class CMediatype extends CApiService {
 		$mediatypeids = DB::insert('media_type', $mediatypes);
 		$ins_media_type_param = [];
 		$ins_media_type_message = [];
+		$types = array_column($mediatypes, 'message_templates', 'type');
+		$default_subject = (array_key_exists(MEDIA_TYPE_SMS, $types) && count($types) > 1) ? ['subject' => ''] : [];
 
 		foreach ($mediatypes as $i => $mediatype) {
 			$mediatypeid = $mediatypeids[$i];
@@ -859,7 +861,7 @@ class CMediatype extends CApiService {
 
 			if (array_key_exists('message_templates', $mediatype)) {
 				foreach ($mediatype['message_templates'] as $message_template) {
-					$ins_media_type_message[] = ['mediatypeid' => $mediatypeid] + $message_template;
+					$ins_media_type_message[] = ['mediatypeid' => $mediatypeid] + $message_template + $default_subject;
 				}
 			}
 		}
