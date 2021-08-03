@@ -88,6 +88,7 @@ void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t ho
 void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
 		zbx_vector_uint64_t *groupids);
 void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname);
+void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname);
 
 void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid, const char *name,
 		int status, int discover, int custom_interfaces);

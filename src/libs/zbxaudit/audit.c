@@ -591,6 +591,13 @@ void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname)
 	zbx_audit_host_create_entry(AUDIT_ACTION_DELETE, hostid, hostname);
 }
 
+void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname)
+{
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_audit_host_prototype_create_entry(AUDIT_ACTION_DELETE, hostid, hostname);
+}
+
 void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid, const char *name,
 		int status, int discover, int custom_interfaces)
 {

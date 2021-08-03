@@ -1478,16 +1478,18 @@ static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeid
  * Parameters: host_prototypeids - [IN] list of host prototypes               *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
+static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
+		zbx_vector_str_t *host_prototype_names)
 {
+	int			i;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	zbx_vector_uint64_t	hostids, group_prototypeids;
+	zbx_vector_uint64_t	hostids, group_prototype_ids;
 	zbx_vector_str_t	hostnames;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 == host_prototypeids->values_num)
+	if (0 == host_prototype_ids->values_num)
 		goto out;
 
 	/* delete discovered hosts */
@@ -1495,13 +1497,13 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_str_create(&hostnames);
 	//zbx_vector_ids_names_create(&host_ids_names);
-	zbx_vector_uint64_create(&group_prototypeids);
+	zbx_vector_uint64_create(&group_prototype_ids);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hd.hostid,h.name from host_discovery hd, hosts h "
 			 "where hd.hostid=h.hostid");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_hostid",
-			host_prototypeids->values, host_prototypeids->values_num);
+			host_prototype_ids->values, host_prototype_ids->values_num);
 
 	DBselect_ids_names(sql, &hostids, &hostnames);
 
@@ -1513,22 +1515,25 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select group_prototypeid from group_prototype where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
-			host_prototypeids->values, host_prototypeids->values_num);
+			host_prototype_ids->values, host_prototype_ids->values_num);
 
-	DBselect_uint64(sql, &group_prototypeids);
+	DBselect_uint64(sql, &group_prototype_ids);
 
-	DBgroup_prototypes_delete(&group_prototypeids);
+	DBgroup_prototypes_delete(&group_prototype_ids);
 
 	/* delete host prototypes */
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
-			host_prototypeids->values, host_prototypeids->values_num);
+			host_prototype_ids->values, host_prototype_ids->values_num);
 
 	DBexecute("%s", sql);
 
-	zbx_vector_uint64_destroy(&group_prototypeids);
+	for (i = 0; i < host_prototype_ids->values_num; i++)
+		zbx_audit_host_prototype_del(host_prototype_ids->values[i], host_prototype_names->values[i]);
+	
+	zbx_vector_uint64_destroy(&group_prototype_ids);
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_str_destroy(&hostnames);
 	zbx_free(sql);
@@ -1677,14 +1682,16 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_t	host_prototypeids;
+	zbx_vector_uint64_t	host_prototype_ids;
+	zbx_vector_str_t	host_prototype_names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_uint64_create(&host_prototypeids);
+	zbx_vector_uint64_create(&host_prototype_ids);
+	zbx_vector_str_create(&host_prototype_names);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hp.hostid"
+			"select hp.hostid,hp.name"
 			" from items hi,host_discovery hhd,hosts hp,host_discovery thd,items ti"
 			" where hi.itemid=hhd.parent_itemid"
 				" and hhd.hostid=hp.hostid"
@@ -1695,13 +1702,15 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	DBselect_uint64(sql, &host_prototypeids);
+	//DBselect_uint64(sql, &host_prototypeids);
+	DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names);
 
-	DBdelete_host_prototypes(&host_prototypeids);
+	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names);
 
 	zbx_free(sql);
 
-	zbx_vector_uint64_destroy(&host_prototypeids);
+	zbx_vector_uint64_destroy(&host_prototype_ids);
+	zbx_vector_str_destroy(&host_prototype_names);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -5003,6 +5012,7 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&host_prototype_ids);
+	zbx_vector_str_create(&host_prototype_names);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hd.hostid"
@@ -5014,10 +5024,11 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str
 	//DBselect_uint64(sql, &host_prototype_ids);
 	DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names);
 
-	DBdelete_host_prototypes(&host_prototype_ids);
+	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names);
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&host_prototype_ids);
+	zbx_vector_str_destroy(&host_prototype_names);
 
 	DBdelete_hosts(hostids, hostnames);
 
