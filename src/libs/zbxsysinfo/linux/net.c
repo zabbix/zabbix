@@ -46,13 +46,10 @@ net_stat_t;
 
 typedef struct
 {
-	struct addrinfo	*ai_local;
-	unsigned short	lport;
-	struct addrinfo	*ai_remote;
-	unsigned short	rport;
-	unsigned char	state;
-	unsigned int	prefix_sz_l;
-	unsigned int	prefix_sz_r;
+	struct addrinfo	*ai;
+	unsigned short	port;
+	unsigned int	prefix_sz;
+	unsigned char	comp;
 }
 net_count_info_t;
 
@@ -840,12 +837,12 @@ static int	scan_ipv6_addr(const char *addr, struct sockaddr_in6 *sa6)
 	return SUCCEED;
 }
 
-static int	get_proc_net_count_ipv6(const char *filename, net_count_info_t *result_exp, zbx_uint64_t *count,
-		char **error)
+static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, net_count_info_t *exp_l,
+		net_count_info_t *exp_r, zbx_uint64_t *count, char **error)
 {
 	char			line[MAX_STRING_LEN], *p;
 	unsigned short		lport, rport;
-	unsigned char		state;
+	unsigned char		state_f;
 	FILE			*f;
 	ZBX_SOCKADDR		sockaddr_l, sockaddr_r;
 	struct sockaddr_in6	*sa_l, *sa_r;
@@ -890,16 +887,16 @@ static int	get_proc_net_count_ipv6(const char *filename, net_count_info_t *resul
 
 		p += 32;
 
-		if (2 != sscanf(p, ":%hx %hhx", &rport, &state))
+		if (2 != sscanf(p, ":%hx %hhx", &rport, &state_f))
 			continue;
 
-		if ((0 != result_exp->lport && result_exp->lport != lport) ||
-				(0 != result_exp->rport && result_exp->rport != rport) ||
-				(0 != result_exp->state && result_exp->state != state) ||
-				(NULL != result_exp->ai_local && FAIL == zbx_ip_cmp(result_exp->prefix_sz_l,
-				result_exp->ai_local, sockaddr_l)) ||
-				(NULL != result_exp->ai_remote && FAIL == zbx_ip_cmp(result_exp->prefix_sz_r,
-				result_exp->ai_remote, sockaddr_r)))
+		if ((0 != exp_l->port && exp_l->port != lport) ||
+				(0 != exp_r->port && exp_r->port != rport) ||
+				(0 != state && state != state_f) ||
+				(NULL != exp_l->ai && (AF_INET6 != exp_l->ai->ai_family ||
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l))) ||
+				(NULL != exp_r->ai && (AF_INET6 != exp_r->ai->ai_family ||
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r))))
 		{
 			continue;
 		}
@@ -913,12 +910,12 @@ static int	get_proc_net_count_ipv6(const char *filename, net_count_info_t *resul
 }
 #endif
 
-static int	get_proc_net_count_ipv4(const char *filename, net_count_info_t *result_exp, zbx_uint64_t *count,
-		char **error)
+static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, net_count_info_t *exp_l,
+		net_count_info_t *exp_r, zbx_uint64_t *count, char **error)
 {
 	char			line[MAX_STRING_LEN], *p;
 	unsigned short		lport, rport;
-	unsigned char		state;
+	unsigned char		state_f;
 	FILE			*f;
 	ZBX_SOCKADDR		sockaddr_l, sockaddr_r;
 	struct sockaddr_in	*sa_l, *sa_r;
@@ -946,18 +943,22 @@ static int	get_proc_net_count_ipv4(const char *filename, net_count_info_t *resul
 			continue;
 
 		if (5 != sscanf(p, ": %x:%hx %x:%hx %hhx", &sa_l->sin_addr.s_addr, &lport, &sa_r->sin_addr.s_addr,
-				&rport, &state))
+				&rport, &state_f))
 		{
 			continue;
 		}
 
-		if ((0 != result_exp->lport && result_exp->lport != lport) ||
-				(0 != result_exp->rport && result_exp->rport != rport) ||
-				(0 != result_exp->state && result_exp->state != state) ||
-				(NULL != result_exp->ai_local && FAIL == zbx_ip_cmp(result_exp->prefix_sz_l,
-				result_exp->ai_local, sockaddr_l)) ||
-				(NULL != result_exp->ai_remote && FAIL == zbx_ip_cmp(result_exp->prefix_sz_r,
-				result_exp->ai_remote, sockaddr_r)))
+		if ((0 != exp_l->port && exp_l->port != lport) ||
+				(0 != exp_r->port && exp_r->port != rport) ||
+				(0 != state && state != state_f) ||
+				(NULL != exp_l->ai &&
+				((AF_INET != exp_l->ai->ai_family && 0 == exp_l->comp) ||
+				((AF_INET == exp_l->ai->ai_family || 0 != exp_l->comp) &&
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l)))) ||
+				(NULL != exp_r->ai &&
+				((AF_INET != exp_r->ai->ai_family && 0 == exp_r->comp) ||
+				((AF_INET == exp_r->ai->ai_family || 0 != exp_r->comp) &&
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r)))))
 		{
 			continue;
 		}
@@ -970,12 +971,12 @@ static int	get_proc_net_count_ipv4(const char *filename, net_count_info_t *resul
 	return SUCCEED;
 }
 
-static int	get_addr_info(const char *addr_in, const char *port_in, struct addrinfo *hints, struct addrinfo **ai,
-		unsigned short *port, unsigned int *prefix_sz, char **error)
+static int	get_addr_info(const char *addr_in, const char *port_in, struct addrinfo *hints, net_count_info_t *info, char **error)
 {
 	char		*cidr_sep, *addr;
 	const char	*service = NULL;
 	int		ret = FAIL, res, prefix_sz_local;
+
 
 	if (NULL != addr_in && '\0' != *addr_in)
 	{
@@ -1003,7 +1004,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 
 	if (NULL != port_in && '\0' != *port_in)
 	{
-		if (SUCCEED != is_ushort(port_in, port))
+		if (SUCCEED != is_ushort(port_in, &info->port))
 		{
 			size_t	i, len;
 
@@ -1028,7 +1029,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 	if (NULL == addr && NULL == service)
 		return SUCCEED;
 
-	if (EAI_SERVICE == (res = getaddrinfo(addr, service, hints, ai)))
+	if (EAI_SERVICE == (res = getaddrinfo(addr, service, hints, &info->ai)))
 	{
 		*error = zbx_dsprintf(*error, "The service \"%s\" is not available for the requested socket type.",
 				port_in);
@@ -1041,13 +1042,19 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 	}
 
 #ifdef HAVE_IPV6
-	if ((*ai)->ai_family == AF_INET6)
+	if (info->ai->ai_family == AF_INET6)
 	{
-		if (NULL != addr && -1 == prefix_sz_local)
-			prefix_sz_local = IPV6_MAX_CIDR_PREFIX;
+		if (NULL != addr)
+		{
+			if (NULL != strchr(addr, '.'))
+				info->comp = 1;
+
+			if (-1 == prefix_sz_local)
+				prefix_sz_local = IPV6_MAX_CIDR_PREFIX;
+		}
 
 		if (NULL != service)
-			*port = ntohs(((struct sockaddr_in6*)(*ai)->ai_addr)->sin6_port);
+			info->port = ntohs(((struct sockaddr_in6*)info->ai->ai_addr)->sin6_port);
 	}
 	else
 #endif
@@ -1056,16 +1063,16 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 			prefix_sz_local = IPV4_MAX_CIDR_PREFIX;
 
 		if (NULL != service)
-			*port = ntohs(((struct sockaddr_in*)(*ai)->ai_addr)->sin_port);
+			info->port = ntohs(((struct sockaddr_in*)info->ai->ai_addr)->sin_port);
 	}
 
 	if (NULL == addr)
 	{
-		freeaddrinfo(*ai);
-		*ai = NULL;
+		freeaddrinfo(info->ai);
+		info->ai = NULL;
 	}
 	else
-		*prefix_sz = (unsigned int)prefix_sz_local;
+		info->prefix_sz = (unsigned int)prefix_sz_local;
 
 	ret = SUCCEED;
 err:
@@ -1077,8 +1084,9 @@ err:
 static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int			ret = SYSINFO_RET_FAIL;
-	net_count_info_t	info;
+	net_count_info_t	info_l, info_r;
 	char			*error = NULL, *laddr, *raddr, *lport, *rport, *state;
+	unsigned char		state_num = 0;
 	zbx_uint64_t		count = 0;
 	struct addrinfo		hints;
 
@@ -1094,7 +1102,8 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 	rport = get_rparam(request, 3);
 	state = get_rparam(request, 4);
 
-	memset(&info, 0, sizeof(info));
+	memset(&info_l, 0, sizeof(info_l));
+	memset(&info_r, 0, sizeof(info_r));
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
@@ -1112,21 +1121,21 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 	}
 
 	/* local address and port */
-	if (SUCCEED != get_addr_info(laddr, lport, &hints, &info.ai_local, &info.lport, &info.prefix_sz_l, &error))
+	if (SUCCEED != get_addr_info(laddr, lport, &hints, &info_l, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		goto err;
 	}
 
 	/* remote address and port */
-	if (SUCCEED != get_addr_info(raddr, rport, &hints, &info.ai_remote, &info.rport, &info.prefix_sz_r, &error))
+	if (SUCCEED != get_addr_info(raddr, rport, &hints, &info_r, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		goto err;
 	}
 
 	/* connection state */
-	if (NULL != state && '\0' != *state && 0 == (info.state = (NET_CONN_TYPE_TCP ==
+	if (NULL != state && '\0' != *state && 0 == (state_num = (NET_CONN_TYPE_TCP ==
 			conn_type ? get_connection_state_tcp(state) : get_connection_state_udp(state))))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
@@ -1134,7 +1143,7 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 	}
 
 	if (SUCCEED != get_proc_net_count_ipv4(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp" : "/proc/net/udp",
-			&info, &count, &error))
+			state_num, &info_l, &info_r, &count, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		goto err;
@@ -1142,7 +1151,7 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 
 #ifdef HAVE_IPV6
 	if (SUCCEED != get_proc_net_count_ipv6(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp6" : "/proc/net/udp6",
-			&info, &count, &error))
+			state_num, &info_l, &info_r,  &count, &error))
 	{
 		SET_MSG_RESULT(result, error);
 		goto err;
@@ -1153,11 +1162,11 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 
 	ret = SYSINFO_RET_OK;
 err:
-	if (NULL != info.ai_local)
-		freeaddrinfo(info.ai_local);
+	if (NULL != info_l.ai)
+		freeaddrinfo(info_l.ai);
 
-	if (NULL != info.ai_remote)
-		freeaddrinfo(info.ai_remote);
+	if (NULL != info_r.ai)
+		freeaddrinfo(info_r.ai);
 
 	return ret;
 }
