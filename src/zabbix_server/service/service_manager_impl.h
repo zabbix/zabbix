@@ -23,6 +23,12 @@
 #ifndef ZABBIX_SERVICE_MANAGER_IMPL_H
 #define ZABBIX_SERVICE_MANAGER_IMPL_H
 
+#define ZBX_SERVICE_STATUS_CURRENT	0
+#define ZBX_SERVICE_STATUS_INC		1
+#define ZBX_SERVICE_STATUS_DEC		2
+#define ZBX_SERVICE_STATUS_IGNORE	3
+#define ZBX_SERVICE_STATUS_FIXED	4
+
 typedef struct
 {
 	zbx_uint64_t	servicetagid;
@@ -35,16 +41,31 @@ zbx_service_tag_t;
 
 typedef struct
 {
+	zbx_uint64_t	service_ruleid;
+	int		type;
+	int		limit_value;
+	int		limit_status;
+	int		new_status;
+	int		revision;
+}
+zbx_service_rule_t;
+
+typedef struct
+{
 	zbx_uint64_t		serviceid;
 	zbx_vector_ptr_t	tags;
 	zbx_vector_ptr_t	service_problems;
 	zbx_vector_ptr_t	service_problem_tags;
 	zbx_vector_ptr_t	children;
 	zbx_vector_ptr_t	parents;
+	zbx_vector_ptr_t	status_rules;
 	char			*name;
 	int			status;
 	int			algorithm;
 	int			revision;
+	int			weight;
+	int			propagation_rule;
+	int			propagation_value;
 }
 zbx_service_t;
 
