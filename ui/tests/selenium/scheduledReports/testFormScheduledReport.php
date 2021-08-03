@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @dataSource ScheduledReports
+ *
  * @backup report
  */
 class testFormScheduledReport extends CWebTest {
@@ -35,6 +36,8 @@ class testFormScheduledReport extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
 	 */
 	public function getBehaviors() {
 		return [CMessageBehavior::class];
@@ -92,8 +95,8 @@ class testFormScheduledReport extends CWebTest {
 	/**
 	 * Check report form layout on page and in overlay dialog in dashboard.
 	 *
-	 * @param CElement $form
-	 * @param string $dashboard		dashboard name
+	 * @param CElement	$form			form element to be checked
+	 * @param string	$dashboard		dashboard name
 	 */
 	private function checkFormLayout($form, $dashboard = null) {
 		$subscription_container = $form->getField('Subscriptions')->asTable();
@@ -135,6 +138,11 @@ class testFormScheduledReport extends CWebTest {
 			$overlay_form = $subscription_overlay->query('id:subscription-form')->waitUntilReady()->asFluidForm()->one();
 			$overlay_form->checkValue((is_array($type)) ? $type : ['Generate report by' => 'Current user']);
 
+			$buttons = (is_array($type)) ? ['Update', 'Cancel'] : ['Add', 'Cancel'];
+			foreach ($buttons as $button) {
+				$this->assertTrue($subscription_overlay->query('button', $button)->one()->isClickable());
+			}
+
 			if ($type === self::USER) {
 				$overlay_form->checkValue(['Status' => 'Include']);
 			}
@@ -149,7 +157,7 @@ class testFormScheduledReport extends CWebTest {
 		}
 
 		// Check default subscriber in the Subscription table.
-		$this->default_values['Subscriptions']['Generate report by'] = 'Admin (Zabbix Administrator)';
+		$this->default_values['Subscriptions']['Generate report by'] = $this->default_values['Subscriptions']['Recipient'];
 		$row = $subscription_container->findRow('Recipient', $this->default_values['Subscriptions']['Recipient']);
 		foreach ($this->default_values['Subscriptions'] as $column => $value) {
 			$this->assertEquals($value, $row->getColumn($column)->getText());
@@ -992,6 +1000,7 @@ class testFormScheduledReport extends CWebTest {
 
 	/**
 	 * @dataProvider getUpdateData
+	 *
 	 * @backupOnce report
 	 */
 	public function testFormScheduledReport_Update($data) {
@@ -1390,48 +1399,40 @@ class testFormScheduledReport extends CWebTest {
 			$action = CTestArrayHelper::get($subscriber, 'action', USER_ACTION_ADD);
 			unset($subscriber['action']);
 
-			switch ($action) {
-				case USER_ACTION_ADD:
+			if ($action === USER_ACTION_REMOVE) {
+				$container->findRow('Recipient', $subscriber['fields']['Recipient'])
+						->query('button:Remove')->one()->click()->waitUntilNotPresent();
+			}
+			else {
+				if ($action === USER_ACTION_ADD) {
 					$container->query('button', 'Add '.$subscriber['type'])->one()->click();
-					break;
-
-				case USER_ACTION_UPDATE:
+				}
+				else {
 					$container->getRow($subscriber['index'])->getColumn('Recipient')->query('tag:a')->one()->click();
 					unset($subscriber['index']);
-					break;
-			}
+				}
+				$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$form = $overlay->query('id:subscription-form')->waitUntilReady()->asFluidForm()->one();
+				if (array_key_exists('fields', $subscriber)) {
+					$form->fill($subscriber['fields']);
+				}
 
-			switch ($action) {
-				case USER_ACTION_ADD:
-				case USER_ACTION_UPDATE:
-					$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-					$form = $overlay->query('id:subscription-form')->waitUntilReady()->asFluidForm()->one();
-					if (array_key_exists('fields', $subscriber)) {
-						$form->fill($subscriber['fields']);
+				$form->submit();
+				$this->query('xpath:.//button[contains(@class, "is-loading")]')->waitUntilNotPresent();
+
+				if (CTestArrayHelper::get($data, 'subscription_error', false)) {
+					// Check error in subscription overlay for last subscriber.
+					if ($i === count($data['Subscriptions'])) {
+						$this->assertMessage(TEST_BAD, null, $data['subscription_error']);
 					}
-
-					$form->submit();
-					$this->query('xpath:.//button[contains(@class, "is-loading")]')->waitUntilNotPresent();
-
-					if (CTestArrayHelper::get($data, 'subscription_error', false)) {
-						// Check error in subscription overlay for last subscriber.
-						if ($i === count($data['Subscriptions'])) {
-							$this->assertMessage(TEST_BAD, null, $data['subscription_error']);
-						}
-					}
-					else {
-						$overlay->waitUntilNotVisible();
-						// Wait for the subscriber to be added to the subscription table.
-						$user = CTestArrayHelper::get($subscriber,
-								'fields.Recipient', $this->default_values['Subscriptions']['Recipient']);
-						$container->query('link', $user)->waitUntilVisible();
-					}
-					break;
-
-				case USER_ACTION_REMOVE:
-					$container->findRow('Recipient', $subscriber['fields']['Recipient'])
-							->query('button:Remove')->one()->click()->waitUntilNotPresent();
-					break;
+				}
+				else {
+					$overlay->waitUntilNotVisible();
+					// Wait for the subscriber to be added to the subscription table.
+					$user = CTestArrayHelper::get($subscriber,
+							'fields.Recipient', $this->default_values['Subscriptions']['Recipient']);
+					$container->query('link', $user)->waitUntilVisible();
+				}
 			}
 		}
 	}
@@ -1449,26 +1450,24 @@ class testFormScheduledReport extends CWebTest {
 			$action = CTestArrayHelper::get($subscriber, 'action', USER_ACTION_ADD);
 			unset($subscriber['action']);
 
-			switch ($action) {
-				case USER_ACTION_ADD:
-				case USER_ACTION_UPDATE:
-					// Check that subscriber was added to the Subscription table.
-					$user = CTestArrayHelper::get($subscriber,
-							'fields.Recipient', $this->default_values['Subscriptions']['Recipient']);
-					$row = $table->findRow('Recipient', $user);
+			if ($action === USER_ACTION_REMOVE){
+				$this->assertFalse($table->findRow('Recipient', $subscriber['fields']['Recipient'])->isValid());
+			}
+			else {
+				// Check that subscriber was added to the Subscription table.
+				$user = CTestArrayHelper::get($subscriber,
+						'fields.Recipient', $this->default_values['Subscriptions']['Recipient']);
+				$row = $table->findRow('Recipient', $user);
 
-					$report_by = (CTestArrayHelper::get($subscriber, 'fields.Generate report by', 'Current user') === 'Current user')
-							? 'Admin (Zabbix Administrator)'
-							: 'Recipient';
-					$this->assertEquals($report_by, $row->getColumn('Generate report by')->getText());
+				$report_by = (CTestArrayHelper::get($subscriber, 'fields.Generate report by', 'Current user') === 'Current user')
+						? 'Admin (Zabbix Administrator)'
+						: 'Recipient';
+				$this->assertEquals($report_by, $row->getColumn('Generate report by')->getText());
 
-					$status = ($subscriber['type'] === self::USER) ? 'Include' : '';
-					$this->assertEquals(CTestArrayHelper::get($subscriber, 'fields.Status', $status),
-							$row->getColumn('Status')->getText()
-					);
-					break;
-				case USER_ACTION_REMOVE:
-					$this->assertFalse($table->findRow('Recipient', $subscriber['fields']['Recipient'])->isValid());
+				$status = ($subscriber['type'] === self::USER) ? 'Include' : '';
+				$this->assertEquals(CTestArrayHelper::get($subscriber, 'fields.Status', $status),
+						$row->getColumn('Status')->getText()
+				);
 			}
 		}
 	}

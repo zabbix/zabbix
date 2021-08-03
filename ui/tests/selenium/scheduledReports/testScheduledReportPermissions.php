@@ -25,24 +25,28 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @dataSource ScheduledReports
+ *
  * @backup report
+ *
  * @onBefore prepareData
  */
 class testScheduledReportPermissions extends CWebTest {
 
 	use TableTrait;
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return [CMessageBehavior::class];
 	}
 
 	protected static $roleids;
 	protected static $userids;
 	protected static $usergroupids;
 	protected static $dashboardids;
-	protected static $reportids;
 
 	public function prepareData() {
 		$roles = CDataHelper::call('role.create', [
@@ -77,7 +81,7 @@ class testScheduledReportPermissions extends CWebTest {
 			[
 				'name' => 'super-admin role for reports',
 				'type' => 3
-			],
+			]
 		]);
 		$this->assertArrayHasKey('roleids', $roles);
 		self::$roleids = CDataHelper::getIds('name');
@@ -249,10 +253,9 @@ class testScheduledReportPermissions extends CWebTest {
 						'access_userid' => 1
 					]
 				]
-			],
+			]
 		]);
 		$this->assertArrayHasKey('reportids', $reports);
-		self::$reportids = CDataHelper::getIds('name');
 	}
 
 	public static function getUsersWithoutPermissions() {
@@ -555,6 +558,7 @@ class testScheduledReportPermissions extends CWebTest {
 	 * After changing dashboard, all "Generate report by" users should be set to the current user.
 	 *
 	 * @dataProvider getReportData
+	 *
 	 * @backup report
 	 */
 	public function testScheduledReportPermissions_ChangeDashboard($data) {
@@ -662,6 +666,7 @@ class testScheduledReportPermissions extends CWebTest {
 	 * Check that cannot delete a user, user group, and dashboard if they are linked to the report.
 	 *
 	 * @dataProvider getDeleteData
+	 *
 	 * @backupOnce profiles
 	 */
 	public function testScheduledReportPermissions_Delete($data) {

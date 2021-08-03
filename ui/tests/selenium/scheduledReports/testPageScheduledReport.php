@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @dataSource ScheduledReports
+ *
  * @backup report
  */
 class testPageScheduledReport extends CWebTest {
@@ -37,9 +38,7 @@ class testPageScheduledReport extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return [CMessageBehavior::class];
 	}
 
 	/**
@@ -81,6 +80,7 @@ class testPageScheduledReport extends CWebTest {
 	 * Test related reports view in dashboard.
 	 *
 	 * @dataProvider getDashboardData
+	 *
 	 * @backupOnce profiles
 	 */
 	public function testPageScheduledReport_Dashboard($data) {
@@ -454,7 +454,7 @@ class testPageScheduledReport extends CWebTest {
 
 	public static function getDeleteData() {
 		return [
-			// Enable/disable single report by clicking on table column "Status".
+			// Delete single, delete multiple and delete all reports.
 			[
 				[
 					'Name' => 'Report for delete',
@@ -470,7 +470,7 @@ class testPageScheduledReport extends CWebTest {
 			],
 			[
 				[
-					'delte_all' => true
+					'delete_all' => true
 				]
 			]
 		];
@@ -490,7 +490,11 @@ class testPageScheduledReport extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
 
-		if (CTestArrayHelper::get($data, 'Name', false)) {
+		if (array_key_exists('delete_all', $data)) {
+			$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM report'));
+			$this->assertTableStats(0);
+		}
+		else {
 			if (!is_array($data['Name'])) {
 				$data['Name'] = [$data['Name']];
 			}
@@ -500,10 +504,6 @@ class testPageScheduledReport extends CWebTest {
 			foreach ($data['Name'] as $name) {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM report WHERE name='.zbx_dbstr($name)));
 			}
-		}
-		else {
-			$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM report'));
-			$this->assertTableStats(0);
 		}
 	}
 }

@@ -643,8 +643,10 @@ class testSID extends CWebTest {
 				'subscriptions%5B0%5D%5Bcreator_type%5D=0&subscriptions%5B0%5D%5Bcreator_name%5D=Admin+%28Zabbix+Administrator%29&'.
 				'subscriptions%5B0%5D%5Bcreator_inaccessible%5D=0&subscriptions%5B0%5D%5Bexclude%5D=0&description=&'.
 				'status=0&action=scheduledreport.create']],
+
 			// Scheduled report delete.
 			[['link' => 'zabbix.php?action=scheduledreport.delete&reportids[]=1']],
+
 			// Scheduled report update.
 			[['link' => 'zabbix.php?form_refresh=1&reportid=8&old_dashboardid=2&userid=1&'.
 				'name=Report+for+filter+-+enabled+sid&dashboardid=2&period=3&cycle=2&hours=00&'.
@@ -656,6 +658,7 @@ class testSID extends CWebTest {
 				'subscriptions%5B0%5D%5Bcreator_type%5D=1&subscriptions%5B0%5D%5Bcreator_name%5D=Recipient&'.
 				'subscriptions%5B0%5D%5Bcreator_inaccessible%5D=0&subscriptions%5B0%5D%5Bexclude%5D=0&description=&'.
 				'status=0&action=scheduledreport.update']],
+
 			// Scheduled report test.
 			[['link' => 'zabbix.php?action=popup.scheduledreport.test&period=2&now=1627543595&dashboardid=1'.
 				'&name=Report+for+testFormScheduledReport&subject=Report+subject+for+testFormScheduledReport&'.
