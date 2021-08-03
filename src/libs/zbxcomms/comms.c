@@ -2069,6 +2069,20 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ip_cmp                                                       *
+ *                                                                            *
+ * Purpose: check if the address belongs to the given subnet                  *
+ *                                                                            *
+ * Parameters: prefix_size - [IN] subnet prefix size                          *
+ *             current_ai  - [IN] subnet                                      *
+ *             name        - [IN] address                                     *
+ *                                                                            *
+ * Return value: SUCCEED - address belongs to the subnet                      *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
 #ifndef HAVE_IPV6
 int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 {
