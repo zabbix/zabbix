@@ -187,7 +187,7 @@ class testFormAdministrationScripts extends CWebTest {
 						'Name' => 'Test parameters',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script',
-						'Timeout' => '1s',
+						'Timeout' => '1s'
 					],
 					'Parameters' => [
 						[
