@@ -316,10 +316,6 @@ class testEscalations extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['maintenanceids']));
 		$maintenance_id = $response['result']['maintenanceids'][0];
 
-		$response = $this->call('action.get', [
-		]);
-		var_dump($response);
-
 		$this->reloadConfigurationCache();
 		sleep(60);
 
@@ -575,7 +571,7 @@ class testEscalations extends CIntegrationTest {
 			'actionid' => self::$trigger_actionid,
 			'operations' => [
 				[
-					'esc_period' => 0,
+					'esc_period' => '1m',
 					'esc_step_from' => 1,
 					'esc_step_to' => 1,
 					'evaltype' => 0,
@@ -624,61 +620,6 @@ class testEscalations extends CIntegrationTest {
 	}
 
 	/**
-	 * @backup alerts, history_uint, items
-	 */
-	public function testEscalations_checkInternalDisabledItem() {
-		$this->reloadConfigurationCache();
-
-		$this->assertTrue(@unlink(self::ITEM_UNSUPP_FILENAME) !== false);
-
-		// Disable item
-		$response = $this->call('item.update', [
-			"itemid" => self::$trapper_itemid,
-			"status" => 1
-		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-
-		$this->reloadConfigurationCache();
-
-		sleep(2);
-
-		// Check if there are 2 alerts for this action
-		$response = $this->call('alert.get', [
-			'actionids' => self::$internal_actionid
-		]);
-		$this->assertEmpty($response['result']);
-	}
-
-	/**
-	 * @backup alerts, history_uint, items
-	 */
-	public function testEscalations_checkInternalDeletedItem() {
-		$this->assertTrue(@file_put_contents(self::ITEM_UNSUPP_FILENAME, 'text') !== false);
-		// Create action
-		$this->reloadConfigurationCache();
-		$this->assertTrue(@unlink(self::ITEM_UNSUPP_FILENAME) !== false);
-
-		// Delete item
-		$response = $this->call('item.update', [
-			"itemid" => self::$vfs_itemid,
-			"status" => 1
-		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-
-		$this->reloadConfigurationCache();
-
-		sleep(2);
-
-		// Check if there are no alerts for this action
-		$response = $this->call('alert.get', [
-			'actionids' => self::$internal_actionid
-		]);
-		$this->assertEmpty($response['result']);
-	}
-
-	/**
 	 * Test unfinished webhook
 	 *
 	 * @backup actions, alerts, history_uint, media_type, users, media, events, problem
@@ -686,13 +627,14 @@ class testEscalations extends CIntegrationTest {
 	public function testEscalations_checkUnfinishedAlerts() {
 		$this->reloadConfigurationCache();
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+
 		// Create webhook mediatype
 		$script_code = <<<HEREDOC
 var params = JSON.parse(value);
 
 if (!(params.event_value === '0' || params.event_update_status === '1')) {
 	var now = new Date().getTime();
-	while (new Date().getTime() < now + 3000) { /* do nothing */ }
+	while (new Date().getTime() < now + 11000) { /* do nothing */ }
 }
 
 return {};
@@ -770,8 +712,8 @@ HEREDOC;
 					'opmessage' => [
 						'default_msg' => 0,
 						'mediatypeid' => 0,
-						'subject' => 's',
-						'message' => 's',
+						'subject' => 'R',
+						'message' => 'R',
 					],
 				]
 			]
@@ -787,14 +729,17 @@ HEREDOC;
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 
-		sleep(5);
+		$response = $this->call('alert.get', [
+			'actionids' => $actionid
+		]);
+		$this->assertCount(1, $response['result']);
 
-		// Check if there are 2 alerts for this action
+		sleep(8);
+
 		$response = $this->call('alert.get', [
 			'actionids' => $actionid
 		]);
 		$this->assertCount(2, $response['result']);
-		$this->assertFalse(abs($response['result'][0]['clock'] - $response['result'][1]['clock']) < 4);
 	}
 
 	/**
