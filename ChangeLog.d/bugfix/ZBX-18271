@@ -1,1 +1,1 @@
-..F....... [ZBX-18271] fixed incorrect ordering for tags and overrides in widgets; operations overrides in host prototype form; interface order in item and discovery prototypes forms (gcalenko)
+..F....... [ZBX-18271] fixed incorrect ordering for tags and overrides in widgets, operations overrides in host prototype form and interface order in item and discovery prototypes forms (gcalenko)
