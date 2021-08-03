@@ -162,6 +162,52 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'count(/host/trap,#10,"ge","99")'
 				]
 			],
+			// count() function with foreach aggregated functions
+			[
+				[
+					'formula' => 'count(exists_foreach(/host/trap))'
+				]
+			],
+			[
+				[
+					'formula' => 'count(last_foreach(/host/trap,1h))'
+				]
+			],
+			[
+				[
+					'formula' => 'count(last_foreach(/*/trap))'
+				]
+			],
+			[
+				[
+					'formula' => 'count(count_foreach(/host/trap, 1))'
+				]
+			],
+			[
+				[
+					'formula' => 'count(avg_foreach(/host/trap, 1))'
+				]
+			],
+			[
+				[
+					'formula' => 'count(max_foreach(/host/trap, 1))'
+				]
+			],
+			[
+				[
+					'formula' => 'count(min_foreach(/host/trap, 1))'
+				]
+			],
+			[
+				[
+					'formula' => 'count(sum_foreach(/host/trap, 1))'
+				]
+			],
+			[
+				[
+					'formula' => 'item_count(/host/trap)'
+				]
+			],
 			// cos() function.
 			[
 				[
@@ -765,6 +811,112 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'count(/host/trap,#4:now-5h,"1","eq")',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "count".'
+				]
+			],
+			// count() function with foreach aggregated functions validation
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(exists_foreach(/host/trap, 1, 1))',
+					'error' => "Invalid parameter \"/1/params\": invalid number of parameters in function \"exists_foreach\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(exists_foreach(/host/trap, eg))',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"count(exists_foreach(/host/trap, eg))\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(exists_foreach(/host/trap, #7 ,eg))',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"count(exists_foreach(/host/trap, #7 ,eg))\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(last_foreach(/host/trap, 1h, 1))',
+					'error' => "Invalid parameter \"/1/params\": invalid number of parameters in function \"last_foreach\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(last_foreach(/host/trap, #7, eg))',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"count(last_foreach(/host/trap, #7, eg))\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(count_foreach(/host/trap, 1, 1))',
+					'error' => "Invalid parameter \"/1/params\": invalid number of parameters in function \"count_foreach\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(count_foreach(/host/trap, #7, eg))',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"count(count_foreach(/host/trap, #7, eg))\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(avg_foreach(/host/trap, 1h, 1))',
+					'error' => "Invalid parameter \"/1/params\": invalid number of parameters in function \"avg_foreach\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(avg_foreach(/host/trap, #7, eg))',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"count(avg_foreach(/host/trap, #7, eg))\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap, 1h, 1)',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"count(max_foreach(/host/trap, 1h, 1)\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(min_foreach(/host/trap, 1h, 1))',
+					'error' => "Invalid parameter \"/1/params\": invalid number of parameters in function \"min_foreach\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(sum_foreach(/host/trap, 1h, 1))',
+					'error' => "Invalid parameter \"/1/params\": invalid number of parameters in function \"sum_foreach\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(sum_foreach(/host/trap, #7, eg))',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"count(sum_foreach(/host/trap, #7, eg))\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'item_count(/host/trap, 1, eg)',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"item_count(/host/trap, 1, eg)\"."
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'item_count(/host/trap)',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"item_count(/host/trap, 1, eg)\"."
 				]
 			],
 			// cot() function validation.
