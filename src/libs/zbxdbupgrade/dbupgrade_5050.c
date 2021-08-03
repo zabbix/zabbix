@@ -497,14 +497,14 @@ static int	DBpatch_5050035(void)
 
 static int	DBpatch_5050036(void)
 {
-	const ZBX_FIELD	field = {"status_up", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"propagation_rule", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }
 
 static int	DBpatch_5050037(void)
 {
-	const ZBX_FIELD	field = {"status_up_value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"propagation_value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }

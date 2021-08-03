@@ -3537,13 +3537,13 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'status_up' => [
+			'propagation_rule' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
 			],
-			'severity_up' => [
+			'propagation_value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
