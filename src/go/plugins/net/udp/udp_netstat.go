@@ -48,8 +48,8 @@ func (p *Plugin) exportNetUdpSocketCount(params []string) (result int, err error
 	lport := 0
 	if len(params) > 1 && len(params[1]) > 0 {
 		if port, err := strconv.ParseUint(params[1], 10, 16); err != nil {
-			if lport, err = net.LookupPort("tcp", params[1]); err != nil {
-				if lport, err = net.LookupPort("tcp6", params[1]); err != nil {
+			if lport, err = net.LookupPort("udp", params[1]); err != nil {
+				if lport, err = net.LookupPort("udp6", params[1]); err != nil {
 					return 0, errors.New(errorInvalidSecondParam)
 				}
 			}
@@ -72,8 +72,8 @@ func (p *Plugin) exportNetUdpSocketCount(params []string) (result int, err error
 	rport := 0
 	if len(params) > 3 && len(params[3]) > 0 {
 		if port, err := strconv.ParseUint(params[3], 10, 16); err != nil {
-			if rport, err = net.LookupPort("tcp", params[3]); err != nil {
-				if rport, err = net.LookupPort("tcp6", params[3]); err != nil {
+			if rport, err = net.LookupPort("udp", params[3]); err != nil {
+				if rport, err = net.LookupPort("udp6", params[3]); err != nil {
 					return 0, errors.New(errorInvalidFourthParam)
 				}
 			}
