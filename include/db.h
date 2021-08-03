@@ -42,20 +42,6 @@ extern int	CONFIG_DBPORT;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 
-/* typedef struct */
-/* { */
-/* 	zbx_uint64_t	id; */
-/* 	char		*name; */
-/* } */
-/* zbx_id_name_pair_t; */
-
-/* ZBX_PTR_VECTOR_DECL(ids_names, zbx_id_name_pair_t*) */
-/* ZBX_PTR_VECTOR_IMPL(ids_names, zbx_id_name_pair_t*) */
-
-/* void	DBselect_ids_names(const char *sql, zbx_vector_id_name_pair_t *ids); */
-
-void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
-
 typedef enum
 {
 	GRAPH_TYPE_NORMAL = 0,
@@ -952,5 +938,7 @@ int	zbx_db_trigger_get_all_hostids(const DB_TRIGGER *trigger, const zbx_vector_u
 int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out);
 int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
 void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
+
+void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
 #endif

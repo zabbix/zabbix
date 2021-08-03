@@ -121,7 +121,6 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event, char **hostnam
 		ZBX_STR2UINT64(hostid, row[0]);
 		zbx_strcpy_alloc(hostname, &out_alloc, &out_offset, row[1]);
 	}
-
 	DBfree_result(result);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, hostid);

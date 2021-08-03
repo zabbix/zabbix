@@ -36,13 +36,11 @@ typedef struct
 }
 zbx_id_name_pair_t;
 
-
-
 static zbx_hash_t	zbx_ids_names_hash_func(const void *data)
 {
 	const zbx_id_name_pair_t	*id_name_pair_entry = (const zbx_id_name_pair_t *)data;
 
-	return  ZBX_DEFAULT_UINT64_HASH_ALGO(&(id_name_pair_entry->id), sizeof(id_name_pair_entry->id),
+	return ZBX_DEFAULT_UINT64_HASH_ALGO(&(id_name_pair_entry->id), sizeof(id_name_pair_entry->id),
 			ZBX_DEFAULT_HASH_SEED);
 }
 
@@ -98,7 +96,7 @@ void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_st
 	{
 		zbx_id_name_pair_t	*found, temp_t;
 		temp_t.id = ids->values[i];
-		if (NULL != (found =  (zbx_id_name_pair_t *)zbx_hashset_search(&ids_names, &temp_t)))
+		if (NULL != (found = (zbx_id_name_pair_t *)zbx_hashset_search(&ids_names, &temp_t)))
 		{
 			zbx_vector_str_append(names, zbx_strdup(NULL, found->name));
 			zbx_free(found->name);
@@ -1474,7 +1472,8 @@ static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeid
  *                                                                            *
  * Purpose: deletes host prototypes from database                             *
  *                                                                            *
- * Parameters: host_prototypeids - [IN] list of host prototypes               *
+ * Parameters: host_prototypeids   - [IN] list of host prototype ids          *
+ *             host_prototypenames - [IN] list of host prototype names        *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
@@ -1516,7 +1515,6 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
 			host_prototype_ids->values, host_prototype_ids->values_num);
 
 	DBselect_uint64(sql, &group_prototype_ids);
-
 	DBgroup_prototypes_delete(&group_prototype_ids);
 
 	/* delete host prototypes */
@@ -1678,7 +1676,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
  ******************************************************************************/
 static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
-	int			i = 0;
+	int			i;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	host_prototype_ids;
@@ -1706,7 +1704,6 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&host_prototype_ids);
-
 	for (i = 0; i < host_prototype_names.values_num; i++)
 		zbx_free(host_prototype_names.values[i]);
 	zbx_vector_str_destroy(&host_prototype_names);
@@ -4818,18 +4815,21 @@ clean:
 /******************************************************************************
  *                                                                            *
  * Function: DBdelete_hosts                                                   *
+ * COPY of DBdelete_hosts_for_lld but with audit                              *
+ * remove DBdelete_hosts_for_lld when audit is implemented for LLD            *
  *                                                                            *
  * Purpose: delete hosts from database with all elements                      *
  *                                                                            *
- * Parameters: hostids - [IN] host identificators from database               *
+ * Parameters: hostids   - [IN] host identificators from database             *
+ *             hostnames - [IN] names of host identificators                  *
  *                                                                            *
  ******************************************************************************/
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames)
 {
+	int			i;
 	zbx_vector_uint64_t	itemids, httptestids, selementids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
