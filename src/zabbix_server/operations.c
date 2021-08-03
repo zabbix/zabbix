@@ -121,6 +121,7 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event, char **hostnam
 		ZBX_STR2UINT64(hostid, row[0]);
 		zbx_strcpy_alloc(hostname, &out_alloc, &out_offset, row[1]);
 	}
+
 	DBfree_result(result);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, hostid);
@@ -432,7 +433,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 
 				make_hostname(host_visible);	/* replace not-allowed symbols */
 				host_visible_unique = DBget_unique_hostname_by_sample(host_visible, "name");
-				zbx_strcpy_alloc(&hostname, &sql_alloc, &sql_offset, host_visible_unique);
+				hostname = zbx_strdup(hostname, host_visible_unique);
 				zbx_free(host_visible);
 
 				*status = HOST_STATUS_MONITORED;

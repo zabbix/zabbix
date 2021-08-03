@@ -86,9 +86,8 @@ void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_st
 
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
-		//zbx_vector_str_append(names, zbx_strdup(NULL, row[1]));
 		local_id_name_pair.id = id;
-		local_id_name_pair.name = row[1];
+		local_id_name_pair.name = zbx_strdup(NULL, row[1]);
 		zbx_hashset_insert(&ids_names, &local_id_name_pair, sizeof(local_id_name_pair));
 	}
 	DBfree_result(result);
@@ -101,14 +100,14 @@ void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_st
 		temp_t.id = ids->values[i];
 		if (NULL != (found =  (zbx_id_name_pair_t *)zbx_hashset_search(&ids_names, &temp_t)))
 		{
-		  zbx_vector_str_append(names, found->name);
+			zbx_vector_str_append(names, zbx_strdup(NULL, found->name));
+			zbx_free(found->name);
 		}
 		else
 		{
-		  THIS_SHOULD_NEVER_HAPPEN;
+			THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
-	//zbx_ids_names_clean(&ids_names);
 	zbx_hashset_destroy(&ids_names);
 }
 
@@ -1496,19 +1495,18 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_str_create(&hostnames);
-	//zbx_vector_ids_names_create(&host_ids_names);
 	zbx_vector_uint64_create(&group_prototype_ids);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hd.hostid,h.name from host_discovery hd, hosts h "
-			 "where hd.hostid=h.hostid");
+			"where hd.hostid=h.hostid and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
 
 	DBselect_ids_names(sql, &hostids, &hostnames);
 
 	if (0 != hostids.values_num)
-	  DBdelete_hosts(&hostids, &hostnames);
+		DBdelete_hosts(&hostids, &hostnames);
 
 	/* delete group prototypes */
 
@@ -1532,7 +1530,7 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
 
 	for (i = 0; i < host_prototype_ids->values_num; i++)
 		zbx_audit_host_prototype_del(host_prototype_ids->values[i], host_prototype_names->values[i]);
-	
+
 	zbx_vector_uint64_destroy(&group_prototype_ids);
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_str_destroy(&hostnames);
@@ -1680,6 +1678,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
  ******************************************************************************/
 static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
+	int			i = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	host_prototype_ids;
@@ -1701,15 +1700,15 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 				" and",
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
-
-	//DBselect_uint64(sql, &host_prototypeids);
 	DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names);
-
 	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names);
 
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&host_prototype_ids);
+
+	for (i = 0; i < host_prototype_names.values_num; i++)
+		zbx_free(host_prototype_names.values[i]);
 	zbx_vector_str_destroy(&host_prototype_names);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -4999,7 +4998,8 @@ out:
  * Purpose: delete hosts from database, check if there are any host           *
  *          prototypes and delete them first                                  *
  *                                                                            *
- * Parameters: hostids - [IN] host identificators from database               *
+ * Parameters: hostids   - [IN] host identificators from database             *
+ *             hostnames - [IN] names of host identificators                  *
  *                                                                            *
  ******************************************************************************/
 void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames)
@@ -5015,13 +5015,12 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str
 	zbx_vector_str_create(&host_prototype_names);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hd.hostid"
+			"select hd.hostid,h.name"
 			" from items i,host_discovery hd, hosts h"
 			" where hd.hostid=h.hostid and i.itemid=hd.parent_itemid"
 				" and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
 
-	//DBselect_uint64(sql, &host_prototype_ids);
 	DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names);
 
 	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names);

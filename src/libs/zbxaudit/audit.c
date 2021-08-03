@@ -253,7 +253,8 @@ void	zbx_audit_flush(void)
 			zbx_db_insert_add_values(&db_insert_audit, audit_cuid, AUDIT_USERID, AUDIT_USERNAME,
 					(int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP, (*audit_entry)->id,
 					(*audit_entry)->name, (*audit_entry)->resource_type,
-					recsetid_cuid, (*audit_entry)->details_json.buffer);
+					recsetid_cuid, 0 == strcmp((*audit_entry)->details_json.buffer, "{}") ? "" :
+					(*audit_entry)->details_json.buffer);
 #undef AUDIT_USERID
 #undef AUDIT_USERNAME
 #undef AUDIT_IP
@@ -538,7 +539,7 @@ void	zbx_audit_##resource##_create_entry(int audit_action, zbx_uint64_t hostid, 
 	found_audit_host_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,			\
 			&(local_audit_host_entry_x));							\
 	if (NULL == found_audit_host_entry)								\
-	  {												\
+	{												\
 		zbx_audit_entry_t	*local_audit_host_entry_insert;					\
 													\
 		local_audit_host_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL,			\
@@ -608,7 +609,8 @@ void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_u
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.name", name);
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.status", status);
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.discover", discover);
-	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.custom_interfaces", custom_interfaces);
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.custom_interfaces",
+			custom_interfaces);
 }
 
 
@@ -675,10 +677,7 @@ void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid,
 
 void	zbx_audit_host_update_json_add_parent_template(zbx_uint64_t hostid, zbx_uint64_t templateid)
 {
-	char	audit_key_parent_templates[AUDIT_DETAILS_KEY_LEN];
-
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_parent_templates, AUDIT_DETAILS_KEY_LEN, "host.parentTemplates[%lu]", templateid);
-	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ATTACH, audit_key_parent_templates, "");
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "host.templates", templateid);
 }
