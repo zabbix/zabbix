@@ -670,12 +670,13 @@ typedef enum
 }
 zbx_conn_flags_t;
 
-zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
-		const char *dns, unsigned short port, zbx_conn_flags_t flags);
-void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version, const unsigned char bulk,
-		const char *community, const char *securityname, const unsigned char securitylevel,
-		const char *authpassphrase, const char *privpassphrase, const unsigned char authprotocol,
-		const unsigned char privprotocol, const char *contextname);
+zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
+		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags);
+void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,
+		const unsigned char bulk, const char *community, const char *securityname,
+		const unsigned char securitylevel, const char *authpassphrase, const char *privpassphrase,
+		const unsigned char authprotocol, const unsigned char privprotocol, const char *contextname,
+		const zbx_uint64_t hostid);
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 
