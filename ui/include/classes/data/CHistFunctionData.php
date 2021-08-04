@@ -366,6 +366,32 @@ final class CHistFunctionData {
 			case 'avg_foreach':
 			case 'count_foreach':
 			case 'exists_foreach':
+			case 'item_count':
+			case 'last_foreach':
+			case 'max_foreach':
+			case 'min_foreach':
+			case 'sum_foreach':
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Check if the result of aggregating function is further aggregatable.
+	 *
+	 * @static
+	 *
+	 * @param string $function
+	 *
+	 * @return bool
+	 */
+	public static function isAggregatable(string $function): bool {
+		switch ($function) {
+			case 'avg_foreach':
+			case 'count_foreach':
+			case 'exists_foreach':
 			case 'last_foreach':
 			case 'max_foreach':
 			case 'min_foreach':
