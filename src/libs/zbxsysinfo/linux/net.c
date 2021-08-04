@@ -971,12 +971,12 @@ static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, ne
 	return SUCCEED;
 }
 
-static int	get_addr_info(const char *addr_in, const char *port_in, struct addrinfo *hints, net_count_info_t *info, char **error)
+static int	get_addr_info(const char *addr_in, const char *port_in, struct addrinfo *hints, net_count_info_t *info,
+		char **error)
 {
 	char		*cidr_sep, *addr;
 	const char	*service = NULL;
 	int		ret = FAIL, res, prefix_sz_local;
-
 
 	if (NULL != addr_in && '\0' != *addr_in)
 	{
@@ -1006,17 +1006,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 	{
 		if (SUCCEED != is_ushort(port_in, &info->port))
 		{
-			size_t	i, len;
-
-			len = strlen(port_in);
-
-			for (i = 0; i < len; i++)
-			{
-				if ((0 == isdigit(*(port_in + i))) && (0 < i || '-' != *port_in))
-					break;
-			}
-
-			if (i == len)
+			if (0 != atoi(port_in))
 			{
 				*error = zbx_dsprintf(*error, "Invalid port number: %s", port_in);
 				goto err;
