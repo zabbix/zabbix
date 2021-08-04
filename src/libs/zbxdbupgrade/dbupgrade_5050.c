@@ -540,6 +540,36 @@ static int	DBpatch_5050040(void)
 	return DBadd_foreign_key("service_status_rule", 1, &field);
 }
 
+static int	DBpatch_5050041(void)
+{
+	const ZBX_FIELD	field = {"status", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("services", &field);
+}
+
+static int	DBpatch_5050042(void)
+{
+	const ZBX_FIELD	field = {"value", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("service_alarms", &field);
+}
+
+static int	DBpatch_5050043(void)
+{
+	if (ZBX_DB_OK > DBexecute("update services set status=-1 where status=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050044(void)
+{
+	if (ZBX_DB_OK > DBexecute("update service_alarms set value=-1 where value=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -587,5 +617,9 @@ DBPATCH_ADD(5050037, 0, 1)
 DBPATCH_ADD(5050038, 0, 1)
 DBPATCH_ADD(5050039, 0, 1)
 DBPATCH_ADD(5050040, 0, 1)
+DBPATCH_ADD(5050041, 0, 1)
+DBPATCH_ADD(5050042, 0, 1)
+DBPATCH_ADD(5050043, 0, 1)
+DBPATCH_ADD(5050044, 0, 1)
 
 DBPATCH_END()

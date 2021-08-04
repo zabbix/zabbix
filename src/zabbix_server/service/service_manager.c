@@ -148,7 +148,7 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 	int			i, j;
 	zbx_vector_ptr_t	candidates;
 
-	if (TRIGGER_SEVERITY_NOT_CLASSIFIED == event->severity)
+	if (ZBX_SERVICE_STATUS_OK == event->severity)
 		return;
 
 	zbx_vector_ptr_create(&candidates);
@@ -1241,9 +1241,9 @@ static int	service_get_status(const zbx_service_t	*service, int *status)
 	if (ZBX_SERVICE_STATUS_IGNORE == service->propagation_rule)
 		return FAIL;
 
-	if (TRIGGER_SEVERITY_NOT_CLASSIFIED == service->status)
+	if (ZBX_SERVICE_STATUS_OK == service->status)
 	{
-		*status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+		*status = ZBX_SERVICE_STATUS_OK;
 		return SUCCEED;
 	}
 
@@ -1259,15 +1259,15 @@ static int	service_get_status(const zbx_service_t	*service, int *status)
 			break;
 		case ZBX_SERVICE_STATUS_DEC:
 			*status = service->status - service->propagation_value;
-			if (TRIGGER_SEVERITY_NOT_CLASSIFIED >= *status)
-				*status = TRIGGER_SEVERITY_NOT_CLASSIFIED + 1;
+			if (ZBX_SERVICE_STATUS_OK >= *status)
+				*status = ZBX_SERVICE_STATUS_OK + 1;
 			break;
 		case ZBX_SERVICE_STATUS_FIXED:
 			*status = service->propagation_value;
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			*status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+			*status = ZBX_SERVICE_STATUS_OK;
 			break;
 	}
 
@@ -1544,7 +1544,7 @@ out:
  ******************************************************************************/
 static int	service_get_main_status(const zbx_service_t *service, zbx_vector_ptr_t *causes)
 {
-	int	status = TRIGGER_SEVERITY_NOT_CLASSIFIED, child_status, i;
+	int	status = ZBX_SERVICE_STATUS_OK, child_status, i;
 
 	switch (service->algorithm)
 	{
@@ -1556,7 +1556,7 @@ static int	service_get_main_status(const zbx_service_t *service, zbx_vector_ptr_
 				if (SUCCEED != service_get_status(child, &child_status))
 					continue;
 
-				if (TRIGGER_SEVERITY_NOT_CLASSIFIED == child_status)
+				if (ZBX_SERVICE_STATUS_OK == child_status)
 				{
 					if (NULL != causes)
 						zbx_vector_ptr_clear(causes);
@@ -1568,7 +1568,7 @@ static int	service_get_main_status(const zbx_service_t *service, zbx_vector_ptr_
 				if (status < child_status)
 					status = child->status;
 
-				if (TRIGGER_SEVERITY_NOT_CLASSIFIED != status && NULL != causes)
+				if (ZBX_SERVICE_STATUS_OK != status && NULL != causes)
 					zbx_vector_ptr_append(causes, child);
 			}
 			break;
@@ -1583,7 +1583,7 @@ static int	service_get_main_status(const zbx_service_t *service, zbx_vector_ptr_
 				if (status < child_status)
 					status = child_status;
 
-				if (TRIGGER_SEVERITY_NOT_CLASSIFIED != status && NULL != causes)
+				if (ZBX_SERVICE_STATUS_OK != status && NULL != causes)
 					zbx_vector_ptr_append(causes, child);
 			}
 			break;
@@ -1673,7 +1673,7 @@ static int	service_get_rule_status(const zbx_service_t *service, const zbx_servi
 		zbx_vector_ptr_t *causes)
 {
 	zbx_vector_ptr_t	children;
-	int			status = TRIGGER_SEVERITY_NOT_CLASSIFIED, status_limit, total_num, total_weight, weight;
+	int			status = ZBX_SERVICE_STATUS_OK, status_limit, total_num, total_weight, weight;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() service:" ZBX_FS_UI64 ", rule:" ZBX_FS_UI64, __func__, service->serviceid,
 			rule->service_ruleid);
@@ -1691,7 +1691,7 @@ static int	service_get_rule_status(const zbx_service_t *service, const zbx_servi
 			status_limit = rule->limit_status + 1;
 			break;
 		default:
-			status_limit = TRIGGER_SEVERITY_NOT_CLASSIFIED + 1;
+			status_limit = ZBX_SERVICE_STATUS_OK + 1;
 	}
 
 	service_get_children_by_status(service, status_limit, &children, &total_weight, &total_num);
@@ -1816,9 +1816,10 @@ static char	*service_get_event_name(zbx_service_manager_t *manager, const char *
 
 	switch (status)
 	{
-		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+		case ZBX_SERVICE_STATUS_OK:
 			severity = "OK";
 			break;
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
 		case TRIGGER_SEVERITY_INFORMATION:
 		case TRIGGER_SEVERITY_WARNING:
 		case TRIGGER_SEVERITY_AVERAGE:
@@ -2070,18 +2071,18 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 
 		if (NULL != (update = get_update_by_serviceid(updates, problem_service.values[i].second)))
 		{
-			name = service_get_event_name(manager, update->service->name, TRIGGER_SEVERITY_NOT_CLASSIFIED);
+			name = service_get_event_name(manager, update->service->name, ZBX_SERVICE_STATUS_OK);
 			ts = update->ts;
 		}
 		else
 		{
 			zbx_timespec(&ts);
-			name = service_get_event_name(manager, NULL, TRIGGER_SEVERITY_NOT_CLASSIFIED);
+			name = service_get_event_name(manager, NULL, ZBX_SERVICE_STATUS_OK);
 		}
 
 		zbx_db_insert_add_values(&db_insert_events, eventid, EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE,
 				problem_service.values[i].second, ts.sec, SERVICE_VALUE_OK, ts.ns, name,
-				TRIGGER_SEVERITY_NOT_CLASSIFIED);
+				ZBX_SERVICE_STATUS_OK);
 
 		if (NULL != update)
 		{
@@ -2279,9 +2280,9 @@ static void	db_manage_service_events(zbx_service_manager_t *manager, zbx_hashset
 		if (update->old_status == update->service->status)
 			continue;
 
-		if (TRIGGER_SEVERITY_NOT_CLASSIFIED != update->service->status)
+		if (ZBX_SERVICE_STATUS_OK != update->service->status)
 		{
-			if (TRIGGER_SEVERITY_NOT_CLASSIFIED == update->old_status)
+			if (ZBX_SERVICE_STATUS_OK == update->old_status)
 				zbx_vector_ptr_append(&events_create, update);
 			else
 				zbx_vector_ptr_append(&events_update, update);
@@ -2339,7 +2340,7 @@ static void	db_update_services(zbx_service_manager_t *manager)
 	while (NULL != (service_diff = (zbx_services_diff_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_service_t	service_local = {.serviceid = service_diff->serviceid}, *service;
-		int		status = TRIGGER_SEVERITY_NOT_CLASSIFIED, i;
+		int		status = ZBX_SERVICE_STATUS_OK, i;
 		zbx_timespec_t	ts = {0, 0};
 
 		service = zbx_hashset_search(&manager->services, &service_local);
