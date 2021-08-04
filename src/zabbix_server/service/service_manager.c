@@ -694,10 +694,10 @@ static void	sync_service_rules(zbx_service_manager_t *service_manager, int *upda
 
 		ZBX_STR2UINT64(rule_local.service_ruleid, row[0]);
 
-		rule_local.type = atoi(row[3]);
-		rule_local.limit_value = atoi(row[4]);
-		rule_local.limit_status = atoi(row[5]);
-		rule_local.new_status = atoi(row[6]);
+		rule_local.type = atoi(row[2]);
+		rule_local.limit_value = atoi(row[3]);
+		rule_local.limit_status = atoi(row[4]);
+		rule_local.new_status = atoi(row[5]);
 
 		if (NULL == (rule = zbx_hashset_search(&service_manager->service_rules, &rule_local)))
 		{
@@ -1531,6 +1531,231 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: service_get_main_status                                          *
+ *                                                                            *
+ * Purpose: get service status by applying the main service status algorithm  *
+ *                                                                            *
+ * Parameters: service - [IN] the service                                     *
+ *             causes  - [OUT] the children that affected the service status  *
+ *                             (optional, can be NULL)                        *
+ *                                                                            *
+ *  Return value: The service status.                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	service_get_main_status(const zbx_service_t *service, zbx_vector_ptr_t *causes)
+{
+	int	status = TRIGGER_SEVERITY_NOT_CLASSIFIED, child_status, i;
+
+	switch (service->algorithm)
+	{
+		case SERVICE_ALGORITHM_MIN:
+			for (i = 0; i < service->children.values_num; i++)
+			{
+				zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
+
+				if (SUCCEED != service_get_status(child, &child_status))
+					continue;
+
+				if (TRIGGER_SEVERITY_NOT_CLASSIFIED == child_status)
+				{
+					if (NULL != causes)
+						zbx_vector_ptr_clear(causes);
+
+					status = child_status;
+					break;
+				}
+
+				if (status < child_status)
+					status = child->status;
+
+				if (TRIGGER_SEVERITY_NOT_CLASSIFIED != status && NULL != causes)
+					zbx_vector_ptr_append(causes, child);
+			}
+			break;
+		case SERVICE_ALGORITHM_MAX:
+			for (i = 0; i < service->children.values_num; i++)
+			{
+				zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
+
+				if (SUCCEED != service_get_status(child, &child_status))
+					continue;
+
+				if (status < child_status)
+					status = child_status;
+
+				if (TRIGGER_SEVERITY_NOT_CLASSIFIED != status && NULL != causes)
+					zbx_vector_ptr_append(causes, child);
+			}
+			break;
+		case SERVICE_ALGORITHM_NONE:
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "unknown calculation algorithm of service status [%d]",
+					service->algorithm);
+			break;
+	}
+
+	return status;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: service_get_children_by_status                                   *
+ *                                                                            *
+ * Purpose: get children with status greater or equal to the specified        *
+ *                                                                            *
+ * Parameters: service      - [IN] the service                                *
+ *             status       - [IN] the target status                          *
+ *             children     - [OUT] the children having the required status   *
+ *             total_weight - [OUT] the weight of all not ignored children    *
+ *             total_num    - [OUT] the number of all not ignored children    *
+ *                                                                            *
+ ******************************************************************************/
+static void	service_get_children_by_status(const zbx_service_t *service, int status, zbx_vector_ptr_t *children,
+		int *total_weight, int *total_num)
+{
+	int	i, child_status;
+
+	*total_num = 0;
+	*total_weight = 0;
+
+	for (i = 0; i < service->children.values_num; i++)
+	{
+		zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
+
+		if (SUCCEED != service_get_status(child, &child_status))
+			continue;
+
+		(*total_weight) += child->weight;
+		(*total_num)++;
+
+		if (child_status >= status)
+			zbx_vector_ptr_append(children, child);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: services_get_weight                                              *
+ *                                                                            *
+ * Purpose: get total weight of all specified services                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	services_get_weight(const zbx_vector_ptr_t *services)
+{
+	int	i, weight = 0;
+
+	for (i = 0; i < services->values_num; i++)
+	{
+		zbx_service_t	*service = (zbx_service_t *)services->values[i];
+
+		weight += service->weight;
+	}
+
+	return weight;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: service_get_rule_status                                          *
+ *                                                                            *
+ * Purpose: get service status according to the specified rule                *
+ *                                                                            *
+ * Parameters: service - [IN] the service                                     *
+ *             rule    - [IN] the service status rule                         *
+ *             causes  - [OUT] the children that affected the service status  *
+ *                             (optional, can be NULL)                        *
+ *                                                                            *
+ *  Return value: The service status.                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule_t *rule,
+		zbx_vector_ptr_t *causes)
+{
+	zbx_vector_ptr_t	children;
+	int			status = TRIGGER_SEVERITY_NOT_CLASSIFIED, status_limit, total_num, total_weight, weight;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() service:" ZBX_FS_UI64 ", rule:" ZBX_FS_UI64, __func__, service->serviceid,
+			rule->service_ruleid);
+
+	zbx_vector_ptr_create(&children);
+
+	switch (rule->type)
+	{
+		case ZBX_SERVICE_CALC_STATUS_MORE:
+		case ZBX_SERVICE_CALC_STATUS_MORE_PERC:
+			status_limit = rule->limit_status;
+			break;
+		case ZBX_SERVICE_CALC_STATUS_LESS:
+		case ZBX_SERVICE_CALC_STATUS_LESS_PERC:
+			status_limit = rule->limit_status + 1;
+			break;
+		default:
+			status_limit = TRIGGER_SEVERITY_NOT_CLASSIFIED + 1;
+	}
+
+	service_get_children_by_status(service, status_limit, &children, &total_weight, &total_num);
+
+	if (0 == children.values_num)
+		goto out;
+
+	switch (rule->type)
+	{
+		case ZBX_SERVICE_CALC_STATUS_MORE:
+			if (children.values_num < rule->limit_value)
+				goto out;
+			break;
+		case ZBX_SERVICE_CALC_STATUS_MORE_PERC:
+			if (children.values_num * 100 / total_num < rule->limit_value)
+				goto out;
+			break;
+		case ZBX_SERVICE_CALC_STATUS_LESS:
+			if (total_num - children.values_num >= rule->limit_value)
+				goto out;
+			break;
+		case ZBX_SERVICE_CALC_STATUS_LESS_PERC:
+			if ((total_num - children.values_num) * 100 / total_num >= rule->limit_value)
+				goto out;
+			break;
+		case ZBX_SERVICE_CALC_WEIGHT_MORE:
+			weight = services_get_weight(&children);
+			if (weight < rule->limit_value)
+				goto out;
+			break;
+		case ZBX_SERVICE_CALC_WEIGHT_MORE_PERC:
+			weight = services_get_weight(&children);
+			if (weight * 100 / total_weight < rule->limit_value)
+				goto out;
+			break;
+		case ZBX_SERVICE_CALC_WEIGHT_LESS:
+			weight = services_get_weight(&children);
+			if (weight >= rule->limit_value)
+				goto out;
+			break;
+		case ZBX_SERVICE_CALC_WEIGHT_LESS_PERC:
+			weight = services_get_weight(&children);
+			if (weight * 100 / total_weight >= rule->limit_value)
+				goto out;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+	}
+
+	if (NULL != causes)
+		zbx_vector_ptr_append_array(causes, children.values, children.values_num);
+
+	status = rule->new_status;
+out:
+	zbx_vector_ptr_destroy(&children);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() status:%d", __func__, status);
+
+	return status;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: its_itservice_update_status                                      *
  *                                                                            *
  * Purpose: updates service and its parents statuses                          *
@@ -1548,49 +1773,16 @@ out:
 static void	its_itservice_update_status(zbx_service_t *itservice, const zbx_timespec_t *ts,
 		zbx_vector_ptr_t *alarms, zbx_hashset_t *service_updates, int flags)
 {
-	int	status, child_status, i;
+	int	status, rule_status, i;
 
-	switch (itservice->algorithm)
+	status = service_get_main_status(itservice, NULL);
+
+	for (i = 0; i < itservice->status_rules.values_num; i++)
 	{
-		case SERVICE_ALGORITHM_MIN:
-			status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-			for (i = 0; i < itservice->children.values_num; i++)
-			{
-				zbx_service_t	*child = (zbx_service_t *)itservice->children.values[i];
+		zbx_service_rule_t	*rule = (zbx_service_rule_t *)itservice->status_rules.values[i];
 
-				if (SUCCEED != service_get_status(child, &child_status))
-					continue;
-
-				if (TRIGGER_SEVERITY_NOT_CLASSIFIED == child_status)
-				{
-					status = child_status;
-					break;
-				}
-
-				if (status < child_status)
-					status = child->status;
-			}
-			break;
-		case SERVICE_ALGORITHM_MAX:
-			status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-			for (i = 0; i < itservice->children.values_num; i++)
-			{
-				zbx_service_t	*child = (zbx_service_t *)itservice->children.values[i];
-
-				if (SUCCEED != service_get_status(child, &child_status))
-					continue;
-
-				if (status < child_status)
-					status = child_status;
-			}
-			break;
-		case SERVICE_ALGORITHM_NONE:
-			status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_ERR, "unknown calculation algorithm of service status [%d]",
-					itservice->algorithm);
-			return;
+		if (status < (rule_status = service_get_rule_status(itservice, rule, NULL)))
+			status = rule_status;
 	}
 
 	if (itservice->status != status)
