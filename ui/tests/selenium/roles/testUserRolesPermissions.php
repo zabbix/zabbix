@@ -189,7 +189,7 @@ class testUserRolesPermissions extends CWebTest {
 
 
 	/**
-	 * Check creation/edit for dashboard, map, screen, maintenance.
+	 * Check creation/edit for dashboard, map, reports, maintenance.
 	 *
 	 * @dataProvider getPageActionsData
 	 */
@@ -203,9 +203,9 @@ class testUserRolesPermissions extends CWebTest {
 			foreach ($data['page_buttons'] as $button) {
 				$this->assertTrue($this->query('button', $button)->one()->isEnabled($action_status));
 			}
+
 			$this->page->open((array_key_exists('report', $data)) ? 'zabbix.php?action=scheduledreport.edit&reportid='.
-					self::$reportid : $data['action_link']
-			)->waitUntilReady();
+					self::$reportid : $data['action_link'])->waitUntilReady();
 
 			foreach ($data['form_button'] as $text) {
 				$this->assertTrue($this->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));
@@ -277,6 +277,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
 			$this->changeRoleRule([$data['action'] => ($action_status === true) ? false : true]);
 
+			// Check that problem actions works after they were turned on.
 			if ($action_status === false) {
 				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 				$row->query('link', 'No')->one()->waitUntilCLickable()->click();
