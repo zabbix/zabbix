@@ -4,4 +4,6 @@ noinst_LIBRARIES = libzbxaudit.a
 
 libzbxaudit_a_SOURCES = \
 	audit.c \
+	audit.h \
+	audit_host.c \
 	audit.h
