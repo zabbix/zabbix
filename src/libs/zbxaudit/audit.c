@@ -273,8 +273,7 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 
 	local_audit_entry.id = id;
 
-	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
-			&(local_audit_entry_x));
+	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
 
 	if (NULL == found_audit_entry)
 	{
@@ -293,8 +292,8 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 
 	local_audit_entry.id = id;
 
-	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
-			&(local_audit_entry_x));
+	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
+
 	if (NULL == found_audit_entry)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
