@@ -157,7 +157,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	if (ZBX_DB_OK > DBexecute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
 			"resourcename,resourcetype,recordsetid,details) values ('%s'," ZBX_FS_UI64 ",'%s',%d,'%d','%s',"
-			ZBX_FS_UI64 ",'%s',%d,'%s','%s' )", auditid_cuid, userid, username, (int)time(NULL),
+			ZBX_FS_UI64 ",'%s',%d,'%s','%s')", auditid_cuid, userid, username, (int)time(NULL),
 			AUDIT_ACTION_EXECUTE, clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid,
 			details_json.buffer))
 	{
@@ -230,7 +230,7 @@ void	zbx_audit_flush(void)
 	zbx_hashset_iter_reset(&zbx_audit, &iter);
 
 	zbx_db_insert_prepare(&db_insert_audit, "auditlog", "auditid", "userid", "username", "clock", "action", "ip",
-			"resourceid","resourcename","resourcetype","recordsetid","details", NULL);
+			"resourceid", "resourcename", "resourcetype", "recordsetid", "details", NULL);
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
@@ -266,8 +266,7 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 
 	local_audit_entry.id = id;
 
-	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
-			&(local_audit_entry_x));
+	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
 
 	if (NULL == found_audit_entry)
 	{
@@ -286,8 +285,8 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 
 	local_audit_entry.id = id;
 
-	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,
-			&(local_audit_entry_x));
+	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
+
 	if (NULL == found_audit_entry)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;

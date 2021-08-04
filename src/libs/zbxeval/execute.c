@@ -2571,7 +2571,6 @@ static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const z
 static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	int		i;
 	zbx_variant_t	*arg, ret_value;
 
 	if (1 != token->opt)

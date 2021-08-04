@@ -1735,5 +1735,4 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 /* UTF-8 trimming */
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
-
 #endif
