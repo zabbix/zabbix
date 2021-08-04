@@ -915,8 +915,8 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'item_count(/host/trap)',
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"item_count(/host/trap, 1, eg)\"."
+					'formula' => 'item_count(/host/trap, #1, 1, eg)',
+					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"item_count(/host/trap, #1, 1, eg)\"."
 				]
 			],
 			// cot() function validation.
