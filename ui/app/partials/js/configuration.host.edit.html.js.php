@@ -164,7 +164,7 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 					clear_tmpl.setAttribute('type', 'hidden');
 					clear_tmpl.setAttribute('name', 'clear_templates[]');
 					clear_tmpl.setAttribute('value', node.dataset.templateid);
-					elt.form.appendChild(clear_tmpl);
+					node.form.appendChild(clear_tmpl);
 
 					node.closest('tr').remove();
 					this.resetNewTemplatesField();
@@ -356,29 +356,26 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				use_psk = (document.querySelector('[name="tls_in_psk"]').checked
 					|| selected_connection == <?= HOST_ENCRYPTION_PSK ?>),
 				use_cert = (document.querySelector('[name="tls_in_cert"]').checked
-					|| selected_connection == <?= HOST_ENCRYPTION_CERTIFICATE ?>),
-				psk_field_display = use_psk ? '' : 'none',
-				cert_field_display = use_cert ? '' : 'none';
+					|| selected_connection == <?= HOST_ENCRYPTION_CERTIFICATE ?>);
 
 			// If PSK is selected or checked.
 			if (document.querySelector('#change_psk')) {
-				document.querySelector('#change_psk').closest('div').style.display = cert_field_display;
-				document.querySelector('[for="change_psk"]').style.display = cert_field_display;
+				document.querySelector('#change_psk').closest('div').style.display = use_psk ? '' : 'none';
+				document.querySelector('[for="change_psk"]').style.display = use_psk ? '' : 'none';
 
 				// As long as button is there, other PSK fields must be hidden.
-				psk_field_display = 'none';
+				use_psk = false;
 			}
-
-			document.querySelector('#tls_psk_identity').closest('div').style.display = psk_field_display;
-			document.querySelector('[for="tls_psk_identity"]').style.display = psk_field_display;
-			document.querySelector('#tls_psk').closest('div').style.display = psk_field_display;
-			document.querySelector('[for="tls_psk"]').style.display = psk_field_display;
+			document.querySelector('#tls_psk_identity').closest('div').style.display = use_psk ? '' : 'none';
+			document.querySelector('[for="tls_psk_identity"]').style.display = use_psk ? '' : 'none';
+			document.querySelector('#tls_psk').closest('div').style.display = use_psk ? '' : 'none';
+			document.querySelector('[for="tls_psk"]').style.display = use_psk ? '' : 'none';
 
 			// If certificate is selected or checked.
-			document.querySelector('#tls_issuer').closest('div').style.display = cert_field_display;
-			document.querySelector('[for="tls_issuer"]').style.display = cert_field_display;
-			document.querySelector('#tls_subject').closest('div').style.display = cert_field_display;
-			document.querySelector('[for="tls_subject"]').style.display = cert_field_display;
+			document.querySelector('#tls_issuer').closest('div').style.display = use_cert ? '' : 'none';
+			document.querySelector('[for="tls_issuer"]').style.display = use_cert ? '' : 'none';
+			document.querySelector('#tls_subject').closest('div').style.display = use_cert ? '' : 'none';
+			document.querySelector('[for="tls_subject"]').style.display = use_cert ? '' : 'none';
 
 			// Update tls_accept.
 			let tls_accept = 0x00;
@@ -473,6 +470,10 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			return fields;
 		}
 	};
+
+	<?php if (array_key_exists('warnings', $data)): ?>
+		jQuery(<?=json_encode($data['warnings'])?>).insertBefore(overlays_stack.end().$dialogue.find('form'));
+	<?php endif; ?>
 
 	<?php if (array_key_exists('popup_form', $data)): ?>
 		/**

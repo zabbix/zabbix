@@ -162,6 +162,12 @@ class CControllerHostEdit extends CController {
 			]
 		];
 
+		if ($this->getAction() === 'popup.host.edit' && ($messages = getMessages()) !== null) {
+			$data['warnings'] = $messages
+				->addClass(ZBX_STYLE_MSG_WARNING)
+				->toString();
+		}
+
 		// Rename fields according names of host edit form.
 		$data['host'] = CArrayHelper::renameKeys($data['host'], [
 			'name' => 'visiblename'
@@ -365,11 +371,25 @@ class CControllerHostEdit extends CController {
 				'preservekeys' => true
 			]);
 
-			$inputs['macros'] = array_map(function ($macro) {
+			$secrets_reset = false;
+			$inputs['macros'] = array_map(function ($macro) use (&$secrets_reset) {
 				unset($macro['hostmacroid']);
+
+				if ((int) $macro['type'] === ZBX_MACRO_TYPE_SECRET) {
+					$secrets_reset = true;
+					$macro = ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $macro;
+				}
+
+				$macro = $macro + ['description' => ''];
 
 				return $macro;
 			}, $this->getInput('macros', []));
+
+			if ($secrets_reset) {
+				CMessageHelper::addError(
+					_('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
+				);
+			}
 
 			$inputs['valuemaps'] = array_map(function ($valuemap) {
 				unset($valuemap['valuemapid']);
