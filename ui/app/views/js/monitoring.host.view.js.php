@@ -137,7 +137,10 @@
 				this.clearLoading();
 				this.removeMessages();
 				this.doRefresh(response.body);
-				this.updateCreateHostButton(response.groupids);
+
+				if ('groupids' in response) {
+					this.updateCreateHostButton(response.groupids);
+				}
 
 				if ('messages' in response) {
 					this.addMessages(response.messages);

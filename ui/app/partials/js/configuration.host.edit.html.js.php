@@ -491,21 +491,23 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 					jQuery(response.errors).insertBefore($form);
 				}
 				else if ('hostid' in response) {
-					clearMessages();
-					addMessage(response.message_box);
-
+					// Original url restored after dialog close.
 					overlayDialogueDestroy(overlay.dialogueid);
 
-					let current_curl = new Curl(location.href, false);
+					const current_curl = new Curl(location.href, false);
+					let filter_btn = document.querySelector('[name=filter_set]');
 
-					if (current_curl.getArgument('action') === 'host.list') {
-						// Todo: refresh lists
-						alert('todo: refresh host.list or [name="filter_set"] while keeping messages')
+					if (current_curl.getArgument('action') === 'host.list' || filter_btn !== undefined) {
+						postMessageOk(response.message)
+						redirect(current_curl.getUrl())
 					}
 					else {
-						let filter_btn = document.querySelector('[name="filter_apply"]');
+						filter_btn = document.querySelector('[name="filter_apply"]');
 
-						if (filter_btn) {
+						clearMessages();
+						addMessage(response.message_box);
+
+						if (filter_btn !== undefined) {
 							filter_btn.click();
 						}
 					}
