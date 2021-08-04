@@ -42,13 +42,13 @@ $interfaces_row = null;
 
 if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	if ($data['editable_discovery_rules']) {
-		$discovery_rule = new CLink($data['host']['discoveryRule']['name'],
+		$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
 			(new CUrl('host_prototypes.php'))
 				->setArgument('form', 'update')
 				->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
 				->setArgument('hostid', $data['host']['hostDiscovery']['parent_hostid'])
 				->setArgument('context', 'host')
-		);
+		))->setAttribute('target', '_blank');
 	}
 	else {
 		$discovery_rule = $data['host']['discoveryRule']
