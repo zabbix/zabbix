@@ -36,7 +36,7 @@ $nav_items = new CList();
 
 if ($data['can_create_hosts']) {
 	$nav_items->addItem((new CSimpleButton(_('Create host')))
-		->addClass('js-create-host')
+		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPCREATE)
 		->setAttribute('data-hostgroups', json_encode($data['filter_groupids']))
 	);
 }
@@ -80,7 +80,6 @@ $this->includeJsFile('monitoring.host.view.js.php', $data);
 
 (new CScriptTag('
 	host_page.start();
-	host_popup.init();
 '))
 	->setOnDocumentReady()
 	->show();

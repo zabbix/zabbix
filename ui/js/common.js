@@ -373,8 +373,6 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			'element': trigger_elmnt,
 			'type': 'popup'
 		});
-
-		overlay.original_url = location.href;
 	}
 
 	overlay

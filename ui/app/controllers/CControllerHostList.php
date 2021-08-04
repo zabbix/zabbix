@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CControllerHostList extends CController {
 
 	protected function init() {
@@ -28,7 +29,6 @@ class CControllerHostList extends CController {
 		$fields = [
 			'page'                => 'ge 1',
 			'tags'                => 'array',
-			// filter
 			'filter_set'          => 'in 1',
 			'filter_rst'          => 'in 1',
 			'filter_host'         => 'string',
@@ -41,7 +41,6 @@ class CControllerHostList extends CController {
 			'filter_proxyids'     => 'array_db hosts.proxy_hostid',
 			'filter_evaltype'     => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags'         => 'array',
-			// sort and sortorder
 			'sort'                => 'in name,status',
 			'sortorder'           => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 		];
@@ -65,12 +64,16 @@ class CControllerHostList extends CController {
 			CProfile::update('web.hosts.filter_dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hosts.filter_host', $this->getInput('filter_host', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hosts.filter_port', $this->getInput('filter_port', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.hosts.filter_monitored_by', $this->getInput('filter_monitored_by', ZBX_MONITORED_BY_ANY),
-				PROFILE_TYPE_INT
+			CProfile::update('web.hosts.filter_monitored_by',
+				$this->getInput('filter_monitored_by', ZBX_MONITORED_BY_ANY), PROFILE_TYPE_INT
 			);
-			CProfile::updateArray('web.hosts.filter_templates', $this->getInput('filter_templates', []), PROFILE_TYPE_ID);
+			CProfile::updateArray('web.hosts.filter_templates',
+				$this->getInput('filter_templates', []), PROFILE_TYPE_ID
+			);
 			CProfile::updateArray('web.hosts.filter_groups', $this->getInput('filter_groups', []), PROFILE_TYPE_ID);
-			CProfile::updateArray('web.hosts.filter_proxyids', $this->getInput('filter_proxyids', []), PROFILE_TYPE_ID);
+			CProfile::updateArray('web.hosts.filter_proxyids',
+				$this->getInput('filter_proxyids', []), PROFILE_TYPE_ID
+			);
 			CProfile::update('web.hosts.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 				PROFILE_TYPE_INT
 			);
@@ -129,15 +132,16 @@ class CControllerHostList extends CController {
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
 		$tags = $this->getInput('tags', []);
+
 		foreach ($tags as $key => $tag) {
-			// remove empty new tag lines
+			// Remove empty new tag lines.
 			if ($tag['tag'] === '' && $tag['value'] === '') {
 				unset($tags[$key]);
 				continue;
 			}
 
-			// remove inherited tags
-			if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+			// Remove inherited tags.
+			if (array_key_exists('type', $tag) && !((int) $tag['type'] & ZBX_PROPERTY_OWN)) {
 				unset($tags[$key]);
 			}
 			else {
@@ -219,11 +223,11 @@ class CControllerHostList extends CController {
 
 		order_result($hosts, $sort_field, $sort_order);
 
-		// pager
-		if (hasRequest('page')) {
+		// Paging.
+		if ($this->hasInput('page')) {
 			$page_num = $this->getInput('page');
 		}
-		elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		elseif (isRequestMethod('get') && !$this->hasInput('cancel')) {
 			$page_num = 1;
 		}
 		else {
@@ -232,7 +236,7 @@ class CControllerHostList extends CController {
 
 		CPagerHelper::savePage($this->getAction(), $page_num);
 
-		$paginator = CPagerHelper::paginate($page_num, $hosts, $sort_order,
+		$paging = CPagerHelper::paginate($page_num, $hosts, $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
@@ -254,7 +258,7 @@ class CControllerHostList extends CController {
 
 		order_result($hosts, $sort_field, $sort_order);
 
-		// selecting linked templates to templates linked to hosts
+		// Selecting linked templates to templates linked to hosts.
 		$templateids = [];
 
 		foreach ($hosts as $host) {
@@ -299,7 +303,8 @@ class CControllerHostList extends CController {
 				$proxy_hostids[$host['proxy_hostid']] = $host['proxy_hostid'];
 			}
 
-			if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			if ((int) $host['status'] === HOST_STATUS_MONITORED &&
+					(int) $host['maintenance_status'] === HOST_MAINTENANCE_STATUS_ON) {
 				$maintenanceids[$host['maintenanceid']] = true;
 			}
 		}
@@ -337,10 +342,14 @@ class CControllerHostList extends CController {
 			]);
 		}
 
+		if (!$filter['tags']) {
+			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+		}
+
 		$data = [
 			'action' => $this->getAction(),
 			'hosts' => $hosts,
-			'paginator' => $paginator,
+			'paging' => $paging,
 			'page' => $page_num,
 			'filter' => $filter,
 			'sortField' => $sort_field,

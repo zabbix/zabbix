@@ -31,7 +31,7 @@ $widget = (new CWidget())
 	->setControls((new CTag('nav', true, (new CList())
 			->addItem(
 				(new CSimpleButton(_('Create host')))
-					->addClass('js-create-host')
+					->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPCREATE)
 					->setAttribute('data-hostgroups', json_encode(array_keys($data['filter']['groups'])))
 			)
 			->addItem(
@@ -44,11 +44,7 @@ $widget = (new CWidget())
 
 $action_url = (new CUrl('zabbix.php'))->setArgument('action', $data['action']);
 
-if (!$data['filter']['tags']) {
-	$data['filter']['tags'] = $filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
-}
-
-$filter = (new CFilter($action_url))
+$filter = (new CFilter())
 	->setResetUrl($action_url)
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
@@ -460,7 +456,7 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 
 $form->addItem([
 	$table,
-	$data['paginator'],
+	$data['paging'],
 	new CActionButtonList('action', 'ids', [
 		'enable-hosts' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?'),
 			'redirect' => $status_toggle_url

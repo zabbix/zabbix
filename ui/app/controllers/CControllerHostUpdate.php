@@ -152,7 +152,8 @@ class CControllerHostUpdate extends CController {
 		if ($hostids !== false && $this->processValueMaps()) {
 			$output += [
 				'hostid' => $hostids['hostids'][0],
-				'message' => makeMessageBox(true, [], _('Host updated'), true, false)->toString()
+				'message' => _('Host updated'),
+				'message_box' => makeMessageBox(true, [], _('Host updated'), true, false)->toString()
 			];
 		} else {
 			$errors = getMessages(false, _('Cannot update host'), true);

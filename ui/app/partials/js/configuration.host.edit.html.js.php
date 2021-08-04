@@ -74,6 +74,7 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				->toString()
 		?>
 	</script>
+
 	<script type="text/x-jquery-tmpl" id="macro-row-tmpl">
 		<?= (new CRow([
 				(new CCol([
@@ -103,72 +104,90 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 	</script>
 <?php endif ?>
 
-<script type="text/javascript">
+<script>
 	'use strict';
 
 	var host_edit = {
-
+		/**
+		 * Host form setup.
+		 */
 		init() {
 			this.initHostTab();
 			this.initTemplatesTab();
 			this.initMacrosTab();
 			this.initInventoryTab();
-			this.initEncriptionTab();
+			this.initEncryptionTab();
 		},
 
+		/**
+		 * Sets up visible name placeholder synchronization.
+		 */
 		initHostTab() {
 			const host_field = document.getElementById('host');
 
-			'input paste'.split(' ').forEach(event => {
-				host_field.addEventListener(event, e => this.setVisibleNamePlaceholder(e.target.value));
+			'input paste'.split(' ').forEach((event_type) => {
+				host_field.addEventListener(event_type, (e) => this.setVisibleNamePlaceholder(e.target.value));
 			});
 			this.setVisibleNamePlaceholder(host_field.value);
 		},
 
+
+		/**
+		 * Updates visible name placeholder.
+		 * @param {string} placeholder Text to display as default host alias.
+		 */
 		setVisibleNamePlaceholder(placeholder) {
 			document.getElementById('visiblename').placeholder = placeholder;
 		},
 
+		/**
+		 * Sets up template element functionality.
+		 */
 		initTemplatesTab() {
-			document.getElementById('linked-template').addEventListener('click', event => {
-				if (event.target.classList.contains('js-tmpl-unlink')) {
-					if (event.target.dataset.templateid === undefined) {
+			document.getElementById('linked-template').addEventListener('click', (e) => {
+				const node = e.target;
+
+				if (node.classList.contains('js-tmpl-unlink')) {
+					if (node.dataset.templateid === undefined) {
 						return;
 					}
 
-					event.target.closest('tr').remove();
+					node.closest('tr').remove();
 					this.resetNewTemplatesField();
 				}
-				else if (event.target.classList.contains('js-tmpl-unlink-and-clear')) {
-					if (event.target.dataset.templateid === undefined) {
+				else if (node.classList.contains('js-tmpl-unlink-and-clear')) {
+					if (node.dataset.templateid === undefined) {
 						return;
 					}
 
 					var clear_tmpl = document.createElement('input');
 					clear_tmpl.setAttribute('type', 'hidden');
 					clear_tmpl.setAttribute('name', 'clear_templates[]');
-					clear_tmpl.setAttribute('value', event.target.dataset.templateid);
-					event.target.form.appendChild(clear_tmpl);
+					clear_tmpl.setAttribute('value', node.dataset.templateid);
+					elt.form.appendChild(clear_tmpl);
 
-					event.target.closest('tr').remove();
+					node.closest('tr').remove();
 					this.resetNewTemplatesField();
 				}
 			});
 		},
 
+		/**
+		 * Replaces template multiselect with a copy that has disabled templates updated.
+		 */
 		resetNewTemplatesField() {
-			var $old_ms = $('#add_templates_'),
-				$new_ms = $('<div>'),
+			var $old_multiselect = $('#add_templates_'),
+				$new_multiselect = $('<div>'),
 				linked_templates = [],
-				data = $old_ms.multiSelect('getData');
+				data = $old_multiselect.multiSelect('getData');
 
-			document.querySelectorAll('[name="templates[]').forEach(i => {
-				linked_templates.push(i.value);
+			document.querySelectorAll('[name="templates[]').forEach((input) => {
+				linked_templates.push(input.value);
 			});
 
-			$('#add_templates_').parent().html($new_ms);
+			$('#add_templates_').parent().html($new_multiselect);
 
-			$new_ms
+			$new_multiselect
 				.addClass('multiselect active')
 				.css('width', '<?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px')
 				.attr('id', 'add_templates_')
@@ -189,6 +208,9 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				});
 		},
 
+		/**
+		 * Set up of macros functionality.
+		 */
 		initMacrosTab() {
 			var linked_templateids = <?= json_encode($linked_templates) ?>,
 				$show_inherited_macros = $('input[name="show_inherited_macros"]');
@@ -209,20 +231,22 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				]
 			]) ?>);
 
-			$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-				var panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+			$('#tabs').on('tabscreate tabsactivate', (e, ui) => {
+				var panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 				if (panel.attr('id') === 'macros-tab') {
-					let macros_initialized = panel.data('macros_initialized') || false;
+					let macros_initialized = (panel.data('macros_initialized') || false);
 
 					// Please note that macro initialization must take place once and only when the tab is visible.
-					if (event.type === 'tabsactivate') {
+					if (e.type === 'tabsactivate') {
 						let panel_templateids = panel.data('templateids') || [],
 							templateids = this.getNewlyAddedTemplates();
 
 						if (panel_templateids.xor(templateids).length > 0) {
 							panel.data('templateids', templateids);
-							this.macros_manager.load($show_inherited_macros.val(), linked_templateids.concat(templateids));
+							this.macros_manager.load($show_inherited_macros.val(),
+								linked_templateids.concat(templateids)
+							);
 							panel.data('macros_initialized', true);
 						}
 					}
@@ -244,23 +268,28 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				}
 			});
 
-			$show_inherited_macros.on('change', event => {
-				if (event.target.name !== 'show_inherited_macros') {
+			$show_inherited_macros.on('change', (e) => {
+				if (e.target.name !== 'show_inherited_macros') {
 					return;
 				}
 
 				let templateids = linked_templateids.concat(this.getNewlyAddedTemplates());
-				this.macros_manager.load(event.target.value, templateids);
+				this.macros_manager.load(e.value, templateids);
+				this.updateEncryptionFields();
 			});
 		},
 
+		/**
+		 * Helper to get added template IDs as an array.
+		 * @returns {array}
+		*/
 		getNewlyAddedTemplates() {
-			let $ms = $('#add_templates_'),
+			let $template_multiselect = $('#add_templates_'),
 				templateids = [];
 
 			// Readonly forms don't have multiselect.
-			if ($ms.length) {
-				$ms.multiSelect('getData').forEach(template => {
+			if ($template_multiselect.length) {
+				$template_multiselect.multiSelect('getData').forEach(template => {
 					templateids.push(template.id);
 				});
 			}
@@ -268,82 +297,100 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			return templateids;
 		},
 
+		/**
+		 * Set up of inventory functionality.
+		 */
 		initInventoryTab() {
-			document.querySelectorAll('[name=inventory_mode]').forEach(item => {
+			document.querySelectorAll('[name=inventory_mode]').forEach((item) => {
 				item.addEventListener('change', function () {
 					let inventory_fields = document.querySelectorAll('[name^="host_inventory"]'),
 						item_links = document.querySelectorAll('.populating_item');
 
 					switch (this.value) {
 						case '<?= HOST_INVENTORY_DISABLED ?>':
-							inventory_fields.forEach(i => i.disabled = true);
-							item_links.forEach(i => i.style.display = 'none');
+							inventory_fields.forEach((field) => field.disabled = true);
+							item_links.forEach((link) => link.style.display = 'none');
 							break;
 
 						case '<?= HOST_INVENTORY_MANUAL ?>':
-							inventory_fields.forEach(i => i.disabled = false);
-							item_links.forEach(i => i.style.display = 'none');
+							inventory_fields.forEach((field) => field.disabled = false);
+							item_links.forEach((link) => link.style.display = 'none');
 							break;
 
 						case '<?= HOST_INVENTORY_AUTOMATIC ?>':
-							inventory_fields.forEach(i => i.disabled = i.classList.contains('linked_to_item'));
-							item_links.forEach(i => i.style.display = '');
+							inventory_fields.forEach((field) =>
+								field.disabled = field.classList.contains('linked_to_item')
+							);
+							item_links.forEach((link) => link.style.display = '');
 							break;
 					}
 				})
 			});
 		},
 
-		initEncriptionTab() {
-			document.querySelectorAll('[name=tls_connect], [name^=tls_in_]').forEach(field => {
-				field.addEventListener('change', () => this.updateEncriptionFields());
+		/**
+		 * Set up of encryption functionality.
+		 */
+		initEncryptionTab() {
+			document.querySelectorAll('[name=tls_connect], [name^=tls_in_]').forEach((field) => {
+				field.addEventListener('change', () => this.updateEncryptionFields());
 			});
 
 			if (document.querySelector('#change_psk')) {
 				document.querySelector('#change_psk').addEventListener('click', () => {
 					document.querySelector('#change_psk').closest('div').remove();
 					document.querySelector('[for="change_psk"]').remove();
-					this.updateEncriptionFields();
+					this.updateEncryptionFields();
 				});
 			}
 
-			this.updateEncriptionFields();
+			this.updateEncryptionFields();
 		},
 
-		updateEncriptionFields() {
+
+		/**
+		 * Propagate changes of selected encryption type to related inputs.
+		 */
+		updateEncryptionFields() {
 			let selected_connection = document.querySelector('[name="tls_connect"]:checked').value,
 				use_psk = (document.querySelector('[name="tls_in_psk"]').checked
 					|| selected_connection == <?= HOST_ENCRYPTION_PSK ?>),
 				use_cert = (document.querySelector('[name="tls_in_cert"]').checked
-					|| selected_connection == <?= HOST_ENCRYPTION_CERTIFICATE ?>);
+					|| selected_connection == <?= HOST_ENCRYPTION_CERTIFICATE ?>),
+				psk_field_display = use_psk ? '' : 'none',
+				cert_field_display = use_cert ? '' : 'none';
 
 			// If PSK is selected or checked.
 			if (document.querySelector('#change_psk')) {
-				document.querySelector('#change_psk').closest('div').style.display = use_psk ? '' : 'none';
-				document.querySelector('[for="change_psk"]').style.display = use_psk ? '' : 'none';
+				document.querySelector('#change_psk').closest('div').style.display = cert_field_display;
+				document.querySelector('[for="change_psk"]').style.display = cert_field_display;
 
 				// As long as button is there, other PSK fields must be hidden.
-				use_psk = false;
+				psk_field_display = 'none';
 			}
-			document.querySelector('#tls_psk_identity').closest('div').style.display = use_psk ? '' : 'none';
-			document.querySelector('[for="tls_psk_identity"]').style.display = use_psk ? '' : 'none';
-			document.querySelector('#tls_psk').closest('div').style.display = use_psk ? '' : 'none';
-			document.querySelector('[for="tls_psk"]').style.display = use_psk ? '' : 'none';
+
+			document.querySelector('#tls_psk_identity').closest('div').style.display = psk_field_display;
+			document.querySelector('[for="tls_psk_identity"]').style.display = psk_field_display;
+			document.querySelector('#tls_psk').closest('div').style.display = psk_field_display;
+			document.querySelector('[for="tls_psk"]').style.display = psk_field_display;
 
 			// If certificate is selected or checked.
-			document.querySelector('#tls_issuer').closest('div').style.display = use_cert ? '' : 'none';
-			document.querySelector('[for="tls_issuer"]').style.display = use_cert ? '' : 'none';
-			document.querySelector('#tls_subject').closest('div').style.display = use_cert ? '' : 'none';
-			document.querySelector('[for="tls_subject"]').style.display = use_cert ? '' : 'none';
+			document.querySelector('#tls_issuer').closest('div').style.display = cert_field_display;
+			document.querySelector('[for="tls_issuer"]').style.display = cert_field_display;
+			document.querySelector('#tls_subject').closest('div').style.display = cert_field_display;
+			document.querySelector('[for="tls_subject"]').style.display = cert_field_display;
 
 			// Update tls_accept.
 			let tls_accept = 0x00;
+
 			if (document.querySelector('[name="tls_in_none"]').checked) {
 				tls_accept |= <?= HOST_ENCRYPTION_NONE ?>;
 			}
+
 			if (document.querySelector('[name="tls_in_psk"]').checked) {
 				tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
 			}
+
 			if (document.querySelector('[name="tls_in_cert"]').checked) {
 				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
 			}
@@ -351,6 +398,11 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			document.getElementById('tls_accept').value = tls_accept;
 		},
 
+		/**
+		 * Posts hosts form to backend, triggers formSubmitted event on PopUp.
+		 *
+		 * @param {HTMLFormElement} form Host form.
+		 */
 		submit(form) {
 			var fields = getFormFields(form),
 				curl = new Curl(form.getAttribute('action'));
@@ -369,7 +421,7 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 
 			// Groups are not extracted properly by getFormFields.
 			fields.groups = [];
-			form.querySelectorAll('[name^="groups[]"]').forEach(group => {
+			form.querySelectorAll('[name^="groups[]"]').forEach((group) => {
 				fields.groups.push((group.name === 'groups[][new]') ? {'new': group.value} : group.value);
 			});
 
@@ -382,17 +434,25 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				.then(response => form.dispatchEvent(new CustomEvent('formSubmitted', {detail: response})));
 		},
 
+		/**
+		 * Handles current host deletion.
+		 */
 		deleteHost() {
 			const curl = new Curl('zabbix.php', false);
-			const overlay = overlays_stack.end();
 
 			curl.setArgument('action', 'host.massdelete');
 			curl.setArgument('ids', [document.getElementById('hostid').value]);
-			curl.setArgument('back_url', overlay?.original_url || '');
+			curl.setArgument('back_url', host_popup.original_url);
 
 			redirect(curl.getUrl(), 'post');
 		},
 
+		/**
+		 * Collect fields & values to transfer to a host clone.
+		 *
+		 * @param {HTMLFormElement} form Cloneable host form.
+		 * @returns {object}             Fields/values to populate for clone form.
+		 */
 		getCloneData(form) {
 			var fields = getFormFields(form);
 
@@ -414,64 +474,13 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 		}
 	};
 
-
-	<?php if (!array_key_exists('popup_form', $data)): ?>
-		document.addEventListener('DOMContentLoaded', () => {
-			const form = document.getElementById('<?= $data['form_name'] ?>');
-
-			form.addEventListener('submit', event => {
-				event.preventDefault();
-				host_edit.submit(form);
-			});
-
-			form.addEventListener('formSubmitted', event => {
-				let response = event.detail;
-
-				clearMessages();
-
-				if ('errors' in response) {
-					addMessage(response.errors);
-				}
-				else if ('hostid' in response) {
-					const curl = new Curl('zabbix.php');
-
-					postMessageOk(response.message);
-					curl.setArgument('action', 'host.list');
-					window.location = curl.getUrl();
-				}
-			});
-
-			var cloneBtn = document.getElementById('clone');
-			var fullCloneBtn = document.getElementById('full_clone');
-
-			function cloneHandler(operation_type) {
-				return function() {
-					var curl = new Curl('zabbix.php', false),
-						fields = host_edit.getCloneData(form);
-
-					curl.setArgument('action', 'host.edit');
-					curl.setArgument(operation_type, 1);
-
-					for (const [k, v] of Object.entries(fields)) {
-						curl.setArgument(k, v);
-					}
-
-					redirect(curl.getUrl(), 'post');
-				};
-			}
-
-			if (cloneBtn) {
-				cloneBtn.addEventListener('click', cloneHandler('clone'));
-			}
-
-			if (fullCloneBtn) {
-				fullCloneBtn.addEventListener('click', cloneHandler('full_clone'));
-			}
-		});
-	<?php else: ?>
+	<?php if (array_key_exists('popup_form', $data)): ?>
+		/**
+		 * In-popup listeners and set up, called when we are sure the popup HTML has been populated.
+		 */
 		function setupHostPopup() {
-			document.getElementById('<?= $data['form_name'] ?>').addEventListener('formSubmitted', event => {
-				let response = event.detail,
+			document.getElementById('<?= $data['form_name'] ?>').addEventListener('formSubmitted', (e) => {
+				let response = e.detail,
 					overlay = overlays_stack.end(),
 					$form = overlay.$dialogue.find('form');
 
@@ -483,11 +492,12 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				}
 				else if ('hostid' in response) {
 					clearMessages();
-					addMessage(response.message);
+					addMessage(response.message_box);
 
 					overlayDialogueDestroy(overlay.dialogueid);
 
 					let current_curl = new Curl(location.href, false);
+
 					if (current_curl.getArgument('action') === 'host.list') {
 						// Todo: refresh lists
 						alert('todo: refresh host.list or [name="filter_set"] while keeping messages')
@@ -502,17 +512,19 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				}
 			});
 
-			$('#tabs').on('tabsactivate', (event, ui) => {
+			$('#tabs').on('tabsactivate change', () => {
 				overlays_stack.end().centerDialog();
 			});
 
-			$('#tabs').on('change', () => {
-				overlays_stack.end().centerDialog();
-			});
+			var clone_button = document.querySelector('.js-clone-host'),
+				full_clone_button = document.querySelector('.js-full-clone-host');
 
-			var cloneBtn = document.querySelector('.js-clone-host');
-			var fullCloneBtn = document.querySelector('.js-full-clone-host');
-
+			/**
+			* Supplies a handler for in-popup clone button click with according action.
+			*
+			* @param {string} operation_type Either 'clone' or 'full_clone'.
+			* @return {callable}             Click handler.
+			*/
 			function popupCloneHandler(operation_type) {
 				return function() {
 					var $form = overlays_stack.end().$dialogue.find('form'),
@@ -528,15 +540,15 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 				};
 			}
 
-			if (cloneBtn) {
-				cloneBtn.addEventListener('click', popupCloneHandler('clone'));
+			if (clone_button) {
+				clone_button.addEventListener('click', popupCloneHandler('clone'));
 			}
 
-			if (fullCloneBtn) {
-				fullCloneBtn.addEventListener('click', popupCloneHandler('full_clone'));
+			if (full_clone_button) {
+				full_clone_button.addEventListener('click', popupCloneHandler('full_clone'));
 			};
 
-			window.addEventListener('popstate', event => {
+			window.addEventListener('popstate', () => {
 				const overlay = overlays_stack.end();
 
 				if (overlay) {
@@ -546,4 +558,65 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 		}
 	<?php endif; ?>
 
+	document.addEventListener('DOMContentLoaded', () => {
+		<?php if (!array_key_exists('popup_form', $data)): ?>
+			const form = document.getElementById('<?= $data['form_name'] ?>');
+
+			form.addEventListener('submit', (e) => {
+				e.preventDefault();
+				host_edit.submit(form);
+			});
+
+			form.addEventListener('formSubmitted', (e) => {
+				let response = e.detail;
+
+				clearMessages();
+
+				if ('errors' in response) {
+					addMessage(response.errors);
+				}
+				else if ('hostid' in response) {
+					const curl = new Curl('zabbix.php');
+
+					postMessageOk(response.message);
+					curl.setArgument('action', 'host.list');
+					window.location = curl.getUrl();
+				}
+			});
+
+			var clone_button = document.getElementById('clone'),
+				full_clone_button = document.getElementById('full_clone');
+
+			/**
+			* Supplies a handler for in-page clone button click with according action.
+			*
+			* @param {string} operation_type Either 'clone' or 'full_clone'.
+			* @return {callable}             Click handler.
+			*/
+
+			function inlineCloneHandler(operation_type) {
+				return function() {
+					var curl = new Curl('zabbix.php', false),
+						fields = host_edit.getCloneData(form);
+
+					curl.setArgument('action', 'host.edit');
+					curl.setArgument(operation_type, 1);
+
+					for (const [k, v] of Object.entries(fields)) {
+						curl.setArgument(k, v);
+					}
+
+					redirect(curl.getUrl(), 'post');
+				};
+			}
+
+			if (clone_button) {
+				clone_button.addEventListener('click', inlineCloneHandler('clone'));
+			}
+
+			if (full_clone_button) {
+				full_clone_button.addEventListener('click', inlineCloneHandler('full_clone'));
+			}
+		<?php endif; ?>
+	});
 </script>

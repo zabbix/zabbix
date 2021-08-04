@@ -17,44 +17,66 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+const ZBX_STYLE_ZABBIX_HOST_POPUPEDIT = 'js-edit-host';
+const ZBX_STYLE_ZABBIX_HOST_POPUPCREATE = 'js-create-host';
+
 const host_popup = {
+	/**
+	 * General entry point to be called on pages that need host popup functionality.
+	 *
+	 * @returns {void}
+	 */
 	init() {
 		this.initActionButtons();
+
+		this.original_url = location.href;
 	},
 
+	/**
+	 * Sets up listeners for elements marked to start host edit/create popup.
+	 *
+	 * @returns {void}
+	 */
 	initActionButtons() {
-		document.addEventListener('click', event => {
-			if (event.target.classList.contains('js-create-host')) {
-				const options = (event.target.dataset.hostgroups !== undefined)
-					? {groupids: JSON.parse(event.target.dataset.hostgroups)}
-					: {};
+		document.addEventListener('click', (e) => {
+			const node = e.target;
 
-				this.edit(options, {'backurl': window.location.href});
+			if (node.classList.contains(ZBX_STYLE_ZABBIX_HOST_POPUPCREATE)) {
+				const host_data = (node.dataset.hostgroups !== undefined)
+					? { groupids: JSON.parse(node.dataset.hostgroups) }
+					: {},
+					url = new Curl('zabbix.php', false);
 
-				const url = new Curl('zabbix.php', false);
+				this.edit(host_data);
 				url.setArgument('action', 'host.create');
 				history.pushState({}, '', url.getUrl());
 			}
-			else if (event.target.classList.contains('js-edit-host')) {
+			else if (node.classList.contains(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)) {
 				let hostid = null;
 
-				if (event.target.hostid !== undefined && event.target.dataset.hostid !== undefined) {
-					hostid = event.target.dataset.hostid;
+				if (node.hostid !== undefined && node.dataset.hostid !== undefined) {
+					hostid = node.dataset.hostid;
 				}
 				else {
-					hostid = new Curl(event.target.href).getArgument('hostid')
+					hostid = new Curl(node.href).getArgument('hostid')
 				}
 
-				this.edit({hostid:  hostid}, {'backurl': window.location.href});
-
-				history.pushState({}, '', event.target.getAttribute('href'));
-
-				event.preventDefault();
+				e.preventDefault();
+				this.edit({hostid});
+				history.pushState({}, '', node.getAttribute('href'));
 			}
 		}, {capture: true});
 	},
 
-	edit(host_data = {}, options) {
+	/**
+	 * Sets up and opens host edit popup.
+	 *
+	 * @param {object} host_data                 Host data used to initalize host form.
+	 * @param {object} host_data{hostid}         ID of host to edit.
+	 * @param {object} host_data{groupids}       Host groups to pre-fill when creating new host.
+	 * @returns {void}
+	 */
+	edit(host_data = {}) {
 		this.pauseRefresh();
 
 		const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
@@ -66,12 +88,12 @@ const host_popup = {
 				postMessageDetails('success', e.detail.messages);
 			}
 
-			// reload || refresh;
+			// TODO: reload || refresh;
 		});
 
 		overlay.$dialogue[0].addEventListener('overlay.close', () => {
-			history.replaceState({}, '', options.backurl);
-			this.resumeRefresh()
+			history.replaceState({}, '', this.original_url);
+			this.resumeRefresh();
 		}, {once: true});
 	},
 

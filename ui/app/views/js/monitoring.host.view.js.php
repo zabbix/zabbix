@@ -111,6 +111,14 @@
 			doRefresh: function(body) {
 				this.getCurrentForm().replaceWith(body);
 			},
+			/**
+			* Popuplates data-attribute used to prefill new host.
+			*
+			* @param {array} groupids Filtered host group IDs.
+			*/
+			updateCreateHostButton: function(groupids) {
+				$('.'+ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).attr('data-hostgroups', JSON.stringify(groupids));
+			},
 			bindDataEvents: function(deferred) {
 				var that = this;
 
@@ -129,6 +137,7 @@
 				this.clearLoading();
 				this.removeMessages();
 				this.doRefresh(response.body);
+				this.updateCreateHostButton(response.groupids);
 
 				if ('messages' in response) {
 					this.addMessages(response.messages);
@@ -178,6 +187,8 @@
 				}
 			},
 			start: function() {
+				host_popup.init();
+
 				this.running = true;
 				this.refresh();
 			}

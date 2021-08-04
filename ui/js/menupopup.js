@@ -235,7 +235,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 				config_url.setArgument('action', 'host.edit');
 				config_url.setArgument('hostid', options.hostid);
 
-				config.class = 'js-edit-host';
+				config.class = ZBX_STYLE_ZABBIX_HOST_POPUPEDIT;
 				config.url = config_url.getUrl();
 			}
 			else {
