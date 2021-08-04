@@ -87,10 +87,10 @@ void	zbx_audit_host_create_entry(int audit_action, zbx_uint64_t hostid, const ch
 void	zbx_audit_host_prototype_create_entry(int audit_action, zbx_uint64_t hostid, const char *name);
 void	zbx_audit_host_update_json_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t main_, zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns,
-		zbx_uint64_t port);
+		int port);
 void	zbx_audit_host_prototype_update_json_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t main_, zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns,
-		zbx_uint64_t port);
+		int port);
 void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid);
 void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
 		zbx_vector_uint64_t *groupids);
@@ -104,7 +104,7 @@ void	zbx_audit_host_update_json_update_interface_ip(zbx_uint64_t hostid, zbx_uin
 void	zbx_audit_host_update_json_update_interface_dns(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		const char *dns_old, const char *dns_new);
 void	zbx_audit_host_update_json_update_interface_port(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
-		zbx_uint64_t port_old, zbx_uint64_t port_new);
+		int port_old, int port_new);
 
 void	zbx_audit_host_prototype_update_json_update_interface_useip(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t useip_old, zbx_uint64_t useip_new);
@@ -113,7 +113,7 @@ void	zbx_audit_host_prototype_update_json_update_interface_ip(zbx_uint64_t hosti
 void	zbx_audit_host_prototype_update_json_update_interface_dns(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		const char *dns_old, const char *dns_new);
 void	zbx_audit_host_prototype_update_json_update_interface_port(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
-		zbx_uint64_t port_old, zbx_uint64_t port_new);
+		int port_old, int port_new);
 
 void	zbx_audit_host_prototype_update_json_update_interface_main(zbx_uint64_t hostid, zbx_uint64_t interfaceid,
 		zbx_uint64_t main_old, zbx_uint64_t main_new);

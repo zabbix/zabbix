@@ -5288,7 +5288,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s','%s',%d)",
 		interfaceid, hostid, (int)main_, (int)type, (int)useip, ip_esc, dns_esc, (int)port);
 
-	zbx_audit_host_update_json_add_interfaces(hostid, interfaceid, main_, type, useip, ip_esc, dns_esc, port);
+	zbx_audit_host_update_json_add_interfaces(hostid, interfaceid, main_, type, useip, ip_esc, dns_esc, (int)port);
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 out:
