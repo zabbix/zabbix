@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 11:57+0300\n"
+"POT-Creation-Date: 2021-07-30 19:53+0300\n"
 "PO-Revision-Date: 2021-04-21 13:18+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -17762,11 +17762,11 @@ msgstr ""
 msgid "Ukrainian (uk_UA)"
 msgstr "אוקראינית (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:245
+#: include/classes/core/CConfigFile.php:249
 msgid "Unable to change configuration file permissions to 0600."
 msgstr "לא ניתן לשנות את הרשאות קובץ ההגדרות ל־0600."
 
-#: include/classes/core/CConfigFile.php:254
+#: include/classes/core/CConfigFile.php:258
 msgid "Unable to create the configuration file."
 msgstr "לא ניתן ליצור את קובץ התצורה."
 
@@ -17793,7 +17793,7 @@ msgstr "לא ניתן לטעון משתני API של סדר וניקיון."
 msgid "Unable to load settings API parameters."
 msgstr "לא ניתן לטעון את משתני API ההגדרות."
 
-#: include/classes/core/CConfigFile.php:250
+#: include/classes/core/CConfigFile.php:254
 msgid "Unable to overwrite the existing configuration file."
 msgstr "לא ניתן לשכתב על קובץ התצורה הקיים."
 
