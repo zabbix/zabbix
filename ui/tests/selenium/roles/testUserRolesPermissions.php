@@ -225,28 +225,36 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'activityid' => 'message',
-					'action' => 'Add problem comments'
+					'action' => 'Add problem comments',
+					'column' => 'Message',
+					'value' => 'test_text'
 				]
 			],
 			// Severity.
 			[
 				[
 					'activityid' => 'change_severity',
-					'action' => 'Change severity'
-				]
-			],
-			// Acknowledge problem.
-			[
-				[
-					'activityid' => 'acknowledge_problem',
-					'action' => 'Acknowledge problems'
+					'action' => 'Change severity',
+					'column' => 'Severity',
+					'value' => 'Average'
 				]
 			],
 			// Close problem.
 			[
 				[
 					'activityid' => 'close_problem',
-					'action' => 'Close problems'
+					'action' => 'Close problems',
+					'column' => 'Status',
+					'value' => 'CLOSING'
+				]
+			],
+			// Acknowledge problem.
+			[
+				[
+					'activityid' => 'acknowledge_problem',
+					'action' => 'Acknowledge problems',
+					'column' => 'Ack',
+					'value' => 'Yes'
 				]
 			]
 		];
@@ -255,25 +263,53 @@ class testUserRolesPermissions extends CWebTest {
 	/**
 	 * Check problem actions.
 	 *
+	 * @backupOnce events
 	 * @dataProvider getProblemActionsData
 	 */
-	public function testUserRolesPermissions_ProblemActions($data) {
+	public function testUserRolesPermissions_ProblemAction($data) {
 		$this->page->userLogin('user_for_role', 'zabbix');
 
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-			$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag')
-					->query('link', 'No')->one()->waitUntilCLickable()->click();
+			$row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag');
+			$row->query('link', 'No')->one()->waitUntilCLickable()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
 			$this->changeRoleRule([$data['action'] => ($action_status === true) ? false : true]);
+
+			if ($action_status === false) {
+				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
+				$row->query('link', 'No')->one()->waitUntilCLickable()->click();
+
+				if ($data['activityid'] === 'message') {
+					$dialog->query('id:message')->one()->fill('test_text');
+					$dialog->query('button:Update')->one()->click();
+					$this->page->waitUntilReady();
+					$row->getColumn('Actions')->query('xpath:.//span[contains(@class, "icon-action-msgs")]')->one()->click();
+					$message_hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
+					$value = $message_hint->query('class:list-table')->asTable()->one()->getRow(0)->getColumn($data['column'])->getText();
+					$this->assertEquals($data['value'], $value);
+				}
+				else {
+					$dialog->query('id', $data['activityid'])->asCheckbox()->one()->check();
+
+					if ($data['activityid'] === 'change_severity') {
+						$dialog->query('id:severity')->asSegmentedRadio()->one()->fill('Average');
+					}
+
+					$dialog->query('button:Update')->one()->click();
+					$this->page->waitUntilReady();
+					$severity = $row->getColumn($data['column'])->getText();
+					$this->assertEquals($data['value'], $severity);
+				}
+			}
 		}
 	}
 
 	/**
 	 * Check that Acknowledge link is disabled after all problem actions is disabled.
 	 */
-	public function testUserRolesPermissions_ProblemActionsAll() {
+	public function testUserRolesPermissions_ProblemsActionsAll() {
 		$problem_host = 'Host for triggers filtering';
 		$context_before = [
 			'Problems',
