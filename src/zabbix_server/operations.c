@@ -722,6 +722,7 @@ void	op_host_del(const DB_EVENT *event)
 	zbx_vector_str_append(&hostnames, hostname);
 	DBdelete_hosts_with_prototypes(&hostids, &hostnames);
 	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
 
 	zbx_audit_host_del(hostid, hostname);

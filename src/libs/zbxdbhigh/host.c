@@ -1531,6 +1531,7 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
 
 	zbx_vector_uint64_destroy(&group_prototype_ids);
 	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
 	zbx_free(sql);
 out:
@@ -1704,8 +1705,7 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&host_prototype_ids);
-	for (i = 0; i < host_prototype_names.values_num; i++)
-		zbx_free(host_prototype_names.values[i]);
+	zbx_vector_str_clear_ext(&host_prototype_names, zbx_str_free);
 	zbx_vector_str_destroy(&host_prototype_names);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1974,7 +1974,6 @@ ZBX_PTR_VECTOR_IMPL(interfaces, zbx_interfaces_prototype_t *)
 typedef struct
 {
 	zbx_uint64_t		templateid;		/* link to parent template */
-	zbx_uint64_t		old_templateid;
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		itemid;			/* discovery rule id */
 	zbx_vector_uint64_t	lnk_templateids;	/* list of templates which should be linked */
@@ -1991,7 +1990,6 @@ typedef struct
 #define ZBX_FLAG_HPLINK_UPDATE_STATUS			0x02
 #define ZBX_FLAG_HPLINK_UPDATE_DISCOVER			0x04
 #define ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES	0x08
-#define ZBX_FLAG_HPLINK_UPDATE_TEMPLATEID		0x10
 	unsigned char		flags;
 	unsigned char		discover;
 	unsigned char		old_discover;
@@ -2170,34 +2168,26 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 				if (host_prototype->itemid == itemid && 0 == strcmp(host_prototype->host, row[2]))
 				{
-					host_prototype->old_templateid = host_prototype->hostid;
 					ZBX_STR2UINT64(host_prototype->hostid, row[1]);
-					zabbix_log(LOG_LEVEL_INFORMATION, "AGS COMPARING NAME: ->%s<-, and row[3]: ->%s<-",
-							host_prototype->name, row[3]);
-
-					zabbix_log(LOG_LEVEL_INFORMATION, "AGS2 COMPARING STATUS: ->%d<-, and row[3]: ->%d<-",
-							host_prototype->old_status, atoi(row[4]));
-
 					if (0 != strcmp(host_prototype->name, row[3]))
 					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_NAME;
-						host_prototype->old_name = zbx_strdup(NULL, host_prototype->name);
+						host_prototype->old_name = zbx_strdup(NULL, row[3]);
 					}
 					if (host_prototype->status != (status = (unsigned char)atoi(row[4])))
 					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_STATUS;
-						host_prototype->old_status = host_prototype->status;
+						host_prototype->old_status = status;
 					}
 					if (host_prototype->discover != (unsigned char)atoi(row[5]))
 					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_DISCOVER;
-						host_prototype->old_discover = host_prototype->discover;
+						host_prototype->old_discover = (unsigned char)atoi(row[5]);
 					}
 					if (host_prototype->custom_interfaces != (unsigned char)atoi(row[6]))
 					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES;
-						host_prototype->old_custom_interfaces =
-								host_prototype->custom_interfaces;
+						host_prototype->old_custom_interfaces = (unsigned char)atoi(row[6]);
 					}
 					break;
 				}
@@ -3458,8 +3448,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
 					host_prototype->name);
 
-			zbx_audit_host_prototype_update_json_update_templateid(host_prototype->hostid,
-					host_prototype->old_templateid, host_prototype->templateid);
+			zbx_audit_host_prototype_update_json_add_templateid(host_prototype->hostid,
+					host_prototype->templateid);
 
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_NAME))
 			{
@@ -3473,7 +3463,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			{
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",status=%d",
 						host_prototype->status);
-
 				zbx_audit_host_prototype_update_json_update_status(host_prototype->hostid,
 						host_prototype->old_status, host_prototype->status);
 

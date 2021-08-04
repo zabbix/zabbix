@@ -614,12 +614,12 @@ void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_u
 }
 
 
-void	zbx_audit_host_prototype_update_json_update_templateid(zbx_uint64_t hostid, zbx_uint64_t old_templateid,
-		zbx_uint64_t new_templateid)
+void	zbx_audit_host_prototype_update_json_add_templateid(zbx_uint64_t hostid, zbx_uint64_t templateid)
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_update_json_update_uint64(hostid, "hostprototype.templateid", old_templateid, new_templateid);
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "hostprototype.templateid",
+			templateid);
 }
 
 void	zbx_audit_host_prototype_update_json_update_name(zbx_uint64_t hostid, const char *old_name,
@@ -634,7 +634,7 @@ void	zbx_audit_host_prototype_update_json_update_status(zbx_uint64_t hostid, int
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_update_json_update_uint64(hostid, "hostprototype.status", old_status, new_status);
+	zbx_audit_update_json_update_int(hostid, "hostprototype.status", old_status, new_status);
 }
 
 void	zbx_audit_host_prototype_update_json_update_discover(zbx_uint64_t hostid, int old_discover,
@@ -642,7 +642,7 @@ void	zbx_audit_host_prototype_update_json_update_discover(zbx_uint64_t hostid, i
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_update_json_update_uint64(hostid, "hostprototype.discover", old_discover, new_discover);
+	zbx_audit_update_json_update_int(hostid, "hostprototype.discover", old_discover, new_discover);
 }
 
 void	zbx_audit_host_prototype_update_json_update_custom_interfaces(zbx_uint64_t hostid, int old_custom_interfaces,
@@ -650,7 +650,7 @@ void	zbx_audit_host_prototype_update_json_update_custom_interfaces(zbx_uint64_t 
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_update_json_update_uint64(hostid, "hostprototype.custom_interfaces", old_custom_interfaces,
+	zbx_audit_update_json_update_int(hostid, "hostprototype.custom_interfaces", old_custom_interfaces,
 			new_custom_interfaces);
 }
 

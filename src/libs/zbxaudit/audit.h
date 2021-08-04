@@ -92,8 +92,7 @@ void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname);
 
 void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid, const char *name,
 		int status, int discover, int custom_interfaces);
-void	zbx_audit_host_prototype_update_json_update_templateid(zbx_uint64_t hostid, zbx_uint64_t old_templateid,
-		zbx_uint64_t new_templateid);
+void	zbx_audit_host_prototype_update_json_add_templateid(zbx_uint64_t hostid, zbx_uint64_t templateid);
 void	zbx_audit_host_prototype_update_json_update_name(zbx_uint64_t hostid, const char *old_name,
 		const char *new_name);
 void	zbx_audit_host_prototype_update_json_update_status(zbx_uint64_t hostid, int old_status, int new_status);
