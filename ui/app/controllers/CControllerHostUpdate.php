@@ -146,6 +146,10 @@ class CControllerHostUpdate extends CController {
 			unset($host['tls_issuer'], $host['tls_subject']);
 		}
 
+		if ((int) $this->host['flags'] === ZBX_FLAG_DISCOVERY_CREATED) {
+			$host = array_intersect_key($host, array_flip(['hostid', 'status', 'inventory', 'description']));
+		}
+
 		$output = [];
 		$hostids = API::Host()->update($host);
 

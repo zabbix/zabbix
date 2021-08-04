@@ -290,11 +290,11 @@ class CControllerHostEdit extends CController {
 	 * @return void
 	 */
 	protected function extendProxies(?array &$proxies): void {
-		if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$proxies = ($this->host['proxy_hostid'] != 0)
+		if ((int) $this->host['flags'] === ZBX_FLAG_DISCOVERY_CREATED) {
+			$proxies = ($this->host['proxy_hostid'] !== '0')
 				? API::Proxy()->get([
 					'output' => ['host', 'proxyid'],
-					'proxyids' => [$data['proxy_hostid']],
+					'proxyids' => [$this->host['proxy_hostid']],
 					'preservekeys' => true
 				])
 				: [];
@@ -428,7 +428,7 @@ class CControllerHostEdit extends CController {
 			'hostid' => null,
 			'name' => '',
 			'host' => '',
-			'proxy_hostid' => 0,
+			'proxy_hostid' => '0',
 			'status' => HOST_STATUS_MONITORED,
 			'ipmi_authtype' => IPMI_AUTHTYPE_DEFAULT,
 			'ipmi_privilege' => IPMI_PRIVILEGE_USER,

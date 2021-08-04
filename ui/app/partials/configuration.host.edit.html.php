@@ -25,7 +25,7 @@
 
 $this->includeJsFile('configuration.host.edit.html.js.php');
 
-$readonly = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
+$host_is_discovered = ((int) $data['host']['flags'] === ZBX_FLAG_DISCOVERY_CREATED);
 
 $host_form = (new CForm())
 	->setId($data['form_name'])
@@ -40,7 +40,7 @@ $host_form = (new CForm())
 $discovered_by = null;
 $interfaces_row = null;
 
-if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+if ($host_is_discovered) {
 	if ($data['editable_discovery_rules']) {
 		$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
 			(new CUrl('host_prototypes.php'))
@@ -106,7 +106,7 @@ $host_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('host', $data['host']['host'], $readonly, DB::getFieldLength('hosts', 'host')))
+			(new CTextBox('host', $data['host']['host'], $host_is_discovered, DB::getFieldLength('hosts', 'host')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
@@ -115,7 +115,7 @@ $host_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Visible name'), 'visiblename'),
 		new CFormField(
-			(new CTextBox('visiblename', $data['host']['visiblename'], $readonly, DB::getFieldLength('hosts', 'name')))
+			(new CTextBox('visiblename', $data['host']['visiblename'], $host_is_discovered, DB::getFieldLength('hosts', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	])
@@ -125,7 +125,7 @@ $host_tab = (new CFormGrid())
 			(new CMultiSelect([
 				'name' => 'groups[]',
 				'object_name' => 'hostGroup',
-				'disabled' => $readonly,
+				'disabled' => $host_is_discovered,
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 				'data' => $data['groups_ms'],
 				'popup' => [
@@ -146,7 +146,7 @@ $host_tab = (new CFormGrid())
 		new CLabel(_('Interfaces')),
 		new CFormField([
 			new CDiv([renderInterfaceHeaders(), $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]),
-			($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+			(!$host_is_discovered)
 				? new CDiv(
 					(new CButton('', _('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
@@ -175,7 +175,7 @@ $host_tab = (new CFormGrid())
 			(new CSelect('proxy_hostid'))
 				->setValue($data['host']['proxy_hostid'])
 				->setFocusableElementId('label-proxy')
-				->setReadonly($readonly)
+				->setReadonly($host_is_discovered)
 				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
 		)
 	])
@@ -190,7 +190,7 @@ $host_tab = (new CFormGrid())
 // Templates tab.
 $templates_tab = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED);
 
-if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+if ($host_is_discovered) {
 	$linked_template_table = (new CTable())
 		->setHeader([_('Name')])
 		->setId('linked-template')
@@ -297,7 +297,7 @@ else {
 }
 
 // IPMI tab.
-if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+if ($host_is_discovered) {
 	$ipmi_authtype_select = [
 		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['host']['ipmi_authtype']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
@@ -327,7 +327,7 @@ $ipmi_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Username'), 'ipmi_username'),
 		new CFormField(
-			(new CTextBox('ipmi_username', $data['host']['ipmi_username'], $readonly))
+			(new CTextBox('ipmi_username', $data['host']['ipmi_username'], $host_is_discovered))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->disableAutocomplete()
 		)
@@ -335,7 +335,7 @@ $ipmi_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Password'), 'ipmi_password'),
 		new CFormField(
-			(new CTextBox('ipmi_password', $data['host']['ipmi_password'], $readonly))
+			(new CTextBox('ipmi_password', $data['host']['ipmi_password'], $host_is_discovered))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->disableAutocomplete()
 		)
@@ -347,7 +347,7 @@ $tags_tab = (new CFormGrid())
 	->addItem(new CPartial('configuration.tags.tab', [
 		'source' => 'host',
 		'tags' => $data['host']['tags'],
-		'readonly' => false
+		'readonly' => $host_is_discovered
 	]));
 
 // Macros tab.
@@ -363,7 +363,7 @@ $macros_tab = (new CFormGrid())
 			->addRow(null,
 				new CPartial('hostmacros.list.html', [
 					'macros' => $data['host']['macros'],
-					'readonly' => $readonly
+					'readonly' => $host_is_discovered
 				]), 'macros_container'
 			)
 	);
@@ -378,9 +378,9 @@ $inventory_tab = (new CFormGrid())
 				->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-				->setEnabled(!$readonly)
+				->setEnabled(!$host_is_discovered)
 				->setModern(true),
-			$readonly ? new CInput('hidden', 'inventory_mode', $data['host']['inventory_mode']) : null
+			$host_is_discovered ? new CInput('hidden', 'inventory_mode', $data['host']['inventory_mode']) : null
 		])
 	]);
 
@@ -453,7 +453,7 @@ $encryption_tab = (new CFormGrid())
 				->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
 				->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
 				->setModern(true)
-				->setEnabled(!$readonly)
+				->setEnabled(!$host_is_discovered)
 		)
 	])
 	->addItem([
@@ -464,19 +464,19 @@ $encryption_tab = (new CFormGrid())
 					(new CCheckBox('tls_in_none'))
 						->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
 						->setLabel(_('No encryption'))
-						->setEnabled(!$readonly)
+						->setEnabled(!$host_is_discovered)
 				)
 				->addItem(
 					(new CCheckBox('tls_in_psk'))
 						->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
 						->setLabel(_('PSK'))
-						->setEnabled(!$readonly)
+						->setEnabled(!$host_is_discovered)
 				)
 				->addItem(
 					(new CCheckBox('tls_in_cert'))
 						->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
 						->setLabel(_('Certificate'))
-						->setEnabled(!$readonly)
+						->setEnabled(!$host_is_discovered)
 				),
 			new CInput('hidden', 'tls_accept', $tls_accept)
 		])
@@ -489,7 +489,7 @@ $encryption_tab = (new CFormGrid())
 				(new CSimpleButton(_('Change PSK')))
 					->setId('change_psk')
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->setEnabled(!$readonly)
+					->setEnabled(!$host_is_discovered)
 			)
 		]
 		: null
@@ -514,7 +514,7 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Issuer'), 'tls_issuer'),
 		new CFormField(
-			(new CTextBox('tls_issuer', $data['host']['tls_issuer'], $readonly,
+			(new CTextBox('tls_issuer', $data['host']['tls_issuer'], $host_is_discovered,
 				DB::getFieldLength('hosts', 'tls_issuer')
 			))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 		)
@@ -522,21 +522,21 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_x('Subject', 'encryption certificate'), 'tls_subject'),
 		new CFormField(
-			(new CTextBox('tls_subject', $data['host']['tls_subject'], $readonly,
+			(new CTextBox('tls_subject', $data['host']['tls_subject'], $host_is_discovered,
 				DB::getFieldLength('hosts', 'tls_subject')
 			))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 		)
 	]);
 
 // Value mapping tab.
-if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+if (!$host_is_discovered) {
 	$value_mapping_tab = (new CFormGrid())
 		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 		->addItem((new CFormList('valuemap-formlist'))
 			->addRow(null, new CPartial('configuration.valuemap', [
 				'source' => 'host',
 				'valuemaps' => $data['host']['valuemaps'],
-				'readonly' => $readonly,
+				'readonly' => $host_is_discovered,
 				'form' => 'host'
 			]))
 		);
@@ -553,7 +553,7 @@ $tabs = (new CTabView())
 	->addTab('inventory-tab', _('Inventory'), $inventory_tab, TAB_INDICATOR_INVENTORY)
 	->addTab('encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);;
 
-if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+if (!$host_is_discovered) {
 	$tabs->addTab('valuemap-tab', _('Value mapping'), $value_mapping_tab, TAB_INDICATOR_VALUEMAPS);
 }
 
