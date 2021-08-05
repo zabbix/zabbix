@@ -1474,8 +1474,8 @@ static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeid
  *                                                                            *
  * Purpose: deletes host prototypes from database                             *
  *                                                                            *
- * Parameters: host_prototypeids   - [IN] list of host prototype ids          *
- *             host_prototypenames - [IN] list of host prototype names        *
+ * Parameters: host_prototypeids    - [IN] list of host prototype ids         *
+ *             host_prototype_names - [IN] list of host prototype names       *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
@@ -3196,7 +3196,8 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
  *                                                                            *
  * Purpose: prepare sql for update record of interface_snmp table             *
  *                                                                            *
- * Parameters: interfaceid - [IN] snmp interface id;                          *
+ * Parameters: hostid      - [IN] host identificator                          *
+ *             interfaceid - [IN] snmp interface id;                          *
  *             snmp        - [IN] snmp interface prototypes for update        *
  *             sql         - [IN/OUT] sql string                              *
  *             sql_alloc   - [IN/OUT] size of sql string                      *
@@ -3709,7 +3710,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					zbx_audit_host_prototype_update_json_update_interface_type(
 							host_prototype->hostid, interface->interfaceid,
 							interface->type_orig, interface->type);
-
 				}
 
 				if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_USEIP))
@@ -5648,6 +5648,7 @@ void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 	zbx_db_insert_add_values(&db_insert, hostid, inventory_mode);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
+	zbx_audit_host_update_json_add_inventory_mode(hostid, inventory_mode);
 }
 
 /******************************************************************************
@@ -5670,12 +5671,13 @@ void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 	DB_RESULT	result;
 	DB_ROW		row;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	result = DBselect("select inventory_mode from host_inventory where hostid=" ZBX_FS_UI64, hostid);
 
 	if (NULL == (row = DBfetch(result)))
 	{
 		DBadd_host_inventory(hostid, inventory_mode);
-		zbx_audit_host_update_json_add_inventory_mode(hostid, inventory_mode);
 	}
 	else if (inventory_mode != atoi(row[0]))
 	{
@@ -5685,4 +5687,6 @@ void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 	}
 
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
