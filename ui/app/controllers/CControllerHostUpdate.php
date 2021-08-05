@@ -20,12 +20,11 @@
 
 
 /**
- * Controller for host creation.
+ * Controller for host update.
  */
 class CControllerHostUpdate extends CController {
 
 	protected function checkInput(): bool {
-
 		$fields = [
 			'hostid'			=> 'required|db hosts.hostid',
 			'host'				=> 'required|db hosts.host|not_empty',

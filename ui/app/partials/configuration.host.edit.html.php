@@ -542,7 +542,7 @@ if (!$host_is_discovered) {
 		);
 }
 
-// Output.
+// main output
 $tabs = (new CTabView())
 	->setSelected(0)
 	->addTab('host-tab', _('Host'), $host_tab)

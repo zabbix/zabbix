@@ -28,7 +28,6 @@ class CControllerHostList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'page'                => 'ge 1',
-			'tags'                => 'array',
 			'filter_set'          => 'in 1',
 			'filter_rst'          => 'in 1',
 			'filter_host'         => 'string',
@@ -131,24 +130,6 @@ class CControllerHostList extends CController {
 
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
-		$tags = $this->getInput('tags', []);
-
-		foreach ($tags as $key => $tag) {
-			// Remove empty new tag lines.
-			if ($tag['tag'] === '' && $tag['value'] === '') {
-				unset($tags[$key]);
-				continue;
-			}
-
-			// Remove inherited tags.
-			if (array_key_exists('type', $tag) && !((int) $tag['type'] & ZBX_PROPERTY_OWN)) {
-				unset($tags[$key]);
-			}
-			else {
-				unset($tags[$key]['type']);
-			}
-		}
-
 		$sort_field = $this->getInput('sort', CProfile::get('web.hosts.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.hosts.sortorder', ZBX_SORT_UP));
 
@@ -223,7 +204,6 @@ class CControllerHostList extends CController {
 
 		order_result($hosts, $sort_field, $sort_order);
 
-		// Paging.
 		if ($this->hasInput('page')) {
 			$page_num = $this->getInput('page');
 		}
@@ -241,7 +221,9 @@ class CControllerHostList extends CController {
 		);
 
 		$hosts = API::Host()->get([
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['name', 'proxy_hostid', 'maintenance_status', 'maintenanceid', 'flags', 'status',
+				'tls_connect', 'tls_accept'
+			],
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_COUNT,

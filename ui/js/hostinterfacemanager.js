@@ -63,9 +63,7 @@ class HostInterfaceManager {
 		this.$noInterfacesMsg = jQuery(options.templates.no_interface_msg)
 				.insertAfter(jQuery('.' + this.ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER));
 
-		// Variables.
 		this.interfaces = {};
-
 		this.data = data;
 	}
 
@@ -208,11 +206,11 @@ class HostInterfaceManager {
 
 	getInterfaces() {
 		let types = {
-				[this.INTERFACE_TYPE_AGENT]: {main: null, all: []},
-				[this.INTERFACE_TYPE_SNMP]: {main: null, all: []},
-				[this.INTERFACE_TYPE_JMX]: {main: null, all: []},
-				[this.INTERFACE_TYPE_IPMI]: {main: null, all: []}
-			};
+			[this.INTERFACE_TYPE_AGENT]: {main: null, all: []},
+			[this.INTERFACE_TYPE_SNMP]: {main: null, all: []},
+			[this.INTERFACE_TYPE_JMX]: {main: null, all: []},
+			[this.INTERFACE_TYPE_IPMI]: {main: null, all: []}
+		};
 
 		Object
 			.entries(this.data)
@@ -447,6 +445,7 @@ class HostInterfaceManager {
 				case 'text':
 					el.readOnly = true;
 					break;
+
 				case 'radio':
 				case 'checkbox':
 					const {checked, name, value} = el;
@@ -460,7 +459,6 @@ class HostInterfaceManager {
 
 						el.insertAdjacentElement('beforebegin', input);
 					}
-
 					break;
 			}
 		}

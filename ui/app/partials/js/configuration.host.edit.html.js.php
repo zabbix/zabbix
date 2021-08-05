@@ -207,7 +207,7 @@ $linked_templates = $host_is_discovered
 		/**
 		 * Collects ids of currently active (linked + new) templates.
 		 *
-		 * @returns {array} Templateids.
+		 * @return {array} Templateids.
 		 */
 		getAssignedTemplates() {
 			const linked_templateids = [];
@@ -290,7 +290,8 @@ $linked_templates = $host_is_discovered
 
 		/**
 		 * Helper to get added template IDs as an array.
-		 * @returns {array}
+		 *
+		 * @return {array}
 		*/
 		getNewlyAddedTemplates() {
 			let $template_multiselect = $('#add_templates_'),
@@ -461,7 +462,8 @@ $linked_templates = $host_is_discovered
 		 * Collect fields & values to transfer to a host clone.
 		 *
 		 * @param {HTMLFormElement} form Cloneable host form.
-		 * @returns {object}             Fields/values to populate for clone form.
+		 *
+		 * @return {object}             Fields/values to populate for clone form.
 		 */
 		getCloneData(form) {
 			var fields = getFormFields(form);
@@ -535,6 +537,7 @@ $linked_templates = $host_is_discovered
 			* Supplies a handler for in-popup clone button click with according action.
 			*
 			* @param {string} operation_type Either 'clone' or 'full_clone'.
+			*
 			* @return {callable}             Click handler.
 			*/
 			function popupCloneHandler(operation_type) {
@@ -716,6 +719,7 @@ $linked_templates = $host_is_discovered
 			* Supplies a handler for in-page clone button click with according action.
 			*
 			* @param {string} operation_type Either 'clone' or 'full_clone'.
+			*
 			* @return {callable}             Click handler.
 			*/
 			function inlineCloneHandler(operation_type) {

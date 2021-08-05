@@ -47,7 +47,7 @@ if (isset($_GET['lang'])) {
 }
 
 // available scripts 'scriptFileName' => 'path relative to js/'
-$availableJScripts = [
+$available_js_cripts = [
 	'common.js' => '',
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
@@ -136,7 +136,7 @@ $availableJScripts = [
 	'popup.operation.common.js' => 'pages/'
 ];
 
-$tranStrings = [
+$translate_strings = [
 	'gtlc.js' => [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
@@ -473,16 +473,16 @@ else {
 $js .= 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
 
 foreach ($files as $file) {
-	if (array_key_exists($file, $tranStrings)) {
-		foreach ($tranStrings[$file] as $origStr => $str) {
-			$js .= 'locale[\'' . $origStr . '\'] = ' . json_encode($str) . ';';
+	if (array_key_exists($file, $translate_strings)) {
+		foreach ($translate_strings[$file] as $origStr => $str) {
+			$js .= 'locale[\''.$origStr.'\'] = '.json_encode($str).';';
 		}
 	}
 }
 
 foreach ($files as $file) {
-	if (array_key_exists($file, $availableJScripts)) {
-		$js .= file_get_contents('js/'.$availableJScripts[$file].$file)."\n";
+	if (array_key_exists($file, $available_js_cripts)) {
+		$js .= file_get_contents('js/'.$available_js_cripts[$file].$file)."\n";
 	}
 }
 

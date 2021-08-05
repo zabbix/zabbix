@@ -25,12 +25,13 @@
 class CControllerHostCreate extends CController {
 
 	protected function checkInput(): bool {
-
 		$fields = [
 			'host'				=> 'required|db hosts.host|not_empty',
 			'visiblename'		=> 'db hosts.name',
 			'description'		=> 'db hosts.description',
-			'status'			=> 'required|db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]),
+			'status'			=> 'required|db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
+										HOST_STATUS_NOT_MONITORED
+									]),
 			'proxy_hostid'		=> 'db hosts.proxy_hostid',
 			'interfaces'		=> 'array',
 			'mainInterfaces'	=> 'array',
@@ -38,17 +39,17 @@ class CControllerHostCreate extends CController {
 			'tags'				=> 'array',
 			'add_templates'		=> 'array_db hosts.hostid',
 			'ipmi_authtype'		=> 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
-									IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM,
-									IPMI_AUTHTYPE_RMCP_PLUS
-								]),
+										IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM,
+										IPMI_AUTHTYPE_RMCP_PLUS
+									]),
 			'ipmi_privilege'	=> 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER,
-									IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM
-								]),
+										IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM
+									]),
 			'ipmi_username'		=> 'db hosts.ipmi_username',
 			'ipmi_password'		=> 'db hosts.ipmi_password',
 			'tls_connect'		=> 'db hosts.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK,
-									HOST_ENCRYPTION_CERTIFICATE
-								]),
+										HOST_ENCRYPTION_CERTIFICATE
+									]),
 			'tls_accept'		=> 'db hosts.tls_accept|ge 0|le '.
 										(0 | HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
 			'tls_subject'		=> 'db hosts.tls_subject',
@@ -57,7 +58,7 @@ class CControllerHostCreate extends CController {
 			'tls_psk'			=> 'db hosts.tls_psk',
 			'inventory_mode'	=> 'db host_inventory.inventory_mode|in '.implode(',', [HOST_INVENTORY_DISABLED,
 										HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC
-								]),
+									]),
 			'host_inventory'	=> 'array',
 			'macros'			=> 'array',
 			'valuemaps'			=> 'array',
@@ -100,7 +101,6 @@ class CControllerHostCreate extends CController {
 	}
 
 	protected function doAction(): void {
-
 		$host = array_filter([
 			'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
 			'proxy_hostid' => $this->getInput('proxy_hostid', 0),
@@ -310,7 +310,6 @@ class CControllerHostCreate extends CController {
 	 * @return bool
 	 */
 	private function copyFromCloneSourceHost(int $src_hostid, int $hostid): bool {
-
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
 		if (!copyHttpTests($src_hostid, $hostid)) {
 			return false;

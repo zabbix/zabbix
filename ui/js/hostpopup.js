@@ -17,14 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 const ZBX_STYLE_ZABBIX_HOST_POPUPEDIT = 'js-edit-host';
 const ZBX_STYLE_ZABBIX_HOST_POPUPCREATE = 'js-create-host';
 
 const host_popup = {
 	/**
 	 * General entry point to be called on pages that need host popup functionality.
-	 *
-	 * @returns {void}
 	 */
 	init() {
 		this.initActionButtons();
@@ -34,8 +33,6 @@ const host_popup = {
 
 	/**
 	 * Sets up listeners for elements marked to start host edit/create popup.
-	 *
-	 * @returns {void}
 	 */
 	initActionButtons() {
 		document.addEventListener('click', (e) => {
@@ -74,7 +71,6 @@ const host_popup = {
 	 * @param {object} host_data                 Host data used to initalize host form.
 	 * @param {object} host_data{hostid}         ID of host to edit.
 	 * @param {object} host_data{groupids}       Host groups to pre-fill when creating new host.
-	 * @returns {void}
 	 */
 	edit(host_data = {}) {
 		this.pauseRefresh();
@@ -100,5 +96,4 @@ const host_popup = {
 	pauseRefresh() {},
 
 	resumeRefresh() {}
-
 };

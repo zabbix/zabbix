@@ -137,8 +137,8 @@ $widget->addItem($filter);
 $form = (new CForm())->setName('hosts');
 $header_checkbox = (new CCheckBox('all_hosts'))
 	->onClick("checkAll('".$form->getName()."', 'all_hosts', 'ids');");
-$show_monitored_by = ((int) $data['filter']['monitored_by'] === ZBX_MONITORED_BY_PROXY
-		|| (int) $data['filter']['monitored_by'] === ZBX_MONITORED_BY_ANY);
+$show_monitored_by = ($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
+		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY);
 $header_sortable_name = make_sorting_header(_('Name'), 'name',
 	$data['sortField'], $data['sortOrder'], $action_url->getUrl()
 );
@@ -175,7 +175,7 @@ foreach ($data['hosts'] as $host) {
 	if ($host['interfaces']) {
 		foreach ($interface_types as $interface_type) {
 			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
-				return ((int) $host_interface['type'] === $interface_type);
+				return ($host_interface['type'] == $interface_type);
 			});
 
 			if ($host_interfaces) {
@@ -198,7 +198,7 @@ foreach ($data['hosts'] as $host) {
 			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
 	}
-	elseif ((int) $host['flags'] === ZBX_FLAG_DISCOVERY_CREATED) {
+	elseif ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		// Discovered host which does not contain info about parent discovery rule is inaccessible for current user.
 		$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
@@ -219,8 +219,8 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('update', 1)
 		->setArgument('return_to', 'hosts');
 
-	if ((int) $host['status'] === HOST_STATUS_MONITORED) {
-		if ((int) $host['maintenance_status'] === HOST_MAINTENANCE_STATUS_ON) {
+	if ($host['status'] == HOST_STATUS_MONITORED) {
+		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
 				$maintenance = $data['maintenances'][$host['maintenanceid']];
 				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
@@ -329,23 +329,23 @@ foreach ($data['hosts'] as $host) {
 	$tls_connect = (int) $host['tls_connect'];
 	$tls_accept = (int) $host['tls_accept'];
 
-	if ((int) $host['flags'] === ZBX_FLAG_DISCOVERY_CREATED && (int) $host['hostDiscovery']['ts_delete'] !== 0) {
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && (int) $host['hostDiscovery']['ts_delete'] != 0) {
 		$info_icons[] = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
 	}
 
-	if ($tls_connect === HOST_ENCRYPTION_NONE
-			&& ($tls_accept & HOST_ENCRYPTION_NONE) === HOST_ENCRYPTION_NONE
-			&& ($tls_accept & HOST_ENCRYPTION_PSK) !== HOST_ENCRYPTION_PSK
-			&& ($tls_accept & HOST_ENCRYPTION_CERTIFICATE) !== HOST_ENCRYPTION_CERTIFICATE) {
+	if ($tls_connect == HOST_ENCRYPTION_NONE
+			&& ($tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE
+			&& ($tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
+			&& ($tls_accept & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
 		$encryption = (new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN)))
 			->addClass(ZBX_STYLE_STATUS_CONTAINER);
 	}
 	else {
 		// Incoming encryption.
-		if ($tls_connect === HOST_ENCRYPTION_NONE) {
+		if ($tls_connect == HOST_ENCRYPTION_NONE) {
 			$in_encryption = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
-		elseif ($tls_connect === HOST_ENCRYPTION_PSK) {
+		elseif ($tls_connect == HOST_ENCRYPTION_PSK) {
 			$in_encryption = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
@@ -355,21 +355,21 @@ foreach ($data['hosts'] as $host) {
 		// Outgoing encryption.
 		$out_encryption = [];
 
-		if (($tls_accept & HOST_ENCRYPTION_NONE) === HOST_ENCRYPTION_NONE) {
+		if (($tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
 			$out_encryption[] = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
 			$out_encryption[] = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
-		if (($tls_accept & HOST_ENCRYPTION_PSK) === HOST_ENCRYPTION_PSK) {
+		if (($tls_accept & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
 			$out_encryption[] = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
 			$out_encryption[] = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
-		if (($tls_accept & HOST_ENCRYPTION_CERTIFICATE) === HOST_ENCRYPTION_CERTIFICATE) {
+		if (($tls_accept & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
 			$out_encryption[] = (new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
@@ -470,7 +470,7 @@ $form->addItem([
 		],
 		'host.export' => [
 			'content' => new CButtonExport('export.hosts', $action_url
-				->setArgument('page', ((int) $data['page'] === 1) ? null : $data['page'])
+				->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
 				->getUrl()
 			)
 		],
