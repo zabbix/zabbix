@@ -23,12 +23,13 @@
  * @var CView $this
  */
 
-$linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+$host_is_discovered = ((int) $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
+$linked_templates = $host_is_discovered
 	? array_column($data['host']['parentTemplates'], 'templateid')
 	: [];
 ?>
 
-<?php if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED): ?>
+<?php if (!$host_is_discovered): ?>
 	<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
 		<?= (new CRow([
 				(new CCol([
@@ -178,12 +179,7 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 		resetNewTemplatesField() {
 			var $old_multiselect = $('#add_templates_'),
 				$new_multiselect = $('<div>'),
-				linked_templates = [],
 				data = $old_multiselect.multiSelect('getData');
-
-			document.querySelectorAll('[name="templates[]').forEach((input) => {
-				linked_templates.push(input.value);
-			});
 
 			$('#add_templates_').parent().html($new_multiselect);
 
@@ -202,22 +198,36 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 							dstfrm: '<?= $data['form_name'] ?>',
 							dstfld1: 'add_templates_',
 							multiselect: '1',
-							disableids: linked_templates
+							disableids: this.getAssignedTemplates()
 						}
 					}
 				});
 		},
 
 		/**
+		 * Collects ids of currently active (linked + new) templates.
+		 *
+		 * @returns {array} Templateids.
+		 */
+		getAssignedTemplates() {
+			const linked_templateids = [];
+
+			document.querySelectorAll('[name="templates[]').forEach((input) => {
+				linked_templateids.push(input.value);
+			});
+
+			return linked_templateids.concat(this.getNewlyAddedTemplates());
+		},
+
+		/**
 		 * Set up of macros functionality.
 		 */
 		initMacrosTab() {
-			var linked_templateids = <?= json_encode($linked_templates) ?>,
-				$show_inherited_macros = $('input[name="show_inherited_macros"]');
+			const $show_inherited_macros = $('input[name="show_inherited_macros"]');
 
 			this.macros_manager = new HostMacrosManager(<?= json_encode([
 				'properties' => [
-					'readonly' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+					'readonly' => $host_is_discovered
 				],
 				'defines' => [
 					'ZBX_STYLE_TEXTAREA_FLEXIBLE' => ZBX_STYLE_TEXTAREA_FLEXIBLE,
@@ -240,12 +250,12 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 					// Please note that macro initialization must take place once and only when the tab is visible.
 					if (e.type === 'tabsactivate') {
 						let panel_templateids = panel.data('templateids') || [],
-							templateids = this.getNewlyAddedTemplates();
+							templateids = this.getAssignedTemplates();
 
 						if (panel_templateids.xor(templateids).length > 0) {
 							panel.data('templateids', templateids);
-							this.macros_manager.load($show_inherited_macros.val(),
-								linked_templateids.concat(templateids)
+							this.macros_manager.load($show_inherited_macros.filter(':checked').val(),
+								templateids
 							);
 							panel.data('macros_initialized', true);
 						}
@@ -256,11 +266,11 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 					}
 
 					// Initialize macros.
-					<?php if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED): ?>
+					<?php if ($host_is_discovered): ?>
 						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 					<?php else: ?>
 						this.macros_manager.initMacroTable(this.macros_manager.getMacroTable(),
-							$('input[name="show_inherited_macros"]:checked').val()
+							$show_inherited_macros.filter(':checked').val()
 						);
 					<?php endif ?>
 
@@ -273,8 +283,7 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 					return;
 				}
 
-				let templateids = linked_templateids.concat(this.getNewlyAddedTemplates());
-				this.macros_manager.load(e.value, templateids);
+				this.macros_manager.load(e.target.value, this.getAssignedTemplates());
 				this.updateEncryptionFields();
 			});
 		},
@@ -286,6 +295,10 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 		getNewlyAddedTemplates() {
 			let $template_multiselect = $('#add_templates_'),
 				templateids = [];
+
+			if ($template_multiselect.data('multiSelect') === undefined) {
+				return templateids;
+			}
 
 			// Readonly forms don't have multiselect.
 			if ($template_multiselect.length) {
@@ -667,7 +680,7 @@ $linked_templates = ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 
 		hostInterfaceManager.render();
 
-		<?php if ((int) $data['host']['flags'] === ZBX_FLAG_DISCOVERY_CREATED): ?>
+		<?php if ($host_is_discovered): ?>
 			hostInterfaceManager.makeReadonly();
 		<?php endif; ?>
 
