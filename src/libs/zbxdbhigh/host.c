@@ -56,10 +56,12 @@ static int	zbx_ids_names_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBselect_ids_names                                                *
+ * Function: DBselect_ids_names                                               *
  *                                                                            *
- * Parameters: sql - [IN] sql statement                                       *
- *             ids - [OUT] sorted list of selected uint64 values              *
+ * Parameters: sql   - [IN] sql statement                                     *
+ *             ids   - [OUT] sorted list of selected uint64 values            *
+ *             names - [OUT] list of names of the requested resource, order   *
+ *                     matches the order of ids list                          *
  *                                                                            *
  ******************************************************************************/
 void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names)
