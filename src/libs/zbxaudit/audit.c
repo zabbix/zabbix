@@ -26,6 +26,16 @@
 static int		audit_mode;
 static zbx_hashset_t	zbx_audit;
 
+int	zbx_get_audit_mode(void)
+{
+	return audit_mode;
+}
+
+zbx_hashset_t	*zbx_get_audit_hashset(void)
+{
+	return &zbx_audit;
+}
+
 static void	append_str_json(struct zbx_json *json, const char *audit_op, const char *key, const char *val)
 {
 	zbx_json_addarray(json, key);
@@ -75,16 +85,6 @@ static void	update_int_json(struct zbx_json *json, const char *key, int val_old,
 	zbx_json_addint64(json, NULL, val_new);
 	zbx_json_addint64(json, NULL, val_old);
 	zbx_json_close(json);
-}
-
-int	zbx_get_audit_mode(void)
-{
-	return audit_mode;
-}
-
-zbx_hashset_t*	zbx_get_audit_hashset(void)
-{
-	return &zbx_audit;
 }
 
 /******************************************************************************

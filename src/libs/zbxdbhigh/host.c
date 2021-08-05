@@ -77,7 +77,6 @@ void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_st
 			zbx_ids_names_hash_func,
 			zbx_ids_names_compare_func);
 #undef IDS_NAMES_HASHSET_DEF_SIZE
-
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
@@ -97,6 +96,7 @@ void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_st
 	for (i = 0; i < ids->values_num; i++)
 	{
 		zbx_id_name_pair_t	*found, temp_t;
+
 		temp_t.id = ids->values[i];
 		if (NULL != (found = (zbx_id_name_pair_t *)zbx_hashset_search(&ids_names, &temp_t)))
 		{
@@ -1499,7 +1499,7 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
 	zbx_vector_uint64_create(&group_prototype_ids);
 
 	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hd.hostid,h.name from host_discovery hd, hosts h "
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hd.hostid,h.name from host_discovery hd,hosts h "
 			"where hd.hostid=h.hostid and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);

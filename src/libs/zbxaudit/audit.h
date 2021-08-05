@@ -44,7 +44,7 @@
 		return						\
 
 int		zbx_get_audit_mode(void);
-zbx_hashset_t*	zbx_get_audit_hashset(void);
+zbx_hashset_t	*zbx_get_audit_hashset(void);
 
 typedef struct zbx_audit_entry
 {

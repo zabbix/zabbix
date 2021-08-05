@@ -18,7 +18,7 @@
 **/
 
 #ifndef ZABBIX_AUDIT_HOST_H
-#define ZABBIX_AUDIT__HOST_H
+#define ZABBIX_AUDIT_HOST_H
 
 #include "common.h"
 #include "audit.h"
