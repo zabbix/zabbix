@@ -265,10 +265,7 @@ if (getRequest('itemid', false)) {
 
 		foreach ($override['operations'] as &$operation) {
 			if (array_key_exists('optag', $operation)) {
-				CArrayHelper::sort($operation['optag'], [
-					['field' => 'tag', 'order' => ZBX_SORT_UP],
-					['field' => 'value', 'order' => ZBX_SORT_UP]
-				]);
+				CArrayHelper::sort($operation['optag'], ['tag', 'value']);
 				$operation['optag'] = array_values($operation['optag']);
 			}
 		}

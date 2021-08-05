@@ -184,6 +184,7 @@ class CWidgetHelper {
 			'name' => $field->getName().'[]',
 			'object_name' => 'hosts',
 			'data' => $field->getValue(),
+			'placeholder' => $field->getPlaceholder(),
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
@@ -195,7 +196,6 @@ class CWidgetHelper {
 			'add_post_js' => false
 		]))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-			->setAttribute('placeholder', $field->getPlaceholder())
 			->setAriaRequired(self::isAriaRequired($field))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}

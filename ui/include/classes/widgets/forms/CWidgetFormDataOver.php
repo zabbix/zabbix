@@ -27,11 +27,6 @@ class CWidgetFormDataOver extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_DATA_OVER);
 
-		if (array_key_exists('tags', $this->data) && $this->data['tags']) {
-			// API doesn't guarantee fields to be retrieved in same order as stored.
-			ksort($this->data['tags'], SORT_NUMERIC);
-		}
-
 		// Host groups.
 		$field_groups = new CWidgetFieldMsGroup('groupids', _('Host groups'));
 

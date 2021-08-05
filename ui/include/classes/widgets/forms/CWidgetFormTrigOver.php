@@ -27,11 +27,6 @@ class CWidgetFormTrigOver extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_TRIG_OVER);
 
-		if (array_key_exists('tags', $this->data) && $this->data['tags']) {
-			// API doesn't guarantee fields to be retrieved in same order as stored.
-			ksort($this->data['tags'], SORT_NUMERIC);
-		}
-
 		// Output information option.
 		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), [
 			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problems'),

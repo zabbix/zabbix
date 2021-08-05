@@ -114,16 +114,31 @@ class CWidgetForm {
 	 * @return array
 	 */
 	protected static function convertDottedKeys(array $data) {
+		// API doesn't guarantee fields to be retrieved in same order as stored. Sorting by key...
+		uksort($data, function ($key1, $key2) {
+			foreach (['key1', 'key2'] as $var) {
+				if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', (string) $$var, $matches) === 1) {
+					$$var = $matches[1].'.'.$matches[3].'.'.$matches[2].'.'.$matches[4];
+				}
+				elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', (string) $$var, $matches) === 1) {
+					$$var = $matches[1].'.'.$matches[3].'.'.$matches[2];
+				}
+			}
+
+			return strnatcmp((string) $key1, (string) $key2);
+		});
+
+		// Converting dot-delimited keys to the arrays.
 		foreach ($data as $key => $value) {
-			if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', $key, $matches) === 1) {
+			if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', (string) $key, $matches) === 1) {
 				$data[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
 				unset($data[$key]);
 			}
-			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', $key, $matches) === 1) {
+			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', (string) $key, $matches) === 1) {
 				$data[$matches[1]][$matches[3]][$matches[2]] = $value;
 				unset($data[$key]);
 			}
-			elseif (preg_match('/^([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
+			elseif (preg_match('/^([a-z]+)\.(\d+)$/', (string) $key, $matches) === 1) {
 				$data[$matches[1]][$matches[2]] = $value;
 				unset($data[$key]);
 			}
