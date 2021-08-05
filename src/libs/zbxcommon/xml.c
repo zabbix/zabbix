@@ -38,7 +38,7 @@ static char	data_static[ZBX_MAX_B64_LEN];
 
 typedef struct _zbx_xml_node_t zbx_xml_node_t;
 
-ZBX_PTR_VECTOR_DECL(xml_node_ptr, zbx_xml_node_t *);
+ZBX_PTR_VECTOR_DECL(xml_node_ptr, zbx_xml_node_t *)
 
 struct _zbx_xml_node_t
 {
@@ -49,7 +49,7 @@ struct _zbx_xml_node_t
 	int				is_array;
 };
 
-ZBX_PTR_VECTOR_IMPL(xml_node_ptr, zbx_xml_node_t *);
+ZBX_PTR_VECTOR_IMPL(xml_node_ptr, zbx_xml_node_t *)
 
 /******************************************************************************
  *                                                                            *
