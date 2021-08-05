@@ -1271,11 +1271,6 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 	$data['display_interfaces'] = ($data['host']['status'] == HOST_STATUS_MONITORED
 			|| $data['host']['status'] == HOST_STATUS_NOT_MONITORED);
 
-	// Sort interfaces to be listed starting with one selected as 'main'.
-	CArrayHelper::sort($data['interfaces'], [
-		['field' => 'main', 'order' => ZBX_SORT_DOWN]
-	]);
-
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
 	}

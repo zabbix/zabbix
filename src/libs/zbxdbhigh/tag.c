@@ -41,4 +41,4 @@ int	zbx_db_tag_compare_func(const void *d1, const void *d2)
 	return strcmp(tag1->value, tag2->value);
 }
 
-ZBX_PTR_VECTOR_IMPL(db_tag_ptr, zbx_db_tag_t *);
+ZBX_PTR_VECTOR_IMPL(db_tag_ptr, zbx_db_tag_t *)
