@@ -207,7 +207,7 @@ class CControllerHostList extends CController {
 		if ($this->hasInput('page')) {
 			$page_num = $this->getInput('page');
 		}
-		elseif (isRequestMethod('get') && !$this->hasInput('cancel')) {
+		elseif (isRequestMethod('get')) {
 			$page_num = 1;
 		}
 		else {
@@ -285,8 +285,8 @@ class CControllerHostList extends CController {
 				$proxy_hostids[$host['proxy_hostid']] = $host['proxy_hostid'];
 			}
 
-			if ((int) $host['status'] === HOST_STATUS_MONITORED &&
-					(int) $host['maintenance_status'] === HOST_MAINTENANCE_STATUS_ON) {
+			if ($host['status'] == HOST_STATUS_MONITORED &&
+					$host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 				$maintenanceids[$host['maintenanceid']] = true;
 			}
 		}

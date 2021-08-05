@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$host_is_discovered = ((int) $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
+$host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 $linked_templates = $host_is_discovered
 	? array_column($data['host']['parentTemplates'], 'templateid')
 	: [];
@@ -146,28 +146,28 @@ $linked_templates = $host_is_discovered
 		 */
 		initTemplatesTab() {
 			document.getElementById('linked-template').addEventListener('click', (e) => {
-				const node = e.target;
+				const element = e.target;
 
-				if (node.classList.contains('js-tmpl-unlink')) {
-					if (node.dataset.templateid === undefined) {
+				if (element.classList.contains('js-tmpl-unlink')) {
+					if (element.dataset.templateid === undefined) {
 						return;
 					}
 
-					node.closest('tr').remove();
+					element.closest('tr').remove();
 					this.resetNewTemplatesField();
 				}
-				else if (node.classList.contains('js-tmpl-unlink-and-clear')) {
-					if (node.dataset.templateid === undefined) {
+				else if (element.classList.contains('js-tmpl-unlink-and-clear')) {
+					if (element.dataset.templateid === undefined) {
 						return;
 					}
 
 					var clear_tmpl = document.createElement('input');
 					clear_tmpl.setAttribute('type', 'hidden');
 					clear_tmpl.setAttribute('name', 'clear_templates[]');
-					clear_tmpl.setAttribute('value', node.dataset.templateid);
-					node.form.appendChild(clear_tmpl);
+					clear_tmpl.setAttribute('value', element.dataset.templateid);
+					element.form.appendChild(clear_tmpl);
 
-					node.closest('tr').remove();
+					element.closest('tr').remove();
 					this.resetNewTemplatesField();
 				}
 			});

@@ -499,6 +499,10 @@ static int	DBpatch_5050035(void)
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sortorder' where idx='web.hosts.php.sortorder'"))
 		return FAIL;
 
+	if (ZBX_DB_OK > DBexecute("update profiles set value_str='host.list' where idx='web.pager.entity' "
+				"and value_str='hosts.php'"))
+		return FAIL;
+
 	return SUCCEED;
 }
 #endif

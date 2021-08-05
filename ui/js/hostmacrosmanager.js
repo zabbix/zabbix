@@ -24,10 +24,10 @@
 class HostMacrosManager {
 
 	constructor(options) {
-		// Nodes.
+		// nodes
 		this.$container = $('#macros_container .table-forms-td-right');
 
-		// Defines.
+		// defines
 		for (let [prop, value] of Object.entries({...options.properties, ...options.defines})) {
 			this[prop] = value;
 		}
@@ -50,7 +50,7 @@ class HostMacrosManager {
 				this.loaderStart();
 			}
 		})
-			.done(response => {
+			.done((response) => {
 				if (typeof response === 'object' && 'errors' in response) {
 					this.$container.append(response.errors);
 				}
