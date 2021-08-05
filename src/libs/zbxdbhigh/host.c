@@ -3427,6 +3427,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 		interface->ip = zbx_strdup(NULL, row[4]);
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
+		interface->flags = 0;
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
@@ -3444,6 +3445,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 			ZBX_STR2UCHAR(snmp->authprotocol, row[14]);
 			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
 			snmp->contextname = zbx_strdup(NULL, row[16]);
+			snmp->flags = 0;
 			interface->data.snmp = snmp;
 		}
 		else
@@ -3500,7 +3502,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 					uint64_t	interfaceid;
 
 					ZBX_STR2UINT64(interfaceid, row[0]);
-					ZBX_STR2UINT64(type, row[3]);
+					ZBX_STR2UCHAR(type, row[3]);
 
 					if (INTERFACE_TYPE_SNMP == type)
 					{
