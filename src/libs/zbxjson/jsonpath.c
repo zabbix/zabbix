@@ -1839,15 +1839,16 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 		{
 			case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
 				if (FAIL == jsonpath_extract_value(jp_root, token->data, &value))
-					goto out;
+					zbx_variant_set_none(&value);
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
 				/* relative path can be applied only to array or object */
 				if ('[' != *jp.start && '{' != *jp.start)
 					goto out;
+
 				if (FAIL == jsonpath_extract_value(&jp, token->data, &value))
-					goto out;
+					zbx_variant_set_none(&value);
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_CONST_STR:
