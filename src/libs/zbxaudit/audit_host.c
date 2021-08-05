@@ -93,8 +93,8 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(resource)\
 PREPARE_AUDIT_SNMP_INTERFACE(host)
 PREPARE_AUDIT_SNMP_INTERFACE(host_prototype)
 
-void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_uint64_t hostid,
-		zbx_uint64_t proxy_hostid, const char *hostname)
+void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid,
+		const char *hostname)
 {
 	RETURN_IF_AUDIT_OFF();
 

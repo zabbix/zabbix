@@ -24,7 +24,7 @@
 #include "dbcache.h"
 #include "zbxserver.h"
 #include "template.h"
-#include "../../libs/zbxaudit/audit.h"
+#include "../../libs/zbxaudit/audit_host.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "../zbxalgo/vectorimpl.h"
