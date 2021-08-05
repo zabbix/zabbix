@@ -101,50 +101,55 @@ class CControllerHostCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$host = array_filter([
-			'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
-			'proxy_hostid' => $this->getInput('proxy_hostid', 0),
-			'groups' => $this->processHostGroups(),
-			'interfaces' => $this->processHostInterfaces(),
-			'tags' => $this->processTags(),
-			'templates' => zbx_toObject($this->getInput('add_templates', []), 'templateid'),
-			'macros' => $this->processUserMacros(),
-			'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) != HOST_INVENTORY_DISABLED)
-				? $this->getInput('host_inventory', [])
-				: [],
-			'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
-			'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
-		]);
+		$hostids = false;
 
-		$this->getInputs($host, [
-			'host', 'visiblename', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege',
-			'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk',
-			'inventory_mode'
-		]);
+		try {
+			$host = array_filter([
+				'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
+				'proxy_hostid' => $this->getInput('proxy_hostid', 0),
+				'groups' => $this->processHostGroups(),
+				'interfaces' => $this->processHostInterfaces(),
+				'tags' => $this->processTags(),
+				'templates' => zbx_toObject($this->getInput('add_templates', []), 'templateid'),
+				'macros' => $this->processUserMacros(),
+				'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) != HOST_INVENTORY_DISABLED)
+					? $this->getInput('host_inventory', [])
+					: [],
+				'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
+				'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
+			]);
 
-		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-			unset($host['tls_psk'], $host['tls_psk_identity']);
+			$this->getInputs($host, [
+				'host', 'visiblename', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege',
+				'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk',
+				'inventory_mode'
+			]);
+
+			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+				unset($host['tls_psk'], $host['tls_psk_identity']);
+			}
+
+			if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
+					&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
+				unset($host['tls_issuer'], $host['tls_subject']);
+			}
+
+			$host = CArrayHelper::renameKeys($host, [
+				'visiblename' => 'name'
+			]);
+
+			$full_clone = $this->hasInput('full_clone');
+			$src_hostid = $this->getInput('clone_hostid', false);
+
+			if ($src_hostid) {
+				$host = $this->extendHostClone($host, (int) $src_hostid);
+			}
+
+			$output = [];
+			$hostids = API::Host()->create($host);
+		} catch (Exception $exception) {
+			// Code is not missing here.
 		}
-
-		if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
-				&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
-			unset($host['tls_issuer'], $host['tls_subject']);
-		}
-
-		$host = CArrayHelper::renameKeys($host, [
-			'visiblename' => 'name'
-		]);
-
-		$full_clone = $this->hasInput('full_clone');
-		$src_hostid = $this->getInput('clone_hostid', false);
-
-		if ($src_hostid) {
-			$host = $this->extendHostClone($host, (int) $src_hostid);
-		}
-
-		$output = [];
-		$hostids = API::Host()->create($host);
-
 		if ($hostids !== false && $this->createValueMaps((int) $hostids['hostids'][0])
 				&& (!$full_clone || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
 			$output += [

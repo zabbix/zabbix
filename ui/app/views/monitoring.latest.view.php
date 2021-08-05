@@ -40,11 +40,6 @@ $widget = (new CWidget())
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
-		'evaltype' => $data['filter']['evaltype'],
-		'tags' => $data['filter']['tags']
-	]);
-
 	$widget->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'latest.view'))
 		->setProfile('web.latest.filter')
@@ -92,7 +87,10 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				),
 			(new CFormList())
-				->addRow(_('Tags'), $filter_tags_table)
+				->addRow(_('Tags'), CTagFilterFieldHelper::getTagFilterField([
+					'evaltype' => $data['filter']['evaltype'],
+					'tags' => $data['filter']['tags']
+				]))
 				->addRow(_('Show details'), [
 					(new CCheckBox('filter_show_details'))->setChecked($data['filter']['show_details'] == 1),
 					(new CDiv([
