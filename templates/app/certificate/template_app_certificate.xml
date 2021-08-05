@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-07-29T10:49:17Z</date>
+   <date>2021-08-05T09:20:49Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -247,7 +247,8 @@ Template tooling version used: 0.39</description>
                      <expression>{diff()}=1</expression>
                      <name>Cert: Fingerprint has changed (new version: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
-                     <description>Cert fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</description>
+                     <description>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.&#13;
+There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>

@@ -4,10 +4,9 @@
 ## Overview
 
 For Zabbix version: 5.0 and higher  
-The template to monitor TLS/SSL certificate on the website by Zabbix agent 2 that works without any external scripts.  
+The template to monitor TLS/SSL certificate on the website by Zabbix agent 2 that works without any external scripts.
 Zabbix agent 2 with the WebCertificate plugin requests certificate using the web.certificate.get key and returns
 JSON with certificate attributes.
-
 
 ## Setup
 
@@ -22,7 +21,6 @@ JSON with certificate attributes.
 4\. Link the template to the host.
 
 5\. Customize the value of {$CERT.WEBSITE.HOSTNAME} macro.
-
 
 ## Zabbix configuration
 
@@ -68,7 +66,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Cert: SSL certificate is invalid |<p>SSL certificate has expired or it is issued for another domain.</p> |`{TEMPLATE_NAME:cert.validation.str("invalid")} = 1` |HIGH | |
 |Cert: SSL certificate expires soon (less than {$CERT.NOTAFTER.MIN.WARN} days) |<p>The SSL certificate should be updated or it will become untrusted.</p> |`({TEMPLATE_NAME:cert.not_after.last()} - {TEMPLATE_NAME:cert.not_after.now()}) / 86400 < {$CERT.NOTAFTER.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Cert: SSL certificate is invalid</p> |
-|Cert: Fingerprint has changed (new version: {ITEM.VALUE}) |<p>Cert fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</p> |`{TEMPLATE_NAME:cert.sha1_fingerprint.diff()}=1` |INFO |<p>Manual close: YES</p> |
+|Cert: Fingerprint has changed (new version: {ITEM.VALUE}) |<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</p><p>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p> |`{TEMPLATE_NAME:cert.sha1_fingerprint.diff()}=1` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 
