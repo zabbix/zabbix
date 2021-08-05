@@ -52,5 +52,4 @@ $data += [
 (new CWidget())
 	->setTitle(_('Host'))
 	->addItem(new CPartial('configuration.host.edit.html', $data))
-	->addItem(new CScriptTag($this->readJsFile('configuration.host.edit.js.php')))
 	->show();
