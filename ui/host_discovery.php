@@ -805,9 +805,7 @@ if (hasRequest('form')) {
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
-		CArrayHelper::sort($data['overrides'], [
-			['field' => 'step', 'order' => ZBX_SORT_UP]
-		]);
+		CArrayHelper::sort($data['overrides'], ['order']);
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
