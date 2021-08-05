@@ -213,17 +213,17 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'item_count(/host/trap)'
 				]
 			],
-			[
-				[
-					'formula' => 'item_count(/*/trap)'
-				]
-			],
-			[
-				[
-					'formula' => 'item_count(/host/trap[*])'
-				]
-			],
 // TODO uncomment after ZBX-19773 will be completed
+//			[
+//				[
+//					'formula' => 'item_count(/*/trap)'
+//				]
+//			],
+//			[
+//				[
+//					'formula' => 'item_count(/host/trap[*])'
+//				]
+//			],
 //			[
 //				[
 //					'formula' => 'item_count(/*/agent.ping?[group="grp"]'
@@ -882,6 +882,13 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap, 1h, 1)',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap, 1h, 1)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap, 1h) 1)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap, 1h) 1)".'
 				]
 			],
 			[
