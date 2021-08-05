@@ -186,6 +186,8 @@ class CProfile {
 			self::$profiles[$idx][$row['idx2']] = $row[$value_type];
 		}
 
+		ksort(self::$profiles[$idx], SORT_NUMERIC);
+
 		return array_key_exists($idx2, self::$profiles[$idx]) ? self::$profiles[$idx][$idx2] : $default_value;
 	}
 
