@@ -351,7 +351,7 @@ void	zbx_audit_host_prototype_update_json_add_templates(zbx_uint64_t hostid, zbx
 
 	for (i = 0; i < templateids->values_num; i++)
 	{
-		zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "host.templates",
+		zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "hostprototype.templates",
 				templateids->values[i]);
 	}
 }
