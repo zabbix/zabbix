@@ -125,6 +125,12 @@ class testFormScheduledReport extends CWebTest {
 			$this->assertFalse($form->getField('Repeat on')->isVisible());
 		}
 
+		// Check placeholders in "Start date" and "End date" fields.
+		foreach (['Start date', 'End date'] as $date_field) {
+			$placeholder = $form->getField($date_field)->query('xpath:./input')->one()->getAttribute('placeholder');
+			$this->assertEquals('YYYY-MM-DD', $placeholder);
+		}
+
 		// Check default values for current subscriber and when add new subscriptions in overlay dialog.
 		foreach ([$this->default_values['Subscriptions'], self::USER, self::USER_GROUP] as $type) {
 			if (is_array($type)) {
