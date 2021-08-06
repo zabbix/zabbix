@@ -401,3 +401,4 @@ void	zbx_service_deserialize_parent_services(const unsigned char *data, zbx_uint
 	}
 
 }
+
