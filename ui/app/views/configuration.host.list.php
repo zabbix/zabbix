@@ -476,7 +476,7 @@ $form->addItem([
 				->addClass(ZBX_STYLE_BTN_ALT)
 		],
 		'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
-	])
+	], 'hosts')
 ]);
 
 $widget
