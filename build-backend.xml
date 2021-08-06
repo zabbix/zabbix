@@ -75,6 +75,7 @@
 				<trycatch>
 					<try>
 						<exec executable="scan-build" failonerror="on">
+							<arg line="-plist-html"/>
 							<arg line="-o"/>
 							<arg line="./clang-scan-build-reports"/>
 							<arg line="make"/>
