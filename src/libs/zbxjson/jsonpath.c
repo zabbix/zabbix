@@ -1696,9 +1696,6 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 	zbx_variant_t		value, *right;
 	double			res;
 
-	zbx_variant_set_none(&value);
-	value.data.str = NULL;
-
 	if (SUCCEED != jsonpath_pointer_to_jp(pnext, &jp))
 		return FAIL;
 
