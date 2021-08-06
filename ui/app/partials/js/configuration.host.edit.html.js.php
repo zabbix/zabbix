@@ -69,7 +69,9 @@ $linked_templates = $host_is_discovered
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
-				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
+				))
+					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+					->setColSpan(7)
 			]))
 				->addClass('form_row')
 				->toString()
@@ -269,9 +271,7 @@ $linked_templates = $host_is_discovered
 					<?php if ($host_is_discovered): ?>
 						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 					<?php else: ?>
-						this.macros_manager.initMacroTable(this.macros_manager.getMacroTable(),
-							$show_inherited_macros.filter(':checked').val()
-						);
+						this.macros_manager.initMacroTable($show_inherited_macros.filter(':checked').val());
 					<?php endif ?>
 
 					panel.data('macros_initialized', true);

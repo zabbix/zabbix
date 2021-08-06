@@ -109,6 +109,8 @@ class HostMacrosManager {
 	initMacroTable(show_inherited_macros) {
 		var $parent = this.getMacroTable();
 
+		show_inherited_macros = +show_inherited_macros;
+
 		$parent
 			.dynamicRows({
 				remove_next_sibling: show_inherited_macros,
@@ -191,20 +193,21 @@ class HostMacrosManager {
 	}
 
 	initMacroFields($parent) {
-		$('.' + this.ZBX_STYLE_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field').each((i, obj) => {
-			const $obj = $(obj);
-			$obj.addClass('initialized-field');
+		$('.'+this.ZBX_STYLE_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field').each((index, textarea) => {
+			const $textarea = $(textarea);
 
-			if ($obj.hasClass('macro')) {
-				$obj.on('change keydown', e => {
+			if ($textarea.hasClass('macro')) {
+				$textarea.on('change keydown', e => {
 					if (e.type === 'change' || e.which === 13) {
-						this.macroToUpperCase($obj);
-						$obj.textareaFlexible();
+						this.macroToUpperCase($textarea);
+						$textarea.textareaFlexible();
 					}
 				});
 			}
 
-			$obj.textareaFlexible();
+			$textarea
+				.addClass('initialized-field')
+				.textareaFlexible();
 		});
 
 		// Init tab indicator observer.
@@ -218,7 +221,7 @@ class HostMacrosManager {
 	}
 
 	getMacroTable() {
-		return $('.host-macros-table', this.$container);
+		return $('.inherited-macros-table, .host-macros-table', this.$container).eq(0);
 	}
 
 	loaderStart() {
