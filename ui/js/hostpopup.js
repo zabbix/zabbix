@@ -22,6 +22,8 @@ const ZBX_STYLE_ZABBIX_HOST_POPUPEDIT = 'js-edit-host';
 const ZBX_STYLE_ZABBIX_HOST_POPUPCREATE = 'js-create-host';
 
 const host_popup = {
+	PAGE_TYPE_JS: 'ajax',
+
 	/**
 	 * General entry point to be called on pages that need host popup functionality.
 	 */
@@ -73,6 +75,8 @@ const host_popup = {
 	 * @param {object} host_data{groupids}       Host groups to pre-fill when creating new host.
 	 */
 	edit(host_data = {}) {
+		host_data.output = this.PAGE_TYPE_JS;
+
 		const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
 		overlay.$dialogue.addClass('sticked-to-top')[0].addEventListener('dialogue.submit', (e) => {

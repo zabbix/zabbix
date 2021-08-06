@@ -424,7 +424,7 @@ $linked_templates = $host_is_discovered
 			fields.description = fields.description.trim();
 
 			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
-			fields.output = 'ajax';
+			fields.output = <?= json_encode(PAGE_TYPE_JS) ?>;
 
 			if (document.querySelector('#change_psk')) {
 				delete fields.tls_psk_identity;
@@ -587,7 +587,7 @@ $linked_templates = $host_is_discovered
 		'use strict';
 
 		<?php if (array_key_exists('warnings', $data)): ?>
-			jQuery(<?=json_encode($data['warnings'])?>).insertBefore(overlays_stack.end().$dialogue.find('form'));
+			jQuery(<?= json_encode($data['warnings']) ?>).insertBefore(overlays_stack.end().$dialogue.find('form'));
 		<?php endif; ?>
 
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
