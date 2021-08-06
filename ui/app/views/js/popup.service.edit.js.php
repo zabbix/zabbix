@@ -78,7 +78,7 @@ window.service_edit_popup = {
 
 		// Update form field state according to the form data.
 
-		for (const id of ['algorithm', 'showsla']) {
+		for (const id of ['advanced_configuration', 'algorithm', 'showsla']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this.update());
@@ -91,6 +91,21 @@ window.service_edit_popup = {
 			template: '#problem-tag-row-tmpl',
 			rows: problem_tags
 		});
+
+		// Setup Service rules.
+		document
+			.getElementById('additional_rules')
+			.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-add')) {
+					this.editRule();
+				}
+				else if (e.target.classList.contains('js-edit')) {
+					this.editRule(e.target.closest('tr'));
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					e.target.closest('tr').remove();
+				}
+			});
 
 		// Setup Service times.
 		document
@@ -121,14 +136,64 @@ window.service_edit_popup = {
 	},
 
 	update() {
+		const advanced_configuration = document.getElementById('advanced_configuration').checked;
 		const status_enabled = document.getElementById('algorithm').value != <?= SERVICE_ALGORITHM_NONE ?>;
 		const showsla = document.getElementById('showsla').checked;
+
+		document.getElementById('additional_rules_label').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('additional_rules_field').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('status_propagation_rules_label').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('status_propagation_rules_field').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('weight_label').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('weight_field').style.display = advanced_configuration ? '' : 'none';
 
 		document.getElementById('problem_tags_label').style.display = status_enabled ? '' : 'none';
 		document.getElementById('problem_tags_field').style.display = status_enabled ? '' : 'none';
 
 		document.getElementById('showsla').disabled = !status_enabled;
 		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
+	},
+
+	editRule(row = null) {
+		let popup_params;
+
+		if (row !== null) {
+			const row_index = row.dataset.row_index;
+
+			popup_params = {
+				edit: '1',
+				row_index,
+				new_status: row.querySelector(`[name="additional_rules[${row_index}][new_status]"`).value,
+				type: row.querySelector(`[name="additional_rules[${row_index}][type]"`).value,
+				limit_value: row.querySelector(`[name="additional_rules[${row_index}][limit_value]"`).value,
+				limit_status: row.querySelector(`[name="additional_rules[${row_index}][limit_status]"`).value
+			};
+		}
+		else {
+			let row_index = 0;
+
+			while (document.querySelector(`#additional_rules [data-row_index="${row_index}"]`) !== null) {
+				row_index++;
+			}
+
+			popup_params = {row_index};
+		}
+
+		const overlay = PopUp('popup.service.rule.edit', popup_params, 'service_rule_edit', document.activeElement);
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			const new_row = e.detail;
+
+			if (row !== null) {
+				row.insertAdjacentHTML('afterend', new_row);
+				row.remove();
+			}
+			else {
+				document
+					.querySelector('#additional_rules tbody')
+					.insertAdjacentHTML('beforeend', new_row);
+			}
+		});
 	},
 
 	editTime(row = null) {

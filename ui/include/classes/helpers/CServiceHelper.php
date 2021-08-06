@@ -23,9 +23,86 @@ class CServiceHelper {
 
 	public static function getAlgorithmNames(): array {
 		return [
-			SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
-			SERVICE_ALGORITHM_MIN => _('Problem, if all children have problems'),
-			SERVICE_ALGORITHM_NONE => _('Do not calculate')
+			SERVICE_ALGORITHM_MAX => _('Most critical of child nodes'),
+			SERVICE_ALGORITHM_MIN => _('Most critical if all children have problems'),
+			SERVICE_ALGORITHM_NONE => _('Set status to OK')
+		];
+	}
+
+	public static function getRuleConditionNames(): array {
+		return [
+			// TODO: Need to synchronize constants with serverside
+			SERVICE_CALC_STATUS_MORE => _s('if at least %1$s child nodes are %2$s or greater',
+				new CTag('b', true, 'N'), new CTag('b', true, _('Status'))
+			),
+			SERVICE_CALC_STATUS_MORE_PERC => _s('if at least %1$s child nodes are %2$s or greater',
+				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
+			),
+			SERVICE_CALC_STATUS_LESS => _s('if less than %1$s child nodes are %2$s or less',
+				new CTag('b', true, 'N'), new CTag('b', true, _('Status'))
+			),
+			SERVICE_CALC_STATUS_LESS_PERC => _s('if less than %1$s child nodes are %2$s or less',
+				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
+			),
+			SERVICE_CALC_WEIGHT_MORE => _s('if at least %1$s of child nodes weight is in %2$s or greater',
+				new CTag('b', true, 'W'), new CTag('b', true, _('Status'))
+			),
+			SERVICE_CALC_WEIGHT_MORE_PERC => _s('if at least %1$s of child nodes weight is in %2$s or greater',
+				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
+			),
+			SERVICE_CALC_WEIGHT_LESS => _s('if less than %1$s of child nodes weight is in %2$s or less',
+				new CTag('b', true, 'W'), new CTag('b', true, _('Status'))
+			),
+			SERVICE_CALC_WEIGHT_LESS_PERC => _s('if less than %1$s of child nodes weight is in %2$s or less',
+				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
+			)
+		];
+	}
+
+	public static function getRuleByCondition(int $new_status, int $condition, int $number, int $status): string {
+		$status = self::getRuleStatusNames()[$status];
+
+		switch ($condition) {
+			case SERVICE_CALC_STATUS_MORE:
+			case SERVICE_CALC_STATUS_MORE_PERC:
+				$rule = _s('if at least %1$s child nodes are %2$s or greater', (string) $number, $status);
+				break;
+			case SERVICE_CALC_STATUS_LESS:
+			case SERVICE_CALC_STATUS_LESS_PERC:
+				$rule = _s('if less than %1$s child nodes are %2$s or less', (string) $number, $status);
+				break;
+			case SERVICE_CALC_WEIGHT_MORE:
+			case SERVICE_CALC_WEIGHT_MORE_PERC:
+				$rule = _s('if at least %1$s of child nodes weight is in %2$s or greater', (string) $number, $status);
+				break;
+			case SERVICE_CALC_WEIGHT_LESS:
+			case SERVICE_CALC_WEIGHT_LESS_PERC:
+				$rule = _s('if less than %1$s of child nodes weight is in %2$s or less', (string) $number, $status);
+				break;
+			default:
+				$rule = null;
+		}
+
+		return $rule !== null ? self::getRuleStatusNames()[$new_status].' - '.$rule : '';
+	}
+
+	public static function getRuleStatusNames(): array {
+		$status_names = [-1 => _('OK')];
+
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+			$status_names[$severity] = getSeverityName($severity);
+		}
+
+		return $status_names;
+	}
+
+	public static function getPropagationRuleNames(): array {
+		return [
+			SERVICE_PROPAGATION_STATUS_AS_IS => _('As is'),
+			SERVICE_PROPAGATION_STATUS_INC => _('Increase'),
+			SERVICE_PROPAGATION_STATUS_DEC => _('Decrease'),
+			SERVICE_PROPAGATION_STATUS_IGNORE => _('Ignore this service'),
+			SERVICE_PROPAGATION_STATUS_FIXED => _('Fixed status')
 		];
 	}
 }

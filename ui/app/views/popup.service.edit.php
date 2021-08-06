@@ -42,6 +42,27 @@ $parent_services = (new CMultiSelect([
 	'custom_select' => true
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
+$additional_rules = (new CTable())
+	->setId('additional_rules')
+	->setHeader(
+		(new CRowHeader([_('Name'), _('Action')]))->addClass(ZBX_STYLE_GREY)
+	);
+
+foreach ($data['form']['additional_rules'] as $row_index => $rule) {
+	$additional_rules->addItem(new CPartial('service.rule.row', ['row_index' => $row_index] + $rule));
+}
+
+$additional_rules->addItem(
+	(new CTag('tfoot', true))
+		->addItem(
+			(new CCol(
+				(new CSimpleButton(_('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-add')
+			))->setColSpan(2)
+		)
+);
+
 $service_tab = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
@@ -56,16 +77,6 @@ $service_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Parent services'), 'parent_serviceids__ms'),
 		new CFormField($parent_services)
-	])
-	->addItem([
-		new CLabel(_('Status calculation algorithm'), 'algorithm_focusable'),
-		new CFormField(
-			(new CSelect('algorithm'))
-				->setId('algorithm')
-				->setFocusableElementId('algorithm_focusable')
-				->setValue($data['form']['algorithm'])
-				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getAlgorithmNames()))
-		)
 	])
 	->addItem([
 		(new CLabel(_('Problem tags')))->setId('problem_tags_label'),
@@ -123,6 +134,49 @@ $service_tab = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		)
+	])
+	->addItem([
+		new CLabel(_('Status calculation algorithm'), 'algorithm_focusable'),
+		new CFormField(
+			(new CSelect('algorithm'))
+				->setId('algorithm')
+				->setFocusableElementId('algorithm_focusable')
+				->setValue($data['form']['algorithm'])
+				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getAlgorithmNames()))
+		)
+	])
+	->addItem(
+		(new CFormField(
+			(new CCheckBox('advanced_configuration', 1))
+				->setLabel(_('Advanced configuration'))
+				->setChecked($data['form']['advanced_configuration'])
+				->setUncheckedValue(0)
+		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+	)
+	->addItem([
+		(new CLabel(_('Additional rules')))->setId('additional_rules_label'),
+		(new CFormField(
+			(new CDiv($additional_rules))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		))->setId('additional_rules_field')
+	])
+	->addItem([
+		(new CLabel(_('Status propagation rule')))->setId('status_propagation_rules_label'),
+		(new CFormField(
+			(new CSelect('propagation_rule'))
+				->setId('propagation_rule')
+				->setFocusableElementId('propagation_rule_focusable')
+				->setValue($data['form']['propagation_rule'])
+				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getPropagationRuleNames()))
+		))->setId('status_propagation_rules_field')
+	])
+	->addItem([
+		(new CLabel(_('Weight')))->setId('weight_label'),
+		(new CFormField(
+			(new CTextBox('weight', $data['form']['weight'], false, 7))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		))->setId('weight_field')
 	]);
 
 // SLA tab.

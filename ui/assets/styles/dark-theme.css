@@ -690,6 +690,7 @@ footer {
     grid-column-start: initial;
     grid-column-end: span 1; }
   .form-grid .table-forms-separator {
+    display: inline-flex;
     line-height: 1.4; }
     .form-grid .table-forms-separator td {
       padding: 5px 5px 5px 0; }

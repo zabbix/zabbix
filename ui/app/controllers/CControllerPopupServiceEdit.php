@@ -149,7 +149,12 @@ class CControllerPopupServiceEdit extends CController {
 					: [['tag' => '', 'value' => '']],
 				'problem_tags' => ($this->service !== null && $this->service['problem_tags'])
 					? $this->service['problem_tags']
-					: [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']]
+					: [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
+				'advanced_configuration' => $this->service !== null ? $this->service['advanced_configuration'] : false,
+				'additional_rules' => $this->service !== null ? $this->service['additional_rules'] : [],
+				'propagation_rule' => $this->service !== null ? $this->service['propagation_rule'] : [],
+				'propagation_value' => $this->service !== null ? $this->service['propagation_value'] : [],
+				'weight' => $this->service !== null ? $this->service['weight'] : 0
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

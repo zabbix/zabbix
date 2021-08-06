@@ -168,8 +168,8 @@ class ZBase {
 
 		$this->setMaintenanceMode();
 
-		ini_set('display_errors', 'Off');
-		set_error_handler('zbx_err_handler');
+//		ini_set('display_errors', 'Off');
+//		set_error_handler('zbx_err_handler');
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
