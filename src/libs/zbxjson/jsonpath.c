@@ -1822,8 +1822,7 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 					stack.values_num--;
 					break;
 				case ZBX_JSONPATH_TOKEN_OP_REGEXP:
-					if (NULL == left->data.str || NULL == right->data.str ||
-							FAIL == zbx_variant_convert(left, ZBX_VARIANT_STR) ||
+					if (FAIL == zbx_variant_convert(left, ZBX_VARIANT_STR) ||
 							FAIL == zbx_variant_convert(right, ZBX_VARIANT_STR))
 					{
 						res = 0.0;
