@@ -67,7 +67,7 @@ class CControllerHostMassDelete extends CController {
 			CMessageHelper::setErrorTitle(_('Cannot delete host'));
 		}
 
-		if (!$redirect_url) {
+		if ($redirect_url === '') {
 			$redirect_url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'host.list')
 				->setArgument('page', CPagerHelper::loadPage('host.list', null));

@@ -147,7 +147,8 @@ class CControllerHostCreate extends CController {
 
 			$output = [];
 			$hostids = API::Host()->create($host);
-		} catch (Exception $exception) {
+		}
+		catch (Exception $exception) {
 			// Code is not missing here.
 		}
 		if ($hostids !== false && $this->createValueMaps((int) $hostids['hostids'][0])

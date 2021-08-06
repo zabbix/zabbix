@@ -26,7 +26,7 @@
 $data['form_name'] = 'host-form';
 $data['popup_form'] = true;
 
-if ((int) $data['hostid'] === 0) {
+if ($data['hostid'] == 0) {
 	$buttons = [
 		[
 			'title' => _('Add'),

@@ -23,12 +23,14 @@
  * @var CView $this
  */
 
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')));
+
 $data += [
 	'form_name' => 'host-form',
 	'buttons' => ((int) $data['hostid'] === 0)
 		? [
 			new CSubmit('add', _('Add')),
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')))
+			$cancel_button
 		]
 		: [
 			new CSubmit('update', _('Update')),
@@ -45,8 +47,8 @@ $data += [
 					->getUrl()
 				)
 				->addClass(ZBX_STYLE_BTN_ALT),
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')))
-		],
+			$cancel_button
+		]
 ];
 
 (new CWidget())

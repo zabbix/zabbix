@@ -426,12 +426,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				$result = false;
 			}
 
-			if ($this->getInput('return_to', false) === 'hosts') {
-				$enable_wanted = ((int) $this->getInput('status', HOST_STATUS_NOT_MONITORED) === HOST_STATUS_MONITORED);
+			if ($this->getInput('return_to', '') === 'hosts') {
+				$requested_host_enable = ($this->getInput('status', HOST_STATUS_NOT_MONITORED) == HOST_STATUS_MONITORED);
 				$hosts_count = is_array($result) ? count($result['hostids']) : count($hosts);
 
 				if ($result) {
-					$messageSuccess = $enable_wanted
+					$messageSuccess = $requested_host_enable
 						? _n('Host enabled', 'Hosts enabled', $hosts_count)
 						: _n('Host disabled', 'Hosts disabled', $hosts_count);
 
@@ -439,7 +439,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					CMessageHelper::setSuccessTitle($messageSuccess);
 				}
 				else {
-					$messageFailed = $enable_wanted
+					$messageFailed = $requested_host_enable
 						? _n('Cannot enable host', 'Cannot enable hosts', $hosts_count)
 						: _n('Cannot disable host', 'Cannot disable hosts', $hosts_count);
 

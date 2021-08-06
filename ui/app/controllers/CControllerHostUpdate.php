@@ -154,7 +154,8 @@ class CControllerHostUpdate extends CController {
 
 			$output = [];
 			$hostids = API::Host()->update($host);
-		} catch (Exception $exception) {
+		}
+		catch (Exception $exception) {
 			// Code is not missing here.
 		}
 
@@ -164,7 +165,8 @@ class CControllerHostUpdate extends CController {
 				'message' => _('Host updated'),
 				'message_box' => makeMessageBox(true, [], _('Host updated'), true, false)->toString()
 			];
-		} else {
+		}
+		else {
 			$errors = getMessages(false, _('Cannot update host'), true);
 
 			if ($errors !== null) {

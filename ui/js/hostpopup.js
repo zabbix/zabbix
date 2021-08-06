@@ -39,7 +39,7 @@ const host_popup = {
 			const node = e.target;
 
 			if (node.classList.contains(ZBX_STYLE_ZABBIX_HOST_POPUPCREATE)) {
-				const host_data = (node.dataset.hostgroups !== undefined)
+				const host_data = (typeof node.dataset.hostgroups !== 'undefined')
 					? { groupids: JSON.parse(node.dataset.hostgroups) }
 					: {},
 					url = new Curl('zabbix.php', false);
@@ -51,7 +51,7 @@ const host_popup = {
 			else if (node.classList.contains(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)) {
 				let hostid = null;
 
-				if (node.hostid !== undefined && node.dataset.hostid !== undefined) {
+				if (typeof node.hostid !== 'undefined' && typeof node.dataset.hostid !== 'undefined') {
 					hostid = node.dataset.hostid;
 				}
 				else {
@@ -68,7 +68,7 @@ const host_popup = {
 	/**
 	 * Sets up and opens host edit popup.
 	 *
-	 * @param {object} host_data                 Host data used to initalize host form.
+	 * @param {object} host_data                 Host data used to initialize host form.
 	 * @param {object} host_data{hostid}         ID of host to edit.
 	 * @param {object} host_data{groupids}       Host groups to pre-fill when creating new host.
 	 */

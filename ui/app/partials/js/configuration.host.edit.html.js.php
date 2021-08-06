@@ -151,7 +151,7 @@ $linked_templates = $host_is_discovered
 				const element = e.target;
 
 				if (element.classList.contains('js-tmpl-unlink')) {
-					if (element.dataset.templateid === undefined) {
+					if (typeof element.dataset.templateid === 'undefined') {
 						return;
 					}
 
@@ -159,7 +159,7 @@ $linked_templates = $host_is_discovered
 					this.resetNewTemplatesField();
 				}
 				else if (element.classList.contains('js-tmpl-unlink-and-clear')) {
-					if (element.dataset.templateid === undefined) {
+					if (typeof element.dataset.templateid === 'undefined') {
 						return;
 					}
 
@@ -297,7 +297,7 @@ $linked_templates = $host_is_discovered
 			let $template_multiselect = $('#add_templates_'),
 				templateids = [];
 
-			if ($template_multiselect.data('multiSelect') === undefined) {
+			if (typeof $template_multiselect.data('multiSelect') === 'undefined') {
 				return templateids;
 			}
 
@@ -509,7 +509,7 @@ $linked_templates = $host_is_discovered
 					const current_curl = new Curl(location.href, false);
 					let filter_btn = document.querySelector('[name=filter_set]');
 
-					if (current_curl.getArgument('action') === 'host.list' || filter_btn !== undefined) {
+					if (current_curl.getArgument('action') === 'host.list' || typeof filter_btn !== 'undefined') {
 						postMessageOk(response.message)
 						redirect(current_curl.getUrl())
 					}
@@ -519,7 +519,7 @@ $linked_templates = $host_is_discovered
 						clearMessages();
 						addMessage(response.message_box);
 
-						if (filter_btn !== undefined) {
+						if (typeof filter_btn !== 'undefined') {
 							filter_btn.click();
 						}
 					}
