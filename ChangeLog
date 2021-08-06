@@ -145,11 +145,16 @@ A......... [ZBX-8999] fixed exporting of images separately from other objects (I
 Changes for 5.4.4rc1
 
 New features:
+.........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
 A.F....... [ZBXNEXT-6528,ZBXNEXT-6569] improved performance of graphs and graphs prototypes configuration process (rlataria, Sasha, vmaksimovs)
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 
 Bug fixes:
+........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
+A......... [ZBX-19752] fixed multiple types of media type creation having message templates in one API call (gcalenko)
+........S. [ZBX-19660] fixed script permission check when executing on current host (wiper)
+..F....... [ZBX-18271] fixed incorrect ordering for tags and overrides in widgets, operations overrides in host prototype form and interface order in item and discovery prototypes forms (gcalenko, Sasha)
 .D........ [ZBX-18523] added documentation for Hostname parameter in sender (dgoloscapov)
 ..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
 ...G...... [ZBX-19116] fixed system.cpu.util for agent2 not working in non-English Windows (arimdjonoks)
