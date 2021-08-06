@@ -1407,7 +1407,7 @@ static size_t	zbx_pack_record(const zbx_opcommand_parts_t *parts, char **packed_
 	p += zbx_strlcpy(p, parts->type, (size_t)(p_end - p)) + 1;
 	p += zbx_strlcpy(p, parts->execute_on, (size_t)(p_end - p)) + 1;
 	p += zbx_strlcpy(p, parts->port, (size_t)(p_end - p)) + 1;
-	p += zbx_strlcpy(p, parts->authtype, (size_t)(p_end - p)) + 1;
+	zbx_strlcpy(p, parts->authtype, (size_t)(p_end - p)) + 1;
 
 	return size;
 }
