@@ -73,8 +73,6 @@ const host_popup = {
 	 * @param {object} host_data{groupids}       Host groups to pre-fill when creating new host.
 	 */
 	edit(host_data = {}) {
-		this.pauseRefresh();
-
 		const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
 		overlay.$dialogue.addClass('sticked-to-top')[0].addEventListener('dialogue.submit', (e) => {
@@ -83,17 +81,10 @@ const host_popup = {
 			if (e.detail.messages !== null) {
 				postMessageDetails('success', e.detail.messages);
 			}
-
-			// TODO: reload || refresh;
 		});
 
 		overlay.$dialogue[0].addEventListener('overlay.close', () => {
 			history.replaceState({}, '', this.original_url);
-			this.resumeRefresh();
 		}, {once: true});
-	},
-
-	pauseRefresh() {},
-
-	resumeRefresh() {}
+	}
 };
