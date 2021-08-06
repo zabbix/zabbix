@@ -336,12 +336,16 @@ void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid,
 	}
 }
 
-void	zbx_audit_host_update_json_add_parent_template(zbx_uint64_t hostid, zbx_uint64_t templateid)
-{
-	RETURN_IF_AUDIT_OFF();
+#define PREPARE_AUDIT_TEMPLATE_OP(op1, op2)									\
+void	zbx_audit_host_update_json_##op1##_parent_template(zbx_uint64_t hostid, zbx_uint64_t templateid)	\
+{														\
+	RETURN_IF_AUDIT_OFF();											\
+														\
+	zbx_audit_update_json_append_uint64(hostid, op2, "host.templates", templateid);				\
+}														\
 
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "host.templates", templateid);
-}
+PREPARE_AUDIT_TEMPLATE_OP(attach, AUDIT_DETAILS_ACTION_ATTACH)
+PREPARE_AUDIT_TEMPLATE_OP(detach, AUDIT_DETAILS_ACTION_DETACH)
 
 void	zbx_audit_host_prototype_update_json_add_templates(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {

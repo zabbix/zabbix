@@ -1793,9 +1793,12 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Function: DBdelete_template_elements                                       *
  *                                                                            *
+ * COPY of DBdelete_template_elements_for_lld but with audit                  *
+ *                                                                            *
  * Purpose: delete template elements from host                                *
  *                                                                            *
  * Parameters: hostid          - [IN] host identificator from database        *
+ *             hostname        - [IN] name of the host                         *
  *             del_templateids - [IN] array of template IDs                   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -1803,7 +1806,83 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids, char **error)
+int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,
+		char **error)
+{
+	char			*sql = NULL, err[MAX_STRING_LEN];
+	size_t			sql_alloc = 128, sql_offset = 0;
+	zbx_vector_uint64_t	templateids;
+	int			i, index, res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&templateids);
+
+	get_templates_by_hostid(hostid, &templateids);
+
+	for (i = 0; i < del_templateids->values_num; i++)
+	{
+		if (FAIL == (index = zbx_vector_uint64_bsearch(&templateids, del_templateids->values[i],
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			/* template already unlinked */
+			zbx_vector_uint64_remove(del_templateids, i--);
+		}
+		else
+			zbx_vector_uint64_remove(&templateids, index);
+	}
+
+	/* all templates already unlinked */
+	if (0 == del_templateids->values_num)
+		goto clean;
+
+	if (SUCCEED != (res = validate_linked_templates(&templateids, err, sizeof(err))))
+	{
+		*error = zbx_strdup(NULL, err);
+		goto clean;
+	}
+
+	zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, hostname);
+
+	DBdelete_template_httptests(hostid, del_templateids);
+	DBdelete_template_graphs(hostid, del_templateids);
+	DBdelete_template_triggers(hostid, del_templateids);
+	DBdelete_template_host_prototypes(hostid, del_templateids);
+
+	/* removing items will remove discovery rules related to them */
+	DBdelete_template_items(hostid, del_templateids);
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"delete from hosts_templates"
+			" where hostid=" ZBX_FS_UI64
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid",
+			del_templateids->values, del_templateids->values_num);
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	for (i = 0; i < del_templateids->values_num; i++)
+	{
+		zbx_audit_host_update_json_detach_parent_template(hostid, del_templateids->values[i]);
+	}
+clean:
+	zbx_vector_uint64_destroy(&templateids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * temporary function until audit for lld is complete                         *
+ ******************************************************************************/
+int	DBdelete_template_elements_for_lld(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids,
+		char **error)
 {
 	char			*sql = NULL, err[MAX_STRING_LEN];
 	size_t			sql_alloc = 128, sql_offset = 0;
@@ -4908,7 +4987,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	for (i = 0; i < lnk_templateids->values_num; i++)
 	{
 		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid++, hostid, lnk_templateids->values[i]);
-		zbx_audit_host_update_json_add_parent_template(hostid, lnk_templateids->values[i]);
+		zbx_audit_host_update_json_attach_parent_template(hostid, lnk_templateids->values[i]);
 	}
 
 	DBcopy_template_items(hostid, lnk_templateids);

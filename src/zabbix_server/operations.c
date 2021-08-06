@@ -1002,7 +1002,7 @@ void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids
 	if (0 == (hostid = select_discovered_host(event, &hostname)))
 		goto out;
 
-	if (SUCCEED != DBdelete_template_elements(hostid, del_templateids, &error))
+	if (SUCCEED != DBdelete_template_elements(hostid, hostname, del_templateids, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot unlink template: %s", error);
 		zbx_free(error);
