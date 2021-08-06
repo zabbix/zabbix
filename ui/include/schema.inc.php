@@ -8168,6 +8168,13 @@ return [
 				'length' => 20,
 				'ref_table' => 'module',
 				'ref_field' => 'moduleid'
+			],
+			'value_serviceid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'services',
+				'ref_field' => 'serviceid'
 			]
 		]
 	],

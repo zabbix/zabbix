@@ -375,6 +375,76 @@ out:
 	return perm;
 }
 
+static int	get_service_global_access_rights(zbx_uint64_t roleid, zbx_uint64_t serviceid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int			ret = PERM_READ_WRITE;
+
+	result = DBselect("select name,value_int from role_rule where name in ('services.read','services.write') and "
+			"roleid=" ZBX_FS_UI64, roleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	value;
+
+		ZBX_STR2UINT64(value, row[1]);
+
+		if (0 == value)
+		{
+			if (0 == strcmp(row[0], "services.read"))
+			{
+				ret = PERM_DENY;
+				goto out;
+			}
+			else
+			{
+				ret = PERM_READ;
+			}
+		}
+	}
+
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	get_service_access_rights(zbx_uint64_t roleid, zbx_uint64_t serviceid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int			ret = 0, rows = 0;
+
+	result = DBselect("select name,value_serviceid from role_rule where roleid=" ZBX_FS_UI64 " and value_serviceid="
+			ZBX_FS_UI64 " and type=3", roleid, serviceid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	value;
+
+		ZBX_STR2UINT64(value, row[1]);
+
+		if (0 == strncmp(row[0], "services.read.id", ZBX_CONST_STRLEN("services.read.id")))
+		{
+			ret |= PERM_READ;
+		}
+		else if (0 == strncmp(row[0], "services.write.id", ZBX_CONST_STRLEN("services.write.id")))
+		{
+			ret |= PERM_READ_WRITE;
+		}
+
+		rows++;
+	}
+
+	if (0 == rows)
+		ret = PERM_READ_WRITE;
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_service_permission                                           *
@@ -385,21 +455,97 @@ out:
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_service_permission(zbx_uint64_t userid, char **user_timezone)
+static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, zbx_uint64_t serviceid)
 {
+	int			i, perm;
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
 	zbx_user_t	user = {.userid = userid};
+	zbx_ipc_message_t	response;
+	zbx_vector_ptr_t	parent_services;
 
-	if (USER_TYPE_SUPER_ADMIN == (user.type = get_user_info(userid, &user.roleid, user_timezone)))
-		return PERM_READ_WRITE;
+	user.type = get_user_info(userid, &user.roleid, user_timezone);
 
-	if (SUCCEED == zbx_check_user_administration_actions_permissions(&user,
-			ZBX_USER_ROLE_PERMISSION_UI_DEFAULT_ACCESS,
-			ZBX_USER_ROLE_PERMISSION_UI_MONITORING_SERVICES))
+	if (PERM_DENY == (perm = get_service_global_access_rights(user.roleid, serviceid)))
+		return perm;
+
+	if (PERM_DENY == (perm = get_service_access_rights(user.roleid, serviceid)))
+		return perm;
+
+	zbx_service_serialize_id(&data, &data_alloc, &data_offset, serviceid);
+
+	if (NULL == data)
+		return PERM_DENY;
+
+	zbx_vector_ptr_create(&parent_services);
+
+	zbx_ipc_message_init(&response);
+	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset, &response);
+	zbx_service_deserialize_parent_services(response.data, response.size, &parent_services);
+	zbx_ipc_message_clean(&response);
+
+	for (i = 0; i < 1; i++)
 	{
-		return PERM_READ;
+		int						j;
+		zbx_parent_service_t	*ps = (zbx_parent_service_t*)parent_services.values[i];
+
+		if (PERM_DENY == (perm = get_service_access_rights(user.roleid, parent_services.values[i])))
+			goto out;
+
+		for (j = 0; i < ps->tags.values_num; i++)
+		{
+			zbx_tag_t *tag = ps->tags.values[i];
+			DB_ROW		row;
+			DB_RESULT	result;
+			char		*tag_read, *tag_write, *value_read, *value_write;
+
+			result = DBselect("select r.name,r.value_str from role_rule r inner join service_tag s where "
+					"(r.value_str=s.tag or r.value_str=s.value) and r.name in ('services.read.tag.name', "
+					"'services.read.tag.value') and r.type=1");
+
+			tag_read = tag_write = value_read = value_write = NULL;
+
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (0 == strcmp("services.read.tag.name", row[0]))
+					tag_read = zbx_strdup(NULL, row[1]);
+				else if (0 == strcmp("services.read.tag.value", row[0]))
+					value_read = zbx_strdup(NULL, row[1]);
+				if (0 == strcmp("services.write.tag.name", row[0]))
+					tag_write = zbx_strdup(NULL, row[1]);
+				else if (0 == strcmp("services.write.tag.value", row[0]))
+					value_write = zbx_strdup(NULL, row[1]);
+			}
+			DBfree_result(result);
+
+			if (NULL != tag_read)
+			{
+				if ((NULL != value_read && 0 == strcmp(tag_read, tag->tag) && 0 == strcmp(value_read, tag->value)) ||
+						(0 == strcmp(tag_read, tag->tag)))
+				{
+					perm |= PERM_READ;
+				}
+			}
+			if (NULL != tag_write)
+			{
+				if ((NULL != value_write && 0 == strcmp(tag_write, tag->tag) && 0 == strcmp(value_write, tag->value)) ||
+						(0 == strcmp(tag_write, tag->tag)))
+				{
+					perm |= PERM_READ_WRITE;
+				}
+			}
+
+			zbx_free(tag_read);
+			zbx_free(tag_write);
+			zbx_free(value_read);
+			zbx_free(value_write);
+		}
 	}
 
-	return PERM_DENY;
+out:
+	zbx_free(data);
+
+	return perm;
 }
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg, const char *subj,
@@ -620,7 +766,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 					goto clean;
 				break;
 			case EVENT_OBJECT_SERVICE:
-				if (PERM_READ > get_service_permission(userid, &user_timezone))
+				if (PERM_READ > get_service_permission(userid, &user_timezone, event->objectid))
 					goto clean;
 				break;
 			default:
@@ -722,7 +868,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 					goto clean;
 				break;
 			case EVENT_OBJECT_SERVICE:
-				if (PERM_READ > get_service_permission(userid, &user_timezone))
+				if (PERM_READ > get_service_permission(userid, &user_timezone, event->objectid))
 					goto clean;
 				break;
 			default:
@@ -813,7 +959,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 					goto clean;
 				break;
 			case EVENT_OBJECT_SERVICE:
-				if (PERM_READ > get_service_permission(userid, &user_timezone))
+				if (PERM_READ > get_service_permission(userid, &user_timezone, event->objectid))
 					goto clean;
 				break;
 			default:
@@ -2476,7 +2622,9 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 		escalation = (DB_ESCALATION *)escalations->values[i];
 
 		if (0 != escalation->serviceid)
+		{
 			zbx_vector_uint64_append(&serviceids, escalation->serviceid);
+		}
 	}
 
 	zbx_vector_uint64_sort(&serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);

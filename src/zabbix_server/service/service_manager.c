@@ -29,6 +29,7 @@
 #include "zbxalgo.h"
 #include "service_protocol.h"
 #include "service_actions.h"
+#include "zbxserialize.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -2336,6 +2337,33 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 	zbx_vector_uint64_destroy(&serviceids);
 }
 
+static void	process_parentlist(const zbx_ipc_message_t *message, zbx_service_manager_t *service_manager,
+		zbx_ipc_client_t *client)
+{
+	int					i;
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
+	zbx_uint64_t	child_serviceid = 0;
+
+	zbx_deserialize_uint64(message->data, &child_serviceid);
+
+	zbx_service_t	*service, service_local = {.serviceid = child_serviceid};
+
+	if (NULL == (service = zbx_hashset_search(&service_manager->services, &service_local)))
+		return;
+
+	for (i = 0; i < service->parents.values_num; i++)
+	{
+		zbx_service_t	*parent = (zbx_service_t *)service->parents.values[i];
+
+		zbx_service_serialize_parent_service(&data, &data_alloc, &data_offset, parent->serviceid, &parent->tags);
+	}
+
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset);
+
+	zbx_free(data);
+}
+
 static void	service_manager_init(zbx_service_manager_t *service_manager)
 {
 	zbx_hashset_create_ext(&service_manager->problem_events, 1000, default_uint64_ptr_hash_func,
@@ -2725,6 +2753,9 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE:
 					process_rootcause(message, &service_manager, client);
+					break;
+				case ZBX_IPC_SERVICE_SERVICE_PARENT_LIST:
+					process_parentlist(message, &service_manager, client);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;

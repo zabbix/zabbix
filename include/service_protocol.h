@@ -29,6 +29,13 @@
 #include "zbxalgo.h"
 #include "zbxservice.h"
 
+typedef struct
+{
+	zbx_uint64_t		serviceid;
+	zbx_vector_tags_t	tags;
+}
+zbx_parent_service_t;
+
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
 		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags);
 void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events);
@@ -41,4 +48,9 @@ void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, s
 		zbx_uint64_t serviceid, const zbx_vector_uint64_t *eventids);
 void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_service_t *services);
+void	zbx_service_serialize_parent_service(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		zbx_uint64_t serviceid, zbx_vector_ptr_t *tags);
+void	zbx_service_deserialize_parent_services(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_ptr_t *parent_services);
+
 #endif

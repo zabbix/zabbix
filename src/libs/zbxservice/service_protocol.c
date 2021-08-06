@@ -311,3 +311,93 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 		}
 	}
 }
+
+void	zbx_service_serialize_parent_service(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		zbx_uint64_t serviceid, zbx_vector_ptr_t *tags)
+{
+	zbx_uint32_t	data_len = 0, *len = NULL;
+	zbx_uint32_t		i, tags_num;
+	unsigned char	*ptr;
+	zbx_tag_t			*tag = NULL;
+	zbx_hashset_iter_t	iter;
+
+	zbx_serialize_prepare_value(data_len, serviceid);
+
+	tags_num = tags->values_num;
+	zbx_serialize_prepare_value(data_len, tags_num);
+
+	if (0 != tags->values_num)
+	{
+		len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * 2 * (size_t)tags->values_num);
+
+		for (i = 0; i < tags->values_num; i++)
+		{
+			tag = (zbx_tag_t*)(tags->values + i);
+			zbx_serialize_prepare_str_len(data_len, tag->tag, len[i * 2]);
+			zbx_serialize_prepare_str_len(data_len, tag->value, len[i * 2 + 1]);
+		}
+	}
+
+	if (NULL != *data)
+	{
+		while (data_len > *data_alloc - *data_offset)
+		{
+			*data_alloc *= 2;
+			*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
+		}
+	}
+	else
+		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+
+	ptr = *data + *data_offset;
+	*data_offset += data_len;
+
+	ptr += zbx_serialize_value(ptr, serviceid);
+	ptr += zbx_serialize_value(ptr, tags_num);
+
+	for (i = 0; i < tags->values_num; i++)
+	{
+		tag = (zbx_tag_t*)tags->values[i];
+		zbx_serialize_str(ptr, tag->tag, len);
+
+		if (tag->value != NULL)
+			zbx_serialize_str(ptr, tag->value, len);
+	}
+
+}
+
+void	zbx_service_deserialize_parent_services(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *parent_services)
+{
+	const unsigned char	*end = data + size;
+
+	while (data < end)
+	{
+		zbx_parent_service_t	*service;
+		zbx_uint32_t		values_num, i;
+
+		service = (zbx_parent_service_t *)zbx_malloc(NULL, sizeof(zbx_parent_service_t));
+		zbx_vector_tags_create(&service->tags);
+
+		data += zbx_deserialize_value(data, &service->serviceid);
+		data += zbx_deserialize_value(data, &values_num);
+
+		if (0 != values_num)
+		{
+			zbx_vector_tags_reserve(&service->tags, (size_t)values_num);
+
+			for (i = 0; i < values_num; i++)
+			{
+				zbx_tag_t	*tag;
+				zbx_uint32_t	len;
+
+				tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+				data += zbx_deserialize_str(data, &tag->tag, len);
+				data += zbx_deserialize_str(data, &tag->value, len);
+
+				zbx_vector_tags_append(&service->tags, tag);
+			}
+		}
+		zbx_vector_ptr_append(parent_services, service);
+	}
+
+}
