@@ -451,12 +451,7 @@ class DB {
 	 */
 	public static function insert($table, $values, $getids = true) {
 		$table_schema = self::getSchema($table);
-		$fields = [];
-
-		foreach ($values as $key => $row) {
-			$fields += array_diff_key($row, $fields);
-		}
-
+		$fields = array_reduce($values, 'array_merge', []);
 		$fields = array_intersect_key($fields, $table_schema['fields']);
 
 		foreach ($fields as $field => &$value) {
@@ -467,14 +462,7 @@ class DB {
 		unset($value);
 
 		foreach ($values as $key => &$row) {
-			$row += $fields;
-
-			$ordered_row = [];
-			foreach ($fields as $field => $foo) {
-				$ordered_row[$field] = $row[$field];
-			}
-
-			$row = $ordered_row;
+			$row = array_merge($fields, $row);
 		}
 		unset($row);
 
