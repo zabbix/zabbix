@@ -75,7 +75,7 @@ class testFormScheduledReport extends CWebTest {
 	public function testFormScheduledReport_Layout() {
 		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
 		$this->query('button:Create report')->waitUntilClickable()->one()->click();
-		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 
 		$this->checkFormLayout($form);
 	}
@@ -86,7 +86,7 @@ class testFormScheduledReport extends CWebTest {
 		$this->query('id:dashboard-actions')->one()->waitUntilClickable()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->select('Create new report');
 		$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $overlay->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $overlay->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 		$this->assertFalse($form->query('button:Test')->one(false)->isValid());
 
 		$this->checkFormLayout($form, 'Zabbix server health');
@@ -141,7 +141,7 @@ class testFormScheduledReport extends CWebTest {
 			}
 
 			$subscription_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-			$overlay_form = $subscription_overlay->query('id:subscription-form')->waitUntilReady()->asFluidForm()->one();
+			$overlay_form = $subscription_overlay->query('id:subscription-form')->waitUntilVisible()->asFluidForm()->one();
 			$overlay_form->checkValue((is_array($type)) ? $type : ['Generate report by' => 'Current user']);
 
 			$buttons = (is_array($type)) ? ['Update', 'Cancel'] : ['Add', 'Cancel'];
@@ -174,14 +174,13 @@ class testFormScheduledReport extends CWebTest {
 		$this->assertEquals('Exclude', $row->getColumn('Status')->getText());
 		$row->getColumn('Recipient')->query('tag:a')->one()->click();
 		$subscription_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$overlay_form = $subscription_overlay->query('id:subscription-form')->waitUntilReady()->asFluidForm()->one();
+		$overlay_form = $subscription_overlay->query('id:subscription-form')->waitUntilVisible()->asFluidForm()->one();
 		$overlay_form->checkValue(['Status' => 'Exclude']);
 		$subscription_overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
 
 		// Close report overlay on Dashboard.
 		if ($dashboard) {
-			$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
-			$overlay->close();
+			COverlayDialogElement::find()->waitUntilReady()->one()->close();
 		}
 	}
 
@@ -1078,7 +1077,7 @@ class testFormScheduledReport extends CWebTest {
 	public function testFormScheduledReport_Clone($data) {
 		$this->page->login()->open('zabbix.php?action=scheduledreport.edit&reportid='.
 				CDataHelper::get('ScheduledReports.reportids.'.self::TEST_REPORT_NAME));
-		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 
 		// Get field values from form.
 		$form->fill($data['fields']);
@@ -1178,7 +1177,7 @@ class testFormScheduledReport extends CWebTest {
 		}
 
 		// Change report data to make sure that the changes are not saved to the database after cancellation.
-		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 		$form->fill(['Name' => $new_name, 'Message' => 'cancel test']);
 		$this->fillSubscriptions($subscriptions);
 
@@ -1277,7 +1276,7 @@ class testFormScheduledReport extends CWebTest {
 			$url = 'zabbix.php?action=scheduledreport.edit';
 		}
 		$this->page->login()->open($url);
-		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 		$form->fill(CTestArrayHelper::get($data, 'fields', []));
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
 		COverlayDialogElement::find()->waitUntilReady()->one();
@@ -1316,7 +1315,7 @@ class testFormScheduledReport extends CWebTest {
 			$old_hash = $this->getHash();
 		}
 
-		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Start time', false)) {
@@ -1376,7 +1375,7 @@ class testFormScheduledReport extends CWebTest {
 				$this->query('link', $name)->waitUntilClickable()->one()->click();
 			}
 			$this->page->waitUntilReady();
-			$form_page = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+			$form_page = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 
 			if (CTestArrayHelper::get($data, 'fields.Repeat on') === []) {
 				unset($data['fields']['Repeat on']);
@@ -1399,7 +1398,7 @@ class testFormScheduledReport extends CWebTest {
 	 */
 	private function fillSubscriptions($data) {
 		foreach (CTestArrayHelper::get($data, 'Subscriptions', []) as $i => $subscriber) {
-			$report_form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+			$report_form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 			$container = $report_form->getField('Subscriptions')->asTable();
 
 			$action = CTestArrayHelper::get($subscriber, 'action', USER_ACTION_ADD);
@@ -1418,7 +1417,7 @@ class testFormScheduledReport extends CWebTest {
 					unset($subscriber['index']);
 				}
 				$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-				$form = $overlay->query('id:subscription-form')->waitUntilReady()->asFluidForm()->one();
+				$form = $overlay->query('id:subscription-form')->waitUntilVisible()->asFluidForm()->one();
 				if (array_key_exists('fields', $subscriber)) {
 					$form->fill($subscriber['fields']);
 				}
@@ -1450,7 +1449,7 @@ class testFormScheduledReport extends CWebTest {
 	 */
 	private function checkSubscriptions($subscriptions) {
 		foreach ($subscriptions as $i => $subscriber) {
-			$report_form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+			$report_form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 			$table = $report_form->getField('Subscriptions')->asTable();
 
 			$action = CTestArrayHelper::get($subscriber, 'action', USER_ACTION_ADD);

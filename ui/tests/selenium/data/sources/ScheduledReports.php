@@ -233,12 +233,8 @@ class ScheduledReports {
 			]
 		]);
 
-		$reportids = CDataHelper::getIds('name');
-
-		$result = [
-			'reportids' => $reportids
+		return [
+			'reportids' => CDataHelper::getIds('name')
 		];
-
-		return $result;
 	}
 }

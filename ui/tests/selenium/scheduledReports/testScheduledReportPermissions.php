@@ -307,7 +307,7 @@ class testScheduledReportPermissions extends CWebTest {
 
 		// Check the report form.
 		$this->query('link', $report)->one()->click();
-		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 		foreach ($form->getLabels()->asText() as $label) {
 			if ($label === 'Owner') {
 				$form->checkValue(['Owner' => $owner]);
@@ -440,7 +440,7 @@ class testScheduledReportPermissions extends CWebTest {
 		$this->page->userLogin('admin report permissions', 'zabbix');
 		$this->page->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
 		$this->query('link', $report)->waitUntilClickable()->one()->click();
-		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 		$form->checkValue($before['fields']);
 		$this->assertTableData($before['Subscriptions'], 'id:subscriptions-table');
 
@@ -566,7 +566,7 @@ class testScheduledReportPermissions extends CWebTest {
 		$this->page->userLogin($data['alias'], $data['password']);
 		$this->page->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
 		$this->query('link', $report)->waitUntilClickable()->one()->click();
-		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 		$form->fill(['Dashboard' => 'Global view']);
 		$form->submit();
 		$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -610,7 +610,7 @@ class testScheduledReportPermissions extends CWebTest {
 		$this->page->userLogin($data['alias'], $data['password']);
 		$this->page->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
 		$this->page->query('button:Create report')->waitUntilClickable()->one()->click();
-		$form = $this->query('id:scheduledreport-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
 		$form->checkValue(['Owner' => $data['alias']]);
 		// TODO: check why not working $form->getField('Owner')->isEnabled($state)
 		$this->assertTrue($form->getField('Owner')->query('xpath://div[@class="selected"]/ul')->one()->isEnabled($state));
