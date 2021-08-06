@@ -1658,12 +1658,6 @@ static int	jsonpath_regexp_match(const char *text, const char *pattern, double *
 	zbx_regexp_t	*rxp;
 	const char	*error = NULL;
 
-	if (NULL == text || NULL == pattern)
-	{
-		*result = 0.0;
-		return SUCCEED;
-	}
-
 	if (FAIL == zbx_regexp_compile(pattern, &rxp, &error))
 	{
 		zbx_set_json_strerror("invalid regular expression in JSON path: %s", error);
@@ -1820,15 +1814,26 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 						res = 1.0;
 					}
 					else
+					{
 						res = 0.0;
+					}
 					zbx_variant_set_dbl(left, res);
 					zbx_variant_clear(right);
 					stack.values_num--;
 					break;
 				case ZBX_JSONPATH_TOKEN_OP_REGEXP:
-					zbx_variant_convert(left, ZBX_VARIANT_STR);
-					zbx_variant_convert(right, ZBX_VARIANT_STR);
-					ret = jsonpath_regexp_match(left->data.str, right->data.str, &res);
+					if (NULL == left->data.str || NULL == right->data.str ||
+							FAIL == zbx_variant_convert(left, ZBX_VARIANT_STR) ||
+							FAIL == zbx_variant_convert(right, ZBX_VARIANT_STR))
+					{
+						res = 0.0;
+						ret = SUCCEED;
+					}
+					else
+					{
+						ret = jsonpath_regexp_match(left->data.str, right->data.str, &res);
+					}
+
 					zbx_variant_clear(left);
 					zbx_variant_clear(right);
 
