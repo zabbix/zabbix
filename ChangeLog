@@ -3274,6 +3274,7 @@ Changes for 4.0.33rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 ..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
 ..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
 A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
