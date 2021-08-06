@@ -213,22 +213,21 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'item_count(/host/trap)'
 				]
 			],
-// TODO uncomment after ZBX-19773 will be completed
-//			[
-//				[
-//					'formula' => 'item_count(/*/trap)'
-//				]
-//			],
-//			[
-//				[
-//					'formula' => 'item_count(/host/trap[*])'
-//				]
-//			],
-//			[
-//				[
-//					'formula' => 'item_count(/*/agent.ping?[group="grp"]'
-//				]
-//			],
+			[
+				[
+					'formula' => 'item_count(/*/trap)'
+				]
+			],
+			[
+				[
+					'formula' => 'item_count(/host/trap[*])'
+				]
+			],
+			[
+				[
+					'formula' => 'item_count(/*/trap?[group="grp"])'
+				]
+			],
 			// cos() function.
 			[
 				[
@@ -494,6 +493,68 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => "mod(last(//trap),2s)"
+				]
+			],
+			// monoinc() function.
+			[
+				[
+					'formula' => 'monoinc(/host/trap,#5,"weak")'
+				]
+			],
+			[
+				[
+					'formula' => 'monoinc(/host/trap,#5)'
+				]
+			],
+			[
+				[
+					'formula' => 'monoinc(/host/trap[*],#5)'
+				]
+			],
+			[
+				[
+					'formula' => 'monoinc(/host/trap[*], #5:now-1w)'
+				]
+			],
+			[
+				[
+					'formula' => 'monoinc(/host/trap[*], #5:now-1w, "weak")'
+				]
+			],
+			[
+				[
+					'formula' => 'monoinc(/host/trap[*], #5:now-1w, "strict")'
+				]
+			],
+			// monodec() function.
+			[
+				[
+					'formula' => 'monodec(/host/trap, #5)'
+				]
+			],
+			[
+				[
+					'formula' => 'monodec(/host/trap[*],#5)'
+				]
+			],
+			[
+				[
+					'formula' => 'monodec(/host/trap, #5, "weak")'
+				]
+			],
+			[
+				[
+					'formula' => 'monodec(/host/trap[*], #5:now-1w, "weak")'
+				]
+			],
+			[
+				[
+					'formula' => 'monodec(/host/trap[*], #5:now-1w, "strict")'
+				]
+			],
+			[
+				[
+					'formula' => 'monodec(/host/trap[*], #5:now-1w)'
 				]
 			],
 			// nodata() function.
@@ -1324,6 +1385,134 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'min(/*/trap,#4:now-1m)',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "min".'
+				]
+			],
+			// monoinc() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monoinc(/*/trap[1],#5:now-1h)',
+					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "monoinc".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monoinc(/host/*,#5:now-1h)',
+					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "monoinc".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monoinc(/host/trap,#5:now-1h, weak)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,#5:now-1h, weak)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monoinc(/host/trap,#5:now-1h, strict)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,#5:now-1h, strict)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monoinc(/host/trap,#5:now-1h, "weak", 1)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monoinc".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monoinc(/host/trap,#5:now-1h, "strict", 1)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monoinc".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monoinc(/host/trap,#5:now-1h, "test")',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "monoinc".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monoinc(/host/trap,now-1h, "weak")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,now-1h, "weak")".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monoinc(/host/trap,now-1h, "strict")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,now-1h, "strict")".'
+				]
+			],
+			// monodec() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monodec(/*/trap[1],#5:now-1h)',
+					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "monodec".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monodec(/host/*,#5:now-1h)',
+					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "monodec".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monodec(/host/trap,#5:now-1h, weak)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,#5:now-1h, weak)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monodec(/host/trap,#5:now-1h, strict)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,#5:now-1h, strict)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monodec(/host/trap,#5:now-1h, "weak", 1)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monodec".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monodec(/host/trap,#5:now-1h, "strict", 1)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monodec".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monodec(/host/trap,#5:now-1h, "test")',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "monodec".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monodec(/host/trap,now-1h, "weak")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,now-1h, "weak")".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'monodec(/host/trap,now-1h, "strict")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,now-1h, "strict")".'
 				]
 			],
 			// nodata() function validation.
