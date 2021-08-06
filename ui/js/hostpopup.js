@@ -77,7 +77,7 @@ const host_popup = {
 
 		const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
-		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+		overlay.$dialogue.addClass('sticked-to-top')[0].addEventListener('dialogue.submit', (e) => {
 			postMessageOk(e.detail.title);
 
 			if (e.detail.messages !== null) {

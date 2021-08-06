@@ -914,6 +914,10 @@ form {
 
 .nowrap {
 	white-space: nowrap;
+
+	.input-group {
+		flex-wrap: nowrap;
+	}
 }
 
 .wordwrap {
@@ -3068,6 +3072,10 @@ $form-icon-btn: (
 
 		&.modal-popup-generic {
 			min-width: 650px;
+		}
+
+		&[data-dialogueid="host_edit"] {
+			min-width: 1024px;
 		}
 
 		&.modal-popup-fullscreen {
@@ -6334,4 +6342,14 @@ z-select,
 
 .js-edit-host b {
 	pointer-events: none;
+}
+
+#host-form #macrosFormList {
+	.table-forms-td-left {
+		display:none;
+	}
+
+	.table-forms-td-right {
+		width: 100%;
+	}
 }

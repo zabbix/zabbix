@@ -2833,6 +2833,8 @@ form.is-loading {
 
 .nowrap {
   white-space: nowrap; }
+  .nowrap .input-group {
+    flex-wrap: nowrap; }
 
 .wordwrap {
   white-space: normal;
@@ -4218,6 +4220,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       width: 100%; }
     .overlay-dialogue.modal-popup.modal-popup-generic {
       min-width: 650px; }
+    .overlay-dialogue.modal-popup[data-dialogueid="host_edit"] {
+      min-width: 1024px; }
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       width: calc(100vw - 40px);
       max-width: calc(100vw - 40px); }
@@ -5460,8 +5464,8 @@ svg {
   .columns-wrapper.columns-3 > div,
   .columns-wrapper.columns-3 > li {
     display: block;
-    flex: 0 0 33.3333333333%;
-    max-width: 33.3333333333%; }
+    flex: 0 0 33.33333%;
+    max-width: 33.33333%; }
   .columns-wrapper .column-5 {
     flex: 0 0 5%;
     max-width: 5%; }
@@ -6000,8 +6004,8 @@ svg {
     border-radius: 50%;
     background: #0275b8; }
   .range-control.range-control-focus .range-control-thumb {
-    margin-top: -6.6666666667px;
-    margin-left: -6.6666666667px;
+    margin-top: -6.66667px;
+    margin-left: -6.66667px;
     background: #0275b8;
     border: 2px solid #0395ea; }
   .range-control.range-control-focus .range-control-progress {
@@ -6471,3 +6475,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .js-edit-host b, .js-edit-host strong {
   pointer-events: none; }
+
+#host-form #macrosFormList .table-forms-td-left {
+  display: none; }
+#host-form #macrosFormList .table-forms-td-right {
+  width: 100%; }
