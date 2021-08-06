@@ -135,15 +135,14 @@ $widget->addItem($filter);
 
 // table hosts
 $form = (new CForm())->setName('hosts');
-$header_checkbox = (new CCheckBox('all_hosts'))
-	->onClick("checkAll('".$form->getName()."', 'all_hosts', 'ids');");
+$header_checkbox = (new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'ids');");
 $show_monitored_by = ($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
 		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY);
-$header_sortable_name = make_sorting_header(_('Name'), 'name',
-	$data['sortField'], $data['sortOrder'], $action_url->getUrl()
+$header_sortable_name = make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
+	$action_url->getUrl()
 );
-$header_sortable_status = make_sorting_header(_('Status'), 'status',
-	$data['sortField'], $data['sortOrder'], $action_url->getUrl()
+$header_sortable_status = make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder'],
+	$action_url->getUrl()
 );
 
 $table = (new CTableInfo())
@@ -326,26 +325,23 @@ foreach ($data['hosts'] as $host) {
 
 	$info_icons = [];
 
-	$tls_connect = (int) $host['tls_connect'];
-	$tls_accept = (int) $host['tls_accept'];
-
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && (int) $host['hostDiscovery']['ts_delete'] != 0) {
 		$info_icons[] = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
 	}
 
-	if ($tls_connect == HOST_ENCRYPTION_NONE
-			&& ($tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE
-			&& ($tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
-			&& ($tls_accept & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
+	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
 		$encryption = (new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN)))
 			->addClass(ZBX_STYLE_STATUS_CONTAINER);
 	}
 	else {
 		// Incoming encryption.
-		if ($tls_connect == HOST_ENCRYPTION_NONE) {
+		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
 			$in_encryption = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
-		elseif ($tls_connect == HOST_ENCRYPTION_PSK) {
+		elseif ($host['tls_connect'] == HOST_ENCRYPTION_PSK) {
 			$in_encryption = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
@@ -355,21 +351,21 @@ foreach ($data['hosts'] as $host) {
 		// Outgoing encryption.
 		$out_encryption = [];
 
-		if (($tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
 			$out_encryption[] = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
 			$out_encryption[] = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
-		if (($tls_accept & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
+		if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
 			$out_encryption[] = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
 			$out_encryption[] = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
-		if (($tls_accept & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
+		if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
 			$out_encryption[] = (new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
