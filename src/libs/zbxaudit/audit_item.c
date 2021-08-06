@@ -20,7 +20,6 @@
 #include "dbcache.h"
 
 #include "log.h"
-//#include "audit_item.h"
 #include "audit_item.h"
 
 static int	item_flag_to_resource_type(int flag)

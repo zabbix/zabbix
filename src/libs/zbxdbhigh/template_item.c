@@ -28,9 +28,6 @@
 
 #include "../../libs/zbxaudit/audit_item.h"
 
-/* typedef struct _zbx_template_item_preproc_t zbx_template_item_preproc_t; */
-/* ZBX_PTR_VECTOR_DECL(item_preproc_ptr, zbx_template_item_preproc_t *) */
-
 struct _zbx_template_item_preproc_t
 {
 	zbx_uint64_t	item_preprocid;
