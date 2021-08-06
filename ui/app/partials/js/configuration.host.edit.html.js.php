@@ -424,6 +424,7 @@ $linked_templates = $host_is_discovered
 			fields.description = fields.description.trim();
 
 			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
+			fields.output = 'ajax';
 
 			if (document.querySelector('#change_psk')) {
 				delete fields.tls_psk_identity;
@@ -449,7 +450,13 @@ $linked_templates = $host_is_discovered
 		 * Handles current host deletion.
 		 */
 		deleteHost() {
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php', false),
+				original_curl = new Curl(host_popup.original_url, false);
+
+			if (basename(original_curl.getPath()) === 'hostinventories.php') {
+				original_curl.unsetArgument('hostid');
+				host_popup.original_url = original_curl.getUrl();
+			}
 
 			curl.setArgument('action', 'host.massdelete');
 			curl.setArgument('ids', [document.getElementById('hostid').value]);
@@ -501,6 +508,9 @@ $linked_templates = $host_is_discovered
 
 				if ('errors' in response) {
 					jQuery(response.errors).insertBefore($form);
+				}
+				else if ('error' in response) {
+					overlayDialogueDestroy(overlay.dialogueid);
 				}
 				else if ('hostid' in response) {
 					// Original url restored after dialog close.
@@ -702,6 +712,13 @@ $linked_templates = $host_is_discovered
 
 				if ('errors' in response) {
 					addMessage(response.errors);
+				}
+				else if ('error' in response) {
+					postMessageError(response.error);
+
+					const curl = new Curl('zabbix.php');
+					curl.setArgument('action', 'host.list');
+					window.location = curl.getUrl();
 				}
 				else if ('hostid' in response) {
 					const curl = new Curl('zabbix.php');

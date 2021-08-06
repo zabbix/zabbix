@@ -147,7 +147,6 @@ class CControllerHostEdit extends CController {
 	}
 
 	protected function doAction(): void {
-
 		$this->host = (array) $this->host + $this->getInputValues() + $this->getHostDefaultValues();
 
 		$data = [
