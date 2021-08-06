@@ -1099,7 +1099,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		{
 			/* target is "Current host" */
 			if (SUCCEED != (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
-							sizeof(error))))
+					sizeof(error))))
 			{
 				goto fail;
 			}
