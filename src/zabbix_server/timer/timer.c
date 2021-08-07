@@ -33,6 +33,8 @@
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 
+#define ZBX_EVENT_BATCH_SIZE	1000
+
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 extern int		CONFIG_TIMER_FORKS;
@@ -305,27 +307,32 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 
 	if (0 != eventids.values_num)
 	{
+		int	i;
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
 		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select e.eventid,e.objectid,er.r_eventid,t.tag,t.value"
-				" from events e"
-				" left join event_recovery er"
-					" on e.eventid=er.eventid"
-				" left join problem_tag t"
-					" on e.eventid=t.eventid"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid", eventids.values, eventids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by e.eventid");
+		for (i = 0; i < eventids.values_num; i += ZBX_EVENT_BATCH_SIZE)
+		{
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"select e.eventid,e.objectid,er.r_eventid,t.tag,t.value"
+					" from events e"
+					" left join event_recovery er"
+						" on e.eventid=er.eventid"
+					" left join problem_tag t"
+						" on e.eventid=t.eventid"
+					" where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid",
+					eventids.values + i, MIN(eventids.values_num - i, ZBX_EVENT_BATCH_SIZE));
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by e.eventid");
 
-		result = DBselect("%s", sql);
-		zbx_free(sql);
+			result = DBselect("%s", sql);
+			zbx_free(sql);
 
-		event_queries_fetch(result, event_queries);
-		DBfree_result(result);
+			event_queries_fetch(result, event_queries);
+			DBfree_result(result);
+		}
 
 		zbx_vector_ptr_sort(event_queries, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
