@@ -49,7 +49,7 @@ void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, s
 void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_service_t *services);
 void	zbx_service_serialize_parent_service(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		zbx_uint64_t serviceid, zbx_vector_ptr_t *tags);
+		zbx_uint64_t serviceid, zbx_vector_tags_t *tags);
 void	zbx_service_deserialize_parent_services(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_ptr_t *parent_services);
 

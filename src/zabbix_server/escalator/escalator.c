@@ -484,17 +484,17 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, zbx
 	zbx_service_deserialize_parent_services(response.data, response.size, &parent_services);
 	zbx_ipc_message_clean(&response);
 
-	for (i = 0; i < 1; i++)
+	for (i = 0; i < parent_services.values_num; i++)
 	{
 		int						j;
-		zbx_parent_service_t	*ps = (zbx_parent_service_t*)parent_services.values[i];
+		zbx_parent_service_t	*ps = (zbx_parent_service_t*)(parent_services.values[i]);
 
-		if (PERM_DENY == (perm = get_service_access_rights(user.roleid, parent_services.values[i])))
+		if (PERM_DENY == (perm = get_service_access_rights(user.roleid, ps->serviceid)))
 			goto out;
 
 		for (j = 0; i < ps->tags.values_num; i++)
 		{
-			zbx_tag_t *tag = ps->tags.values[i];
+			zbx_tag_t	*tag = ps->tags.values[i];
 			DB_ROW		row;
 			DB_RESULT	result;
 			char		*tag_read, *tag_write, *value_read, *value_write;
