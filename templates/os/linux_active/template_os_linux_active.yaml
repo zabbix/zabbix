@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:48Z'
+  date: '2021-08-03T06:48:21Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -1595,12 +1595,9 @@ zabbix_export:
               key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]'
               history: 7d
               trends: '0'
-              description: |
-                Indicates the interface RFC2863 operational state as a string.
-                Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".
-                Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
+              description: 'Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt'
               valuemap:
-                name: 'IF-MIB::ifOperStatus'
+                name: ifOperStatus
               preprocessing:
                 -
                   type: JAVASCRIPT
@@ -1608,25 +1605,27 @@ zabbix_export:
                     - |
                       var newvalue;
                       switch(value) {
-                        case "up":
+                        case "unkonwn":
+                          newvalue = 0;
+                          break;
+                        case "notpresent":
                           newvalue = 1;
                           break;
                         case "down":
                           newvalue = 2;
                           break;
+                        case "lowerlayerdown":
+                          newvalue = 3;
+                          break;
                         case "testing":
                           newvalue = 4;
                           break;
-                        case "unknown":
+                        case "dormant":
                           newvalue = 5;
                           break;
-                        case "dormant":
+                        case "up":
                           newvalue = 6;
-                          break;
-                        case "notPresent":
-                          newvalue = 7;
-                          break;
-                        default:
+                          break;  default:
                           newvalue = "Problem parsing interface operstate in JS";
                       }
                       return newvalue;
@@ -1810,26 +1809,29 @@ zabbix_export:
       valuemaps:
         -
           uuid: 9bc9524635a349409e244ad5215c80c1
-          name: 'IF-MIB::ifOperStatus'
+          name: ifOperStatus
           mappings:
             -
+              value: '0'
+              newvalue: unknown
+            -
               value: '1'
-              newvalue: up
+              newvalue: notpresent
             -
               value: '2'
               newvalue: down
             -
+              value: '3'
+              newvalue: lowerlayerdown
+            -
               value: '4'
-              newvalue: unknown
+              newvalue: testing
             -
               value: '5'
               newvalue: dormant
             -
               value: '6'
-              newvalue: notPresent
-            -
-              value: '7'
-              newvalue: lowerLayerDown
+              newvalue: up
         -
           uuid: 8f709b791d1342a48615632e86969c92
           name: 'Linux::Interface protocol types'
