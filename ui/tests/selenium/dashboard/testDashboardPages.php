@@ -334,14 +334,6 @@ class testDashboardPages extends CWebTest {
 		$this->query('xpath:('.$selector.']/following::button)['.$index.']')->waitUntilPresent()->one()->click()->waitUntilReady();
 	}
 
-//	private function selectPage($page_name, $index = 1) {
-//		$selector = '//div[@class="dashboard-navigation-tabs"]//ul[@class="sortable-list"]';
-//		$this->query('xpath:('.$selector.'//span[@title='.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
-//				->one()->click();
-//		$this->query('xpath:'.$selector.'//span[@title='.CXPathHelper::escapeQuotes($page_name).
-//				']/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
-//	}
-
 	private function selectPageAction($page_name, $menu_item, $index = 1) {
 		$this->openPageMenu($page_name, $index);
 		$this->query('xpath://ul[@role="menu"]')->waitUntilVisible()->asPopupMenu()->one()->select($menu_item);
