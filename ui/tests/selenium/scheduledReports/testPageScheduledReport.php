@@ -457,7 +457,7 @@ class testPageScheduledReport extends CWebTest {
 			// Delete single, delete multiple and delete all reports.
 			[
 				[
-					'Name' => 'Report for delete',
+					'Name' => 'Report for delete'
 				]
 			],
 			[
