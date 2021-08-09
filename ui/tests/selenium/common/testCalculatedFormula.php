@@ -934,29 +934,8 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'count(avg_foreach(/host/trap, #7, eg))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(avg_foreach(/host/trap, #7, eg))".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'count(max_foreach(/host/trap, 1h, 1)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap, 1h, 1)".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap, 1h) 1)',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap, 1h) 1)".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'count(min_foreach(/host/trap, 1h, 1))',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "min_foreach".'
 				]
 			],
 			[
@@ -970,7 +949,7 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(sum_foreach(/host/trap, #7, eg))',
-					'error' => "Invalid parameter \"/1/params\": incorrect expression starting from \"count(sum_foreach(/host/trap, #7, eg))\"."
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(sum_foreach(/host/trap, #7, eg))".'
 				]
 			],
 			[
@@ -1405,50 +1384,36 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'monoinc(/host/trap,#5:now-1h, weak)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,#5:now-1h, weak)".'
+					'formula' => 'monoinc(/host/trap,#5:now-1h,weak)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,#5:now-1h,weak)".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'monoinc(/host/trap,#5:now-1h, strict)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,#5:now-1h, strict)".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'monoinc(/host/trap,#5:now-1h, "weak", 1)',
+					'formula' => 'monoinc(/host/trap,#5:now-1h,"strict",1)',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monoinc".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'monoinc(/host/trap,#5:now-1h, "strict", 1)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monoinc".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'monoinc(/host/trap,#5:now-1h, "test")',
+					'formula' => 'monoinc(/host/trap,#5:now-1h,"test")',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "monoinc".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'monoinc(/host/trap,now-1h, "weak")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,now-1h, "weak")".'
+					'formula' => 'monoinc(/host/trap,now-1h,"weak")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,now-1h,"weak")".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'monoinc(/host/trap,now-1h, "strict")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,now-1h, "strict")".'
+					'formula' => 'monoinc(/host/trap,now-1h,"strict")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,now-1h,"strict")".'
 				]
 			],
 			// monodec() function validation.
@@ -1469,50 +1434,29 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'monodec(/host/trap,#5:now-1h, weak)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,#5:now-1h, weak)".'
+					'formula' => 'monodec(/host/trap,#5:now-1h,weak)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,#5:now-1h,weak)".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'monodec(/host/trap,#5:now-1h, strict)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,#5:now-1h, strict)".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'monodec(/host/trap,#5:now-1h, "weak", 1)',
+					'formula' => 'monodec(/host/trap,#5:now-1h,"strict",1)',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monodec".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'monodec(/host/trap,#5:now-1h, "strict", 1)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "monodec".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'monodec(/host/trap,#5:now-1h, "test")',
+					'formula' => 'monodec(/host/trap,#5:now-1h,"test")',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "monodec".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'monodec(/host/trap,now-1h, "weak")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,now-1h, "weak")".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'monodec(/host/trap,now-1h, "strict")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,now-1h, "strict")".'
+					'formula' => 'monodec(/host/trap,now-1h,"weak")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monodec(/host/trap,now-1h,"weak")".'
 				]
 			],
 			// nodata() function validation.
