@@ -256,17 +256,32 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 	zbx_uint64_t			eventid;
 	zbx_uint64_pair_t		pair;
 	zbx_vector_uint64_t		eventids;
+	int				read_tags;
+	const char			*tag_fields, *tag_join;
+
+	read_tags = zbx_dc_maintenance_has_tags();
 
 	/* get open or recently closed problems */
 
-	result = DBselect("select p.eventid,p.objectid,p.r_eventid,t.tag,t.value"
+	if (SUCCEED == read_tags)
+	{
+		tag_fields = "t.tag,t.value";
+		tag_join = " left join problem_tag t on p.eventid=t.eventid";
+	}
+	else
+	{
+		tag_fields = "null,null";
+		tag_join = "";
+	}
+
+	result = DBselect("select p.eventid,p.objectid,p.r_eventid,%s"
 			" from problem p"
-			" left join problem_tag t"
-				" on p.eventid=t.eventid"
+			"%s"
 			" where p.source=%d"
 				" and p.object=%d"
 				" and " ZBX_SQL_MOD(p.eventid, %d) "=%d"
 			" order by p.eventid",
+			tag_fields, tag_join,
 			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, CONFIG_TIMER_FORKS, process_num - 1);
 
 	event_queries_fetch(result, event_queries);
@@ -311,18 +326,24 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
+		if (SUCCEED == read_tags)
+		{
+			tag_fields = "t.tag,t.value";
+			tag_join = " left join event_tag t on e.eventid=t.eventid";
+		}
+
 		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		for (i = 0; i < eventids.values_num; i += ZBX_EVENT_BATCH_SIZE)
 		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-					"select e.eventid,e.objectid,er.r_eventid,t.tag,t.value"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select e.eventid,e.objectid,er.r_eventid,%s"
 					" from events e"
 					" left join event_recovery er"
 						" on e.eventid=er.eventid"
-					" left join problem_tag t"
-						" on e.eventid=t.eventid"
-					" where");
+					"%s"
+					" where",
+					tag_fields, tag_join);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid",
 					eventids.values + i, MIN(eventids.values_num - i, ZBX_EVENT_BATCH_SIZE));
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by e.eventid");
