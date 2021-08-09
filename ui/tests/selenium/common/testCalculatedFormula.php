@@ -162,11 +162,6 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'count(/host/trap,#10,"ge","99")'
 				]
 			],
-			[
-				[
-					'formula' => 'count(/host/trap,#10,"ge","99")'
-				]
-			],
 			// count() function with foreach aggregated functions
 			[
 				[
