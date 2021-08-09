@@ -526,7 +526,7 @@ class testSID extends CWebTest {
 				[
 					'incorrect_request' => true,
 					'link' => (new CUrl('zabbix.php'))
-						->setArgument('actiob', 'host.edit')
+						->setArgument('action', 'host.update')
 						->setArgument('form_refresh', 1)
 						->setArgument('flags', 0)
 						->setArgument('tls_connect', 1)
@@ -576,8 +576,8 @@ class testSID extends CWebTest {
 				[
 					'incorrect_request' => true,
 					'link' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'host.delete')
-						->setArgument('hostid', 99452)
+						->setArgument('action', 'host.massdelete')
+						->setArgument('ids', [99452])
 						->getUrl()
 				]
 			],
