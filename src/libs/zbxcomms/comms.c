@@ -2078,7 +2078,7 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
  * Parameters: prefix_size - [IN] subnet prefix size                          *
  *             current_ai  - [IN] subnet                                      *
  *             name        - [IN] address                                     *
- *             excl        - [IN] compare IPv6 IPv4-mapped address with       *
+ *             ipv6v4_mode - [IN] compare IPv6 IPv4-mapped address with       *
  *                                IPv4 addresses only                         *
  *                                                                            *
  * Return value: SUCCEED - address belongs to the subnet                      *
@@ -2086,17 +2086,17 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
  *                                                                            *
  ******************************************************************************/
 #ifndef HAVE_IPV6
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int excl)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode)
 {
 	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
 				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
 
-	ZBX_UNUSED(excl);
+	ZBX_UNUSED(ipv6v4_mode);
 
 	return subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
 }
 #else
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int excl)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode)
 {
 	/* Network Byte Order is ensured */
 	/* IPv4-compatible, the first 96 bits are zeros */
@@ -2125,7 +2125,7 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_
 				}
 				break;
 			case AF_INET6:
-				if ((0 == excl || 0 != memcmp(name6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
+				if ((0 == ipv6v4_mode || 0 != memcmp(name6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
 						SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
 						name6->sin6_addr.s6_addr,
 						ai_addr6->sin6_addr.s6_addr))
@@ -2144,15 +2144,17 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_
 			/* incoming AF_INET6, must see whether it is compatible or mapped */
 
 			if (((0 == memcmp(name6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) ||
-					(0 == excl && 0 == memcmp(name6->sin6_addr.s6_addr,
+					(0 == ipv6v4_mode && 0 == memcmp(name6->sin6_addr.s6_addr,
 					ipv4_compat_mask, 12))) && SUCCEED == subnet_match(AF_INET, prefix_size,
 					&name6->sin6_addr.s6_addr[12], &ai_addr4->sin_addr.s_addr))
 			{
 				return SUCCEED;
 			}
 		}
-		else if (AF_INET6 == current_ai->ai_family && 0 == excl)
-		{				/* incoming AF_INET, must see whether the given is compatible or mapped */
+		else if (AF_INET6 == current_ai->ai_family && 0 == ipv6v4_mode)
+		{
+			/* incoming AF_INET, must see whether the given is compatible or mapped */
+
 			memcpy(ipv6_compat_address, ipv4_compat_mask, sizeof(ipv4_compat_mask));
 			memcpy(&ipv6_compat_address[sizeof(ipv4_compat_mask)], &name4->sin_addr.s_addr, 4);
 
