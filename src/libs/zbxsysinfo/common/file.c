@@ -925,7 +925,7 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 			goto err;
 		}
 
-		zbx_sha256_process_bytes(buf, strlen(buf), &ctx);
+		zbx_sha256_process_bytes(buf, nr, &ctx);
 	}
 
 	if (0 > nr)
