@@ -62,7 +62,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ssize_t		nbytes;
 		char		cbuf[MAX_BUFFER_LEN];
 		zbx_uint64_t	lines_num = 0;
-		int		f = -1;
+		int		f;
 		double		ts;
 
 		ts = zbx_time();
