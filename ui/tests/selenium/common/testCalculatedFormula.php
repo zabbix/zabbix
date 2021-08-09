@@ -913,21 +913,7 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap,1h),1)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h)1)".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'count(sum_foreach(/host/trap,1h,1))',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "sum_foreach".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'count(sum_foreach(/host/trap,#7,eg))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(sum_foreach(/host/trap,#7,eg))".'
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),1)".'
 				]
 			],
 			[
@@ -1385,13 +1371,6 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'monoinc(/host/trap,now-1h,"weak")',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,now-1h,"weak")".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'monoinc(/host/trap,now-1h,"strict")',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "monoinc(/host/trap,now-1h,"strict")".'
 				]
 			],
 			// monodec() function validation.
