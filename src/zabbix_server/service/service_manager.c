@@ -1249,15 +1249,15 @@ static int	service_get_status(const zbx_service_t	*service, int *status)
 
 	switch (service->propagation_rule)
 	{
-		case ZBX_SERVICE_STATUS_CURRENT:
+		case ZBX_SERVICE_STATUS_AS_IS:
 			*status = service->status;
 			break;
-		case ZBX_SERVICE_STATUS_INC:
+		case ZBX_SERVICE_STATUS_INCREASE:
 			*status = service->status + service->propagation_value;
 			if (TRIGGER_SEVERITY_COUNT <= *status)
 				*status = TRIGGER_SEVERITY_COUNT - 1;
 			break;
-		case ZBX_SERVICE_STATUS_DEC:
+		case ZBX_SERVICE_STATUS_DECREASE:
 			*status = service->status - service->propagation_value;
 			if (ZBX_SERVICE_STATUS_OK >= *status)
 				*status = ZBX_SERVICE_STATUS_OK + 1;
@@ -1682,12 +1682,12 @@ static int	service_get_rule_status(const zbx_service_t *service, const zbx_servi
 
 	switch (rule->type)
 	{
-		case ZBX_SERVICE_CALC_STATUS_MORE:
-		case ZBX_SERVICE_CALC_STATUS_MORE_PERC:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
 			status_limit = rule->limit_status;
 			break;
-		case ZBX_SERVICE_CALC_STATUS_LESS:
-		case ZBX_SERVICE_CALC_STATUS_LESS_PERC:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
 			status_limit = rule->limit_status + 1;
 			break;
 		default:
@@ -1701,38 +1701,38 @@ static int	service_get_rule_status(const zbx_service_t *service, const zbx_servi
 
 	switch (rule->type)
 	{
-		case ZBX_SERVICE_CALC_STATUS_MORE:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
 			if (children.values_num < rule->limit_value)
 				goto out;
 			break;
-		case ZBX_SERVICE_CALC_STATUS_MORE_PERC:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
 			if (children.values_num * 100 / total_num < rule->limit_value)
 				goto out;
 			break;
-		case ZBX_SERVICE_CALC_STATUS_LESS:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
 			if (total_num - children.values_num >= rule->limit_value)
 				goto out;
 			break;
-		case ZBX_SERVICE_CALC_STATUS_LESS_PERC:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
 			if ((total_num - children.values_num) * 100 / total_num >= rule->limit_value)
 				goto out;
 			break;
-		case ZBX_SERVICE_CALC_WEIGHT_MORE:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
 			weight = services_get_weight(&children);
 			if (weight < rule->limit_value)
 				goto out;
 			break;
-		case ZBX_SERVICE_CALC_WEIGHT_MORE_PERC:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
 			weight = services_get_weight(&children);
 			if (weight * 100 / total_weight < rule->limit_value)
 				goto out;
 			break;
-		case ZBX_SERVICE_CALC_WEIGHT_LESS:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
 			weight = services_get_weight(&children);
 			if (weight >= rule->limit_value)
 				goto out;
 			break;
-		case ZBX_SERVICE_CALC_WEIGHT_LESS_PERC:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
 			weight = services_get_weight(&children);
 			if (weight * 100 / total_weight >= rule->limit_value)
 				goto out;
