@@ -1079,6 +1079,14 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 		pos = skip_spaces(data, loc.r + 1);
 	}
+	else /* no labels in row, can only match by metric name */
+	{
+		if (NULL == filter->metric) /* no metric name in filter to match against */
+		{
+			match = FAIL;
+			goto out;
+		}
+	}
 
 	/* check if there was a whitespace before metric value */
 	if (pos == loc.r + 1)
