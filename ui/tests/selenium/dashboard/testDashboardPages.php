@@ -29,8 +29,6 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardPages extends CWebTest {
 
-	private const DEFAULT_TIME = '1 minute';
-
 	/**
 	 * Attach MessageBehavior to the test.
 	 */
@@ -60,17 +58,24 @@ class testDashboardPages extends CWebTest {
 	protected static $dashboardid_kiosk;
 
 	/**
-	 * New dashboard with two pages.
+	 * Id of dashboard for page creation.
+	 *
+	 * @var integer
+	 */
+	protected static $dashboardid_creation;
+
+	/**
+	 * New dashboards.
 	 */
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'Dashboard for page creation',
-				'display_period' => 60,
+				'name' => 'Dashboard for layout',
+				'display_period' => 30,
 				'auto_start' => 1,
 				'pages' => [
 					[
-						'name' => 'first_page_name',
+						'name' => 'First_page_name',
 						'widgets' => [
 							[
 								'name' => 'First page clocks',
@@ -101,7 +106,7 @@ class testDashboardPages extends CWebTest {
 			],
 			[
 				'name' => 'Dashboard for copy',
-				'display_period' => 60,
+				'display_period' => 30,
 				'auto_start' => 1,
 				'pages' => [
 					[
@@ -136,7 +141,7 @@ class testDashboardPages extends CWebTest {
 			],
 			[
 				'name' => 'Dashboard for kiosk',
-				'display_period' => 60,
+				'display_period' => 30,
 				'auto_start' => 1,
 				'pages' => [
 					[
@@ -182,12 +187,40 @@ class testDashboardPages extends CWebTest {
 						]
 					]
 				]
+			],
+			[
+				'name' => 'Dashboard for page creation',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [
+					[
+						'name' => 'first_page_creation'
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for page delete',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [
+					[
+						'name' => 'Delete_1'
+					],
+					[
+						'name' => 'Delete_2'
+					],
+					[
+						'name' => 'Delete_3'
+					]
+				]
 			]
 		]);
 		$this->assertArrayHasKey('dashboardids', $response);
 		self::$dashboardid = $response['dashboardids'][0];
 		self::$dashboardid_copy = $response['dashboardids'][1];
 		self::$dashboardid_kiosk = $response['dashboardids'][2];
+		self::$dashboardid_creation = $response['dashboardids'][3];
+		self::$dashboardid_delete = $response['dashboardids'][4];
 	}
 
 	public function testDashboardPages_Layout() {
@@ -201,7 +234,7 @@ class testDashboardPages extends CWebTest {
 		// All available display period time.
 		$this->assertEquals(['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'],
 				$properties_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText());
-		$properties_form->fill(['Name' => 'Dashboard creation', 'Default page display period' => self::DEFAULT_TIME]);
+		$properties_form->fill(['Name' => 'Dashboard creation', 'Default page display period' => '30 seconds']);
 		$properties_form->submit();
 		$this->page->waitUntilReady();
 
@@ -212,7 +245,7 @@ class testDashboardPages extends CWebTest {
 
 		// Check add page form.
 		$add_menu->select('Add page');
-		$this->checkPageProperties('', self::DEFAULT_TIME);
+		$this->checkPageProperties();
 
 		// Check page popup-menu options in edit mode.
 		$this->openPageMenu('Page 1');
@@ -222,7 +255,7 @@ class testDashboardPages extends CWebTest {
 
 		// Check page properties in edit mode.
 		$page_menu->select('Properties');
-		$this->checkPageProperties('', self::DEFAULT_TIME);
+		$this->checkPageProperties();
 		$this->query('id:dashboard-cancel')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
@@ -236,13 +269,13 @@ class testDashboardPages extends CWebTest {
 		}
 
 		// Check page popup-menu options in created dashboard.
-		$this->openPageMenu('first_page_name');
+		$this->openPageMenu('First_page_name');
 		$page_menu->hasTitles('ACTIONS');
 		$this->assertEquals(['Copy', 'Properties'], $page_menu->getItems()->asText());
 
 		// Check page properties in created dashboard.
 		$page_menu->select('Properties');
-		$this->checkPageProperties('first_page_name', self::DEFAULT_TIME);
+		$this->checkPageProperties();
 	}
 
 	public function testDashboardPages_CopyPage() {
@@ -263,7 +296,7 @@ class testDashboardPages extends CWebTest {
 
 		// Copied page added.
 		array_push($pages_before, 'first_page_copy');
-		sleep(1);
+		$dashboard->waitUntilReady();
 
 		// Assert that new page added.
 		$this->assertEquals($pages_before, $this->getTitles());
@@ -293,6 +326,7 @@ class testDashboardPages extends CWebTest {
 			if ($direction === 'previous') {
 				$widget_name = ['First', 'Third', 'Second'];
 			}
+
 			foreach ($widget_name as $widget) {
 				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
 				$this->query('xpath://button[contains(@class, "'.$direction.'-page")]')->one()->click()->waitUntilReady();
@@ -313,15 +347,158 @@ class testDashboardPages extends CWebTest {
 		$this->page->assertHeader('Dashboard for kiosk');
 	}
 
-	private function checkPageProperties($page_name, $default_time) {
+	public static function getCreateData() {
+		return [
+			[
+				[
+					'fields' => [
+						'Name' => 'Simple name',
+						'Page display period' => '10 seconds'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => '#!@#$%^&*()_+',
+						'Page display period' => '30 seconds'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => '      trimmed name      ',
+						'Page display period' => '1 minute'
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'long_name_here_long_name_here_long_name_here_long_name_here_long_name_here',
+						'Page display period' => '2 minutes'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'first_page_creation',
+						'Page display period' => '10 minutes'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'кириллица',
+						'Page display period' => '30 minutes'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => '♥♥♥♥♥♥♥',
+						'Page display period' => '1 hour'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 *
+	 * @dataProvider getCreateData
+	 */
+	public function testDashboardPages_Create($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_creation)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->edit();
+		$this->query('id:dashboard-add')->one()->click();
+		$this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one()->select('Add page');
 		$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
-		$this->assertEquals('Dashboard page properties', $page_dialog->getTitle());
+		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->fill($data['fields']);
+		$page_form->submit();
+		$dashboard->waitUntilReady();
+
+		$title = $data['fields']['Name'];
+		if (CTestArrayHelper::get($data, 'trim', false)) {
+			$title = trim($data['fields']['Name']);
+		}
+
+		$this->assertTitle($title);
+		$dashboard->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$index = ($title === 'first_page_creation') ? 2 : 1;
+		$this->checkPageValues($title, $data['fields']['Page display period'], $index);
+	}
+
+	public function testDashboardPages_MaximumPageError() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&new=1')->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+		$properties_form = $dialog->query('name:dashboard_properties_form')->asForm()->one();
+		$properties_form->fill(['Name' => 'Dashboard for limit check and navigation'])->submit();
+		$this->page->waitUntilReady();
+
+		$dashboard = CDashboardElement::find()->one();
+		for ($i = 0; $i <= 49; $i++) {
+			$this->query('id:dashboard-add')->one()->click();
+			$this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one()->select('Add page');
+
+			if ($i !== 49) {
+				$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+				$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->submit();
+				$dashboard->waitUntilReady();
+			}
+		}
+
+		$this->assertMessage(TEST_BAD, 'Cannot add dashboard page: maximum number of 50 dashboard pages has been added.');
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard created');
+	}
+
+	/**
+	 * @depends testDashboardPages_MaximumPageError
+	 */
+	public function testDashboardPages_Navigation() {
+		$this->page->login()->open('zabbix.php?action=dashboard.list')->waitUntilReady();
+		$this->query('link:Dashboard for limit check and navigation')->one()->click();
+		$this->page->waitUntilReady();
+		$next_page = $this->query('xpath://button[@class="dashboard-next-page btn-iterator-page-next"]')->one();
+		$previous_page = $this->query('xpath://button[@class="dashboard-previous-page btn-iterator-page-previous"]')->one();
+		$next_page->isEnabled();
+		$previous_page->isEnabled(false);
+
+		for ($i = 1; $i <= 3; $i++) {
+			$this->assertEquals('Page '.$i, $this->query('xpath://div[@class="selected-tab"]/span')->one()->waitUntilPresent()->getText());
+			if ($i !== 3) {
+				$next_page->waitUntilReady()->click();
+			}
+		}
+		$previous_page->isEnabled();
+
+		for ($i = 3; $i >= 1; $i--) {
+			$this->assertEquals('Page '.$i, $this->query('xpath://div[@class="selected-tab"]/span')->one()->waitUntilPresent()->getText());
+			if ($i !== 1) {
+				$previous_page->waitUntilReady()->click();
+			}
+		}
+		$previous_page->isEnabled(false);
+	}
+
+	public function testDashboardPages_Delete() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_creation)->waitUntilReady();
+	}
+
+	private function checkPageValues($page_name, $default_time, $index = 1) {
+		$this->selectPageAction($page_name, 'Properties', $index);
+		$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
 		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
-		$page_form->checkValue(['Name' => $page_name]);
-		$this->assertEquals(['Name', 'Page display period'], $page_form->getLabels()->asText());
-		$this->assertEquals(['Default ('.$default_time.')', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'],
-				$page_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText());
-		$page_dialog->query('button:Cancel')->one()->click();
+		$page_form->checkValue(['Name' => $page_name, 'Page display period' => $default_time]);
 	}
 
 	private function openPageMenu($page_name, $index = 1) {
@@ -331,8 +508,16 @@ class testDashboardPages extends CWebTest {
 		if ($value !== 'selected-tab') {
 			$this->selectPage($page_name, $index);
 		}
-		$this->query('xpath:('.$selector.']/following::button)['.$index.']')->waitUntilPresent()->one()->click()->waitUntilReady();
+		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilPresent()->one()->click()->waitUntilVisible();
 	}
+
+//	private function selectPage($page_name, $index = 1) {
+//		$selector = '//div[@class="dashboard-navigation-tabs"]//ul[@class="sortable-list"]';
+//		$this->query('xpath:('.$selector.'//span[@title='.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
+//				->one()->click()->waitUntilReady();
+//		$this->query('xpath:'.$selector.'//span[@title='.CXPathHelper::escapeQuotes($page_name).
+//				']/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+//	}
 
 	private function selectPageAction($page_name, $menu_item, $index = 1) {
 		$this->openPageMenu($page_name, $index);
@@ -344,5 +529,20 @@ class testDashboardPages extends CWebTest {
 		if ($pages->count() > 0) {
 			return $pages->asText();
 		}
+	}
+
+	private function assertTitle($title) {
+		$all_titles = $this->getTitles();
+		$this->assertTrue(in_array($title, $all_titles, true));
+	}
+
+	private function checkPageProperties() {
+		$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
+		$this->assertEquals('Dashboard page properties', $page_dialog->getTitle());
+		$this->assertEquals(['Name', 'Page display period'], $page_form->getLabels()->asText());
+		$this->assertEquals(['Default (30 seconds)', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'],
+				$page_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText());
+		$page_dialog->query('button:Cancel')->one()->click();
 	}
 }
