@@ -180,27 +180,27 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'count(count_foreach(/host/trap, 1))'
+					'formula' => 'count(count_foreach(/host/trap,1))'
 				]
 			],
 			[
 				[
-					'formula' => 'count(avg_foreach(/host/trap, 1))'
+					'formula' => 'count(avg_foreach(/host/trap,1))'
 				]
 			],
 			[
 				[
-					'formula' => 'count(max_foreach(/host/trap, 1))'
+					'formula' => 'count(max_foreach(/host/trap,1))'
 				]
 			],
 			[
 				[
-					'formula' => 'count(min_foreach(/host/trap, 1))'
+					'formula' => 'count(min_foreach(/host/trap,1))'
 				]
 			],
 			[
 				[
-					'formula' => 'count(sum_foreach(/host/trap, 1))'
+					'formula' => 'count(sum_foreach(/host/trap,1))'
 				]
 			],
 			[
@@ -508,18 +508,18 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'monoinc(/host/trap[*], #5:now-1w)'
+					'formula' => 'monoinc(/host/trap[*],#5:now-1w)'
 				]
 			],
 			[
 				[
-					'formula' => 'monoinc(/host/trap[*], #5:now-1w, "strict")'
+					'formula' => 'monoinc(/host/trap[*],#5:now-1w,"strict")'
 				]
 			],
 			// monodec() function.
 			[
 				[
-					'formula' => 'monodec(/host/trap, #5)'
+					'formula' => 'monodec(/host/trap,#5)'
 				]
 			],
 			[
@@ -529,17 +529,17 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'monodec(/host/trap, #5, "weak")'
+					'formula' => 'monodec(/host/trap,#5,"weak")'
 				]
 			],
 			[
 				[
-					'formula' => 'monodec(/host/trap[*], #5:now-1w, "strict")'
+					'formula' => 'monodec(/host/trap[*],#5:now-1w,"strict")'
 				]
 			],
 			[
 				[
-					'formula' => 'monodec(/host/trap[*], #5:now-1w)'
+					'formula' => 'monodec(/host/trap[*],#5:now-1w)'
 				]
 			],
 			// nodata() function.
@@ -891,64 +891,57 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'count(exists_foreach(/host/trap, 1, 1))',
+					'formula' => 'count(exists_foreach(/host/trap,1,1))',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "exists_foreach".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'count(exists_foreach(/host/trap, eg))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(exists_foreach(/host/trap, eg))".'
+					'formula' => 'count(exists_foreach(/host/trap,eg))',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(exists_foreach(/host/trap,eg))".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'count(exists_foreach(/host/trap, #7 ,eg))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(exists_foreach(/host/trap, #7 ,eg))".'
+					'formula' => 'count(exists_foreach(/host/trap,#7,eg))',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(exists_foreach(/host/trap,#7,eg))".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'count(last_foreach(/host/trap, #7, eg))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(last_foreach(/host/trap, #7, eg))".'
+					'formula' => 'count(max_foreach(/host/trap,1h)1)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h)1)".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'count(max_foreach(/host/trap, 1h) 1)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap, 1h) 1)".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'count(sum_foreach(/host/trap, 1h, 1))',
+					'formula' => 'count(sum_foreach(/host/trap,1h,1))',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "sum_foreach".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'count(sum_foreach(/host/trap, #7, eg))',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(sum_foreach(/host/trap, #7, eg))".'
+					'formula' => 'count(sum_foreach(/host/trap,#7,eg))',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(sum_foreach(/host/trap,#7,eg))".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'item_count(/host/trap, 1, eg)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "item_count(/host/trap, 1, eg)".'
+					'formula' => 'item_count(/host/trap,1,eg)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "item_count(/host/trap,1,eg)".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'item_count(/host/trap, #1, 1, eg)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "item_count(/host/trap, #1, 1, eg)".'
+					'formula' => 'item_count(/host/trap,#1,1,eg)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "item_count(/host/trap,#1,1,eg)".'
 				]
 			],
 			[
