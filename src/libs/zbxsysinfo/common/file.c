@@ -91,13 +91,13 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				lines_num++;
 				dif = p2 - p1;
+				p1 = p2;
 
 				if (dif < sz)
 				{
 					sz -= dif + 1;
-					p1 = p2 + 1;
+					p1++;
 				}
-
 			}
 		}
 
