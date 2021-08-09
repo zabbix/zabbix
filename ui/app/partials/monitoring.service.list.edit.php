@@ -71,7 +71,7 @@ foreach ($data['services'] as $serviceid => $service) {
 
 			$parents[] = (new CLink($parent['name'],
 				(new CUrl('zabbix.php'))
-					->setArgument('action', 'service.list')
+					->setArgument('action', 'service.list.edit')
 					->setArgument('serviceid', $parent['serviceid'])
 			))->setAttribute('data-serviceid', $parent['serviceid']);
 		}
