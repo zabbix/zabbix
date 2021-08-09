@@ -158,7 +158,7 @@ class ScheduledReports {
 					[
 						'userid' => $userids['user-recipient of the report'],
 						'access_userid' => $userids['user-recipient of the report']
-					],
+					]
 				],
 				'user_groups' => [
 					[

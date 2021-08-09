@@ -535,7 +535,7 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => '  Report with leading and trailing spaces  ',
 						'Subject' => '  test.trim  ',
 						'Message' => '  test.trim  ',
-						'Description' => '  test.trim  ',
+						'Description' => '  test.trim  '
 					],
 					'trim' => true
 				]
