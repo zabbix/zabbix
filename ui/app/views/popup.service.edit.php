@@ -181,9 +181,8 @@ foreach (range(1, 5) as $value) {
 	$propagation_value_number->addValue($value, $value, 'propagation_value_number_'.$value);
 }
 
-$propagation_value_status = (new CSeverity(['name' => 'propagation_value_status',
-	'value' => $data['form']['propagation_value']
-]))->addValue(_('OK'), TRIGGER_SEVERITY_NONE, ZBX_STYLE_NORMAL_BG);
+$propagation_value_status = (new CSeverity('propagation_value_status', (int) $data['form']['propagation_value']))
+	->addValue(_('OK'), TRIGGER_SEVERITY_NONE, ZBX_STYLE_NORMAL_BG);
 
 $service_tab
 	->addItem([

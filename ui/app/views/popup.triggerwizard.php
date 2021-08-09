@@ -90,10 +90,7 @@ $form->addItem(
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 		->addRow((new CLabel(_('Item'), 'itemid'))->setAsteriskMark(), $ms_itemid)
-		->addRow(_('Severity'), new CSeverity([
-			'name' => 'priority',
-			'value' => (int) $options['priority']
-		]))
+		->addRow(_('Severity'), new CSeverity('priority', (int) $options['priority']))
 		->addRow((new CLabel(_('Expression'), 'logexpr'))->setAsteriskMark(),
 			(new CTextBox('expression'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
