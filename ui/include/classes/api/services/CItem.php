@@ -44,6 +44,17 @@ class CItem extends CItemGeneral {
 		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE
 	];
 
+	/**
+	 * Define a set of supported item types.
+	 *
+	 * @var array
+	 */
+	const SUPPORTED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
+		ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+		ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
+		ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+	];
+
 	public function __construct() {
 		parent::__construct();
 
@@ -391,6 +402,9 @@ class CItem extends CItemGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
+			// Items share table with item prototypes. Therefore remove item unrelated fields.
+			unset($item['discover']);
+
 			if (!$options['countOutput']) {
 				$result[$item['itemid']] = $item;
 				continue;

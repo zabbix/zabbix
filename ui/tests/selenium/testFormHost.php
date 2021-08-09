@@ -592,7 +592,7 @@ class testFormHost extends CWebTest {
 							'type' => 'Agent',
 							'ip' => '127.1.1.1',
 							'port' => '111',
-							'default' => true
+							'Default' => true
 						]
 					]
 				]
@@ -666,7 +666,7 @@ class testFormHost extends CWebTest {
 							'dns' => '1444',
 							'Connect to' => 'DNS',
 							'port' => '500',
-							'default' => true
+							'Default' => true
 						]
 					]
 				]
@@ -1108,7 +1108,7 @@ class testFormHost extends CWebTest {
 							'dns' => 'agent',
 							'Connect to' => 'DNS',
 							'port' => '10054',
-							'default' => true
+							'Default' => true
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -1125,7 +1125,7 @@ class testFormHost extends CWebTest {
 							'Authentication passphrase' => 'test123',
 							'Privacy protocol' => 'AES',
 							'Privacy passphrase' => '456test',
-							'default' => true
+							'Default' => true
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -1134,7 +1134,7 @@ class testFormHost extends CWebTest {
 							'dns' => 'ipmi',
 							'Connect to' => 'DNS',
 							'port' => '500',
-							'default' => true
+							'Default' => true
 						]
 					]
 				]

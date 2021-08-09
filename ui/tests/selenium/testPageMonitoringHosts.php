@@ -23,6 +23,9 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/traits/FilterTrait.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
+/**
+ * @dataSource TagFilter
+ */
 class testPageMonitoringHosts extends CWebTest {
 
 	use FilterTrait;
@@ -66,7 +69,7 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 
 		// Check tags on the specific host.
-		$tags = $table->findRow('Name', 'Host with tags for cloning')->getColumn('Tags')->query('class:tag')->all();
+		$tags = $table->findRow('Name', 'Host for tags filtering - clone')->getColumn('Tags')->query('class:tag')->all();
 		$this->assertEquals(['action: clone', 'tag: host'], $tags->asText());
 
 		foreach ($tags as $tag) {
@@ -359,7 +362,7 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'result' => [
-						'Simple form test host'
+						'Host for tags filtering'
 					]
 				]
 			],
@@ -372,7 +375,7 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'result' => [
-						'Simple form test host'
+						'Host for tags filtering'
 					]
 				]
 			],
@@ -386,8 +389,8 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'result' => [
-						'Host with tags for cloning',
-						'Simple form test host'
+						'Host for tags filtering',
+						'Host for tags filtering - clone'
 					]
 				]
 			],
@@ -401,8 +404,8 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'result' => [
-						'Host with tags for cloning',
-						'Host with tags for updating'
+						'Host for tags filtering - clone',
+						'Host for tags filtering - update'
 					]
 				]
 			],
@@ -416,7 +419,7 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'result' => [
-						'Host with tags for cloning'
+						'Host for tags filtering - clone'
 					]
 				]
 			],
@@ -431,9 +434,9 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'result' => [
-						'Host with tags for cloning',
-						'Host with tags for updating',
-						'Simple form test host'
+						'Host for tags filtering',
+						'Host for tags filtering - clone',
+						'Host for tags filtering - update'
 					]
 				]
 			],

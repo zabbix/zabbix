@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-07-08T14:45:55Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template APP Systemd by Zabbix agent 2</template>
+         <name>Template APP Systemd by Zabbix agent 2</name>
+         <description>Get systemd units metrics from plugin for the zabbix-agent2.&#13;
+  1. Setup and configure zabbix-agent2 compiled with the Systemd monitoring plugin.&#13;
+  2. Set filters with macros if you want to override default filter parameters.&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Systemd</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Service units discovery</name>
+               <type>ZABBIX_PASSIVE</type>
+               <key>systemd.unit.discovery[service]</key>
+               <delay>30m</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#UNIT.ACTIVESTATE}</macro>
+                        <value>{$SYSTEMD.ACTIVESTATE.SERVICE.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.ACTIVESTATE}</macro>
+                        <value>{$SYSTEMD.ACTIVESTATE.SERVICE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.UNITFILESTATE}</macro>
+                        <value>{$SYSTEMD.UNITFILESTATE.SERVICE.MATCHES}</value>
+                        <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.UNITFILESTATE}</macro>
+                        <value>{$SYSTEMD.UNITFILESTATE.SERVICE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>D</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.NAME}</macro>
+                        <value>{$SYSTEMD.NAME.SERVICE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>E</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.NAME}</macro>
+                        <value>{$SYSTEMD.NAME.SERVICE.MATCHES}</value>
+                        <formulaid>F</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discover systemd service units and their details.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#UNIT.NAME}: Active state</name>
+                     <type>DEPENDENT</type>
+                     <key>systemd.service.active_state["{#UNIT.NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>State value that reflects whether the unit is currently active or not. The following states are currently defined: "active", "reloading", "inactive", "failed", "activating", and "deactivating".</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Systemd service: {#UNIT.NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>Unit Active State</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.ActiveState.state</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>30m</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>systemd.unit.get["{#UNIT.NAME}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;&gt;1</expression>
+                           <name>{#UNIT.NAME}: Service is not running</name>
+                           <priority>WARNING</priority>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#UNIT.NAME}: Load state</name>
+                     <type>DEPENDENT</type>
+                     <key>systemd.service.load_state["{#UNIT.NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>State value that reflects whether the configuration file of this unit has been loaded. The following states are currently defined: "loaded", "error", and "masked".</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Systemd service: {#UNIT.NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>Unit Load State</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.LoadState.state</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>30m</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>systemd.unit.get["{#UNIT.NAME}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#UNIT.NAME}: Unit file state</name>
+                     <type>DEPENDENT</type>
+                     <key>systemd.service.unitfile_state["{#UNIT.NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>Encodes the install state of the unit file of FragmentPath. It currently knows the following states: "enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", and "invalid".</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Systemd service: {#UNIT.NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>Unit File State</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.UnitFileState.state</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>30m</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>systemd.unit.get["{#UNIT.NAME}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#UNIT.NAME}: Active time</name>
+                     <type>DEPENDENT</type>
+                     <key>systemd.service.uptime["{#UNIT.NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <description>Number of seconds since unit entered the active state.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Systemd service: {#UNIT.NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>data = JSON.parse(value)
+  if (data.ActiveEnterTimestamp &gt; data.ActiveExitTimestamp) {
+      return Math.floor(Date.now()/1000)-Number(data.ActiveEnterTimestamp)/1000000;
+    }
+  return null;
+</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>systemd.unit.get["{#UNIT.NAME}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>{#UNIT.NAME}: has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#UNIT.NAME}: Get unit info</name>
+                     <key>systemd.unit.get["{#UNIT.NAME}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>TEXT</value_type>
+                     <description>Returns all properties of a systemd service unit.&#13;
+ Unit description: {#UNIT.DESCRIPTION}.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Socket units discovery</name>
+               <type>ZABBIX_PASSIVE</type>
+               <key>systemd.unit.discovery[socket]</key>
+               <delay>30m</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#UNIT.ACTIVESTATE}</macro>
+                        <value>{$SYSTEMD.ACTIVESTATE.SOCKET.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.ACTIVESTATE}</macro>
+                        <value>{$SYSTEMD.ACTIVESTATE.SOCKET.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.UNITFILESTATE}</macro>
+                        <value>{$SYSTEMD.UNITFILESTATE.SOCKET.MATCHES}</value>
+                        <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.UNITFILESTATE}</macro>
+                        <value>{$SYSTEMD.UNITFILESTATE.SOCKET.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>D</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.NAME}</macro>
+                        <value>{$SYSTEMD.NAME.SOCKET.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>E</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#UNIT.NAME}</macro>
+                        <value>{$SYSTEMD.NAME.SOCKET.MATCHES}</value>
+                        <formulaid>F</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discover systemd socket units and their details.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#UNIT.NAME}: Connections accepted per sec</name>
+                     <type>DEPENDENT</type>
+                     <key>systemd.socket.conn_accepted.rate["{#UNIT.NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The number of accepted socket connections (NAccepted) per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Systemd socket: {#UNIT.NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.NAccepted</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>systemd.unit.get["{#UNIT.NAME}",Socket]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#UNIT.NAME}: Connections connected</name>
+                     <type>DEPENDENT</type>
+                     <key>systemd.socket.conn_count["{#UNIT.NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <description>The current number of socket connections (NConnections).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Systemd socket: {#UNIT.NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.NConnections</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>systemd.unit.get["{#UNIT.NAME}",Socket]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#UNIT.NAME}: Get unit info</name>
+                     <key>systemd.unit.get["{#UNIT.NAME}",Socket]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <status>ENABLED</status>
+                     <value_type>TEXT</value_type>
+                     <description>Returns all properties of a systemd socket unit.&#13;
+ Unit description: {#UNIT.DESCRIPTION}.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$SYSTEMD.ACTIVESTATE.SERVICE.MATCHES}</macro>
+               <value>active</value>
+               <description>Filter of systemd service units by active state</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.ACTIVESTATE.SERVICE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter of systemd service units by active state</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.ACTIVESTATE.SOCKET.MATCHES}</macro>
+               <value>active</value>
+               <description>Filter of systemd socket units by active state</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.ACTIVESTATE.SOCKET.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter of systemd socket units by active state</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.NAME.SERVICE.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of systemd service units by name</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.NAME.SERVICE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter of systemd service units by name</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.NAME.SOCKET.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of systemd socket units by name</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.NAME.SOCKET.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter of systemd socket units by name</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.UNITFILESTATE.SERVICE.MATCHES}</macro>
+               <value>enabled</value>
+               <description>Filter of systemd service units by unit file state</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.UNITFILESTATE.SERVICE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter of systemd service units by unit file state</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.UNITFILESTATE.SOCKET.MATCHES}</macro>
+               <value>enabled</value>
+               <description>Filter of systemd socket units by unit file state</description>
+            </macro>
+            <macro>
+               <macro>{$SYSTEMD.UNITFILESTATE.SOCKET.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter of systemd socket units by unit file state</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>Unit Load State</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>loaded</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>error</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>masked</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Unit Active State</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>active</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>reloading</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>inactive</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>activating</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>deactivating</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Unit File State</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>enabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>enabled-runtime</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>linked</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>linked-runtime</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>masked</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>masked-runtime</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>static</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>disabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>invalid</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

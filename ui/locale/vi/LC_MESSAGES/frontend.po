@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-28 19:52+0300\n"
+"POT-Creation-Date: 2021-08-06 19:52+0300\n"
 "PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -47,7 +47,7 @@ msgstr "\"%1$s\" được dự đoán trước"
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%1$s\" phải ở giữa 1970.01.01 và 2038.01.18."
 
-#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
 msgstr "giá trị \"%1$s\" phải nhỏ hơn hoặc bằng giá trị \"%2$s\""
@@ -58,7 +58,7 @@ msgstr "giá trị \"%1$s\" phải nhỏ hơn hoặc bằng giá trị \"%2$s\""
 msgid "\"host:key\" pair is expected"
 msgstr "cặp \"host:key\" được dự đoán"
 
-#: include/forms.inc.php:1292
+#: include/forms.inc.php:1297
 #: include/views/configuration.host.discovery.edit.php:704
 #: include/views/js/configuration.host.discovery.edit.js.php:91
 #: include/views/js/item.preprocessing.js.php:148
@@ -110,7 +110,7 @@ msgid "%1$s Item"
 msgid_plural "%1$s Items"
 msgstr[0] "%1$s mục%1$s mục"
 
-#: include/classes/api/services/CItemGeneral.php:2328
+#: include/classes/api/services/CItemGeneral.php:2342
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -321,7 +321,7 @@ msgstr "500 giá trị gần nhất"
 msgid "<empty string>"
 msgstr "<empty string>"
 
-#: include/forms.inc.php:1340 include/views/js/item.preprocessing.js.php:197
+#: include/forms.inc.php:1345 include/views/js/item.preprocessing.js.php:197
 msgid "<label name>"
 msgstr "<label name>"
 
@@ -329,7 +329,7 @@ msgstr "<label name>"
 msgid "<manual>"
 msgstr "<bằng tay>"
 
-#: include/forms.inc.php:1338 include/forms.inc.php:1346
+#: include/forms.inc.php:1343 include/forms.inc.php:1351
 #: include/views/js/item.preprocessing.js.php:195
 #: include/views/js/item.preprocessing.js.php:204
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
@@ -339,7 +339,7 @@ msgstr "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 msgid "<sub-menu/sub-menu/...>script"
 msgstr "<sub-menu/sub-menu/...>tập lệnh"
 
-#: include/classes/widgets/CWidgetHelper.php:770
+#: include/classes/widgets/CWidgetHelper.php:784
 msgid "ADD OVERRIDE"
 msgstr "Thêm đè lên"
 
@@ -519,7 +519,7 @@ msgstr "Hành động đã cập nhật"
 #: include/classes/screens/CScreenProblem.php:908
 #: include/classes/screens/CScreenProblem.php:1157
 #: include/classes/screens/CScreenProblem.php:1218 include/events.inc.php:251
-#: include/forms.inc.php:1224 include/menu.inc.php:116
+#: include/forms.inc.php:1229 include/menu.inc.php:116
 #: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:77
 #: include/views/monitoring.screen.list.php:89
@@ -599,8 +599,8 @@ msgstr "Kích hoạt"
 #: app/views/popup.maintenance.period.php:189 app/views/popup.media.php:52
 #: app/views/popup.media.php:127 app/views/popup.mediatype.message.php:95
 #: app/views/popup.triggerwizard.php:110 app/views/popup.triggerwizard.php:144
-#: include/classes/widgets/CWidgetHelper.php:502 include/forms.inc.php:1474
-#: include/forms.inc.php:2014 include/views/configuration.action.edit.php:130
+#: include/classes/widgets/CWidgetHelper.php:516 include/forms.inc.php:1479
+#: include/forms.inc.php:2022 include/views/configuration.action.edit.php:130
 #: include/views/configuration.action.edit.php:314
 #: include/views/configuration.action.edit.php:400
 #: include/views/configuration.action.edit.php:480
@@ -729,7 +729,7 @@ msgstr "Thêm các mục thiếu"
 msgid "Add multiple maps"
 msgstr "Thêm nhiều bản đồ"
 
-#: include/classes/widgets/CWidgetHelper.php:1197
+#: include/classes/widgets/CWidgetHelper.php:1211
 msgid "Add new data set"
 msgstr "Đặt lại dữ liệu mới"
 
@@ -737,7 +737,7 @@ msgstr "Đặt lại dữ liệu mới"
 msgid "Add new interface"
 msgstr "Thêm giao diện mới"
 
-#: include/classes/widgets/CWidgetHelper.php:724
+#: include/classes/widgets/CWidgetHelper.php:738
 msgid "Add new override"
 msgstr "Ghi đè"
 
@@ -825,15 +825,15 @@ msgstr "Tên máy chủ agent. Trả về kiểu string"
 msgid "Agent interfaces"
 msgstr "Giao diện agent"
 
-#: include/classes/widgets/CWidgetHelper.php:1136
+#: include/classes/widgets/CWidgetHelper.php:1150
 msgid "Aggregate"
 msgstr "Tổng hợp"
 
-#: include/classes/widgets/CWidgetHelper.php:1108
+#: include/classes/widgets/CWidgetHelper.php:1122
 msgid "Aggregation function"
 msgstr "Chức năng tổng hợp"
 
-#: include/classes/widgets/CWidgetHelper.php:1127
+#: include/classes/widgets/CWidgetHelper.php:1141
 msgid "Aggregation interval"
 msgstr "Chu kỳ tổng hợp"
 
@@ -951,7 +951,7 @@ msgstr "Và"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:80
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:80
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:370
 #: include/views/configuration.action.edit.php:119
 #: include/views/configuration.correlation.edit.php:111
 #: include/views/configuration.host.discovery.edit.php:573
@@ -1032,7 +1032,7 @@ msgstr "Kiểu ứng dụng"
 msgid "Application updated"
 msgstr "Ứng dụng đã cập nhật"
 
-#: include/classes/api/services/CItemGeneral.php:551
+#: include/classes/api/services/CItemGeneral.php:565
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Ứng dụng có ID \"%1$s\" không sẵn sàng trên \"%2$s\"."
@@ -1293,9 +1293,9 @@ msgstr "Cài đặt xác thưc đã được cập nhật"
 msgid "Author"
 msgstr "Tác giả"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:157
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:229
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:150
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:222
 msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Tự động"
@@ -1396,9 +1396,9 @@ msgstr "Màu nền"
 msgid "Background image"
 msgstr "Ảnh nền"
 
-#: include/classes/widgets/CWidgetHelper.php:746
-#: include/classes/widgets/CWidgetHelper.php:789
-#: include/classes/widgets/CWidgetHelper.php:1038
+#: include/classes/widgets/CWidgetHelper.php:760
+#: include/classes/widgets/CWidgetHelper.php:803
+#: include/classes/widgets/CWidgetHelper.php:1052
 msgid "Bar"
 msgstr "Thanh"
 
@@ -1406,8 +1406,8 @@ msgstr "Thanh"
 msgid "Base DN"
 msgstr "DN cơ sở"
 
-#: include/classes/widgets/CWidgetHelper.php:772
-#: include/classes/widgets/CWidgetHelper.php:1029
+#: include/classes/widgets/CWidgetHelper.php:786
+#: include/classes/widgets/CWidgetHelper.php:1043
 msgid "Base colour"
 msgstr "Màu cơ bản"
 
@@ -1613,15 +1613,15 @@ msgstr "Hủy bỏ"
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
 msgstr "Không thể thêm ứng dụng dò tìm \"%1$s\" trên một web scenario."
 
-#: include/classes/api/services/CGraph.php:702
-#: include/classes/api/services/CGraph.php:716
-#: include/classes/api/services/CGraph.php:730
+#: include/classes/api/services/CGraph.php:706
+#: include/classes/api/services/CGraph.php:720
+#: include/classes/api/services/CGraph.php:734
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "Không thể thêm một item phi số \"%1$s\" vào biểu đồ \"%2$s\"."
 
-#: include/classes/api/services/CGraphPrototype.php:670
-#: include/classes/api/services/CGraphPrototype.php:734
+#: include/classes/api/services/CGraphPrototype.php:671
+#: include/classes/api/services/CGraphPrototype.php:735
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "Không thể thêm một item phi số \"%1$s\" vào kiểu biểu đồ \"%2$s\"."
@@ -1643,18 +1643,18 @@ msgstr "Không thể thêm liên kết"
 msgid "Cannot add correlation condition"
 msgstr "Không thể thêm điều kiện liên kết"
 
-#: include/classes/api/services/CTrigger.php:962
+#: include/classes/api/services/CTrigger.php:970
 #: include/classes/api/services/CTriggerPrototype.php:780
 msgid "Cannot add dependency from a host to a template."
 msgstr "Không thể thêm quan hệ phụ thuộc từ một máy chủ đến một mẫu."
 
-#: include/classes/api/services/CDiscoveryRule.php:859
+#: include/classes/api/services/CDiscoveryRule.php:869
 #: include/triggers.inc.php:553
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr "Không thể thêm quan hệ phụ thuộc từ trigger \"%1$s:%2$s\" đến trigger không tồn tại \"%3$s:%4$s\"."
 
-#: host_discovery.php:658
+#: host_discovery.php:673
 msgid "Cannot add discovery rule"
 msgstr "Không thể thêm quy tắc phát hiện"
 
@@ -1826,21 +1826,21 @@ msgstr "Không thể xóa lịch sử"
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr "Không thể xóa lịch sử: ít nhất 1 mục không thuộc thiết bị được giám sát"
 
-#: include/classes/api/services/CDiscoveryRule.php:2436
+#: include/classes/api/services/CDiscoveryRule.php:2448
 msgid "Cannot clone graph prototypes."
 msgstr "Không thể sao chép kiểu đồ thị."
 
-#: include/classes/api/services/CDiscoveryRule.php:2490
+#: include/classes/api/services/CDiscoveryRule.php:2502
 msgid "Cannot clone host prototypes."
 msgstr "Không thể sao chép kiểu host."
 
-#: include/classes/api/services/CDiscoveryRule.php:2241
-#: include/classes/api/services/CDiscoveryRule.php:2297
-#: include/classes/api/services/CDiscoveryRule.php:2315
+#: include/classes/api/services/CDiscoveryRule.php:2251
+#: include/classes/api/services/CDiscoveryRule.php:2307
+#: include/classes/api/services/CDiscoveryRule.php:2325
 msgid "Cannot clone item prototypes."
 msgstr "Không thể sao chép kiểu item."
 
-#: include/classes/api/services/CDiscoveryRule.php:772
+#: include/classes/api/services/CDiscoveryRule.php:782
 msgid "Cannot clone trigger prototypes."
 msgstr "Không thể sao chép kiểu trigger."
 
@@ -1890,12 +1890,12 @@ msgstr "Không thể tạo một kiểu host trên một discovered host \"%
 msgid "Cannot create another database connection."
 msgstr "Không thể tạo sự kết nối cơ sở dữ liệu khác."
 
-#: include/classes/api/services/CTrigger.php:996
+#: include/classes/api/services/CTrigger.php:1004
 #: include/classes/api/services/CTriggerPrototype.php:811
 msgid "Cannot create circular dependencies."
 msgstr "Không thể tạo quan hệ phụ thuộc vòng tròn."
 
-#: include/classes/api/services/CTrigger.php:968
+#: include/classes/api/services/CTrigger.php:976
 msgid "Cannot create dependency on trigger itself."
 msgstr "Không thể tạo quan hệ phụ thuộc trên bản thân trigger."
 
@@ -1947,7 +1947,7 @@ msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] "Không thể xóa dashboard"
 
-#: include/classes/api/services/CTrigger.php:866
+#: include/classes/api/services/CTrigger.php:874
 #: include/classes/api/services/CTriggerPrototype.php:577
 msgid "Cannot delete dependency"
 msgstr "Không thể xóa quan hệ phụ thuộc"
@@ -1957,11 +1957,11 @@ msgstr "Không thể xóa quan hệ phụ thuộc"
 msgid "Cannot delete discovered application \"%1$s\"."
 msgstr "Không thể xóa ứng dụng dò tìm \"%1$s\"."
 
-#: discoveryconf.php:157 host_discovery.php:376
+#: discoveryconf.php:157 host_discovery.php:391
 msgid "Cannot delete discovery rule"
 msgstr "Không thể xóa quy tắc phát hiện"
 
-#: discoveryconf.php:199 host_discovery.php:701
+#: discoveryconf.php:199 host_discovery.php:716
 msgid "Cannot delete discovery rules"
 msgstr "Không thể xóa các quy tắc phát hiện"
 
@@ -1990,7 +1990,7 @@ msgstr[0] "Không thể xóa nhóm"
 msgid "Cannot delete host"
 msgstr "Không thể xóa host"
 
-#: include/classes/api/services/CHost.php:1454
+#: include/classes/api/services/CHost.php:1463
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2019,7 +2019,7 @@ msgstr "Không thể xóa hình ảnh"
 msgid "Cannot delete interface for discovered host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1241
+#: include/classes/api/services/CHost.php:1250
 msgid "Cannot delete inventory."
 msgstr "Không thể xóa danh sách lưu trữ."
 
@@ -2106,31 +2106,31 @@ msgstr "Không thể xóa template"
 msgid "Cannot delete templated application."
 msgstr "Không thể xóa ứng dụng mẫu."
 
-#: include/classes/api/services/CGraphPrototype.php:576
+#: include/classes/api/services/CGraphPrototype.php:577
 msgid "Cannot delete templated graph prototype."
 msgstr "Không thể xóa kiểu đồ thị mẫu."
 
-#: include/classes/api/services/CGraph.php:559
+#: include/classes/api/services/CGraph.php:563
 msgid "Cannot delete templated graph."
 msgstr "Không thể xóa đồ thị mẫu."
 
-#: include/classes/api/services/CHostPrototype.php:1154
+#: include/classes/api/services/CHostPrototype.php:1159
 msgid "Cannot delete templated host prototype."
 msgstr "Không thể xóa kiểu host mẫu."
 
-#: include/classes/api/services/CItemPrototype.php:913
+#: include/classes/api/services/CItemPrototype.php:924
 msgid "Cannot delete templated item prototype."
 msgstr "Không thể xóa kiểu giao thức đồ thị mẫu."
 
-#: include/classes/api/services/CItem.php:753
+#: include/classes/api/services/CItem.php:767
 msgid "Cannot delete templated item."
 msgstr "Không thể xóa item mẫu."
 
-#: include/classes/api/services/CDiscoveryRule.php:555
+#: include/classes/api/services/CDiscoveryRule.php:565
 msgid "Cannot delete templated items."
 msgstr "Không thể xóa các item mẫu."
 
-#: include/classes/api/services/CTrigger.php:653
+#: include/classes/api/services/CTrigger.php:661
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Không thể xóa trigger mẫu \"%1$s:%2$s\"."
@@ -2190,7 +2190,7 @@ msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
 msgstr[0] "Không thể vô hiệu quan hệ"
 
-#: discoveryconf.php:184 host_discovery.php:691
+#: discoveryconf.php:184 host_discovery.php:706
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Không thể vô hiệu quy tắc khám phá"
@@ -2245,7 +2245,7 @@ msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
 msgstr[0] "Không thể kích hoạt quan hệ"
 
-#: discoveryconf.php:183 host_discovery.php:690
+#: discoveryconf.php:183 host_discovery.php:705
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Không thể kích hoạt quy tắc khám phá"
@@ -2329,8 +2329,8 @@ msgstr "Không thể tìm thấy host \"%1$s\" được sử dụng trong m
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Không thể tìm thấy nhóm host \"%1$s\" cho kiểu host \"%2$s\" của quy tắc phát hiện \"%3$s\" trên \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:2086
-#: include/classes/api/services/CDiscoveryRule.php:2268
+#: include/classes/api/services/CDiscoveryRule.php:2096
+#: include/classes/api/services/CDiscoveryRule.php:2278
 #: include/classes/api/services/CItemGeneral.php:108 include/items.inc.php:498
 #: include/items.inc.php:644
 #, c-format
@@ -2441,7 +2441,7 @@ msgstr "Không thể tìm thấy dạng thức cây. Kiểm tra cấu tru�
 msgid "Cannot format tree."
 msgstr "Không thể tìm thấy dạng thức cây."
 
-#: include/classes/api/services/CTemplate.php:905
+#: include/classes/api/services/CTemplate.php:906
 msgid "Cannot have empty visible template name."
 msgstr "Không thể để trống tên mẫu."
 
@@ -2455,12 +2455,12 @@ msgstr[0] "Không thể nhập \"%1$s\", mẫu đã liên kết \"%2$s\" không 
 msgid "Cannot insert trigger expression"
 msgstr "Không thể chèn biểu thức trigger"
 
-#: include/classes/api/services/CHost.php:1219
+#: include/classes/api/services/CHost.php:1228
 msgid "Cannot link template"
 msgstr "Không thể liên kết template"
 
-#: include/classes/api/services/CTemplate.php:992
-#: include/classes/api/services/CTemplate.php:1006
+#: include/classes/api/services/CTemplate.php:993
+#: include/classes/api/services/CTemplate.php:1007
 msgid "Cannot link template."
 msgstr "Không thể kết nối mẫu."
 
@@ -2475,19 +2475,19 @@ msgstr[0] "Không thể tải mô-đun tại: %1$s."
 msgid "Cannot logout."
 msgstr "Không thể đăng xuất."
 
-#: include/classes/api/services/CHost.php:1085
+#: include/classes/api/services/CHost.php:1094
 msgid "Cannot mass update host name."
 msgstr "Không thể cập nhật cùng một lúc tên host."
 
-#: include/classes/api/services/CTemplate.php:1130
+#: include/classes/api/services/CTemplate.php:1131
 msgid "Cannot mass update template name."
 msgstr "Không thể cập nhật hàng loạt tên mẫu."
 
-#: include/classes/api/services/CHost.php:1071
+#: include/classes/api/services/CHost.php:1080
 msgid "Cannot mass update visible host name."
 msgstr "Không thể cập nhật cùng một lúc visible host name."
 
-#: include/classes/api/services/CTemplate.php:1095
+#: include/classes/api/services/CTemplate.php:1096
 msgid "Cannot mass update visible template name."
 msgstr "Không thể cập nhật hàng loạt tên mẫu có thể nhìn thấy."
 
@@ -2496,17 +2496,17 @@ msgstr "Không thể cập nhật hàng loạt tên mẫu có thể nhìn thấy
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
 msgstr "Không thể vượt qua ID mẫu trùng lặp cho liên kết: %1$s."
 
-#: include/classes/db/DB.php:864
+#: include/classes/db/DB.php:852
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "Không thể xóa trạng thái trong bảng \"%1$s\" với điều kiện tại đó."
 
-#: include/classes/db/DB.php:577
+#: include/classes/db/DB.php:565
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Không thể cập nhật trạng thái trong bảng \"%1$s\" với nhiều giá trị."
 
-#: include/classes/db/DB.php:590
+#: include/classes/db/DB.php:578
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Không thể cập nhật trạng thái trong bảng \"%1$s\" với điều kiện tại đó."
@@ -2550,13 +2550,12 @@ msgstr "Không thể lưu ô điều khiển \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Không thể gửi lệnh, kiểm tra kết nối đến Zabbix server \"%1$s\"."
 
-#: host_discovery.php:388 host_discovery.php:721 items.php:868 items.php:1369
+#: host_discovery.php:403 host_discovery.php:736 items.php:868 items.php:1369
 msgid "Cannot send request"
 msgstr "Không thể gửi yêu cầu"
 
-#: include/classes/api/services/CTask.php:437
-#: include/classes/api/services/CTask.php:447
-#: include/classes/api/services/CTask.php:470
+#: include/classes/api/services/CTask.php:438
+#: include/classes/api/services/CTask.php:451
 #, c-format
 msgid "Cannot send request: %1$s."
 msgstr "Không thể gửi yêu cầu: %1$s."
@@ -2576,7 +2575,7 @@ msgstr "Không thể đặt \"%1$s\" cho đồ thị \"%2$s\"."
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Không thể đặt \"%1$s\" cho kiểu đồ thị \"%2$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:311
+#: include/classes/api/services/CItemGeneral.php:325
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Không thể đặt lại \"%1$s\" cho item \"%2$s\"."
@@ -2587,7 +2586,7 @@ msgstr "Không thể đặt lại \"%1$s\" cho item \"%2$s\"."
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Không thể đặt \"%1$s\" cho screen mẫu \"%2$s\"."
 
-#: include/classes/api/services/CItemPrototype.php:339
+#: include/classes/api/services/CItemPrototype.php:350
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
 msgstr "Không thể đặt trường \"templateid\" cho kiểu ứng dụng trong kiểu item \"%1$s\"."
@@ -2597,9 +2596,9 @@ msgstr "Không thể đặt trường \"templateid\" cho kiểu ứng dụng tro
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Không thể đặt lại \"templateid\" cho screen \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1136
-#: include/classes/api/services/CHost.php:2084
-#: include/classes/api/services/CHost.php:2245
+#: include/classes/api/services/CHost.php:1145
+#: include/classes/api/services/CHost.php:2093
+#: include/classes/api/services/CHost.php:2254
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Không thể đặt lại các trường inventory khi vô hiệu hóa inventory."
 
@@ -2634,12 +2633,12 @@ msgstr "Không thể ngắt kết nối hoặc xóa các web scenario."
 msgid "Cannot unlink and clear applications."
 msgstr "Không thể ngắt kết nối hoặc xóa các ứng dụng."
 
-#: include/classes/api/services/CHost.php:1194
+#: include/classes/api/services/CHost.php:1203
 msgid "Cannot unlink template"
 msgstr "Không thể ngắt kết nối tempate"
 
-#: include/classes/api/services/CTemplate.php:957
-#: include/classes/api/services/CTemplate.php:980
+#: include/classes/api/services/CTemplate.php:958
+#: include/classes/api/services/CTemplate.php:981
 msgid "Cannot unlink template."
 msgstr "Không thể kết nối đến mẫu."
 
@@ -2664,7 +2663,7 @@ msgstr "Không thể cập nhật \"%1$s\" cho đồ thị \"%2$s\"."
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
 msgstr "Không thể cập nhật \"%1$s\" cho kiểu đồ thị \"%2$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:265
+#: include/classes/api/services/CItemGeneral.php:279
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "Không thể cập nhật \"%1$s\" cho item \"%2$s\"."
@@ -2679,19 +2678,19 @@ msgstr "Không thể cập nhật \"%1$s\" cho trigger mẫu \"%2$s\"."
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Không thể cập nhật \"%1$s\" cho kiểu trigger mẫu \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:2222
+#: include/classes/api/services/CHost.php:2231
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Không thể cập nhật \"%2$s\" cho máy chủ dò tìm \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:195
+#: include/classes/api/services/CItemGeneral.php:209
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr "Không thể cập nhật \"%2$s\" cho item được dò tìm \"%1$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:923
-#: include/classes/api/services/CTrigger.php:697
-#: include/classes/api/services/CTrigger.php:826
+#: include/classes/api/services/CTrigger.php:705
+#: include/classes/api/services/CTrigger.php:834
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Không thể cập nhật \"%2$s\" cho một trigger dò tìm \"%1$s\"."
@@ -2762,7 +2761,7 @@ msgstr "Không thể cập nhật sự tương quan"
 msgid "Cannot update discovered application \"%1$s\"."
 msgstr "Không thể cập nhật ứng dụng dò tìm \"%1$s\"."
 
-#: discoveryconf.php:126 host_discovery.php:661
+#: discoveryconf.php:126 host_discovery.php:676
 msgid "Cannot update discovery rule"
 msgstr "Không thể cập nhật quy tắc phát hiện"
 
@@ -2794,7 +2793,7 @@ msgstr "Không thể cập nhật các nhóm cho host được phát hiê
 msgid "Cannot update host"
 msgstr "Không thể cập nhật máy chủ"
 
-#: include/classes/api/services/CHost.php:1033
+#: include/classes/api/services/CHost.php:1042
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Không thể cập nhật cài đặt mật mã máy chủ. Cài đặt kết nối cho cả hướng được chỉ rõ."
 
@@ -2912,8 +2911,8 @@ msgstr "Không thể cập nhật các template ứng dụng."
 msgid "Cannot update templates"
 msgstr "Không thể cập nhật mẫu"
 
-#: include/classes/api/services/CTemplate.php:856
-#: include/classes/api/services/CTemplate.php:1191
+#: include/classes/api/services/CTemplate.php:857
+#: include/classes/api/services/CTemplate.php:1192
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Không thể cập nhật các template trên host được phát hiện \"%1$s\"."
@@ -3095,9 +3094,9 @@ msgstr "Kiểm tra lỗi trong việc sử dụng biểu thức"
 msgid "Check of pre-requisites"
 msgstr "Kiểm tra điều kiện tiên quyết"
 
-#: include/classes/api/services/CItemGeneral.php:378
-#: include/classes/api/services/CItemGeneral.php:385
 #: include/classes/api/services/CItemGeneral.php:392
+#: include/classes/api/services/CItemGeneral.php:399
+#: include/classes/api/services/CItemGeneral.php:406
 msgid "Check the key, please. Default example was passed."
 msgstr "Kiểm tra key. Ví dụ mặc định là mật khẩu đã được sử dụng."
 
@@ -3276,7 +3275,7 @@ msgid "Close problem"
 msgstr "Đóng vấn đề"
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:970 jsLoader.php:248
+#: include/classes/widgets/CWidgetHelper.php:984 jsLoader.php:248
 #: jsLoader.php:253
 msgid "Collapse"
 msgstr "Thu hẹp"
@@ -3391,12 +3390,12 @@ msgstr "Điều kiện \"%2$s\" không được sử dụng trong công thức \
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
 msgstr "Điều kiện \"%2$s\" không được sử dụng trong công thức \"%3$s\" cho liên kết \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1755
+#: include/classes/api/services/CDiscoveryRule.php:1765
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr "Điều kiện \"%2$s\" không được sử dụng trong công thức \"%3$s\" cho quy tắc dò tìm \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1549
+#: include/classes/api/services/CDiscoveryRule.php:1559
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
 msgstr "Điều kiện \"%2$s không được sử dụng trong công thức \"%3$s\" để ghi đè \"%1$s\"."
@@ -3411,12 +3410,12 @@ msgstr "Điều kiện \"%2$s\" được sử dụng trong công thức \"%3$s\"
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
 msgstr "Điều kiện \"%2$s\" được sử dụng trong công thức \"%3$s\" cho liên kết \"%1$s\" không xác định."
 
-#: include/classes/api/services/CDiscoveryRule.php:1754
+#: include/classes/api/services/CDiscoveryRule.php:1764
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
 msgstr "Điều kiện \"%2$s\" được sử dụng trong công thức \"%3$s\" cho quy tắc dò tìm \"%1$s\" không được xác định."
 
-#: include/classes/api/services/CDiscoveryRule.php:1548
+#: include/classes/api/services/CDiscoveryRule.php:1558
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
 msgstr "Điều kiện \"%2$s được sử dụng trong công thức \"%3$s\" để ghi đè \"%1$s\" thì chưa được định nghĩa."
@@ -3634,9 +3633,9 @@ msgstr "Chúc mừng! Bạn đã cài đặt thành công Zabbix frontend."
 msgid "Connect to"
 msgstr "Kết nối tới"
 
-#: include/classes/widgets/CWidgetHelper.php:752
-#: include/classes/widgets/CWidgetHelper.php:827
-#: include/classes/widgets/CWidgetHelper.php:1087
+#: include/classes/widgets/CWidgetHelper.php:766
+#: include/classes/widgets/CWidgetHelper.php:841
+#: include/classes/widgets/CWidgetHelper.php:1101
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "Đã kết nối"
@@ -3728,8 +3727,8 @@ msgstr "Liên lạc"
 #: app/views/js/monitoring.problem.view.js.php:49
 #: app/views/monitoring.host.view.php:65
 #: app/views/monitoring.problem.view.php:255
-#: include/classes/widgets/CWidgetHelper.php:480
-#: include/classes/widgets/CWidgetHelper.php:526
+#: include/classes/widgets/CWidgetHelper.php:494
+#: include/classes/widgets/CWidgetHelper.php:540
 #: include/views/configuration.host.list.php:66
 #: include/views/configuration.maintenance.edit.php:158
 #: include/views/configuration.maintenance.edit.php:179
@@ -3780,7 +3779,7 @@ msgstr "Chứa"
 #: include/views/configuration.template.list.php:135
 #: include/views/configuration.trigger.prototype.list.php:35
 #: include/views/configuration.triggers.list.php:174
-#: include/views/monitoring.history.php:237
+#: include/views/monitoring.history.php:240
 #: include/views/monitoring.hostscreen.php:68
 #: include/views/monitoring.overview.items.php:88
 #: include/views/monitoring.overview.triggers.php:124
@@ -4166,8 +4165,8 @@ msgstr "Hiệu chỉnh tin nhắn"
 msgid "Custom multiplier"
 msgstr "Tùy chỉnh nhân bản"
 
-#: app/views/js/popup.itemtestedit.view.js.php:375 include/forms.inc.php:1223
-#: include/forms.inc.php:1429 include/views/js/item.preprocessing.js.php:64
+#: app/views/js/popup.itemtestedit.view.js.php:375 include/forms.inc.php:1228
+#: include/forms.inc.php:1434 include/views/js/item.preprocessing.js.php:64
 msgid "Custom on fail"
 msgstr "Hiệu chỉnh thất bại"
 
@@ -4299,8 +4298,8 @@ msgstr "Dữ liệu không được mã hóa chính xác."
 msgid "Data overview"
 msgstr "Tổng quan dữ liệu"
 
-#: include/classes/widgets/CWidgetHelper.php:1142
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
+#: include/classes/widgets/CWidgetHelper.php:1156
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:34
 #: include/classes/widgets/views/widget.svggraph.form.view.php:288
 msgid "Data set"
 msgstr "Đặt lại dữ liệu"
@@ -4531,8 +4530,8 @@ msgstr "Trễ bởi"
 #: app/views/administration.valuemap.list.php:99
 #: app/views/monitoring.dashboard.list.php:85
 #: include/classes/html/CButtonDelete.php:25
-#: include/classes/widgets/CWidgetHelper.php:663
-#: include/classes/widgets/CWidgetHelper.php:1015 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:677
+#: include/classes/widgets/CWidgetHelper.php:1029 include/services.inc.php:118
 #: include/views/configuration.action.list.php:151
 #: include/views/configuration.application.list.php:149
 #: include/views/configuration.correlation.list.php:132
@@ -4838,17 +4837,17 @@ msgstr "Xóa trigger?"
 msgid "Delete web scenario?"
 msgstr "Xóa web scanario?"
 
-#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1612
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Đã xóa: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1022
+#: include/classes/api/services/CHostPrototype.php:1027
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Đã xóa: Kiểu host \"%1$s\" trên \"%2$s\"."
 
-#: include/classes/api/services/CTemplate.php:822
+#: include/classes/api/services/CTemplate.php:823
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Đã xóa: Template \"%1$s\"."
@@ -5096,7 +5095,7 @@ msgstr "Hủy không thay đổi"
 msgid "Discard unchanged with heartbeat"
 msgstr "Hủy bỏ không thay đổi với nhịp tim"
 
-#: app/views/js/popup.itemtestedit.view.js.php:353 include/forms.inc.php:1408
+#: app/views/js/popup.itemtestedit.view.js.php:353 include/forms.inc.php:1413
 #: include/views/js/item.preprocessing.js.php:66
 msgid "Discard value"
 msgstr "Hủy giá trị"
@@ -5209,12 +5208,12 @@ msgstr ""
 msgid "Discovery rule"
 msgstr "Quy tắc phát hiện"
 
-#: include/classes/api/services/CDiscoveryRule.php:48
+#: include/classes/api/services/CDiscoveryRule.php:58
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Quy tắc phát hiện \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ template khác."
 
-#: include/classes/api/services/CDiscoveryRule.php:49
+#: include/classes/api/services/CDiscoveryRule.php:59
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 msgstr "Quy tắc phát hiện \"%1$s\" đã tồn tại trên \"%2$s\"."
@@ -5227,7 +5226,7 @@ msgstr "Quy tắc phát hiện \"%1$s\" đã tồn tại trên \"%2$s\"."
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr "Quy tắc dò tìm \"%1$s\" đã tồn tại."
 
-#: include/classes/api/services/CDiscoveryRule.php:2105
+#: include/classes/api/services/CDiscoveryRule.php:2115
 #, c-format
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
 msgstr "Quy tắc dò tìm \"%1$s\" không thể được sao chép mà không có mục chính."
@@ -5238,25 +5237,25 @@ msgstr "Quy tắc dò tìm \"%1$s\" không thể được sao chép mà không c
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr "Quy tắc dò tìm \"%1$s\" trong hoạt động \"%2$s\" được sử dụng."
 
-#: discoveryconf.php:132 host_discovery.php:658
+#: discoveryconf.php:132 host_discovery.php:673
 msgid "Discovery rule created"
 msgstr "Quy tắc phát hiện đã tạo"
 
-#: discoveryconf.php:157 host_discovery.php:376
+#: discoveryconf.php:157 host_discovery.php:391
 msgid "Discovery rule deleted"
 msgstr "Quy tắc phát hiện đã xóa"
 
-#: discoveryconf.php:181 host_discovery.php:688
+#: discoveryconf.php:181 host_discovery.php:703
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Quy tắc khám phá đã bị vô hiệu"
 
-#: discoveryconf.php:180 host_discovery.php:687
+#: discoveryconf.php:180 host_discovery.php:702
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Quy tắc khám phá đã được kích hoạt"
 
-#: discoveryconf.php:125 host_discovery.php:661
+#: discoveryconf.php:125 host_discovery.php:676
 msgid "Discovery rule updated"
 msgstr "Quy tắc phát hiện đã cập nhật"
 
@@ -5270,7 +5269,7 @@ msgstr "Quy tắc phát hiện đã cập nhật"
 msgid "Discovery rules"
 msgstr "Các quy tắc phát hiện"
 
-#: discoveryconf.php:199 host_discovery.php:701
+#: discoveryconf.php:199 host_discovery.php:716
 msgid "Discovery rules deleted"
 msgstr "Các quy tắc phát hiện đã xóa"
 
@@ -5386,12 +5385,12 @@ msgstr "Tải xuống tệp tin cấu hình"
 msgid "Downtime"
 msgstr "Thời gian down"
 
-#: include/classes/widgets/CWidgetHelper.php:742
-#: include/classes/widgets/CWidgetHelper.php:786
-#: include/classes/widgets/CWidgetHelper.php:787
-#: include/classes/widgets/CWidgetHelper.php:788
-#: include/classes/widgets/CWidgetHelper.php:789
-#: include/classes/widgets/CWidgetHelper.php:1033
+#: include/classes/widgets/CWidgetHelper.php:756
+#: include/classes/widgets/CWidgetHelper.php:800
+#: include/classes/widgets/CWidgetHelper.php:801
+#: include/classes/widgets/CWidgetHelper.php:802
+#: include/classes/widgets/CWidgetHelper.php:803
+#: include/classes/widgets/CWidgetHelper.php:1047
 msgid "Draw"
 msgstr "Vẽ"
 
@@ -5411,7 +5410,7 @@ msgstr "Tạo bản sao \"%1$s\" giá trị \"%2$s\" cho liên kết\"%3$s\"."
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 msgstr "Tạo bản sao \"%1$s\" giá trị \"%2$s\" cho liên kết."
 
-#: include/classes/api/services/CItemPrototype.php:349
+#: include/classes/api/services/CItemPrototype.php:360
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item prototype \"%2$s\"."
 msgstr "Tạo bản sao \"tên\" giá trị \"%1$s\" cho kiểu ứng dụng trong kiểu itam \"%2$s\"."
@@ -5428,7 +5427,7 @@ msgstr "Tạo bản sao \"tên\" giá trị \"%1$s\" cho sơ đồ."
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr "Tạo bản sao \"tên\" giá trị \"%1$s\" cho screen."
 
-#: include/classes/api/services/CTrigger.php:1138
+#: include/classes/api/services/CTrigger.php:1146
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Bản sao quan hệ phụ thuộc trong trigger \"%1$s\"."
@@ -5438,14 +5437,14 @@ msgstr "Bản sao quan hệ phụ thuộc trong trigger \"%1$s\"."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Tạo bản sao quan hệ phụ thuộc trong kiểu trigger \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:2020
-#: include/classes/api/services/CHost.php:2275
+#: include/classes/api/services/CHost.php:2029
+#: include/classes/api/services/CHost.php:2284
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
 msgstr "Trùng máy chủ. Máy chủ với tên trùng \"%1$s\" đã tồn tại trong dữ liệu."
 
-#: include/classes/api/services/CHost.php:2027
-#: include/classes/api/services/CHost.php:2295
+#: include/classes/api/services/CHost.php:2036
+#: include/classes/api/services/CHost.php:2304
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr "Trùng máy chủ. Máy chủ với tên trùng \"%1$s\" đã tồn tại trong dữ liệu."
@@ -5506,7 +5505,7 @@ msgstr "Item động"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Mỗi URL cần có một tên duy nhất. Xin chắc chắn chỉ có một URl có tên"
 
-#: include/classes/widgets/CWidgetHelper.php:1141
+#: include/classes/widgets/CWidgetHelper.php:1155
 msgid "Each item"
 msgstr "Mỗi mục"
 
@@ -5609,7 +5608,7 @@ msgstr "Tệp chứng chỉ SSL trống cho web scenario \"%1$s\"."
 msgid "Empty SSL key file for web scenario \"%1$s\"."
 msgstr "Tệp khóa SSL trống cho web scenario: \"%1$s\"."
 
-#: include/classes/api/services/CItemPrototype.php:333
+#: include/classes/api/services/CItemPrototype.php:344
 #, c-format
 msgid "Empty application prototype name in item prototype \"%1$s\"."
 msgstr "Tên kiểu ứng trống trong kiểu item \"%1$s\"."
@@ -5627,12 +5626,12 @@ msgstr "ID liên kết trống."
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr "ID công thức điều kiện lọc trống cho hoạt động \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1782
+#: include/classes/api/services/CDiscoveryRule.php:1792
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "ID công thức điều kiện lọc trống cho quy tắc dò tìm \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1774
+#: include/classes/api/services/CDiscoveryRule.php:1784
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
 msgstr "Macro điều kiện lọc trống cho quy tắc dò tìm \"%1$s\"."
@@ -5655,10 +5654,10 @@ msgstr "Loại điều kiện lọc trống cho hành động \"%1$s\"."
 #: include/classes/api/services/CHostGeneral.php:154
 #: include/classes/api/services/CHostInterface.php:574
 #: include/classes/api/services/CHostInterface.php:618
-#: include/classes/api/services/CHost.php:846
-#: include/classes/api/services/CHost.php:1418
-#: include/classes/api/services/CHost.php:1954
-#: include/classes/api/services/CHostPrototype.php:950
+#: include/classes/api/services/CHost.php:855
+#: include/classes/api/services/CHost.php:1427
+#: include/classes/api/services/CHost.php:1963
+#: include/classes/api/services/CHostPrototype.php:955
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -5676,8 +5675,8 @@ msgstr "Loại điều kiện lọc trống cho hành động \"%1$s\"."
 #: include/classes/api/services/CService.php:366
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
-#: include/classes/api/services/CTemplate.php:630
-#: include/classes/api/services/CTrigger.php:794
+#: include/classes/api/services/CTemplate.php:631
+#: include/classes/api/services/CTrigger.php:802
 #: include/classes/api/services/CUserMacro.php:479
 #: include/classes/api/services/CUserMacro.php:526
 #: include/classes/api/services/CUserMacro.php:626
@@ -5913,8 +5912,8 @@ msgstr "English (en_US)"
 #: app/views/js/monitoring.problem.view.js.php:50
 #: app/views/monitoring.host.view.php:66
 #: app/views/monitoring.problem.view.php:256
-#: include/classes/widgets/CWidgetHelper.php:481
-#: include/classes/widgets/CWidgetHelper.php:527
+#: include/classes/widgets/CWidgetHelper.php:495
+#: include/classes/widgets/CWidgetHelper.php:541
 #: include/views/configuration.host.list.php:67
 #: include/views/configuration.maintenance.edit.php:159
 #: include/views/configuration.maintenance.edit.php:180
@@ -6083,7 +6082,7 @@ msgid "Execution confirmation"
 msgstr "Thực hiện xá nhận"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:970 jsLoader.php:249
+#: include/classes/widgets/CWidgetHelper.php:984 jsLoader.php:249
 #: jsLoader.php:252
 msgid "Expand"
 msgstr "Mở rộng"
@@ -6162,8 +6161,8 @@ msgstr "Biểu thức không thể bị rỗng"
 msgid "Expression constructor"
 msgstr "Người xây dựng biểu thức"
 
-#: include/forms.inc.php:1847 include/forms.inc.php:1853
-#: include/forms.inc.php:1862
+#: include/forms.inc.php:1855 include/forms.inc.php:1861
+#: include/forms.inc.php:1870
 msgid "Expression syntax error."
 msgstr "Biểu thức lỗi cú pháp."
 
@@ -6218,7 +6217,7 @@ msgstr "Không thể phân tích cú pháp URL."
 msgid "Failed to update dashboard"
 msgstr "Không thể cập nhật bảng điều khiển"
 
-#: include/classes/api/services/CTemplate.php:579
+#: include/classes/api/services/CTemplate.php:580
 msgid "Failed to update template."
 msgstr "Không thể cập nhật mẫu."
 
@@ -6266,8 +6265,8 @@ msgstr "Trường \"%1$s\" không thể bị thiết lập là NULL."
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
 #: include/classes/api/services/CHostGroup.php:983
-#: include/classes/api/services/CHost.php:991
-#: include/classes/api/services/CTemplate.php:884
+#: include/classes/api/services/CHost.php:1000
+#: include/classes/api/services/CTemplate.php:885
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
 #, c-format
@@ -6319,7 +6318,7 @@ msgstr "Trường \"%1$s\" được chuẩn bị cho loại phương tiện \"%2
 msgid "Field \"%1$s\" must be missing."
 msgstr "Trường \"%1$s\" phải bị lỗi."
 
-#: include/classes/api/services/CTemplate.php:464
+#: include/classes/api/services/CTemplate.php:465
 msgid "Field \"host\" is mandatory."
 msgstr "Trường \"máy chủ\" là bắt buộc."
 
@@ -6347,19 +6346,19 @@ msgstr "Kích cỡ tệp tin (byte). Trả về kiểu integer"
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Thông tin thời gian tập tin. Trả về kiểu integer (dấu thời gian Unix)"
 
-#: include/classes/widgets/CWidgetHelper.php:748
-#: include/classes/widgets/CWidgetHelper.php:803
-#: include/classes/widgets/CWidgetHelper.php:804
-#: include/classes/widgets/CWidgetHelper.php:805
-#: include/classes/widgets/CWidgetHelper.php:806
-#: include/classes/widgets/CWidgetHelper.php:807
-#: include/classes/widgets/CWidgetHelper.php:808
-#: include/classes/widgets/CWidgetHelper.php:809
-#: include/classes/widgets/CWidgetHelper.php:810
-#: include/classes/widgets/CWidgetHelper.php:811
-#: include/classes/widgets/CWidgetHelper.php:812
-#: include/classes/widgets/CWidgetHelper.php:813
-#: include/classes/widgets/CWidgetHelper.php:1067
+#: include/classes/widgets/CWidgetHelper.php:762
+#: include/classes/widgets/CWidgetHelper.php:817
+#: include/classes/widgets/CWidgetHelper.php:818
+#: include/classes/widgets/CWidgetHelper.php:819
+#: include/classes/widgets/CWidgetHelper.php:820
+#: include/classes/widgets/CWidgetHelper.php:821
+#: include/classes/widgets/CWidgetHelper.php:822
+#: include/classes/widgets/CWidgetHelper.php:823
+#: include/classes/widgets/CWidgetHelper.php:824
+#: include/classes/widgets/CWidgetHelper.php:825
+#: include/classes/widgets/CWidgetHelper.php:826
+#: include/classes/widgets/CWidgetHelper.php:827
+#: include/classes/widgets/CWidgetHelper.php:1081
 msgid "Fill"
 msgstr "Điền"
 
@@ -6397,7 +6396,7 @@ msgstr "Khu vực được tô kín"
 #: include/views/configuration.template.list.php:77
 #: include/views/configuration.triggers.list.php:162
 #: include/views/inventory.host.list.php:42
-#: include/views/monitoring.history.php:266
+#: include/views/monitoring.history.php:269
 #: include/views/monitoring.overview.items.php:96
 #: include/views/monitoring.screen.list.php:64
 #: include/views/monitoring.slideconf.list.php:52
@@ -6502,12 +6501,12 @@ msgstr "Công thức"
 msgid "Formula missing for action \"%1$s\"."
 msgstr "Thiếu biểu thức cho hành động \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1752
+#: include/classes/api/services/CDiscoveryRule.php:1762
 #, c-format
 msgid "Formula missing for discovery rule \"%1$s\"."
 msgstr "Thiếu biểu thức cho quy định dò tìm \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1545
+#: include/classes/api/services/CDiscoveryRule.php:1555
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
 msgstr "Thiểu biểu thức để ghi đè \"%1$s\"."
@@ -6525,7 +6524,7 @@ msgid "Friday"
 msgstr "Thứ sáu"
 
 #: app/views/report.services.php:82 include/classes/html/CFilter.php:282
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:79
 #: include/views/configuration.services.edit.php:257
 #: include/views/configuration.services.edit.php:305
 #: include/views/js/monitoring.sysmaps.js.php:732 report4.php:191
@@ -6704,40 +6703,40 @@ msgstr "Đường độ dốc"
 msgid "Graph"
 msgstr "Đồ thị"
 
-#: include/classes/api/services/CGraph.php:429
-#: include/classes/api/services/CGraphPrototype.php:440
+#: include/classes/api/services/CGraph.php:433
+#: include/classes/api/services/CGraphPrototype.php:441
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr "Đồ thị \"%1$s\" đã tồn tại trên \"%2$s\" (kế thừa từ template khác)."
 
-#: include/classes/api/services/CGraph.php:450
-#: include/classes/api/services/CGraph.php:457
-#: include/classes/api/services/CGraphPrototype.php:466
-#: include/classes/api/services/CGraphPrototype.php:473
+#: include/classes/api/services/CGraph.php:454
+#: include/classes/api/services/CGraph.php:461
+#: include/classes/api/services/CGraphPrototype.php:467
+#: include/classes/api/services/CGraphPrototype.php:474
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
 msgstr "Đồ thị \"%1$s\" đã tồn tại trên \"%2$s\" (các item là không giống nhau)."
 
-#: include/classes/api/services/CGraph.php:404
-#: include/classes/api/services/CGraphPrototype.php:415
+#: include/classes/api/services/CGraph.php:408
+#: include/classes/api/services/CGraphPrototype.php:416
 #: include/graphs.inc.php:440
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "Đồ thị \"%1$s\" đã tồn tại trên \"%2$s\"."
 
-#: include/classes/api/services/CGraph.php:367
+#: include/classes/api/services/CGraph.php:370
 #: include/classes/api/services/CGraphPrototype.php:371
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
 msgstr "Đồ thị \"%1$s\" không thể kế thừa. Không có các item yêu cầu trên \"%2$s\" (giá trị item Ymax)."
 
-#: include/classes/api/services/CGraph.php:375
+#: include/classes/api/services/CGraph.php:378
 #: include/classes/api/services/CGraphPrototype.php:380
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
 msgstr "Đồ thị \"%1$s\" không thể kế thừa. Không có các item yêu cầu trên \"%2$s\" (giá trị item Ymin)."
 
-#: include/classes/api/services/CGraph.php:361
+#: include/classes/api/services/CGraph.php:364
 #: include/classes/api/services/CGraphPrototype.php:365
 #, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
@@ -6785,12 +6784,12 @@ msgstr "Phần tử đồ thị"
 msgid "Graph prototype"
 msgstr "Kiểu đồ thị"
 
-#: include/classes/api/services/CGraphPrototype.php:767
+#: include/classes/api/services/CGraphPrototype.php:768
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Kiểu đồ thị \"%1$s\" bao gồm các kiểu item từ nhiều quy tắc phát hiện."
 
-#: include/classes/api/services/CGraphPrototype.php:773
+#: include/classes/api/services/CGraphPrototype.php:774
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
 msgstr "Kiểu đồ thị \"%1$s\" phải có ít nhất một kiểu item."
@@ -6841,7 +6840,7 @@ msgstr "Tính tổng đồ thị"
 #: app/controllers/CControllerPopupGeneric.php:313
 #: include/views/configuration.graph.edit.php:101
 #: include/views/configuration.graph.list.php:139
-#: include/views/monitoring.history.php:251
+#: include/views/monitoring.history.php:254
 msgid "Graph type"
 msgstr "Kiểu đồ thị"
 
@@ -6859,10 +6858,10 @@ msgstr "Đồ thị với ID \"%1$s\" không sẵn sàng."
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Đồ thị với tên \"%1$s\" đã tồn tại trong số các đồ thị hoặc các kiểu đồ thị."
 
-#: include/classes/api/services/CGraph.php:411
-#: include/classes/api/services/CGraph.php:432
-#: include/classes/api/services/CGraphPrototype.php:422
-#: include/classes/api/services/CGraphPrototype.php:443
+#: include/classes/api/services/CGraph.php:415
+#: include/classes/api/services/CGraph.php:436
+#: include/classes/api/services/CGraphPrototype.php:423
+#: include/classes/api/services/CGraphPrototype.php:444
 msgid "Graph with same name but other type exist."
 msgstr "Đồ thị với tên giống nhau nhưng kiểu khác nhau tồn tại."
 
@@ -6958,7 +6957,7 @@ msgstr "Nhóm cho các host được phát hiện \"%1$s\"."
 msgid "Group name"
 msgstr "Tên nhóm"
 
-#: include/classes/api/services/CHostPrototype.php:1112
+#: include/classes/api/services/CHostPrototype.php:1117
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Kiểu nhóm không thể dựa trên một nhóm host được phát hiện \"%1$s\"."
@@ -7144,7 +7143,7 @@ msgstr "Làm nổi bật toàn bộ hàng"
 #: include/classes/macros/CMacrosResolverGeneral.php:852
 #: include/classes/screens/CScreenProblem.php:1301
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:275 include/forms.inc.php:714
 #: include/views/configuration.item.list.php:70
 #: include/views/configuration.item.prototype.list.php:59 items.php:261
@@ -7170,7 +7169,7 @@ msgstr "Lịch sử bị xóa"
 msgid "History clearing can take a long time. Continue?"
 msgstr "Xóa lịch sử có thể mất một thời gian dài. Tiếp tục?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:54
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:47
 msgid "History data selection"
 msgstr "Lựa chọn dữ liệu lịch sử"
 
@@ -7253,17 +7252,17 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Thiết bị"
 
-#: include/classes/api/services/CHost.php:1098
-#: include/classes/api/services/CTemplate.php:496
+#: include/classes/api/services/CHost.php:1107
+#: include/classes/api/services/CTemplate.php:497
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Host \"%1$s\" đã tồn tại."
 
 #: include/classes/api/services/CHostGroup.php:1541
-#: include/classes/api/services/CHost.php:1057
-#: include/classes/api/services/CHost.php:1991
-#: include/classes/api/services/CHost.php:2185
+#: include/classes/api/services/CHost.php:1066
+#: include/classes/api/services/CHost.php:2000
+#: include/classes/api/services/CHost.php:2194
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Máy chủ \"%1$s\" không thể không có nhóm máy chủ."
@@ -7482,12 +7481,12 @@ msgstr "Các mạng host"
 msgid "Host prototype"
 msgstr "Kiểu máy"
 
-#: include/classes/api/services/CHostPrototype.php:830
+#: include/classes/api/services/CHostPrototype.php:835
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ các template khác."
 
-#: include/classes/api/services/CHostPrototype.php:818
+#: include/classes/api/services/CHostPrototype.php:823
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\"."
@@ -7547,7 +7546,7 @@ msgstr "Host subnet mask"
 msgid "Host time"
 msgstr "Thời gian của host"
 
-#: include/classes/api/services/CHost.php:920
+#: include/classes/api/services/CHost.php:929
 msgid "Host update failed."
 msgstr "Host cập nhật thất bại."
 
@@ -7560,17 +7559,17 @@ msgstr "Host đã cập nhật"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "Máy chủ với ID \"%1$s\" không sẵn sàng."
 
-#: include/classes/api/services/CHost.php:2115
-#: include/classes/api/services/CHost.php:2356
-#: include/classes/api/services/CTemplate.php:1156
+#: include/classes/api/services/CHost.php:2124
+#: include/classes/api/services/CHost.php:2365
+#: include/classes/api/services/CTemplate.php:1157
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Host với cùng một tên \"%1$s\" đã tồn tại."
 
-#: include/classes/api/services/CHost.php:2121
-#: include/classes/api/services/CHost.php:2363
-#: include/classes/api/services/CTemplate.php:522
-#: include/classes/api/services/CTemplate.php:1121
+#: include/classes/api/services/CHost.php:2130
+#: include/classes/api/services/CHost.php:2372
+#: include/classes/api/services/CTemplate.php:523
+#: include/classes/api/services/CTemplate.php:1122
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Host với cùng một tên hiển thị \"%1$s\" đã tồn tại."
@@ -8248,25 +8247,25 @@ msgstr "Đối số không chính xác được thông qua hàm"
 #: include/classes/api/services/CHostInterface.php:1173
 #: include/classes/api/services/CHostInterface.php:1191
 #: include/classes/api/services/CHostInterface.php:1208
-#: include/classes/api/services/CHost.php:1382
+#: include/classes/api/services/CHost.php:1391
 #: include/classes/api/services/CHostPrototype.php:457
 #: include/classes/api/services/CHostPrototype.php:478
-#: include/classes/api/services/CItemGeneral.php:250
-#: include/classes/api/services/CItemGeneral.php:1194
-#: include/classes/api/services/CItemGeneral.php:1227
-#: include/classes/api/services/CItemGeneral.php:1252
-#: include/classes/api/services/CItemGeneral.php:1289
-#: include/classes/api/services/CItemGeneral.php:1304
-#: include/classes/api/services/CItemGeneral.php:1332
-#: include/classes/api/services/CItemGeneral.php:1378
-#: include/classes/api/services/CItemGeneral.php:1401
-#: include/classes/api/services/CItemGeneral.php:1450
-#: include/classes/api/services/CItemGeneral.php:1494
-#: include/classes/api/services/CItemGeneral.php:1507
-#: include/classes/api/services/CItemGeneral.php:1560
-#: include/classes/api/services/CItemGeneral.php:1571
-#: include/classes/api/services/CItemGeneral.php:1586
-#: include/classes/api/services/CItemGeneral.php:1597
+#: include/classes/api/services/CItemGeneral.php:264
+#: include/classes/api/services/CItemGeneral.php:1208
+#: include/classes/api/services/CItemGeneral.php:1241
+#: include/classes/api/services/CItemGeneral.php:1266
+#: include/classes/api/services/CItemGeneral.php:1303
+#: include/classes/api/services/CItemGeneral.php:1318
+#: include/classes/api/services/CItemGeneral.php:1346
+#: include/classes/api/services/CItemGeneral.php:1392
+#: include/classes/api/services/CItemGeneral.php:1415
+#: include/classes/api/services/CItemGeneral.php:1464
+#: include/classes/api/services/CItemGeneral.php:1508
+#: include/classes/api/services/CItemGeneral.php:1521
+#: include/classes/api/services/CItemGeneral.php:1574
+#: include/classes/api/services/CItemGeneral.php:1585
+#: include/classes/api/services/CItemGeneral.php:1600
+#: include/classes/api/services/CItemGeneral.php:1611
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:101
 #: include/classes/api/services/CMapElement.php:120
@@ -8301,9 +8300,9 @@ msgstr "Giá trị số lượng lớn không chính xác cho interface."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Tính toán giá trị SLA cho dịch vụ \"%1$s\" không chính xác."
 
-#: include/classes/api/services/CHost.php:1080
-#: include/classes/api/services/CHost.php:1979
-#: include/classes/api/services/CHost.php:2269
+#: include/classes/api/services/CHost.php:1089
+#: include/classes/api/services/CHost.php:1988
+#: include/classes/api/services/CHost.php:2278
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr "Ký tự không chính xác được sử dụng cho tên máy chủ \"%1$s\"."
@@ -8314,8 +8313,8 @@ msgstr "Ký tự không chính xác được sử dụng cho tên máy chủ \"%
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Các ký tự được sử dụng cho tên proxy \"%1$s\" không chính xác."
 
-#: include/classes/api/services/CTemplate.php:474
-#: include/classes/api/services/CTemplate.php:1166
+#: include/classes/api/services/CTemplate.php:475
+#: include/classes/api/services/CTemplate.php:1167
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Các ký tự được sử dụng cho tên template \"%1$s\" không chính xác."
@@ -8325,7 +8324,7 @@ msgstr "Các ký tự được sử dụng cho tên template \"%1$s\" khôn
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr "Điều kiện không chính xác cho hoạt động \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1747
+#: include/classes/api/services/CDiscoveryRule.php:1757
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Điều kiện không chính xác cho quy tắc dò tìm \"%1$s\"."
@@ -8344,12 +8343,12 @@ msgstr "Biểu thức tự chọn \"%2$s\" không chính xác cho hoạt động
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
 msgstr "Biểu thức tự chọn \"%2$s\" không chính xác cho liên kết \"%1$s\": %3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:1753
+#: include/classes/api/services/CDiscoveryRule.php:1763
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr "Biểu thức tự chọn \"%2$s\" không chính xác cho quy tắc dò tìm \"%1$s\": %3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:1546
+#: include/classes/api/services/CDiscoveryRule.php:1556
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
 msgstr "Biểu thức tùy chọn không chính xác \"%2$s\" để chép đè \"%1$s\": %3$s."
@@ -8382,7 +8381,7 @@ msgstr "Giá trị đối tượng sự kiện không chính xác."
 msgid "Incorrect eventsource value."
 msgstr "Giá trị nguồn sự kiện không chính xác."
 
-#: include/classes/db/DB.php:597 include/classes/db/DB.php:871
+#: include/classes/db/DB.php:585 include/classes/db/DB.php:859
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Trường có tên \"%1$s\" không chính xác hoặc giá trị ở nơi báo cáo đối với bảng \"%2$s\"."
@@ -8407,7 +8406,7 @@ msgstr "Tải lên tập tin không chính xác."
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr "ID công thức điều kiện bộ lọc không chính xác cho hoạt động \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1783
+#: include/classes/api/services/CDiscoveryRule.php:1793
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "ID công thức điều kiện bộ lọc không chính xác cho quy tắc dò tìm \"%1$s\"."
@@ -8417,12 +8416,12 @@ msgstr "ID công thức điều kiện bộ lọc không chính xác cho quy t�
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
 msgstr "ID công thức điều kiện bộ lọc không chính xác cho liên kết \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1775
+#: include/classes/api/services/CDiscoveryRule.php:1785
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr "Điều kiện lọc macro không chính xác cho quy tắc dò tìm \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1581
+#: include/classes/api/services/CDiscoveryRule.php:1591
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
 msgstr "Macro điều kiện bộ lọc không chính xác để ghi đè \"%1$s\"."
@@ -8433,7 +8432,7 @@ msgstr "Macro điều kiện bộ lọc không chính xác để ghi đè \"%1$s
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr "Thao tác điều kiện lọc không chính xác cho hoạt động \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1787
+#: include/classes/api/services/CDiscoveryRule.php:1797
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "Thao tác điều kiện lọc không chính xác cho quy tắc dò tìm \"%1$s\"."
@@ -8482,9 +8481,9 @@ msgstr "Chỉ số hình ảnh không chính xác."
 #: include/classes/api/services/CAction.php:2927
 #: include/classes/api/services/CAction.php:2939
 #: include/classes/api/services/CHostInterface.php:664
-#: include/classes/api/services/CHost.php:1063
-#: include/classes/api/services/CHost.php:1973
-#: include/classes/api/services/CHost.php:2171
+#: include/classes/api/services/CHost.php:1072
+#: include/classes/api/services/CHost.php:1982
+#: include/classes/api/services/CHost.php:2180
 #: include/classes/api/services/CImage.php:435
 #: include/classes/api/services/CImage.php:480
 #: include/classes/api/services/CProxy.php:619
@@ -8492,10 +8491,10 @@ msgstr "Chỉ số hình ảnh không chính xác."
 #: include/classes/api/services/CProxy.php:729
 #: include/classes/api/services/CProxy.php:751
 #: include/classes/api/services/CScreen.php:426
-#: include/classes/api/services/CTemplate.php:469
-#: include/classes/api/services/CTemplate.php:610
+#: include/classes/api/services/CTemplate.php:470
+#: include/classes/api/services/CTemplate.php:611
 #: include/classes/api/services/CTemplateScreen.php:596
-#: include/classes/api/services/CTrigger.php:799
+#: include/classes/api/services/CTrigger.php:807
 msgid "Incorrect input parameters."
 msgstr "Các tham số đầu vào không chính xác."
 
@@ -8509,8 +8508,8 @@ msgstr "Tham số giao diện DNS \"%1$s\" được cung cấp không đúng."
 msgid "Incorrect interface port \"%1$s\" provided."
 msgstr "Cống kết nối \"%1$s\" không đúng."
 
-#: include/classes/api/services/CHost.php:2090
-#: include/classes/api/services/CHost.php:2251
+#: include/classes/api/services/CHost.php:2099
+#: include/classes/api/services/CHost.php:2260
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
 msgstr "Trường kiểm kê \"%1$s\" không chính xác."
@@ -8548,7 +8547,7 @@ msgstr "Kiểu giá trị item không chính xác"
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Kiểu giá trị item \"%1$s\" được cung cấp không chính xác đối với hàm trigger \"%2$s\"."
 
-#: include/forms.inc.php:1509
+#: include/forms.inc.php:1514
 msgid "Incorrect list of items."
 msgstr "Thống kê không chính xác của các item."
 
@@ -8682,8 +8681,8 @@ msgstr "Thứ tự sắp xếp không chính xác cho dịch vụ \"%1$s\"."
 msgid "Incorrect source value."
 msgstr "Giá trị nguồn không chính xác."
 
-#: include/classes/api/services/CHost.php:2062
-#: include/classes/api/services/CHost.php:2217
+#: include/classes/api/services/CHost.php:2071
+#: include/classes/api/services/CHost.php:2226
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Trạng thái máy chủ không chính xác \"%1$s\"."
@@ -8758,7 +8757,7 @@ msgstr "Loại tính toán không chính xác cho hoạt động \"%1$s\"."
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
 msgstr "Loại tính toán không chính xác cho liên kết\"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1740
+#: include/classes/api/services/CDiscoveryRule.php:1750
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Loại tính toán không chính xác cho quy tắc dò tìm \"%1$s\"."
@@ -8815,8 +8814,8 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:525
 #: include/classes/api/services/CDRule.php:587
 #: include/classes/api/services/CDRule.php:600
-#: include/classes/api/services/CItemGeneral.php:484
-#: include/classes/api/services/CItemGeneral.php:2305
+#: include/classes/api/services/CItemGeneral.php:498
+#: include/classes/api/services/CItemGeneral.php:2319
 #: include/classes/validators/CNewValidator.php:122
 #: include/classes/validators/CNewValidator.php:135
 #: include/classes/validators/CNewValidator.php:148
@@ -8946,8 +8945,8 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CCorrelation.php:1151
-#: include/classes/api/services/CDiscoveryRule.php:1809
-#: include/classes/api/services/CDiscoveryRule.php:2207
+#: include/classes/api/services/CDiscoveryRule.php:1819
+#: include/classes/api/services/CDiscoveryRule.php:2217
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -8970,74 +8969,74 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CEvent.php:771
 #: include/classes/api/services/CEvent.php:812
 #: include/classes/api/services/CEvent.php:869
-#: include/classes/api/services/CHost.php:1021
-#: include/classes/api/services/CHost.php:1871
-#: include/classes/api/services/CHost.php:1877
-#: include/classes/api/services/CHost.php:1892
-#: include/classes/api/services/CHost.php:1898
-#: include/classes/api/services/CHost.php:1903
-#: include/classes/api/services/CHost.php:1909
-#: include/classes/api/services/CHost.php:1917
-#: include/classes/api/services/CHost.php:1923
+#: include/classes/api/services/CHost.php:1030
+#: include/classes/api/services/CHost.php:1880
+#: include/classes/api/services/CHost.php:1886
+#: include/classes/api/services/CHost.php:1901
+#: include/classes/api/services/CHost.php:1907
+#: include/classes/api/services/CHost.php:1912
+#: include/classes/api/services/CHost.php:1918
+#: include/classes/api/services/CHost.php:1926
 #: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:1938
-#: include/classes/api/services/CHost.php:2000
-#: include/classes/api/services/CHost.php:2056
-#: include/classes/api/services/CHost.php:2194
-#: include/classes/api/services/CHost.php:2211
+#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1947
+#: include/classes/api/services/CHost.php:2009
+#: include/classes/api/services/CHost.php:2065
+#: include/classes/api/services/CHost.php:2203
+#: include/classes/api/services/CHost.php:2220
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
-#: include/classes/api/services/CItemGeneral.php:209
-#: include/classes/api/services/CItemGeneral.php:429
-#: include/classes/api/services/CItemGeneral.php:440
-#: include/classes/api/services/CItemGeneral.php:446
+#: include/classes/api/services/CItemGeneral.php:223
+#: include/classes/api/services/CItemGeneral.php:443
 #: include/classes/api/services/CItemGeneral.php:454
-#: include/classes/api/services/CItemGeneral.php:466
-#: include/classes/api/services/CItemGeneral.php:472
-#: include/classes/api/services/CItemGeneral.php:478
-#: include/classes/api/services/CItemGeneral.php:491
-#: include/classes/api/services/CItemGeneral.php:517
-#: include/classes/api/services/CItemGeneral.php:1232
-#: include/classes/api/services/CItemGeneral.php:1238
-#: include/classes/api/services/CItemGeneral.php:1256
-#: include/classes/api/services/CItemGeneral.php:1271
-#: include/classes/api/services/CItemGeneral.php:1294
-#: include/classes/api/services/CItemGeneral.php:1309
-#: include/classes/api/services/CItemGeneral.php:1316
-#: include/classes/api/services/CItemGeneral.php:1324
-#: include/classes/api/services/CItemGeneral.php:1337
-#: include/classes/api/services/CItemGeneral.php:1348
-#: include/classes/api/services/CItemGeneral.php:1358
-#: include/classes/api/services/CItemGeneral.php:1365
-#: include/classes/api/services/CItemGeneral.php:1383
-#: include/classes/api/services/CItemGeneral.php:1406
-#: include/classes/api/services/CItemGeneral.php:1457
-#: include/classes/api/services/CItemGeneral.php:1464
-#: include/classes/api/services/CItemGeneral.php:1470
-#: include/classes/api/services/CItemGeneral.php:1477
-#: include/classes/api/services/CItemGeneral.php:1485
+#: include/classes/api/services/CItemGeneral.php:460
+#: include/classes/api/services/CItemGeneral.php:468
+#: include/classes/api/services/CItemGeneral.php:480
+#: include/classes/api/services/CItemGeneral.php:486
+#: include/classes/api/services/CItemGeneral.php:492
+#: include/classes/api/services/CItemGeneral.php:505
+#: include/classes/api/services/CItemGeneral.php:531
+#: include/classes/api/services/CItemGeneral.php:1246
+#: include/classes/api/services/CItemGeneral.php:1252
+#: include/classes/api/services/CItemGeneral.php:1270
+#: include/classes/api/services/CItemGeneral.php:1285
+#: include/classes/api/services/CItemGeneral.php:1308
+#: include/classes/api/services/CItemGeneral.php:1323
+#: include/classes/api/services/CItemGeneral.php:1330
+#: include/classes/api/services/CItemGeneral.php:1338
+#: include/classes/api/services/CItemGeneral.php:1351
+#: include/classes/api/services/CItemGeneral.php:1362
+#: include/classes/api/services/CItemGeneral.php:1372
+#: include/classes/api/services/CItemGeneral.php:1379
+#: include/classes/api/services/CItemGeneral.php:1397
+#: include/classes/api/services/CItemGeneral.php:1420
+#: include/classes/api/services/CItemGeneral.php:1471
+#: include/classes/api/services/CItemGeneral.php:1478
+#: include/classes/api/services/CItemGeneral.php:1484
+#: include/classes/api/services/CItemGeneral.php:1491
 #: include/classes/api/services/CItemGeneral.php:1499
-#: include/classes/api/services/CItemGeneral.php:1510
-#: include/classes/api/services/CItemGeneral.php:1515
-#: include/classes/api/services/CItemGeneral.php:1523
+#: include/classes/api/services/CItemGeneral.php:1513
+#: include/classes/api/services/CItemGeneral.php:1524
 #: include/classes/api/services/CItemGeneral.php:1529
-#: include/classes/api/services/CItemGeneral.php:1540
-#: include/classes/api/services/CItemGeneral.php:1564
-#: include/classes/api/services/CItemGeneral.php:1577
-#: include/classes/api/services/CItemGeneral.php:1590
-#: include/classes/api/services/CItemGeneral.php:1605
-#: include/classes/api/services/CItemGeneral.php:1615
-#: include/classes/api/services/CItemGeneral.php:1953
-#: include/classes/api/services/CItemGeneral.php:1973
-#: include/classes/api/services/CItemGeneral.php:1980
-#: include/classes/api/services/CItemGeneral.php:1990
-#: include/classes/api/services/CItemGeneral.php:2070
+#: include/classes/api/services/CItemGeneral.php:1537
+#: include/classes/api/services/CItemGeneral.php:1543
+#: include/classes/api/services/CItemGeneral.php:1554
+#: include/classes/api/services/CItemGeneral.php:1578
+#: include/classes/api/services/CItemGeneral.php:1591
+#: include/classes/api/services/CItemGeneral.php:1604
+#: include/classes/api/services/CItemGeneral.php:1619
+#: include/classes/api/services/CItemGeneral.php:1629
+#: include/classes/api/services/CItemGeneral.php:1967
+#: include/classes/api/services/CItemGeneral.php:1987
+#: include/classes/api/services/CItemGeneral.php:1994
+#: include/classes/api/services/CItemGeneral.php:2004
 #: include/classes/api/services/CItemGeneral.php:2084
-#: include/classes/api/services/CItemGeneral.php:2248
-#: include/classes/api/services/CItem.php:819
-#: include/classes/api/services/CItem.php:827
-#: include/classes/api/services/CItemPrototype.php:979
-#: include/classes/api/services/CItemPrototype.php:987
+#: include/classes/api/services/CItemGeneral.php:2098
+#: include/classes/api/services/CItemGeneral.php:2262
+#: include/classes/api/services/CItem.php:833
+#: include/classes/api/services/CItem.php:841
+#: include/classes/api/services/CItemPrototype.php:990
+#: include/classes/api/services/CItemPrototype.php:998
 #: include/classes/api/services/CMaintenance.php:495
 #: include/classes/api/services/CMaintenance.php:717
 #: include/classes/api/services/CMapElement.php:85
@@ -9077,7 +9076,7 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CProxy.php:797
 #: include/classes/api/services/CScreen.php:394
 #: include/classes/api/services/CScreen.php:400
-#: include/classes/api/services/CTemplate.php:429
+#: include/classes/api/services/CTemplate.php:430
 #: include/classes/api/services/CTriggerGeneral.php:703
 #: include/classes/api/services/CTriggerGeneral.php:709
 #: include/classes/api/services/CTriggerGeneral.php:729
@@ -9440,19 +9439,19 @@ msgstr "Chu kì lưu trữ dữ liệu nội bộ không chính xác: %1$s."
 #: app/controllers/CControllerPopupLldOperation.php:195
 #: disc_prototypes.php:370 disc_prototypes.php:375 disc_prototypes.php:388
 #: disc_prototypes.php:715 disc_prototypes.php:720 disc_prototypes.php:733
-#: host_discovery.php:414 host_discovery.php:420 host_discovery.php:433
+#: host_discovery.php:429 host_discovery.php:435 host_discovery.php:448
 #: items.php:528 items.php:533 items.php:546 items.php:933 items.php:938
 #: items.php:951
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "Khoảng thời gian \"%1$s\" không hợp lệ."
 
-#: include/classes/api/services/CDiscoveryRule.php:50
+#: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Key \"%1$s\" không hợp lệ đối với quy tắc phát hiện \"%2$s\" trên \"%3$s\": \"%4$s\"."
 
-#: include/classes/api/services/CItem.php:53
+#: include/classes/api/services/CItem.php:64
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Key \"%1$s\" không hợp lệ đối với item \"%2$s\" trên \"%3$s\": \"%4$s\"."
@@ -9506,29 +9505,29 @@ msgstr "Số đối số không hợp lệ của các tham số."
 #: include/classes/api/services/CAutoregistration.php:145
 #: include/classes/api/services/CAutoregistration.php:151
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CDiscoveryRule.php:1593
-#: include/classes/api/services/CDiscoveryRule.php:1613
-#: include/classes/api/services/CDiscoveryRule.php:1625
-#: include/classes/api/services/CDiscoveryRule.php:1644
-#: include/classes/api/services/CDiscoveryRule.php:1655
-#: include/classes/api/services/CDiscoveryRule.php:1667
-#: include/classes/api/services/CDiscoveryRule.php:1675
-#: include/classes/api/services/CDiscoveryRule.php:1686
-#: include/classes/api/services/CDiscoveryRule.php:1697
-#: include/classes/api/services/CDiscoveryRule.php:1829
-#: include/classes/api/services/CDiscoveryRule.php:1915
-#: include/classes/api/services/CDiscoveryRule.php:1932
-#: include/classes/api/services/CDiscoveryRule.php:1950
-#: include/classes/api/services/CDiscoveryRule.php:1958
-#: include/classes/api/services/CItemGeneral.php:2262
-#: include/classes/api/services/CItemGeneral.php:2269
-#: include/classes/api/services/CItemGeneral.php:2275
-#: include/classes/api/services/CItemGeneral.php:2284
-#: include/classes/api/services/CItemGeneral.php:2291
-#: include/classes/api/services/CItemGeneral.php:2322
-#: include/classes/api/services/CItemGeneral.php:2327
-#: include/classes/api/services/CItemGeneral.php:2337
-#: include/classes/api/services/CItemGeneral.php:2366
+#: include/classes/api/services/CDiscoveryRule.php:1603
+#: include/classes/api/services/CDiscoveryRule.php:1623
+#: include/classes/api/services/CDiscoveryRule.php:1635
+#: include/classes/api/services/CDiscoveryRule.php:1654
+#: include/classes/api/services/CDiscoveryRule.php:1665
+#: include/classes/api/services/CDiscoveryRule.php:1677
+#: include/classes/api/services/CDiscoveryRule.php:1685
+#: include/classes/api/services/CDiscoveryRule.php:1696
+#: include/classes/api/services/CDiscoveryRule.php:1707
+#: include/classes/api/services/CDiscoveryRule.php:1839
+#: include/classes/api/services/CDiscoveryRule.php:1925
+#: include/classes/api/services/CDiscoveryRule.php:1942
+#: include/classes/api/services/CDiscoveryRule.php:1960
+#: include/classes/api/services/CDiscoveryRule.php:1968
+#: include/classes/api/services/CItemGeneral.php:2276
+#: include/classes/api/services/CItemGeneral.php:2283
+#: include/classes/api/services/CItemGeneral.php:2289
+#: include/classes/api/services/CItemGeneral.php:2298
+#: include/classes/api/services/CItemGeneral.php:2305
+#: include/classes/api/services/CItemGeneral.php:2336
+#: include/classes/api/services/CItemGeneral.php:2341
+#: include/classes/api/services/CItemGeneral.php:2351
+#: include/classes/api/services/CItemGeneral.php:2380
 #: include/classes/api/services/CModule.php:291
 #: include/classes/api/services/CTriggerGeneral.php:1686
 #: include/classes/api/services/CTriggerGeneral.php:1702
@@ -9609,8 +9608,8 @@ msgstr "Số đối số không hợp lệ của các tham số."
 #: include/classes/validators/CApiInputValidator.php:1878
 #: include/classes/validators/CApiInputValidator.php:1898
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:130
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:476
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 #: include/profiles.inc.php:151
 #, c-format
 msgid "Invalid parameter \"%1$s\": %2$s."
@@ -9713,7 +9712,7 @@ msgstr "Thời gian lưu trữ dữ liệu phiên người dùng không hợp l�
 msgid "Inventory"
 msgstr "Kiểm kê"
 
-#: include/classes/api/services/CHost.php:1260
+#: include/classes/api/services/CHost.php:1269
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Kiểm kê bị vô hiệu hóa cho host \"%1$s\"."
@@ -9770,13 +9769,13 @@ msgstr "Italian (it_IT)"
 msgid "Item"
 msgstr "Item"
 
-#: include/classes/api/services/CHostPrototype.php:1056
-#: include/classes/api/services/CItem.php:51
+#: include/classes/api/services/CHostPrototype.php:1061
+#: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Item \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ template khác."
 
-#: include/classes/api/services/CItem.php:52
+#: include/classes/api/services/CItem.php:63
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item \"%1$s\" không tồn tại trên \"%2$s\"."
@@ -9786,7 +9785,7 @@ msgstr "Item \"%1$s\" không tồn tại trên \"%2$s\"."
 msgid "Item \"%1$s\" cannot be copied without its master item."
 msgstr "Mục \"%1$s\" không thể được sao chép mà không có mục chính."
 
-#: include/classes/api/services/CItem.php:936
+#: include/classes/api/services/CItem.php:950
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Item \"%1$s\" không thể gắn vào một quá trình kiểm kê số trường đang bị lỗi \"%2$d\". Các lựa chọn là: từ 0 (Không được gắn vào) đến \"%3$d\"."
@@ -9796,8 +9795,8 @@ msgstr "Item \"%1$s\" không thể gắn vào một quá trình kiểm k�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Item \"%1$s\" không tồn tại trên template \"%2$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:2208
-#: include/classes/api/services/CItemGeneral.php:1954
+#: include/classes/api/services/CDiscoveryRule.php:2218
+#: include/classes/api/services/CItemGeneral.php:1968
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "Item \"%1$s\" không tồn tại hoặc bạn không có quyền truy cập vào item này"
@@ -9846,7 +9845,7 @@ msgstr "Item trong trạng thái \"không được hỗ trợ\""
 msgid "Item not selected"
 msgstr "Item không được lựa chọn"
 
-#: include/classes/api/services/CItemGeneral.php:1222
+#: include/classes/api/services/CItemGeneral.php:1236
 #, c-format
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "Item chuẩn bị xử lí bị thiếu tham số: %1$s"
@@ -9866,7 +9865,7 @@ msgstr "Kiểu item"
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Kiểu item \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ template khác."
 
-#: include/classes/api/services/CItemGeneral.php:968
+#: include/classes/api/services/CItemGeneral.php:982
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
 msgstr "Kiểu item \"%1$s\" đã tồn tại trên \"%2$s\", được kết nối đên quy tắc khác."
@@ -9918,11 +9917,11 @@ msgstr ""
 msgid "Item updated"
 msgstr "Item đã được cập nhật"
 
-#: include/classes/api/services/CItemGeneral.php:361
+#: include/classes/api/services/CItemGeneral.php:375
 msgid "Item uses host interface from non-parent host."
 msgstr "Item sử dụng host interface không phải từ host gốc."
 
-#: include/classes/api/services/CItemGeneral.php:364
+#: include/classes/api/services/CItemGeneral.php:378
 msgid "Item uses incorrect interface type."
 msgstr "Item sử dụng kiểu interface không chính xác."
 
@@ -9947,32 +9946,32 @@ msgstr "Mục sẽ không được làm mới. Khoảng thời gian cập nhật
 msgid "Item with ID \"%1$s\" is not available."
 msgstr "Item với ID \"%1$s\" không sẵn sàng."
 
-#: include/classes/api/services/CItemGeneral.php:599
+#: include/classes/api/services/CItemGeneral.php:613
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\" như là một quy tắc phát hiện."
 
-#: include/classes/api/services/CItemGeneral.php:605
+#: include/classes/api/services/CItemGeneral.php:619
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\" như là một item được tạo từ item gốc nguyên mẫu."
 
-#: include/classes/api/services/CItemGeneral.php:602
+#: include/classes/api/services/CItemGeneral.php:616
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\" như là một item gốc nguyên mẫu."
 
-#: include/classes/api/services/CItemGeneral.php:596
+#: include/classes/api/services/CItemGeneral.php:610
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\" như là một item."
 
-#: include/classes/api/services/CItemGeneral.php:608
+#: include/classes/api/services/CItemGeneral.php:622
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\" như là phần tử item chưa biết."
 
-#: include/classes/api/services/CItemGeneral.php:1811
+#: include/classes/api/services/CItemGeneral.php:1825
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\"."
@@ -9995,7 +9994,7 @@ msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\"."
 #: include/views/configuration.template.list.php:152
 #: include/views/configuration.template.list.php:246
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
-#: include/views/inventory.host.view.php:204 items.php:1708 queue.php:110
+#: include/views/inventory.host.view.php:204 items.php:1703 queue.php:110
 msgid "Items"
 msgstr "Các item"
 
@@ -10047,8 +10046,8 @@ msgstr "JMX interfaces"
 msgid "JSON data"
 msgstr "JSON data"
 
-#: include/classes/api/services/CItemGeneral.php:2337
-#: include/classes/api/services/CItemGeneral.php:2366
+#: include/classes/api/services/CItemGeneral.php:2351
+#: include/classes/api/services/CItemGeneral.php:2380
 msgid "JSON is expected"
 msgstr "JSON thì được kỳ vọng"
 
@@ -10078,7 +10077,7 @@ msgstr "Tháng 1"
 msgid "Japanese (ja_JP)"
 msgstr "Japanese (ja_JP)"
 
-#: app/views/administration.mediatype.edit.php:219 include/forms.inc.php:1323
+#: app/views/administration.mediatype.edit.php:219 include/forms.inc.php:1328
 #: include/items.inc.php:1824 include/views/js/item.preprocessing.js.php:181
 msgid "JavaScript"
 msgstr "JavaScript"
@@ -10126,7 +10125,7 @@ msgstr "Kerberos"
 msgid "Key"
 msgstr "Key"
 
-#: include/classes/api/services/CItemGeneral.php:413
+#: include/classes/api/services/CItemGeneral.php:427
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Key \"%1$s\" không khớp với <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -10337,9 +10336,9 @@ msgstr "Latvian (lv_LV)"
 msgid "Layout"
 msgstr "Bố cục"
 
-#: include/classes/widgets/CWidgetHelper.php:755
-#: include/classes/widgets/CWidgetHelper.php:830
-#: include/classes/widgets/CWidgetHelper.php:1098
+#: include/classes/widgets/CWidgetHelper.php:769
+#: include/classes/widgets/CWidgetHelper.php:844
+#: include/classes/widgets/CWidgetHelper.php:1112
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:70
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:86
@@ -10356,10 +10355,10 @@ msgstr "Bố cục"
 msgid "Left"
 msgstr "Bên trái"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:143
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:476
 msgid "Left Y"
 msgstr "Bên trái Y"
 
@@ -10375,9 +10374,9 @@ msgstr "Lịch sử"
 msgid "Limit for search and filter results"
 msgstr "Tìm kiếm/lọc các yếu tố giới hạn"
 
-#: include/classes/widgets/CWidgetHelper.php:743
-#: include/classes/widgets/CWidgetHelper.php:786
-#: include/classes/widgets/CWidgetHelper.php:1035 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:757
+#: include/classes/widgets/CWidgetHelper.php:800
+#: include/classes/widgets/CWidgetHelper.php:1049 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:346
 #: include/views/js/monitoring.sysmaps.js.php:395
 #: include/views/js/monitoring.sysmaps.js.php:764
@@ -10556,7 +10555,7 @@ msgstr "Cục bộ"
 
 #: include/classes/screens/CScreenHistory.php:270
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
-#: include/views/monitoring.history.php:289
+#: include/views/monitoring.history.php:292
 #: include/views/monitoring.screen.constructor.edit.php:720
 msgid "Local time"
 msgstr "Giờ địa phương"
@@ -10962,12 +10961,12 @@ msgstr "Mục chính"
 msgid "Matches regular expression"
 msgstr "Khớp biểu thức chính quy"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:143
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:213
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:215
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:134
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:206
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:476
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 msgid "Max"
 msgstr "Lớn nhất"
 
@@ -10997,7 +10996,7 @@ msgstr "Số lượng tiến trình tối thiểu được hỗ trợ bởi HĐH
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:239
 #: include/classes/mvc/CController.php:208
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:444
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:437
 #: include/validate.inc.php:470
 #, c-format
 msgid "Maximum time period to display is %1$s day."
@@ -11182,10 +11181,10 @@ msgstr "Microsoft Edge"
 msgid "Middle"
 msgstr "Giữa"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:126
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:198
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:119
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:191
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:193
 msgid "Min"
 msgstr "Tối thiểu"
 
@@ -11227,7 +11226,7 @@ msgstr "Sự quan trọng tối thiểu"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:234
 #: include/classes/mvc/CController.php:201
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:439
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:432
 #: include/validate.inc.php:463
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
@@ -11247,7 +11246,7 @@ msgstr "Thiếu trường \"gitemid\" cho item."
 msgid "Missing \"itemid\" field for item."
 msgstr "Thiếu trường \"itemid\" cho item."
 
-#: include/classes/api/services/CItemPrototype.php:327
+#: include/classes/api/services/CItemPrototype.php:338
 #, c-format
 msgid "Missing \"name\" field for application prototype in item prototype \"%1$s\"."
 msgstr "Thiếu trường \"tên\" cho kiểu ứng dụng trong kiểu item \"%1$s\"."
@@ -11260,11 +11259,11 @@ msgstr "Thiếu trường \"tên\" cho kiểu đồ thị."
 msgid "Missing \"name\" field for graph."
 msgstr "Thiếu trường \"tên\" cho đồ thị."
 
-#: include/classes/widgets/CWidgetHelper.php:750
-#: include/classes/widgets/CWidgetHelper.php:826
-#: include/classes/widgets/CWidgetHelper.php:827
-#: include/classes/widgets/CWidgetHelper.php:828
-#: include/classes/widgets/CWidgetHelper.php:1082
+#: include/classes/widgets/CWidgetHelper.php:764
+#: include/classes/widgets/CWidgetHelper.php:840
+#: include/classes/widgets/CWidgetHelper.php:841
+#: include/classes/widgets/CWidgetHelper.php:842
+#: include/classes/widgets/CWidgetHelper.php:1096
 msgid "Missing data"
 msgstr "Thiếu dữ liệu"
 
@@ -11497,7 +11496,7 @@ msgstr "NTLM"
 #: disc_prototypes.php:44 graphs.php:43 host_discovery.php:48 httpconf.php:41
 #: include/classes/screens/CScreenHttpTest.php:108
 #: include/classes/widgets/CWidgetHelper.php:68 include/forms.inc.php:290
-#: include/forms.inc.php:1221 include/hosts.inc.php:109
+#: include/forms.inc.php:1226 include/hosts.inc.php:109
 #: include/views/configuration.action.edit.php:45
 #: include/views/configuration.action.edit.php:56
 #: include/views/configuration.action.list.php:63
@@ -11796,7 +11795,7 @@ msgstr "Không có \"%1$s\" được đưa ra cho màn hình mẫu."
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr "Không có \"%2$s\" cho điều kiện lọc hoạt động \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1791
+#: include/classes/api/services/CDiscoveryRule.php:1801
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
 msgstr "Không có \"%2$s\" cho điều kiện lọc quy tắc dò tìm \"%1$s\"."
@@ -11806,12 +11805,12 @@ msgstr "Không có \"%2$s\" cho điều kiện lọc quy tắc dò tìm \"%1$s\"
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr "Không có \"%2$s\" cho lọc hoạt động \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1759
+#: include/classes/api/services/CDiscoveryRule.php:1769
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "Không có \"%2$s\" cho bộ lọc quy tắc dò tìm \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:531
+#: include/classes/api/services/CItemGeneral.php:545
 msgid "No SNMP OID specified."
 msgstr "SNMP OID không được ghi rõ."
 
@@ -11834,7 +11833,7 @@ msgstr "Không có loại xác thực được chỉ định cho lệnh thao tá
 msgid "No authentication user name specified for action operation command \"%1$s\"."
 msgstr "Không có tên người dùng xác thực được chỉ định cho lệnh thao tác hành động \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:501
+#: include/classes/api/services/CItemGeneral.php:515
 msgid "No authentication user name specified."
 msgstr "Không quy định xác thực tên người dùng."
 
@@ -11886,7 +11885,7 @@ msgstr "Không có interface mặc định cho kiểu \"%1$s\" trên \"%2$s\"
 msgid "No details"
 msgstr "Không có thông tin chi tiết"
 
-#: include/classes/api/services/CDiscoveryRule.php:610
+#: include/classes/api/services/CDiscoveryRule.php:620
 msgid "No discovery rule IDs given."
 msgstr "Không có quy tắc phát hiện các ID cho."
 
@@ -11928,7 +11927,7 @@ msgstr "Không có ID kiểu đồ thị được cung cấp cho phần tử scr
 msgid "No graphs added."
 msgstr "Không có đồ thị nào được thêm vào."
 
-#: include/classes/api/services/CDiscoveryRule.php:613
+#: include/classes/api/services/CDiscoveryRule.php:623
 msgid "No host IDs given."
 msgstr "Không có các host ID nhất định."
 
@@ -11974,7 +11973,7 @@ msgstr "Không có hình ảnh"
 msgid "No interface found"
 msgstr "Không tìm thấy giao diện"
 
-#: include/classes/api/services/CItemGeneral.php:358
+#: include/classes/api/services/CItemGeneral.php:372
 msgid "No interface found."
 msgstr "Không tìm thấy interface."
 
@@ -11984,8 +11983,8 @@ msgstr "Không tìm thấy interface."
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr "Không có giao diện được cung cấp cho proxy \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:2069
-#: include/classes/api/services/CHost.php:2262
+#: include/classes/api/services/CHost.php:2078
+#: include/classes/api/services/CHost.php:2271
 #, c-format
 msgid "No interfaces for host \"%1$s\"."
 msgstr "Không có các giao diện cho máy chủ \"%1$s\"."
@@ -12069,7 +12068,7 @@ msgstr "Không có quyền truy cập hệ thống."
 #: app/controllers/CControllerWidgetMapView.php:68
 #: app/controllers/CControllerWidgetPlainTextView.php:78
 #: app/views/monitoring.widget.graph.view.php:27 disc_prototypes.php:1201
-#: disc_prototypes.php:1436 host_discovery.php:751
+#: disc_prototypes.php:1431 host_discovery.php:766
 #: hostinventoriesoverview.php:74
 #: include/classes/api/services/CAction.php:1590
 #: include/classes/api/services/CAction.php:1969
@@ -12088,11 +12087,11 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CDashboard.php:371
 #: include/classes/api/services/CDashboard.php:396
 #: include/classes/api/services/CDashboard.php:1236
-#: include/classes/api/services/CDiscoveryRule.php:548
-#: include/classes/api/services/CDiscoveryRule.php:589
-#: include/classes/api/services/CDiscoveryRule.php:625
-#: include/classes/api/services/CDiscoveryRule.php:1712
-#: include/classes/api/services/CDiscoveryRule.php:1984
+#: include/classes/api/services/CDiscoveryRule.php:558
+#: include/classes/api/services/CDiscoveryRule.php:599
+#: include/classes/api/services/CDiscoveryRule.php:635
+#: include/classes/api/services/CDiscoveryRule.php:1722
+#: include/classes/api/services/CDiscoveryRule.php:1994
 #: include/classes/api/services/CDRule.php:183
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CDRule.php:336
@@ -12102,11 +12101,11 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CEvent.php:859
 #: include/classes/api/services/CGraphGeneral.php:64
 #: include/classes/api/services/CGraphGeneral.php:86
-#: include/classes/api/services/CGraph.php:554
-#: include/classes/api/services/CGraph.php:688
-#: include/classes/api/services/CGraphPrototype.php:571
-#: include/classes/api/services/CGraphPrototype.php:656
-#: include/classes/api/services/CGraphPrototype.php:718
+#: include/classes/api/services/CGraph.php:558
+#: include/classes/api/services/CGraph.php:692
+#: include/classes/api/services/CGraphPrototype.php:572
+#: include/classes/api/services/CGraphPrototype.php:657
+#: include/classes/api/services/CGraphPrototype.php:719
 #: include/classes/api/services/CHostBase.php:49
 #: include/classes/api/services/CHostGeneral.php:56
 #: include/classes/api/services/CHostGroup.php:770
@@ -12121,16 +12120,16 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CHostInterface.php:585
 #: include/classes/api/services/CHostInterface.php:859
 #: include/classes/api/services/CHostInterface.php:888
-#: include/classes/api/services/CHost.php:1387
-#: include/classes/api/services/CHost.php:1422
-#: include/classes/api/services/CHost.php:2045
-#: include/classes/api/services/CHost.php:2177
+#: include/classes/api/services/CHost.php:1396
+#: include/classes/api/services/CHost.php:1431
+#: include/classes/api/services/CHost.php:2054
+#: include/classes/api/services/CHost.php:2186
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1081
-#: include/classes/api/services/CHostPrototype.php:1103
-#: include/classes/api/services/CHostPrototype.php:1137
+#: include/classes/api/services/CHostPrototype.php:1086
+#: include/classes/api/services/CHostPrototype.php:1108
+#: include/classes/api/services/CHostPrototype.php:1142
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12141,11 +12140,11 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CImage.php:419
 #: include/classes/api/services/CImage.php:471
 #: include/classes/api/services/CImage.php:493
-#: include/classes/api/services/CItemGeneral.php:201
-#: include/classes/api/services/CItemGeneral.php:303
-#: include/classes/api/services/CItemGeneral.php:318
-#: include/classes/api/services/CItem.php:746
-#: include/classes/api/services/CItemPrototype.php:906
+#: include/classes/api/services/CItemGeneral.php:215
+#: include/classes/api/services/CItemGeneral.php:317
+#: include/classes/api/services/CItemGeneral.php:332
+#: include/classes/api/services/CItem.php:760
+#: include/classes/api/services/CItemPrototype.php:917
 #: include/classes/api/services/CMaintenance.php:263
 #: include/classes/api/services/CMaintenance.php:292
 #: include/classes/api/services/CMaintenance.php:305
@@ -12179,18 +12178,18 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CScript.php:631
 #: include/classes/api/services/CService.php:988
 #: include/classes/api/services/CService.php:1012
-#: include/classes/api/services/CTask.php:425
-#: include/classes/api/services/CTask.php:492
-#: include/classes/api/services/CTemplate.php:846
+#: include/classes/api/services/CTask.php:427
+#: include/classes/api/services/CTask.php:474
+#: include/classes/api/services/CTemplate.php:847
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:961
-#: include/classes/api/services/CTrigger.php:645
-#: include/classes/api/services/CTrigger.php:692
-#: include/classes/api/services/CTrigger.php:726
-#: include/classes/api/services/CTrigger.php:819
+#: include/classes/api/services/CTrigger.php:653
+#: include/classes/api/services/CTrigger.php:700
+#: include/classes/api/services/CTrigger.php:734
+#: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
 #: include/classes/api/services/CTriggerPrototype.php:700
 #: include/classes/api/services/CTriggerPrototype.php:718
@@ -12207,7 +12206,7 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
 #: include/classes/screens/CScreenLldGraph.php:51 include/func.inc.php:1507
-#: items.php:1461 items.php:1665 services.php:84
+#: items.php:1461 items.php:1660 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Không có quyền truy cập vào đối tượng được gọi hoặc nó không tồn tại!"
 
@@ -12216,7 +12215,7 @@ msgstr "Không có quyền truy cập vào đối tượng được gọi
 msgid "No private key file specified for action operation command \"%1$s\"."
 msgstr "Không có tập tin khóa riêng được chỉ định cho lệnh thao tác \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:509
+#: include/classes/api/services/CItemGeneral.php:523
 msgid "No private key file specified."
 msgstr "Không quy định khóa tập tin riêng."
 
@@ -12229,7 +12228,7 @@ msgstr "Không có proxy"
 msgid "No public key file specified for action operation command \"%1$s\"."
 msgstr "Không có tập tin khóa công khai nào được chỉ định cho lệnh thao tác \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:506
+#: include/classes/api/services/CItemGeneral.php:520
 msgid "No public key file specified."
 msgstr "Không quy định được khóa tập tin công khai."
 
@@ -12284,9 +12283,9 @@ msgstr "Không có cờ boolean bị phản đối."
 #: app/views/monitoring.problem.view.php:280
 #: app/views/monitoring.problem.view.php:291
 #: app/views/monitoring.problem.view.php:308
-#: include/classes/widgets/CWidgetHelper.php:751
-#: include/classes/widgets/CWidgetHelper.php:826
-#: include/classes/widgets/CWidgetHelper.php:1086
+#: include/classes/widgets/CWidgetHelper.php:765
+#: include/classes/widgets/CWidgetHelper.php:840
+#: include/classes/widgets/CWidgetHelper.php:1100
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:140
 #: include/classes/widgets/forms/CWidgetFormProblems.php:118
 #: include/classes/widgets/forms/CWidgetFormProblems.php:140
@@ -12313,7 +12312,7 @@ msgstr "Không có"
 #: app/views/popup.generic.php:530 include/graphs.inc.php:24
 #: include/items.inc.php:156 include/triggers.inc.php:1217
 #: include/views/configuration.triggers.list.php:71
-#: include/views/monitoring.history.php:253
+#: include/views/monitoring.history.php:256
 msgid "Normal"
 msgstr "Bình thường"
 
@@ -12336,7 +12335,7 @@ msgstr "Không báo nhận"
 msgid "Not all results are displayed. Please provide more specific search criteria."
 msgstr "Không phải tất cả các kết quả được hiển thị. Vui lòng cung cấp các tiêu chí tìm kiếm cụ thể hơn."
 
-#: include/classes/api/services/CTrigger.php:1041
+#: include/classes/api/services/CTrigger.php:1049
 #: include/classes/api/services/CTriggerPrototype.php:859
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
@@ -12472,7 +12471,7 @@ msgstr "Số lượng nhánh bộ xử lý trên VMware hypervisor, <url> 
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Số lượng bộ xử lý trên máy ảo VMware, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:286
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
 msgstr "Số lượng hàng"
 
@@ -12761,11 +12760,11 @@ msgstr "Chỉ quản trị viên mới có thể đặt chủ sở hữu slide s
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Chỉ các item được gán đến host đã kích hoạt mới được tính"
 
-#: include/classes/api/services/CItemGeneral.php:1444
+#: include/classes/api/services/CItemGeneral.php:1458
 msgid "Only one Prometheus step is allowed."
 msgstr "Chỉ một bước Prometheus được cho phép."
 
-#: include/classes/api/services/CItemGeneral.php:1412
+#: include/classes/api/services/CItemGeneral.php:1426
 msgid "Only one change step is allowed."
 msgstr "Chỉ một bước thay đổi được cho phép."
 
@@ -12773,8 +12772,8 @@ msgstr "Chỉ một bước thay đổi được cho phép."
 msgid "Only one check can be unique."
 msgstr "Chỉ một kiểm tra có thể là duy nhất."
 
-#: include/classes/api/services/CItemGeneral.php:1389
-#: include/classes/api/services/CItemGeneral.php:1434
+#: include/classes/api/services/CItemGeneral.php:1403
+#: include/classes/api/services/CItemGeneral.php:1448
 msgid "Only one throttling step is allowed."
 msgstr "Chỉ một bước tiết lưu được cho phép."
 
@@ -12909,7 +12908,7 @@ msgstr "Tùy chọn"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:81
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:81
 #: include/classes/widgets/forms/CWidgetFormProblems.php:96
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:371
 #: include/triggers.inc.php:1290
 #: include/views/configuration.action.edit.php:121
 #: include/views/configuration.correlation.edit.php:113
@@ -13059,7 +13058,7 @@ msgstr "Ưu tiên chu kỳ item"
 msgid "Override with name \"%1$s\" already exists."
 msgstr "Ghi đè với tên \"%1$s\" đã tồn tại."
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:409
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:402
 #: include/classes/widgets/views/widget.svggraph.form.view.php:294
 #: include/views/configuration.host.discovery.edit.php:756
 #: include/views/configuration.host.discovery.edit.php:772
@@ -13316,7 +13315,7 @@ msgid "Parameter \"%1$s\" is deprecated."
 msgstr "Tham số \"%1$s\" được yêu cầu."
 
 #: app/views/administration.mediatype.edit.php:211
-#: include/classes/debug/CProfiler.php:182 include/forms.inc.php:1222
+#: include/classes/debug/CProfiler.php:182 include/forms.inc.php:1227
 msgid "Parameters"
 msgstr "Tham số"
 
@@ -13548,24 +13547,24 @@ msgstr "Vui lòng nhập tên máy chủ hoặc địa chỉ IP máy chủ và s
 msgid "Please select two elements"
 msgstr "Xin vui lòng lựa chọn 2 phần tử"
 
-#: include/classes/widgets/CWidgetHelper.php:749
-#: include/classes/widgets/CWidgetHelper.php:815
-#: include/classes/widgets/CWidgetHelper.php:816
-#: include/classes/widgets/CWidgetHelper.php:817
-#: include/classes/widgets/CWidgetHelper.php:818
-#: include/classes/widgets/CWidgetHelper.php:819
-#: include/classes/widgets/CWidgetHelper.php:820
-#: include/classes/widgets/CWidgetHelper.php:821
-#: include/classes/widgets/CWidgetHelper.php:822
-#: include/classes/widgets/CWidgetHelper.php:823
-#: include/classes/widgets/CWidgetHelper.php:824
-#: include/classes/widgets/CWidgetHelper.php:1050
+#: include/classes/widgets/CWidgetHelper.php:763
+#: include/classes/widgets/CWidgetHelper.php:829
+#: include/classes/widgets/CWidgetHelper.php:830
+#: include/classes/widgets/CWidgetHelper.php:831
+#: include/classes/widgets/CWidgetHelper.php:832
+#: include/classes/widgets/CWidgetHelper.php:833
+#: include/classes/widgets/CWidgetHelper.php:834
+#: include/classes/widgets/CWidgetHelper.php:835
+#: include/classes/widgets/CWidgetHelper.php:836
+#: include/classes/widgets/CWidgetHelper.php:837
+#: include/classes/widgets/CWidgetHelper.php:838
+#: include/classes/widgets/CWidgetHelper.php:1064
 msgid "Point size"
 msgstr "Kích cỡ điểm"
 
-#: include/classes/widgets/CWidgetHelper.php:744
-#: include/classes/widgets/CWidgetHelper.php:787
-#: include/classes/widgets/CWidgetHelper.php:1036
+#: include/classes/widgets/CWidgetHelper.php:758
+#: include/classes/widgets/CWidgetHelper.php:801
+#: include/classes/widgets/CWidgetHelper.php:1050
 #: include/views/js/monitoring.sysmaps.js.php:416
 msgid "Points"
 msgstr "Điểm"
@@ -13747,7 +13746,7 @@ msgstr "Cấp đặc quyền"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:76
 #: include/classes/widgets/forms/CWidgetFormProblems.php:204
 #: include/classes/widgets/forms/CWidgetFormProblems.php:205
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:356
 #: include/views/configuration.item.list.php:172
 #: include/views/configuration.trigger.prototype.list.php:152
 #: include/views/configuration.triggers.list.php:86
@@ -13772,7 +13771,7 @@ msgid "Problem expression"
 msgstr "Biểu thức vấn đề"
 
 #: include/classes/widgets/CWidgetConfig.php:46
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:331
 msgid "Problem hosts"
 msgstr "Vấn đề máy chủ"
 
@@ -14105,8 +14104,8 @@ msgstr "Sự phục hồi"
 msgid "Recovery expression"
 msgstr "Biểu thức phục hồi"
 
-#: include/forms.inc.php:1895 include/forms.inc.php:1901
-#: include/forms.inc.php:1910
+#: include/forms.inc.php:1903 include/forms.inc.php:1909
+#: include/forms.inc.php:1918
 msgid "Recovery expression syntax error."
 msgstr "Phục hồi lỗi cú pháp biểu thức."
 
@@ -14242,9 +14241,9 @@ msgstr "Lệnh từ xa"
 #: app/views/monitoring.problem.view.php:262
 #: app/views/popup.lldoperation.php:152 app/views/popup.lldoverride.php:136
 #: app/views/popup.media.php:45 app/views/popup.media.php:110
-#: include/classes/widgets/CWidgetHelper.php:490
-#: include/classes/widgets/CWidgetHelper.php:534 include/forms.inc.php:1454
-#: include/forms.inc.php:1983 include/views/configuration.action.edit.php:94
+#: include/classes/widgets/CWidgetHelper.php:504
+#: include/classes/widgets/CWidgetHelper.php:548 include/forms.inc.php:1459
+#: include/forms.inc.php:1991 include/views/configuration.action.edit.php:94
 #: include/views/configuration.action.edit.php:268
 #: include/views/configuration.action.edit.php:296
 #: include/views/configuration.action.edit.php:382
@@ -14429,7 +14428,7 @@ msgstr "Yêu cầu nội dung"
 msgid "Request body type"
 msgstr "Yêu cầu kiểu nội dung"
 
-#: host_discovery.php:388 host_discovery.php:721 items.php:868 items.php:1369
+#: host_discovery.php:403 host_discovery.php:736 items.php:868 items.php:1369
 msgid "Request sent successfully"
 msgstr "Yêu cầu gửi thành công"
 
@@ -14661,9 +14660,9 @@ msgstr "Trả về tỉ lệ mất gói tin ping ICMP."
 msgid "Revert changes"
 msgstr "Hoàn nguyên thay đổi"
 
-#: include/classes/widgets/CWidgetHelper.php:756
-#: include/classes/widgets/CWidgetHelper.php:831
-#: include/classes/widgets/CWidgetHelper.php:1099
+#: include/classes/widgets/CWidgetHelper.php:770
+#: include/classes/widgets/CWidgetHelper.php:845
+#: include/classes/widgets/CWidgetHelper.php:1113
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/configuration.graph.edit.js.php:148
 #: include/views/js/monitoring.sysmaps.js.php:36
@@ -14674,10 +14673,10 @@ msgstr "Hoàn nguyên thay đổi"
 msgid "Right"
 msgstr "Bên phải"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:187
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:215
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:193
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 msgid "Right Y"
 msgstr "Trục phải Y"
 
@@ -14851,7 +14850,7 @@ msgstr "SNMP interfaces"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: include/classes/api/services/CItemGeneral.php:525
+#: include/classes/api/services/CItemGeneral.php:539
 msgid "SNMP trap key is invalid."
 msgstr "Khóa SNMP trap là không hợp lệ."
 
@@ -14903,12 +14902,12 @@ msgstr "Đếm SQL: %1$s (chọn: %2$s | thực thi: %3$s)"
 msgid "SQL query"
 msgstr "Truy vấn SQL"
 
-#: include/classes/db/DB.php:881
+#: include/classes/db/DB.php:869
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "Thực hiện câu lệnh SQL đã thất bại \"%1$s\""
 
-#: include/classes/db/DB.php:549 include/classes/db/DB.php:608
+#: include/classes/db/DB.php:537 include/classes/db/DB.php:596
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Thực hiện câu lệnh SQL đã thất bại \"%1$s\"."
@@ -15251,8 +15250,8 @@ msgstr "Tên bảo mật"
 #: app/views/popup.condition.common.php:398 app/views/popup.generic.php:646
 #: app/views/popup.services.php:132 app/views/popup.triggerexpr.php:73
 #: include/classes/html/CMultiSelect.php:86
-#: include/classes/widgets/CWidgetHelper.php:357
-#: include/classes/widgets/CWidgetHelper.php:573 include/forms.inc.php:260
+#: include/classes/widgets/CWidgetHelper.php:371
+#: include/classes/widgets/CWidgetHelper.php:587 include/forms.inc.php:260
 #: include/views/configuration.graph.edit.php:202
 #: include/views/configuration.graph.edit.php:289
 #: include/views/configuration.item.edit.php:96
@@ -15303,7 +15302,7 @@ msgstr "Đã chọn liên kết bị xóa"
 msgid "Selected elements"
 msgstr "Các phần tử đã chọn"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:325
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:318
 msgid "Selected items only"
 msgstr "Chỉ item được chọn"
 
@@ -15504,12 +15503,12 @@ msgstr "Các dịch vụ tạo thành một quan hệ phụ thuộc vòng 
 msgid "Session terminated, re-login, please."
 msgstr "Kết thúc phiên làm việc, hãy đăng nhập lại."
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:74
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:67
 msgid "Set custom time period"
 msgstr "Đặt chu kỳ thời gian tùy chỉnh"
 
 #: app/controllers/CControllerPopupItemTestSend.php:395
-#: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1410
+#: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1415
 #: include/views/js/item.preprocessing.js.php:68
 msgid "Set error to"
 msgstr "Đặt lỗi thành"
@@ -15522,7 +15521,7 @@ msgstr "Đặt chế độ kiểm kê máy chủ"
 msgid "Set new value"
 msgstr "Thiết lập giá trị mới"
 
-#: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1409
+#: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1414
 #: include/views/js/item.preprocessing.js.php:67
 msgid "Set value to"
 msgstr "Thiết lập giá trị cho"
@@ -15556,7 +15555,7 @@ msgstr "Cài đặt LDAP tham chiếu đến \"Off\" thất bại."
 #: include/classes/widgets/forms/CWidgetFormProblems.php:85
 #: include/classes/widgets/forms/CWidgetFormProblems.php:202
 #: include/classes/widgets/forms/CWidgetFormProblems.php:203
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:344
 #: include/events.inc.php:164 include/triggers.inc.php:1195
 #: include/views/configuration.item.list.php:144
 #: include/views/configuration.trigger.prototype.edit.php:76
@@ -15634,15 +15633,15 @@ msgstr "Rút ngắn"
 #: app/views/monitoring.problem.view.php:96
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:102
 #: include/classes/widgets/forms/CWidgetFormProblems.php:33
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:187
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:259
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:31
 #: include/views/js/monitoring.sysmaps.js.php:100 report2.php:542
 msgid "Show"
 msgstr "Hiển thị"
 
-#: app/views/monitoring.latest.view.php:110
+#: app/views/monitoring.latest.view.php:111
 #: app/views/monitoring.problem.view.php:333
 msgid "Show details"
 msgstr "Hiển thị chi tiết"
@@ -15663,7 +15662,7 @@ msgstr "Hiển thị các item không có dữ liệu"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:74
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:74
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:273
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:266
 #: include/views/configuration.graph.edit.php:109
 msgid "Show legend"
 msgstr "Hiển thị chú thích"
@@ -15684,7 +15683,7 @@ msgstr "Hiển thị các dòng"
 msgid "Show operational data"
 msgstr "Hiển thị dữ liệu hoạt động"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:306
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:299
 msgid "Show problems"
 msgstr "Hiển thị vấn đề"
 
@@ -16007,7 +16006,7 @@ msgstr "Tập lệnh được chỉ định không tồn tại hoặc bạn
 msgid "Specify host to see the graphs."
 msgstr "Chỉ định máy chủ để xem các biểu đồ."
 
-#: app/views/popup.generic.php:166 include/views/monitoring.history.php:292
+#: app/views/popup.generic.php:166 include/views/monitoring.history.php:295
 msgid "Specify some filter condition to see the values."
 msgstr "Chỉ định một số điều kiện lọc để xem các giá trị."
 
@@ -16016,13 +16015,13 @@ msgid "Speed"
 msgstr "Tốc độ"
 
 #: app/views/popup.generic.php:521 include/graphs.inc.php:25
-#: include/views/monitoring.history.php:254
+#: include/views/monitoring.history.php:257
 msgid "Stacked"
 msgstr "Xếp chồng"
 
-#: include/classes/widgets/CWidgetHelper.php:745
-#: include/classes/widgets/CWidgetHelper.php:788
-#: include/classes/widgets/CWidgetHelper.php:1037
+#: include/classes/widgets/CWidgetHelper.php:759
+#: include/classes/widgets/CWidgetHelper.php:802
+#: include/classes/widgets/CWidgetHelper.php:1051
 msgid "Staircase"
 msgstr "Staircase"
 
@@ -16050,8 +16049,8 @@ msgstr "Thời gian bắt đầu khởi động của máy chủ Zabbix, U
 msgid "State"
 msgstr "Tình trạng"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:158
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:230
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:151
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:223
 msgctxt "history source selection method"
 msgid "Static"
 msgstr "Tĩnh"
@@ -16436,7 +16435,7 @@ msgstr "Thẻ giá trị"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:79
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:79
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:369
 #: include/events.inc.php:234 include/views/configuration.host.edit.php:358
 #: include/views/configuration.host.list.php:170
 #: include/views/configuration.host.list.php:198
@@ -16490,16 +16489,16 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Template"
 
-#: include/classes/api/services/CHost.php:1109
-#: include/classes/api/services/CTemplate.php:486
+#: include/classes/api/services/CHost.php:1118
+#: include/classes/api/services/CTemplate.php:487
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Mẫu \"%1$s\" đã tồn tại."
 
 #: include/classes/api/services/CHostGroup.php:1546
-#: include/classes/api/services/CTemplate.php:420
-#: include/classes/api/services/CTemplate.php:1088
+#: include/classes/api/services/CTemplate.php:421
+#: include/classes/api/services/CTemplate.php:1089
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "Mẫu \"%1$s\" không thể nằm ngoài nhóm máy chủ."
@@ -16563,17 +16562,17 @@ msgstr "Template đã được cập nhật"
 msgid "Template value"
 msgstr "Giá trị mẫu"
 
-#: include/classes/api/services/CHost.php:2136
-#: include/classes/api/services/CHost.php:2381
-#: include/classes/api/services/CTemplate.php:1143
+#: include/classes/api/services/CHost.php:2145
+#: include/classes/api/services/CHost.php:2390
+#: include/classes/api/services/CTemplate.php:1144
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Template với cùng một tên \"%1$s\" đã tồn tại."
 
-#: include/classes/api/services/CHost.php:2142
-#: include/classes/api/services/CHost.php:2389
-#: include/classes/api/services/CTemplate.php:509
-#: include/classes/api/services/CTemplate.php:1108
+#: include/classes/api/services/CHost.php:2151
+#: include/classes/api/services/CHost.php:2398
+#: include/classes/api/services/CTemplate.php:510
+#: include/classes/api/services/CTemplate.php:1109
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Template với cùng tên hiển thị \"%1$s\" đã tồn tại."
@@ -16615,7 +16614,7 @@ msgstr "Các mẫu đã được cập nhật"
 #: app/views/js/popup.itemtestedit.view.js.php:508
 #: app/views/popup.itemtestedit.view.php:314
 #: app/views/popup.mediatypetest.edit.php:99
-#: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1450
+#: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1455
 #: include/views/configuration.host.discovery.edit.php:790
 #: include/views/configuration.host.discovery.edit.php:801
 #: include/views/configuration.item.edit.php:880
@@ -16630,7 +16629,7 @@ msgstr "Các mẫu đã được cập nhật"
 msgid "Test"
 msgstr "Kiểm tra"
 
-#: include/forms.inc.php:1480
+#: include/forms.inc.php:1485
 msgid "Test all steps"
 msgstr "Kiểm tra tất cả các bước"
 
@@ -16936,9 +16935,9 @@ msgstr "Chu kỳ thời gian"
 #: app/controllers/CControllerPopupTriggerExpr.php:169
 #: app/controllers/CControllerPopupTriggerExpr.php:183
 #: app/controllers/CControllerPopupTriggerExpr.php:212
-#: include/classes/widgets/CWidgetHelper.php:757
-#: include/classes/widgets/CWidgetHelper.php:833
-#: include/classes/widgets/CWidgetHelper.php:1102
+#: include/classes/widgets/CWidgetHelper.php:771
+#: include/classes/widgets/CWidgetHelper.php:847
+#: include/classes/widgets/CWidgetHelper.php:1116
 msgid "Time shift"
 msgstr "Di chuyển mốc thời gian"
 
@@ -16967,12 +16966,12 @@ msgstr "Hết giờ"
 #: include/classes/screens/CScreenHistory.php:449
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:53
-#: include/views/monitoring.history.php:288
+#: include/views/monitoring.history.php:291
 msgid "Timestamp"
 msgstr "Nhãn thời gian"
 
 #: include/classes/html/CFilter.php:290
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:98
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:91
 #: include/views/js/monitoring.sysmaps.js.php:732
 msgid "To"
 msgstr "Đến"
@@ -17047,19 +17046,19 @@ msgstr "Chuyển đổi kết quả truy vấn SQL thành một mảng JSON đ�
 msgid "Transform SQL query result into a JSON array."
 msgstr "Chuyển đổi kết quả truy vấn SQL thành một mảng JSON."
 
-#: include/classes/widgets/CWidgetHelper.php:747
-#: include/classes/widgets/CWidgetHelper.php:791
-#: include/classes/widgets/CWidgetHelper.php:792
-#: include/classes/widgets/CWidgetHelper.php:793
-#: include/classes/widgets/CWidgetHelper.php:794
-#: include/classes/widgets/CWidgetHelper.php:795
-#: include/classes/widgets/CWidgetHelper.php:796
-#: include/classes/widgets/CWidgetHelper.php:797
-#: include/classes/widgets/CWidgetHelper.php:798
-#: include/classes/widgets/CWidgetHelper.php:799
-#: include/classes/widgets/CWidgetHelper.php:800
-#: include/classes/widgets/CWidgetHelper.php:801
-#: include/classes/widgets/CWidgetHelper.php:1058
+#: include/classes/widgets/CWidgetHelper.php:761
+#: include/classes/widgets/CWidgetHelper.php:805
+#: include/classes/widgets/CWidgetHelper.php:806
+#: include/classes/widgets/CWidgetHelper.php:807
+#: include/classes/widgets/CWidgetHelper.php:808
+#: include/classes/widgets/CWidgetHelper.php:809
+#: include/classes/widgets/CWidgetHelper.php:810
+#: include/classes/widgets/CWidgetHelper.php:811
+#: include/classes/widgets/CWidgetHelper.php:812
+#: include/classes/widgets/CWidgetHelper.php:813
+#: include/classes/widgets/CWidgetHelper.php:814
+#: include/classes/widgets/CWidgetHelper.php:815
+#: include/classes/widgets/CWidgetHelper.php:1072
 msgid "Transparency"
 msgstr "Công khai"
 
@@ -17067,9 +17066,9 @@ msgstr "Công khai"
 msgid "Transport error."
 msgstr "Lỗi đường truyền."
 
-#: include/classes/widgets/CWidgetHelper.php:753
-#: include/classes/widgets/CWidgetHelper.php:828
-#: include/classes/widgets/CWidgetHelper.php:1090
+#: include/classes/widgets/CWidgetHelper.php:767
+#: include/classes/widgets/CWidgetHelper.php:842
+#: include/classes/widgets/CWidgetHelper.php:1104
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "Coi là 0"
@@ -17090,7 +17089,7 @@ msgstr "Khuynh hướng chu kỳ lưu trữ dữ liệu"
 
 #: app/partials/monitoring.latest.view.html.php:61
 #: app/views/administration.housekeeping.edit.php:139
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:50
 #: include/forms.inc.php:297 include/forms.inc.php:719
 #: include/views/configuration.item.list.php:71
 #: include/views/configuration.item.prototype.list.php:60 items.php:262
@@ -17141,7 +17140,7 @@ msgstr "Hành động kích hoạt"
 msgid "Trigger added"
 msgstr "Trigger được thêm vào"
 
-#: include/classes/api/services/CTrigger.php:1084
+#: include/classes/api/services/CTrigger.php:1092
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Trigger không thể phụ thuộc vào một trigger mà được kế thừa từ nó."
 
@@ -17354,7 +17353,7 @@ msgstr "Thứ ba"
 msgid "Turkish (tr_TR)"
 msgstr "Turkish (tr_TR)"
 
-#: include/classes/api/services/CItem.php:997
+#: include/classes/api/services/CItem.php:1011
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Hai item (\"%1$s\" và \"%2$s\") không thể gắn vào một trường host còn lại \"%3$s\", điều này sẽ dẫn đến một cuộc xung đột."
@@ -17448,7 +17447,7 @@ msgstr "Kiểu tính toán"
 msgid "Type of information"
 msgstr "Kiểu thông tin"
 
-#: include/classes/api/services/CItemGeneral.php:422
+#: include/classes/api/services/CItemGeneral.php:436
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr "Loại thông tin phải là \"Số (unsigned)\" hoặc \"Số (float)\" cho các item tổng hợp."
 
@@ -17530,11 +17529,11 @@ msgstr "URLs"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainian (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:192
+#: include/classes/core/CConfigFile.php:200
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:202
+#: include/classes/core/CConfigFile.php:209
 msgid "Unable to create the configuration file."
 msgstr "Không thể tạo tập tin cấu hình."
 
@@ -17545,7 +17544,7 @@ msgstr "Không thể tạo tập tin cấu hình."
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr "Không thể xác định phiên bản database hiện tại: %1$s."
 
-#: include/classes/core/CConfigFile.php:198
+#: include/classes/core/CConfigFile.php:205
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Không thể ghi đè lên tệp cấu hình hiện có."
 
@@ -17592,8 +17591,8 @@ msgstr "Bỏ chặn các người dùng được lựa chọn?"
 msgid "Unexpected response for action %1$s."
 msgstr "Phản ứng bất ngờ cho hành động %1$s."
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:228
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:149
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:221
 #: include/views/configuration.item.edit.php:574
 #: include/views/configuration.item.massupdate.php:182
 #: include/views/configuration.item.prototype.edit.php:549
@@ -17756,7 +17755,7 @@ msgstr "Hành động không được hỗ trợ."
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr "Không hỗ trợ tham số \"%2$s\" cho một điều kiện lọc cho hoạt động \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1792
+#: include/classes/api/services/CDiscoveryRule.php:1802
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
 msgstr "Tham số không được hỗ trợ \"%2$s\" cho điều kiện lọc của quy tắc dò tìm \"%1$s\"."
@@ -17766,7 +17765,7 @@ msgstr "Tham số không được hỗ trợ \"%2$s\" cho điều kiện lọc c
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr "Tham số không được hỗ trợ \"%2$s\" cho bộ lọc hoạt động \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1760
+#: include/classes/api/services/CDiscoveryRule.php:1770
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "Tham số không được hỗ trợ \"%2$s\" cho bộ lọc quy tắc dò tìm \"%1$s\"."
@@ -17869,7 +17868,7 @@ msgstr "Cập nhật thao tác"
 msgid "Update problem"
 msgstr "Cập nhật vấn đề"
 
-#: include/classes/api/services/CHost.php:1355
+#: include/classes/api/services/CHost.php:1364
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "Cập nhật trạng thái của máy chủ \"%1$s\"."
@@ -18478,7 +18477,7 @@ msgstr "Thẩm định"
 #: include/views/configuration.triggers.list.php:197
 #: include/views/configuration.triggers.massupdate.php:90
 #: include/views/monitoring.history.php:161
-#: include/views/monitoring.history.php:290
+#: include/views/monitoring.history.php:293
 #, c-format
 msgid "Value"
 msgstr "Giá trị"
@@ -18661,7 +18660,7 @@ msgstr "Kích thước không gian ảo tính bằng byte hoặc theo tỷ lệ 
 msgid "Visible name"
 msgstr "Tên hiển thị"
 
-#: include/classes/api/services/CHost.php:2287
+#: include/classes/api/services/CHost.php:2296
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Tên hiển thị không thể bị trống nếu tên host bị lỗi."
 
@@ -18798,19 +18797,19 @@ msgstr "Khi hoạt động"
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widget quá nhỏ so với số lượng cột và hàng được chỉ định."
 
-#: graphs.php:44 include/classes/widgets/CWidgetHelper.php:741
-#: include/classes/widgets/CWidgetHelper.php:774
-#: include/classes/widgets/CWidgetHelper.php:775
-#: include/classes/widgets/CWidgetHelper.php:776
-#: include/classes/widgets/CWidgetHelper.php:777
-#: include/classes/widgets/CWidgetHelper.php:778
-#: include/classes/widgets/CWidgetHelper.php:779
-#: include/classes/widgets/CWidgetHelper.php:780
-#: include/classes/widgets/CWidgetHelper.php:781
-#: include/classes/widgets/CWidgetHelper.php:782
-#: include/classes/widgets/CWidgetHelper.php:783
-#: include/classes/widgets/CWidgetHelper.php:784
-#: include/classes/widgets/CWidgetHelper.php:1042
+#: graphs.php:44 include/classes/widgets/CWidgetHelper.php:755
+#: include/classes/widgets/CWidgetHelper.php:788
+#: include/classes/widgets/CWidgetHelper.php:789
+#: include/classes/widgets/CWidgetHelper.php:790
+#: include/classes/widgets/CWidgetHelper.php:791
+#: include/classes/widgets/CWidgetHelper.php:792
+#: include/classes/widgets/CWidgetHelper.php:793
+#: include/classes/widgets/CWidgetHelper.php:794
+#: include/classes/widgets/CWidgetHelper.php:795
+#: include/classes/widgets/CWidgetHelper.php:796
+#: include/classes/widgets/CWidgetHelper.php:797
+#: include/classes/widgets/CWidgetHelper.php:798
+#: include/classes/widgets/CWidgetHelper.php:1056
 #: include/views/configuration.graph.edit.php:91
 #: include/views/configuration.graph.list.php:137
 #: include/views/js/monitoring.sysmaps.js.php:117
@@ -18832,7 +18831,7 @@ msgstr "Thu thập dữ liệu"
 msgid "With dependencies"
 msgstr "Với sự phụ thuộc"
 
-#: include/forms.inc.php:1366 include/views/js/item.preprocessing.js.php:215
+#: include/forms.inc.php:1371 include/views/js/item.preprocessing.js.php:215
 msgid "With header row"
 msgstr "Với dòng tiêu đề"
 
@@ -18890,8 +18889,8 @@ msgstr "Tên lớp Module.php bị sai cho mô-đun đặt tại %1$s."
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Những trường không đúng đối với quan hệ phụ thuộc cho dịch vụ \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1967
-#: include/classes/api/services/CHost.php:2165
+#: include/classes/api/services/CHost.php:1976
+#: include/classes/api/services/CHost.php:2174
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Các trường sai cho máy chủ \"%1$s\"."
@@ -18929,7 +18928,7 @@ msgstr "Giá trị sai cho trường url."
 msgid "X"
 msgstr "X"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:259
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
 msgid "X-Axis"
 msgstr "Trục X"
 
@@ -18957,11 +18956,11 @@ msgstr "Dữ liệu XML"
 msgid "XML is empty"
 msgstr "XML trống"
 
-#: include/classes/api/services/CItemGeneral.php:2322
+#: include/classes/api/services/CItemGeneral.php:2336
 msgid "XML is expected"
 msgstr "XML được kỳ vọng"
 
-#: include/forms.inc.php:1287 include/views/js/item.preprocessing.js.php:141
+#: include/forms.inc.php:1292 include/views/js/item.preprocessing.js.php:141
 msgid "XPath"
 msgstr "XPath"
 
@@ -18974,8 +18973,8 @@ msgstr "Y"
 msgid "Y axis MAX value"
 msgstr "Giá trị cực đại của trục Y"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:484
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:500
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:477
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:493
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr "Giá trị lớn nhất của trục Y phải lớn hơn giá trị nhỏ nhất của trục Y"
 
@@ -18992,10 +18991,10 @@ msgstr "Giá trị cực tiểu trục Y"
 msgid "Y axis side"
 msgstr "Trục bên Y"
 
-#: include/classes/widgets/CWidgetHelper.php:754
-#: include/classes/widgets/CWidgetHelper.php:830
-#: include/classes/widgets/CWidgetHelper.php:831
-#: include/classes/widgets/CWidgetHelper.php:1096
+#: include/classes/widgets/CWidgetHelper.php:768
+#: include/classes/widgets/CWidgetHelper.php:844
+#: include/classes/widgets/CWidgetHelper.php:845
+#: include/classes/widgets/CWidgetHelper.php:1110
 msgid "Y-axis"
 msgstr "Trục Y"
 
@@ -19111,8 +19110,8 @@ msgstr "Bạn đã không chỉ định mục tiêu cho kịch bản toàn cầu
 
 #: include/classes/api/services/CAuditLog.php:75
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:947
-#: include/classes/api/services/CHost.php:1012
+#: include/classes/api/services/CHost.php:956
+#: include/classes/api/services/CHost.php:1021
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:528
@@ -19127,11 +19126,11 @@ msgstr "Bạn đã không chỉ định mục tiêu cho kịch bản toàn cầu
 #: include/classes/api/services/CScript.php:560
 #: include/classes/api/services/CTask.php:44
 #: include/classes/api/services/CTask.php:244
-#: include/classes/api/services/CTemplate.php:449
-#: include/classes/api/services/CTemplate.php:605
-#: include/classes/api/services/CTemplate.php:641
-#: include/classes/api/services/CTemplate.php:1080
-#: include/classes/api/services/CTemplate.php:1186
+#: include/classes/api/services/CTemplate.php:450
+#: include/classes/api/services/CTemplate.php:606
+#: include/classes/api/services/CTemplate.php:642
+#: include/classes/api/services/CTemplate.php:1081
+#: include/classes/api/services/CTemplate.php:1187
 #: include/classes/api/services/CUserMacro.php:252
 #: include/classes/api/services/CUserMacro.php:352
 #: include/classes/api/services/CUserMacro.php:447
@@ -19337,9 +19336,9 @@ msgid "a number is too large"
 msgstr "một số là quá lớn"
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1272
-#: include/classes/api/services/CItemGeneral.php:1349
-#: include/classes/api/services/CItemGeneral.php:1359
+#: include/classes/api/services/CItemGeneral.php:1286
+#: include/classes/api/services/CItemGeneral.php:1363
+#: include/classes/api/services/CItemGeneral.php:1373
 #: include/classes/api/services/CScreen.php:394
 msgid "a numeric value is expected"
 msgstr "một giá trị số được mong đợi"
@@ -19421,8 +19420,8 @@ msgstr "tất cả media"
 
 #: include/classes/api/services/CDRule.php:467
 #: include/classes/api/services/CDRule.php:474
-#: include/classes/api/services/CItemGeneral.php:2262
-#: include/classes/api/services/CItemGeneral.php:2284
+#: include/classes/api/services/CItemGeneral.php:2276
+#: include/classes/api/services/CItemGeneral.php:2298
 #: include/classes/api/services/CModule.php:291
 #: include/classes/import/validators/C44XmlValidator.php:2133
 #: include/classes/import/validators/C44XmlValidator.php:2153
@@ -19455,7 +19454,7 @@ msgstr ""
 msgid "an empty string is expected"
 msgstr "một chuỗi trống dự kiến"
 
-#: include/classes/api/services/CHost.php:1904
+#: include/classes/api/services/CHost.php:1913
 #: include/classes/validators/CApiInputValidator.php:1019
 msgid "an even number of hexadecimal characters is expected"
 msgstr "một số lượng chẵn các ký tự thập lục phân được mong đợi"
@@ -19532,18 +19531,18 @@ msgstr "band() - Bitwise AND của giá trị T và mặt nạ cuối cùng (g�
 msgid "blinking"
 msgstr "nhấp nháy"
 
-#: include/classes/api/services/CItemGeneral.php:447
+#: include/classes/api/services/CItemGeneral.php:461
 msgid "both username and password should be either present or empty"
 msgstr "cả tên người dùng và mật khẩu đều phải có hoặc trống"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:142
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:214
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:120
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:135
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:192
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:207
 msgid "calculated"
 msgstr "tính toán"
 
-#: include/classes/api/services/CItemGeneral.php:209
+#: include/classes/api/services/CItemGeneral.php:223
 msgid "cannot be changed"
 msgstr "không thể thay đổi"
 
@@ -19575,7 +19574,7 @@ msgstr "không thể thay đổi"
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CCorrelation.php:1151
-#: include/classes/api/services/CDiscoveryRule.php:1933
+#: include/classes/api/services/CDiscoveryRule.php:1943
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:319
@@ -19583,21 +19582,21 @@ msgstr "không thể thay đổi"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:540
 #: include/classes/api/services/CEvent.php:812
-#: include/classes/api/services/CHost.php:1892
-#: include/classes/api/services/CHost.php:1898
-#: include/classes/api/services/CItemGeneral.php:440
-#: include/classes/api/services/CItemGeneral.php:467
-#: include/classes/api/services/CItemGeneral.php:473
-#: include/classes/api/services/CItemGeneral.php:479
-#: include/classes/api/services/CItemGeneral.php:518
-#: include/classes/api/services/CItemGeneral.php:1232
-#: include/classes/api/services/CItemGeneral.php:1256
-#: include/classes/api/services/CItemGeneral.php:1294
-#: include/classes/api/services/CItemGeneral.php:1309
-#: include/classes/api/services/CItemGeneral.php:1337
-#: include/classes/api/services/CItemGeneral.php:1457
-#: include/classes/api/services/CItemGeneral.php:1499
-#: include/classes/api/services/CItemGeneral.php:1616
+#: include/classes/api/services/CHost.php:1901
+#: include/classes/api/services/CHost.php:1907
+#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:481
+#: include/classes/api/services/CItemGeneral.php:487
+#: include/classes/api/services/CItemGeneral.php:493
+#: include/classes/api/services/CItemGeneral.php:532
+#: include/classes/api/services/CItemGeneral.php:1246
+#: include/classes/api/services/CItemGeneral.php:1270
+#: include/classes/api/services/CItemGeneral.php:1308
+#: include/classes/api/services/CItemGeneral.php:1323
+#: include/classes/api/services/CItemGeneral.php:1351
+#: include/classes/api/services/CItemGeneral.php:1471
+#: include/classes/api/services/CItemGeneral.php:1513
+#: include/classes/api/services/CItemGeneral.php:1630
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
@@ -19653,7 +19652,7 @@ msgstr "không thể thay đổi"
 msgid "cannot be empty"
 msgstr "không thể để trống"
 
-#: include/classes/api/services/CItemGeneral.php:2276
+#: include/classes/api/services/CItemGeneral.php:2290
 msgid "cannot convert to JSON, result value too long"
 msgstr "không thể chuyển đổi sang JSON, giá trị kết quả quá dài"
 
@@ -19661,7 +19660,7 @@ msgstr "không thể chuyển đổi sang JSON, giá trị kết quả quá dài
 msgid "cannot perform Scroll API request, data could be truncated"
 msgstr "không thể thực hiện yêu cầu API, dữ liệu có thể bị cắt ngắn"
 
-#: include/classes/api/services/CDiscoveryRule.php:1916
+#: include/classes/api/services/CDiscoveryRule.php:1926
 msgid "cannot update property for templated discovery rule"
 msgstr "không thể cập nhật thuộc tính cho mẫu quy tắc dò tìm"
 
@@ -19678,7 +19677,7 @@ msgstr "kiểm tra biểu thức bắt đầu từ \"%1$s\""
 msgid "circular dependency is not allowed"
 msgstr "vòng phụ thuộc thì không được phép"
 
-#: include/classes/api/services/CItemGeneral.php:1991
+#: include/classes/api/services/CItemGeneral.php:2005
 #: include/classes/import/CConfigurationImport.php:2848
 msgid "circular item dependency is not allowed"
 msgstr "phụ thuộc item không được phép"
@@ -19791,8 +19790,9 @@ msgid "discovery"
 msgstr "dò tìm"
 
 #: include/classes/api/services/CTask.php:449
-msgid "discovery rule is disabled"
-msgstr "quy tắc dò tìm bị vô hiệu hóa"
+#, c-format
+msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:126
 #, c-format
@@ -19847,8 +19847,8 @@ msgstr "thất bại trong việc phân tích JSON"
 msgid "first"
 msgstr "đầu tiên"
 
-#: include/classes/api/services/CItemGeneral.php:1317
-#: include/classes/api/services/CItemGeneral.php:1465
+#: include/classes/api/services/CItemGeneral.php:1331
+#: include/classes/api/services/CItemGeneral.php:1479
 msgid "first parameter is expected"
 msgstr "tham số đầu tiên được mong đợi"
 
@@ -19901,17 +19901,13 @@ msgstr "máy chủ"
 msgid "host group"
 msgstr "nhóm máy chủ"
 
-#: include/classes/api/services/CTask.php:470
-msgid "host is not monitored"
-msgstr "máy chủ không được theo dõi"
-
-#: include/classes/widgets/CWidgetHelper.php:616
-#: include/classes/widgets/CWidgetHelper.php:976
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
+#: include/classes/widgets/CWidgetHelper.php:630
+#: include/classes/widgets/CWidgetHelper.php:990
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:332
 msgid "host pattern"
 msgstr "mẫu máy chủ"
 
-#: include/classes/api/services/CItemGeneral.php:1974
+#: include/classes/api/services/CItemGeneral.php:1988
 msgid "hostid of dependent item and master item should match"
 msgstr "id máy chủ của item phụ thuộc và item chủ phải phù hợp"
 
@@ -19970,12 +19966,12 @@ msgctxt "event source"
 msgid "internal"
 msgstr "internal"
 
-#: include/classes/api/services/CItemGeneral.php:1478
+#: include/classes/api/services/CItemGeneral.php:1492
 msgid "invalid Prometheus output"
 msgstr "đầu ra Prometheus không hợp lệ"
 
-#: include/classes/api/services/CItemGeneral.php:1471
-#: include/classes/api/services/CItemGeneral.php:1486
+#: include/classes/api/services/CItemGeneral.php:1485
+#: include/classes/api/services/CItemGeneral.php:1500
 msgid "invalid Prometheus pattern"
 msgstr "mẫu Prometheus không hợp lệ"
 
@@ -20037,11 +20033,12 @@ msgid "item"
 msgstr "item"
 
 #: include/classes/api/services/CTask.php:450
-msgid "item is disabled"
-msgstr "item bị vô hiệu hóa"
+#, c-format
+msgid "item \"%1$s\" on host \"%2$s\" is not monitored"
+msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:636
-#: include/classes/widgets/CWidgetHelper.php:993
+#: include/classes/widgets/CWidgetHelper.php:650
+#: include/classes/widgets/CWidgetHelper.php:1007
 msgid "item pattern"
 msgstr "item mẫu"
 
@@ -20069,7 +20066,7 @@ msgstr "last() - Giá trị T cuối cùng (gần đây nhất)"
 msgid "left"
 msgstr "bên trái"
 
-#: include/forms.inc.php:1281 include/views/js/item.preprocessing.js.php:134
+#: include/forms.inc.php:1286 include/views/js/item.preprocessing.js.php:134
 msgid "list of characters"
 msgstr "danh sách kí tự"
 
@@ -20131,10 +20128,10 @@ msgstr "bản đồ"
 msgid "matches"
 msgstr "khớp với"
 
-#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1395
-#: include/classes/graphdraw/CPieGraphDraw.php:293 include/forms.inc.php:1306
+#: include/classes/graphdraw/CPieGraphDraw.php:293 include/forms.inc.php:1311
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:68
 #: include/views/js/configuration.graph.edit.js.php:139
@@ -20148,20 +20145,20 @@ msgstr "max"
 msgid "max() - Maximum value for period T"
 msgstr "max() - Giá trị tối đa cho giai đoạn T"
 
-#: include/classes/api/services/CItemGeneral.php:2085
+#: include/classes/api/services/CItemGeneral.php:2099
 msgid "maximum dependent items count reached"
 msgstr "số lượng phụ thuộc tối đa đạt đến"
 
-#: include/classes/api/services/CItemGeneral.php:2071
+#: include/classes/api/services/CItemGeneral.php:2085
 #: include/classes/import/CConfigurationImport.php:2796
 #: include/classes/import/CConfigurationImport.php:2863
 msgid "maximum number of dependency levels reached"
 msgstr "số lượng mức độ phụ thuộc tối đa đạt được"
 
-#: include/classes/api/services/CItemGeneral.php:1367
+#: include/classes/api/services/CItemGeneral.php:1381
 #: include/classes/graphdraw/CLineGraphDraw.php:1379
 #: include/classes/graphdraw/CLineGraphDraw.php:1392
-#: include/classes/graphdraw/CPieGraphDraw.php:289 include/forms.inc.php:1305
+#: include/classes/graphdraw/CPieGraphDraw.php:289 include/forms.inc.php:1310
 #: include/graphs.inc.php:76
 #: include/views/js/configuration.graph.edit.js.php:66
 #: include/views/js/configuration.graph.edit.js.php:137
@@ -20175,7 +20172,7 @@ msgstr "min"
 msgid "min() - Minimum value for period T"
 msgstr "min() - Giá trị tối thiểu cho giai đoạn T"
 
-#: include/classes/api/services/CHost.php:1910
+#: include/classes/api/services/CHost.php:1919
 #: include/classes/validators/CApiInputValidator.php:1013
 #, c-format
 msgid "minimum length is %1$s characters"
@@ -20228,7 +20225,7 @@ msgstr "tên"
 msgid "new"
 msgstr "mới"
 
-#: disc_prototypes.php:1302 disc_prototypes.php:1326 hosts.php:1389
+#: disc_prototypes.php:1297 disc_prototypes.php:1321 hosts.php:1389
 #: include/views/configuration.item.massupdate.php:417 templates.php:954
 msgctxt "new element in multiselect"
 msgid "new"
@@ -20243,12 +20240,12 @@ msgstr "không có dữ liệu"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr "nodata() - Không nhận được dữ liệu trong khoảng thời gian T (1 - đúng, 0 - sai), Chế độ (nghiêm ngặt - bỏ qua thời gian trễ proxy trong việc gửi dữ liệu)"
 
-#: include/classes/widgets/CWidgetHelper.php:1104 include/graphs.inc.php:74
+#: include/classes/widgets/CWidgetHelper.php:1118 include/graphs.inc.php:74
 msgid "none"
 msgstr "không"
 
-#: include/classes/api/services/CItemGeneral.php:2269
-#: include/classes/api/services/CItemGeneral.php:2291
+#: include/classes/api/services/CItemGeneral.php:2283
+#: include/classes/api/services/CItemGeneral.php:2305
 msgid "nonempty key and value pair expected"
 msgstr "cặp khóa và giá trị dự kiến không được để trống"
 
@@ -20264,7 +20261,7 @@ msgstr "không được chọn"
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Số giây kể từ Epoch"
 
-#: include/forms.inc.php:1273 include/views/js/item.preprocessing.js.php:126
+#: include/forms.inc.php:1278 include/views/js/item.preprocessing.js.php:126
 msgid "number"
 msgstr "số"
 
@@ -20325,12 +20322,12 @@ msgstr "chỉ cho phép một đơn vị thời gian"
 msgid "other"
 msgstr "khác"
 
-#: include/forms.inc.php:1299 include/views/js/item.preprocessing.js.php:156
+#: include/forms.inc.php:1304 include/views/js/item.preprocessing.js.php:156
 msgid "output"
 msgstr "đầu ra"
 
 #: app/views/popup.httpstep.php:173 app/views/popup.lldoperation.php:76
-#: include/forms.inc.php:1298 include/forms.inc.php:1312
+#: include/forms.inc.php:1303 include/forms.inc.php:1317
 #: include/views/js/item.preprocessing.js.php:155
 #: include/views/js/item.preprocessing.js.php:170
 msgid "pattern"
@@ -20344,7 +20341,7 @@ msgstr "percentile() - Phần trăm P của giai đoạn T"
 msgid "prev() - Previous value"
 msgstr "prev() - Giá trị trước"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:357
 msgid "problem pattern"
 msgstr "mẫu vấn đề"
 
@@ -20368,7 +20365,7 @@ msgstr "regexp() - Biểu thức V thông thường khớp với giá trị cu�
 msgid "regular expression"
 msgstr "biểu thức chính quy"
 
-#: include/forms.inc.php:1375 include/views/js/item.preprocessing.js.php:224
+#: include/forms.inc.php:1380 include/views/js/item.preprocessing.js.php:224
 msgid "replacement"
 msgstr "thay thế"
 
@@ -20383,7 +20380,7 @@ msgstr "bên phải"
 msgid "root"
 msgstr "root"
 
-#: include/classes/api/services/CItemGeneral.php:1981
+#: include/classes/api/services/CItemGeneral.php:1995
 msgid "ruleid of dependent item and master item should match"
 msgstr "quy tắc của item phụ thuộc và item chủ phải phù hợp"
 
@@ -20392,12 +20389,12 @@ msgctxt "second short"
 msgid "s"
 msgstr "s"
 
-#: app/views/administration.mediatype.edit.php:220 include/forms.inc.php:1324
+#: app/views/administration.mediatype.edit.php:220 include/forms.inc.php:1329
 #: include/views/js/item.preprocessing.js.php:182
 msgid "script"
 msgstr "kịch bản"
 
-#: include/forms.inc.php:1374 include/views/js/item.preprocessing.js.php:223
+#: include/forms.inc.php:1379 include/views/js/item.preprocessing.js.php:223
 msgid "search string"
 msgstr "tìm chuỗi"
 
@@ -20406,12 +20403,12 @@ msgctxt "adjective"
 msgid "second"
 msgstr "giây"
 
-#: include/classes/api/services/CItemGeneral.php:1325
-#: include/classes/api/services/CItemGeneral.php:1511
+#: include/classes/api/services/CItemGeneral.php:1339
+#: include/classes/api/services/CItemGeneral.php:1525
 msgid "second parameter is expected"
 msgstr "tham số thứ hai được kì vọng"
 
-#: include/forms.inc.php:1317 include/views/js/item.preprocessing.js.php:176
+#: include/forms.inc.php:1322 include/views/js/item.preprocessing.js.php:176
 msgid "seconds"
 msgstr "giây"
 
@@ -20424,19 +20421,19 @@ msgid "short description"
 msgstr "mô tả ngắn"
 
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CHost.php:1917
-#: include/classes/api/services/CHost.php:1923
+#: include/classes/api/services/CHost.php:1926
 #: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:1938
+#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:1947
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
-#: include/classes/api/services/CItemGeneral.php:454
-#: include/classes/api/services/CItemGeneral.php:492
-#: include/classes/api/services/CItemGeneral.php:1383
-#: include/classes/api/services/CItemGeneral.php:1406
-#: include/classes/api/services/CItemGeneral.php:1578
-#: include/classes/api/services/CItemGeneral.php:1606
-#: include/classes/api/services/CItemGeneral.php:2248
+#: include/classes/api/services/CItemGeneral.php:468
+#: include/classes/api/services/CItemGeneral.php:506
+#: include/classes/api/services/CItemGeneral.php:1397
+#: include/classes/api/services/CItemGeneral.php:1420
+#: include/classes/api/services/CItemGeneral.php:1592
+#: include/classes/api/services/CItemGeneral.php:1620
+#: include/classes/api/services/CItemGeneral.php:2262
 #: include/classes/api/services/CMaintenance.php:495
 #: include/classes/api/services/CMaintenance.php:717
 #: include/classes/api/services/CMediatype.php:786
@@ -20490,8 +20487,8 @@ msgstr "thông tin được cung cấp không phải là duy nhất"
 #: app/views/monitoring.host.view.php:62
 #: app/views/monitoring.problem.view.php:252
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/widgets/CWidgetHelper.php:475
-#: include/classes/widgets/CWidgetHelper.php:522 include/forms.inc.php:1976
+#: include/classes/widgets/CWidgetHelper.php:489
+#: include/classes/widgets/CWidgetHelper.php:536 include/forms.inc.php:1984
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.maintenance.edit.php:176
 #: include/views/configuration.template.list.php:47
@@ -20521,13 +20518,13 @@ msgstr "mẫu ID \"%1$s\" được thông qua %2$s lần"
 #: app/controllers/CControllerDashboardUpdate.php:150
 #: include/classes/api/services/CAutoregistration.php:145
 #: include/classes/api/services/CDashboard.php:388
-#: include/classes/api/services/CDiscoveryRule.php:1594
-#: include/classes/api/services/CDiscoveryRule.php:1951
-#: include/classes/api/services/CDiscoveryRule.php:1959
-#: include/classes/api/services/CHost.php:2001
-#: include/classes/api/services/CHost.php:2195
+#: include/classes/api/services/CDiscoveryRule.php:1604
+#: include/classes/api/services/CDiscoveryRule.php:1961
+#: include/classes/api/services/CDiscoveryRule.php:1969
+#: include/classes/api/services/CHost.php:2010
+#: include/classes/api/services/CHost.php:2204
 #: include/classes/api/services/CHttpTest.php:742
-#: include/classes/api/services/CTemplate.php:430
+#: include/classes/api/services/CTemplate.php:431
 #: include/classes/validators/CApiInputValidator.php:942
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
@@ -20553,7 +20550,7 @@ msgstr "thẻ \"%1$s\" bị thiếu"
 msgid "third"
 msgstr "thứ ba"
 
-#: include/classes/api/services/CItemGeneral.php:1516
+#: include/classes/api/services/CItemGeneral.php:1530
 msgid "third parameter is expected"
 msgstr "tham số thứ ba được mong đợi"
 
@@ -20623,10 +20620,10 @@ msgstr "kết thúc key bất thường"
 msgid "unexpected end of macro"
 msgstr "kết thúc bất ngờ của macro"
 
-#: include/classes/api/services/CDiscoveryRule.php:1614
-#: include/classes/api/services/CDiscoveryRule.php:1645
-#: include/classes/api/services/CDiscoveryRule.php:1668
-#: include/classes/api/services/CDiscoveryRule.php:1687
+#: include/classes/api/services/CDiscoveryRule.php:1624
+#: include/classes/api/services/CDiscoveryRule.php:1655
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#: include/classes/api/services/CDiscoveryRule.php:1697
 #: include/classes/api/services/CHttpTest.php:456
 #: include/classes/api/services/CHttpTest.php:480
 #: include/classes/validators/CApiInputValidator.php:914
@@ -20649,11 +20646,11 @@ msgstr "văn bản bất ngờ \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:761
 #: include/classes/api/services/CEvent.php:870
-#: include/classes/api/services/CHost.php:1872
-#: include/classes/api/services/CHost.php:1878
-#: include/classes/api/services/CItemGeneral.php:1239
-#: include/classes/api/services/CItemGeneral.php:1565
-#: include/classes/api/services/CItemGeneral.php:1591
+#: include/classes/api/services/CHost.php:1881
+#: include/classes/api/services/CHost.php:1887
+#: include/classes/api/services/CItemGeneral.php:1253
+#: include/classes/api/services/CItemGeneral.php:1579
+#: include/classes/api/services/CItemGeneral.php:1605
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
 #: include/classes/api/services/CTriggerGeneral.php:730
@@ -20686,11 +20683,11 @@ msgstr "số phiên bản không được hỗ trợ"
 #: app/views/popup.itemtestedit.view.php:82
 #: include/classes/html/CMacroValue.php:121
 #: include/classes/html/CMacroValue.php:129
-#: include/classes/widgets/CWidgetHelper.php:485
-#: include/classes/widgets/CWidgetHelper.php:530
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
-#: include/forms.inc.php:1981
+#: include/classes/widgets/CWidgetHelper.php:499
+#: include/classes/widgets/CWidgetHelper.php:544
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:166
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:238
+#: include/forms.inc.php:1989
 #: include/views/configuration.host.discovery.edit.php:129
 #: include/views/configuration.host.discovery.edit.php:225
 #: include/views/configuration.host.list.php:70
@@ -20711,7 +20708,7 @@ msgstr "số phiên bản không được hỗ trợ"
 msgid "value"
 msgstr "giá trị"
 
-#: include/classes/api/services/CDiscoveryRule.php:1830
+#: include/classes/api/services/CDiscoveryRule.php:1840
 #, c-format
 msgid "value \"%1$s\" already exists"
 msgstr "giá trị \"%1$s\" đã tồn tại"
@@ -20752,14 +20749,14 @@ msgid "value is too long"
 msgstr "giá trị quá dài"
 
 #: app/controllers/CControllerPopupHttpStep.php:101
-#: include/classes/api/services/CDiscoveryRule.php:1626
-#: include/classes/api/services/CDiscoveryRule.php:1657
-#: include/classes/api/services/CDiscoveryRule.php:1677
-#: include/classes/api/services/CDiscoveryRule.php:1698
+#: include/classes/api/services/CDiscoveryRule.php:1636
+#: include/classes/api/services/CDiscoveryRule.php:1667
+#: include/classes/api/services/CDiscoveryRule.php:1687
+#: include/classes/api/services/CDiscoveryRule.php:1708
 #: include/classes/api/services/CEvent.php:772
-#: include/classes/api/services/CHost.php:1022
-#: include/classes/api/services/CHost.php:2057
-#: include/classes/api/services/CHost.php:2212
+#: include/classes/api/services/CHost.php:1031
+#: include/classes/api/services/CHost.php:2066
+#: include/classes/api/services/CHost.php:2221
 #: include/classes/api/services/CMapElement.php:86
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
@@ -20772,7 +20769,7 @@ msgstr "giá trị quá dài"
 msgid "value must be one of %1$s"
 msgstr "giá trị phải là một trong %1$s"
 
-#: include/classes/api/services/CItemGeneral.php:1524
+#: include/classes/api/services/CItemGeneral.php:1538
 msgid "value of first parameter is too long"
 msgstr "giá trị của tham số đầu tiên quá dài"
 
@@ -20780,11 +20777,11 @@ msgstr "giá trị của tham số đầu tiên quá dài"
 msgid "value of new event tag"
 msgstr "giá trị của thẻ sự kiện mới"
 
-#: include/classes/api/services/CItemGeneral.php:1530
+#: include/classes/api/services/CItemGeneral.php:1544
 msgid "value of second parameter is too long"
 msgstr "giá trị của tham số thứ hai quá dài"
 
-#: include/classes/api/services/CItemGeneral.php:1541
+#: include/classes/api/services/CItemGeneral.php:1555
 #, c-format
 msgid "value of third parameter must be one of %1$s"
 msgstr "giá trị của tham số thứ ba phải là một trong số %1$s"
@@ -20794,11 +20791,11 @@ msgstr "giá trị của tham số thứ ba phải là một trong số %1$s"
 msgid "via"
 msgstr "via"
 
-#: include/classes/api/services/CTask.php:439
+#: include/classes/api/services/CTask.php:440
 msgid "wrong discovery rule type"
 msgstr "phát hiện sai loại quy tắc"
 
-#: include/classes/api/services/CTask.php:440
+#: include/classes/api/services/CTask.php:441
 msgid "wrong item type"
 msgstr "loại item sai"
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-31T16:03:02Z</date>
+   <date>2021-06-29T11:55:23Z</date>
    <groups>
       <group>
          <name>Templates/SAN</name>
@@ -47,6 +47,7 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.789.1.6.4.7.0</snmp_oid>
                <key>fas3220.disk[diskFailedCount]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>The number of disks that are currently broken.</description>
                <applications>
                   <application>
@@ -67,6 +68,7 @@ Template tooling version used: 0.38</description>
                <key>fas3220.disk[diskFailedMessage]</key>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>If diskFailedCount is non-zero, this is a string describing the failed disk or disks. Each failed disk is described.</description>
                <applications>
@@ -88,6 +90,7 @@ Template tooling version used: 0.38</description>
                <key>fas3220.inventory[productFirmwareVersion]</key>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Version string for the firmware running on this platform.</description>
                <applications>
@@ -109,6 +112,7 @@ Template tooling version used: 0.38</description>
                <key>fas3220.inventory[productVersion]</key>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Version string for the software running on this platform.</description>
                <applications>
@@ -139,6 +143,7 @@ Template tooling version used: 0.38</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.19.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>Count of the number of chassis fans that are not operating within the recommended RPM range.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -153,12 +158,13 @@ Template tooling version used: 0.38</description>
                      </preprocessing>
                   </item_prototype>
                   <item_prototype>
-                     <name>Node {#NODE.NAME}: Failed FAN messgae</name>
+                     <name>Node {#NODE.NAME}: Failed FAN message</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.20.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>Text message describing current condition of chassis fans. This is useful only if envFailedFanCount is not zero.</description>
                      <application_prototypes>
@@ -179,6 +185,7 @@ Template tooling version used: 0.38</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.21.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>Count of the number of power supplies that are in degraded mode.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -199,6 +206,7 @@ Template tooling version used: 0.38</description>
                      <key>fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>Text message describing the state of any power supplies that are currently degraded. This is useful only if envFailedPowerSupplyCount is not zero.</description>
                      <application_prototypes>
@@ -219,6 +227,7 @@ Template tooling version used: 0.38</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.18.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>An indication of whether the hardware is currently operating outside of its recommended temperature range. The hardware will shutdown if the temperature exceeds critical thresholds.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -246,6 +255,7 @@ Template tooling version used: 0.38</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.11.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeHealth, "{#NODE.NAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>Whether or not the node can communicate with the cluster.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -277,6 +287,7 @@ Template tooling version used: 0.38</description>
                      <key>fas3220.cluster[nodeLocation, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Node Location. Same as sysLocation for a specific node.</description>
                      <application_prototypes>
@@ -298,6 +309,7 @@ Template tooling version used: 0.38</description>
                      <key>fas3220.cluster[nodeModel, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Node Model. Same as productModel for a specific node.</description>
                      <application_prototypes>
@@ -318,6 +330,7 @@ Template tooling version used: 0.38</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.17.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeNvramBatteryStatus, "{#NODE.NAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>An indication of the current status of the NVRAM battery or batteries.&#13;
 Batteries which are fully or partially discharged may not fully protect the system during a crash. The end-of-life status values are based on the manufacturer's recommended life for the batteries.&#13;
 Possible values:&#13;
@@ -360,6 +373,7 @@ fullyCharged(9).</description>
                      <key>fas3220.cluster[nodeSerialNumber, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Node Serial Number. Same as productSerialNum for a specific node.</description>
                      <application_prototypes>
@@ -380,6 +394,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeUptime, "{#NODE.NAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>s</units>
                      <description>Node uptime. Same as sysUpTime for a specific node.</description>
                      <application_prototypes>
@@ -434,6 +449,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.2.1.14.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>The average, over the last minute, of the percentage of time that this processor was not idle.</description>
@@ -513,6 +529,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.31.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <description>The total disk space that is free for use on {#FSNAME}.</description>
                      <application_prototypes>
@@ -540,6 +557,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.29.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.fs[df64TotalKBytes, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <description>The total capacity in Bytes for {#FSNAME}.</description>
                      <application_prototypes>
@@ -560,6 +578,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.30.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.fs[df64UsedKBytes, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <description>The total disk space that is in use on {#FSNAME}.</description>
                      <application_prototypes>
@@ -580,6 +599,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.38.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.fs[dfCompressSavedPercent, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>Provides the percentage of compression savings in a volume, which is ((compr_saved/used)) * 10(compr_saved + 0). This is only returned for volumes.</description>
@@ -595,6 +615,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.40.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.fs[dfDedupeSavedPercent, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>Provides the percentage of deduplication savings in a volume, which is ((dedup_saved/(dedup_saved + used)) * 100). This is only returned for volumes.</description>
@@ -610,6 +631,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>%</units>
                      <description>The percentage of disk space currently in use on {#FSNAME}.</description>
                      <application_prototypes>
@@ -662,6 +684,7 @@ fullyCharged(9).</description>
                               <macro>{#FSTYPE}</macro>
                               <value>3|4</value>
                               <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -691,6 +714,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.21.2.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>The reason node cannot take over it's HA partner {#PARTNER.NAME}.&#13;
 Possible states:&#13;
   ok(1),&#13;
@@ -759,6 +783,7 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.21.2.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.ha[haSettings, "{#NODE.NAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>High Availability configuration settings. The value notConfigured(1) indicates that the HA is not licensed. The thisNodeDead(5) setting indicates that this node has been takenover.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -845,7 +870,9 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64InDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <status>ENABLED</status>
+                     <description>MIB: IF-MIB&#13;
+The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -865,7 +892,9 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</description>
+                     <status>ENABLED</status>
+                     <description>MIB: IF-MIB&#13;
+The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -884,6 +913,7 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.25.{#IFSNMPINDEX}</snmp_oid>
                      <key>fas3220.net.if[if64InOctets, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>The total number of octets received on the interface, including framing characters.</description>
                      <application_prototypes>
@@ -909,7 +939,9 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64OutDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <status>ENABLED</status>
+                     <description>MIB: IF-MIB&#13;
+The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -929,7 +961,9 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of outbound packets that could not be transmitted because of errors.</description>
+                     <status>ENABLED</status>
+                     <description>MIB: IF-MIB&#13;
+The number of outbound packets that could not be transmitted because of errors.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -948,6 +982,7 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.31.{#IFSNMPINDEX}</snmp_oid>
                      <key>fas3220.net.if[if64OutOctets, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>The total number of octets transmitted out of the interface, including framing characters.</description>
                      <application_prototypes>
@@ -973,6 +1008,7 @@ Possible states:&#13;
                      <key>fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>The list of reasons why the port is marked as degraded.</description>
                      <application_prototypes>
@@ -993,6 +1029,7 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.30.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>The health status of the port.</description>
                      <application_prototypes>
@@ -1016,6 +1053,7 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>The link-state of the port. Normally it is either UP(2) or DOWN(3).</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1038,6 +1076,7 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.net.port[netportRole, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>Role of the port. A port must have one of the following roles: cluster(1), data(2), mgmt(3), intercluster(4), cluster-mgmt(5) or undef(0). The cluster port is used to communicate to other node(s) in the cluster. The data port services clients' requests. It is where all the file requests come in. The management port is used by administrator to manage resources within a node. The intercluster port is used to communicate to other cluster. The cluster-mgmt port is used to manage resources within the cluster. The undef role is for the port that has not yet been assigned a role.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1060,7 +1099,8 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.11.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.net.port[netportSpeedOper, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
-                     <description>The speed that appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).</description>
+                     <status>ENABLED</status>
+                     <description>The speed appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -1082,6 +1122,7 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.14.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>Indicates whether the port status is set 'UP' by an administrator.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1107,7 +1148,7 @@ or {Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>

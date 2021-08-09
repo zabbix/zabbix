@@ -168,6 +168,9 @@ char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
+/* not used in tests, defined for linking with comms.c */
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
+
 const char	title_message[] = "mock_title_message";
 const char	*usage_message[] = {"mock_usage_message", NULL};
 const char	*help_message[] = {"mock_help_message", NULL};

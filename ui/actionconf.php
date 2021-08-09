@@ -599,6 +599,7 @@ else {
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	]);
+	order_result($data['actions'], $sortField, $sortOrder);
 
 	// pager
 	if (hasRequest('page')) {

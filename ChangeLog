@@ -1,6 +1,63 @@
+Changes for 5.0.15rc1
+
+New features:
+.........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
+...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
+
+Bug fixes:
+........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
+A......... [ZBX-19752] fixed multiple types of media type creation having message templates in one API call (gcalenko)
+..F....... [ZBX-18271] fixed incorrect ordering for tags and overrides in widgets, operations overrides in host prototype form and interface order in item and discovery prototypes forms (gcalenko, Sasha)
+.D........ [ZBX-18523] added documentation for Hostname parameter in sender (dgoloscapov)
+..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
+...G...... [ZBX-19116] fixed system.cpu.util for agent2 not working in non-English Windows (arimdjonoks)
+..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
+A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
+...G...... [ZBX-19732] fixed Zabbix agent2 not starting when ListenIP is set to 0.0.0.0 (vso)
+.........T [ZBX-19692] fixed issues with Zyxel templates (abakaldin)
+A......... [ZBX-19124] fixed PHP runtime errors when passed incorrect value for "output" option (Sasha)
+A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
+........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.14
+
+5.0.14rc1 was released as 5.0.14 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.14rc1
+
+New features:
+.........T [ZBXNEXT-5925] added template "Systemd by Zabbix agent 2" (ychukina)
+.........T [ZBXNEXT-6660] added template for f5 BIG-IP (abakaldin)
+.........T [ZBXNEXT-6729] added template "GridGain by JMX" (ychukina)
+
+Bug fixes:
+....I..... [ZBX-19498] fixed 'subject' being too long when {TRIGGER.NAME} is converted to {EVENT.RECOVERY.NAME} (dgoloscapov, wiper)
+A......... [ZBX-19536] fixed host.get with selectTags = ['tag'] call attempting to retrieve tag value(s) as well (jfreibergs)
+...G...... [ZBX-19476] fixed support of short form ipv6 in ListenIP field for Zabbix agent 2 (MVekslers)
+........S. [ZBX-19481] fixed alerting problem while being in maintenance (dgoloscapov)
+.........T [ZBX-19562] fixed descriptions of some keys in "Server HP iLO SNMP", removed the "Oracle by ODBC" and "Asterisk by HTTP" templates (abakaldin)
+.......PS. [ZBX-19428] fixed high CPU usage and preprocessing workers exiting with timeout when starting numerous poller, trapper and discoverer processes (vso)
+.........T [ZBX-19622] moved cisco templates one level higher (afayantsev)
+.........T [ZBX-19588] fixed typo in metric name in Template SAN NetApp FAS3220 SNMP (abiba)
+.........T [ZBX-19230] fixed typo in Windows template (abakaldin)
+...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)
+........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
+.........T [ZBX-19586] fixed calculated item expression in "Template PHP-FPM by Zabbix agent" and "Template PHP-FPM by HTTP" (ychukina)
+.........T [ZBX-19545] fixed discovery of MPM event in Template Apache (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.13
+
+5.0.13rc1 was released as 5.0.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.13rc1
 
 New features:
+.........T [ZBXNEXT-6671] added templates DELL PowerEdge R720 SNMP, R720 by HTTP, R740 SNMP, R740 by HTTP, R820 SNMP, R820 by HTTP, R840 SNMP, R840 by HTTP (mchudinov)
+...G...... [ZBXNEXT-6596] added native linux proc.num support plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 1h in media types (Ivo)
 .........T [ZBXNEXT-6643] added templates HPE ProLiant DL360 SNMP, HPE ProLiant DL380 SNMP, HPE ProLiant BL460 SNMP, HPE ProLiant BL920 SNMP (mchudinov)
 .........T [ZBXNEXT-6595] added Nginx Plus template (afayantsev)
@@ -10,6 +67,25 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 .........T [ZBXNEXT-6590] added templates ZYXEL ISP switches and DSLAM (abakaldin)
 
 Bug fixes:
+....I..... [ZBX-19431] changed defaults of widgets in "Zabbix server health" dashboard to show problems for selected items only (jfreibergs)
+.........T [ZBX-19362] removed the multiplier of "Cache swap current size" item in Template App Squid (mchudinov)
+A......... [ZBX-19200] fixed host, template, item, trigger and graph APIs returning unnecessary fields (Ivo)
+.........T [ZBX-19349] fixed parameters of some keys in "Template DB PostgreSQL agent 2" (abakaldin)
+.........T [ZBX-19219] added Cisco image usage policy note and fixed directory structure for Cisco templates (afayantsev)
+..F....... [ZBX-18695] fixed file_put_contents() runtime error if web server has no write permissions for zabbix.conf.php (agriscenko)
+A......... [ZBX-19424] fixed trigger handling failing if host name looks like a number (jfreibergs)
+..F....... [ZBX-18265] changed "Monitoring > Hosts > Latest data" to show Items without data by default (jfreibergs)
+.......PS. [ZBX-19318] added sorting by itemids for trends flush to avoid deadlock (dgoloscapov)
+..F....... [ZBX-19203] fixed filter values to be unset when switching between pages and resetting filter in latest data history screen (miks)
+.......PS. [ZBX-18879] fixed update vmware info about vCenter fullname and version (MVekslers)
+...G...... [ZBX-18914] fixed timeout issue with vfs.fs plugin for Zabbix agent 2 (esneiders)
+..F....... [ZBX-19123] fixed sorting by name or status on action page (jfreibergs)
+A......... [ZBX-18941] improved error messages on "Execute now" by adding item and host names (miks)
+A......... [ZBX-19447] implemented item type validation by API (miks)
+..F....... [ZBX-18863] fixed error when overviews skipped entries with numeric host/item/trigger names (miks)
+A......... [ZBX-19388] fixed inherited graph and graph prototype update if user has no permissions to child host or template (Ivo)
+..F....... [ZBX-18699] fixed selected value appearance in popup host group filter (miks)
+..F....... [ZBX-19084] fixed removal of inherited tags in "Tags" tab (Ivo)
 A......... [ZBX-18788] fixed webhook parameters not being reset on media type change (gcalenko)
 .......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
 .......PS. [ZBX-19299] added more precise epsilon for float64 (dgoloscapov)
@@ -2100,12 +2176,42 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.33rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
+..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
+..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
+A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
+........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
+...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.32
+
+4.0.32rc2 was released as 4.0.32 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.32rc2
+
+Bug fixes:
+A......... [ZBX-19558] fixed creating of dependent item prototypes (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.32rc1
 
 New features:
 ..F....... [ZBXNEXT-6662] increased field size to 2000 characters in web scenario variables and web scenario step variables and post fields (Ivo)
 
 Bug fixes:
+..F....... [ZBX-18695] fixed file_put_contents() runtime error if web server has no write permissions for zabbix.conf.php (agriscenko)
+A......... [ZBX-19424] fixed trigger handling failing if host name looks like a number (jfreibergs)
+.......PS. [ZBX-19318] added sorting by itemids for trends flush to avoid deadlock (dgoloscapov)
+.......PS. [ZBX-18879] fixed update vmware info about vCenter fullname and version (MVekslers)
+A......... [ZBX-19447] implemented item type validation by API (miks)
+A......... [ZBX-19388] fixed inherited graph and graph prototype update if user has no permissions to child host or template (Ivo)
 .......PS. [ZBX-19358] fixed memory leak in case of duplicate vmware hv uuid (MVekslers)
 A......... [ZBX-19248] fixed retrieving of all data from separate database tables inside of API methods when empty value for filter is passed (vmaksimovs)
 ..F....... [ZBX-19300] updated jquery version (ashubin)

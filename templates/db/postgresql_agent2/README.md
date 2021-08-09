@@ -29,7 +29,7 @@ GRANT EXECUTE ON FUNCTION pg_catalog.pg_stat_file(text) TO zbx_monitor;
 
 ```bash
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
-    host            all              zbx_monitor            127.0.0.1   	         md5
+    host            all              zbx_monitor            localhost   	         md5
 ```
 
 For more information please read the PostgreSQL documentation https://www.postgresql.org/docs/current/auth-pg-hba-conf.html.

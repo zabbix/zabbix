@@ -967,18 +967,18 @@ abstract class CHostGeneral extends CHostBase {
 				'output' => $this->outputExtend($options['selectTags'], ['hostid']),
 				'filter' => ['hostid' => $hostids]
 			];
-			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
 
 			foreach ($result as &$host) {
 				$host['tags'] = [];
 			}
 			unset($host);
 
+			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
+
 			while ($tag = DBfetch($tags)) {
-				$result[$tag['hostid']]['tags'][] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
+				$hostid = $tag['hostid'];
+				unset($tag['hosttagid'], $tag['hostid']);
+				$result[$hostid]['tags'][] = $tag;
 			}
 		}
 

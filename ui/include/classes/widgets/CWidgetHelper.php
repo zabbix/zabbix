@@ -71,8 +71,22 @@ class CWidgetHelper {
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 			->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate))
-			->addItem((new CScriptTag('$("z-select#type").on("change", updateWidgetConfigDialogue);'))
-				->setOnDocumentReady()
+			->addItem(
+				(new CScriptTag('
+					$("z-select#type").on("change", updateWidgetConfigDialogue);
+
+					document
+						.getElementById("widget_dialogue_form")
+						.addEventListener("change", (e) => {
+							const is_trimmable = e.target.matches(
+								\'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])\'
+							);
+
+							if (is_trimmable) {
+								e.target.value = e.target.value.trim();
+							}
+						}, {capture: true});
+				'))->setOnDocumentReady()
 			);
 	}
 
@@ -170,6 +184,7 @@ class CWidgetHelper {
 			'name' => $field->getName().'[]',
 			'object_name' => 'hosts',
 			'data' => $field->getValue(),
+			'placeholder' => $field->getPlaceholder(),
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
@@ -181,7 +196,6 @@ class CWidgetHelper {
 			'add_post_js' => false
 		]))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-			->setAttribute('placeholder', $field->getPlaceholder())
 			->setAriaRequired(self::isAriaRequired($field))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}

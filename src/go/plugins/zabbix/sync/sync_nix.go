@@ -25,7 +25,6 @@ func getMetrics() []string {
 	return []string{
 		"net.dns", "Checks if DNS service is up.",
 		"net.dns.record", "Performs DNS query.",
-		"proc.num", "The number of processes.",
 		"system.hw.chassis", "Chassis information.",
 		"system.hw.devices", "Listing of PCI or USB devices.",
 		"vfs.dir.count", "Directory entry count.",

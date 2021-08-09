@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-10T18:31:47Z</date>
+   <date>2021-07-23T11:06:20Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template ZYXEL IES1248-51 SNMP</template>
-         <name>Template ZYXEL IES1248-51 SNMP</name>
+         <template>Template Net ZYXEL IES1248-51 SNMP</template>
+         <name>Template Net ZYXEL IES1248-51 SNMP</name>
          <description>ZYXEL IES1248-51&#13;
 &#13;
 MIBs used:&#13;
@@ -90,7 +90,7 @@ Template tooling version used: 0.38</description>
                <snmp_oid>.1.3.6.1.2.1.1.4.0</snmp_oid>
                <key>zyxel.ies1248.contact</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -117,7 +117,7 @@ on how to contact this person.</description>
                <snmp_oid>.1.3.6.1.4.1.890.1.5.13.1.1.3.1.4.0.0</snmp_oid>
                <key>zyxel.ies1248.fwversion</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -151,7 +151,7 @@ on how to contact this person.</description>
                <snmp_oid>.1.3.6.1.2.1.1.6.0</snmp_oid>
                <key>zyxel.ies1248.location</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -177,7 +177,7 @@ The physical location of this node (e.g.,&#13;
                <snmp_oid>.1.3.6.1.2.1.2.2.1.6.1</snmp_oid>
                <key>zyxel.ies1248.mac</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -206,7 +206,7 @@ should contain an octet string of zero length.</description>
                <snmp_oid>.1.3.6.1.2.1.1.1.0</snmp_oid>
                <key>zyxel.ies1248.model</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -244,7 +244,7 @@ printable ASCII characters.</description>
                <snmp_oid>.1.3.6.1.2.1.1.5.0</snmp_oid>
                <key>zyxel.ies1248.name</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -271,7 +271,7 @@ fully-qualified domain name.</description>
                <snmp_oid>.1.3.6.1.4.1.890.1.5.13.1.1.2.1.3.0</snmp_oid>
                <key>zyxel.ies1248.serialnumber</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -461,7 +461,7 @@ Current speed in Revolutions Per Minute (RPM) on the fan.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.fan[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -856,7 +856,7 @@ interface, including framing characters.  This object is a&#13;
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.net.adsl.in.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -864,7 +864,7 @@ interface, including framing characters.  This object is a&#13;
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.net.adsl.out.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -873,15 +873,15 @@ interface, including framing characters.  This object is a&#13;
                </graph_prototypes>
                <overrides>
                   <override>
-                     <name>Trigger disabled</name>
+                     <name>Don't create triggers for matching interface</name>
                      <step>1</step>
                      <filter>
                         <conditions>
                            <condition>
                               <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>.*</value>
+                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
+                              <operator>NOT_MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -892,29 +892,6 @@ interface, including framing characters.  This object is a&#13;
                            <value>.*</value>
                            <status>ENABLED</status>
                            <discover>NO_DISCOVER</discover>
-                        </operation>
-                     </operations>
-                  </override>
-                  <override>
-                     <name>Trigger enabled</name>
-                     <step>2</step>
-                     <filter>
-                        <conditions>
-                           <condition>
-                              <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
-                              <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
-                           </condition>
-                        </conditions>
-                     </filter>
-                     <operations>
-                        <operation>
-                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
-                           <operator>REGEXP</operator>
-                           <value>.*</value>
-                           <status>ENABLED</status>
-                           <discover>DISCOVER</discover>
                         </operation>
                      </operations>
                   </override>
@@ -1103,7 +1080,7 @@ interface, including framing characters.  This object is a&#13;
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.net.if.in.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1111,7 +1088,7 @@ interface, including framing characters.  This object is a&#13;
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.net.if.out.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1215,7 +1192,7 @@ The current temperature measured at this sensor</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.temp[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1276,7 +1253,7 @@ The current voltage reading.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL IES1248-51 SNMP</host>
+                              <host>Template Net ZYXEL IES1248-51 SNMP</host>
                               <key>zyxel.ies1248.volt[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1320,7 +1297,7 @@ return JSON.stringify(outArr);
             </macro>
             <macro>
                <macro>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</macro>
-               <value>NEED TRIGGERS</value>
+               <value>CHANGE_IF_NEEDED</value>
                <description>Triggers will be created only for interfaces whose description contains the value of this macro</description>
             </macro>
             <macro>
