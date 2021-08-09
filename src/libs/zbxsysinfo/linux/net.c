@@ -49,7 +49,7 @@ typedef struct
 	struct addrinfo	*ai;
 	unsigned short	port;
 	unsigned int	prefix_sz;
-	unsigned char	comp;
+	unsigned char	mapped;
 }
 net_count_info_t;
 
@@ -826,12 +826,15 @@ static unsigned char	get_connection_state_udp(const char *name)
 #ifdef HAVE_IPV6
 static int	scan_ipv6_addr(const char *addr, struct sockaddr_in6 *sa6)
 {
-	int	i;
+	int	i, k;
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < 16; i += 4)
 	{
-		if (1 != sscanf(addr + i * 2, "%2hhx", &sa6->sin6_addr.s6_addr[i]))
-			return FAIL;
+		for (k = 0; k < 4; k++)
+		{
+			if (1 != sscanf(addr + i * 2 + k * 2, "%2hhx", &sa6->sin6_addr.s6_addr[i + 3 - k]))
+				return FAIL;
+		}
 	}
 
 	return SUCCEED;
@@ -893,10 +896,12 @@ static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, ne
 		if ((0 != exp_l->port && exp_l->port != lport) ||
 				(0 != exp_r->port && exp_r->port != rport) ||
 				(0 != state && state != state_f) ||
-				(NULL != exp_l->ai && (AF_INET6 != exp_l->ai->ai_family ||
-				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l))) ||
-				(NULL != exp_r->ai && (AF_INET6 != exp_r->ai->ai_family ||
-				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r))))
+				(NULL != exp_l->ai &&
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l,
+				1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
+				(NULL != exp_r->ai &&
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r,
+				1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
 		{
 			continue;
 		}
@@ -952,13 +957,11 @@ static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, ne
 				(0 != exp_r->port && exp_r->port != rport) ||
 				(0 != state && state != state_f) ||
 				(NULL != exp_l->ai &&
-				((AF_INET != exp_l->ai->ai_family && 0 == exp_l->comp) ||
-				((AF_INET == exp_l->ai->ai_family || 0 != exp_l->comp) &&
-				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l)))) ||
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l,
+				1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
 				(NULL != exp_r->ai &&
-				((AF_INET != exp_r->ai->ai_family && 0 == exp_r->comp) ||
-				((AF_INET == exp_r->ai->ai_family || 0 != exp_r->comp) &&
-				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r)))))
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r,
+				1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
 		{
 			continue;
 		}
@@ -1034,13 +1037,15 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 #ifdef HAVE_IPV6
 	if (info->ai->ai_family == AF_INET6)
 	{
+		const unsigned char	ipv6_mapped[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
+
 		if (NULL != addr)
 		{
-			if (NULL != strchr(addr, '.'))
-				info->comp = 1;
-
 			if (-1 == prefix_sz_local)
 				prefix_sz_local = IPV6_MAX_CIDR_PREFIX;
+
+			if (0 == memcmp(((struct sockaddr_in6*)info->ai->ai_addr)->sin6_addr.s6_addr, ipv6_mapped, 12))
+				info->mapped = 1;
 		}
 
 		if (NULL != service)
