@@ -1079,9 +1079,9 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 		pos = skip_spaces(data, loc.r + 1);
 	}
-	else /* no labels in row, can only match by metric name */
+	else /* no labels in row */
 	{
-		if (NULL == filter->metric) /* no metric name in filter to match against */
+		if (0 < filter->labels.values_num) /* got labels in filter */
 		{
 			match = FAIL;
 			goto out;
