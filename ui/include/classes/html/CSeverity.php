@@ -25,11 +25,9 @@ class CSeverity extends CRadioButtonList {
 	 *
 	 * string $options['name']   HTML element name.
 	 * int    $options['value']  Default selected value, default TRIGGER_SEVERITY_NOT_CLASSIFIED.
-	 * bool   $options['all']    Is option 'All' available, default false.
 	 * @property array
 	 */
 	private $options = [
-		'all'	=> false,
 		'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 	];
 
@@ -69,10 +67,6 @@ class CSeverity extends CRadioButtonList {
 	}
 
 	public function toString($destroy = true) {
-		if ($this->options['all']) {
-			$this->addValue(_('all'), -1);
-		}
-
 		foreach (getSeverities() as $severity) {
 			$this->addValue($severity['name'], $severity['value'], $severity['style']);
 		}

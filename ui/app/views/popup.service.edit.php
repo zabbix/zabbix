@@ -42,27 +42,6 @@ $parent_services = (new CMultiSelect([
 	'custom_select' => true
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-$additional_rules = (new CTable())
-	->setId('additional_rules')
-	->setHeader(
-		(new CRowHeader([_('Name'), _('Action')]))->addClass(ZBX_STYLE_GREY)
-	);
-
-foreach ($data['form']['additional_rules'] as $row_index => $rule) {
-	$additional_rules->addItem(new CPartial('service.rule.row', ['row_index' => $row_index] + $rule));
-}
-
-$additional_rules->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-add')
-			))->setColSpan(2)
-		)
-);
-
 $service_tab = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
@@ -152,7 +131,30 @@ $service_tab = (new CFormGrid())
 				->setChecked($data['form']['advanced_configuration'])
 				->setUncheckedValue(0)
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
-	)
+	);
+
+$additional_rules = (new CTable())
+	->setId('additional_rules')
+	->setHeader(
+		(new CRowHeader([_('Name'), _('Action')]))->addClass(ZBX_STYLE_GREY)
+	);
+
+foreach ($data['form']['additional_rules'] as $row_index => $rule) {
+	$additional_rules->addItem(new CPartial('service.rule.row', ['row_index' => $row_index] + $rule));
+}
+
+$additional_rules->addItem(
+	(new CTag('tfoot', true))
+		->addItem(
+			(new CCol(
+				(new CSimpleButton(_('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-add')
+			))->setColSpan(2)
+		)
+);
+
+$service_tab
 	->addItem([
 		(new CLabel(_('Additional rules')))->setId('additional_rules_label'),
 		(new CFormField(
@@ -170,12 +172,30 @@ $service_tab = (new CFormGrid())
 				->setValue($data['form']['propagation_rule'])
 				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getPropagationRuleNames()))
 		))->setId('status_propagation_rules_field')
+	]);
+
+$propagation_value_number = (new CRadioButtonList('propagation_value_number', $data['form']['propagation_value']))
+	->setId('propagation_value_number')
+	->setModern(true);
+foreach (range(1, 5) as $value) {
+	$propagation_value_number->addValue($value, $value, 'propagation_value_number_'.$value);
+}
+
+$propagation_value_status = (new CSeverity(['name' => 'propagation_value_status',
+	'value' => $data['form']['propagation_value']
+]))->addValue(_('OK'), TRIGGER_SEVERITY_NONE, ZBX_STYLE_NORMAL_BG);
+
+$service_tab
+	->addItem([
+		(new CFormField([
+			$propagation_value_number,
+			$propagation_value_status
+		]))->setId('status_propagation_value_field')
 	])
 	->addItem([
 		(new CLabel(_('Weight')))->setId('weight_label'),
 		(new CFormField(
-			(new CTextBox('weight', $data['form']['weight'], false, 7))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			(new CTextBox('weight', $data['form']['weight'], false, 7))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		))->setId('weight_field')
 	]);
 

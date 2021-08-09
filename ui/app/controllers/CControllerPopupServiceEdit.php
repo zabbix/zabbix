@@ -150,10 +150,12 @@ class CControllerPopupServiceEdit extends CController {
 				'problem_tags' => ($this->service !== null && $this->service['problem_tags'])
 					? $this->service['problem_tags']
 					: [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
-				'advanced_configuration' => $this->service !== null ? $this->service['advanced_configuration'] : false,
+				'advanced_configuration' => $this->service !== null
+					? $this->service['advanced_configuration']
+					: false,
 				'additional_rules' => $this->service !== null ? $this->service['additional_rules'] : [],
-				'propagation_rule' => $this->service !== null ? $this->service['propagation_rule'] : [],
-				'propagation_value' => $this->service !== null ? $this->service['propagation_value'] : [],
+				'propagation_rule' => $this->service !== null ? $this->service['propagation_rule'] : ZBX_SERVICE_STATUS_AS_IS,
+				'propagation_value' => $this->service !== null ? $this->service['propagation_value'] : null,
 				'weight' => $this->service !== null ? $this->service['weight'] : 0
 			],
 			'user' => [

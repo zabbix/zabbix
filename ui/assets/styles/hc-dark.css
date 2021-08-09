@@ -4934,6 +4934,9 @@ a.link-action {
   color: #4b0c0c;
   background-color: #e45959; }
 
+.normal-bg input[type="radio"]:checked + label {
+  background-color: #209450; }
+
 .na-bg a,
 .normal-bg a,
 .info-bg a,

@@ -78,7 +78,7 @@ window.service_edit_popup = {
 
 		// Update form field state according to the form data.
 
-		for (const id of ['advanced_configuration', 'algorithm', 'showsla']) {
+		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm', 'showsla']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this.update());
@@ -137,6 +137,7 @@ window.service_edit_popup = {
 
 	update() {
 		const advanced_configuration = document.getElementById('advanced_configuration').checked;
+		const propagation_rule = document.getElementById('propagation_rule').value;
 		const status_enabled = document.getElementById('algorithm').value != <?= SERVICE_ALGORITHM_NONE ?>;
 		const showsla = document.getElementById('showsla').checked;
 
@@ -144,8 +145,24 @@ window.service_edit_popup = {
 		document.getElementById('additional_rules_field').style.display = advanced_configuration ? '' : 'none';
 		document.getElementById('status_propagation_rules_label').style.display = advanced_configuration ? '' : 'none';
 		document.getElementById('status_propagation_rules_field').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('status_propagation_value_field').style.display = advanced_configuration ? '' : 'none';
 		document.getElementById('weight_label').style.display = advanced_configuration ? '' : 'none';
 		document.getElementById('weight_field').style.display = advanced_configuration ? '' : 'none';
+
+		switch (propagation_rule) {
+			case '<?= ZBX_SERVICE_STATUS_INCREASE ?>':
+			case '<?= ZBX_SERVICE_STATUS_DECREASE ?>':
+				document.getElementById('propagation_value_number').style.display = '';
+				document.getElementById('propagation_value_status').style.display = 'none';
+				break;
+			case '<?= ZBX_SERVICE_STATUS_FIXED ?>':
+				document.getElementById('propagation_value_number').style.display = 'none';
+				document.getElementById('propagation_value_status').style.display = '';
+				break;
+			default:
+				document.getElementById('propagation_value_number').style.display = 'none';
+				document.getElementById('propagation_value_status').style.display = 'none';
+		}
 
 		document.getElementById('problem_tags_label').style.display = status_enabled ? '' : 'none';
 		document.getElementById('problem_tags_field').style.display = status_enabled ? '' : 'none';

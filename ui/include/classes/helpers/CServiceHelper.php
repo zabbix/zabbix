@@ -31,29 +31,28 @@ class CServiceHelper {
 
 	public static function getRuleConditionNames(): array {
 		return [
-			// TODO: Need to synchronize constants with serverside
-			SERVICE_CALC_STATUS_MORE => _s('if at least %1$s child nodes are %2$s or greater',
+			ZBX_SERVICE_STATUS_RULE_TYPE_N_GE => _s('if at least %1$s child nodes are %2$s or greater',
 				new CTag('b', true, 'N'), new CTag('b', true, _('Status'))
 			),
-			SERVICE_CALC_STATUS_MORE_PERC => _s('if at least %1$s child nodes are %2$s or greater',
+			ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE => _s('if at least %1$s child nodes are %2$s or greater',
 				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
 			),
-			SERVICE_CALC_STATUS_LESS => _s('if less than %1$s child nodes are %2$s or less',
+			ZBX_SERVICE_STATUS_RULE_TYPE_N_L => _s('if less than %1$s child nodes are %2$s or less',
 				new CTag('b', true, 'N'), new CTag('b', true, _('Status'))
 			),
-			SERVICE_CALC_STATUS_LESS_PERC => _s('if less than %1$s child nodes are %2$s or less',
+			ZBX_SERVICE_STATUS_RULE_TYPE_NP_L => _s('if less than %1$s child nodes are %2$s or less',
 				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
 			),
-			SERVICE_CALC_WEIGHT_MORE => _s('if at least %1$s of child nodes weight is in %2$s or greater',
+			ZBX_SERVICE_STATUS_RULE_TYPE_W_GE => _s('if at least %1$s of child nodes weight is in %2$s or greater',
 				new CTag('b', true, 'W'), new CTag('b', true, _('Status'))
 			),
-			SERVICE_CALC_WEIGHT_MORE_PERC => _s('if at least %1$s of child nodes weight is in %2$s or greater',
+			ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE => _s('if at least %1$s of child nodes weight is in %2$s or greater',
 				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
 			),
-			SERVICE_CALC_WEIGHT_LESS => _s('if less than %1$s of child nodes weight is in %2$s or less',
+			ZBX_SERVICE_STATUS_RULE_TYPE_W_L => _s('if less than %1$s of child nodes weight is in %2$s or less',
 				new CTag('b', true, 'W'), new CTag('b', true, _('Status'))
 			),
-			SERVICE_CALC_WEIGHT_LESS_PERC => _s('if less than %1$s of child nodes weight is in %2$s or less',
+			ZBX_SERVICE_STATUS_RULE_TYPE_WP_L => _s('if less than %1$s of child nodes weight is in %2$s or less',
 				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
 			)
 		];
@@ -63,20 +62,20 @@ class CServiceHelper {
 		$status = self::getRuleStatusNames()[$status];
 
 		switch ($condition) {
-			case SERVICE_CALC_STATUS_MORE:
-			case SERVICE_CALC_STATUS_MORE_PERC:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
 				$rule = _s('if at least %1$s child nodes are %2$s or greater', (string) $number, $status);
 				break;
-			case SERVICE_CALC_STATUS_LESS:
-			case SERVICE_CALC_STATUS_LESS_PERC:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
 				$rule = _s('if less than %1$s child nodes are %2$s or less', (string) $number, $status);
 				break;
-			case SERVICE_CALC_WEIGHT_MORE:
-			case SERVICE_CALC_WEIGHT_MORE_PERC:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
 				$rule = _s('if at least %1$s of child nodes weight is in %2$s or greater', (string) $number, $status);
 				break;
-			case SERVICE_CALC_WEIGHT_LESS:
-			case SERVICE_CALC_WEIGHT_LESS_PERC:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
 				$rule = _s('if less than %1$s of child nodes weight is in %2$s or less', (string) $number, $status);
 				break;
 			default:
@@ -89,8 +88,8 @@ class CServiceHelper {
 	public static function getRuleStatusNames(): array {
 		$status_names = [-1 => _('OK')];
 
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$status_names[$severity] = getSeverityName($severity);
+		foreach (getSeverities() as $severity) {
+			$status_names[$severity['value']] = $severity['name'];
 		}
 
 		return $status_names;
@@ -98,11 +97,11 @@ class CServiceHelper {
 
 	public static function getPropagationRuleNames(): array {
 		return [
-			SERVICE_PROPAGATION_STATUS_AS_IS => _('As is'),
-			SERVICE_PROPAGATION_STATUS_INC => _('Increase'),
-			SERVICE_PROPAGATION_STATUS_DEC => _('Decrease'),
-			SERVICE_PROPAGATION_STATUS_IGNORE => _('Ignore this service'),
-			SERVICE_PROPAGATION_STATUS_FIXED => _('Fixed status')
+			ZBX_SERVICE_STATUS_AS_IS => _('As is'),
+			ZBX_SERVICE_STATUS_INCREASE => _('Increase by'),
+			ZBX_SERVICE_STATUS_DECREASE => _('Decrease by'),
+			ZBX_SERVICE_STATUS_IGNORE => _('Ignore this service'),
+			ZBX_SERVICE_STATUS_FIXED => _('Fixed status')
 		];
 	}
 }

@@ -45,20 +45,20 @@ window.service_rule_edit_popup = {
 		const unit = document.getElementById('service_rule_limit_value_unit');
 
 		switch (type) {
-			case '<?= SERVICE_CALC_STATUS_MORE ?>':
-			case '<?= SERVICE_CALC_STATUS_LESS ?>':
+			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_N_GE ?>':
+			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_N_L ?>':
 				label.innerText = 'N';
 				unit.style.display = 'none';
 				break;
-			case '<?= SERVICE_CALC_STATUS_MORE_PERC ?>':
-			case '<?= SERVICE_CALC_STATUS_LESS_PERC ?>':
-			case '<?= SERVICE_CALC_WEIGHT_MORE_PERC ?>':
-			case '<?= SERVICE_CALC_WEIGHT_LESS_PERC ?>':
+			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE ?>':
+			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_NP_L ?>':
+			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE ?>':
+			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_WP_L ?>':
 				label.innerText = 'N';
 				unit.style.display = '';
 				break;
-			case '<?= SERVICE_CALC_WEIGHT_MORE ?>':
-			case '<?= SERVICE_CALC_WEIGHT_LESS ?>':
+			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_W_GE ?>':
+			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_W_L ?>':
 				label.innerText = 'W';
 				unit.style.display = 'none';
 				break;
