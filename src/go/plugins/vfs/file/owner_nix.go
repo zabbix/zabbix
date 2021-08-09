@@ -83,9 +83,7 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 
 	switch ownertype + resulttype {
 	case "userid":
-		u := strconv.FormatUint(uint64(stat.Uid), 10)
-		g := strconv.FormatUint(uint64(stat.Gid), 10)
-		ret = u + "/" + g
+		ret = strconv.FormatUint(uint64(stat.Uid), 10)
 	case "groupid":
 		ret = strconv.FormatUint(uint64(stat.Gid), 10)
 	case "username":
