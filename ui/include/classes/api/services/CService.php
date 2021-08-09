@@ -474,7 +474,7 @@ class CService extends CApiService {
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($tags, 'serviceid', 'servicetagid');
-			$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid'], $options['selectTags']);
+			$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid']);
 			$result = $relation_map->mapMany($result, $tags, 'tags');
 
 			if ($options['selectTags'] === API_OUTPUT_COUNT) {
@@ -504,9 +504,7 @@ class CService extends CApiService {
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($problem_tags, 'serviceid', 'service_problem_tagid');
-			$problem_tags = $this->unsetExtraFields($problem_tags, ['service_problem_tagid', 'serviceid'],
-				$options['selectProblemTags']
-			);
+			$problem_tags = $this->unsetExtraFields($problem_tags, ['service_problem_tagid', 'serviceid']);
 			$result = $relation_map->mapMany($result, $problem_tags, 'problem_tags');
 
 			if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
@@ -534,8 +532,15 @@ class CService extends CApiService {
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($times, 'serviceid', 'timeid');
-			$times = $this->unsetExtraFields($times, ['timeid', 'serviceid'], $options['selectTimes']);
+			$times = $this->unsetExtraFields($times, ['timeid', 'serviceid']);
 			$result = $relation_map->mapMany($result, $times, 'times');
+
+			if ($options['selectTimes'] === API_OUTPUT_COUNT) {
+				foreach ($result as &$row) {
+					$row['times'] = (string) count($row['times']);
+				}
+				unset($row);
+			}
 		}
 
 		if ($options['selectAlarms'] !== null) {
@@ -555,8 +560,15 @@ class CService extends CApiService {
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($alarms, 'serviceid', 'servicealarmid');
-			$alarms = $this->unsetExtraFields($alarms, ['servicealarmid', 'serviceid'], ['selectAlarms']);
+			$alarms = $this->unsetExtraFields($alarms, ['servicealarmid', 'serviceid']);
 			$result = $relation_map->mapMany($result, $alarms, 'alarms');
+
+			if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
+				foreach ($result as &$row) {
+					$row['alarms'] = (string) count($row['alarms']);
+				}
+				unset($row);
+			}
 		}
 
 		return $result;

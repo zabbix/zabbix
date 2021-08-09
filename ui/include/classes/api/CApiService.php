@@ -271,15 +271,15 @@ class CApiService {
 	}
 
 	/**
-	 * Unsets fields $fields from the given objects if they are not requested in $output.
+	 * Unset those fields of the objects, which are not requested for the $output.
 	 *
 	 * @param array        $objects
 	 * @param array        $fields
-	 * @param string|array $output		desired output
+	 * @param string|array $output   requested output
 	 *
 	 * @return array
 	 */
-	protected function unsetExtraFields(array $objects, array $fields, $output) {
+	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		// find the fields that have not been requested
 		$extraFields = [];
 		foreach ($fields as $field) {
