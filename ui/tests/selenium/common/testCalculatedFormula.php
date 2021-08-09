@@ -513,11 +513,6 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => 'monoinc(/host/trap[*], #5:now-1w, "weak")'
-				]
-			],
-			[
-				[
 					'formula' => 'monoinc(/host/trap[*], #5:now-1w, "strict")'
 				]
 			],
@@ -535,11 +530,6 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'monodec(/host/trap, #5, "weak")'
-				]
-			],
-			[
-				[
-					'formula' => 'monodec(/host/trap[*], #5:now-1w, "weak")'
 				]
 			],
 			[
