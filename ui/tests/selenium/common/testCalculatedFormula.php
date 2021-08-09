@@ -912,7 +912,7 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'count(max_foreach(/host/trap,1h)1)',
+					'formula' => 'count(max_foreach(/host/trap,1h),1)',
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h)1)".'
 				]
 			],
