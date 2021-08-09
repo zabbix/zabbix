@@ -336,9 +336,9 @@ class testDashboardPages extends CWebTest {
 
 	private function selectPage($page_name, $index = 1) {
 		$selector = '//div[@class="dashboard-navigation-tabs"]//ul[@class="sortable-list"]';
-		$this->query('xpath:('.$selector.'//span[@title='.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
+		$this->query('xpath:('.$selector. '//span[@title='.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
 				->one()->click();
-		$this->query('xpath:'.$selector.'//span[@title='.CXPathHelper::escapeQuotes($page_name).
+		$this->query('xpath:'.$selector. '//span[@title='.CXPathHelper::escapeQuotes($page_name).
 				']/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
 	}
 
