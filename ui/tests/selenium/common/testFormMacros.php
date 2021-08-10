@@ -1118,7 +1118,6 @@ abstract class testFormMacros extends CWebTest {
 				}
 			}
 			unset($macro);
-
 		}
 
 		$this->assertMacros(($data !== null) ? $data['macros'] : []);
