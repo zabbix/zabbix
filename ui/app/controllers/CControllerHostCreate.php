@@ -75,9 +75,7 @@ class CControllerHostCreate extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))
-				->disableView()
-			);
+			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 		}
 
 		return $ret;
@@ -100,83 +98,92 @@ class CControllerHostCreate extends CController {
 		return $ret;
 	}
 
+	/**
+	 * Data collection, validation and creation of new host. May produce various validation and integrity exceptions,
+	 * which are stored as error messages by the underlying mechanisms.
+	 *
+	 * @return array Response data, empty on errors.
+	 */
+	private function createHost(): array {
+		$host = array_filter([
+			'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
+			'proxy_hostid' => $this->getInput('proxy_hostid', 0),
+			'groups' => $this->processHostGroups(),
+			'interfaces' => $this->processHostInterfaces(),
+			'tags' => $this->processTags(),
+			'templates' => zbx_toObject($this->getInput('add_templates', []), 'templateid'),
+			'macros' => $this->processUserMacros(),
+			'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) != HOST_INVENTORY_DISABLED)
+				? $this->getInput('host_inventory', [])
+				: [],
+			'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
+			'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
+		]);
+
+		$this->getInputs($host, [
+			'host', 'visiblename', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege',
+			'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk',
+			'inventory_mode'
+		]);
+
+		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+			unset($host['tls_psk'], $host['tls_psk_identity']);
+		}
+
+		if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
+				&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
+			unset($host['tls_issuer'], $host['tls_subject']);
+		}
+
+		$host = CArrayHelper::renameKeys($host, ['visiblename' => 'name']);
+
+		$full_clone = $this->hasInput('full_clone');
+		$src_hostid = $this->getInput('clone_hostid', false);
+
+		if ($src_hostid) {
+			$host = $this->extendHostCloneEncryption($host, (int) $src_hostid);
+		}
+
+		$hostids = API::Host()->create($host);
+
+		if ($hostids !== false && $this->createValueMaps((int) $hostids['hostids'][0])
+			&& (!$full_clone || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
+			return [
+				'hostid' => $hostids['hostids'][0],
+				'message' => makeMessageBox(true, [], _('Host updated'), true, false)->toString(),
+				'message_raw' => _('Host added')
+			];
+		}
+
+		return [];
+	}
+
 	protected function doAction(): void {
-		$hostids = false;
-
 		try {
-			$host = array_filter([
-				'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
-				'proxy_hostid' => $this->getInput('proxy_hostid', 0),
-				'groups' => $this->processHostGroups(),
-				'interfaces' => $this->processHostInterfaces(),
-				'tags' => $this->processTags(),
-				'templates' => zbx_toObject($this->getInput('add_templates', []), 'templateid'),
-				'macros' => $this->processUserMacros(),
-				'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) != HOST_INVENTORY_DISABLED)
-					? $this->getInput('host_inventory', [])
-					: [],
-				'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
-				'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
-			]);
-
-			$this->getInputs($host, [
-				'host', 'visiblename', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege',
-				'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk',
-				'inventory_mode'
-			]);
-
-			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-				unset($host['tls_psk'], $host['tls_psk_identity']);
-			}
-
-			if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
-					&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
-				unset($host['tls_issuer'], $host['tls_subject']);
-			}
-
-			$host = CArrayHelper::renameKeys($host, [
-				'visiblename' => 'name'
-			]);
-
-			$full_clone = $this->hasInput('full_clone');
-			$src_hostid = $this->getInput('clone_hostid', false);
-
-			if ($src_hostid) {
-				$host = $this->extendHostClone($host, (int) $src_hostid);
-			}
-
-			$output = [];
-			$hostids = API::Host()->create($host);
+			$output = $this->createHost();
 		}
 		catch (Exception $exception) {
 			// Code is not missing here.
 		}
-		if ($hostids !== false && $this->createValueMaps((int) $hostids['hostids'][0])
-				&& (!$full_clone || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
-			$output += [
-				'hostid' => $hostids['hostids'][0],
-				'message' => _('Host added')
-			];
-		}
 
 		if (($messages = getMessages()) !== null) {
-			$output['errors'] = $messages->toString();
+			$output = ['errors' => $messages->toString()];
 		}
 
-		$response = (new CControllerResponseData(['main_block' => json_encode($output)]))
-			->disableView();
-		$this->setResponse($response);
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 
 	/**
-	 * Copy write-only fields from source host to the new host. Used to clone host.
+	 * Copy write-only PSK fields values from source host to the new host. Used to clone host.
 	 *
-	 * @param array $host
-	 * @param int   $src_hostid
+	 * @param array $host                New host data to update.
+	 * @param array $host['tls_connect'] Type of connection to host.
+	 * @param array $host['tls_accept']  Type(s) of connection from host.
+	 * @param int   $src_hostid          ID of host to copy data from.
 	 *
-	 * @return array
+	 * @return array New host data with PSK, identity added (if applicable).
 	 */
-	private function extendHostClone(array $host, int $src_hostid): array {
+	private function extendHostCloneEncryption(array $host, int $src_hostid): array {
 		if ($host['tls_connect'] == HOST_ENCRYPTION_PSK || ($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
 			// Add values to PSK fields from cloned host.
 			$clone_hosts = API::Host()->get([
@@ -185,7 +192,7 @@ class CControllerHostCreate extends CController {
 				'editable' => true
 			]);
 
-			if (reset($clone_hosts)) {
+			if ($clone_hosts) {
 				$host['tls_psk_identity'] = $this->getInput('tls_psk_identity', $clone_hosts[0]['tls_psk_identity']);
 				$host['tls_psk'] = $this->getInput('tls_psk', $clone_hosts[0]['tls_psk']);
 			}
@@ -357,7 +364,7 @@ class CControllerHostCreate extends CController {
 
 		// Copy graphs.
 		$db_graphs = API::Graph()->get([
-			'output' => API_OUTPUT_EXTEND,
+			'output' => [],
 			'selectHosts' => ['hostid'],
 			'selectItems' => ['type'],
 			'hostids' => $src_hostid,

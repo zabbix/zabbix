@@ -520,14 +520,14 @@ $linked_templates = $host_is_discovered
 					let filter_btn = document.querySelector('[name=filter_set]');
 
 					if (current_curl.getArgument('action') === 'host.list' || typeof filter_btn !== 'undefined') {
-						postMessageOk(response.message)
+						postMessageOk(response.message_raw)
 						redirect(current_curl.getUrl())
 					}
 					else {
 						filter_btn = document.querySelector('[name="filter_apply"]');
 
 						clearMessages();
-						addMessage(response.message_box);
+						addMessage(response.message);
 
 						if (typeof filter_btn !== 'undefined') {
 							filter_btn.click();

@@ -121,7 +121,10 @@ class CControllerHostEdit extends CController {
 			}
 			else {
 				$this->host = API::Host()->get([
-					'output' => API_OUTPUT_EXTEND,
+					'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
+						'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
+						'tls_subject', 'flags', 'inventory_mode'
+					],
 					'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
 					'selectGroups' => ['groupid'],
 					'selectHostDiscovery' => ['parent_hostid'],

@@ -505,18 +505,6 @@ function getHostInterface(?array $interface): string {
 	return $ip_or_dns.':'.$interface['port'];
 }
 
-function get_hostgroup_by_groupid($groupid) {
-	$groups = DBfetch(DBselect('SELECT g.* FROM hstgrp g WHERE g.groupid='.zbx_dbstr($groupid)));
-
-	if ($groups) {
-		return $groups;
-	}
-
-	error(_s('No host groups with group ID "%1$s".', $groupid));
-
-	return false;
-}
-
 function get_host_by_itemid($itemids) {
 	$res_array = is_array($itemids);
 	zbx_value2array($itemids);

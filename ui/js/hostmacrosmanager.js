@@ -211,12 +211,12 @@ class HostMacrosManager {
 		});
 
 		// Init tab indicator observer.
-		const macro_indicator = new MacrosTabIndicatorItem;
+		const macro_indicator = new MacrosTabIndicatorItem,
+			tab = document.querySelector('#tab_macros-tab');
 
-		// Tab element.
-		const tab = document.querySelector('#tab_macros-tab');
 		if (tab) {
 			macro_indicator.initObserver(tab);
+			macro_indicator.addAttributes(tab);
 		}
 	}
 
