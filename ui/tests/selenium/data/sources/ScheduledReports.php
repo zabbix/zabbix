@@ -29,7 +29,7 @@ class ScheduledReports {
 		CDataHelper::call('user.create', [
 			[
 				'username' => 'admin user for testFormScheduledReport',
-				'passwd' => 'zabbix123',
+				'passwd' => 'xibbaz123',
 				'roleid' => 2,
 				'usrgrps' => [
 					[
@@ -39,7 +39,7 @@ class ScheduledReports {
 			],
 			[
 				'username' => 'user-recipient of the report',
-				'passwd' => 'zabbix123',
+				'passwd' => 'xibbaz123',
 				'roleid' => 2,
 				'usrgrps' => [
 					[
