@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-04-06T06:13:42Z'
+  date: '2021-07-21T15:15:32Z'
   media_types:
     -
       name: Slack
@@ -74,7 +74,7 @@ zabbix_export:
           value: '{HOST.CONN}'
         -
           name: host_name
-          value: '{HOST.HOST}'
+          value: '{HOST.NAME}'
         -
           name: message_ts
           value: '{EVENT.TAGS.__message_ts}'
