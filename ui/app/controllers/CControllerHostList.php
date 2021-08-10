@@ -221,8 +221,8 @@ class CControllerHostList extends CController {
 		);
 
 		$hosts = API::Host()->get([
-			'output' => ['name', 'proxy_hostid', 'maintenance_status', 'maintenanceid', 'flags', 'status',
-				'tls_connect', 'tls_accept'
+			'output' => ['name', 'proxy_hostid', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'flags',
+				'status', 'tls_connect', 'tls_accept'
 			],
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectInterfaces' => API_OUTPUT_EXTEND,

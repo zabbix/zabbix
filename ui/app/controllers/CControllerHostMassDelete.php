@@ -48,7 +48,7 @@ class CControllerHostMassDelete extends CController {
 		$result = API::Host()->delete($hostids);
 
 		if ($result) {
-			uncheckTableRows();
+			uncheckTableRows('hosts');
 		}
 		else {
 			$hostids = API::Host()->get([
@@ -57,7 +57,7 @@ class CControllerHostMassDelete extends CController {
 				'editable' => true
 			]);
 
-			uncheckTableRows(null, array_column($hostids, 'hostid'));
+			uncheckTableRows('hosts', array_column($hostids, 'hostid'));
 		}
 
 		if ($result) {
