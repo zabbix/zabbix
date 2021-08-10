@@ -19,6 +19,11 @@
 **/
 
 
+if (empty($_GET['files']) && !array_key_exists('showGuiMessaging', $_GET)) {
+	// Scripts get loaded by second jsLoader call.
+	return;
+}
+
 // get language translations
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
@@ -408,7 +413,6 @@ $translate_strings = [
 
 $js = '';
 if (empty($_GET['files'])) {
-
 	$files = [
 		'jquery.js',
 		'jquery-ui.js',
@@ -456,7 +460,7 @@ if (empty($_GET['files'])) {
 	}
 
 	// load frontend messaging only for some pages
-	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
+	if (array_key_exists('showGuiMessaging', $_GET) && $_GET['showGuiMessaging']) {
 		$files[] = 'class.browsertab.js';
 		$files[] = 'class.notification.collection.js';
 		$files[] = 'class.notifications.audio.js';
