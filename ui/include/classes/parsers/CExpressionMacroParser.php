@@ -35,14 +35,36 @@ class CExpressionMacroParser extends CParser {
 	private $error = '';
 
 	/**
-	 * Set up necessary parsers.
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'usermacros' => false    Enable user macros usage in expression.
+	 *   'lldmacros' => false     Enable low-level discovery macros usage in expression.
+	 *   'host_macro_n' => false  Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false    Allow empty hostname in the query string.
+	 *
+	 * @var array
 	 */
-	public function __construct() {
+	private $options = [
+		'usermacros' => false,
+		'lldmacros' => false,
+		'host_macro_n' => false,
+		'empty_host' => false
+	];
+
+	/**
+	 * Set up necessary parsers.
+	 *
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+
 		$this->expression_parser = new CExpressionParser([
-			'usermacros' => true,
-			'lldmacros' => true,
-			'host_macro_n' => true,
-			'empty_host' => true
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros'],
+			'host_macro_n' => $this->options['host_macro_n'],
+			'empty_host' => $this->options['empty_host']
 		]);
 	}
 
