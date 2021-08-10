@@ -80,10 +80,34 @@ PREPARE_AUDIT_HOST_INTERFACE(resource, contextname, const char*, string)					\
 PREPARE_AUDIT_HOST(host, AUDIT_RESOURCE_HOST)
 PREPARE_AUDIT_HOST(host_prototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
 
+#define PREPARE_AUDIT_HOST_UPDATE(resource, type1, type2)						\
+void	zbx_audit_host_update_json_update_##resource(zbx_uint64_t hostid, type1 old_##resource,		\
+		type1 new_##resource);									\
+
+PREPARE_AUDIT_HOST_UPDATE(host, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE(name, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE(proxy_hostid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_HOST_UPDATE(ipmi_authtype, int, int)
+PREPARE_AUDIT_HOST_UPDATE(ipmi_privilege, int, int)
+PREPARE_AUDIT_HOST_UPDATE(ipmi_username, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE(ipmi_password, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE(tls_connect, int, int)
+PREPARE_AUDIT_HOST_UPDATE(tls_accept, int, int)
+PREPARE_AUDIT_HOST_UPDATE(tls_issuer, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE(tls_subject, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE(tls_psk_identity, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE(tls_psk, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE(custom_interfaces, int, int)
+#undef PREPARE_AUDIT_HOST_UPDATE
+
 void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid);
 void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
 		zbx_vector_uint64_t *groupids);
 void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname);
+void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *host, zbx_uint64_t proxy_hostid,
+		int ipmi_authtype, int ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
+		int status, int flags, int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject,
+		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces);
 void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname);
 void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid, const char *name,
 		int status, int discover, int custom_interfaces);
