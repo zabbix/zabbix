@@ -162,7 +162,7 @@ function actionConditionValueToString(array $actions) {
 					break;
 
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
-					$result[$i][$j] = getSeverityName($condition['value']);
+					$result[$i][$j] = CSeverityHelper::getName((int) $condition['value']);
 					break;
 
 				case CONDITION_TYPE_DRULE:
@@ -1737,8 +1737,8 @@ function makeEventSeverityChangesIcon(array $data, array $users) {
 		$severity['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		// severity changes
-		$old_severity_name = getSeverityName($severity['old_severity']);
-		$new_severity_name = getSeverityName($severity['new_severity']);
+		$old_severity_name = CSeverityHelper::getName((int) $severity['old_severity']);
+		$new_severity_name = CSeverityHelper::getName((int) $severity['new_severity']);
 
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']),
@@ -2061,8 +2061,8 @@ function makeActionTableIcon(array $action) {
 					? ZBX_STYLE_ACTION_ICON_SEV_UP
 					: ZBX_STYLE_ACTION_ICON_SEV_DOWN;
 
-				$old_severity_name = getSeverityName($action['old_severity']);
-				$new_severity_name = getSeverityName($action['new_severity']);
+				$old_severity_name = CSeverityHelper::getName((int) $action['old_severity']);
+				$new_severity_name = CSeverityHelper::getName((int) $action['new_severity']);
 				$hint = $old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name;
 
 				$action_icons[] = makeActionIcon(['icon' => $action_type, 'hint' => $hint]);

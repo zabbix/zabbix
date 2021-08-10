@@ -88,7 +88,7 @@ class CServiceHelper {
 	public static function getRuleStatusNames(): array {
 		$status_names = [-1 => _('OK')];
 
-		foreach (getSeverities() as $severity) {
+		foreach (CSeverityHelper::getSeverities() as $severity) {
 			$status_names[$severity['value']] = $severity['name'];
 		}
 

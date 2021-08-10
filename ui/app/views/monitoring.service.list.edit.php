@@ -81,8 +81,8 @@ if ($data['service'] !== null && !$data['is_filtered']) {
 		$service_status_style_class = null;
 	}
 	else {
-		$service_status = getSeverityName($data['service']['status']);
-		$service_status_style_class = 'service-status-'.getSeverityStyle($data['service']['status']);
+		$service_status = CSeverityHelper::getName((int) $data['service']['status']);
+		$service_status_style_class = 'service-status-'.CSeverityHelper::getStyle((int) $data['service']['status']);
 	}
 
 	$filter

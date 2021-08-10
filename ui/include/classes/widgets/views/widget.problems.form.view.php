@@ -68,7 +68,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['problem']), CWidgetHelper::g
 // Severity.
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['severities']),
-	CWidgetHelper::getSeverities($fields['severities'])
+	CWidgetHelper::getSeverities((int) $fields['severities'])
 );
 
 // Tags.

@@ -1262,7 +1262,7 @@ function getMapHighligts(array $map, array $map_info) {
 
 		switch ($element_info['icon_type']) {
 			case SYSMAP_ELEMENT_ICON_ON:
-				$hl_color = getSeverityColor($element_info['priority']);
+				$hl_color = CSeverityHelper::getColor((int) $element_info['priority']);
 				break;
 
 			case SYSMAP_ELEMENT_ICON_MAINTENANCE:

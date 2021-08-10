@@ -32,7 +32,7 @@ $help_hint = (new CList())
 	->addItem([
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOTIF_INDIC)
-			->addClass(getSeverityStyle(null, false)),
+			->addClass(CSeverityHelper::getStyle(null, false)),
 		new CTag('h4', true, _('OK')),
 		(new CTag('p', true, ''))->addClass(ZBX_STYLE_GREY)
 	]);
@@ -40,8 +40,8 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 	$help_hint->addItem([
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOTIF_INDIC)
-			->addClass(getSeverityStyle($severity)),
-		new CTag('h4', true, getSeverityName($severity)),
+			->addClass(CSeverityHelper::getStyle($severity)),
+		new CTag('h4', true, CSeverityHelper::getName($severity)),
 		(new CTag('p', true, _('PROBLEM')))->addClass(ZBX_STYLE_GREY)
 	]);
 }
@@ -54,7 +54,7 @@ if ($blink_period > 0) {
 		->addItem(
 			(new CDiv())
 				->addClass(ZBX_STYLE_NOTIF_INDIC)
-				->addClass(getSeverityStyle(null, false))
+				->addClass(CSeverityHelper::getStyle(null, false))
 				->addClass('blink')
 				->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN)
 		);
@@ -62,7 +62,7 @@ if ($blink_period > 0) {
 		$indic_container->addItem(
 			(new CDiv())
 				->addClass(ZBX_STYLE_NOTIF_INDIC)
-				->addClass(getSeverityStyle($severity))
+				->addClass(CSeverityHelper::getStyle($severity))
 				->addClass('blink')
 				->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN)
 			);

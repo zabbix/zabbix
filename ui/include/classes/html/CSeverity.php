@@ -55,7 +55,7 @@ class CSeverity extends CRadioButtonList {
 	}
 
 	public function toString(bool $destroy = true): string {
-		foreach (getSeverities() as $severity) {
+		foreach (CSeverityHelper::getSeverities() as $severity) {
 			$this->addValue($severity['name'], $severity['value'], $severity['style']);
 		}
 

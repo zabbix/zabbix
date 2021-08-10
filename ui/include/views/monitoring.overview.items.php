@@ -31,8 +31,8 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 	$help_hint->addItem([
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOTIF_INDIC)
-			->addClass(getSeverityStyle($severity)),
-		new CTag('h4', true, getSeverityName($severity)),
+			->addClass(CSeverityHelper::getStyle($severity)),
+		new CTag('h4', true, CSeverityHelper::getName($severity)),
 		(new CTag('p', true, _('PROBLEM')))->addClass(ZBX_STYLE_GREY)
 	]);
 }

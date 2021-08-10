@@ -41,7 +41,7 @@ else {
 
 	for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
 		if (in_array($severity, $filter_severities)) {
-			$header[] = getSeverityName($severity);
+			$header[] = CSeverityHelper::getName($severity);
 		}
 	}
 
