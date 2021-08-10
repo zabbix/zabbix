@@ -1238,7 +1238,7 @@ static void	service_problems_index_clean(void *data)
  ******************************************************************************/
 static int	service_get_status(const zbx_service_t	*service, int *status)
 {
-	if (ZBX_SERVICE_STATUS_IGNORE == service->propagation_rule)
+	if (ZBX_SERVICE_STATUS_PROPAGATION_IGNORE == service->propagation_rule)
 		return FAIL;
 
 	if (ZBX_SERVICE_STATUS_OK == service->status)
@@ -1249,20 +1249,20 @@ static int	service_get_status(const zbx_service_t	*service, int *status)
 
 	switch (service->propagation_rule)
 	{
-		case ZBX_SERVICE_STATUS_AS_IS:
+		case ZBX_SERVICE_STATUS_PROPAGATION_AS_IS:
 			*status = service->status;
 			break;
-		case ZBX_SERVICE_STATUS_INCREASE:
+		case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
 			*status = service->status + service->propagation_value;
 			if (TRIGGER_SEVERITY_COUNT <= *status)
 				*status = TRIGGER_SEVERITY_COUNT - 1;
 			break;
-		case ZBX_SERVICE_STATUS_DECREASE:
+		case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
 			*status = service->status - service->propagation_value;
 			if (ZBX_SERVICE_STATUS_OK >= *status)
 				*status = ZBX_SERVICE_STATUS_OK + 1;
 			break;
-		case ZBX_SERVICE_STATUS_FIXED:
+		case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
 			*status = service->propagation_value;
 			break;
 		default:
