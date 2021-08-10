@@ -129,10 +129,10 @@ class testEscalations extends CIntegrationTest {
 					[
 						'conditiontype' => CONDITION_TYPE_TRIGGER,
 						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => self::$triggerid,
+						'value' => self::$triggerid
 					]
 				],
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
 			],
 			'name' => 'Trapper received 1 (problem) clone',
 			'operations' => [
@@ -189,7 +189,7 @@ class testEscalations extends CIntegrationTest {
 						'value' => '0'
 					]
 				],
-				'evaltype' => CONDITION_EVAL_TYPE_AND,
+				'evaltype' => CONDITION_EVAL_TYPE_AND
 			],
 			'name' => 'Not supported item on '.self::HOST_NAME,
 			'operations' => [
@@ -519,7 +519,7 @@ class testEscalations extends CIntegrationTest {
 					],
 					'opmessage_grp' => [['usrgrpid' => 7]]
 				]
-			],
+			]
 		]);
 
 		$this->assertArrayHasKey('actionids', $response['result']);
@@ -598,7 +598,7 @@ class testEscalations extends CIntegrationTest {
 					],
 					'opmessage_grp' => [['usrgrpid' => 7]]
 				]
-			],
+			]
 		]);
 
 		$this->assertArrayHasKey('actionids', $response['result']);
@@ -611,7 +611,7 @@ class testEscalations extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
-			'actionsids' => [self::$trigger_actionid],
+			'actionsids' => [self::$trigger_actionid]
 			]
 		);
 		$this->assertCount(2, $response['result']);
@@ -647,11 +647,11 @@ HEREDOC;
 			'parameters' => [
 				[
 					'name' => 'event_value',
-					'value' => '{EVENT.VALUE}',
+					'value' => '{EVENT.VALUE}'
 				],
 				[
 					'name' => 'event_update_status',
-					'value' => '{EVENT.SOURCE}',
+					'value' => '{EVENT.SOURCE}'
 				]
 			],
 			'content_type' => 1
@@ -682,10 +682,10 @@ HEREDOC;
 					[
 						'conditiontype' => CONDITION_TYPE_TRIGGER,
 						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => self::$triggerid,
+						'value' => self::$triggerid
 					]
 				],
-				'evaltype' => 0,
+				'evaltype' => 0
 			],
 			'name' => 'Trapper received 1 (unfinished alert check)',
 			'operations' => [
@@ -699,9 +699,9 @@ HEREDOC;
 						'default_msg' => 0,
 						'mediatypeid' => $mediatypeid,
 						'subject' => 's',
-						'message' => 's',
+						'message' => 's'
 					],
-					'opmessage_grp' => [['usrgrpid' => 7]],
+					'opmessage_grp' => [['usrgrpid' => 7]]
 				]
 			],
 			'pause_suppressed' => 0,
@@ -713,8 +713,8 @@ HEREDOC;
 						'default_msg' => 0,
 						'mediatypeid' => 0,
 						'subject' => 'R',
-						'message' => 'R',
-					],
+						'message' => 'R'
+					]
 				]
 			]
 		]);
@@ -765,11 +765,11 @@ HEREDOC;
 					[
 						'conditiontype' => '2',
 						'operator' => 0,
-						'value' => $dep_triggerid,
+						'value' => $dep_triggerid
 					]
 				],
-				'evaltype' => 0,
-			],
+				'evaltype' => 0
+			]
 		]);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
