@@ -25,7 +25,7 @@
 
 $this->includeJsFile('configuration.host.edit.html.js.php');
 
-$host_is_discovered = ((int) $data['host']['flags'] === ZBX_FLAG_DISCOVERY_CREATED);
+$host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 
 $host_form = (new CForm())
 	->setId($data['form_name'])
@@ -441,7 +441,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 
 // Encryption tab.
 $tls_accept = (int) $data['host']['tls_accept'];
-$is_psk_set = ((int) $data['host']['tls_connect'] = HOST_ENCRYPTION_PSK || $tls_accept & HOST_ENCRYPTION_PSK);
+$is_psk_set = ($data['host']['tls_connect'] == HOST_ENCRYPTION_PSK || $tls_accept & HOST_ENCRYPTION_PSK);
 
 $encryption_tab = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
