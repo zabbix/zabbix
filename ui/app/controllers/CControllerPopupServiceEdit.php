@@ -52,12 +52,15 @@ class CControllerPopupServiceEdit extends CController {
 
 		if ($this->hasInput('serviceid')) {
 			$this->service = API::Service()->get([
-				'output' => ['serviceid', 'name', 'algorithm', 'showsla', 'goodsla', 'sortorder'],
+				'output' => ['serviceid', 'name', 'algorithm', 'showsla', 'goodsla', 'sortorder', 'weight',
+					'propagation_rule', 'propagation_value'
+				],
 				'selectParents' => ['serviceid', 'name'],
 				'selectChildren' => ['serviceid', 'name', 'algorithm'],
 				'selectTags' => ['tag', 'value'],
 				'selectProblemTags' => ['tag', 'operator', 'value'],
 				'selectTimes' => ['type', 'ts_from', 'ts_to', 'note'],
+				'selectStatusRules' => ['type', 'limit_value', 'limit_status', 'new_status'],
 				'serviceids' => $this->getInput('serviceid')
 			]);
 

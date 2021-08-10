@@ -182,7 +182,7 @@ foreach (range(1, 5) as $value) {
 }
 
 $propagation_value_status = (new CSeverity('propagation_value_status', (int) $data['form']['propagation_value']))
-	->addValue(_('OK'), TRIGGER_SEVERITY_NONE, ZBX_STYLE_NORMAL_BG);
+	->addValue(_('OK'), ZBX_SEVERITY_OK, ZBX_STYLE_NORMAL_BG);
 
 $service_tab
 	->addItem([

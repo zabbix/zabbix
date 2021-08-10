@@ -52,10 +52,10 @@ class CControllerPopupServiceRuleEdit extends CController {
 
 	protected function doAction(): void {
 		$form = [
-			'new_status' => $this->getInput('new_status', TRIGGER_SEVERITY_NONE),
+			'new_status' => $this->getInput('new_status', ZBX_SEVERITY_OK),
 			'type' => $this->getInput('type', ZBX_SERVICE_STATUS_RULE_TYPE_N_GE),
 			'limit_value' => $this->getInput('limit_value', 0),
-			'limit_status' => $this->getInput('limit_status', TRIGGER_SEVERITY_NONE)
+			'limit_status' => $this->getInput('limit_status', ZBX_SEVERITY_OK)
 		];
 
 		$data = [
