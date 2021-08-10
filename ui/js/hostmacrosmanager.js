@@ -214,7 +214,7 @@ class HostMacrosManager {
 		const macro_indicator = new MacrosTabIndicatorItem;
 
 		// Tab element.
-		const tab = document.querySelector('#tab_macroTab');
+		const tab = document.querySelector('#tab_macros-tab');
 		if (tab) {
 			macro_indicator.initObserver(tab);
 		}
