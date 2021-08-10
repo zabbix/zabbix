@@ -3033,7 +3033,7 @@ static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces,
 			if (0 != strcmp(interface->port, port))
 				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_PORT;
 
-			if (INTERFACE_TYPE_SNMP == interface->type)
+			if (INTERFACE_TYPE_SNMP == interface->type && INTERFACE_TYPE_SNMP == type)
 			{
 				zbx_interface_prototype_snmp_t *snmp = interface->data.snmp;
 
