@@ -895,10 +895,11 @@ err:
 
 static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 {
-	int		i, nr, f, ret = SYSINFO_RET_FAIL;
+	int		i, f, ret = SYSINFO_RET_FAIL;
 	char		buf[16 * ZBX_KIBIBYTE];
 	char		hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 	double		ts;
+	ssize_t		nr;
 	sha256_ctx	ctx;
 
 	ts = zbx_time();
@@ -917,7 +918,7 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 
 	zbx_sha256_init(&ctx);
 
-	while (0 < (nr = (int)read(f, buf, sizeof(buf))))
+	while (0 < (nr = read(f, buf, sizeof(buf))))
 	{
 		if (CONFIG_TIMEOUT < zbx_time() - ts)
 		{
