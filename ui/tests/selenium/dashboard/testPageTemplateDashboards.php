@@ -121,7 +121,7 @@ class testPageTemplateDashboards extends CWebTest {
 	public function testPageTemplateDashboards_Delete() {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::TEMPLATEID);
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilVisible();
-		$table->findRows($this->wrapDashboardNames(self::DASHBOARDS_2_DELETE))->select();
+		$table->findRows('Name', self::DASHBOARDS_2_DELETE)->select();
 
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
