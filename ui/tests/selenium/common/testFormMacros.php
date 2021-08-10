@@ -105,6 +105,21 @@ abstract class testFormMacros extends CWebTest {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'Name' => 'With lowercase MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$lowercase}',
+							'value' => 'lowercase_value',
+							'description' => 'UPPERCASE DESCRIPTION'
+						]
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'Name' => 'Without dollar in MACROS',
 					'macros' => [
@@ -116,6 +131,51 @@ abstract class testFormMacros extends CWebTest {
 					],
 					'error_details_host' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".',
 					'error_details_prototype' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With two dollars in MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$$MACRO}'
+						]
+					],
+					'error_details_host' => 'Invalid macro "{$$MACRO}": incorrect syntax near "$MACRO}".',
+					'error_details_prototype' => 'Invalid macro "{$$MACRO}": incorrect syntax near "$MACRO}".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With wrong symbols in MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MAC%^}'
+						]
+					],
+					'error_details_host' => 'Invalid macro "{$MAC%^}": incorrect syntax near "%^}".',
+					'error_details_prototype' => 'Invalid macro "{$MAC%^}": incorrect syntax near "%^}".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With LLD macro in MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{#LLD_MACRO}'
+						]
+					],
+					'error_details_host' => 'Invalid macro "{#LLD_MACRO}": incorrect syntax near "#LLD_MACRO}".',
+					'error_details_prototype' => 'Invalid macro "{#LLD_MACRO}": incorrect syntax near "#LLD_MACRO}".'
 				]
 			],
 			[
@@ -266,23 +326,23 @@ abstract class testFormMacros extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
+							'macro' => '{$lowercase}',
+							'value' => 'lowercase_value',
+							'description' => 'UPPERCASE DESCRIPTION'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
 							'macro' => '{$MACRO:regex:"^[a-z]"}',
 							'value' => 'regex',
 							'description' => ''
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
+							'index' => 2,
 							'macro' => '{$MACRO:regex:^[0-9a-z]}',
 							'value' => '',
 							'description' => 'DESCRIPTION'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'macro' => '{$UPDATED_MACRO_2}',
-							'value' => 'Значение',
-							'description' => 'Описание'
 						]
 					]
 				]
@@ -317,6 +377,51 @@ abstract class testFormMacros extends CWebTest {
 					],
 					'error_details_host' => 'Invalid macro "": macro is empty.',
 					'error_details_prototype' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With two dollars in MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$$MACRO}'
+						]
+					],
+					'error_details_host' => 'Invalid macro "{$$MACRO}": incorrect syntax near "$MACRO}".',
+					'error_details_prototype' => 'Invalid macro "{$$MACRO}": incorrect syntax near "$MACRO}".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With wrong symbols in MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MAC%^}'
+						]
+					],
+					'error_details_host' => 'Invalid macro "{$MAC%^}": incorrect syntax near "%^}".',
+					'error_details_prototype' => 'Invalid macro "{$MAC%^}": incorrect syntax near "%^}".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With LLD macro in MACROS',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{#LLD_MACRO}'
+						]
+					],
+					'error_details_host' => 'Invalid macro "{#LLD_MACRO}": incorrect syntax near "#LLD_MACRO}".',
+					'error_details_prototype' => 'Invalid macro "{#LLD_MACRO}": incorrect syntax near "#LLD_MACRO}".'
 				]
 			],
 			[
@@ -398,18 +503,18 @@ abstract class testFormMacros extends CWebTest {
 	 *  Check adding and saving macros in host, host prototype or template form.
 	 *
 	 * @param array	     $data			given data provider
-	 * @param string     $form_type		string used in form selector
 	 * @param string     $host_type		string defining is it host, template or host prototype
 	 * @param string     $name			name of host where changes are made
 	 * @param boolean    $update		true if update, false if create
 	 * @param boolean    $is_prototype	defines is it prototype or not
 	 * @param int        $lld_id	    points to LLD rule id where host prototype belongs
 	 */
-	public function checkMacros($data, $form_type, $host_type, $name = null, $update = false, $is_prototype = false, $lld_id = null) {
+	public function checkMacros($data, $host_type, $name = null, $update = false, $is_prototype = false, $lld_id = null) {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
 
+		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		if ($update) {
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
@@ -417,7 +522,7 @@ abstract class testFormMacros extends CWebTest {
 				$is_prototype
 					? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
 					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-				);
+			);
 		}
 		else {
 			$this->page->login()->open(
@@ -428,7 +533,7 @@ abstract class testFormMacros extends CWebTest {
 
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			$name = $is_prototype ? $data['Name'].' {#KEY}' : $data['Name'];
-			$form->fill([ucfirst($host_type).' name' => $name]);
+			$form->fill([($host_type === 'template') ? 'Template name' : 'Host name' => $name]);
 
 			if ($is_prototype) {
 				$form->selectTab('Groups');
@@ -447,8 +552,9 @@ abstract class testFormMacros extends CWebTest {
 				$this->assertMessage(TEST_GOOD, $update ? ucfirst($object).' updated' : ucfirst($object).' added');
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
 				// Check the results in form.
-				$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type, $data);
+				$this->checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, $data);
 				break;
+
 			case TEST_BAD:
 				$this->assertMessage(TEST_BAD, $update ? 'Cannot update '.$object : 'Cannot add '.$object,
 						($is_prototype ? $data['error_details_prototype'] : $data['error_details_host'])
@@ -463,12 +569,11 @@ abstract class testFormMacros extends CWebTest {
 	 * Test removing Macros from host, host prototype or template.
 	 *
 	 * @param string $name			name of host where changes are made
-	 * @param string $form_type		string used in form selector
 	 * @param string $host_type		string defining is it host, template or host prototype
 	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
-	protected function checkRemoveAll($name, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
+	protected function checkRemoveAll($name, $host_type, $is_prototype = false, $lld_id = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
 		$this->page->login()->open(
@@ -477,6 +582,7 @@ abstract class testFormMacros extends CWebTest {
 				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
+		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->removeAllMacros();
@@ -485,7 +591,7 @@ abstract class testFormMacros extends CWebTest {
 		$this->assertMessage(TEST_GOOD, ($is_prototype ? 'Host prototype' : ucfirst($host_type)).' updated');
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
 		// Check the results in form.
-		$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type, null);
+		$this->checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, null);
 	}
 
 	public static function getCheckInheritedMacrosData() {
@@ -552,12 +658,12 @@ abstract class testFormMacros extends CWebTest {
 	 * Test changing and resetting global macro on host, prototype or template.
 	 *
 	 * @param array  $data		    given data provider
-	 * @param string $form_type		string used in form selector
 	 * @param string $host_type		string defining is it host, template or host prototype
 	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
-	protected function checkChangeInheritedMacros($data, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
+	protected function checkChangeInheritedMacros($data, $host_type, $is_prototype = false, $lld_id = null) {
+		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		if ($is_prototype) {
 			$this->page->login()->open('host_prototypes.php?form=create&parent_discoveryid='.$lld_id);
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
@@ -571,7 +677,7 @@ abstract class testFormMacros extends CWebTest {
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			$name = $host_type.' with edited global macro '.time();
 			$form->fill([
-				ucfirst($host_type).' name' => $name,
+				($host_type === 'template') ? 'Template name' : 'Host name' => $name,
 				'Groups' => 'Zabbix servers'
 			]);
 		}
@@ -582,13 +688,7 @@ abstract class testFormMacros extends CWebTest {
 			case 'Add new macro':
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->page->waitUntilReady();
-
-				// Get all global macros before changes.
-				$global_macros = $this->getGlobalMacrosFrotendTable();
-
-				// Return to object's macros.
-				$radio_switcher->fill(ucfirst($host_type).' macros');
-				$this->page->waitUntilReady();
+				$global_macros = $this->getGlobalMacrosAndSwitch($radio_switcher, $host_type);
 				$this->fillMacros($data['macros']);
 
 				// Get all object's macros.
@@ -612,13 +712,10 @@ abstract class testFormMacros extends CWebTest {
 
 					$this->assertTrue($this->getValueField($data_macro['macro'])->isEnabled());
 
-					// Get macro index.
-					$macro_index = explode('_', $this->query('xpath://textarea[text()='.
-							CXPathHelper::escapeQuotes($data_macro['macro']).']')->one()->getAttribute('id'), 3
-					);
-
 					// Fill macro description by new description using found macro index.
-					$this->assertTrue($this->query('id:macros_'.$macro_index[1].'_description')->one()->isEnabled());
+					$this->assertTrue($this->query('id:macros_'.$this->getMacroIndex($data_macro['macro']).
+							'_description')->one()->isEnabled()
+					);
 				}
 
 				// Add newly added macros to global macros array.
@@ -631,13 +728,7 @@ abstract class testFormMacros extends CWebTest {
 			case 'Redefine global macro on Host':
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->page->waitUntilReady();
-
-				// Get all global macros before changes.
-				$global_macros = $this->getGlobalMacrosFrotendTable();
-
-				// Return to object's macros.
-				$radio_switcher->fill(ucfirst($host_type).' macros');
-				$this->page->waitUntilReady();
+				$global_macros = $this->getGlobalMacrosAndSwitch($radio_switcher, $host_type);
 				$this->fillMacros($data['macros']);
 
 				// Redefine macro values in expected Global macros.
@@ -662,13 +753,11 @@ abstract class testFormMacros extends CWebTest {
 					);
 
 					$this->assertTrue($this->getValueField($data_macro['macro'])->isEnabled());
-					// Get macro index.
-					$macro_index = explode('_', $this->query('xpath://textarea[text()='.
-							CXPathHelper::escapeQuotes($data_macro['macro']).']')->one()->getAttribute('id'), 3
-					);
 
 					// Fill macro description by new description using found macro index.
-					$this->assertTrue($this->query('id:macros_'.$macro_index[1].'_description')->one()->isEnabled());
+					$this->assertTrue($this->query('id:macros_'.$this->getMacroIndex($data_macro['macro']).
+							'_description')->one()->isEnabled()
+					);
 					$this->assertTrue($this->query('xpath://textarea[text()='.
 							CXPathHelper::escapeQuotes($data_macro['macro']).']/../..//button[text()="Remove"]')->exists()
 					);
@@ -692,12 +781,10 @@ abstract class testFormMacros extends CWebTest {
 					// Fill macro value by new value.
 					$this->getValueField($data_macro['macro'])->fill($data_macro['value']);
 
-					// Get macro index.
-					$macro_index = explode('_', $this->query('xpath://textarea[text()='.
-							CXPathHelper::escapeQuotes($data_macro['macro']).']')->one()->getAttribute('id'), 3);
-
 					// Fill macro description by new description using found macro index.
-					$this->query('id:macros_'.$macro_index[1].'_description')->one()->fill($data_macro['description']);
+					$this->query('id:macros_'.$this->getMacroIndex($data_macro['macro']).'_description')->one()
+							->fill($data_macro['description']
+					);
 				}
 
 				// Get new Global macro table.
@@ -831,18 +918,18 @@ abstract class testFormMacros extends CWebTest {
 	 *
 	 * @param array      $data		      given data provider
 	 * @param array      $id		      host's, prototype's or template's id
-	 * @param string     $form_type	      string used in form selector
 	 * @param string     $host_type	      string defining is it host, template or host prototype
 	 * @param boolean    $is_prototype    defines is it prototype or not
 	 * @param int        $lld_id		  points to LLD rule id where host prototype belongs
 	 */
-	protected function checkRemoveInheritedMacros($data, $id, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
-		$this->page->login()->open(
-			$is_prototype
-				? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
-				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-		);
+	protected function checkRemoveInheritedMacros($data, $id, $host_type, $is_prototype = false, $lld_id = null) {
+		$link = $is_prototype
+			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0';
 
+		$this->page->login()->open($link);
+
+		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
@@ -851,13 +938,8 @@ abstract class testFormMacros extends CWebTest {
 			case 'Remove macro from Host':
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->page->waitUntilReady();
+				$global_macros = $this->getGlobalMacrosAndSwitch($radio_switcher, $host_type);
 
-				// Get all global macros before changes.
-				$global_macros = $this->getGlobalMacrosFrotendTable();
-
-				// Return to object's macros.
-				$radio_switcher->fill(ucfirst($host_type).' macros');
-				$this->page->waitUntilReady();
 				$this->removeMacro($data['macros']);
 				$hostmacros = $this->getMacros(true);
 
@@ -887,10 +969,7 @@ abstract class testFormMacros extends CWebTest {
 				$radio_switcher->fill('Inherited and '.$host_type.' macros');
 				$this->page->waitUntilReady();
 				$this->removeMacro($data['macros']);
-				$global_macros = $this->getGlobalMacrosFrotendTable();
-
-				$radio_switcher->fill(ucfirst($host_type).' macros');
-				$this->page->waitUntilReady();
+				$global_macros = $this->getGlobalMacrosAndSwitch($radio_switcher, $host_type);
 
 				foreach ($data['macros'] as $data_macro) {
 					foreach ($hostmacros as $i => &$hostmacro) {
@@ -966,27 +1045,19 @@ abstract class testFormMacros extends CWebTest {
 					);
 					$this->assertEquals($data_macro['value'], $this->getValueField($data_macro['macro'])->getValue());
 
-					// Get macro index.
-					$macro_index = explode('_', $this->query('xpath://textarea[text()='.
-							CXPathHelper::escapeQuotes($data_macro['macro']).']')->one()->getAttribute('id'), 3);
-
 					// Check macro description and disabled field.
-					$this->assertFalse($this->query('id:macros_'.$macro_index[1].'_description')->one()->isEnabled());
-					$this->assertEquals($data_macro['description'],
-							$this->query('id:macros_'.$macro_index[1].'_description')->one()->getValue()
+					$this->assertFalse($this->query('id:macros_'.$this->getMacroIndex($data_macro['macro']).'_description')
+							->one()->isEnabled()
+					);
+					$this->assertEquals($data_macro['description'],	$this->query('id:macros_'.$this
+							->getMacroIndex($data_macro['macro']).'_description')->one()->getValue()
 					);
 				}
 				break;
 		}
 
 		$form->submit();
-
-		$this->page->open(
-			$is_prototype
-				? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
-				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-		);
-
+		$this->page->open($link);
 		$form->invalidate();
 		$form->selectTab('Macros');
 
@@ -1024,11 +1095,11 @@ abstract class testFormMacros extends CWebTest {
 	 * @param string     $name			  name of host where changes are made
 	 * @param boolean    $is_prototype    defines is it prototype or not
 	 * @param int        $lld_id		  points to LLD rule id where host prototype belongs
-	 * @param string     $host_type		  string defining is it host, template or host prototype
 	 * @param string     $form_type		  string used in form selector
+	 * @param string     $host_type		  string defining is it host, template or host prototype
 	 * @param array	     $data			  given data provider
 	 */
-	private function checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type,  $data = null) {
+	private function checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, $data = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
 		$this->page->open(
@@ -1039,6 +1110,17 @@ abstract class testFormMacros extends CWebTest {
 
 		$form = $this->query('id:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
+
+		if ($data !== null) {
+			foreach ($data['macros'] as &$macro) {
+				if ($macro['macro'] === '{$lowercase}') {
+					$macro['macro'] = '{$LOWERCASE}';
+				}
+			}
+			unset($macro);
+
+		}
+
 		$this->assertMacros(($data !== null) ? $data['macros'] : []);
 		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
 		// Get all macros defined for this host.
@@ -1385,5 +1467,39 @@ abstract class testFormMacros extends CWebTest {
 		});
 
 		return $macros;
+	}
+
+	/**
+	 * Get macro index for the provided macro name.
+	 *
+	 * @param string    $macro    macro name for which index needs to be fetched
+	 *
+	 * @return int
+	 */
+	private function getMacroIndex($macro) {
+		$index = explode('_', $this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).']')
+				->one()->getAttribute('id'), 3
+		);
+
+		return $index[1];
+	}
+
+	/**
+	 * Get macro index for the provided macro name.
+	 *
+	 * @param CElement    $radio_switcher    macro name for which index needs to be fetched
+	 * @param string      $host_type         string defining is it host, template or host prototype
+	 *
+	 * @return array
+	 */
+	private function getGlobalMacrosAndSwitch($radio_switcher, $host_type) {
+		// Get all global macros before changes.
+		$global_macros = $this->getGlobalMacrosFrotendTable();
+
+		// Return to object's macros.
+		$radio_switcher->fill(ucfirst($host_type).' macros');
+		$this->page->waitUntilReady();
+
+		return $global_macros;
 	}
 }

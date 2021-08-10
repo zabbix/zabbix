@@ -86,6 +86,8 @@ trait MacrosTrait {
 	/**
 	 * Get input fields of macros.
 	 *
+	 * @param boolean    $with_type    true if type of macros (secret or text) needed to be returned in macros array
+	 *
 	 * @return array
 	 */
 	public function getMacros($with_type = false) {

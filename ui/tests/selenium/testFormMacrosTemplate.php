@@ -52,25 +52,25 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @dataProvider getCreateMacrosData
 	 */
 	public function testFormMacrosTemplate_Create($data) {
-		$this->checkMacros($data, 'templates', 'template');
+		$this->checkMacros($data, 'template');
 	}
 
 	/**
 	 * @dataProvider getUpdateMacrosData
 	 */
 	public function testFormMacrosTemplate_Update($data) {
-		$this->checkMacros($data, 'templates', 'template', $this->template_name_update, true);
+		$this->checkMacros($data, 'template', $this->template_name_update, true);
 	}
 
 	public function testFormMacrosTemplate_RemoveAll() {
-		$this->checkRemoveAll($this->template_name_remove, 'templates', 'template');
+		$this->checkRemoveAll($this->template_name_remove, 'template');
 	}
 
 	/**
 	 * @dataProvider getCheckInheritedMacrosData
 	 */
 	public function testFormMacrosTemplate_ChangeInheritedMacro($data) {
-		$this->checkChangeInheritedMacros($data, 'templates', 'template');
+		$this->checkChangeInheritedMacros($data, 'template');
 	}
 
 	public function prepareTemplateRemoveMacrosData() {
@@ -122,7 +122,7 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @onBeforeOnce prepareTemplateRemoveMacrosData
 	 */
 	public function testFormMacrosTemplate_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, self::$templateid_remove_inherited, 'templates', 'template');
+		$this->checkRemoveInheritedMacros($data, self::$templateid_remove_inherited, 'template');
 	}
 
 	public function getCreateSecretMacrosData() {

@@ -56,25 +56,25 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getCreateMacrosData
 	 */
 	public function testFormMacrosHostPrototype_Create($data) {
-		$this->checkMacros($data, 'hostPrototype', 'host', null, false, self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkMacros($data, 'host prototype', null, false, self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	/**
 	 * @dataProvider getUpdateMacrosData
 	 */
 	public function testFormMacrosHostPrototype_Update($data) {
-		$this->checkMacros($data, 'hostPrototype', 'host', $this->host_name_update, true, self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkMacros($data, 'host prototype', $this->host_name_update, true, self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	public function testFormMacrosHostPrototype_RemoveAll() {
-		$this->checkRemoveAll($this->host_name_remove, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkRemoveAll($this->host_name_remove, 'host prototype', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	/**
 	 * @dataProvider getCheckInheritedMacrosData
 	 */
 	public function testFormMacrosHostPrototype_ChangeInheritedMacro($data) {
-		$this->checkChangeInheritedMacros($data, 'hostPrototype', 'host prototype', self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkChangeInheritedMacros($data, 'host prototype', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	public function prepareHostPrototypeRemoveMacrosData() {
@@ -129,7 +129,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @onBeforeOnce prepareHostPrototypeRemoveMacrosData
 	 */
 	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, self::$host_prototoypeid_remove_inherited, 'hostPrototype', 'host prototype',
+		$this->checkRemoveInheritedMacros($data, self::$host_prototoypeid_remove_inherited, 'host prototype',
 				self::IS_PROTOTYPE, self::LLD_ID);
 	}
 

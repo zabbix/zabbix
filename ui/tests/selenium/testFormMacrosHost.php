@@ -52,25 +52,25 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getCreateMacrosData
 	 */
 	public function testFormMacrosHost_Create($data) {
-		$this->checkMacros($data, 'hosts', 'host');
+		$this->checkMacros($data, 'host');
 	}
 
 	/**
 	 * @dataProvider getUpdateMacrosData
 	 */
 	public function testFormMacrosHost_Update($data) {
-		$this->checkMacros($data, 'hosts', 'host', $this->host_name_update, true);
+		$this->checkMacros($data, 'host', $this->host_name_update, true);
 	}
 
 	public function testFormMacrosHost_RemoveAll() {
-		$this->checkRemoveAll($this->host_name_remove, 'hosts', 'host');
+		$this->checkRemoveAll($this->host_name_remove, 'host');
 	}
 
 	/**
 	 * @dataProvider getCheckInheritedMacrosData
 	 */
 	public function testFormMacrosHost_ChangeInheritedMacro($data) {
-		$this->checkChangeInheritedMacros($data, 'hosts', 'host');
+		$this->checkChangeInheritedMacros($data, 'host');
 	}
 
 	public function prepareHostRemoveMacrosData() {
@@ -130,7 +130,7 @@ class testFormMacrosHost extends testFormMacros {
 	 * @onBeforeOnce prepareHostRemoveMacrosData
 	 */
 	public function testFormMacrosHost_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, self::$hostid_remove_inherited, 'hosts', 'host');
+		$this->checkRemoveInheritedMacros($data, self::$hostid_remove_inherited, 'host');
 	}
 
 	public function getSecretMacrosLayoutData() {
