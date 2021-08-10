@@ -254,6 +254,8 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size)))
 	{
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+
 		if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
