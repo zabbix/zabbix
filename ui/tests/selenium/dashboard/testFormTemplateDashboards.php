@@ -521,7 +521,7 @@ class testFormTemplateDashboards extends CWebTest {
 						'Name' => '    Trailing & leading spaces    ',
 						'Start slideshow automatically' => false
 					],
-					'trim' => true
+					'trim' => 'Name'
 				]
 			]
 		];
@@ -578,7 +578,6 @@ class testFormTemplateDashboards extends CWebTest {
 
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
-
 	}
 
 	/**
@@ -605,7 +604,6 @@ class testFormTemplateDashboards extends CWebTest {
 		// Close the opened alert so that the next running scenario would not fail.
 		$this->page->acceptAlert();
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
-
 	}
 
 	public static function getWidgetsCreateData() {
@@ -672,16 +670,15 @@ class testFormTemplateDashboards extends CWebTest {
 				]
 			],
 			// Widget with trailing and leading spaces in name
-			// TODO: Uncomment the below tet case when ZBX-19589 is merged.
-//			[
-//				[
-//					'fields' => [
-//						'Type' => 'Clock',
-//						'Name' => '    Clock widget with trailing and leading spaces    '
-//					],
-//					'trim' => true
-//				]
-//			],
+			[
+				[
+					'fields' => [
+						'Type' => 'Clock',
+						'Name' => '    Clock widget with trailing and leading spaces    '
+					],
+					'trim' => 'Name'
+				]
+			],
 			// Graph Classic widget with missing graph
 			[
 				[
@@ -975,22 +972,23 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => 'URL',
 						'Name' => 'URL widget with trailing and leading spaces in URL',
 						'URL' => '    URL    '
-					]
+					],
+					'trim' => 'URL'
+				]
+			],
+			// URL widget with spaces in URL
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'URL',
+						'Name' => 'URL widget with space in URL',
+						'URL' => '     '
+					],
+					'trim' => 'URL',
+					'error_message' => 'Invalid parameter "URL": cannot be empty.'
 				]
 			]
-			// URL widget with spaces in URL
-			// TODO: Uncomment the below tet case when ZBX-19589 is merged.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'Type' => 'URL',
-//						'Name' => 'URL widget with space in URL',
-//						'URL' => ' '
-//					],
-//					'error_message' => 'Invalid parameter "URL": cannot be empty.'
-//				]
-//			]
 		];
 	}
 
@@ -1006,6 +1004,8 @@ class testFormTemplateDashboards extends CWebTest {
 
 		$form->fill($data['fields']);
 		COverlayDialogElement::find()->one()->waitUntilReady();
+		// Trimming is only triggered together with an on-change event which is generated once focus is removed.
+		$this->page->removeFocus();
 		$old_values = $form->getFields()->asValues();
 		$form->submit();
 
@@ -1014,6 +1014,7 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->query('button:Add')->one()->waitUntilClickable()->click();
 			$form->invalidate();
 			$form->fill($data['fields']);
+			$this->page->removeFocus();
 			$form->submit();
 		}
 
@@ -1030,6 +1031,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 		$form = CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
 		$form->fill($data['fields']);
+		$this->page->removeFocus();
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$old_values = $form->getFields()->asValues();
 		$form->submit();
@@ -1156,6 +1158,9 @@ class testFormTemplateDashboards extends CWebTest {
 				$this->query('button:Save changes')->one()->click();
 			}
 			else {
+				if (array_key_exists('trim', $data)) {
+					$old_values[$data['trim']] = trim($old_values[$data['trim']]);
+				}
 				$form = COverlayDialogElement::find()->one()->asForm()->waitUntilVisible();
 				$this->assertEquals($old_values, $form->getFields()->asValues());
 			}
@@ -1165,6 +1170,9 @@ class testFormTemplateDashboards extends CWebTest {
 		else {
 			// Wait for widgets to be present as dashboard is slow when there ame many widgets on it.
 			if ($check !== 'dashboard action') {
+				if (CTestArrayHelper::get($data, 'trim') === 'Name') {
+					$data['fields']['Name'] = trim($data['fields']['Name']);
+				}
 				$name = ($data['fields']['Name'] === '') ? 'Local' : $data['fields']['Name'];
 				CDashboardElement::find()->one()->asDashboard()->getWidget($name)->waitUntilVisible();
 			}
@@ -1181,7 +1189,7 @@ class testFormTemplateDashboards extends CWebTest {
 			// Trim trailing and leading spaces from reference dashboard name if necessary.
 			$created_values = $old_values;
 			if (array_key_exists('trim', $data)) {
-				$created_values['Name'] = trim($created_values['Name']);
+				$created_values[$data['trim']] = trim($created_values[$data['trim']]);
 			}
 
 			$dashboard_name = ($check === 'dashboard action')

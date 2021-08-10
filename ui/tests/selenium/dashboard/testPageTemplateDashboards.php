@@ -139,6 +139,7 @@ class testPageTemplateDashboards extends CWebTest {
 	 * Function formats the array of dashboard names so that it would be a valid for input into assertTableData function.
 	 *
 	 * @param type $unwrapped_dashboards
+	 *
 	 * @return type
 	 */
 	private function wrapDashboardNames($unwrapped_dashboards = self::DASHBOARDS) {
