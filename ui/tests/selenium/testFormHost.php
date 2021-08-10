@@ -198,7 +198,7 @@ class testFormHost extends CWebTest {
 			->setArgument('hostid', self::$hostids['testFormHost with items'])
 			->getUrl()
 		);
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 		// Check tabs available in the form
 		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
 		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
@@ -735,7 +735,7 @@ class testFormHost extends CWebTest {
 			->setArgument('action', 'host.create')
 			->getUrl()
 		);
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1352,7 +1352,7 @@ class testFormHost extends CWebTest {
 			->setArgument('hostid', self::$hostids['testFormHost_Update'])
 			->getUrl()
 		);
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1595,7 +1595,7 @@ class testFormHost extends CWebTest {
 			->getUrl()
 		);
 
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 		$form->setFilter(new CElementFilter(CElementFilter::VISIBLE));
 		// Get values from form.
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
@@ -1686,7 +1686,7 @@ class testFormHost extends CWebTest {
 		}
 
 		// Change the host data to make sure that the changes are not saved to the database after cancellation.
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 		$form->fill(['Host name' => $new_name]);
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']]);
 		$interfaces_form->fill($interface);
