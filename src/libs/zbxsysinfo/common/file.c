@@ -90,7 +90,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 			while (NULL != (p2 = memchr(p1, '\n', sz)))
 			{
 				lines_num++;
-				dif = p2 - p1;
+				dif = (size_t)(p2 - p1);
 				p1 = p2;
 
 				if (dif < sz)
