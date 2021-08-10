@@ -719,6 +719,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 	int			i;
 	zbx_template_item_t	*dependent;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	if (NULL == item->key) /* existing item */
 	{
 		char		*str_esc;
@@ -728,311 +730,94 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			goto dependent;
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update items set ");
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_INTERFACEID))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sinterfaceid=%s", d,
-					DBsql_id_ins(item->interfaceid));
-			d = ",";
+
+#define PREPARE_UPDATE_ID(FLAG_POSTFIX, field)									\
+		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
+		{												\
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=%s", d,			\
+					DBsql_id_ins(item->field));						\
+			d = ",";										\
+														\
+			zbx_audit_item_update_json_update_##field(*itemid, item->field##_orig, item->field);	\
 		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TEMPLATEID))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
-					item->templateid);
-			d = ",";
+#define PREPARE_UPDATE_STR(FLAG_POSTFIX, field)									\
+		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
+		{												\
+			str_esc = DBdyn_escape_string(item->field);						\
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"='%s'", d, str_esc);		\
+			d = ",";										\
+			zbx_free(str_esc);									\
+														\
+			zbx_audit_item_update_json_update_##field(*itemid, item->field##_orig, item->field);	\
 		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_NAME))
-		{
-			str_esc = DBdyn_escape_string(item->name);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sname='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
+#define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)									\
+		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
+		{												\
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=%d", d, (int)item->field);	\
+			d = ",";										\
+														\
+			zbx_audit_item_update_json_update_##field(*itemid, (int)item->field##_orig,		\
+			(int)item->field);									\
 		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TYPE))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%stype=%d", d, (int)item->type);
-			d = ",";
+#define PREPARE_UPDATE_UINT64(FLAG_POSTFIX, field)								\
+		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##TEMPLATEID))			\
+		{												\
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=" ZBX_FS_UI64, d,		\
+					item->field);								\
+			d = ",";										\
+														\
+			zbx_audit_item_update_json_update_##field(*itemid, item->field##_orig, item->field);	\
 		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VALUE_TYPE))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%svalue_type=%d", d, (int)item->value_type);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DELAY))
-		{
-			str_esc = DBdyn_escape_string(item->delay);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sdelay='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HISTORY))
-		{
-			str_esc = DBdyn_escape_string(item->history);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%shistory='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TRENDS))
-		{
-			str_esc = DBdyn_escape_string(item->trends);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%strends='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_STATUS))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sstatus=%d", d, (int)item->status);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TRAPPER_HOSTS))
-		{
-			str_esc = DBdyn_escape_string(item->trapper_hosts);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%strapper_hosts='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_UNITS))
-		{
-			str_esc = DBdyn_escape_string(item->units);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sunits='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FORMULA))
-		{
-			str_esc = DBdyn_escape_string(item->formula);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sformula='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LOGTIMEFMT))
-		{
-			str_esc = DBdyn_escape_string(item->logtimefmt);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%slogtimefmt='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VALUEMAPID))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%svaluemapid=%s", d,
-					DBsql_id_ins(item->valuemapid));
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PARAMS))
-		{
-			str_esc = DBdyn_escape_string(item->params);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sparams='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_IPMI_SENSOR))
-		{
-			str_esc = DBdyn_escape_string(item->ipmi_sensor);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sipmi_sensor='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SNMP_OID))
-		{
-			str_esc = DBdyn_escape_string(item->snmp_oid);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmp_oid='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_AUTHTYPE))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sauthtype=%d", d, (int)item->authtype);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_USERNAME))
-		{
-			str_esc = DBdyn_escape_string(item->username);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%susername='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PASSWORD))
-		{
-			str_esc = DBdyn_escape_string(item->password);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%spassword='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PUBLICKEY))
-		{
-			str_esc = DBdyn_escape_string(item->publickey);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%spublickey='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_PRIVATEKEY))
-		{
-			str_esc = DBdyn_escape_string(item->privatekey);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sprivatekey='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FLAGS))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sflags=%d", d, (int)item->flags);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DESCRIPTION))
-		{
-			str_esc = DBdyn_escape_string(item->description);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sdescription='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_INVENTORY_LINK))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sinventory_link=%d", d,
-					(int)item->inventory_link);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_LIFETIME))
-		{
-			str_esc = DBdyn_escape_string(item->lifetime);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%slifetime='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_EVALTYPE))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sevaltype=%d", d, (int)item->evaltype);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_JMX_ENDPOINT))
-		{
-			str_esc = DBdyn_escape_string(item->jmx_endpoint);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sjmx_endpoint='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_MASTER_ITEMID))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%smaster_itemid=%s", d,
-					DBsql_id_ins(item->master_itemid));
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_TIMEOUT))
-		{
-			str_esc = DBdyn_escape_string(item->timeout);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%stimeout='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_URL))
-		{
-			str_esc = DBdyn_escape_string(item->url);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%surl='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_QUERY_FIELDS))
-		{
-			str_esc = DBdyn_escape_string(item->query_fields);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%squery_fields='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_POSTS))
-		{
-			str_esc = DBdyn_escape_string(item->posts);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sposts='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_STATUS_CODES))
-		{
-			str_esc = DBdyn_escape_string(item->status_codes);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sstatus_codes='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_FOLLOW_REDIRECTS))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sfollow_redirects=%d", d,
-					(int)item->follow_redirects);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_POST_TYPE))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%spost_type=%d", d, (int)item->post_type);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HTTP_PROXY))
-		{
-			str_esc = DBdyn_escape_string(item->http_proxy);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%shttp_proxy='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_HEADERS))
-		{
-			str_esc = DBdyn_escape_string(item->headers);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sheaders='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RETRIEVE_MODE))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sretrieve_mode=%d", d,
-					(int)item->retrieve_mode);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_REQUEST_METHOD))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%srequest_method=%d", d,
-					(int)item->request_method);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_OUTPUT_FORMAT))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%soutput_format=%d", d,
-					(int)item->output_format);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_CERT_FILE))
-		{
-			str_esc = DBdyn_escape_string(item->ssl_cert_file);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sssl_cert_file='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_KEY_FILE))
-		{
-			str_esc = DBdyn_escape_string(item->ssl_key_file);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sssl_key_file='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_SSL_KEY_PASSWORD))
-		{
-			str_esc = DBdyn_escape_string(item->ssl_key_password);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sssl_key_password='%s'", d, str_esc);
-			d = ",";
-			zbx_free(str_esc);
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VERIFY_PEER))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sverify_peer=%d", d,
-					(int)item->verify_peer);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VERIFY_HOST))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sverify_host=%d", d,
-					(int)item->verify_host);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_ALLOW_TRAPS))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sallow_traps=%d", d,
-					(int)item->allow_traps);
-			d = ",";
-		}
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DISCOVER))
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sdiscover=%d", d, (int)item->discover);
+		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, *itemid, item->name);
+		PREPARE_UPDATE_ID(INTERFACEID, interfaceid)
+		PREPARE_UPDATE_STR(NAME, name)
+		PREPARE_UPDATE_UC(TYPE, type)
+		PREPARE_UPDATE_UINT64(TEMPLATEID, templateid)
+		PREPARE_UPDATE_UC(VALUE_TYPE, value_type)
+		PREPARE_UPDATE_STR(DELAY, delay);
+		PREPARE_UPDATE_STR(HISTORY, history)
+		PREPARE_UPDATE_STR(TRENDS, trends)
+		PREPARE_UPDATE_UC(STATUS, status)
+		PREPARE_UPDATE_STR(TRAPPER_HOSTS, trapper_hosts)
+		PREPARE_UPDATE_STR(UNITS, units)
+		PREPARE_UPDATE_STR(FORMULA, formula)
+		PREPARE_UPDATE_STR(LOGTIMEFMT, logtimefmt)
+		PREPARE_UPDATE_ID(VALUEMAPID, valuemapid)
+		PREPARE_UPDATE_STR(PARAMS, params)
+		PREPARE_UPDATE_STR(PARAMS, params)
+		PREPARE_UPDATE_STR(SNMP_OID, snmp_oid)
+		PREPARE_UPDATE_UC(AUTHTYPE, authtype)
+		PREPARE_UPDATE_STR(USERNAME, username)
+		PREPARE_UPDATE_STR(PASSWORD, password)
+		PREPARE_UPDATE_STR(PUBLICKEY, publickey)
+		PREPARE_UPDATE_STR(PRIVATEKEY, privatekey)
+		PREPARE_UPDATE_UC(FLAGS, flags)
+		PREPARE_UPDATE_STR(DESCRIPTION, description)
+		PREPARE_UPDATE_UC(INVENTORY_LINK, inventory_link)
+		PREPARE_UPDATE_STR(LIFETIME, lifetime)
+		PREPARE_UPDATE_UC(EVALTYPE, evaltype)
+		PREPARE_UPDATE_STR(JMX_ENDPOINT, jmx_endpoint)
+		PREPARE_UPDATE_ID(MASTER_ITEMID, master_itemid)
+		PREPARE_UPDATE_STR(TIMEOUT, timeout)
+		PREPARE_UPDATE_STR(URL, url)
+		PREPARE_UPDATE_STR(QUERY_FIELDS, query_fields)
+		PREPARE_UPDATE_STR(POSTS, posts)
+		PREPARE_UPDATE_STR(STATUS_CODES, status_codes)
+		PREPARE_UPDATE_UC(FOLLOW_REDIRECTS, follow_redirects)
+		PREPARE_UPDATE_UC(POST_TYPE, post_type)
+		PREPARE_UPDATE_STR(HTTP_PROXY, http_proxy)
+		PREPARE_UPDATE_STR(HEADERS, headers)
+		PREPARE_UPDATE_UC(RETRIEVE_MODE, retrieve_mode)
+		PREPARE_UPDATE_UC(REQUEST_METHOD, request_method)
+		PREPARE_UPDATE_UC(OUTPUT_FORMAT, output_format)
+		PREPARE_UPDATE_STR(SSL_CERT_FILE, ssl_cert_file)
+		PREPARE_UPDATE_STR(SSL_KEY_FILE, ssl_key_file)
+		PREPARE_UPDATE_STR(SSL_KEY_PASSWORD, ssl_key_password)
+		PREPARE_UPDATE_UC(VERIFY_PEER, verify_peer)
+		PREPARE_UPDATE_UC(VERIFY_HOST, verify_host)
+		PREPARE_UPDATE_UC(ALLOW_TRAPS, allow_traps)
+		PREPARE_UPDATE_UC(DISCOVER, discover)
+		ZBX_UNUSED(d);
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 	}
@@ -1070,6 +855,8 @@ dependent:
 		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, sql, sql_alloc,
 				sql_offset);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
