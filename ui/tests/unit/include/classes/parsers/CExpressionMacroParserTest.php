@@ -133,5 +133,6 @@ class CExpressionMacroParserTest extends TestCase {
 			'match' => $expression_macro_parser->getMatch(),
 			'length' => $expression_macro_parser->getLength()
 		]);
+		$this->assertTrue($expression_macro_parser->getExpressionParser() instanceof CExpressionParser);
 	}
 }

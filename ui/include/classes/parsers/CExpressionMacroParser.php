@@ -112,6 +112,7 @@ class CExpressionMacroParser extends CParser {
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
+		$this->tokens = $this->expression_parser->getResult()->getTokens();
 
 		return (isset($source[$p]) ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS);
 	}
@@ -125,4 +126,12 @@ class CExpressionMacroParser extends CParser {
 		return $this->error;
 	}
 
+	/**
+	 * Returns the expression parser.
+	 *
+	 * @return CExpressionParser
+	 */
+	public function getExpressionParser(): CExpressionParser {
+		return $this->expression_parser;
+	}
 }
