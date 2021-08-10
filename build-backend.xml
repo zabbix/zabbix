@@ -193,7 +193,7 @@
 						<arg line="tests_build"/>
 					</exec>
 					<mkdir dir="tests_results/@{conf-name}"/>
-					<exec executable="tests/tests_run.pl" failonerror="on" output="tests_results/@{conf-name}/output.xml">
+					<exec executable="tests/tests_run.pl" failonerror="off" output="tests_results/@{conf-name}/output.xml">
 						<arg line="-x @{conf-name}"/>
 					</exec>
 				</try>
