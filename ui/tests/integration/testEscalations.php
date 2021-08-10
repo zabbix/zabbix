@@ -526,7 +526,7 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
 		$response = $this->call('user.update', [
 			'userid' => 1,
-			'user_medias' => [
+			'medias' => [
 				[
 					'mediatypeid' => 1,
 					'sendto' => 'test@local.local'
@@ -662,7 +662,7 @@ HEREDOC;
 
 		$response = $this->call('user.update', [
 			'userid' => 1,
-			'user_medias' => [
+			'medias' => [
 				[
 					'mediatypeid' => $mediatypeid,
 					'sendto' => 'q'
