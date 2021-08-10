@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-08-04T11:24:00Z</date>
+   <date>2021-08-09T13:53:25Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -11,7 +11,9 @@
       <template>
          <template>Template App HAProxy by Zabbix agent</template>
          <name>Template App HAProxy by Zabbix agent</name>
-         <description>Get metrics from status page using Zabbix agent https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/. Example configuration of HAProxy:&#13;
+         <description>Get metrics from status page using Zabbix agent&#13;
+https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/.&#13;
+Example configuration of HAProxy:&#13;
   frontend stats&#13;
       bind *:8404&#13;
       stats enable&#13;
@@ -266,7 +268,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Number of active servers</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.act[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.act[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -293,7 +295,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Number of backup servers</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.bck[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.bck[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -320,7 +322,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Incoming traffic</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.bin.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.bin.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -353,7 +355,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Outgoing traffic</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.bout.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.bout.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -386,7 +388,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Responses denied per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.dresp.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.dresp.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -414,7 +416,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Errors connection per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.econ.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.econ.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -442,7 +444,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Response errors per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.eresp.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.eresp.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -478,7 +480,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Number of responses with codes 1xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.hrsp_1xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -506,7 +508,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Number of responses with codes 2xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.hrsp_2xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -534,7 +536,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Number of responses with codes 3xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.hrsp_3xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -562,7 +564,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Number of responses with codes 4xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.hrsp_4xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -590,7 +592,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Number of responses with codes 5xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.hrsp_5xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -618,7 +620,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Unassigned requests</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.qcur[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.qcur[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -649,7 +651,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Time in queue</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.qtime[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.qtime[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -686,7 +688,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Responses time</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.rtime[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.rtime[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -723,7 +725,7 @@ catch (error) {
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Status</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.status[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.status[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -767,7 +769,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Sessions per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.stot.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.stot.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -795,7 +797,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Weight</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.weight[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.weight[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -822,7 +824,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Redispatched requests per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.wredis.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.wredis.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -850,7 +852,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Backend {#PXNAME}: Retried connections per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.backend.wretr.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.backend.wretr.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -886,7 +888,7 @@ no check - Health checks are not enabled for this server.</description>
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.backend.bin.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.backend.bin.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -895,7 +897,7 @@ no check - Health checks are not enabled for this server.</description>
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.backend.bout.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.backend.bout.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -907,7 +909,7 @@ no check - Health checks are not enabled for this server.</description>
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.backend.wredis.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.backend.wredis.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -915,7 +917,7 @@ no check - Health checks are not enabled for this server.</description>
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.backend.wretr.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.backend.wretr.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -928,7 +930,7 @@ no check - Health checks are not enabled for this server.</description>
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.backend.hrsp_1xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.backend.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -936,7 +938,7 @@ no check - Health checks are not enabled for this server.</description>
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.backend.hrsp_2xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.backend.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -944,7 +946,7 @@ no check - Health checks are not enabled for this server.</description>
                            <color>F63100</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.backend.hrsp_3xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.backend.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -952,7 +954,7 @@ no check - Health checks are not enabled for this server.</description>
                            <color>A54F10</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.backend.hrsp_4xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.backend.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -960,7 +962,7 @@ no check - Health checks are not enabled for this server.</description>
                            <color>FC6EA3</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.backend.hrsp_5xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.backend.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1034,7 +1036,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Incoming traffic</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.bin.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.bin.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1067,7 +1069,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Outgoing traffic</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.bout.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.bout.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1100,7 +1102,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Denied requests per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.dreq.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.dreq.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1136,7 +1138,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Request errors per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.ereq.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.ereq.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1172,7 +1174,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Number of responses with codes 1xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.hrsp_1xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1200,7 +1202,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Number of responses with codes 2xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.hrsp_2xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1228,7 +1230,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Number of responses with codes 3xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.hrsp_3xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1256,7 +1258,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Number of responses with codes 4xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.hrsp_4xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1284,7 +1286,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Number of responses with codes 5xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.hrsp_5xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1312,7 +1314,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Sessions rate</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1335,7 +1337,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Requests rate</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.req_rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.req_rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1358,7 +1360,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Established sessions</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.scur[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1381,7 +1383,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Session limits</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.slim[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1408,7 +1410,7 @@ no check - Health checks are not enabled for this server.</description>
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Status</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.frontend.status[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.status[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1438,12 +1440,12 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                   <item_prototype>
                      <name>HAProxy Frontend {#PXNAME}: Session utilization</name>
                      <type>CALCULATED</type>
-                     <key>haproxy.frontend.sutil[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.frontend.sutil[{#PXNAME},{#SVNAME}]</key>
                      <history>7d</history>
                      <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <params>last(haproxy.frontend.scur[{#PXNAME}:{#SVNAME}]) / last(haproxy.frontend.slim[{#PXNAME}:{#SVNAME}]) * 100</params>
+                     <params>last("haproxy.frontend.scur[{#PXNAME},{#SVNAME}]") / last("haproxy.frontend.slim[{#PXNAME},{#SVNAME}]") * 100</params>
                      <description>Percentage of sessions used (scur / slim * 100).</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1469,7 +1471,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.ereq.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.ereq.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1477,7 +1479,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.dreq.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.dreq.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1490,7 +1492,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.bin.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.bin.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1499,7 +1501,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.bout.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.bout.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1511,7 +1513,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.req_rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.req_rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1519,7 +1521,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1532,7 +1534,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.hrsp_1xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1540,7 +1542,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.hrsp_2xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1548,7 +1550,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>F63100</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.hrsp_3xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1556,7 +1558,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>A54F10</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.hrsp_4xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1564,7 +1566,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                            <color>FC6EA3</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.frontend.hrsp_5xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.frontend.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1639,16 +1641,19 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Server is active</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.act[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.act[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
-                     <description>Server is active.</description>
+                     <description>Shows whether the server is active (marked with a Y) or a backup (marked with a -).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>HAProxy {#PXNAME} {#SVNAME}</name>
                         </application_prototype>
                      </application_prototypes>
+                     <valuemap>
+                        <name>Server mode</name>
+                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -1666,16 +1671,19 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Server is backup</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.bck[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.bck[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
-                     <description>Server is backup.</description>
+                     <description>Shows whether the server is a backup (marked with a Y) or active (marked with a -).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>HAProxy {#PXNAME} {#SVNAME}</name>
                         </application_prototype>
                      </application_prototypes>
+                     <valuemap>
+                        <name>Server mode</name>
+                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
@@ -1693,7 +1701,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Incoming traffic</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.bin.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.bin.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1726,7 +1734,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Outgoing traffic</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.bout.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.bout.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1759,7 +1767,7 @@ When Status is OPEN, the frontend is operating normally and ready to receive tra
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Status of last health check</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.check_status[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.check_status[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1802,14 +1810,14 @@ Notice: If a check is currently running, the last known status will be reported,
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{regexp("(?:L[4-7]OK|^$)",#3)} = 0</expression>
-                           <name>HAProxy: Health check error</name>
+                           <name>HAProxy {#PXNAME} {#SVNAME}: Health check error</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>Please check the server for faults.</description>
                            <dependencies>
                               <dependency>
                                  <name>HAProxy {#PXNAME} {#SVNAME}: Server is DOWN</name>
-                                 <expression>{Template App HAProxy by Zabbix agent:haproxy.server.status[{#PXNAME}:{#SVNAME}].count(#5,"DOWN",eq)}=5</expression>
+                                 <expression>{Template App HAProxy by Zabbix agent:haproxy.server.status[{#PXNAME},{#SVNAME}].count(#5,"DOWN",eq)}=5</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1818,7 +1826,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Responses denied per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.dresp.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.dresp.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1846,7 +1854,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Errors connection per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.econ.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.econ.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1874,7 +1882,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Response errors per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.eresp.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.eresp.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1910,7 +1918,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 1xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.hrsp_1xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1938,7 +1946,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 2xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.hrsp_2xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1966,7 +1974,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 3xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.hrsp_3xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -1994,7 +2002,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 4xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.hrsp_4xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2022,7 +2030,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Number of responses with codes 5xx per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.hrsp_5xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2050,7 +2058,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Server was selected per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.lbtot.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.lbtot.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2078,7 +2086,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Unassigned requests</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.qcur[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.qcur[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2109,7 +2117,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Configured maxqueue</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.qlimit[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.qlimit[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2142,7 +2150,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Time in queue</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.qtime[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.qtime[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2179,7 +2187,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Responses time</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.rtime[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.rtime[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2216,7 +2224,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Status</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.status[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.status[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -2253,7 +2261,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Sessions per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.stot.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.stot.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2281,7 +2289,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Weight</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.weight[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.weight[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2308,7 +2316,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Redispatched requests per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.wredis.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.wredis.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2336,7 +2344,7 @@ Notice: If a check is currently running, the last known status will be reported,
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Retried connections per second</name>
                      <type>DEPENDENT</type>
-                     <key>haproxy.server.wretr.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <key>haproxy.server.wretr.rate[{#PXNAME},{#SVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <status>ENABLED</status>
@@ -2372,7 +2380,7 @@ Notice: If a check is currently running, the last known status will be reported,
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.server.bin.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.server.bin.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2381,7 +2389,7 @@ Notice: If a check is currently running, the last known status will be reported,
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.server.bout.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.server.bout.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2394,7 +2402,7 @@ Notice: If a check is currently running, the last known status will be reported,
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.server.hrsp_1xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.server.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2402,7 +2410,7 @@ Notice: If a check is currently running, the last known status will be reported,
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.server.hrsp_2xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.server.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2410,7 +2418,7 @@ Notice: If a check is currently running, the last known status will be reported,
                            <color>F63100</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.server.hrsp_3xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.server.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2418,7 +2426,7 @@ Notice: If a check is currently running, the last known status will be reported,
                            <color>A54F10</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.server.hrsp_4xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.server.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2426,7 +2434,7 @@ Notice: If a check is currently running, the last known status will be reported,
                            <color>FC6EA3</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.server.hrsp_5xx.rate[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.server.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2438,7 +2446,7 @@ Notice: If a check is currently running, the last known status will be reported,
                            <color>1A7C11</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.server.rtime[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.server.rtime[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2446,7 +2454,7 @@ Notice: If a check is currently running, the last known status will be reported,
                            <color>2774A4</color>
                            <item>
                               <host>Template App HAProxy by Zabbix agent</host>
-                              <key>haproxy.server.qtime[{#PXNAME}:{#SVNAME}]</key>
+                              <key>haproxy.server.qtime[{#PXNAME},{#SVNAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2829,6 +2837,19 @@ Notice: If a check is currently running, the last known status will be reported,
             <mapping>
                <value>1</value>
                <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Server mode</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>-</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Y</newvalue>
             </mapping>
          </mappings>
       </value_map>
