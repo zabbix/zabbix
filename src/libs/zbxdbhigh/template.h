@@ -117,6 +117,7 @@ typedef struct
 	char				*params;
 	char				*params_orig;
 	char				*ipmi_sensor;
+	char				*ipmi_sensor_orig;
 	char				*snmp_oid;
 	char				*snmp_oid_orig;
 	char				*username;

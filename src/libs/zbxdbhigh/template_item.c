@@ -329,16 +329,16 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 
 		if (SUCCEED != DBis_null(row[26]))
 		{
-			char		*str_orig = NULL;
 			unsigned char	uchar_orig;
 			zbx_uint64_t	uint64_orig;
 
 #define SET_FLAG_STR(r, i, f)			\
-						\
 {						\
-	str_orig = zbx_strdup(str_orig, (r));	\
-	if (0 != strcmp(str_orig, (i)))		\
+	if (0 != strcmp(r, (i)))		\
+	{					\
 		item->upd_flags |= f;		\
+		i##_orig = zbx_strdup(NULL, r);	\
+	}					\
 }
 
 #define SET_FLAG_UCHAR(r, i, f)		\
@@ -346,9 +346,11 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 {					\
 	ZBX_STR2UCHAR(uchar_orig, (r));	\
 	if (uchar_orig != (i))		\
+	{				\
 		item->upd_flags |= f;	\
+		i##_orig = uchar_orig;	\
+	}				\
 }
-
 
 #define SET_FLAG_UINT64(r, i, f)			\
 							\
@@ -358,7 +360,10 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	else						\
 		ZBX_STR2UINT64(uint64_orig, (r));	\
 	if (uint64_orig != (i))				\
+	{						\
 		item->upd_flags |= f;			\
+		i##_orig = uint64_orig;			\
+	}						\
 }
 			item->key = NULL;
 			ZBX_STR2UINT64(item->itemid, row[26]);
@@ -411,7 +416,6 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 			SET_FLAG_UCHAR(row[95], item->allow_traps, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_ALLOW_TRAPS);
 			SET_FLAG_UCHAR(row[96], item->discover, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DISCOVER);
 
-			zbx_free(str_orig);
 		}
 		else
 		{
@@ -738,7 +742,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					DBsql_id_ins(item->field));						\
 			d = ",";										\
 														\
-			zbx_audit_item_update_json_update_##field(*itemid, item->field##_orig, item->field);	\
+			zbx_audit_item_update_json_update_##field(*itemid, item->flags, item->field##_orig,	\
+			item->field);										\
 		}
 #define PREPARE_UPDATE_STR(FLAG_POSTFIX, field)									\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
@@ -748,7 +753,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			d = ",";										\
 			zbx_free(str_esc);									\
 														\
-			zbx_audit_item_update_json_update_##field(*itemid, item->field##_orig, item->field);	\
+			zbx_audit_item_update_json_update_##field(*itemid, item->flags, item->field##_orig,	\
+					item->field);								\
 		}
 #define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)									\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
@@ -756,17 +762,18 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=%d", d, (int)item->field);	\
 			d = ",";										\
 														\
-			zbx_audit_item_update_json_update_##field(*itemid, (int)item->field##_orig,		\
-			(int)item->field);									\
+			zbx_audit_item_update_json_update_##field(*itemid, item->flags,				\
+					(int)item->field##_orig, (int)item->field);				\
 		}
 #define PREPARE_UPDATE_UINT64(FLAG_POSTFIX, field)								\
-		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##TEMPLATEID))			\
+		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"=" ZBX_FS_UI64, d,		\
 					item->field);								\
 			d = ",";										\
 														\
-			zbx_audit_item_update_json_update_##field(*itemid, item->field##_orig, item->field);	\
+			zbx_audit_item_update_json_update_##field(*itemid, item->flags, item->field##_orig,	\
+					item->field);								\
 		}
 		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, *itemid, item->name);
 		PREPARE_UPDATE_ID(INTERFACEID, interfaceid)
@@ -784,7 +791,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		PREPARE_UPDATE_STR(LOGTIMEFMT, logtimefmt)
 		PREPARE_UPDATE_ID(VALUEMAPID, valuemapid)
 		PREPARE_UPDATE_STR(PARAMS, params)
-		PREPARE_UPDATE_STR(PARAMS, params)
+		PREPARE_UPDATE_STR(IPMI_SENSOR, ipmi_sensor)
 		PREPARE_UPDATE_STR(SNMP_OID, snmp_oid)
 		PREPARE_UPDATE_UC(AUTHTYPE, authtype)
 		PREPARE_UPDATE_STR(USERNAME, username)
@@ -1282,6 +1289,40 @@ static void	free_template_item(zbx_template_item_t *item)
 	zbx_vector_lld_macro_ptr_destroy(&item->item_lld_macros);
 	zbx_vector_lld_macro_ptr_destroy(&item->template_lld_macros);
 
+#define CLEAN_ORIG(FLAG_POSTFIX, field)							\
+	if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))	\
+	{										\
+		zbx_free(item->field);							\
+	}
+	CLEAN_ORIG(NAME, name_orig)
+	CLEAN_ORIG(DELAY, delay_orig)
+	CLEAN_ORIG(HISTORY, history_orig)
+	CLEAN_ORIG(TRENDS, trends_orig)
+	CLEAN_ORIG(TRAPPER_HOSTS, trapper_hosts_orig)
+	CLEAN_ORIG(UNITS, units_orig)
+	CLEAN_ORIG(FORMULA, formula_orig)
+	CLEAN_ORIG(LOGTIMEFMT, logtimefmt_orig)
+	CLEAN_ORIG(PARAMS, params_orig)
+	CLEAN_ORIG(IPMI_SENSOR, ipmi_sensor_orig)
+	CLEAN_ORIG(SNMP_OID, snmp_oid_orig)
+	CLEAN_ORIG(USERNAME, username_orig)
+	CLEAN_ORIG(PASSWORD, password_orig)
+	CLEAN_ORIG(PUBLICKEY, publickey_orig)
+	CLEAN_ORIG(PRIVATEKEY, privatekey_orig)
+	CLEAN_ORIG(DESCRIPTION, description_orig)
+	CLEAN_ORIG(LIFETIME, lifetime_orig)
+	CLEAN_ORIG(JMX_ENDPOINT, jmx_endpoint_orig)
+	CLEAN_ORIG(TIMEOUT, timeout_orig)
+	CLEAN_ORIG(URL, url_orig)
+	CLEAN_ORIG(QUERY_FIELDS, query_fields_orig)
+	CLEAN_ORIG(POSTS, posts_orig)
+	CLEAN_ORIG(STATUS_CODES, status_codes_orig)
+	CLEAN_ORIG(HTTP_PROXY, http_proxy_orig)
+	CLEAN_ORIG(HEADERS, headers_orig)
+	CLEAN_ORIG(SSL_CERT_FILE, ssl_cert_file_orig)
+	CLEAN_ORIG(SSL_KEY_FILE, ssl_key_file_orig)
+	CLEAN_ORIG(SSL_KEY_PASSWORD, ssl_key_password_orig)
+#undef CLEAN_ORIG
 	zbx_free(item);
 }
 

@@ -44,7 +44,7 @@ static int	item_flag_to_resource_type(int flag)
 	}
 }
 
-#define	PREPARE_AUDIT_ITEM_CREATE(resource, audit_resource_flag)							\
+#define	PREPARE_AUDIT_ITEM_CREATE(resource, audit_resource_flag)						\
 void	zbx_audit_##resource##_create_entry(int audit_action, zbx_uint64_t itemid, const char *name)		\
 {														\
 	zbx_audit_entry_t	local_audit_item_entry, **found_audit_item_entry;				\
@@ -74,6 +74,10 @@ void	zbx_audit_##resource##_create_entry(int audit_action, zbx_uint64_t itemid, 
 PREPARE_AUDIT_ITEM_CREATE(item, AUDIT_RESOURCE_ITEM)
 #undef PREPARE_AUDIT_ITEM_CREATE
 
+#define ONLY_ITEM (AUDIT_RESOURCE_ITEM == resource_type)
+#define ONLY_ITEM_PROTOTYPE (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)
+#define ONLY_LLD_RULE (AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)
+
 void	zbx_audit_item_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item, zbx_uint64_t hostid)
 {
 	int	resource_type;
@@ -82,13 +86,9 @@ void	zbx_audit_item_add_data(zbx_uint64_t itemid, const zbx_template_item_t *ite
 
 	resource_type = item_flag_to_resource_type(item->flags);
 
-#define ONLY_ITEM (AUDIT_RESOURCE_ITEM == resource_type)
-#define ONLY_ITEM_PROTOTYPE (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)
-#define ONLY_LLD_RULE (AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)
 #define ONLY_ITEM_AND_ITEM_PROTOTYPE (AUDIT_RESOURCE_ITEM == resource_type || \
 		AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)
-#define IT_OR_ITP(s) ONLY_ITEM ? "item."#s :				\
-	(ONLY_ITEM_PROTOTYPE ? "itemprototype."#s : "discoveryrule."#s)
+#define IT_OR_ITP(s) ONLY_ITEM ? "item."#s : (ONLY_ITEM_PROTOTYPE ? "itemprototype."#s : "discoveryrule."#s)
 #define ADD_JSON_S(x)	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP(x), item->x)
 #define ADD_JSON_UI(x)	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP(x), item->x)
 	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP(itemid), itemid);
@@ -161,64 +161,74 @@ void	zbx_audit_item_add_data(zbx_uint64_t itemid, const zbx_template_item_t *ite
 	}
 #undef ADD_JSON_UI
 #undef ADD_JSON_S
+#undef IT_OR_ITP
 }
 
+#define IT_OR_ITP(s) ONLY_ITEM ? "item."#s : (ONLY_ITEM_PROTOTYPE ? "itemprototype."#s : "discoveryrule."#s)
 #define PREPARE_AUDIT_ITEM_UPDATE(resource, type1, type2)							\
-void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid,					\
+void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,				\
 		type1 resource##_old, type1 resource##_new)							\
 {														\
+	int	resource_type;											\
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_audit_update_json_update_##type2(itemid, "item."#resource, resource##_old, resource##_new);		\
+	resource_type = item_flag_to_resource_type(flags);							\
+	zbx_audit_update_json_update_##type2(itemid, IT_OR_ITP(resource), resource##_old, resource##_new);	\
 }
 
-PREPARE_AUDIT_ITEM_UPDATE(interfaceid, zbx_uint64_t, uint64)
-PREPARE_AUDIT_ITEM_UPDATE(templateid, zbx_uint64_t, uint64)
-PREPARE_AUDIT_ITEM_UPDATE(name, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(type, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(value_type, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(delay, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(history, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(trends, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(status, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(trapper_hosts, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(units, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(formula, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(logtimefmt, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(valuemapid, zbx_uint64_t, uint64)
-PREPARE_AUDIT_ITEM_UPDATE(params, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(snmp_oid, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(authtype, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(username, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(password, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(publickey, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(privatekey, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(flags, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(description, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(inventory_link, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(lifetime, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(evaltype, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(jmx_endpoint, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(master_itemid, zbx_uint64_t, uint64)
-PREPARE_AUDIT_ITEM_UPDATE(timeout, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(url, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(query_fields, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(posts, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(status_codes, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(follow_redirects, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(redirects, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(post_type, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(http_proxy, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(headers, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(retrieve_mode, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(request_method, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(output_format, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(ssl_cert_file, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(ssl_key_file, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(ssl_key_password, const char*, string)
-PREPARE_AUDIT_ITEM_UPDATE(verify_peer, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(verify_host, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(allow_traps, int, int)
-PREPARE_AUDIT_ITEM_UPDATE(discover, int, int)
+PREPARE_AUDIT_ITEM_UPDATE(interfaceid,		zbx_uint64_t,	uint64)
+PREPARE_AUDIT_ITEM_UPDATE(templateid,		zbx_uint64_t,	uint64)
+PREPARE_AUDIT_ITEM_UPDATE(name,			const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(type,			int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(value_type,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(delay,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(history,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(trends,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(status,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(trapper_hosts,	const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(units,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(formula,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(logtimefmt,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(valuemapid,		zbx_uint64_t,	uint64)
+PREPARE_AUDIT_ITEM_UPDATE(params,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(ipmi_sensor,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(snmp_oid,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(authtype,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(username,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(password,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(publickey,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(privatekey,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(flags,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(description,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(inventory_link,	int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(lifetime,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(evaltype,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(jmx_endpoint,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(master_itemid,	zbx_uint64_t,	uint64)
+PREPARE_AUDIT_ITEM_UPDATE(timeout,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(url,			const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(query_fields,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(posts,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(status_codes,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(follow_redirects,	int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(redirects,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(post_type,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(http_proxy,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(headers,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(retrieve_mode,	int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(request_method,	int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(output_format,	int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(ssl_cert_file,	const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(ssl_key_file,		const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(ssl_key_password,	const char*,	string)
+PREPARE_AUDIT_ITEM_UPDATE(verify_peer,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(verify_host,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(allow_traps,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(discover,		int,		int)
 #undef PREPARE_AUDIT_ITEM_UPDATE
+
+#undef ONLY_ITEM
+#undef ONLY_ITEM_PROTOTYPE
+#undef ONLY_LLD_RULE
+#undef IT_OR_ITP

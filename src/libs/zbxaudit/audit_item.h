@@ -30,7 +30,7 @@ void	zbx_audit_item_add_data(zbx_uint64_t itemid, const zbx_template_item_t *ite
 
 
 #define PREPARE_AUDIT_ITEM_UPDATE(resource, type1, type2)				\
-void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid,		\
+void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,	\
 		type1 resource##_old, type1 resource##_new);
 
 PREPARE_AUDIT_ITEM_UPDATE(interfaceid, zbx_uint64_t, uint64)
@@ -48,6 +48,7 @@ PREPARE_AUDIT_ITEM_UPDATE(formula, const char*, string)
 PREPARE_AUDIT_ITEM_UPDATE(logtimefmt, const char*, string)
 PREPARE_AUDIT_ITEM_UPDATE(valuemapid, zbx_uint64_t, uint64)
 PREPARE_AUDIT_ITEM_UPDATE(params, const char*, string)
+PREPARE_AUDIT_ITEM_UPDATE(ipmi_sensor, const char*, string)
 PREPARE_AUDIT_ITEM_UPDATE(snmp_oid, const char*, string)
 PREPARE_AUDIT_ITEM_UPDATE(authtype, int, int)
 PREPARE_AUDIT_ITEM_UPDATE(username, const char*, string)
