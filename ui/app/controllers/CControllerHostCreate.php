@@ -185,7 +185,7 @@ class CControllerHostCreate extends CController {
 				'editable' => true
 			]);
 
-			if ($clone_hosts !== false) {
+			if (reset($clone_hosts)) {
 				$host['tls_psk_identity'] = $this->getInput('tls_psk_identity', $clone_hosts[0]['tls_psk_identity']);
 				$host['tls_psk'] = $this->getInput('tls_psk', $clone_hosts[0]['tls_psk']);
 			}
