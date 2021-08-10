@@ -42,7 +42,7 @@ class CSeverity extends CRadioButtonList {
 	 *
 	 * @return CSeverity
 	 */
-	public function addValue(string $label, $value, ?string $class = null, ?string $on_change = null): self {
+	public function addValue($label, $value, $class = null, $on_change = null): self {
 		$this->values[] = [
 			'name' => $label,
 			'value' => $value,
@@ -54,7 +54,7 @@ class CSeverity extends CRadioButtonList {
 		return $this;
 	}
 
-	public function toString(bool $destroy = true): string {
+	public function toString($destroy = true): string {
 		foreach (CSeverityHelper::getSeverities() as $severity) {
 			$this->addValue($severity['name'], $severity['value'], $severity['style']);
 		}

@@ -23,7 +23,7 @@ class CServiceHelper {
 
 	public static function getAlgorithmNames(): array {
 		return [
-			SERVICE_ALGORITHM_MAX => _('Most critical of child nodes'),
+			SERVICE_ALGORITHM_MAX => _('Most critical of child services'),
 			SERVICE_ALGORITHM_MIN => _('Most critical if all children have problems'),
 			SERVICE_ALGORITHM_NONE => _('Set status to OK')
 		];
@@ -31,29 +31,29 @@ class CServiceHelper {
 
 	public static function getRuleConditionNames(): array {
 		return [
-			ZBX_SERVICE_STATUS_RULE_TYPE_N_GE => _s('if at least %1$s child nodes are %2$s or greater',
-				new CTag('b', true, 'N'), new CTag('b', true, _('Status'))
+			ZBX_SERVICE_STATUS_RULE_TYPE_N_GE => _s('if at least %2$s child services are %1$s or greater',
+				new CTag('b', true, _('Status')), new CTag('b', true, 'N')
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE => _s('if at least %1$s child nodes are %2$s or greater',
-				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
+			ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE => _s('if at least %2$s child services are %1$s or greater',
+				new CTag('b', true, _('Status')), new CTag('b', true, 'N%')
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_N_L => _s('if less than %1$s child nodes are %2$s or less',
-				new CTag('b', true, 'N'), new CTag('b', true, _('Status'))
+			ZBX_SERVICE_STATUS_RULE_TYPE_N_L => _s('if less than %2$s child services are %1$s or less',
+				new CTag('b', true, _('Status')), new CTag('b', true, 'N')
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_NP_L => _s('if less than %1$s child nodes are %2$s or less',
-				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
+			ZBX_SERVICE_STATUS_RULE_TYPE_NP_L => _s('if less than %2$s child services are %1$s or less',
+				new CTag('b', true, _('Status')), new CTag('b', true, 'N%')
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_W_GE => _s('if at least %1$s of child nodes weight is in %2$s or greater',
-				new CTag('b', true, 'W'), new CTag('b', true, _('Status'))
+			ZBX_SERVICE_STATUS_RULE_TYPE_W_GE => _s('if at least %2$s of child services weight is in %1$s or greater',
+				new CTag('b', true, _('Status')), new CTag('b', true, 'W')
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE => _s('if at least %1$s of child nodes weight is in %2$s or greater',
-				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
+			ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE => _s('if at least %2$s of child services weight is in %1$s or greater',
+				new CTag('b', true, _('Status')), new CTag('b', true, 'N%')
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_W_L => _s('if less than %1$s of child nodes weight is in %2$s or less',
-				new CTag('b', true, 'W'), new CTag('b', true, _('Status'))
+			ZBX_SERVICE_STATUS_RULE_TYPE_W_L => _s('if less than %2$s of child services weight is in %1$s or less',
+				new CTag('b', true, _('Status')), new CTag('b', true, 'W')
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_WP_L => _s('if less than %1$s of child nodes weight is in %2$s or less',
-				new CTag('b', true, 'N%'), new CTag('b', true, _('Status'))
+			ZBX_SERVICE_STATUS_RULE_TYPE_WP_L => _s('if less than %2$s of child services weight is in %1$s or less',
+				new CTag('b', true, _('Status')), new CTag('b', true, 'N%')
 			)
 		];
 	}
@@ -64,19 +64,31 @@ class CServiceHelper {
 		switch ($condition) {
 			case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
 			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
-				$rule = _s('if at least %1$s child nodes are %2$s or greater', (string) $number, $status);
+				$rule = _n(
+					'if at least %2$s child service is %1$s or greater',
+					'if at least %2$s child services are %1$s or greater',
+					$status, $number
+				);
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
 			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
-				$rule = _s('if less than %1$s child nodes are %2$s or less', (string) $number, $status);
+				$rule = _n(
+					'if less than %2$s child service is %1$s or less',
+					'if less than %2$s child services are %1$s or less',
+					$status, $number
+				);
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
+				$rule = _s('if at least %2$s of child services weight is in %1$s or greater', $status, $number);
+				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
-				$rule = _s('if at least %1$s of child nodes weight is in %2$s or greater', (string) $number, $status);
+				$rule = _s('if at least %2$s of child services weight is in %1$s or greater', $status, $number.'%');
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
+				$rule = _s('if less than %2$s of child services weight is in %1$s or less', $status, $number);
+				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
-				$rule = _s('if less than %1$s of child nodes weight is in %2$s or less', (string) $number, $status);
+				$rule = _s('if less than %2$s of child services weight is in %1$s or less', $status, $number.'%');
 				break;
 			default:
 				$rule = null;
