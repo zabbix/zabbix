@@ -158,10 +158,18 @@ class CControllerHostUpdate extends CController {
 		$hostids = API::Host()->update($host);
 
 		if ($hostids !== false && $this->processValueMaps()) {
+			$messages = get_and_clear_messages();
+			$details = [];
+
+			foreach ($messages as $message) {
+				$details[] = $message['message'];
+			}
+
 			return [
 				'hostid' => $hostids['hostids'][0],
-				'message' => makeMessageBox(true, [], _('Host updated'), true, false)->toString(),
-				'message_raw' => _('Host updated')
+				'message' => makeMessageBox(true, $messages, _('Host updated'), true, false)->toString(),
+				'message_raw' => _('Host updated'),
+				'details' => $details
 			];
 		}
 
@@ -169,15 +177,16 @@ class CControllerHostUpdate extends CController {
 	}
 
 	protected function doAction(): void {
+		$failed = false;
 
 		try {
 			$output = $this->updateHost();
 		}
 		catch (Exception $exception) {
-			// Code is not missing here.
+			$failed = true;
 		}
 
-		if (($messages = getMessages()) !== null) {
+		if ($failed && ($messages = getMessages()) !== null) {
 			$output = ['errors' => $messages->toString()];
 		}
 

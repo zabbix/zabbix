@@ -21,6 +21,7 @@
 const ZBX_STYLE_ZABBIX_HOST_POPUPEDIT = 'js-edit-host';
 const ZBX_STYLE_ZABBIX_HOST_POPUPCREATE = 'js-create-host';
 const PAGE_TYPE_JS = 'ajax';
+const MESSAGE_TYPE_SUCCESS = 'success';
 
 const host_popup = {
 	/**
@@ -120,7 +121,6 @@ function hosts_delete(host_form = null) {
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
 		body: urlEncodeData(curl.getUrl())
 	})
-		.then((response) => response.json())
 		.then((response) => handle_hostaction_response(response, host_form));
 
 	return false;
@@ -128,13 +128,21 @@ function hosts_delete(host_form = null) {
 
 /**
  * Show error/success messages from host actions, refreshes originator pages/lists on success.
- * @param {object} response Controller response JSON.
+ * @param {Promise} response Fetch promise.
  * @param {string|undefined} response{error} More "deep"/automated errors, from e.g. permissions, maintenance checks.
  * @param {string|undefined} response{errors} Controller-level failures, validation errors.
  * @param {string|undefined} response{script_inline} Additional JavaScript to inject into page.
  * @param {HTMLFormElement|JQueryElement|null} host_form Host form, if called from within, null for mass actions.
  */
-function handle_hostaction_response(response, host_form) {
+async function handle_hostaction_response(response, host_form = null) {
+	try {
+		response = await response.text();
+		response = JSON.parse(response)
+	}
+	catch (error) {
+		response = {errors: $(response).find('output').removeClass('msg-global')};
+	}
+
 	const overlay = overlays_stack.end();
 
 	if ('script_inline' in response) {
@@ -142,6 +150,7 @@ function handle_hostaction_response(response, host_form) {
 	}
 
 	clearMessages();
+	$('main').find('> .msg-good, > .msg-bad, > .msg-warning').not('.msg-global-footer').remove();
 
 	if (typeof overlay !== 'undefined') {
 		overlay.unsetLoading();
@@ -176,11 +185,15 @@ function handle_hostaction_response(response, host_form) {
 
 		if (filter_btn !== null) {
 			filter_btn.click();
-			addMessage(response.message)
+			addMessage(response.message);
 		}
 		else {
-			postMessageOk(response.message_raw)
-			location.replace(host_popup.original_url)
+			if ('details' in response) {
+				postMessageDetails(MESSAGE_TYPE_SUCCESS, response.details);
+			}
+
+			postMessageOk(response.message_raw);
+			location.replace(host_popup.original_url);
 		}
 	}
 }

@@ -442,7 +442,6 @@ $linked_templates = $host_is_discovered
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 				body: urlEncodeData(fields)
 			})
-				.then((response) => response.json())
 				.then((response) => form.dispatchEvent(new CustomEvent('formSubmitted', {detail: response})));
 		},
 
@@ -495,7 +494,7 @@ $linked_templates = $host_is_discovered
 		 */
 		function setupHostPopup() {
 			document.getElementById('<?= $data['form_name'] ?>').addEventListener('formSubmitted', (e) =>
-				handle_hostaction_response(e.detail, overlays_stack.end().$dialogue.find('form'))
+				handle_hostaction_response(e.detail, e.target)
 			);
 
 			$('#tabs').on('tabsactivate change', () => {
@@ -662,12 +661,11 @@ $linked_templates = $host_is_discovered
 		<?php if (!array_key_exists('popup_form', $data)): ?>
 			const form = document.getElementById('<?= $data['form_name'] ?>');
 
+			form.addEventListener('formSubmitted', (e) => handle_hostaction_response(e.detail, e.target));
 			form.addEventListener('submit', (e) => {
 				e.preventDefault();
-				host_edit.submit(form);
+				host_edit.submit(e.target);
 			});
-
-			form.addEventListener('formSubmitted', (e) => handle_hostaction_response(e.detail, form));
 
 			var clone_button = document.getElementById('clone'),
 				full_clone_button = document.getElementById('full_clone');
