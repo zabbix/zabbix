@@ -25,6 +25,7 @@ import (
 
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -
@@ -33,6 +34,13 @@ type Plugin struct {
 	cpus      []*cpuUnit
 	collector *pdhCollector
 }
+
+const (
+	modeParam = 2
+	cpuParam  = 1
+
+	defaultIndex = 60
+)
 
 func numCPU() (numCpu int) {
 	size, err := win32.GetLogicalProcessorInformationEx(win32.RelationProcessorCore, nil)
@@ -61,22 +69,33 @@ func numCPU() (numCpu int) {
 }
 
 func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
-	period := historyIndex(60)
+	var percpu bool
+
+	period := historyIndex(defaultIndex)
 	switch len(params) {
-	case 2: // mode parameter
+	case modeParam: // mode parameter
 		if period = periodByMode(params[1]); period < 0 {
-			return nil, errors.New("Invalid third parameter.")
+			return nil, errors.New("Invalid second parameter.")
 		}
+
 		fallthrough
-	case 1: // cpu number or all
-		if params[0] != "" && params[0] != "all" {
-			return nil, errors.New("Invalid first parameter.")
+	case cpuParam: // all, cpu number or per cpu
+		switch params[0] {
+		case "", "all":
+		case "percpu":
+			percpu = true
+		default:
+			return nil, errors.New("Invalid second parameter.")
 		}
-	case 0:
 	default:
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
-	return p.cpus[0].counterAverage(counterLoad, period), nil
+
+	if percpu {
+		return p.cpus[0].counterAverage(counterLoad, period, true), nil
+	}
+
+	return p.cpus[0].counterAverage(counterLoad, period, false), nil
 }
 
 func (p *Plugin) Collect() (err error) {
@@ -148,5 +167,5 @@ func init() {
 		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
 		"system.cpu.load", "CPU load.",
 		"system.cpu.num", "Number of CPUs.",
-		"system.cpu.util", "CPU utilisation percentage.")
+		"system.cpu.util", "CPU utilization percentage.")
 }
