@@ -437,7 +437,7 @@ class testScheduledReportPermissions extends CWebTest {
 			]
 		];
 
-		$this->page->userLogin('admin report permissions', 'zabbix');
+		$this->page->userLogin('admin report permissions', 'xibbaz123');
 		$this->page->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
 		$this->query('link', $report)->waitUntilClickable()->one()->click();
 		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
