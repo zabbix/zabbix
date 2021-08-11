@@ -158,23 +158,28 @@ class CControllerPopupServiceEdit extends CController {
 				'problem_tags' => ($this->service !== null && $this->service['problem_tags'])
 					? $this->service['problem_tags']
 					: [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
+				'advanced_configuration' => $this->service !== null
+					&& ($this->service['propagation_rule'] != $defaults['propagation_rule']
+						|| $this->service['propagation_value'] != $defaults['propagation_value']
+						|| $this->service['weight'] != $defaults['weight']),
 				'status_rules' => $this->service !== null ? $this->service['status_rules'] : [],
 				'propagation_rule' => $this->service !== null
 					? $this->service['propagation_rule']
 					: $defaults['propagation_rule'],
-				'propagation_value' => $this->service !== null ? $this->service['propagation_value'] : null,
+				'propagation_value_number' => ($this->service !== null && in_array($this->service['propagation_rule'],
+						[ZBX_SERVICE_STATUS_INCREASE, ZBX_SERVICE_STATUS_DECREASE]))
+					? $this->service['propagation_value']
+					: null,
+				'propagation_value_status' => ($this->service !== null
+						&& $this->service['propagation_rule'] == ZBX_SERVICE_STATUS_FIXED)
+					? $this->service['propagation_value']
+					: null,
 				'weight' => $this->service !== null ? $this->service['weight'] : $defaults['weight']
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
-
-		$data['form']['advanced_configuration'] = $data['form']['status_rules']
-			|| $data['form']['propagation_rule'] != $defaults['propagation_rule']
-			|| ($data['form']['propagation_value'] !== null
-				&& $data['form']['propagation_value'] != $defaults['propagation_value'])
-			|| $data['form']['weight'] != $defaults['weight'];
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

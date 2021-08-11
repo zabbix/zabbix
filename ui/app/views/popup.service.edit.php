@@ -173,7 +173,9 @@ $service_tab
 		))->setId('status_propagation_rules_field')
 	]);
 
-$propagation_value_number = (new CRadioButtonList('propagation_value_number', (int) $data['form']['propagation_value']))
+$propagation_value_number = (new CRadioButtonList('propagation_value_number',
+	$data['form']['propagation_value_number'] !== null ? (int) $data['form']['propagation_value_number'] : null
+))
 	->setId('propagation_value_number')
 	->setModern(true);
 
@@ -181,7 +183,9 @@ foreach (range(1, TRIGGER_SEVERITY_COUNT - 1) as $value) {
 	$propagation_value_number->addValue($value, $value, 'propagation_value_number_'.$value);
 }
 
-$propagation_value_status = (new CSeverity('propagation_value_status', (int) $data['form']['propagation_value']))
+$propagation_value_status = (new CSeverity('propagation_value_status',
+	$data['form']['propagation_value_status'] !== null ? (int) $data['form']['propagation_value_status'] : null
+))
 	->addValue(_('OK'), ZBX_SEVERITY_OK, ZBX_STYLE_NORMAL_BG);
 
 $service_tab

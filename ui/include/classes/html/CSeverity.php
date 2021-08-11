@@ -21,11 +21,11 @@
 
 class CSeverity extends CRadioButtonList {
 	/**
-	 * @param string $name    HTML element name.
-	 * @param int $value      Default selected value, default TRIGGER_SEVERITY_NOT_CLASSIFIED.
-	 * @param bool  $enabled  If set to false, radio buttons (severities) are marked as disabled.
+	 * @param string   $name     HTML element name.
+	 * @param int|null $value    Default selected value, default TRIGGER_SEVERITY_NOT_CLASSIFIED.
+	 * @param bool     $enabled  If set to false, radio buttons (severities) are marked as disabled.
 	 */
-	public function __construct(string $name, int $value = TRIGGER_SEVERITY_NOT_CLASSIFIED, bool $enabled = true) {
+	public function __construct(string $name, ?int $value = TRIGGER_SEVERITY_NOT_CLASSIFIED, bool $enabled = true) {
 		parent::__construct($name, $value);
 
 		$this->setModern(true);
