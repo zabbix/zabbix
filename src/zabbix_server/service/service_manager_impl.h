@@ -42,6 +42,16 @@
 
 typedef struct
 {
+	zbx_uint64_t	eventid;
+	zbx_uint64_t	service_problemid;
+	zbx_uint64_t	serviceid;
+	int		severity;
+	zbx_timespec_t	ts;
+}
+zbx_service_problem_t;
+
+typedef struct
+{
 	zbx_uint64_t	servicetagid;
 	zbx_uint64_t	serviceid;
 	char		*name;
@@ -131,5 +141,6 @@ typedef struct
 }
 zbx_service_action_condition_t;
 
+int	service_get_status(const zbx_service_t	*service, int *status);
 
 #endif

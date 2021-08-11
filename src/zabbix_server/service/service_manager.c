@@ -42,16 +42,6 @@ static volatile sig_atomic_t	service_cache_reload_requested;
 
 typedef struct
 {
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	service_problemid;
-	zbx_uint64_t	serviceid;
-	int		severity;
-	zbx_timespec_t	ts;
-}
-zbx_service_problem_t;
-
-typedef struct
-{
 	zbx_uint64_t		eventid;
 	zbx_vector_ptr_t	services;
 }
@@ -1236,7 +1226,7 @@ static void	service_problems_index_clean(void *data)
  *               FAIL    - the service must be ignored                        *
  *                                                                            *
  ******************************************************************************/
-static int	service_get_status(const zbx_service_t	*service, int *status)
+int	service_get_status(const zbx_service_t	*service, int *status)
 {
 	if (ZBX_SERVICE_STATUS_PROPAGATION_IGNORE == service->propagation_rule)
 		return FAIL;
@@ -1546,7 +1536,7 @@ static int	service_get_main_status(const zbx_service_t *service)
 
 	switch (service->algorithm)
 	{
-		case SERVICE_ALGORITHM_MIN:
+		case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE:
 			for (i = 0; i < service->children.values_num; i++)
 			{
 				zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
@@ -1564,7 +1554,7 @@ static int	service_get_main_status(const zbx_service_t *service)
 					status = child->status;
 			}
 			break;
-		case SERVICE_ALGORITHM_MAX:
+		case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL:
 			for (i = 0; i < service->children.values_num; i++)
 			{
 				zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
@@ -1576,7 +1566,7 @@ static int	service_get_main_status(const zbx_service_t *service)
 					status = child_status;
 			}
 			break;
-		case SERVICE_ALGORITHM_NONE:
+		case ZBX_SERVICE_STATUS_CALC_SET_OK:
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unknown calculation algorithm of service status [%d]",
@@ -1763,8 +1753,8 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 			if (SUCCEED != service_get_status(child, &child_status))
 				continue;
 
-			if ((SERVICE_ALGORITHM_MIN == service->algorithm && child_status >= severity) ||
-					SERVICE_ALGORITHM_MAX == service->algorithm)
+			if ((ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE == service->algorithm && child_status >= severity) ||
+					ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL == service->algorithm)
 			{
 				zbx_vector_ptr_append(&causes, child);
 			}

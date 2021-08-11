@@ -1,0 +1,4 @@
+---
+test case: Empty request
+include: &include mock_services.inc.yaml
+...

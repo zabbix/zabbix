@@ -218,6 +218,8 @@ tests/libs/zbxtrends/zbx_trends_parse_range
 tests/zabbix_server/preprocessor/item_preproc_csv_to_json
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc
+tests/zabbix_server/service/service_get_rootcause_eventids
+tests/zabbix_server/service/service_get_status
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
 ui/.buildpath
 ui/.htpasswd
