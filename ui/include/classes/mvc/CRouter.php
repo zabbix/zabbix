@@ -110,7 +110,7 @@ class CRouter {
 		'hint.box'									=> ['CControllerHintBox',								'layout.json',			'hint.box'],
 		'host.dashboard.view'						=> ['CControllerHostDashboardView',						'layout.htmlpage',		'monitoring.host.dashboard.view'],
 		'host.list'									=> ['CControllerHostList',								'layout.htmlpage',		'configuration.host.list'],
-		'host.massdelete'							=> ['CControllerHostMassDelete',						null,					null],
+		'host.massdelete'							=> ['CControllerHostMassDelete',						'layout.json',			null],
 		'host.edit'									=> ['CControllerHostEdit',								'layout.htmlpage',		'configuration.host.edit'],
 		'host.create'								=> ['CControllerHostCreate',							'layout.json',			null],
 		'host.update'								=> ['CControllerHostUpdate',							'layout.json',			null],

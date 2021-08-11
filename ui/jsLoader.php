@@ -71,7 +71,7 @@ $available_js_cripts = [
 	'class.widget.trigerover.js' => 'widgets/',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
-	'hostpopup.js' => '',
+	'host-common.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -445,7 +445,7 @@ if (empty($_GET['files'])) {
 		'class.tab-indicators.js',
 		'hostinterfacemanager.js',
 		'hostmacrosmanager.js',
-		'hostpopup.js',
+		'host-common.js',
 		'textareaflexible.js',
 		'init.js'
 	];

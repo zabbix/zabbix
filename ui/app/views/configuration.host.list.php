@@ -475,7 +475,12 @@ $form->addItem([
 				->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
 				->addClass(ZBX_STYLE_BTN_ALT)
 		],
-		'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
+		'host.massdelete' => [
+			'content' => (new CButton('delete', _('Delete')))
+				->onClick('return confirm('.json_encode(_('Delete selected hosts?')).')
+							? hosts_delete() : false')
+				->addClass(ZBX_STYLE_BTN_ALT)
+		]
 	], 'hosts')
 ]);
 

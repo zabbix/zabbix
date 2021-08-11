@@ -442,27 +442,23 @@ $linked_templates = $host_is_discovered
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 				body: urlEncodeData(fields)
 			})
-				.then(response => response.json())
-				.then(response => form.dispatchEvent(new CustomEvent('formSubmitted', {detail: response})));
+				.then((response) => response.json())
+				.then((response) => form.dispatchEvent(new CustomEvent('formSubmitted', {detail: response})));
 		},
 
 		/**
 		 * Handles current host deletion.
 		 */
 		deleteHost() {
-			const curl = new Curl('zabbix.php', false),
-				original_curl = new Curl(host_popup.original_url, false);
+			const original_curl = new Curl(host_popup.original_url);
 
 			if (basename(original_curl.getPath()) === 'hostinventories.php') {
 				original_curl.unsetArgument('hostid');
+				original_curl.unsetArgument('sid');
 				host_popup.original_url = original_curl.getUrl();
 			}
 
-			curl.setArgument('action', 'host.massdelete');
-			curl.setArgument('ids', [document.getElementById('hostid').value]);
-			curl.setArgument('back_url', host_popup.original_url);
-
-			redirect(curl.getUrl(), 'post');
+			return hosts_delete(document.getElementById('<?= $data['form_name'] ?>'));
 		},
 
 		/**
@@ -498,43 +494,9 @@ $linked_templates = $host_is_discovered
 		 * In-popup listeners and set up, called when we are sure the popup HTML has been populated.
 		 */
 		function setupHostPopup() {
-			document.getElementById('<?= $data['form_name'] ?>').addEventListener('formSubmitted', (e) => {
-				let response = e.detail,
-					overlay = overlays_stack.end(),
-					$form = overlay.$dialogue.find('form');
-
-				overlay.unsetLoading();
-				overlay.$dialogue.find('.msg-bad, .msg-good').remove();
-
-				if ('errors' in response) {
-					jQuery(response.errors).insertBefore($form);
-				}
-				else if ('error' in response) {
-					overlayDialogueDestroy(overlay.dialogueid);
-				}
-				else if ('hostid' in response) {
-					// Original url restored after dialog close.
-					overlayDialogueDestroy(overlay.dialogueid);
-
-					const current_curl = new Curl(location.href, false);
-					let filter_btn = document.querySelector('[name=filter_set]');
-
-					if (current_curl.getArgument('action') === 'host.list' || typeof filter_btn !== 'undefined') {
-						postMessageOk(response.message_raw)
-						redirect(current_curl.getUrl())
-					}
-					else {
-						filter_btn = document.querySelector('[name="filter_apply"]');
-
-						clearMessages();
-						addMessage(response.message);
-
-						if (typeof filter_btn !== 'undefined') {
-							filter_btn.click();
-						}
-					}
-				}
-			});
+			document.getElementById('<?= $data['form_name'] ?>').addEventListener('formSubmitted', (e) =>
+				handle_hostaction_response(e.detail, overlays_stack.end().$dialogue.find('form'))
+			);
 
 			$('#tabs').on('tabsactivate change', () => {
 				overlays_stack.end().centerDialog();
@@ -705,29 +667,7 @@ $linked_templates = $host_is_discovered
 				host_edit.submit(form);
 			});
 
-			form.addEventListener('formSubmitted', (e) => {
-				let response = e.detail;
-
-				clearMessages();
-
-				if ('errors' in response) {
-					addMessage(response.errors);
-				}
-				else if ('error' in response) {
-					postMessageError(response.error);
-
-					const curl = new Curl('zabbix.php');
-					curl.setArgument('action', 'host.list');
-					window.location = curl.getUrl();
-				}
-				else if ('hostid' in response) {
-					const curl = new Curl('zabbix.php');
-
-					postMessageOk(response.message);
-					curl.setArgument('action', 'host.list');
-					window.location = curl.getUrl();
-				}
-			});
+			form.addEventListener('formSubmitted', (e) => handle_hostaction_response(e.detail, form));
 
 			var clone_button = document.getElementById('clone'),
 				full_clone_button = document.getElementById('full_clone');

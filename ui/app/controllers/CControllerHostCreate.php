@@ -150,7 +150,7 @@ class CControllerHostCreate extends CController {
 			&& (!$full_clone || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
 			return [
 				'hostid' => $hostids['hostids'][0],
-				'message' => makeMessageBox(true, [], _('Host updated'), true, false)->toString(),
+				'message' => makeMessageBox(true, [], _('Host added'), true, false)->toString(),
 				'message_raw' => _('Host added')
 			];
 		}

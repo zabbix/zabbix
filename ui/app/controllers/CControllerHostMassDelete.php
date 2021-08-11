@@ -23,8 +23,7 @@ class CControllerHostMassDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'ids'       => 'required|array_db hosts.hostid',
-			'back_url'   => 'string'
+			'ids'       => 'required|array_db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,11 +40,12 @@ class CControllerHostMassDelete extends CController {
 	}
 
 	protected function doAction(): void {
-		header('Cache-Control: max-age=1');
-
-		$redirect_url = $this->getInput('back_url', '');
+		$output = [];
 		$hostids = $this->getInput('ids');
+
 		$result = API::Host()->delete($hostids);
+
+		ob_start();
 
 		if ($result) {
 			uncheckTableRows('hosts');
@@ -61,20 +61,19 @@ class CControllerHostMassDelete extends CController {
 		}
 
 		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Host deleted'));
+			$output += [
+				'message' => makeMessageBox(true, [], _('Host deleted'), true, false)->toString(),
+				'message_raw' => _('Host deleted')
+			];
 		}
 		else {
 			CMessageHelper::setErrorTitle(_('Cannot delete host'));
+			$messages = getMessages();
+			$output += ['errors' => $messages->toString()];
 		}
 
-		if ($redirect_url === '') {
-			$redirect_url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'host.list')
-				->setArgument('page', CPagerHelper::loadPage('host.list', null));
-		}
+		$output['script_inline'] = ob_get_clean();
 
-		$response = new CControllerResponseRedirect($redirect_url);
-
-		$this->setResponse($response);
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }
