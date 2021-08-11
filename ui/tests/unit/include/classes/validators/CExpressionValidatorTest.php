@@ -118,6 +118,7 @@ class CExpressionValidatorTest extends TestCase {
 			['avg(/host/key[*,p2], 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['avg(/host/key[p1,*], 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['avg(/host/key[*,*], 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['item_count(/host/key[*,*]))', ['calculated' => true], ['rc' => true, 'error' => null]],
 
 			// Non-aggregating math function.
 			['length(avg_foreach(/host/key, 1))', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "avg_foreach"']],

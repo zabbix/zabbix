@@ -141,7 +141,7 @@ class CExpressionValidator extends CValidator {
 								|| count($token['data']['parameters'][0]['data']['tokens']) != 1
 								|| $token['data']['parameters'][0]['data']['tokens'][0]['type']
 									!= CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
-								|| !CHistFunctionData::isAggregating(
+								|| !CHistFunctionData::isAggregatable(
 									$token['data']['parameters'][0]['data']['tokens'][0]['data']['function']
 								)) {
 							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
@@ -185,7 +185,7 @@ class CExpressionValidator extends CValidator {
 						return false;
 					}
 
-					if ($options['calculated'] && $options['aggregating']) {
+					if ($options['calculated'] && CHistFunctionData::isAggregatable($token['data']['function'])) {
 						if ($parent_token === null
 								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
 								|| !CMathFunctionData::isAggregating($parent_token['data']['function'])
