@@ -525,7 +525,7 @@ class testDashboardPages extends CWebTest {
 	}
 
 	private function openPageMenu($page_name, $index = 1) {
-		$selector = '//div[@class="dashboard-navigation-tabs"]//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
+		$selector = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
 
 		$value = $this->query('xpath:('.$selector.']/../../div)['.$index.']')->one()->getAttribute('class');
 		if ($value !== 'selected-tab') {
@@ -534,6 +534,12 @@ class testDashboardPages extends CWebTest {
 		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilPresent()->one()->click()->waitUntilVisible();
 	}
 
+	private function selectPage($page_name, $index = 1) {
+		$this->query('xpath:(//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
+				->one()->click()->waitUntilReady();
+		$this->query('xpath://ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name).
+				']/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+	}
 
 	private function selectPageAction($page_name, $menu_item, $index = 1) {
 		$this->openPageMenu($page_name, $index);
