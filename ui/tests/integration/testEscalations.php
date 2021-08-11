@@ -382,7 +382,7 @@ class testEscalations extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(2);
+		sleep(4);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -393,7 +393,7 @@ class testEscalations extends CIntegrationTest {
 		sleep(60);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
-		sleep(2);
+		sleep(4);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -448,7 +448,7 @@ class testEscalations extends CIntegrationTest {
 		sleep(60);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(2);
+		sleep(4);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -465,7 +465,7 @@ class testEscalations extends CIntegrationTest {
 		sleep(60);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
-		sleep(2);
+		sleep(4);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -473,7 +473,7 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
-		sleep(2);
+		sleep(4);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
