@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupServiceRuleEdit extends CController {
+class CControllerPopupServiceStatusRuleEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [

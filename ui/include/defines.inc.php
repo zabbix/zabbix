@@ -684,11 +684,9 @@ define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
 define('MAP_LINK_DRAWTYPE_DOT',				3);
 define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
-define('SERVICE_ALGORITHM_NONE',	0); // do not calculate
-define('SERVICE_ALGORITHM_MAX',		1); // problem, if one children has a problem
-define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
-
-define('SERVICE_SLA', '99.9000');
+define('ZBX_SERVICE_STATUS_CALC_SET_OK',			0);
+define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE',	1);
+define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL',	2);
 
 define('SERVICE_SHOW_SLA_OFF',	0);
 define('SERVICE_SHOW_SLA_ON',	1);
@@ -891,10 +889,6 @@ define('CALC_FNC_AVG', 2);
 define('CALC_FNC_MAX', 4);
 define('CALC_FNC_ALL', 7);
 define('CALC_FNC_LST', 9);
-
-define('SERVICE_RULE_STATUS_SET_OK',			0);
-define('SERVICE_RULE_STATUS_CRITICAL_CHILD',	1);
-define('SERVICE_RULE_STATUS_CRITICAL_CHILDREN',	2);
 
 define('ZBX_SERVICE_STATUS_RULE_TYPE_N_GE',		0);
 define('ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE',	1);

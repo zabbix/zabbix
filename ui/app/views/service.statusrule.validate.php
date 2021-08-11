@@ -24,12 +24,12 @@
  */
 
 $output = [
-	'body' => (new CPartial('service.rule.row', [
+	'body' => (new CPartial('service.statusrule.row', [
 		'row_index' => $data['row_index'],
-		'new_status' => (int) $data['form']['new_status'],
-		'type' => (int) $data['form']['type'],
-		'limit_value' => (int) $data['form']['limit_value'],
-		'limit_status' => (int) $data['form']['limit_status']
+		'new_status' => $data['form']['new_status'],
+		'type' => $data['form']['type'],
+		'limit_value' => $data['form']['limit_value'],
+		'limit_status' => $data['form']['limit_status']
 	]))->getOutput()
 ];
 

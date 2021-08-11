@@ -94,13 +94,13 @@ window.service_edit_popup = {
 
 		// Setup Service rules.
 		document
-			.getElementById('additional_rules')
+			.getElementById('status_rules')
 			.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-add')) {
-					this.editRule();
+					this.editStatusRule();
 				}
 				else if (e.target.classList.contains('js-edit')) {
-					this.editRule(e.target.closest('tr'));
+					this.editStatusRule(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
@@ -138,7 +138,7 @@ window.service_edit_popup = {
 	update() {
 		const advanced_configuration = document.getElementById('advanced_configuration').checked;
 		const propagation_rule = document.getElementById('propagation_rule').value;
-		const status_enabled = document.getElementById('algorithm').value != <?= SERVICE_ALGORITHM_NONE ?>;
+		const status_enabled = document.getElementById('algorithm').value != <?= ZBX_SERVICE_STATUS_CALC_SET_OK ?>;
 		const showsla = document.getElementById('showsla').checked;
 
 		document.getElementById('additional_rules_label').style.display = advanced_configuration ? '' : 'none';
@@ -155,10 +155,12 @@ window.service_edit_popup = {
 				document.getElementById('propagation_value_number').style.display = '';
 				document.getElementById('propagation_value_status').style.display = 'none';
 				break;
+
 			case '<?= ZBX_SERVICE_STATUS_FIXED ?>':
 				document.getElementById('propagation_value_number').style.display = 'none';
 				document.getElementById('propagation_value_status').style.display = '';
 				break;
+
 			default:
 				document.getElementById('propagation_value_number').style.display = 'none';
 				document.getElementById('propagation_value_status').style.display = 'none';
@@ -171,7 +173,7 @@ window.service_edit_popup = {
 		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
 	},
 
-	editRule(row = null) {
+	editStatusRule(row = null) {
 		let popup_params;
 
 		if (row !== null) {
@@ -180,23 +182,25 @@ window.service_edit_popup = {
 			popup_params = {
 				edit: '1',
 				row_index,
-				new_status: row.querySelector(`[name="additional_rules[${row_index}][new_status]"`).value,
-				type: row.querySelector(`[name="additional_rules[${row_index}][type]"`).value,
-				limit_value: row.querySelector(`[name="additional_rules[${row_index}][limit_value]"`).value,
-				limit_status: row.querySelector(`[name="additional_rules[${row_index}][limit_status]"`).value
+				new_status: row.querySelector(`[name="status_rules[${row_index}][new_status]"`).value,
+				type: row.querySelector(`[name="status_rules[${row_index}][type]"`).value,
+				limit_value: row.querySelector(`[name="status_rules[${row_index}][limit_value]"`).value,
+				limit_status: row.querySelector(`[name="status_rules[${row_index}][limit_status]"`).value
 			};
 		}
 		else {
 			let row_index = 0;
 
-			while (document.querySelector(`#additional_rules [data-row_index="${row_index}"]`) !== null) {
+			while (document.querySelector(`#status_rules [data-row_index="${row_index}"]`) !== null) {
 				row_index++;
 			}
 
 			popup_params = {row_index};
 		}
 
-		const overlay = PopUp('popup.service.rule.edit', popup_params, 'service_rule_edit', document.activeElement);
+		const overlay = PopUp('popup.service.statusrule.edit', popup_params, 'service_status_rule_edit',
+			document.activeElement
+		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const new_row = e.detail;
@@ -207,7 +211,7 @@ window.service_edit_popup = {
 			}
 			else {
 				document
-					.querySelector('#additional_rules tbody')
+					.querySelector('#status_rules tbody')
 					.insertAdjacentHTML('beforeend', new_row);
 			}
 		});

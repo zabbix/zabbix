@@ -126,21 +126,20 @@ $service_tab = (new CFormGrid())
 	])
 	->addItem(
 		(new CFormField(
-			(new CCheckBox('advanced_configuration', 1))
+			(new CCheckBox('advanced_configuration'))
 				->setLabel(_('Advanced configuration'))
 				->setChecked($data['form']['advanced_configuration'])
-				->setUncheckedValue(0)
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	);
 
 $additional_rules = (new CTable())
-	->setId('additional_rules')
+	->setId('status_rules')
 	->setHeader(
 		(new CRowHeader([_('Name'), _('Action')]))->addClass(ZBX_STYLE_GREY)
 	);
 
-foreach ($data['form']['additional_rules'] as $row_index => $rule) {
-	$additional_rules->addItem(new CPartial('service.rule.row', ['row_index' => $row_index] + $rule));
+foreach ($data['form']['status_rules'] as $row_index => $rule) {
+	$additional_rules->addItem(new CPartial('service.statusrule.row', ['row_index' => $row_index] + $rule));
 }
 
 $additional_rules->addItem(

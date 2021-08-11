@@ -24,8 +24,8 @@
  */
 
 $form = (new CForm())
-	->setId('service-rule-form')
-	->setName('service-rule-form')
+	->setId('service-status-rule-form')
+	->setName('service-status-rule-form')
 	->addVar('edit', $data['is_edit'] ? '1' : null)
 	->addVar('row_index', $data['row_index'])
 	->addItem(getMessages());
@@ -36,21 +36,21 @@ $form->addItem((new CInput('submit'))->addStyle('display: none;'));
 $form_grid = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
-		new CLabel(_('Set status to'), 'service_rule_status'),
+		new CLabel(_('Set status to'), 'service_status_rule_status'),
 		new CFormField(
 			(new CSelect('new_status'))
-				->setId('service_rule_new_status')
-				->setFocusableElementId('service_rule_new_status_focusable')
+				->setId('service_status_rule_new_status')
+				->setFocusableElementId('service_status_rule_new_status_focusable')
 				->setValue($data['form']['new_status'])
 				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getRuleStatusNames()))
 		)
 	])
 	->addItem([
-		new CLabel(_('Condition'), 'service_rule_condition'),
+		new CLabel(_('Condition'), 'service_status_rule_condition'),
 		new CFormField(
 			(new CSelect('type'))
-				->setId('service_rule_type')
-				->setFocusableElementId('service_rule_type_focusable')
+				->setId('service_status_rule_type')
+				->setFocusableElementId('service_status_rule_type_focusable')
 				->setValue($data['form']['type'])
 				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getRuleConditionNames()))
 				->setOptionTemplate('#{*label}')
@@ -58,23 +58,23 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		(new CLabel(_('N'), 'service_rule_limit_value'))->setId('service_rule_limit_value_label'),
+		(new CLabel('N', 'service_status_rule_limit_value'))->setId('service_status_rule_limit_value_label'),
 		new CFormField([
 			(new CTextBox('limit_value', $data['form']['limit_value'], false, 7))
-				->setId('service_rule_limit_value')
+				->setId('service_status_rule_limit_value')
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired(),
 			(new CSpan('%'))
-				->setId('service_rule_limit_value_unit')
+				->setId('service_status_rule_limit_value_unit')
 				->addStyle('display: none;')
 		])
 	])
 	->addItem([
-		new CLabel(_('Status'), 'service_rule_limit_status'),
+		new CLabel(_('Status'), 'service_status_rule_limit_status'),
 		new CFormField(
 			(new CSelect('limit_status'))
-				->setId('service_rule_limit_status')
-				->setFocusableElementId('service_rule_limit_status_focusable')
+				->setId('service_status_rule_limit_status')
+				->setFocusableElementId('service_status_rule_limit_status_focusable')
 				->setValue($data['form']['limit_status'])
 				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getRuleStatusNames()))
 		)
@@ -84,7 +84,7 @@ $form
 	->addItem($form_grid)
 	->addItem(
 		(new CScriptTag('
-			service_rule_edit_popup.init();
+			service_status_rule_edit_popup.init();
 		'))->setOnDocumentReady()
 	);
 
@@ -96,11 +96,11 @@ $output = [
 			'title' => $data['is_edit'] ? _('Update') : _('Add'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'service_rule_edit_popup.submit();'
+			'action' => 'service_status_rule_edit_popup.submit();'
 		]
 	],
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.service.rule.edit.js.php')
+		$this->readJsFile('popup.service.statusrule.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

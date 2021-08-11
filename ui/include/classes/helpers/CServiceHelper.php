@@ -23,37 +23,37 @@ class CServiceHelper {
 
 	public static function getAlgorithmNames(): array {
 		return [
-			SERVICE_ALGORITHM_MAX => _('Most critical of child services'),
-			SERVICE_ALGORITHM_MIN => _('Most critical if all children have problems'),
-			SERVICE_ALGORITHM_NONE => _('Set status to OK')
+			ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE => _('Most critical of child services'),
+			ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL => _('Most critical if all children have problems'),
+			ZBX_SERVICE_STATUS_CALC_SET_OK => _('Set status to OK')
 		];
 	}
 
 	public static function getRuleConditionNames(): array {
 		return [
 			ZBX_SERVICE_STATUS_RULE_TYPE_N_GE => _s('if at least %2$s child services are %1$s or greater',
-				new CTag('b', true, _('Status')), new CTag('b', true, 'N')
+				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N}')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE => _s('if at least %2$s child services are %1$s or greater',
-				new CTag('b', true, _('Status')), new CTag('b', true, 'N%')
+				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N%}')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_N_L => _s('if less than %2$s child services are %1$s or less',
-				new CTag('b', true, _('Status')), new CTag('b', true, 'N')
+				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N}')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_NP_L => _s('if less than %2$s child services are %1$s or less',
-				new CTag('b', true, _('Status')), new CTag('b', true, 'N%')
+				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N%}')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_W_GE => _s('if at least %2$s of child services weight is in %1$s or greater',
-				new CTag('b', true, _('Status')), new CTag('b', true, 'W')
+				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{W}')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE => _s('if at least %2$s of child services weight is in %1$s or greater',
-				new CTag('b', true, _('Status')), new CTag('b', true, 'N%')
+				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N%}')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_W_L => _s('if less than %2$s of child services weight is in %1$s or less',
-				new CTag('b', true, _('Status')), new CTag('b', true, 'W')
+				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{W}')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_WP_L => _s('if less than %2$s of child services weight is in %1$s or less',
-				new CTag('b', true, _('Status')), new CTag('b', true, 'N%')
+				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N%}')
 			)
 		];
 	}

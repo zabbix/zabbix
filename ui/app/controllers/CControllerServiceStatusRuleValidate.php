@@ -19,22 +19,54 @@
 **/
 
 
-class CControllerServiceRuleValidate extends CController {
-
-	private $ts_from;
-	private $ts_to;
+class CControllerServiceStatusRuleValidate extends CController {
 
 	protected function checkInput(): bool {
-		// TODO: needs to update validation rules
 		$fields = [
 			'row_index' =>		'required|int32',
-			'new_status' =>		'int32',
-			'type' =>			'int32',
-			'limit_value' =>	'int32',
-			'limit_status' =>	'int32'
+			'type' =>			'required|in '.implode(',', array_keys(CServiceHelper::getRuleConditionNames())),
+			'limit_value' =>	'required|int32|ge 0',
+			'limit_status' =>	'required|in '.implode(',', array_keys(CServiceHelper::getRuleStatusNames())),
+			'new_status' =>		'required|in '.implode(',', array_keys(CServiceHelper::getRuleStatusNames()))
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			switch ($this->getInput('type')) {
+				case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
+					$limit_value_label = 'N';
+					$limit_value_max = 1000000;
+					break;
+
+				case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
+					$limit_value_label = 'W';
+					$limit_value_max = 1000000;
+					break;
+
+				case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
+					$limit_value_label = 'N';
+					$limit_value_max = 100;
+					break;
+			}
+
+			$validator = new CNewValidator([
+				$limit_value_label => $this->getInput('limit_value')
+			], [
+				$limit_value_label => 'le '.$limit_value_max
+			]);
+
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			$ret = !$validator->isErrorFatal() && !$validator->isError();
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -56,10 +88,10 @@ class CControllerServiceRuleValidate extends CController {
 		$data = [
 			'row_index' => $this->getInput('row_index'),
 			'form' => [
-				'new_status' => $this->getInput('new_status', ZBX_SEVERITY_OK),
-				'type' => $this->getInput('type', ZBX_SERVICE_STATUS_RULE_TYPE_N_GE),
-				'limit_value' => $this->getInput('limit_value', 0),
-				'limit_status' => $this->getInput('limit_status', ZBX_SEVERITY_OK)
+				'type' => $this->getInput('type'),
+				'limit_value' => $this->getInput('limit_value'),
+				'limit_status' => $this->getInput('limit_status'),
+				'new_status' => $this->getInput('new_status')
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

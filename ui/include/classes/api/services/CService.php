@@ -67,7 +67,7 @@ class CService extends CApiService {
 				'serviceid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
-				'algorithm' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE])],
+				'algorithm' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_SET_OK])],
 				'showsla' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON])]
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
@@ -172,7 +172,7 @@ class CService extends CApiService {
 	private function validateCreate(array &$services): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
-			'algorithm' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE])],
+			'algorithm' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_SET_OK])],
 			'showsla' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON])],
 			'goodsla' =>			['type' => API_FLOAT, 'in' => '0:100'],
 			'sortorder' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:999'],
@@ -281,7 +281,7 @@ class CService extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['serviceid']], 'fields' => [
 			'serviceid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
-			'algorithm' =>			['type' => API_INT32, 'in' => implode(',', [SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE])],
+			'algorithm' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_SET_OK])],
 			'showsla' =>			['type' => API_INT32, 'in' => implode(',', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON])],
 			'goodsla' =>			['type' => API_FLOAT, 'in' => '0:100'],
 			'sortorder' =>			['type' => API_INT32, 'in' => '0:999'],
@@ -669,11 +669,6 @@ class CService extends CApiService {
 			}
 
 			switch ($propagation_rule) {
-				case ZBX_SERVICE_STATUS_AS_IS:
-				case ZBX_SERVICE_STATUS_IGNORE:
-					$propagation_values = [0];
-					break;
-
 				case ZBX_SERVICE_STATUS_INCREASE:
 				case ZBX_SERVICE_STATUS_DECREASE:
 					$propagation_values = range(1, TRIGGER_SEVERITY_COUNT - 1);
@@ -683,6 +678,11 @@ class CService extends CApiService {
 					$propagation_values = array_merge([ZBX_SEVERITY_OK],
 						range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
 					);
+					break;
+
+				default:
+					$propagation_values = [0];
+					break;
 			}
 
 			if (!in_array($service['propagation_value'], $propagation_values)) {
@@ -740,7 +740,7 @@ class CService extends CApiService {
 				$has_problem_tags = false;
 			}
 
-			if ($algorithm == SERVICE_ALGORITHM_NONE) {
+			if ($algorithm == ZBX_SERVICE_STATUS_CALC_SET_OK) {
 				$showsla = array_key_exists('showsla', $service)
 					? $service['showsla']
 					: $db_services[$service['serviceid']]['showsla'];
@@ -1460,7 +1460,7 @@ class CService extends CApiService {
 			$problemServiceIds = [];
 			foreach ($services as &$service) {
 				// don't calculate SLA for services with disabled status calculation
-				if ($service['algorithm'] != SERVICE_ALGORITHM_NONE) {
+				if ($service['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK) {
 					$usedSeviceIds[$service['serviceid']] = $service['serviceid'];
 					$service['alarms'] = [];
 
@@ -1474,7 +1474,7 @@ class CService extends CApiService {
 			// initial data
 			foreach ($services as $service) {
 				$rs[$service['serviceid']] = [
-					'status' => $service['algorithm'] != SERVICE_ALGORITHM_NONE ? $service['status'] : null,
+					'status' => $service['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK ? $service['status'] : null,
 					'problems' => [],
 					'sla' => []
 				];
@@ -1512,7 +1512,7 @@ class CService extends CApiService {
 					]);
 
 					$child_services = array_filter($child_services, function (array $service): bool {
-						return $service['algorithm'] != SERVICE_ALGORITHM_NONE && $service['status'] > 0;
+						return $service['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK && $service['status'] > 0;
 					});
 
 					$deep_services += $child_services;
@@ -1608,7 +1608,7 @@ class CService extends CApiService {
 					$parentService = $services[$parentServiceId];
 
 					// escalate only if status calculation is enabled for the parent service and it's in problem state
-					if ($parentService['algorithm'] != SERVICE_ALGORITHM_NONE && $parentService['status'] > 0) {
+					if ($parentService['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK && $parentService['status'] > 0) {
 						if (!isset($parentProblems[$parentServiceId])) {
 							$parentProblems[$parentServiceId] = [];
 						}

@@ -90,6 +90,9 @@ class CControllerPopupServiceEdit extends CController {
 
 			CArrayHelper::sort($this->service['times'], ['type', 'ts_from', 'ts_to']);
 			$this->service['times'] = array_values($this->service['times']);
+
+			CArrayHelper::sort($this->service['status_rules'], ['new_status', 'type', 'limit_value', 'limit_status']);
+			$this->service['status_rules'] = array_values($this->service['status_rules']);
 		}
 
 		if ($this->service !== null) {
@@ -142,7 +145,9 @@ class CControllerPopupServiceEdit extends CController {
 				'parents' => $parents,
 				'children' => $this->service !== null ? $this->service['children'] : [],
 				'children_problem_tags_html' => $children_problem_tags_html,
-				'algorithm' => $this->service !== null ? $this->service['algorithm'] : SERVICE_ALGORITHM_MAX,
+				'algorithm' => $this->service !== null
+					? $this->service['algorithm']
+					: ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
 				'sortorder' => $this->service !== null ? $this->service['sortorder'] : $defaults['sortorder'],
 				'showsla' => $this->service !== null ? $this->service['showsla'] : $defaults['showsla'],
 				'goodsla' => $this->service !== null ? $this->service['goodsla'] : $defaults['goodsla'],
@@ -153,18 +158,23 @@ class CControllerPopupServiceEdit extends CController {
 				'problem_tags' => ($this->service !== null && $this->service['problem_tags'])
 					? $this->service['problem_tags']
 					: [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
-				'advanced_configuration' => $this->service !== null
-					? $this->service['advanced_configuration']
-					: false,
-				'additional_rules' => $this->service !== null ? $this->service['additional_rules'] : [],
-				'propagation_rule' => $this->service !== null ? $this->service['propagation_rule'] : ZBX_SERVICE_STATUS_AS_IS,
+				'status_rules' => $this->service !== null ? $this->service['status_rules'] : [],
+				'propagation_rule' => $this->service !== null
+					? $this->service['propagation_rule']
+					: $defaults['propagation_rule'],
 				'propagation_value' => $this->service !== null ? $this->service['propagation_value'] : null,
-				'weight' => $this->service !== null ? $this->service['weight'] : 0
+				'weight' => $this->service !== null ? $this->service['weight'] : $defaults['weight']
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
+
+		$data['form']['advanced_configuration'] = $data['form']['status_rules']
+			|| $data['form']['propagation_rule'] != $defaults['propagation_rule']
+			|| ($data['form']['propagation_value'] !== null
+				&& $data['form']['propagation_value'] != $defaults['propagation_value'])
+			|| $data['form']['weight'] != $defaults['weight'];
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

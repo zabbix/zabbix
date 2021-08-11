@@ -24,25 +24,25 @@
  */
 ?>
 
-window.service_rule_edit_popup = {
+window.service_status_rule_edit_popup = {
 	overlay: null,
 	dialogue: null,
 	form: null,
 
 	init() {
-		this.overlay = overlays_stack.getById('service_rule_edit');
+		this.overlay = overlays_stack.getById('service_status_rule_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		const type_selector = document.getElementById('service_rule_type');
+		const type_selector = document.getElementById('service_status_rule_type');
 
 		type_selector.addEventListener('change', (e) => this.typeChange(e.target.value));
 		this.typeChange(type_selector.value)
 	},
 
 	typeChange(type) {
-		const label = document.getElementById('service_rule_limit_value_label');
-		const unit = document.getElementById('service_rule_limit_value_unit');
+		const label = document.getElementById('service_status_rule_limit_value_label');
+		const unit = document.getElementById('service_status_rule_limit_value_unit');
 
 		switch (type) {
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_N_GE ?>':
@@ -76,7 +76,7 @@ window.service_rule_edit_popup = {
 
 		const curl = new Curl('zabbix.php', false);
 
-		curl.setArgument('action', 'service.rule.validate');
+		curl.setArgument('action', 'service.statusrule.validate');
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
@@ -89,7 +89,7 @@ window.service_rule_edit_popup = {
 					throw {html_string: response.errors};
 				}
 
-				overlayDialogueDestroy('service_rule_edit');
+				overlayDialogueDestroy('service_status_rule_edit');
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 			})

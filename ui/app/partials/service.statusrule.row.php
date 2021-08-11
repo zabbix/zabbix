@@ -23,15 +23,15 @@
  * @var CPartial $this
  */
 
-$condition_names = CServiceHelper::getRuleConditionNames();
-
 (new CRow([
 	[
-		CServiceHelper::getRuleByCondition($data['new_status'], $data['type'], $data['limit_value'], $data['limit_status']),
-		new CVar('additional_rules['.$data['row_index'].'][new_status]', $data['new_status']),
-		new CVar('additional_rules['.$data['row_index'].'][type]', $data['type']),
-		new CVar('additional_rules['.$data['row_index'].'][limit_value]', $data['limit_value']),
-		new CVar('additional_rules['.$data['row_index'].'][limit_status]', $data['limit_status'])
+		CServiceHelper::getRuleByCondition((int) $data['new_status'], (int) $data['type'], (int) $data['limit_value'],
+			(int) $data['limit_status']
+		),
+		new CVar('status_rules['.$data['row_index'].'][new_status]', $data['new_status']),
+		new CVar('status_rules['.$data['row_index'].'][type]', $data['type']),
+		new CVar('status_rules['.$data['row_index'].'][limit_value]', $data['limit_value']),
+		new CVar('status_rules['.$data['row_index'].'][limit_status]', $data['limit_status'])
 	],
 	new CHorList([
 		(new CSimpleButton(_('Edit')))
