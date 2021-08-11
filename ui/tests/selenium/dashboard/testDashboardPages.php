@@ -535,10 +535,11 @@ class testDashboardPages extends CWebTest {
 	}
 
 	private function selectPage($page_name, $index = 1) {
-		$this->query('xpath:(//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
+		$selection = '//ul[@class="sortable-list"]//span[@title=';
+		$this->query('xpath:('.$selection.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
 				->one()->click()->waitUntilReady();
-		$this->query('xpath://ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name).
-				']/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+		$this->query('xpath:'.$selection.CXPathHelper::escapeQuotes($page_name).']/../../div[@class="selected-tab"]')
+				->one()->waitUntilPresent();
 	}
 
 	private function selectPageAction($page_name, $menu_item, $index = 1) {
