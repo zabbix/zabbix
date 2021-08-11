@@ -103,7 +103,7 @@ class testScheduledReportPermissions extends CWebTest {
 		$users = CDataHelper::call('user.create', [
 			[
 				'username' => 'admin without report permissions',
-				'passwd123' => 'xibbaz123',
+				'passwd' => 'xibbaz123',
 				'roleid' => self::$roleids['admin role without access to reports'],
 				'usrgrps' => [
 					[
