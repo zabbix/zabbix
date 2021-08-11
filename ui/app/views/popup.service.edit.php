@@ -177,7 +177,8 @@ $service_tab
 $propagation_value_number = (new CRadioButtonList('propagation_value_number', $data['form']['propagation_value']))
 	->setId('propagation_value_number')
 	->setModern(true);
-foreach (range(1, 5) as $value) {
+
+foreach (range(1, TRIGGER_SEVERITY_COUNT - 1) as $value) {
 	$propagation_value_number->addValue($value, $value, 'propagation_value_number_'.$value);
 }
 
