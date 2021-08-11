@@ -328,7 +328,7 @@ class testEscalations extends CIntegrationTest {
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
-		sleep(2);
+		sleep(6);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
