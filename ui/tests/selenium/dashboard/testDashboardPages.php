@@ -65,6 +65,13 @@ class testDashboardPages extends CWebTest {
 	protected static $dashboardid_creation;
 
 	/**
+	 * Id of dashboard for page delete.
+	 *
+	 * @var integer
+	 */
+	protected static $dashboardid_delete;
+
+	/**
 	 * New dashboards.
 	 */
 	public function prepareDashboardData() {
@@ -204,13 +211,10 @@ class testDashboardPages extends CWebTest {
 				'auto_start' => 1,
 				'pages' => [
 					[
-						'name' => 'Delete_1'
 					],
 					[
-						'name' => 'Delete_2'
 					],
 					[
-						'name' => 'Delete_3'
 					]
 				]
 			]
@@ -312,39 +316,6 @@ class testDashboardPages extends CWebTest {
 		$this->assertEquals($pages_before, $this->getTitles());
 		$this->selectPage('first_page_copy', 2);
 		$this->assertEquals('First page clocks + changed name', $dashboard->getWidgets()->last()->getHeaderText());
-	}
-
-	public function testDashboardPages_KioskMode() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_kiosk)->waitUntilReady();
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
-		$this->page->waitUntilReady();
-
-		// Switch pages next/previous.
-		$dashboard = CDashboardElement::find()->one();
-		foreach (['next', 'previous'] as $direction) {
-			$widget_name = ['First', 'Second', 'Third'];
-			if ($direction === 'previous') {
-				$widget_name = ['First', 'Third', 'Second'];
-			}
-
-			foreach ($widget_name as $widget) {
-				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
-				$this->query('xpath://button[contains(@class, "'.$direction.'-page")]')->one()->click()->waitUntilReady();
-			}
-		}
-
-		// Control panel screenshot - start/stop status.
-//		$this->page->removeFocus();
-//		foreach (['Stop', 'Start'] as $status) {
-//			$screenshot_area = $this->query('xpath://ul[@class="header-kioskmode-controls"]')->waitUntilVisible()->one();
-//			$this->assertScreenshot($screenshot_area, $status);
-//			$this->query('xpath://button[@title="'.$status.' slideshow"]')->one()->click();
-//		}
-
-		// Check that returned from kiosk view.
-		$this->query('xpath://button[@title="Normal view"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->page->assertHeader('Dashboard for kiosk');
 	}
 
 	public static function getCreateData() {
@@ -491,7 +462,59 @@ class testDashboardPages extends CWebTest {
 	}
 
 	public function testDashboardPages_Delete() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_creation)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_delete)->waitUntilReady();
+		$this->assertEquals(['Page 1', 'Page 2', 'Page 3'], $this->getTitles());
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->edit();
+
+		// Remove second page. All three pages are without names. Their name, should be changed according page amount.
+		$this->selectPageAction('Page 2', 'Delete');
+		$this->assertEquals(['Page 1', 'Page 3'], $this->getTitles());
+		$dashboard->save();
+		$this->assertEquals(['Page 1', 'Page 2'], $this->getTitles());
+		$dashboard->edit();
+		$this->selectPageAction('Page 2', 'Delete');
+		$this->assertEquals(['Page 1'], $this->getTitles());
+
+		// Check that Delete option is disabled when one page left.
+		$this->openPageMenu('Page 1');
+		$page_menu = $this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one();
+		$this->assertTrue($page_menu->query('xpath://a[@aria-label="Actions, Delete"]')->one()->isEnabled(false));
+		$dashboard->save();
+		$this->assertEquals(['Page 1'], $this->getTitles());
+	}
+
+	public function testDashboardPages_KioskMode() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_kiosk)->waitUntilReady();
+		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->page->waitUntilReady();
+
+		// Switch pages next/previous.
+		$dashboard = CDashboardElement::find()->one();
+		foreach (['next', 'previous'] as $direction) {
+			$widget_name = ['First', 'Second', 'Third'];
+			if ($direction === 'previous') {
+				$widget_name = ['First', 'Third', 'Second'];
+			}
+
+			foreach ($widget_name as $widget) {
+				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
+				$this->query('xpath://button[contains(@class, "'.$direction.'-page")]')->one()->click()->waitUntilReady();
+			}
+		}
+
+//		// Control panel screenshot - start/stop status.
+//		$this->page->removeFocus();
+//		foreach (['Stop', 'Start'] as $status) {
+//			$screenshot_area = $this->query('xpath://ul[@class="header-kioskmode-controls"]')->waitUntilVisible()->one();
+//			$this->assertScreenshot($screenshot_area, $status);
+//			$this->query('xpath://button[@title="'.$status.' slideshow"]')->one()->click();
+//		}
+
+		// Check that returned from kiosk view.
+		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Dashboard for kiosk');
 	}
 
 	private function checkPageValues($page_name, $default_time, $index = 1) {
@@ -511,7 +534,13 @@ class testDashboardPages extends CWebTest {
 		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilPresent()->one()->click()->waitUntilVisible();
 	}
 
-
+	private function selectPage($page_name, $index = 1) {
+		$selector = '//div[@class="dashboard-navigation-tabs"]//ul[@class="sortable-list"]';
+		$this->query('xpath:('.$selector.'//span[@title='.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
+				->one()->click()->waitUntilReady();
+		$this->query('xpath:'.$selector.'//span[@title='.CXPathHelper::escapeQuotes($page_name).
+				']/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+	}
 
 	private function selectPageAction($page_name, $menu_item, $index = 1) {
 		$this->openPageMenu($page_name, $index);
