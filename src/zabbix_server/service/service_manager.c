@@ -1233,7 +1233,7 @@ static void	service_problems_index_clean(void *data)
  *             status  - [OUT] the service status                             *
 *                                                                             *
  * Return value: SUCCEED - the status is returned                             *
- *
+ *               FAIL    - the service must be ignored                        *
  *                                                                            *
  ******************************************************************************/
 static int	service_get_status(const zbx_service_t	*service, int *status)
@@ -1536,13 +1536,11 @@ out:
  * Purpose: get service status by applying the main service status algorithm  *
  *                                                                            *
  * Parameters: service - [IN] the service                                     *
- *             causes  - [OUT] the children that affected the service status  *
- *                             (optional, can be NULL)                        *
  *                                                                            *
  *  Return value: The service status.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	service_get_main_status(const zbx_service_t *service, zbx_vector_ptr_t *causes)
+static int	service_get_main_status(const zbx_service_t *service)
 {
 	int	status = ZBX_SERVICE_STATUS_OK, child_status, i;
 
@@ -1558,18 +1556,12 @@ static int	service_get_main_status(const zbx_service_t *service, zbx_vector_ptr_
 
 				if (ZBX_SERVICE_STATUS_OK == child_status)
 				{
-					if (NULL != causes)
-						zbx_vector_ptr_clear(causes);
-
 					status = child_status;
 					break;
 				}
 
 				if (status < child_status)
 					status = child->status;
-
-				if (ZBX_SERVICE_STATUS_OK != status && NULL != causes)
-					zbx_vector_ptr_append(causes, child);
 			}
 			break;
 		case SERVICE_ALGORITHM_MAX:
@@ -1582,9 +1574,6 @@ static int	service_get_main_status(const zbx_service_t *service, zbx_vector_ptr_
 
 				if (status < child_status)
 					status = child_status;
-
-				if (ZBX_SERVICE_STATUS_OK != status && NULL != causes)
-					zbx_vector_ptr_append(causes, child);
 			}
 			break;
 		case SERVICE_ALGORITHM_NONE:
@@ -1754,6 +1743,167 @@ out:
 	return status;
 }
 
+static void	service_get_causes(const zbx_service_t *service, int severity, zbx_vector_ptr_t *services)
+{
+	int			status, child_status, i, index;
+	zbx_vector_ptr_t	children, causes;
+	zbx_service_rule_t	*n_rule = NULL, *w_rule = NULL;
+
+	zbx_vector_ptr_create(&children);
+	zbx_vector_ptr_create(&causes);
+
+	status = service_get_main_status(service);
+
+	if (status >= severity)
+	{
+		for (i = 0; i < service->children.values_num; i++)
+		{
+			zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
+
+			if (SUCCEED != service_get_status(child, &child_status))
+				continue;
+
+			if ((SERVICE_ALGORITHM_MIN == service->algorithm && child_status >= severity) ||
+					SERVICE_ALGORITHM_MAX == service->algorithm)
+			{
+				zbx_vector_ptr_append(&causes, child);
+			}
+			else
+				zbx_vector_ptr_append(&children, child);
+		}
+	}
+
+	for (i = 0; i < causes.values_num; i++)
+	{
+		zbx_vector_ptr_append(services, causes.values[i]);
+		service_get_causes((const zbx_service_t *)causes.values[i], severity, services);
+	}
+
+	if (0 == children.values_num)
+		goto out;
+
+	zbx_vector_ptr_sort(&children, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < service->status_rules.values_num; i++)
+	{
+		zbx_service_rule_t	*rule = (zbx_service_rule_t *)service->status_rules.values[i];
+
+		/* check if the rule can return status of acceptable severity */
+		if (rule->new_status < severity)
+			continue;
+
+		zbx_vector_ptr_clear(&causes);
+
+		if (ZBX_SERVICE_STATUS_OK == service_get_rule_status(service, rule, NULL))
+			continue;
+
+		switch (rule->type)
+		{
+			case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
+			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
+				if (NULL == n_rule || rule->limit_status < n_rule->limit_status)
+					n_rule = rule;
+				break;
+			default:
+				if (NULL == w_rule || rule->limit_status < w_rule->limit_status)
+					w_rule = rule;
+				break;
+		}
+	}
+
+	if (NULL != n_rule)
+	{
+		int	total_weight, total_num;
+
+		zbx_vector_ptr_clear(&causes);
+		service_get_children_by_status(service, n_rule->limit_status, &causes, &total_weight, &total_num);
+
+		for (i = 0; i < causes.values_num && 0 != children.values_num; i++)
+		{
+			zbx_service_t	*child = (zbx_service_t *)causes.values[i];
+
+			if (FAIL == (index = zbx_vector_ptr_bsearch(&children, child, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+				continue;
+
+			zbx_vector_ptr_remove(&children, index);
+			zbx_vector_ptr_append(services, child);
+			service_get_causes(child, n_rule->limit_status, services);
+		}
+
+		/* check if weight based rule is not covered by the count based rule */
+		if (NULL != w_rule && w_rule->limit_status >= n_rule->limit_status)
+			goto out;
+	}
+
+	if (NULL != w_rule)
+	{
+		int	total_weight, total_num;
+
+		zbx_vector_ptr_clear(&causes);
+		service_get_children_by_status(service, w_rule->limit_status, &causes, &total_weight, &total_num);
+
+		/* children with 0 weight cannot affect weight based rule, skip them */
+		for (i = 0; i < children.values_num; )
+		{
+			zbx_service_t	*child = (zbx_service_t *)causes.values[i];
+
+			if (0 == child->weight)
+				zbx_vector_ptr_remove(&children, i);
+			else
+				i++;
+		}
+
+		for (i = 0; i < causes.values_num && 0 != children.values_num; i++)
+		{
+			zbx_service_t	*child = (zbx_service_t *)causes.values[i];
+
+			if (0 == child->weight)
+				continue;
+
+			if (FAIL == (index = zbx_vector_ptr_bsearch(&children, child, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+				continue;
+
+			zbx_vector_ptr_remove(&children, index);
+			zbx_vector_ptr_append(services, child);
+			service_get_causes(child, n_rule->limit_status, services);
+		}
+	}
+
+out:
+	zbx_vector_ptr_destroy(&causes);
+	zbx_vector_ptr_destroy(&children);
+}
+
+static void	service_get_rootcause_eventids(const zbx_service_t *parent, zbx_vector_uint64_t *eventids)
+{
+	zbx_vector_ptr_t	services;
+	int			i, j;
+
+	zbx_vector_ptr_create(&services);
+
+	service_get_causes(parent, TRIGGER_SEVERITY_NOT_CLASSIFIED, &services);
+
+	for (i = 0; i < services.values_num; i++)
+	{
+		zbx_service_t	*service = (zbx_service_t *)services.values[i];
+
+		for (j = 0; j < service->service_problems.values_num; j++)
+		{
+			zbx_service_problem_t	*service_problem;
+
+			service_problem = (zbx_service_problem_t *)service->service_problems.values[j];
+			zbx_vector_uint64_append(eventids, service_problem->eventid);
+		}
+	}
+
+	zbx_vector_ptr_destroy(&services);
+
+	zbx_vector_uint64_sort(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: its_itservice_update_status                                      *
@@ -1775,7 +1925,7 @@ static void	its_itservice_update_status(zbx_service_t *itservice, const zbx_time
 {
 	int	status, rule_status, i;
 
-	status = service_get_main_status(itservice, NULL);
+	status = service_get_main_status(itservice);
 
 	for (i = 0; i < itservice->status_rules.values_num; i++)
 	{
@@ -2656,25 +2806,6 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static	void	get_service_rootcause(zbx_service_t *service, zbx_vector_uint64_t *eventids)
-{
-	int	i;
-
-	for (i = 0; i < service->service_problems.values_num; i++)
-	{
-		zbx_service_problem_t	*service_problem;
-
-		service_problem = (zbx_service_problem_t *)service->service_problems.values[i];
-		zbx_vector_uint64_append(eventids, service_problem->eventid);
-	}
-
-	for (i = 0; i < service->children.values_num; i++)
-	{
-		zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
-
-		get_service_rootcause(child, eventids);
-	}
-}
 static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_manager_t *service_manager,
 		zbx_ipc_client_t *client)
 {
@@ -2695,7 +2826,7 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 		if (NULL == (service = zbx_hashset_search(&service_manager->services, &service_local)))
 			continue;
 
-		get_service_rootcause(service, &eventids);
+		service_get_rootcause_eventids(service, &eventids);
 
 		if (0 == eventids.values_num)
 			continue;
