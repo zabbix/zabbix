@@ -173,7 +173,7 @@ $service_tab
 		))->setId('status_propagation_rules_field')
 	]);
 
-$propagation_value_number = (new CRadioButtonList('propagation_value_number', $data['form']['propagation_value']))
+$propagation_value_number = (new CRadioButtonList('propagation_value_number', (int) $data['form']['propagation_value']))
 	->setId('propagation_value_number')
 	->setModern(true);
 
