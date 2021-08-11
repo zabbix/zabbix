@@ -147,11 +147,19 @@ class CControllerHostCreate extends CController {
 		$hostids = API::Host()->create($host);
 
 		if ($hostids !== false && $this->createValueMaps((int) $hostids['hostids'][0])
-			&& (!$full_clone || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
+				&& (!$full_clone || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
+			$messages = get_and_clear_messages();
+			$details = [];
+
+			foreach ($messages as $message) {
+				$details[] = $message['message'];
+			}
+
 			return [
 				'hostid' => $hostids['hostids'][0],
 				'message' => makeMessageBox(true, [], _('Host added'), true, false)->toString(),
-				'message_raw' => _('Host added')
+				'message_raw' => _('Host added'),
+				'details' => $details
 			];
 		}
 
@@ -159,14 +167,16 @@ class CControllerHostCreate extends CController {
 	}
 
 	protected function doAction(): void {
+		$failed = false;
+
 		try {
 			$output = $this->createHost();
 		}
 		catch (Exception $exception) {
-			// Code is not missing here.
+			$failed = true;
 		}
 
-		if (($messages = getMessages()) !== null) {
+		if ($failed && ($messages = getMessages()) !== null) {
 			$output = ['errors' => $messages->toString()];
 		}
 
