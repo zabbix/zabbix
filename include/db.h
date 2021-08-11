@@ -627,14 +627,15 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid, int hostid);
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error);
 int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,
 		char **error);
+int	DBdelete_template_elements_for_lld(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids, char **error);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 
-void	DBdelete_hosts(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames);
-void	DBdelete_hosts_for_lld(zbx_vector_uint64_t *hostids);
-void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames);
+void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
+void	DBdelete_hosts_for_lld(const zbx_vector_uint64_t *hostids);
+void	DBdelete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
@@ -940,5 +941,5 @@ int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out
 int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
 void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
-void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
+int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 #endif

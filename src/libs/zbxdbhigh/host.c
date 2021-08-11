@@ -63,21 +63,26 @@ static int	zbx_ids_names_compare_func(const void *d1, const void *d2)
  *             names - [OUT] list of names of the requested resource, order   *
  *                     matches the order of ids list                          *
  *                                                                            *
+ * Return value: SUCCEED - query for selecting ids and names SUCCEEDED        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
-void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names)
+int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names)
 {
-	int		i;
+	int		i, ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	id;
 	zbx_hashset_t	ids_names;
+
+	if (NULL == (result = DBselect("%s", sql)))
+		goto out;
 
 #define	IDS_NAMES_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&ids_names, IDS_NAMES_HASHSET_DEF_SIZE,
 			zbx_ids_names_hash_func,
 			zbx_ids_names_compare_func);
 #undef IDS_NAMES_HASHSET_DEF_SIZE
-	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -106,9 +111,14 @@ void	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_st
 		else
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
+			goto clean;
 		}
 	}
+	ret = SUCCEED;
+clean:
 	zbx_hashset_destroy(&ids_names);
+out:
+	return ret;
 }
 
 typedef struct _zbx_template_graph_valid_t zbx_template_graph_valid_t;
@@ -209,7 +219,7 @@ static void	DBget_profiles_by_source_idxs_values(zbx_vector_uint64_t *profileids
  *                                                                            *
  ******************************************************************************/
 static void	DBget_sysmapelements_by_element_type_ids(zbx_vector_uint64_t *selementids, int elementtype,
-		zbx_vector_uint64_t *elementids)
+		const zbx_vector_uint64_t *elementids)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -439,7 +449,7 @@ out:
  *                                                                            *
  * Description: Check collisions in item inventory links                      *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
@@ -531,7 +541,7 @@ out:
  *                                                                            *
  * Description: checking collisions on linking of web scenarios               *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
@@ -634,7 +644,7 @@ static void	zbx_graph_valid_free(zbx_template_graph_valid_t *graph)
  *                                                                            *
  * Description: Check collisions between host and linked template             *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
@@ -963,7 +973,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  *                                                                            *
  * Purpose:  adds table and field with specific id to housekeeper list        *
  *                                                                            *
- * Parameters: ids       - [IN] identificators for data removal               *
+ * Parameters: ids       - [IN] identifiers for data removal                  *
  *             field     - [IN] field name from table                         *
  *             tables_hk - [IN] table name to delete information from         *
  *             count     - [IN] number of tables in tables array              *
@@ -1006,7 +1016,7 @@ out:
  *                                                                            *
  * Purpose: delete trigger from database                                      *
  *                                                                            *
- * Parameters: triggerids - [IN] trigger identificators from database         *
+ * Parameters: triggerids - [IN] trigger identifiers from database            *
  *                                                                            *
  ******************************************************************************/
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
@@ -1063,7 +1073,7 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
  *                                                                            *
  * Purpose: delete parent triggers and auto-created children from database    *
  *                                                                            *
- * Parameters: triggerids - [IN] trigger identificators from database         *
+ * Parameters: triggerids - [IN] trigger identifiers from database            *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
@@ -1100,7 +1110,7 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
  *                                                                            *
  * Purpose: delete triggers by itemid                                         *
  *                                                                            *
- * Parameters: itemids - [IN] item identificators from database               *
+ * Parameters: itemids - [IN] item identifiers from database                  *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1226,7 +1236,7 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
  *                                                                            *
  * Function: DBdelete_graphs_by_itemids                                       *
  *                                                                            *
- * Parameters: itemids - [IN] item identificators from database               *
+ * Parameters: itemids - [IN] item identifiers from database                  *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -1292,7 +1302,7 @@ out:
  *                                                                            *
  * Purpose: delete items from database                                        *
  *                                                                            *
- * Parameters: itemids - [IN] array of item identificators from database      *
+ * Parameters: itemids - [IN] array of item identifiers from database         *
  *                                                                            *
  ******************************************************************************/
 void	DBdelete_items(zbx_vector_uint64_t *itemids)
@@ -1474,12 +1484,12 @@ static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeid
  *                                                                            *
  * Purpose: deletes host prototypes from database                             *
  *                                                                            *
- * Parameters: host_prototypeids    - [IN] list of host prototype ids         *
+ * Parameters: host_prototype_ids   - [IN] list of host prototype ids         *
  *             host_prototype_names - [IN] list of host prototype names       *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
-		zbx_vector_str_t *host_prototype_names)
+static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_ids,
+		const zbx_vector_str_t *host_prototype_names)
 {
 	int			i;
 	char			*sql = NULL;
@@ -1504,7 +1514,8 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
 
-	DBselect_ids_names(sql, &hostids, &hostnames);
+	if (FAIL == DBselect_ids_names(sql, &hostids, &hostnames))
+		goto clean;
 
 	if (0 != hostids.values_num)
 		DBdelete_hosts(&hostids, &hostnames);
@@ -1530,7 +1541,7 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototype_ids,
 
 	for (i = 0; i < host_prototype_ids->values_num; i++)
 		zbx_audit_host_prototype_del(host_prototype_ids->values[i], host_prototype_names->values[i]);
-
+clean:
 	zbx_vector_uint64_destroy(&group_prototype_ids);
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
@@ -1546,7 +1557,7 @@ out:
  *                                                                            *
  * Purpose: delete template web scenatios from host                           *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  ******************************************************************************/
@@ -1586,7 +1597,7 @@ static void	DBdelete_template_httptests(zbx_uint64_t hostid, const zbx_vector_ui
  *                                                                            *
  * Purpose: delete template graphs from host                                  *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -1630,7 +1641,7 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint6
  *                                                                            *
  * Purpose: delete template triggers from host                                *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -1673,7 +1684,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
  *                                                                            *
  * Purpose: delete template host prototypes from host                         *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  ******************************************************************************/
@@ -1700,9 +1711,10 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 				" and",
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
-	DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names);
+	if (FAIL == DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names))
+		goto clean;
 	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names);
-
+clean:
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&host_prototype_ids);
@@ -1718,7 +1730,7 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
  *                                                                            *
  * Purpose: delete template items from host                                   *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -1761,8 +1773,8 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64
  *                                                                            *
  * Description: Retrieve already linked templates for specified host          *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template IDs                       *
+ * Parameters: hostid      - [IN] host identifier from database               *
+ *             templateids - [IN/OUT] array of template IDs                   *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -1797,9 +1809,10 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Purpose: delete template elements from host                                *
  *                                                                            *
- * Parameters: hostid          - [IN] host identificator from database        *
- *             hostname        - [IN] name of the host                         *
+ * Parameters: hostid          - [IN] host identifier from database           *
+ *             hostname        - [IN] name of the host                        *
  *             del_templateids - [IN] array of template IDs                   *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1812,7 +1825,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 	char			*sql = NULL, err[MAX_STRING_LEN];
 	size_t			sql_alloc = 128, sql_offset = 0;
 	zbx_vector_uint64_t	templateids;
-	int			i, index, res = SUCCEED;
+	int			i, res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1822,6 +1835,8 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 
 	for (i = 0; i < del_templateids->values_num; i++)
 	{
+		int	index;
+
 		if (FAIL == (index = zbx_vector_uint64_bsearch(&templateids, del_templateids->values[i],
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
@@ -1949,7 +1964,8 @@ typedef struct
 {
 	zbx_uint64_t	group_prototypeid;
 	zbx_uint64_t	groupid;
-	zbx_uint64_t	templateid;	/* reference to parent group_prototypeid */
+	zbx_uint64_t	templateid_orig;	/* for audit update */
+	zbx_uint64_t	templateid;		/* reference to parent group_prototypeid */
 	char		*name;
 }
 zbx_group_prototype_t;
@@ -2078,19 +2094,19 @@ typedef struct
 	zbx_vector_db_tag_ptr_t	tags;			/* list of host prototype tags */
 	zbx_vector_interfaces_t	interfaces;		/* list of interfaces */
 	char			*host;
-	char			*name;
 	char			*name_orig;
-	unsigned char		status;
+	char			*name;
 	unsigned char		status_orig;
+	unsigned char		status;
 #define ZBX_FLAG_HPLINK_UPDATE_NAME			0x01
 #define ZBX_FLAG_HPLINK_UPDATE_STATUS			0x02
 #define ZBX_FLAG_HPLINK_UPDATE_DISCOVER			0x04
 #define ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES	0x08
 	unsigned char		flags;
-	unsigned char		discover;
 	unsigned char		discover_orig;
-	unsigned char		custom_interfaces;
+	unsigned char		discover;
 	unsigned char		custom_interfaces_orig;
+	unsigned char		custom_interfaces;
 }
 zbx_host_prototype_t;
 
@@ -2112,12 +2128,16 @@ static void	DBhost_interface_free(zbx_interfaces_prototype_t *interface)
 	{
 		if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY))
 			zbx_free(interface->data.snmp->community_orig);
+
 		if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME))
 			zbx_free(interface->data.snmp->securityname_orig);
+
 		if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS))
 			zbx_free(interface->data.snmp->authpassphrase_orig);
+
 		if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS))
 			zbx_free(interface->data.snmp->privpassphrase_orig);
+
 		if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT))
 			zbx_free(interface->data.snmp->contextname_orig);
 
@@ -2279,26 +2299,31 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 				if (host_prototype->itemid == itemid && 0 == strcmp(host_prototype->host, row[2]))
 				{
 					ZBX_STR2UINT64(host_prototype->hostid, row[1]);
+
 					if (0 != strcmp(host_prototype->name, row[3]))
 					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_NAME;
 						host_prototype->name_orig = zbx_strdup(NULL, row[3]);
 					}
+
 					if (host_prototype->status != (status = (unsigned char)atoi(row[4])))
 					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_STATUS;
 						host_prototype->status_orig = status;
 					}
+
 					if (host_prototype->discover != (unsigned char)atoi(row[5]))
 					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_DISCOVER;
 						host_prototype->discover_orig = (unsigned char)atoi(row[5]);
 					}
+
 					if (host_prototype->custom_interfaces != (unsigned char)atoi(row[6]))
 					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES;
 						host_prototype->custom_interfaces_orig = (unsigned char)atoi(row[6]);
 					}
+
 					break;
 				}
 			}
@@ -2532,7 +2557,7 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hostid,group_prototypeid,groupid,name from group_prototype where");
+				"select hostid,group_prototypeid,groupid,name,templateid from group_prototype where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by group_prototypeid");
 
@@ -2564,6 +2589,10 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 						if (group_prototype->groupid == groupid &&
 								0 == strcmp(group_prototype->name, row[3]))
 						{
+							zbx_uint64_t	templateid_orig;
+
+							ZBX_DBROW2UINT64(templateid_orig, row[4]);
+							group_prototype->templateid_orig = templateid_orig;
 							group_prototype->group_prototypeid = group_prototypeid;
 							break;
 						}
@@ -2708,46 +2737,55 @@ static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces,
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE;
 					snmp->version_orig = snmp_type;
 				}
+
 				if (snmp->bulk != bulk)
 				{
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK;
 					snmp->bulk_orig = bulk;
 				}
+
 				if (0 != strcmp(snmp->community, community))
 				{
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY;
 					snmp->community_orig = zbx_strdup(NULL, community);
 				}
+
 				if (0 != strcmp(snmp->securityname, securityname))
 				{
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME;
 					snmp->securityname_orig = zbx_strdup(NULL, securityname);
 				}
+
 				if (snmp->securitylevel != securitylevel)
 				{
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECLEVEL;
 					snmp->securitylevel_orig = securitylevel;
 				}
+
 				if (0 != strcmp(snmp->authpassphrase, authpassphrase))
 				{
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS;
 					snmp->authpassphrase_orig = zbx_strdup(NULL, authpassphrase);
 				}
+
 				if (0 != strcmp(snmp->privpassphrase, privpassphrase))
 				{
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS;
 					snmp->privpassphrase_orig = zbx_strdup(NULL, privpassphrase);
 				}
+
 				if (snmp->authprotocol != authprotocol)
 				{
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPROTOCOL;
 					snmp->authprotocol_orig = authprotocol;
 				}
+
 				if (snmp->privprotocol != privprotocol)
 				{
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPROTOCOL;
 					snmp->privprotocol_orig = privprotocol;
 				}
+
 				if (0 != strcmp(snmp->contextname, contextname))
 				{
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT;
@@ -3275,7 +3313,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
  *                                                                            *
  * Purpose: prepare sql for update record of interface_snmp table             *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator                          *
+ * Parameters: hostid      - [IN] host identifier                             *
  *             interfaceid - [IN] snmp interface id;                          *
  *             snmp        - [IN] snmp interface prototypes for update        *
  *             sql         - [IN/OUT] sql string                              *
@@ -3637,7 +3675,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 						host_prototype->status);
 				zbx_audit_host_prototype_update_json_update_status(host_prototype->hostid,
 						host_prototype->status_orig, host_prototype->status);
-
 			}
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_DISCOVER))
 			{
@@ -3655,9 +3692,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 						host_prototype->custom_interfaces);
 			}
 
-			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
-					host_prototype->name);
-
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
 		}
@@ -3669,6 +3703,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid++, host_prototype->hostid,
 					host_prototype->lnk_templateids.values[j]);
 		}
+
 		zbx_audit_host_prototype_update_json_add_templates(host_prototype->hostid,
 				&(host_prototype->lnk_templateids));
 
@@ -3681,6 +3716,10 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				zbx_db_insert_add_values(&db_insert_gproto, group_prototypeid++, host_prototype->hostid,
 						group_prototype->name, group_prototype->groupid,
 						group_prototype->templateid);
+
+				zbx_audit_host_prototype_update_json_add_group_details(host_prototype->hostid,
+						group_prototype->name, group_prototype->groupid,
+						group_prototype->templateid);
 			}
 			else
 			{
@@ -3689,10 +3728,11 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 						" set templateid=" ZBX_FS_UI64
 						" where group_prototypeid=" ZBX_FS_UI64 ";\n",
 						group_prototype->templateid, group_prototype->group_prototypeid);
-			}
 
-			zbx_audit_host_prototype_update_json_add_group_details(host_prototype->hostid,
-					group_prototype->name, group_prototype->groupid, group_prototype->templateid);
+				zbx_audit_host_prototype_update_json_update_group_links(host_prototype->hostid,
+						group_prototype->group_prototypeid, group_prototype->templateid_orig,
+						group_prototype->templateid);
+			}
 		}
 
 		for (j = 0; j < host_prototype->hostmacros.values_num; j++)
@@ -4893,7 +4933,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
  *                                                                            *
  * Purpose: copy web scenarios from template to host                          *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  ******************************************************************************/
@@ -4920,7 +4960,7 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
  *                                                                            *
  * Purpose: copy elements from specified template                             *
  *                                                                            *
- * Parameters: hostid          - [IN] host identificator from database        *
+ * Parameters: hostid          - [IN] host identifier from database           *
  *             lnk_templateids - [IN] array of template IDs                   *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -4932,7 +4972,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	zbx_uint64_t		hosttemplateid;
 	int			i, res = SUCCEED;
 	char			*template_names, err[MAX_STRING_LEN];
-	zbx_db_insert_t	*db_insert_htemplates;
+	zbx_db_insert_t		*db_insert_htemplates;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5018,11 +5058,11 @@ clean:
  *                                                                            *
  * Purpose: delete hosts from database with all elements                      *
  *                                                                            *
- * Parameters: hostids   - [IN] host identificators from database             *
- *             hostnames - [IN] names of host identificators                  *
+ * Parameters: hostids   - [IN] host identifiers from database                *
+ *             hostnames - [IN] names of hosts                                *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_hosts(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames)
+void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames)
 {
 	int			i;
 	zbx_vector_uint64_t	itemids, httptestids, selementids;
@@ -5051,8 +5091,6 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames)
 	DBdelete_httptests(&httptestids);
 
 	zbx_vector_uint64_destroy(&httptestids);
-
-	/* delete items -> triggers -> graphs */
 
 	zbx_vector_uint64_create(&itemids);
 
@@ -5109,7 +5147,7 @@ out:
  *                                                                            *
  * temporary function until audit for lld is complete                         *
  ******************************************************************************/
-void	DBdelete_hosts_for_lld(zbx_vector_uint64_t *hostids)
+void	DBdelete_hosts_for_lld(const zbx_vector_uint64_t *hostids)
 {
 	zbx_vector_uint64_t	itemids, httptestids, selementids;
 	char			*sql = NULL;
@@ -5196,11 +5234,11 @@ out:
  * Purpose: delete hosts from database, check if there are any host           *
  *          prototypes and delete them first                                  *
  *                                                                            *
- * Parameters: hostids   - [IN] host identificators from database             *
- *             hostnames - [IN] names of host identificators                  *
+ * Parameters: hostids   - [IN] host identifiers from database                *
+ *             hostnames - [IN] names of hosts                                *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str_t *hostnames)
+void	DBdelete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames)
 {
 	zbx_vector_uint64_t	host_prototype_ids;
 	zbx_vector_str_t	host_prototype_names;
@@ -5219,15 +5257,17 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str
 				" and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
 
-	DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names);
+	if (FAIL == DBselect_ids_names(sql, &host_prototype_ids, &host_prototype_names))
+		goto clean;
 
 	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names);
 
+	DBdelete_hosts(hostids, hostnames);
+clean:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&host_prototype_ids);
 	zbx_vector_str_destroy(&host_prototype_names);
 
-	DBdelete_hosts(hostids, hostnames);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -5238,7 +5278,7 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str
  *                                                                            *
  * Purpose: add new interface to specified host                               *
  *                                                                            *
- * Parameters: hostid - [IN] host identificator from database                 *
+ * Parameters: hostid - [IN] host identifier from database                    *
  *             type   - [IN] new interface type                               *
  *             useip  - [IN] how to connect to the host 0/1 - DNS/IP          *
  *             ip     - [IN] IP address                                       *
@@ -5246,7 +5286,7 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids, zbx_vector_str
  *             port   - [IN] port                                             *
  *             flags  - [IN] the used connection type                         *
  *                                                                            *
- * Return value: upon successful completion return interface identificator    *
+ * Return value: upon successful completion return interface identifier       *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -5657,7 +5697,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
  *                                                                            *
  * Purpose: delete host groups from database                                  *
  *                                                                            *
- * Parameters: groupids - [IN] array of group identificators from database    *
+ * Parameters: groupids - [IN] array of group identifiers from database       *
  *                                                                            *
  ******************************************************************************/
 void	DBdelete_groups(zbx_vector_uint64_t *groupids)
