@@ -1805,10 +1805,6 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Function: DBdelete_template_elements                                       *
  *                                                                            *
- * COPY of DBdelete_template_elements_for_lld but with audit                  *
- *                                                                            *
- * Purpose: delete template elements from host                                *
- *                                                                            *
  * Parameters: hostid          - [IN] host identifier from database           *
  *             hostname        - [IN] name of the host                        *
  *             del_templateids - [IN] array of template IDs                   *
@@ -1884,74 +1880,6 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 	{
 		zbx_audit_host_update_json_detach_parent_template(hostid, del_templateids->values[i]);
 	}
-clean:
-	zbx_vector_uint64_destroy(&templateids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
-
-	return res;
-}
-
-/******************************************************************************
- *                                                                            *
- * temporary function until audit for lld is complete                         *
- ******************************************************************************/
-int	DBdelete_template_elements_for_lld(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids,
-		char **error)
-{
-	char			*sql = NULL, err[MAX_STRING_LEN];
-	size_t			sql_alloc = 128, sql_offset = 0;
-	zbx_vector_uint64_t	templateids;
-	int			i, index, res = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&templateids);
-
-	get_templates_by_hostid(hostid, &templateids);
-
-	for (i = 0; i < del_templateids->values_num; i++)
-	{
-		if (FAIL == (index = zbx_vector_uint64_bsearch(&templateids, del_templateids->values[i],
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			/* template already unlinked */
-			zbx_vector_uint64_remove(del_templateids, i--);
-		}
-		else
-			zbx_vector_uint64_remove(&templateids, index);
-	}
-
-	/* all templates already unlinked */
-	if (0 == del_templateids->values_num)
-		goto clean;
-
-	if (SUCCEED != (res = validate_linked_templates(&templateids, err, sizeof(err))))
-	{
-		*error = zbx_strdup(NULL, err);
-		goto clean;
-	}
-
-	DBdelete_template_httptests(hostid, del_templateids);
-	DBdelete_template_graphs(hostid, del_templateids);
-	DBdelete_template_triggers(hostid, del_templateids);
-	DBdelete_template_host_prototypes(hostid, del_templateids);
-
-	/* removing items will remove discovery rules related to them */
-	DBdelete_template_items(hostid, del_templateids);
-
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from hosts_templates"
-			" where hostid=" ZBX_FS_UI64
-				" and",
-			hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid",
-			del_templateids->values, del_templateids->values_num);
-	DBexecute("%s", sql);
-
-	zbx_free(sql);
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 
@@ -5053,8 +4981,6 @@ clean:
 /******************************************************************************
  *                                                                            *
  * Function: DBdelete_hosts                                                   *
- * COPY of DBdelete_hosts_for_lld but with audit                              *
- * remove DBdelete_hosts_for_lld when audit is implemented for LLD            *
  *                                                                            *
  * Purpose: delete hosts from database with all elements                      *
  *                                                                            *
@@ -5139,90 +5065,6 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 
 	for (i = 0; i < hostids->values_num; i++)
 		zbx_audit_host_del(hostids->values[i], hostnames->values[i]);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * temporary function until audit for lld is complete                         *
- ******************************************************************************/
-void	DBdelete_hosts_for_lld(const zbx_vector_uint64_t *hostids)
-{
-	zbx_vector_uint64_t	itemids, httptestids, selementids;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset;
-	int			i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED != DBlock_hostids(hostids))
-		goto out;
-
-	zbx_vector_uint64_create(&httptestids);
-	zbx_vector_uint64_create(&selementids);
-
-	/* delete web tests */
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select httptestid"
-			" from httptest"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
-
-	DBselect_uint64(sql, &httptestids);
-
-	DBdelete_httptests(&httptestids);
-
-	zbx_vector_uint64_destroy(&httptestids);
-
-	/* delete items -> triggers -> graphs */
-
-	zbx_vector_uint64_create(&itemids);
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select itemid"
-			" from items"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
-
-	DBselect_uint64(sql, &itemids);
-
-	DBdelete_items(&itemids);
-
-	zbx_vector_uint64_destroy(&itemids);
-
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	/* delete host from maps */
-	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST, hostids);
-	if (0 != selementids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmaps_elements where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "selementid", selementids.values,
-				selementids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
-
-	/* delete action conditions */
-	for (i = 0; i < hostids->values_num; i++)
-		DBdelete_action_conditions(CONDITION_TYPE_HOST, hostids->values[i]);
-
-	/* delete host */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	DBexecute("%s", sql);
-
-	zbx_free(sql);
-
-	zbx_vector_uint64_destroy(&selementids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

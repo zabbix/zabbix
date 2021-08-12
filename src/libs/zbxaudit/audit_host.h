@@ -81,25 +81,25 @@ PREPARE_AUDIT_HOST_INTERFACE_H(resource, contextname, const char*, string)					\
 PREPARE_AUDIT_HOST_H(host, AUDIT_RESOURCE_HOST)
 PREPARE_AUDIT_HOST_H(host_prototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
 
-#define PREPARE_AUDIT_HOST_UPDATE(resource, type1, type2)						\
+#define PREPARE_AUDIT_HOST_UPDATE_H(resource, type1, type2)						\
 void	zbx_audit_host_update_json_update_##resource(zbx_uint64_t hostid, type1 old_##resource,		\
 		type1 new_##resource);									\
 
-PREPARE_AUDIT_HOST_UPDATE(host, const char*, string)
-PREPARE_AUDIT_HOST_UPDATE(name, const char*, string)
-PREPARE_AUDIT_HOST_UPDATE(proxy_hostid, zbx_uint64_t, uint64)
-PREPARE_AUDIT_HOST_UPDATE(ipmi_authtype, int, int)
-PREPARE_AUDIT_HOST_UPDATE(ipmi_privilege, int, int)
-PREPARE_AUDIT_HOST_UPDATE(ipmi_username, const char*, string)
-PREPARE_AUDIT_HOST_UPDATE(ipmi_password, const char*, string)
-PREPARE_AUDIT_HOST_UPDATE(tls_connect, int, int)
-PREPARE_AUDIT_HOST_UPDATE(tls_accept, int, int)
-PREPARE_AUDIT_HOST_UPDATE(tls_issuer, const char*, string)
-PREPARE_AUDIT_HOST_UPDATE(tls_subject, const char*, string)
-PREPARE_AUDIT_HOST_UPDATE(tls_psk_identity, const char*, string)
-PREPARE_AUDIT_HOST_UPDATE(tls_psk, const char*, string)
-PREPARE_AUDIT_HOST_UPDATE(custom_interfaces, int, int)
-#undef PREPARE_AUDIT_HOST_UPDATE
+PREPARE_AUDIT_HOST_UPDATE_H(host, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_H(name, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_H(proxy_hostid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_HOST_UPDATE_H(ipmi_authtype, int, int)
+PREPARE_AUDIT_HOST_UPDATE_H(ipmi_privilege, int, int)
+PREPARE_AUDIT_HOST_UPDATE_H(ipmi_username, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_H(ipmi_password, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_H(tls_connect, int, int)
+PREPARE_AUDIT_HOST_UPDATE_H(tls_accept, int, int)
+PREPARE_AUDIT_HOST_UPDATE_H(tls_issuer, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_H(tls_subject, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_H(tls_psk_identity, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_H(tls_psk, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_H(custom_interfaces, int, int)
+#undef PREPARE_AUDIT_HOST_UPDATE_H
 
 void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid);
 void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,

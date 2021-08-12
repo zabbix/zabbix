@@ -634,7 +634,6 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 
 void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
-void	DBdelete_hosts_for_lld(const zbx_vector_uint64_t *hostids);
 void	DBdelete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
