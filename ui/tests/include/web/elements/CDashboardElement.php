@@ -252,4 +252,18 @@ class CDashboardElement extends CElement {
 			throw new \Exception('Dashboard is'.($editable ? ' not' : '').' in editing mode.');
 		}
 	}
+	
+	/**
+	 * Open page adding form.
+	 * Dashboard should be in editing mode.
+	 *
+	 * @return COverlayDialogElement
+	 */
+	public function addPage() {
+		$this->checkIfEditable();
+		$this->getControls()->query('id:dashboard-add')->one()->click();
+		$this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one()->select('Add page');
+
+		return $this;
+	}
 }
