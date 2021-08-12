@@ -320,21 +320,14 @@ class CMapHelper {
 			'. '.
 			implode('', array_merge($status_problems, $status_other));
 
-		foreach ($sysmap['shapes'] as &$shape) {
-			if (array_key_exists('text', $shape)) {
-				$shape['text'] = CMacrosResolverHelper::resolveMapLabelMacros($shape['text']);
-				$shape['text'] = str_replace('{MAP.NAME}', $sysmap['name'], $shape['text']);
-			}
-		}
-		unset($shape);
+		$sysmap['shapes'] = CMacrosResolverHelper::resolveMapShapeLabelMacros($sysmap['name'], $sysmap['shapes']);
+		$sysmap['links'] = CMacrosResolverHelper::resolveMapLinkLabelMacros($sysmap['links']);
 
 		foreach ($sysmap['lines'] as $line) {
 			$sysmap['shapes'][] = self::convertLineToShape($line);
 		}
 
 		foreach ($sysmap['links'] as &$link) {
-			$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
-
 			if ($link['permission'] >= PERM_READ) {
 				if (empty($link['linktriggers'])) {
 					continue;

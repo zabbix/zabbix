@@ -233,6 +233,11 @@ if (isset($_REQUEST['sysmapid'])) {
 /*
  * Display
  */
+$sysmap['shapes'] = CMacrosResolverHelper::resolveMapShapeLabelMacros($sysmap['name'], $sysmap['shapes'],
+	['text' => 'expanded']
+);
+$sysmap['links'] = CMacrosResolverHelper::resolveMapLinkLabelMacros($sysmap['links'], ['label' => 'expanded']);
+
 $data = [
 	'sysmap' => $sysmap,
 	'iconList' => [],
@@ -246,11 +251,6 @@ $data['sysmap'] = CMapHelper::applyMapElementLabelProperties($data['sysmap']);
 
 // get selements
 addElementNames($data['sysmap']['selements']);
-
-foreach ($data['sysmap']['shapes'] as &$shape) {
-	$shape['expanded'] = CMacrosResolverHelper::resolveMapLabelMacros($shape['text']);
-}
-unset($shape);
 
 foreach ($data['sysmap']['lines'] as $line) {
 	$data['sysmap']['shapes'][] = CMapHelper::convertLineToShape($line);
@@ -287,7 +287,6 @@ foreach ($data['sysmap']['links'] as &$link) {
 		$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
 	}
 
-	$link['expanded'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
 	order_result($link['linktriggers'], 'desc_exp');
 }
 unset($link);

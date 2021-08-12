@@ -2017,6 +2017,86 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Expand functional macros in given map link labels.
+	 *
+	 * @param array  $links
+	 * @param string $links[]['label']
+	 * @param array  $fields            A maping between source and destination fields.
+	 *
+	 * @return array
+	 */
+	public function resolveMapLinkLabelMacros(array $links, array $fields): array {
+		$types = ['expr_macros' => true];
+		$macros = ['expr_macros' => []];
+		$macro_values = [];
+
+		foreach ($links as $link) {
+			$matched_macros = self::extractMacros(array_intersect_key($link, $fields), $types);
+
+			foreach ($matched_macros['expr_macros'] as $macro => $data) {
+				$macro_values[$macro] = UNRESOLVED_MACRO_STRING;
+			}
+			$macros['expr_macros'] += $matched_macros['expr_macros'];
+		}
+
+		$macro_values = self::getExpressionMacros($macros['expr_macros'], $macro_values);
+
+		foreach ($links as &$link) {
+			foreach ($fields as $from => $to) {
+				$link[$to] = strtr($link[$from], $macro_values);
+			}
+		}
+		unset($link);
+
+		return $links;
+	}
+
+	/**
+	 * Expand functional macros in given map shape labels.
+	 *
+	 * @param string $map_name
+	 * @param array  $shapes
+	 * @param string $shapes[]['text']
+	 * @param array  $fields            A maping between source and destination fields.
+	 *
+	 * @return array
+	 */
+	public function resolveMapShapeLabelMacros(string $map_name, array $shapes, array $fields): array {
+		$types = [
+			'macros' => [
+				'map' => ['{MAP.NAME}']
+			],
+			'expr_macros' => true
+		];
+		$macros = ['expr_macros' => []];
+		$macro_values = [];
+
+		foreach ($shapes as $shape) {
+			$matched_macros = self::extractMacros(array_intersect_key($shape, $fields), $types);
+
+			foreach ($matched_macros['macros']['map'] as $macro) {
+				$macro_values[$macro] = $map_name;
+			}
+
+			foreach ($matched_macros['expr_macros'] as $macro => $data) {
+				$macro_values[$macro] = UNRESOLVED_MACRO_STRING;
+			}
+			$macros['expr_macros'] += $matched_macros['expr_macros'];
+		}
+
+		$macro_values = self::getExpressionMacros($macros['expr_macros'], $macro_values);
+
+		foreach ($shapes as &$shape) {
+			foreach ($fields as $from => $to) {
+				$shape[$to] = strtr($shape[$from], $macro_values);
+			}
+		}
+		unset($shape);
+
+		return $shapes;
+	}
+
+	/**
 	 * Resolve supported macros used in map element label as well as in URL names and values.
 	 *
 	 * @param array        $selements[]

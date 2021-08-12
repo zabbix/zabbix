@@ -244,6 +244,39 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Returns true if parsed expression is calculable.
+	 *
+	 * @param array $tokens
+	 *
+	 * @return bool
+	 */
+	private static function isCalculableExpression(array $tokens): bool {
+		if (count($tokens) != 1 || $tokens[0]['type'] != CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION) {
+			return false;
+		}
+
+		$expression_validator = new CExpressionValidator();
+
+		if (!$expression_validator->validate($tokens)) {
+			return false;
+		}
+
+		if (!in_array($tokens[0]['data']['function'], ['last', 'min', 'max', 'avg'])) {
+			return false;
+		}
+
+		$parameters = $tokens[0]['data']['parameters'];
+
+		// Time shift is not supported.
+		if (array_key_exists(1, $parameters) && ($parameters[1]['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD
+				|| $parameters[1]['data']['sec_num'][0] === '#' || $parameters[1]['data']['time_shift'] !== '')) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Extract macros from a string.
 	 *
 	 * @param array  $texts
@@ -269,6 +302,7 @@ class CMacrosResolverGeneral {
 		$extract_references = array_key_exists('references', $types);
 		$extract_lldmacros = array_key_exists('lldmacros', $types);
 		$extract_functionids = array_key_exists('functionids', $types);
+		$extract_expr_macros = array_key_exists('expr_macros', $types);
 
 		if ($extract_usermacros) {
 			$macros['usermacros'] = [];
@@ -338,6 +372,12 @@ class CMacrosResolverGeneral {
 			$macros['functionids'] = [];
 
 			$functionid_parser = new CFunctionIdParser();
+		}
+
+		if ($extract_expr_macros) {
+			$macros['expr_macros'] = [];
+
+			$expr_macro_parser = new CExpressionMacroParser();
 		}
 
 		foreach ($texts as $text) {
@@ -438,6 +478,26 @@ class CMacrosResolverGeneral {
 					$macros['functionids'][$functionid_parser->getMatch()] = null;
 					$pos += $functionid_parser->getLength() - 1;
 					continue;
+				}
+
+				if ($extract_expr_macros && $expr_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$tokens = $expr_macro_parser
+						->getExpressionParser()
+						->getResult()
+						->getTokens();
+
+					if (self::isCalculableExpression($tokens)) {
+						$macros['expr_macros'][$expr_macro_parser->getMatch()] = [
+							'function' => $tokens[0]['data']['function'],
+							'host' => $tokens[0]['data']['parameters'][0]['data']['host'],
+							'key' => $tokens[0]['data']['parameters'][0]['data']['item'],
+							'sec_num' => array_key_exists(1, $tokens[0]['data']['parameters'])
+								? $tokens[0]['data']['parameters'][1]['data']['sec_num']
+								: ''
+						];
+						$pos += $expr_macro_parser->getLength() - 1;
+						continue;
+					}
 				}
 			}
 		}
@@ -1046,6 +1106,85 @@ class CMacrosResolverGeneral {
 		return $macro_values;
 	}
 
+	/**
+	 * Get expression macros like "{?avg(/host/key, 1d)}".
+	 *
+	 * @param array $macros
+	 * @param array $macros[<macro>]['function']
+	 * @param array $macros[<macro>]['host']
+	 * @param array $macros[<macro>]['key']
+	 * @param array $macros[<macro>]['sec_num']
+	 * @param array $macro_values
+	 *
+	 * @return array
+	 */
+	protected static function getExpressionMacros(array $macros, array $macro_values) {
+		if (!$macros) {
+			return $macro_values;
+		}
+
+		$function_data = [];
+
+		foreach ($macros as $macro => &$data) {
+			if ($data['function'] === 'last') {
+				$function_data['last'][$data['host']][$data['key']][] = $macro;
+			}
+			else {
+				$function_data['other'][$data['host']][$data['key']][$data['function']][$data['sec_num']][] = $macro;
+			}
+		}
+		unset($data);
+
+		foreach ($function_data as $ftype => $hosts) {
+			foreach ($hosts as $host => $keys) {
+				if ($ftype === 'last') {
+					$db_items = API::Item()->get([
+						'output' => ['key_', 'value_type', 'units', 'lastvalue', 'lastclock'],
+						'selectValueMap' => ['mappings'],
+						'webitems' => true,
+						'filter' => [
+							'host' => $host,
+							'key_' => array_keys($keys)
+						]
+					]);
+
+					foreach ($db_items as $db_item) {
+						$value = $db_item['lastclock']
+							? formatHistoryValue($db_item['lastvalue'], $db_item)
+							: UNRESOLVED_MACRO_STRING;
+
+						foreach ($keys[$db_item['key_']] as $_macro) {
+							$macro_values[$_macro] = $value;
+						}
+					}
+				}
+				else {
+					$db_items = API::Item()->get([
+						'output' => ['itemid', 'key_', 'value_type', 'units'],
+						'webitems' => true,
+						'filter' => [
+							'host' => $host,
+							'key_' => array_keys($keys)
+						]
+					]);
+
+					foreach ($db_items as $db_item) {
+						foreach ($keys[$db_item['key_']] as $function => $sec_nums) {
+							foreach ($sec_nums as $sec_num => $_macros) {
+								$value = getItemFunctionalValue($db_item, $function, $sec_num);
+
+								foreach ($_macros as $_macro) {
+									$macro_values[$_macro] = $value;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $macro_values;
+	}
 	/**
 	 * Is type available.
 	 *

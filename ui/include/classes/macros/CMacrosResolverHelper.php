@@ -592,6 +592,38 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Expand functional macros in given map link labels.
+	 *
+	 * @param array  $links
+	 * @param string $links[]['label']
+	 * @param array  $fields            A maping between source and destination fields.
+	 *
+	 * @return array
+	 */
+	public static function resolveMapLinkLabelMacros(array $links, array $fields = ['label' => 'label']): array {
+		self::init();
+
+		return self::$macrosResolver->resolveMapLinkLabelMacros($links, $fields);
+	}
+
+	/**
+	 * Expand functional macros in given map shape labels.
+	 *
+	 * @param string $map_name
+	 * @param array  $shapes
+	 * @param string $shapes[]['text']
+	 * @param array  $fields            A maping between source and destination fields.
+	 *
+	 * @return array
+	 */
+	public static function resolveMapShapeLabelMacros(string $map_name, array $shapes,
+			array $fields = ['text' => 'text']): array {
+		self::init();
+
+		return self::$macrosResolver->resolveMapShapeLabelMacros($map_name, $shapes, $fields);
+	}
+
+	/**
 	 * Resolve macros in dashboard widget URL.
 	 *
 	 * @static
