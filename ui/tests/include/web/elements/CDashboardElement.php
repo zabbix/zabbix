@@ -252,7 +252,7 @@ class CDashboardElement extends CElement {
 			throw new \Exception('Dashboard is'.($editable ? ' not' : '').' in editing mode.');
 		}
 	}
-	
+
 	/**
 	 * Open page adding form.
 	 * Dashboard should be in editing mode.

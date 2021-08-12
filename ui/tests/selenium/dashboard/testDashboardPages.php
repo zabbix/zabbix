@@ -70,7 +70,7 @@ class testDashboardPages extends CWebTest {
 	 * @var integer
 	 */
 	protected static $dashboardid_delete;
-	
+
 	/**
 	 * Id of dashboard for empty pages name.
 	 *
@@ -234,7 +234,7 @@ class testDashboardPages extends CWebTest {
 					]
 				]
 			],
-			
+
 		]);
 		$this->assertArrayHasKey('dashboardids', $response);
 		self::$dashboardid = $response['dashboardids'][0];
@@ -292,9 +292,9 @@ class testDashboardPages extends CWebTest {
 					$status.' slideshow"]')->one()->isDisplayed());
 			$this->query('xpath://button[contains(@class, "slideshow-state")]')->one()->click();
 		}
-		
+
 		// Check Stop/Start slideshow changing automatic slideshow option.
-		
+
 
 		// Check page popup-menu options in created dashboard.
 		$this->openPageMenu('First_page_name');
@@ -416,7 +416,7 @@ class testDashboardPages extends CWebTest {
 
 	/**
 	 * Add new pages with different names to dashboard.
-	 * 
+	 *
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardPages_Create($data) {
@@ -432,7 +432,7 @@ class testDashboardPages extends CWebTest {
 		if (CTestArrayHelper::get($data, 'trim', false)) {
 			$title = trim($data['fields']['Name']);
 		}
-		
+
 		$this->assertTrue(in_array($title, $this->getTitles(), true));
 		$dashboard->save();
 		$this->page->waitUntilReady();
@@ -469,7 +469,7 @@ class testDashboardPages extends CWebTest {
 
 	/**
 	 * Swich pages using next/previous arrow buttons.
-	 * 
+	 *
 	 * @depends testDashboardPages_MaximumPageError
 	 */
 	public function testDashboardPages_Navigation() {
@@ -520,7 +520,7 @@ class testDashboardPages extends CWebTest {
 		$dashboard->save();
 		$this->assertEquals(['Page 1'], $this->getTitles());
 	}
-	
+
 	public function testDashboardPages_EmptyPagesName() {
 		// Check that first page do not has any name.
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_empty)->waitUntilReady();
@@ -531,7 +531,7 @@ class testDashboardPages extends CWebTest {
 		$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
 		$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->checkValue(['Name' => '']);
 		$page_dialog->query('button:Cancel')->one()->click();
-		
+
 		// Check popup-menu options and add page with name.
 		$dashboard->addPage();
 		COverlayDialogElement::find()->waitUntilVisible()->one();
@@ -539,7 +539,7 @@ class testDashboardPages extends CWebTest {
 		$page_dialog->query('button:Apply')->one()->click();
 		$dashboard->waitUntilReady();
 		$this->assertEquals(['Page 1', 'not_page_number'], $this->getTitles());
-		
+
 		// Add page without name and check that it has correct page order number in name.
 		$dashboard->addPage();
 		COverlayDialogElement::find()->waitUntilVisible()->one();
