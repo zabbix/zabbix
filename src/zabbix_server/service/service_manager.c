@@ -1642,14 +1642,11 @@ static int	services_get_weight(const zbx_vector_ptr_t *services)
  *                                                                            *
  * Parameters: service - [IN] the service                                     *
  *             rule    - [IN] the service status rule                         *
- *             causes  - [OUT] the children that affected the service status  *
- *                             (optional, can be NULL)                        *
  *                                                                            *
  *  Return value: The service status.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule_t *rule,
-		zbx_vector_ptr_t *causes)
+int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule_t *rule)
 {
 	zbx_vector_ptr_t	children;
 	int			status = ZBX_SERVICE_STATUS_OK, status_limit, total_num, total_weight, weight;
@@ -1663,20 +1660,19 @@ static int	service_get_rule_status(const zbx_service_t *service, const zbx_servi
 	{
 		case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
 		case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
 			status_limit = rule->limit_status;
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
 		case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
+		case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
 			status_limit = rule->limit_status + 1;
 			break;
-		default:
-			status_limit = ZBX_SERVICE_STATUS_OK + 1;
 	}
 
 	service_get_children_by_status(service, status_limit, &children, &total_weight, &total_num);
-
-	if (0 == children.values_num)
-		goto out;
 
 	switch (rule->type)
 	{
@@ -1708,21 +1704,18 @@ static int	service_get_rule_status(const zbx_service_t *service, const zbx_servi
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
 			weight = services_get_weight(&children);
-			if (weight >= rule->limit_value)
+			if (total_weight - weight >= rule->limit_value)
 				goto out;
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
 			weight = services_get_weight(&children);
-			if (weight * 100 / total_weight >= rule->limit_value)
+			if ((total_weight - weight) * 100 / total_weight >= rule->limit_value)
 				goto out;
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto out;
 	}
-
-	if (NULL != causes)
-		zbx_vector_ptr_append_array(causes, children.values, children.values_num);
 
 	status = rule->new_status;
 out:
@@ -1784,7 +1777,7 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 
 		zbx_vector_ptr_clear(&causes);
 
-		if (ZBX_SERVICE_STATUS_OK == service_get_rule_status(service, rule, NULL))
+		if (ZBX_SERVICE_STATUS_OK == service_get_rule_status(service, rule))
 			continue;
 
 		switch (rule->type)
@@ -1921,7 +1914,7 @@ static void	its_itservice_update_status(zbx_service_t *itservice, const zbx_time
 	{
 		zbx_service_rule_t	*rule = (zbx_service_rule_t *)itservice->status_rules.values[i];
 
-		if (status < (rule_status = service_get_rule_status(itservice, rule, NULL)))
+		if (status < (rule_status = service_get_rule_status(itservice, rule)))
 			status = rule_status;
 	}
 

@@ -143,5 +143,6 @@ zbx_service_action_condition_t;
 
 int	service_get_status(const zbx_service_t	*service, int *status);
 int	service_get_main_status(const zbx_service_t *service);
+int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule_t *rule);
 
 #endif

@@ -180,6 +180,25 @@ void	mock_init_service_cache(const char *path)
 
 				rule = (zbx_service_rule_t *)zbx_malloc(NULL, sizeof(zbx_service_rule_t));
 				memset(rule, 0, sizeof(zbx_service_rule_t));
+				value = zbx_mock_get_object_member_string(hrule, "type");
+				if (0 == strcmp(value, "N_GE"))
+					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_N_GE;
+				else if (0 == strcmp(value, "NP_GE"))
+					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE;
+				else if (0 == strcmp(value, "N_LT"))
+					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_N_L;
+				else if (0 == strcmp(value, "NP_LT"))
+					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_NP_L;
+				else if (0 == strcmp(value, "W_GE"))
+					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_W_GE;
+				else if (0 == strcmp(value, "WP_GE"))
+					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE;
+				else if (0 == strcmp(value, "W_LT"))
+					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_W_L;
+				else if (0 == strcmp(value, "WP_LT"))
+					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_WP_L;
+				else if (0 == strcmp(value, "NP_GE"))
+					fail_msg("unsupported service '%s' rule type '%s'", service->name, value);
 				rule->limit_status = zbx_mock_get_object_member_int(hrule, "limit");
 				rule->limit_value = zbx_mock_get_object_member_int(hrule, "value");
 				rule->new_status = zbx_mock_get_object_member_int(hrule, "status");
