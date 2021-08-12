@@ -27,12 +27,27 @@
 window.service_edit_popup = {
 	algorithm_names: <?= json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT) ?>,
 
+	child_template: null,
 	serviceid: null,
 	overlay: null,
 	dialogue: null,
 	form: null,
 
 	init({serviceid, children, children_problem_tags_html, problem_tags}) {
+		this.child_template = new Template(`
+			<tr>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
+					#{name}
+					<input name="child_serviceids[#{serviceid}]" type="hidden" value="#{serviceid}">
+				</td>
+				<td>#{algorithm}</td>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
+				<td>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>">#{remove}</button>
+				</td>
+			</tr>
+		`);
+
 		this.serviceid = serviceid;
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -260,42 +275,19 @@ window.service_edit_popup = {
 	},
 
 	addChild(service) {
-		const input_name = `child_serviceids[${service.serviceid}]`;
-
-		if (document.querySelector(`#children tbody input[name="${input_name}"]`) !== null) {
+		if (document.querySelector(`#children tbody input[name="child_serviceids[${service.serviceid}]"]`) !== null) {
 			return;
 		}
 
-		const template = document.createElement('template');
-
-		template.innerHTML = `
-			<tr>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-name" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
-					<input type="hidden">
-				</td>
-				<td class="js-algorithm"></td>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-problem_tags_html"></td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"></button>
-				</td>
-			</tr>
-		`;
-
-		const row = template.content.firstElementChild;
-
-		row.querySelector('.js-name').insertAdjacentText('afterbegin', service.name);
-
-		const input = row.querySelector('.js-name input');
-		input.name = input_name;
-		input.value = service.serviceid;
-
-		row.querySelector('.js-algorithm').textContent = this.algorithm_names[service.algorithm];
-		row.querySelector('.js-problem_tags_html').innerHTML = service.problem_tags_html;
-		row.querySelector('.js-remove').textContent = <?= json_encode(_('Remove')); ?>;
-
 		document
 			.querySelector('#children tbody')
-			.appendChild(row);
+			.insertAdjacentHTML('beforeend', this.child_template.evaluate({
+				serviceid: service.serviceid,
+				name: service.name,
+				algorithm: this.algorithm_names[service.algorithm],
+				problem_tags_html: service.problem_tags_html,
+				remove: <?= json_encode(_('Remove')) ?>
+			}));
 	},
 
 	selectChildren() {
