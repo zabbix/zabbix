@@ -43,7 +43,7 @@ window.service_edit_popup = {
 				<td>#{algorithm}</td>
 				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
 				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>"><?= _('Remove') ?></button>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
 				</td>
 			</tr>
 		`);
