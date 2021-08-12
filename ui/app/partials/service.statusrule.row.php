@@ -30,7 +30,8 @@
 		),
 		new CVar('status_rules['.$data['row_index'].'][new_status]', $data['new_status']),
 		new CVar('status_rules['.$data['row_index'].'][type]', $data['type']),
-		new CVar('status_rules['.$data['row_index'].'][limit_value]', $data['limit_value']),
+		// (int) required to preprocess user input like "000123" to 123.
+		new CVar('status_rules['.$data['row_index'].'][limit_value]', (int) $data['limit_value']),
 		new CVar('status_rules['.$data['row_index'].'][limit_status]', $data['limit_status'])
 	],
 	new CHorList([

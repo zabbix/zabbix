@@ -54,7 +54,7 @@ class CControllerPopupServiceStatusRuleEdit extends CController {
 		$form = [
 			'new_status' => $this->getInput('new_status', ZBX_SEVERITY_OK),
 			'type' => $this->getInput('type', ZBX_SERVICE_STATUS_RULE_TYPE_N_GE),
-			'limit_value' => $this->getInput('limit_value', 0),
+			'limit_value' => $this->getInput('limit_value', 1),
 			'limit_status' => $this->getInput('limit_status', ZBX_SEVERITY_OK)
 		];
 
