@@ -182,12 +182,12 @@ class CControllerAuditLogList extends CController {
 	 */
 	private static function getActionsList(): array {
 		return [
-			AUDIT_ACTION_LOGIN => _('Login'),
-			AUDIT_ACTION_LOGOUT => _('Logout'),
-			AUDIT_ACTION_ADD => _('Add'),
-			AUDIT_ACTION_UPDATE => _('Update'),
-			AUDIT_ACTION_DELETE => _('Delete'),
-			AUDIT_ACTION_EXECUTE => _('Execute')
+			CAudit::ACTION_LOGIN => _('Login'),
+			CAudit::ACTION_LOGOUT => _('Logout'),
+			CAudit::ACTION_ADD => _('Add'),
+			CAudit::ACTION_UPDATE => _('Update'),
+			CAudit::ACTION_DELETE => _('Delete'),
+			CAudit::ACTION_EXECUTE => _('Execute')
 		];
 	}
 
@@ -198,42 +198,42 @@ class CControllerAuditLogList extends CController {
 	 */
 	private static function getResourcesList(): array {
 		return [
-			AUDIT_RESOURCE_USER => _('User'),
-			AUDIT_RESOURCE_MEDIA_TYPE => _('Media type'),
-			AUDIT_RESOURCE_HOST => _('Host'),
-			AUDIT_RESOURCE_HOST_PROTOTYPE => _('Host prototype'),
-			AUDIT_RESOURCE_ACTION => _('Action'),
-			AUDIT_RESOURCE_GRAPH => _('Graph'),
-			AUDIT_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
-			AUDIT_RESOURCE_USER_GROUP => _('User group'),
-			AUDIT_RESOURCE_TRIGGER => _('Trigger'),
-			AUDIT_RESOURCE_TRIGGER_PROTOTYPE => _('Trigger prototype'),
-			AUDIT_RESOURCE_HOST_GROUP => _('Host group'),
-			AUDIT_RESOURCE_ITEM => _('Item'),
-			AUDIT_RESOURCE_ITEM_PROTOTYPE => _('Item prototype'),
-			AUDIT_RESOURCE_IMAGE => _('Image'),
-			AUDIT_RESOURCE_VALUE_MAP => _('Value map'),
-			AUDIT_RESOURCE_IT_SERVICE => _('Service'),
-			AUDIT_RESOURCE_MAP => _('Map'),
-			AUDIT_RESOURCE_SCENARIO => _('Web scenario'),
-			AUDIT_RESOURCE_DISCOVERY_RULE => _('Discovery rule'),
-			AUDIT_RESOURCE_PROXY => _('Proxy'),
-			AUDIT_RESOURCE_REGEXP => _('Regular expression'),
-			AUDIT_RESOURCE_MAINTENANCE => _('Maintenance'),
-			AUDIT_RESOURCE_SCRIPT => _('Script'),
-			AUDIT_RESOURCE_MACRO => _('Macro'),
-			AUDIT_RESOURCE_TEMPLATE => _('Template'),
-			AUDIT_RESOURCE_ICON_MAP => _('Icon mapping'),
-			AUDIT_RESOURCE_CORRELATION => _('Event correlation'),
-			AUDIT_RESOURCE_DASHBOARD => _('Dashboard'),
-			AUDIT_RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
-			AUDIT_RESOURCE_MODULE => _('Module'),
-			AUDIT_RESOURCE_SETTINGS => _('Settings'),
-			AUDIT_RESOURCE_HOUSEKEEPING => _('Housekeeping'),
-			AUDIT_RESOURCE_AUTHENTICATION => _('Authentication'),
-			AUDIT_RESOURCE_TEMPLATE_DASHBOARD => _('Template dashboard'),
-			AUDIT_RESOURCE_AUTH_TOKEN => _('API token'),
-			AUDIT_RESOURCE_SCHEDULED_REPORT => _('Scheduled report')
+			CAudit::RESOURCE_USER => _('User'),
+			CAudit::RESOURCE_MEDIA_TYPE => _('Media type'),
+			CAudit::RESOURCE_HOST => _('Host'),
+			CAudit::RESOURCE_HOST_PROTOTYPE => _('Host prototype'),
+			CAudit::RESOURCE_ACTION => _('Action'),
+			CAudit::RESOURCE_GRAPH => _('Graph'),
+			CAudit::RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
+			CAudit::RESOURCE_USER_GROUP => _('User group'),
+			CAudit::RESOURCE_TRIGGER => _('Trigger'),
+			CAudit::RESOURCE_TRIGGER_PROTOTYPE => _('Trigger prototype'),
+			CAudit::RESOURCE_HOST_GROUP => _('Host group'),
+			CAudit::RESOURCE_ITEM => _('Item'),
+			CAudit::RESOURCE_ITEM_PROTOTYPE => _('Item prototype'),
+			CAudit::RESOURCE_IMAGE => _('Image'),
+			CAudit::RESOURCE_VALUE_MAP => _('Value map'),
+			CAudit::RESOURCE_IT_SERVICE => _('Service'),
+			CAudit::RESOURCE_MAP => _('Map'),
+			CAudit::RESOURCE_SCENARIO => _('Web scenario'),
+			CAudit::RESOURCE_DISCOVERY_RULE => _('Discovery rule'),
+			CAudit::RESOURCE_PROXY => _('Proxy'),
+			CAudit::RESOURCE_REGEXP => _('Regular expression'),
+			CAudit::RESOURCE_MAINTENANCE => _('Maintenance'),
+			CAudit::RESOURCE_SCRIPT => _('Script'),
+			CAudit::RESOURCE_MACRO => _('Macro'),
+			CAudit::RESOURCE_TEMPLATE => _('Template'),
+			CAudit::RESOURCE_ICON_MAP => _('Icon mapping'),
+			CAudit::RESOURCE_CORRELATION => _('Event correlation'),
+			CAudit::RESOURCE_DASHBOARD => _('Dashboard'),
+			CAudit::RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
+			CAudit::RESOURCE_MODULE => _('Module'),
+			CAudit::RESOURCE_SETTINGS => _('Settings'),
+			CAudit::RESOURCE_HOUSEKEEPING => _('Housekeeping'),
+			CAudit::RESOURCE_AUTHENTICATION => _('Authentication'),
+			CAudit::RESOURCE_TEMPLATE_DASHBOARD => _('Template dashboard'),
+			CAudit::RESOURCE_AUTH_TOKEN => _('API token'),
+			CAudit::RESOURCE_SCHEDULED_REPORT => _('Scheduled report')
 		];
 	}
 
@@ -265,7 +265,7 @@ class CControllerAuditLogList extends CController {
 
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
-			if ($auditlog['action'] != AUDIT_ACTION_UPDATE && $auditlog['action'] != AUDIT_ACTION_EXECUTE) {
+			if ($auditlog['action'] != CAudit::ACTION_UPDATE && $auditlog['action'] != CAudit::ACTION_EXECUTE) {
 				continue;
 			}
 
@@ -287,10 +287,10 @@ class CControllerAuditLogList extends CController {
 		$new_details = [];
 		foreach ($details as $key => $detail) {
 			switch ($action) {
-				case AUDIT_ACTION_UPDATE:
+				case CAudit::ACTION_UPDATE:
 					$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
 					break;
-				case AUDIT_ACTION_EXECUTE:
+				case CAudit::ACTION_EXECUTE:
 					$new_details[] = sprintf('%s: %s', $key, $detail[1]);
 					break;
 			}

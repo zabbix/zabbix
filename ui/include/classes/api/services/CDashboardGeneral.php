@@ -114,7 +114,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, static::AUDIT_RESOURCE, $db_dashboards);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, static::AUDIT_RESOURCE, $db_dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}

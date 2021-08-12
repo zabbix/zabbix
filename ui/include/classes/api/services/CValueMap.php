@@ -31,6 +31,8 @@ class CValueMap extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_VALUE_MAP;
+
 	protected $tableName = 'valuemap';
 	protected $tableAlias = 'vm';
 	protected $sortColumns = ['valuemapid', 'name'];
@@ -155,7 +157,7 @@ class CValueMap extends CApiService {
 
 		DB::insertBatch('valuemap_mapping', $mappings);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_VALUE_MAP, $valuemaps);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $valuemaps);
 
 		return ['valuemapids' => $valuemapids];
 	}
@@ -270,7 +272,7 @@ class CValueMap extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $valuemaps, $db_valuemaps);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $valuemaps, $db_valuemaps);
 
 		return ['valuemapids' => array_column($valuemaps, 'valuemapid')];
 	}
@@ -308,7 +310,7 @@ class CValueMap extends CApiService {
 
 		$this->deleteByIds($valuemapids);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemaps);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_valuemaps);
 
 		return ['valuemapids' => $valuemapids];
 	}

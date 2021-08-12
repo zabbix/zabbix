@@ -31,6 +31,8 @@ class CMaintenance extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_EDIT_MAINTENANCE]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_MAINTENANCE;
+
 	protected $tableName = 'maintenances';
 	protected $tableAlias = 'm';
 	protected $sortColumns = ['maintenanceid', 'name', 'maintenance_type', 'active_till', 'active_since'];
@@ -476,7 +478,7 @@ class CMaintenance extends CApiService {
 			DB::insert('maintenance_tag', $ins_tags);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAINTENANCE, $maintenances);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
@@ -857,7 +859,7 @@ class CMaintenance extends CApiService {
 
 		$this->updateTags($maintenances, $db_maintenances);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $maintenances, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
@@ -1000,7 +1002,7 @@ class CMaintenance extends CApiService {
 		DB::delete('maintenances_groups', $midCond);
 		DB::delete('maintenances', $midCond);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, $db_maintenances);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}

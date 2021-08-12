@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -20,94 +20,243 @@
 
 
 class CAudit {
+	public const ACTION_ADD = 0;
+	public const ACTION_UPDATE = 1;
+	public const ACTION_DELETE = 2;
+	public const ACTION_LOGIN = 3;
+	public const ACTION_LOGOUT = 4;
+	public const ACTION_EXECUTE = 7;
+
+	public const RESOURCE_USER = 0;
+	public const RESOURCE_MEDIA_TYPE = 3;
+	public const RESOURCE_HOST = 4;
+	public const RESOURCE_ACTION = 5;
+	public const RESOURCE_GRAPH = 6;
+	public const RESOURCE_USER_GROUP = 11;
+	public const RESOURCE_TRIGGER = 13;
+	public const RESOURCE_HOST_GROUP = 14;
+	public const RESOURCE_ITEM = 15;
+	public const RESOURCE_IMAGE = 16;
+	public const RESOURCE_VALUE_MAP = 17;
+	public const RESOURCE_IT_SERVICE = 18;
+	public const RESOURCE_MAP = 19;
+	public const RESOURCE_SCENARIO = 22;
+	public const RESOURCE_DISCOVERY_RULE = 23;
+	public const RESOURCE_SCRIPT = 25;
+	public const RESOURCE_PROXY = 26;
+	public const RESOURCE_MAINTENANCE = 27;
+	public const RESOURCE_REGEXP = 28; // FIXME: add to resource name consts
+	public const RESOURCE_MACRO = 29;
+	public const RESOURCE_TEMPLATE = 30;
+	public const RESOURCE_TRIGGER_PROTOTYPE = 31;
+	public const RESOURCE_ICON_MAP = 32;
+	public const RESOURCE_DASHBOARD = 33;
+	public const RESOURCE_CORRELATION = 34;
+	public const RESOURCE_GRAPH_PROTOTYPE = 35;
+	public const RESOURCE_ITEM_PROTOTYPE = 36;
+	public const RESOURCE_HOST_PROTOTYPE = 37;
+	public const RESOURCE_AUTOREGISTRATION = 38;
+	public const RESOURCE_MODULE = 39;
+	public const RESOURCE_SETTINGS = 40;
+	public const RESOURCE_HOUSEKEEPING = 41;
+	public const RESOURCE_AUTHENTICATION = 42;
+	public const RESOURCE_TEMPLATE_DASHBOARD = 43;
+	public const RESOURCE_USER_ROLE = 44; // FIXME: add to resource name consts
+	public const RESOURCE_AUTH_TOKEN = 45;
+	public const RESOURCE_SCHEDULED_REPORT = 46;
+
+	public const METHOD_ADD = 'add';
+	public const METHOD_UPDATE = 'update';
+	public const METHOD_ATTACH = 'attach';
+	public const METHOD_DETACH = 'detach';
+	public const METHOD_DELETE = 'delete';
+
 	private const AUDITLOG_ENABLE = 1;
 
-	/**
-	 * Supported resources list, every record contains:
-	 * resource id field name
-	 * resource name field name
-	 * resource table name
-	 * resource API name
-	 */
-	private static $supported_type = [
-		AUDIT_RESOURCE_ACTION => 				['actionid', 'name', 'actions', 'action'],
-		AUDIT_RESOURCE_AUTHENTICATION =>		['configid', null, 'config', 'authentication'],
-		AUDIT_RESOURCE_AUTH_TOKEN =>			['tokenid', 'name', 'token', 'token'],
-		AUDIT_RESOURCE_AUTOREGISTRATION =>		['configid', null, 'config', 'autoregistration'],
-		AUDIT_RESOURCE_CORRELATION =>			['correlationid', 'name', 'correlation', 'correlation'],
-		AUDIT_RESOURCE_DASHBOARD =>				['dashboardid', 'name', 'dashboard', 'dashboard'],
-		AUDIT_RESOURCE_DISCOVERY_RULE =>		['druleid', 'name', 'drules', 'drule'],
-		AUDIT_RESOURCE_GRAPH =>					['graphid', 'name', 'graphs', 'graph'],
-		AUDIT_RESOURCE_GRAPH_PROTOTYPE =>		['graphid', 'name', 'graphs', 'graphprototype'],
-		AUDIT_RESOURCE_HOST =>					['hostid', 'name', 'hosts', 'host'],
-		AUDIT_RESOURCE_HOST_GROUP =>			['groupid', 'name', 'groups', 'hostgroup'],
-		AUDIT_RESOURCE_HOST_PROTOTYPE =>		['hostid', 'host', 'hosts', 'hostprototype'],
-		AUDIT_RESOURCE_HOUSEKEEPING =>			['configid', null, 'config', 'housekeeping'],
-		AUDIT_RESOURCE_ICON_MAP =>				['iconmapid', 'name', 'icon_map', 'iconmap'],
-		AUDIT_RESOURCE_IMAGE =>					['imageid', 'name', 'images', 'image'],
-		AUDIT_RESOURCE_IT_SERVICE =>			['serviceid', 'name', 'services', 'service'],
-		AUDIT_RESOURCE_ITEM =>					['itemid', 'name', 'items', 'item'],
-		AUDIT_RESOURCE_ITEM_PROTOTYPE =>		['itemid', 'name', 'items', 'itemprototype'],
-		AUDIT_RESOURCE_MACRO =>					['globalmacroid', 'macro', 'globalmacro', 'usermacro'],
-		AUDIT_RESOURCE_MAINTENANCE =>			['maintenanceid', 'name', 'maintenances', 'maintenance'],
-		AUDIT_RESOURCE_MAP =>					['sysmapid', 'name', 'sysmaps', 'map'],
-		AUDIT_RESOURCE_MEDIA_TYPE =>			['mediatypeid', 'name', 'media_type', 'mediatype'],
-		AUDIT_RESOURCE_MODULE =>				['moduleid', 'id', 'module', 'module'],
-		AUDIT_RESOURCE_PROXY =>					['proxyid', 'host', 'hosts', 'proxy'],
-		AUDIT_RESOURCE_SCENARIO =>				['httptestid', 'name', 'httptest', 'httptest'],
-		AUDIT_RESOURCE_SCHEDULED_REPORT =>		['reportid', 'name', 'report', 'report'],
-		AUDIT_RESOURCE_SCRIPT =>				['scriptid', 'name', 'scripts', 'script'],
-		AUDIT_RESOURCE_SETTINGS =>				['configid', null, 'config', 'settings'],
-		AUDIT_RESOURCE_TEMPLATE =>				['templateid', 'name', 'hosts', 'template'],
-		AUDIT_RESOURCE_TRIGGER =>				['triggerid', 'description', 'triggers', 'trigger'],
-		AUDIT_RESOURCE_TRIGGER_PROTOTYPE =>		['triggerid', 'description', 'triggers', 'triggerprototype'],
-		AUDIT_RESOURCE_USER =>					['userid', 'username', 'users', 'user'],
-		AUDIT_RESOURCE_USER_GROUP =>			['usrgrpid', 'name', 'usrgrp', 'usergroup'],
-		AUDIT_RESOURCE_VALUE_MAP =>				['valuemapid', 'name', 'valuemaps', 'valuemap'],
-		AUDIT_RESOURCE_TEMPLATE_DASHBOARD =>	['dashboardid', 'name', 'dashboard', 'templatedashboard']
+	private const RESOURCES_TABLE_NAME = [ // FIXME: convert from const to static array
+		self::RESOURCE_ACTION => 'actions',
+		self::RESOURCE_AUTHENTICATION => 'config',
+		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'config',
+		self::RESOURCE_CORRELATION => 'correlation',
+		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_DISCOVERY_RULE => 'drules',
+		self::RESOURCE_GRAPH => 'graphs',
+		self::RESOURCE_GRAPH_PROTOTYPE => 'graphs',
+		self::RESOURCE_HOST => 'hosts',
+		self::RESOURCE_HOST_GROUP => 'groups',
+		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
+		self::RESOURCE_HOUSEKEEPING => 'config',
+		self::RESOURCE_ICON_MAP => 'icon_map',
+		self::RESOURCE_IMAGE => 'images',
+		self::RESOURCE_IT_SERVICE => 'services',
+		self::RESOURCE_ITEM => 'items',
+		self::RESOURCE_ITEM_PROTOTYPE => 'items',
+		self::RESOURCE_MACRO => 'globalmacro',
+		self::RESOURCE_MAINTENANCE => 'maintenances',
+		self::RESOURCE_MAP => 'sysmaps',
+		self::RESOURCE_MEDIA_TYPE => 'media_type',
+		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_PROXY => 'hosts',
+		self::RESOURCE_SCENARIO => 'httptest',
+		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'scripts',
+		self::RESOURCE_SETTINGS => 'config',
+		self::RESOURCE_TEMPLATE => 'hosts',
+		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
+		self::RESOURCE_TRIGGER => 'triggers',
+		self::RESOURCE_TRIGGER_PROTOTYPE => 'triggers',
+		self::RESOURCE_USER => 'users',
+		self::RESOURCE_USER_GROUP => 'usrgrp',
+		self::RESOURCE_VALUE_MAP => 'valuemaps'
+	];
+
+	private const RESOURCES_FIELD_NAME = [
+		self::RESOURCE_ACTION => 'name',
+		self::RESOURCE_AUTHENTICATION => null,
+		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_AUTOREGISTRATION => null,
+		self::RESOURCE_CORRELATION => 'name',
+		self::RESOURCE_DASHBOARD => 'name',
+		self::RESOURCE_DISCOVERY_RULE => 'name',
+		self::RESOURCE_GRAPH => 'name',
+		self::RESOURCE_GRAPH_PROTOTYPE => 'name',
+		self::RESOURCE_HOST => 'name',
+		self::RESOURCE_HOST_GROUP => 'name',
+		self::RESOURCE_HOST_PROTOTYPE => 'host',
+		self::RESOURCE_HOUSEKEEPING => null,
+		self::RESOURCE_ICON_MAP => 'name',
+		self::RESOURCE_IMAGE => 'name',
+		self::RESOURCE_IT_SERVICE => 'name',
+		self::RESOURCE_ITEM => 'name',
+		self::RESOURCE_ITEM_PROTOTYPE => 'name',
+		self::RESOURCE_MACRO => 'macro',
+		self::RESOURCE_MAINTENANCE => 'name',
+		self::RESOURCE_MAP => 'name',
+		self::RESOURCE_MEDIA_TYPE => 'name',
+		self::RESOURCE_MODULE => 'id',
+		self::RESOURCE_PROXY => 'host',
+		self::RESOURCE_SCENARIO => 'name',
+		self::RESOURCE_SCHEDULED_REPORT => 'name',
+		self::RESOURCE_SCRIPT => 'name',
+		self::RESOURCE_SETTINGS => null,
+		self::RESOURCE_TEMPLATE => 'name',
+		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
+		self::RESOURCE_TRIGGER => 'description',
+		self::RESOURCE_TRIGGER_PROTOTYPE => 'description',
+		self::RESOURCE_USER => 'username',
+		self::RESOURCE_USER_GROUP => 'name',
+		self::RESOURCE_VALUE_MAP => 'name'
+	];
+
+	private const RESOURCES_API_NAME = [
+		self::RESOURCE_ACTION => 'action',
+		self::RESOURCE_AUTHENTICATION => 'authentication',
+		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_CORRELATION => 'correlation',
+		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_DISCOVERY_RULE => 'drule',
+		self::RESOURCE_GRAPH => 'graph',
+		self::RESOURCE_GRAPH_PROTOTYPE => 'graphprototype',
+		self::RESOURCE_HOST => 'host',
+		self::RESOURCE_HOST_GROUP => 'hostgroup',
+		self::RESOURCE_HOST_PROTOTYPE => 'hostprototype',
+		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
+		self::RESOURCE_ICON_MAP => 'iconmap',
+		self::RESOURCE_IMAGE => 'image',
+		self::RESOURCE_IT_SERVICE => 'service',
+		self::RESOURCE_ITEM => 'item',
+		self::RESOURCE_ITEM_PROTOTYPE => 'itemprototype',
+		self::RESOURCE_MACRO => 'usermacro',
+		self::RESOURCE_MAINTENANCE => 'maintenance',
+		self::RESOURCE_MAP => 'map',
+		self::RESOURCE_MEDIA_TYPE => 'mediatype',
+		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_PROXY => 'proxy',
+		self::RESOURCE_SCENARIO => 'httptest',
+		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'script',
+		self::RESOURCE_SETTINGS => 'settings',
+		self::RESOURCE_TEMPLATE => 'template',
+		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
+		self::RESOURCE_TRIGGER => 'trigger',
+		self::RESOURCE_TRIGGER_PROTOTYPE => 'triggerprototype',
+		self::RESOURCE_USER => 'user',
+		self::RESOURCE_USER_GROUP => 'usergroup',
+		self::RESOURCE_VALUE_MAP => 'valuemap'
 	];
 
 	private static $masked_fields = [
-		'config' => [
-			'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
-		],
-		'globalmacro' => [
+		self::RESOURCE_MACRO => [
 			'fields' => ['value' => true],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
-		'hosts' => [
+		self::RESOURCE_HOST => [
 			'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
 		],
-		'media_type' => [
+		self::RESOURCE_TEMPLATE => [
+			'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
+		],
+		self::RESOURCE_MEDIA_TYPE => [
 			'fields' => ['passwd' => true]
 		],
-		'token' => [
+		self::RESOURCE_AUTH_TOKEN => [
 			'fields' => ['token' => true]
 		],
-		'users' => [
+		self::RESOURCE_USER => [
 			'fields' => ['passwd' => true]
 		]
 	];
 
-	/**
-	 * Add simple audit record.
-	 *
-	 * @param string $userid
-	 * @param string $ip
-	 * @param int    $action        AUDIT_ACTION_*
-	 * @param int    $resourcetype  AUDIT_RESOURCE_*
-	 * @param string $note
-	 */
-	// static public function addDetails($userid, $ip, $action, $resourcetype, $note = '') {
-	// 	DB::insert('auditlog', [[
-	// 		'userid' => $userid,
-	// 		'clock' => time(),
-	// 		'ip' => substr($ip, 0, 39),
-	// 		'action' => $action,
-	// 		'resourcetype' => $resourcetype,
-	// 		'note' => $note
-	// 	]]);
-	// }
+	private static $relatable_id_mapping = [
+		'user.usrgrps' => 'usrgrpid'
+	];
+
+	private static $relatable_object = [
+		self::RESOURCE_USER => ['user.usrgrps']
+	];
+
+	private static $updatable_object = [
+		self::RESOURCE_USER => ['user.medias']
+	];
+
+	public static function log(int $resource, int $action, array $objects, ?array $old_objects): void {
+		if (!self::isAuditEnable() && ($resource != self::RESOURCE_SETTINGS
+					&& !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
+			return;
+		}
+
+		$auditlog = [];
+		$table_key = DB::getSchema(self::RESOURCES_TABLE_NAME[$resource])['key'];
+		$user_data = CApiService::$userData;
+		$clock = time();
+		$ip = substr($user_data['userip'], 0, 39);
+		$recordsetid = self::getRecordSetId();
+
+		foreach ($objects as $object) {
+			$resourceid = $object[$table_key];
+			$old_object = ($action == self::ACTION_UPDATE) ? $old_objects[$resourceid] : [];
+			$resource_name = self::getResourceName($resource, $action, $object, $old_object);
+
+			$diff = self::handleObjectDiff($resource, $action, $object, $old_object);
+
+			$auditlog[] = [
+				'userid' => $user_data['userid'],
+				'username' => $user_data['username'],
+				'clock' => $clock,
+				'ip' => $ip,
+				'action' => $action,
+				'resourcetype' => $resource,
+				'resourceid' => $resourceid,
+				'resourcename' => $resource_name,
+				'recordsetid' => $recordsetid,
+				'details' => (count($diff) == 0) ? '' : json_encode($diff)
+			];
+		}
+
+		DB::insertBatch('auditlog', $auditlog);
+	}
 
 	private static function getRecordSetId(): string {
 		static $recordsetid = null;
@@ -119,125 +268,288 @@ class CAudit {
 		return $recordsetid;
 	}
 
-	/**
-	 * Add audit records.
-	 *
-	 * @param array $userdata      CApiService::$userData
-	 * @param int   $action        AUDIT_ACTION_*
-	 * @param int   $resourcetype  AUDIT_RESOURCE_*
-	 * @param array $objects
-	 * @param array $objects_old
-	 */
-	public static function addBulk(array $userdata, int $action, int $resourcetype, array $objects,
-			array $objects_old = null) {
-		if (!array_key_exists($resourcetype, self::$supported_type)) {
-			return;
+	private static function isAuditEnable(): bool {
+		return CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
+	}
+
+	private static function getResourceName(int $resource, int $action, array $object, array $old_object): string {
+		$field_name = self::RESOURCES_FIELD_NAME[$resource];
+		$resource_name = ($field_name !== null)
+			? (($action == self::ACTION_UPDATE)
+				? $old_object[$field_name]
+				: $object[$field_name])
+			: '';
+
+		if (mb_strlen($resource_name) > 255) {
+			$resource_name = mb_substr($resource_name, 0, 252).'...';
 		}
 
-		if ((CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) != self::AUDITLOG_ENABLE)
-				&& ($resourcetype != AUDIT_RESOURCE_SETTINGS
-					&& !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
-			return;
+		return $resource_name;
+	}
+
+	private static function handleObjectDiff(int $resource, int $action, array $object, array $old_object): array {
+		if (in_array($action, [self::ACTION_DELETE, self::ACTION_LOGIN, self::ACTION_LOGOUT])) {
+			return [];
 		}
 
-		$recordsetid = self::getRecordSetId();
+		$api_name = self::RESOURCES_API_NAME[$resource];
 
-		[$field_name_resourceid, $field_name_resourcename, $table_name, $api_name] = self::$supported_type[$resourcetype];
+		$object = self::maskValues($resource, $object);
 
-		$clock = time();
-		$ip = substr($userdata['userip'], 0, 39);
+		$dot_object = self::dotArrayConverter($api_name, $object);
 
-		$auditlog = [];
+		switch ($action) {
+			case CAudit::ACTION_ADD:
+				return self::handleAdd($dot_object, $resource);
+			case CAudit::ACTION_UPDATE:
+				$dot_old_object = self::dotArrayConverter($api_name, self::maskValues($resource, $old_object));
 
-		foreach ($objects as $object) {
-			$resourceid = $object[$field_name_resourceid];
-			$diff = '';
+				return self::handleUpdate($dot_object, $dot_old_object, $resource);
+		}
 
-			if ($action == AUDIT_ACTION_UPDATE) {
-				$object_old = $objects_old[$resourceid];
+		return [];
+	}
 
-				/**
-				 * Convert two dimension array to one dimension array,
-				 * because array_diff and array_intersect work only with one dimension array.
-				 */
-				$object_old = array_filter($object_old, function ($val) {
-					return !is_array($val);
-				});
-				$object = array_filter($object, function ($val) {
-					return !is_array($val);
-				});
+	private static function isMaskField(int $resource, array $object, string $key): bool {
+		$table_masked_fields = [];
 
-				$object_diff = array_diff_assoc(array_intersect_key($object_old, $object), $object);
+		if (!array_key_exists($resource, self::$masked_fields)) {
+			return false;
+		}
 
-				if (!$object_diff) {
+		$table_masked_fields = self::$masked_fields[$resource]['fields'];
+
+		if (!array_key_exists('conditions', self::$masked_fields[$resource])) {
+			return array_key_exists($key, $table_masked_fields);
+		}
+
+		if (array_key_exists($key, $table_masked_fields)) {
+			if (!array_key_exists('conditions', self::$masked_fields[$resource])) {
+				return true;
+			}
+
+			foreach (self::$masked_fields[$resource]['conditions'] as $field_name => $value) {
+				if (array_key_exists($field_name, $object) && $object[$field_name] == $value) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private static function maskValues(int $resource, array $object): array {
+		foreach ($object as $key => &$value) {
+			$value = self::isMaskField($resource, $object, $key) ? ZBX_SECRET_MASK : $value;
+		}
+		unset($value);
+
+		return $object;
+	}
+
+	private static function dotArrayConverter(string $prefix, array $object): array {
+		$result = [];
+
+		foreach ($object as $key => $value) {
+			$index = is_numeric($key) ? '['.$key.']' : '.'.$key;
+
+			if (array_key_exists($prefix, self::$relatable_id_mapping)) {
+				$index = '['.$value[self::$relatable_id_mapping[$prefix]].']';
+			}
+
+			if (is_array($value)) {
+				$new_prefix = $prefix . $index;
+
+				if (is_numeric($key)) {
+					// Add object marker key.
+					$result[$new_prefix] = '';
+				}
+
+				$result += self::dotArrayConverter($new_prefix, $value);
+			}
+			else {
+				$result[$prefix.$index] = (string) $value;
+			}
+		}
+
+		return $result;
+	}
+
+	private static function isDefaultValue(int $resource, string $path, string $value): bool {
+		$schema_fields = DB::getSchema(self::RESOURCES_TABLE_NAME[$resource])['fields'];
+		$keys = explode('.', $path);
+		$key = end($keys);
+
+		if (!array_key_exists($key, $schema_fields)) {
+			return false;
+		}
+
+		if (!array_key_exists('default', $schema_fields[$key])) {
+			return false;
+		}
+
+		return $value == $schema_fields[$key]['default'];
+	}
+
+	private static function isObjectRelatable(int $resource, string $path): bool {
+		if (!array_key_exists($resource, self::$relatable_object)) {
+			return false;
+		}
+
+		$relatable_objects = self::$relatable_object[$resource];
+
+		foreach ($relatable_objects as $relatable_key) {
+			if (strpos($path, $relatable_key) === 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function isObjectUpdatable(int $resource, string $path): bool {
+		if (!array_key_exists($resource, self::$updatable_object)) {
+			return false;
+		}
+
+		$updatable_objects = self::$updatable_object[$resource];
+
+		foreach ($updatable_objects as $updatable_key) {
+			if (strpos($path, $updatable_key) === 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function isPathMasked(int $resource, string $path, ?string $value): bool {
+		$path = explode('.', $path);
+
+		if (!array_key_exists($resource, self::$masked_fields)) {
+			return false;
+		}
+
+		if (!array_key_exists($path[1], self::$masked_fields[$resource]['fields'])) {
+			return false;
+		}
+
+		return $value === ZBX_SECRET_MASK;
+	}
+
+	private static function getObjectMarkers(array $keys): array {
+		$object_keys = [];
+
+		foreach ($keys as $key) {
+			$pos = strrpos($key, ']');
+
+			if ($pos === false) {
+				continue;
+			}
+
+			$key = substr($key, 0, $pos + 1);
+
+			if(array_key_exists($key, $object_keys)) {
+				$object_keys[substr($key, 0, $pos + 1)]++;
+			}
+			else {
+				$object_keys[$key] = 1;
+			}
+		}
+
+		return $object_keys;
+	}
+
+	private static function handleAdd(array $object, int $resource): array {
+		$object_keys = self::getObjectMarkers(array_keys($object));
+
+		foreach ($object as $key => &$value) {
+			$result = [];
+			$path = preg_replace('/\[[0-9]+\]/', '', $key);
+			$is_object_marker = (array_key_exists($key, $object_keys) && $object_keys[$key] > 1);
+			$is_relatable = self::isObjectRelatable($resource, $path);
+
+			if (self::isDefaultValue($resource, $path, $value)) {
+				unset($object[$key]);
+				continue;
+			}
+
+			$result = [self::METHOD_ADD];
+
+			if ($is_relatable) {
+				$result = [self::METHOD_ATTACH];
+			}
+
+			if (!$is_object_marker) {
+				$result[] = $value;
+			}
+
+			$value = $result;
+		}
+		unset($value);
+
+		return $object;
+	}
+
+	private static function handleUpdate(array $object, array $old_object, int $resource): array {
+		$result = [];
+		$diff_keys = array_keys(array_merge($object, $old_object));
+		$object_keys = self::getObjectMarkers($diff_keys);
+
+		$object += $old_object;
+
+		foreach ($diff_keys as $key) {
+			$value = array_key_exists($key, $object) ? $object[$key] : null;
+			$old_value = array_key_exists($key, $old_object) ? $old_object[$key] : null;
+
+			$path = preg_replace('/\[[0-9]+\]/', '', $key);
+			// Non associative arrays should not be detected as object marker.
+			$is_object_marker = (array_key_exists($key, $object_keys) && $object_keys[$key] > 1);
+			$is_value_masked = self::isPathMasked($resource, $path, $value);
+			$is_relatable = self::isObjectRelatable($resource, $path);
+			$is_updatable = self::isObjectUpdatable($resource, $path);
+
+			if (!$is_relatable && !$is_updatable && $value === null) {
+				continue;
+			}
+
+			if ($value === null) {
+				if ($is_updatable && $is_object_marker) {
+					$result[$key] = [self::METHOD_DELETE];
+				}
+				elseif ($is_updatable) {
 					continue;
 				}
 
-				if (array_key_exists($table_name, self::$masked_fields)) {
-					$table_masked_fields = self::$masked_fields[$table_name]['fields'];
-					$mask_object_old = true;
-					$mask_object = true;
-
-					if (array_key_exists('conditions', self::$masked_fields[$table_name])) {
-						foreach (self::$masked_fields[$table_name]['conditions'] as $field_name => $value) {
-							if ($mask_object_old) {
-								$mask_object_old = ($object_old[$field_name] == $value);
-							}
-							if ($mask_object) {
-								$mask_object = array_key_exists($field_name, $object)
-									? ($object[$field_name] == $value)
-									: ($object_old[$field_name] == $value);
-							}
-						}
-					}
-				}
-				else {
-					$table_masked_fields = [];
-					$mask_object_old = false;
-					$mask_object = false;
+				if ($is_relatable) {
+					$result[$key] = [self::METHOD_DETACH];
 				}
 
-				$details = [];
+				if (!$is_object_marker) {
+					$result[$key][] = $old_value;
+				}
+			}
+			elseif ($old_value === null) {
+				$result[$key] = [self::METHOD_ADD];
 
-				foreach (array_keys($object_diff) as $field_name) {
-					if (array_key_exists($field_name, $table_masked_fields)) {
-						if ($mask_object_old) {
-							$object_old[$field_name] = ZBX_SECRET_MASK;
-						}
-						if ($mask_object) {
-							$object[$field_name] = ZBX_SECRET_MASK;
-						}
-					}
-
-					$details[$api_name.'.'.$field_name] = ['update', $object[$field_name], $object_old[$field_name]];
+				if ($is_relatable) {
+					$result[$key] = [self::METHOD_ATTACH];
 				}
 
-				$diff = json_encode($details);
-
-				$resourcename = ($field_name_resourcename !== null) ? $object_old[$field_name_resourcename] : '';
+				if (!$is_object_marker) {
+					$result[$key][] = $value;
+				}
 			}
 			else {
-				$resourcename = ($field_name_resourcename !== null) ? $object[$field_name_resourcename] : '';
+				if ($is_object_marker && $is_updatable) {
+					$result[$key] = [self::METHOD_UPDATE];
+				}
+				elseif ($value != $old_value || $is_value_masked) {
+					$result[$key] = [self::METHOD_UPDATE, $value, $old_value];
+				}
 			}
-
-			if (mb_strlen($resourcename) > 255) {
-				$resourcename = mb_substr($resourcename, 0, 252).'...';
-			}
-
-			$auditlog[] = [
-				'userid' => $userdata['userid'],
-				'username' => $userdata['username'],
-				'clock' => $clock,
-				'ip' => $ip,
-				'action' => $action,
-				'resourcetype' => $resourcetype,
-				'resourceid' => $resourceid,
-				'resourcename' => $resourcename,
-				'recordsetid' => $recordsetid,
-				'details' => $diff
-			];
 		}
 
-		DB::insertBatch('auditlog', $auditlog);
+		return $result;
 	}
 }

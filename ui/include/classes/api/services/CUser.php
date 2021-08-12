@@ -34,6 +34,8 @@ class CUser extends CApiService {
 		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
+	public const AUDIT_RESOURCE = CAudit::RESOURCE_USER;
+
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
@@ -270,7 +272,7 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__);
 		$this->updateMedias($users, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER, $users);
+		$this->addNewAuditBulk(CAudit::ACTION_ADD, $users);
 
 		return ['userids' => $userids];
 	}
@@ -427,9 +429,15 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__);
 		$this->updateMedias($users, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, $users, $db_users);
+		foreach ($users as $user) {
+			if (!array_key_exists('passwd', $user)) {
+				unset($db_users[$user['userid']]['passwd']);
+			}
+		}
 
-		return ['userids' => zbx_objectValues($users, 'userid')];
+		$this->addNewAuditBulk(CAudit::ACTION_UPDATE, $users, $db_users);
+
+		return ['userids' => array_column($users, 'userid')];
 	}
 
 	/**
@@ -497,9 +505,11 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_users = $this->get([
+		$api_users = $this->get([
 			'output' => [],
-			'userids' => zbx_objectValues($users, 'userid'),
+			'selectMedias' => ['mediatypeid', 'sendto', 'active', 'severity', 'period'],
+			'selectUsrgrps' => ['usrgrpid'],
+			'userids' => array_column($users, 'userid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -509,9 +519,24 @@ class CUser extends CApiService {
 			'output' => ['userid', 'username', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
 				'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid'
 			],
-			'userids' => array_keys($db_users),
+			'userids' => array_keys($api_users),
 			'preservekeys' => true
 		]);
+
+		// Format proper user array.
+		foreach ($api_users as $userid => $user_value) {
+			$db_users[$userid] = $db_users[$userid] + $user_value;
+
+			if (array_key_exists('medias', $db_users[$userid])) {
+				foreach ($db_users[$userid]['medias'] as &$media) {
+					if (!is_array($media['sendto'])) {
+						$media['sendto'] = [$media['sendto']];
+					}
+				}
+				unset($media);
+			}
+		}
+		unset($api_users);
 
 		// Get readonly super admin role ID and name.
 		$db_roles = DBfetchArray(DBselect(
@@ -1145,7 +1170,7 @@ class CUser extends CApiService {
 		]);
 		DB::delete('users', ['userid' => $userids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, $db_users);
+		$this->addNewAuditBulk(CAudit::ACTION_DELETE, $db_users);
 
 		return ['userids' => $userids];
 	}

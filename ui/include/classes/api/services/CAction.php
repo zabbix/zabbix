@@ -32,6 +32,8 @@ class CAction extends CApiService {
 		'validateoperationsintegrity' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ACTION;
+
 	protected $tableName = 'actions';
 	protected $tableAlias = 'a';
 	protected $sortColumns = ['actionid', 'name', 'status'];
@@ -725,7 +727,7 @@ class CAction extends CApiService {
 		// Add operations.
 		$this->addOperations($operations_to_create);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ACTION, $audit);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $audit);
 
 		return ['actionids' => array_keys($actions)];
 	}
@@ -938,7 +940,7 @@ class CAction extends CApiService {
 
 		if ($actions_update_data) {
 			DB::update('actions', $actions_update_data);
-			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $actions, $db_actions);
+			$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $actions, $db_actions);
 		}
 
 		// add, update and delete operations
@@ -1586,7 +1588,7 @@ class CAction extends CApiService {
 
 		DB::delete('actions', ['actionid' => $actionids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, $db_actions);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_actions);
 
 		return ['actionids' => $actionids];
 	}

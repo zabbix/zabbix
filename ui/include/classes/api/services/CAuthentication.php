@@ -29,6 +29,8 @@ class CAuthentication extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_AUTHENTICATION;
+
 	/**
 	 * @var string
 	 */
@@ -127,7 +129,7 @@ class CAuthentication extends CApiService {
 			]);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTHENTICATION,
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE,
 			[['configid' => $db_auth['configid']] + $auth], [$db_auth['configid'] => $db_auth]
 		);
 

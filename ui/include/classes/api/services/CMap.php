@@ -31,6 +31,8 @@ class CMap extends CMapElement {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_MAP;
+
 	protected $tableName = 'sysmaps';
 	protected $tableAlias = 's';
 	protected $sortColumns = ['name', 'width', 'height'];
@@ -1843,7 +1845,7 @@ class CMap extends CMapElement {
 			$this->createShapes($shapes);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAP, $maps);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $maps);
 
 		return ['sysmapids' => $sysmapids];
 	}
@@ -2301,7 +2303,7 @@ class CMap extends CMapElement {
 			$this->updateLinkTriggers($link_triggers_to_update);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAP, $maps, $db_maps);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $maps, $db_maps);
 
 		return ['sysmapids' => $sysmapids];
 	}
@@ -2331,7 +2333,7 @@ class CMap extends CMapElement {
 		]);
 		DB::delete('sysmaps', ['sysmapid' => $sysmapids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $db_maps);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_maps);
 
 		return ['sysmapids' => $sysmapids];
 	}

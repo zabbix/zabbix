@@ -29,6 +29,8 @@ class CSettings extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_SETTINGS;
+
 	/**
 	 * @var string
 	 */
@@ -183,7 +185,7 @@ class CSettings extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SETTINGS,
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE,
 			[['configid' => $db_settings['configid']] + $settings], [$db_settings['configid'] => $db_settings]
 		);
 

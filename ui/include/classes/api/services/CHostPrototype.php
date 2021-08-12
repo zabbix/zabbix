@@ -24,6 +24,8 @@
  */
 class CHostPrototype extends CHostBase {
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_HOST_PROTOTYPE;
+
 	protected $sortColumns = ['hostid', 'host', 'name', 'status', 'discover'];
 
 	/**
@@ -370,7 +372,7 @@ class CHostPrototype extends CHostBase {
 		$this->createReal($host_prototypes);
 		$this->inherit($host_prototypes);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $host_prototypes);
 
 		return ['hostids' => zbx_objectValues($host_prototypes, 'hostid')];
 	}
@@ -679,7 +681,7 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($db_host_prototype);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes, $db_host_prototypes);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $host_prototypes, $db_host_prototypes);
 
 		return ['hostids' => zbx_objectValues($host_prototypes, 'hostid')];
 	}

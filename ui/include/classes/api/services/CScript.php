@@ -33,6 +33,8 @@ class CScript extends CApiService {
 		'execute' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EXECUTE_SCRIPTS]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_SCRIPT;
+
 	protected $tableName = 'scripts';
 	protected $tableAlias = 's';
 	protected $sortColumns = ['scriptid', 'name'];
@@ -254,7 +256,7 @@ class CScript extends CApiService {
 			DB::insertBatch('script_param', $scripts_params);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCRIPT, $scripts);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $scripts);
 
 		return ['scriptids' => $scriptids];
 	}
@@ -496,7 +498,7 @@ class CScript extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT, $scripts, $db_scripts);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $scripts, $db_scripts);
 
 		return ['scriptids' => zbx_objectValues($scripts, 'scriptid')];
 	}
@@ -949,7 +951,7 @@ class CScript extends CApiService {
 
 		DB::delete('scripts', ['scriptid' => $scriptids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, $db_scripts);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_scripts);
 
 		return ['scriptids' => $scriptids];
 	}

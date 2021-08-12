@@ -24,6 +24,8 @@
  */
 class CItem extends CItemGeneral {
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ITEM;
+
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
@@ -731,7 +733,7 @@ class CItem extends CItemGeneral {
 
 		CItemManager::delete($itemids);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $db_items);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_items);
 
 		return ['itemids' => $itemids];
 	}

@@ -31,6 +31,8 @@ class CCorrelation extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_CORRELATION;
+
 	protected $tableName = 'correlation';
 	protected $tableAlias = 'c';
 	protected $sortColumns = ['correlationid', 'name', 'status'];
@@ -502,7 +504,7 @@ class CCorrelation extends CApiService {
 
 		DB::delete('correlation', ['correlationid' => $correlationids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_CORRELATION, $db_correlations);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_correlations);
 
 		return ['correlationids' => $correlationids];
 	}

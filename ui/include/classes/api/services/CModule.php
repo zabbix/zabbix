@@ -31,6 +31,8 @@ class CModule extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_MODULE;
+
 	protected $tableName = 'module';
 	protected $tableAlias = 'md';
 	protected $sortColumns = ['moduleid', 'relative_path'];
@@ -188,7 +190,7 @@ class CModule extends CApiService {
 			$modules[$index]['moduleid'] = $moduleid;
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MODULE, $modules);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $modules);
 
 		return ['moduleids' => $moduleids];
 	}
@@ -249,7 +251,7 @@ class CModule extends CApiService {
 
 		DB::update($this->tableName, $update);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MODULE, $modules, $db_modules);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $modules, $db_modules);
 
 		return ['moduleids' => array_keys($db_modules)];
 	}
@@ -277,7 +279,7 @@ class CModule extends CApiService {
 		if ($moduleids) {
 			DB::delete($this->tableName, [$this->pk => $moduleids]);
 
-			$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MODULE, $db_modules);
+			$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_modules);
 		}
 
 		return ['moduleids' => $moduleids];

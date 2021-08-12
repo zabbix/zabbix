@@ -31,7 +31,7 @@ class CDashboard extends CDashboardGeneral {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_DASHBOARDS]
 	];
 
-	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_DASHBOARD;
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_DASHBOARD;
 
 	/**
 	 * @param array $options
@@ -188,7 +188,7 @@ class CDashboard extends CDashboardGeneral {
 		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
 		$this->updatePages($dashboards);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $dashboards);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}
@@ -222,7 +222,7 @@ class CDashboard extends CDashboardGeneral {
 		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
 		$this->updatePages($dashboards, $db_dashboards);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $dashboards, $db_dashboards);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $dashboards, $db_dashboards);
 
 		return ['dashboardids' => array_column($dashboards, 'dashboardid')];
 	}

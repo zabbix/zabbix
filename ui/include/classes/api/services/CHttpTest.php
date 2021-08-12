@@ -31,6 +31,8 @@ class CHttpTest extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_SCENARIO;
+
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
 	protected $sortColumns = ['httptestid', 'name'];
@@ -269,7 +271,7 @@ class CHttpTest extends CApiService {
 
 		$httptests = Manager::HttpTest()->persist($httptests);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCENARIO, $httptests);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $httptests);
 
 		return ['httptestids' => zbx_objectValues($httptests, 'httptestid')];
 	}
@@ -407,7 +409,7 @@ class CHttpTest extends CApiService {
 		}
 		unset($db_httptest);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, $httptests, $db_httptests);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $httptests, $db_httptests);
 
 		return ['httptestids' => zbx_objectValues($httptests, 'httptestid')];
 	}
@@ -654,7 +656,7 @@ class CHttpTest extends CApiService {
 
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, $db_httptests);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_httptests);
 
 		return ['httptestids' => $httptestids];
 	}

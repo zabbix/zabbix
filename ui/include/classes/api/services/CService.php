@@ -32,7 +32,7 @@ class CService extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	private const AUDIT_RESOURCE = AUDIT_RESOURCE_IT_SERVICE;
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_IT_SERVICE;
 
 	protected $tableName = 'services';
 	protected $tableAlias = 's';
@@ -157,7 +157,7 @@ class CService extends CApiService {
 		}
 		unset($service);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $services);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $services);
 
 		return ['serviceids' => $serviceids];
 	}
@@ -250,7 +250,7 @@ class CService extends CApiService {
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $services, $db_services);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $services, $db_services);
 
 		return ['serviceids' => array_column($services, 'serviceid')];
 	}
@@ -362,7 +362,7 @@ class CService extends CApiService {
 
 		DB::insertBatch('housekeeper', $ins_housekeeper);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, self::AUDIT_RESOURCE, $db_services);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_services);
 
 		return ['serviceids' => $serviceids];
 	}

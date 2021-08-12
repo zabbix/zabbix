@@ -42,6 +42,8 @@ class CReport extends CApiService {
 		]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_SCHEDULED_REPORT;
+
 	protected $tableName = 'report';
 	protected $tableAlias = 'r';
 	protected $sortColumns = ['reportid', 'name', 'status'];
@@ -153,7 +155,7 @@ class CReport extends CApiService {
 		$this->updateUsers($reports, __FUNCTION__);
 		$this->updateUserGroups($reports, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCHEDULED_REPORT, $reports);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $reports);
 
 		return ['reportids' => $reportids];
 	}
@@ -517,7 +519,7 @@ class CReport extends CApiService {
 		$this->updateUsers($reports, __FUNCTION__);
 		$this->updateUserGroups($reports, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCHEDULED_REPORT, $reports, $db_reports);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $reports, $db_reports);
 
 		return ['reportids' => array_column($reports, 'reportid')];
 	}
@@ -929,7 +931,7 @@ class CReport extends CApiService {
 
 		DB::delete('report', ['reportid' => $reportids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCHEDULED_REPORT, $db_reports);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_reports);
 
 		return ['reportids' => $reportids];
 	}

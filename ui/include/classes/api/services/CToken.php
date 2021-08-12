@@ -32,7 +32,7 @@ class CToken extends CApiService {
 		'generate' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS]
 	];
 
-	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_AUTH_TOKEN;
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_AUTH_TOKEN;
 
 	protected $tableName = 'token';
 	protected $tableAlias = 't';
@@ -201,7 +201,7 @@ class CToken extends CApiService {
 			$token['tokenid'] = $tokenids[$index];
 		});
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, static::AUDIT_RESOURCE, $tokens);
+		$this->addNewAuditBulk(CAudit::ACTION_ADD, $tokens);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -337,7 +337,7 @@ class CToken extends CApiService {
 
 		if ($upd_tokens) {
 			DB::update('token', $upd_tokens);
-			$this->addAuditBulk(AUDIT_ACTION_UPDATE, static::AUDIT_RESOURCE, $tokens, $db_tokens);
+			$this->addNewAuditBulk(CAudit::ACTION_UPDATE, $tokens, $db_tokens);
 		}
 
 		return ['tokenids' => array_column($tokens, 'tokenid')];
@@ -363,7 +363,7 @@ class CToken extends CApiService {
 		}
 
 		$db_tokens = $this->get([
-			'output' => ['userid', 'name', 'description', 'status', 'expires_at'],
+			'output' => ['tokenid', 'userid', 'name', 'description', 'status', 'expires_at'],
 			'tokenids' => array_column($tokens, 'tokenid', 'tokenid'),
 			'preservekeys' => true
 		]);
@@ -441,7 +441,7 @@ class CToken extends CApiService {
 
 		DB::delete('token', ['tokenid' => $tokenids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, static::AUDIT_RESOURCE, $db_tokens);
+		$this->addNewAuditBulk(CAudit::ACTION_DELETE, $db_tokens);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -491,11 +491,11 @@ class CToken extends CApiService {
 		}
 
 		DB::update('token', $upd_tokens);
-		array_walk($db_tokens, function (&$db_token) {
-			$db_token['token'] = '';
-		});
+		// array_walk($db_tokens, function (&$db_token) {
+		// 	$db_token['token'] = '';
+		// });
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, static::AUDIT_RESOURCE, $response, $db_tokens);
+		$this->addNewAuditBulk(CAudit::ACTION_UPDATE, $response, $db_tokens);
 
 		return $response;
 	}

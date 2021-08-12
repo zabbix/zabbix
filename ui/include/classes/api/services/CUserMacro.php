@@ -34,6 +34,8 @@ class CUserMacro extends CApiService {
 		'deleteglobal' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
+	protected const AUDIT_RESOURCE = CAudit::RESOURCE_MACRO;
+
 	protected $tableName = 'hostmacro';
 	protected $tableAlias = 'hm';
 	protected $sortColumns = ['macro'];
@@ -256,7 +258,7 @@ class CUserMacro extends CApiService {
 		}
 		unset($globalmacro);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $globalmacros);
+		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $globalmacros);
 
 		return ['globalmacroids' => $globalmacroids];
 	}
@@ -315,7 +317,7 @@ class CUserMacro extends CApiService {
 			DB::update('globalmacro', $upd_globalmacros);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $globalmacros, $db_globalmacros);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $globalmacros, $db_globalmacros);
 
 		return ['globalmacroids' => array_column($globalmacros, 'globalmacroid')];
 	}
@@ -432,7 +434,7 @@ class CUserMacro extends CApiService {
 
 		DB::delete('globalmacro', ['globalmacroid' => $globalmacroids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $db_globalmacros);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_globalmacros);
 
 		return ['globalmacroids' => $globalmacroids];
 	}
