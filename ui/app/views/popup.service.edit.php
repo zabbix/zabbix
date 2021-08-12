@@ -115,7 +115,7 @@ $service_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Status calculation algorithm'), 'algorithm_focusable'),
+		new CLabel(_('Status calculation rule'), 'algorithm_focusable'),
 		new CFormField(
 			(new CSelect('algorithm'))
 				->setId('algorithm')
@@ -272,7 +272,7 @@ $child_services = (new CTable())
 	->setHeader(
 		(new CRowHeader([
 			_('Service'),
-			_('Status calculation'),
+			_('Status calculation rule'),
 			_('Problem tags'),
 			_('Action')
 		]))->addClass(ZBX_STYLE_GREY)

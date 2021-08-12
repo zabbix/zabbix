@@ -747,13 +747,13 @@ class CService extends CApiService {
 
 				if ($showsla == SERVICE_SHOW_SLA_ON) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Service "%1$s" cannot show SLA for the selected status calculation algorithm.', $name)
+						_s('Service "%1$s" cannot show SLA for the selected status calculation rule.', $name)
 					);
 				}
 
 				if ($has_problem_tags) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Service "%1$s" cannot have problem tags with the selected status calculation algorithm.',
+						_s('Service "%1$s" cannot have problem tags with the selected status calculation rule.',
 							$name
 						)
 					);

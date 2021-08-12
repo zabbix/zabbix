@@ -54,7 +54,7 @@ $services = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(new CCheckBox('serviceid_all')))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Name'),
-		_('Status calculation'),
+		_('Status calculation rule'),
 		_('Problem tags')
 	]);
 
