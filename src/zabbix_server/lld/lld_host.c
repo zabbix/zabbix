@@ -3437,7 +3437,7 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->del_templateids.values_num)
 		{
-			if (SUCCEED != DBdelete_template_elements(host->hostid, &host->del_templateids, &err))
+			if (SUCCEED != DBdelete_template_elements_for_lld(host->hostid, &host->del_templateids, &err))
 			{
 				*error = zbx_strdcatf(*error, "Cannot unlink template: %s.\n", err);
 				zbx_free(err);

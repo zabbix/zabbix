@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 19:55+0300\n"
+"POT-Creation-Date: 2021-08-06 19:55+0300\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -75,7 +75,7 @@ msgstr ""
 msgid "\"ruleid\" of dependent item and master item should match"
 msgstr ""
 
-#: include/forms.inc.php:1288
+#: include/forms.inc.php:1293
 #: include/views/configuration.host.discovery.edit.php:815
 #: include/views/js/configuration.host.discovery.edit.js.php:98
 #: include/views/js/item.preprocessing.js.php:148
@@ -337,7 +337,7 @@ msgstr "500 giá trị gần nhất"
 msgid "<empty string>"
 msgstr ""
 
-#: include/forms.inc.php:1336 include/views/js/item.preprocessing.js.php:197
+#: include/forms.inc.php:1341 include/views/js/item.preprocessing.js.php:197
 msgid "<label name>"
 msgstr ""
 
@@ -345,7 +345,7 @@ msgstr ""
 msgid "<manual>"
 msgstr "<bằng tay>"
 
-#: include/forms.inc.php:1334 include/forms.inc.php:1342
+#: include/forms.inc.php:1339 include/forms.inc.php:1347
 #: include/views/js/item.preprocessing.js.php:195
 #: include/views/js/item.preprocessing.js.php:204
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
@@ -426,7 +426,7 @@ msgstr ""
 msgid "API tokens"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:319
+#: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "Abscissa"
 msgstr ""
 
@@ -630,7 +630,7 @@ msgstr "Hành động đã cập nhật"
 #: include/classes/screens/CScreenProblem.php:902
 #: include/classes/screens/CScreenProblem.php:1171
 #: include/classes/screens/CScreenProblem.php:1232 include/events.inc.php:291
-#: include/forms.inc.php:1217 include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:69 jsLoader.php:144
 #: jsLoader.php:172 jsLoader.php:187 jsLoader.php:201 jsLoader.php:327
 #: tr_events.php:182
@@ -738,8 +738,8 @@ msgstr "Kích hoạt"
 #: app/views/popup.triggerwizard.php:116 app/views/popup.triggerwizard.php:150
 #: app/views/popup.valuemap.edit.php:60 app/views/popup.valuemap.edit.php:126
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
-#: include/classes/widgets/CWidgetHelper.php:530 include/forms.inc.php:1476
-#: include/forms.inc.php:2040 include/views/configuration.action.edit.php:133
+#: include/classes/widgets/CWidgetHelper.php:530 include/forms.inc.php:1481
+#: include/forms.inc.php:2045 include/views/configuration.action.edit.php:133
 #: include/views/configuration.action.edit.php:305
 #: include/views/configuration.action.edit.php:389
 #: include/views/configuration.action.edit.php:465
@@ -902,6 +902,8 @@ msgstr ""
 msgid "Add widget"
 msgstr "Thêm ô điều khiển"
 
+#: app/controllers/CControllerAuditLogList.php:283
+#: app/controllers/CControllerAuditLogList.php:294
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Added"
 msgstr ""
@@ -1105,7 +1107,7 @@ msgstr "Và"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:80
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:80
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:370
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:68
 #: include/classes/widgets/forms/CWidgetFormWeb.php:62
 #: include/views/configuration.action.edit.php:122
@@ -1304,6 +1306,10 @@ msgstr "Ít nhất một người dùng hoặc một nhóm người dùng phải
 msgid "At least one user or user group must be specified."
 msgstr ""
 
+#: app/controllers/CControllerAuditLogList.php:290
+msgid "Attached"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:341
 msgid "Attempt interval"
 msgstr "Khoảng thời gian thử nghiệm"
@@ -1404,9 +1410,9 @@ msgstr ""
 msgid "Authorization"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:157
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:229
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:150
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:222
 msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Tự động"
@@ -1543,8 +1549,8 @@ msgstr "Tổ hợp DN"
 msgid "Bind password"
 msgstr "Tổ hợp mật khẩu"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:377
-#: app/controllers/CControllerPopupTriggerExpr.php:410
+#: app/controllers/CControllerPopupTriggerExpr.php:397
+#: app/controllers/CControllerPopupTriggerExpr.php:430
 msgid "Bits to shift"
 msgstr ""
 
@@ -1779,7 +1785,7 @@ msgstr "Không thể thêm quan hệ phụ thuộc từ host đến templat
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr "Không thể thêm quan hệ phụ thuộc từ trigger \"%1$s:%2$s\" đến trigger không tồn tại \"%3$s:%4$s\"."
 
-#: host_discovery.php:702
+#: host_discovery.php:717
 msgid "Cannot add discovery rule"
 msgstr "Không thể thêm quy tắc phát hiện"
 
@@ -1917,9 +1923,9 @@ msgstr "Không thể liên kết ẩn danh với máy chủ LDAP."
 msgid "Cannot bind to LDAP server."
 msgstr "Không thể liên kết với máy chủ LDAP."
 
-#: include/forms.inc.php:1861 include/forms.inc.php:1868
-#: include/forms.inc.php:1878 include/forms.inc.php:1912
-#: include/forms.inc.php:1919 include/forms.inc.php:1929
+#: include/forms.inc.php:1866 include/forms.inc.php:1873
+#: include/forms.inc.php:1883 include/forms.inc.php:1917
+#: include/forms.inc.php:1924 include/forms.inc.php:1934
 #, c-format
 msgid "Cannot build expression tree: %1$s."
 msgstr ""
@@ -2062,13 +2068,13 @@ msgstr[0] "Không thể xóa bảng điểu khiển"
 msgid "Cannot delete dependency"
 msgstr "Không thể xóa quan hệ phụ thuộc"
 
-#: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:397
+#: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:412
 #, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Không thể xóa quy tắc phát hiện"
 
-#: host_discovery.php:745
+#: host_discovery.php:760
 msgid "Cannot delete discovery rules"
 msgstr "Không thể xóa các quy tắc phát hiện"
 
@@ -2302,7 +2308,7 @@ msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
 msgstr[0] "Không thể vô hiệu hóa tỉ lệ sử dụng"
 
-#: app/controllers/CControllerDiscoveryDisable.php:74 host_discovery.php:735
+#: app/controllers/CControllerDiscoveryDisable.php:74 host_discovery.php:750
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Không thể vô hiệu hoa quy tắc phát hiệnKhông thể vô hiệu hóa các quy tắc phát hiện"
@@ -2369,7 +2375,7 @@ msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
 msgstr[0] "Khong thể kích hoạt tỉ lệ sử dụng"
 
-#: app/controllers/CControllerDiscoveryEnable.php:75 host_discovery.php:734
+#: app/controllers/CControllerDiscoveryEnable.php:75 host_discovery.php:749
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Không thể kích hoạt quy tắc phát hiệnKhông thể kích hoạt các quy tắc phát hiện"
@@ -2567,7 +2573,7 @@ msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist.
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Không thể nhập template \"%1$s\", template được liên kết \"%2$s\" không tồn tại."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1438
+#: app/controllers/CControllerPopupTriggerExpr.php:1472
 msgid "Cannot insert trigger expression"
 msgstr "Không thể chèn biểu thức trigger"
 
@@ -2612,17 +2618,17 @@ msgstr "Không thể cập nhật hàng loạt tên mẫu có thể nhìn thấy
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
 msgstr ""
 
-#: include/classes/db/DB.php:941
+#: include/classes/db/DB.php:929
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "Không thể xóa trạng thái trong bảng \"%1$s\" với điều kiện tại đó."
 
-#: include/classes/db/DB.php:654
+#: include/classes/db/DB.php:642
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Không thể cập nhật trạng thái trong bảng \"%1$s\" với nhiều giá trị."
 
-#: include/classes/db/DB.php:667
+#: include/classes/db/DB.php:655
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Không thể cập nhật trạng thái trong bảng \"%1$s\" với điều kiện tại đó."
@@ -2668,7 +2674,7 @@ msgstr "Không thể lưu ô điều khiển \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Không thể gửi lệnh, kiểm tra kết nối đến zabbix server \"%1$s\"."
 
-#: host_discovery.php:409 host_discovery.php:765 items.php:952 items.php:1146
+#: host_discovery.php:424 host_discovery.php:780 items.php:952 items.php:1146
 msgid "Cannot send request"
 msgstr "Không thể gửi yêu cầu"
 
@@ -2845,7 +2851,7 @@ msgid "Cannot update correlation"
 msgstr "Không thể cập nhật sự tương quan"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
-#: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:705
+#: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:720
 msgid "Cannot update discovery rule"
 msgstr "Không thể cập nhật quy tắc phát hiện"
 
@@ -3148,9 +3154,9 @@ msgstr "Chuỗi ký tự bao gồm"
 msgid "Character string not included"
 msgstr "Chuỗi ký tự không bao gồm"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:701
-#: app/controllers/CControllerPopupTriggerExpr.php:873
-#: app/controllers/CControllerPopupTriggerExpr.php:1004
+#: app/controllers/CControllerPopupTriggerExpr.php:721
+#: app/controllers/CControllerPopupTriggerExpr.php:907
+#: app/controllers/CControllerPopupTriggerExpr.php:1038
 msgid "Chars"
 msgstr ""
 
@@ -3467,7 +3473,7 @@ msgstr "Nén"
 msgid "Concurrent sessions"
 msgstr "Các phiên làm việc đồng thời"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1461
+#: app/controllers/CControllerPopupTriggerExpr.php:1495
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 msgid "Condition"
 msgstr "Điều kiện"
@@ -3631,7 +3637,7 @@ msgstr "Cấu hình của các proxy"
 msgid "Configuration of regular expressions"
 msgstr "Cấu hình của các biểu thức chính quy"
 
-#: app/controllers/CControllerScriptEdit.php:204
+#: app/controllers/CControllerScriptEdit.php:208
 #: app/controllers/CControllerScriptList.php:197
 msgid "Configuration of scripts"
 msgstr "Cấu hình của các câu lệnh"
@@ -3947,10 +3953,10 @@ msgstr "Liên kết được cập nhật"
 msgid "Could not save image!"
 msgstr "Không thể lưu trữ hình ảnh!"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:50
-#: app/controllers/CControllerPopupTriggerExpr.php:647
-#: app/controllers/CControllerPopupTriggerExpr.php:816
-#: app/controllers/CControllerPopupTriggerExpr.php:847
+#: app/controllers/CControllerPopupTriggerExpr.php:51
+#: app/controllers/CControllerPopupTriggerExpr.php:667
+#: app/controllers/CControllerPopupTriggerExpr.php:850
+#: app/controllers/CControllerPopupTriggerExpr.php:881
 msgid "Count"
 msgstr "Đếm"
 
@@ -4285,8 +4291,8 @@ msgstr ""
 msgid "Custom multiplier"
 msgstr "Tùy chỉnh nhân bản"
 
-#: app/views/js/popup.itemtestedit.view.js.php:381 include/forms.inc.php:1216
-#: include/forms.inc.php:1431 include/views/js/item.preprocessing.js.php:64
+#: app/views/js/popup.itemtestedit.view.js.php:381 include/forms.inc.php:1221
+#: include/forms.inc.php:1436 include/views/js/item.preprocessing.js.php:64
 msgid "Custom on fail"
 msgstr ""
 
@@ -4435,7 +4441,7 @@ msgid "Data overview"
 msgstr "Tổng quan dữ liệu"
 
 #: include/classes/widgets/CWidgetHelper.php:1154
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:34
 #: include/classes/widgets/views/widget.svggraph.form.view.php:290
 msgid "Data set"
 msgstr "Đặt lại dữ liệu"
@@ -4596,8 +4602,8 @@ msgstr "Dec"
 msgid "December"
 msgstr "Tháng 12"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:860
-#: app/controllers/CControllerPopupTriggerExpr.php:1017
+#: app/controllers/CControllerPopupTriggerExpr.php:894
+#: app/controllers/CControllerPopupTriggerExpr.php:1051
 msgid "Decimal places"
 msgstr ""
 
@@ -5003,6 +5009,10 @@ msgstr "Xóa trigger?"
 msgid "Delete web scenario?"
 msgstr "Xóa web scanario?"
 
+#: app/controllers/CControllerAuditLogList.php:297
+msgid "Deleted"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1494
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
@@ -5093,6 +5103,10 @@ msgstr "Trạng thái triển khai"
 #: include/views/inventory.host.view.php:127
 msgid "Description"
 msgstr "Mô tả"
+
+#: app/controllers/CControllerAuditLogList.php:290
+msgid "Detached"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:82
 #: app/views/reports.auditlog.list.php:94 include/blocks.inc.php:530
@@ -5285,7 +5299,7 @@ msgstr ""
 msgid "Discard unchanged with heartbeat"
 msgstr ""
 
-#: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1410
+#: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1415
 #: include/views/js/item.preprocessing.js.php:66
 msgid "Discard value"
 msgstr ""
@@ -5426,27 +5440,27 @@ msgstr ""
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr "Quy tắc khám phá \"%1$s\" trong hoạt động \"%2$s\" được sử dụng."
 
-#: app/controllers/CControllerDiscoveryCreate.php:85 host_discovery.php:702
+#: app/controllers/CControllerDiscoveryCreate.php:85 host_discovery.php:717
 msgid "Discovery rule created"
 msgstr "Quy tắc phát hiện đã tạo"
 
-#: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:397
+#: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:412
 #, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Quy tắc phát hiện đã xóa"
 
-#: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:732
+#: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:747
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Quy tắc phát hiện đã vô hiệu hóaCác quy tắc phát hiện đã vô hiệu hóa"
 
-#: app/controllers/CControllerDiscoveryEnable.php:72 host_discovery.php:731
+#: app/controllers/CControllerDiscoveryEnable.php:72 host_discovery.php:746
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Quy tắc phát hiện đã kích hoạtCác quy tắc phát hiện đã kích hoạt"
 
-#: app/controllers/CControllerDiscoveryUpdate.php:95 host_discovery.php:705
+#: app/controllers/CControllerDiscoveryUpdate.php:95 host_discovery.php:720
 msgid "Discovery rule updated"
 msgstr "Quy tắc phát hiện đã cập nhật"
 
@@ -5461,7 +5475,7 @@ msgstr "Quy tắc phát hiện đã cập nhật"
 msgid "Discovery rules"
 msgstr "Các quy tắc phát hiện"
 
-#: host_discovery.php:745
+#: host_discovery.php:760
 msgid "Discovery rules deleted"
 msgstr "Các quy tắc phát hiện đã xóa"
 
@@ -5519,7 +5533,7 @@ msgstr "Hiển thị %1$s đến %2$s của %3$s được tìm thấy"
 msgid "Displaying options"
 msgstr "Hiển thị tùy chọn"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:753
+#: app/controllers/CControllerPopupTriggerExpr.php:773
 msgid "Division denominator"
 msgstr ""
 
@@ -6408,8 +6422,8 @@ msgstr "Biểu thức không thể bị rỗng"
 msgid "Expression constructor"
 msgstr "Người xây dựng biểu thức"
 
-#: include/forms.inc.php:1862 include/forms.inc.php:1869
-#: include/forms.inc.php:1879
+#: include/forms.inc.php:1867 include/forms.inc.php:1874
+#: include/forms.inc.php:1884
 msgid "Expression syntax error."
 msgstr "Biểu thức lỗi cú pháp."
 
@@ -6720,8 +6734,8 @@ msgctxt "page navigation"
 msgid "First"
 msgstr "Đầu tiên"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:217
-#: app/controllers/CControllerPopupTriggerExpr.php:246
+#: app/controllers/CControllerPopupTriggerExpr.php:237
+#: app/controllers/CControllerPopupTriggerExpr.php:266
 msgid "Fit"
 msgstr "Phù hợp"
 
@@ -6808,7 +6822,7 @@ msgstr "Thứ sáu"
 #: app/views/popup.service.time.edit.php:61
 #: app/views/popup.service.time.edit.php:124
 #: app/views/popup.tabfilter.edit.php:44 include/classes/html/CFilter.php:282
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:79
 #: include/views/js/monitoring.sysmaps.js.php:748 report4.php:191
 msgid "From"
 msgstr "Từ"
@@ -7385,7 +7399,7 @@ msgstr "Làm nổi bật toàn bộ hàng"
 #: include/classes/screens/CScreenProblem.php:1320
 #: include/classes/screens/CScreenProblem.php:1325
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
 #: jsLoader.php:346
@@ -7409,7 +7423,7 @@ msgstr "Lịch sử bị xóa"
 msgid "History clearing can take a long time. Continue?"
 msgstr "Xóa lịch sử có thể mất một thời gian dài. Tiếp tục?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:54
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:47
 msgid "History data selection"
 msgstr "Lựa chọn dữ liệu lịch sử"
 
@@ -8562,7 +8576,7 @@ msgstr "Giá trị đối tượng sự kiện không chính xác."
 msgid "Incorrect eventsource value."
 msgstr "Giá trị nguồn sự kiện không chính xác."
 
-#: include/classes/db/DB.php:674 include/classes/db/DB.php:948
+#: include/classes/db/DB.php:662 include/classes/db/DB.php:936
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Trường có tên \"%1$s\" không chính xác hoặc giá trị ở nơi báo cáo đối với bảng \"%2$s\"."
@@ -8692,7 +8706,7 @@ msgstr "Kiểu giá trị item không chính xác"
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Kiểu giá trị item \"%1$s\" được cung cấp không chính xác đối với hàm trigger \"%2$s\"."
 
-#: include/forms.inc.php:1511
+#: include/forms.inc.php:1516
 msgid "Incorrect list of items."
 msgstr "Thống kê không chính xác của các item."
 
@@ -9465,7 +9479,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr "Điều kiện hoạt động không hợp lệ: %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1428
+#: app/controllers/CControllerPopupTriggerExpr.php:1462
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr ""
@@ -9491,7 +9505,7 @@ msgstr "Địa chỉ email không hợp lệ cho loại phương tiện với ID
 #: app/controllers/CControllerPopupMassupdateItem.php:210
 #: app/controllers/CControllerPopupMassupdateItem.php:222
 #: disc_prototypes.php:352 disc_prototypes.php:357 disc_prototypes.php:370
-#: host_discovery.php:437 host_discovery.php:443 host_discovery.php:456
+#: host_discovery.php:452 host_discovery.php:458 host_discovery.php:471
 #: items.php:560 items.php:565 items.php:578
 #, c-format
 msgid "Invalid interval \"%1$s\"."
@@ -9690,8 +9704,8 @@ msgstr "Phương pháp tham số không hợp lệ."
 #: include/classes/validators/CApiInputValidator.php:2444
 #: include/classes/validators/CApiInputValidator.php:2451
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:130
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
 #, c-format
 msgid "Invalid parameter \"%1$s\": %2$s."
 msgstr "Tham số \"%1$s\" không hợp lệ: %2$s."
@@ -9901,7 +9915,7 @@ msgstr[0] "Item đã được kích hoạtCác item đã được kích h
 msgid "Item in \"not supported\" state"
 msgstr "Item trong trạng thái \"không được hỗ trợ\""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1421
+#: app/controllers/CControllerPopupTriggerExpr.php:1455
 msgid "Item not selected"
 msgstr "Item không được lựa chọn"
 
@@ -10057,7 +10071,7 @@ msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\"."
 #: include/views/configuration.template.list.php:118
 #: include/views/configuration.template.list.php:206
 #: include/views/inventory.host.view.php:182
-#: include/views/inventory.host.view.php:215 items.php:1297
+#: include/views/inventory.host.view.php:215 items.php:1292
 msgid "Items"
 msgstr "Các item"
 
@@ -10143,7 +10157,7 @@ msgid "Japanese (ja_JP)"
 msgstr "Japanese (ja_JP)"
 
 #: app/views/administration.mediatype.edit.php:220
-#: app/views/administration.script.edit.php:188 include/forms.inc.php:1319
+#: app/views/administration.script.edit.php:188 include/forms.inc.php:1324
 #: include/items.inc.php:1863
 #: include/views/configuration.host.discovery.edit.php:231
 #: include/views/configuration.item.edit.php:267
@@ -10356,16 +10370,17 @@ msgstr "Đồ thị tháng cuối cùng"
 msgid "Last name"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:61
-#: app/controllers/CControllerPopupTriggerExpr.php:75
-#: app/controllers/CControllerPopupTriggerExpr.php:89
-#: app/controllers/CControllerPopupTriggerExpr.php:102
-#: app/controllers/CControllerPopupTriggerExpr.php:123
-#: app/controllers/CControllerPopupTriggerExpr.php:132
-#: app/controllers/CControllerPopupTriggerExpr.php:145
-#: app/controllers/CControllerPopupTriggerExpr.php:182
-#: app/controllers/CControllerPopupTriggerExpr.php:201
-#: app/controllers/CControllerPopupTriggerExpr.php:230
+#: app/controllers/CControllerPopupTriggerExpr.php:62
+#: app/controllers/CControllerPopupTriggerExpr.php:76
+#: app/controllers/CControllerPopupTriggerExpr.php:90
+#: app/controllers/CControllerPopupTriggerExpr.php:103
+#: app/controllers/CControllerPopupTriggerExpr.php:124
+#: app/controllers/CControllerPopupTriggerExpr.php:133
+#: app/controllers/CControllerPopupTriggerExpr.php:146
+#: app/controllers/CControllerPopupTriggerExpr.php:165
+#: app/controllers/CControllerPopupTriggerExpr.php:202
+#: app/controllers/CControllerPopupTriggerExpr.php:221
+#: app/controllers/CControllerPopupTriggerExpr.php:250
 msgid "Last of"
 msgstr "Lần cuối cùng của"
 
@@ -10429,10 +10444,10 @@ msgstr ""
 msgid "Left"
 msgstr "Bên trái"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:143
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
 msgid "Left Y"
 msgstr "rời khỏi Y"
 
@@ -10444,8 +10459,8 @@ msgstr "Cắt trái"
 msgid "Legend"
 msgstr "Lịch sử"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:615
-#: app/controllers/CControllerPopupTriggerExpr.php:733
+#: app/controllers/CControllerPopupTriggerExpr.php:635
+#: app/controllers/CControllerPopupTriggerExpr.php:753
 msgid "Length"
 msgstr ""
 
@@ -11027,9 +11042,9 @@ msgstr "Đánh dấu khác"
 msgid "Mark selected"
 msgstr "Đánh dấu được lựa chọn"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:357
-#: app/controllers/CControllerPopupTriggerExpr.php:397
-#: app/controllers/CControllerPopupTriggerExpr.php:423
+#: app/controllers/CControllerPopupTriggerExpr.php:377
+#: app/controllers/CControllerPopupTriggerExpr.php:417
+#: app/controllers/CControllerPopupTriggerExpr.php:443
 msgid "Mask"
 msgstr "Mặt nạ"
 
@@ -11073,13 +11088,13 @@ msgstr ""
 msgid "Mathematical functions"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:344
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:143
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:213
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:215
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
+#: app/controllers/CControllerPopupTriggerExpr.php:364
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:134
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:206
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
 msgid "Max"
 msgstr "Lớn nhất"
 
@@ -11116,7 +11131,7 @@ msgstr ""
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:259
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:451
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:444
 #: include/validate.inc.php:477
 #, c-format
 msgid "Maximum time period to display is %1$s day."
@@ -11305,11 +11320,11 @@ msgstr ""
 msgid "Middle"
 msgstr "Giữa"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:339
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:126
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:198
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
+#: app/controllers/CControllerPopupTriggerExpr.php:359
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:119
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:191
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:193
 msgid "Min"
 msgstr "Tối thiểu"
 
@@ -11360,7 +11375,7 @@ msgstr "Sự quan trọng tối thiểu"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:244
 #: include/classes/mvc/CController.php:252
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:446
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:439
 #: include/validate.inc.php:470
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
@@ -11407,7 +11422,7 @@ msgstr "Thiếu các item cho kiểu đồ thị \"%1$s\"."
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Thiếu key \"%1$s\" cho host \"%2$s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:222
+#: app/controllers/CControllerPopupTriggerExpr.php:242
 #: app/views/administration.proxy.list.php:48
 #: app/views/administration.proxy.list.php:74 report2.php:201
 msgid "Mode"
@@ -11674,7 +11689,7 @@ msgstr "NTLM"
 #: app/views/reports.scheduledreport.list.php:49 disc_prototypes.php:44
 #: graphs.php:43 host_discovery.php:50 httpconf.php:42
 #: include/classes/screens/CScreenHttpTest.php:113
-#: include/classes/widgets/CWidgetHelper.php:67 include/forms.inc.php:1214
+#: include/classes/widgets/CWidgetHelper.php:67 include/forms.inc.php:1219
 #: include/hosts.inc.php:109 include/views/configuration.action.edit.php:48
 #: include/views/configuration.action.edit.php:59
 #: include/views/configuration.action.list.php:68
@@ -12179,7 +12194,7 @@ msgstr ""
 #: app/controllers/CControllerWidgetMapView.php:70
 #: app/controllers/CControllerWidgetPlainTextView.php:88
 #: app/views/monitoring.widget.graph.view.php:42 disc_prototypes.php:750
-#: host_discovery.php:795 hostinventoriesoverview.php:74
+#: host_discovery.php:810 hostinventoriesoverview.php:74
 #: include/classes/api/services/CAction.php:1582
 #: include/classes/api/services/CAction.php:1863
 #: include/classes/api/services/CAction.php:2872
@@ -12579,7 +12594,7 @@ msgstr "Số lượng nhánh bộ xử lý trên VMware hypervisor, <url> 
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Số lượng bộ xử lý trên máy ảo VMware, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:286
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
 msgstr "Số lượng hàng"
 
@@ -13012,7 +13027,7 @@ msgstr "Tùy chọn"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:81
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:81
 #: include/classes/widgets/forms/CWidgetFormProblems.php:96
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:371
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:69
 #: include/classes/widgets/forms/CWidgetFormWeb.php:63
 #: include/triggers.inc.php:1241
@@ -13141,7 +13156,7 @@ msgstr "Ưu tiên chu kỳ item"
 msgid "Override with name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:409
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:402
 #: include/classes/widgets/views/widget.svggraph.form.view.php:296
 #: include/views/configuration.host.discovery.edit.php:867
 #: include/views/configuration.host.discovery.edit.php:884
@@ -13418,7 +13433,7 @@ msgstr "Tham số \"%1$s\" được yêu cầu."
 
 #: app/views/administration.mediatype.edit.php:212
 #: app/views/administration.script.edit.php:180
-#: include/classes/debug/CProfiler.php:182 include/forms.inc.php:1215
+#: include/classes/debug/CProfiler.php:182 include/forms.inc.php:1220
 #: include/views/configuration.host.discovery.edit.php:223
 #: include/views/configuration.item.edit.php:259
 #: include/views/configuration.item.prototype.edit.php:240
@@ -13544,7 +13559,7 @@ msgstr ""
 msgid "Paste without external links"
 msgstr "Dán mà không cần liên kết bên ngoài"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:829
+#: app/controllers/CControllerPopupTriggerExpr.php:863
 #: app/views/monitoring.charts.view.php:107
 msgid "Pattern"
 msgstr ""
@@ -13562,7 +13577,7 @@ msgstr "Cách sử dụng bộ nhớ lúc cao điểm: %1$s"
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:193
+#: app/controllers/CControllerPopupTriggerExpr.php:213
 msgid "Percentage"
 msgstr "Phần trăm"
 
@@ -13599,7 +13614,7 @@ msgstr "Thực hiện một truy vấn DNS. Trả về chuỗi ký tự với lo
 msgid "Period"
 msgstr "Chu kỳ"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:94
+#: app/controllers/CControllerPopupTriggerExpr.php:95
 msgid "Period shift"
 msgstr ""
 
@@ -13757,7 +13772,7 @@ msgstr "Loại thư"
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:791
+#: app/controllers/CControllerPopupTriggerExpr.php:825
 msgid "Power value"
 msgstr ""
 
@@ -13908,7 +13923,7 @@ msgstr "Cấp đặc quyền"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:76
 #: include/classes/widgets/forms/CWidgetFormProblems.php:204
 #: include/classes/widgets/forms/CWidgetFormProblems.php:205
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:356
 #: include/views/configuration.item.list.php:203
 #: include/views/configuration.trigger.prototype.list.php:166
 #: include/views/configuration.triggers.list.php:95
@@ -13933,7 +13948,7 @@ msgid "Problem expression"
 msgstr "Biểu thức vấn đề"
 
 #: include/classes/widgets/CWidgetConfig.php:57
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:331
 msgid "Problem hosts"
 msgstr "Vấn đề máy chủ"
 
@@ -14286,8 +14301,8 @@ msgstr "Sự phục hồi"
 msgid "Recovery expression"
 msgstr "Biểu thức phục hồi"
 
-#: include/forms.inc.php:1913 include/forms.inc.php:1920
-#: include/forms.inc.php:1930
+#: include/forms.inc.php:1918 include/forms.inc.php:1925
+#: include/forms.inc.php:1935
 msgid "Recovery expression syntax error."
 msgstr "Phục hồi lỗi cú pháp biểu thức."
 
@@ -14442,8 +14457,8 @@ msgstr "Lệnh từ xa"
 #: include/classes/helpers/CTagFilterFieldHelper.php:82
 #: include/classes/helpers/CTagFilterFieldHelper.php:135
 #: include/classes/widgets/CWidgetHelper.php:518
-#: include/classes/widgets/CWidgetHelper.php:571 include/forms.inc.php:1456
-#: include/forms.inc.php:2004 include/views/configuration.action.edit.php:97
+#: include/classes/widgets/CWidgetHelper.php:571 include/forms.inc.php:1461
+#: include/forms.inc.php:2009 include/views/configuration.action.edit.php:97
 #: include/views/configuration.action.edit.php:259
 #: include/views/configuration.action.edit.php:287
 #: include/views/configuration.action.edit.php:371
@@ -14596,8 +14611,8 @@ msgstr "Thay thế"
 msgid "Replace dependencies"
 msgstr "Thay thế quan hệ phụ thuộc"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:620
-#: app/controllers/CControllerPopupTriggerExpr.php:834
+#: app/controllers/CControllerPopupTriggerExpr.php:640
+#: app/controllers/CControllerPopupTriggerExpr.php:868
 msgid "Replacement"
 msgstr ""
 
@@ -14657,7 +14672,7 @@ msgstr "Yêu cầu nội dung"
 msgid "Request body type"
 msgstr "Yêu cầu kiểu nội dung"
 
-#: host_discovery.php:409 host_discovery.php:765 items.php:952 items.php:1146
+#: host_discovery.php:424 host_discovery.php:780 items.php:952 items.php:1146
 msgid "Request sent successfully"
 msgstr "Yêu cầu gửi thành công"
 
@@ -14905,10 +14920,10 @@ msgstr ""
 msgid "Right"
 msgstr "Bên phải"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:187
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:215
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:193
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
 msgid "Right Y"
 msgstr "Trục phải Y"
 
@@ -15127,12 +15142,12 @@ msgstr "Đếm SQL: %1$s (chọn: %2$s | thực thi: %3$s)"
 msgid "SQL query"
 msgstr "Truy vấn SQL"
 
-#: include/classes/db/DB.php:958
+#: include/classes/db/DB.php:946
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "Thực hiện câu lệnh SQL đã thất bại \"%1$s\""
 
-#: include/classes/db/DB.php:626 include/classes/db/DB.php:685
+#: include/classes/db/DB.php:614 include/classes/db/DB.php:673
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Thực hiện câu lệnh SQL đã thất bại \"%1$s\"."
@@ -15487,7 +15502,7 @@ msgstr "Đã chọn và tất cả các vấn đề khác của các trigger li�
 msgid "Selected elements"
 msgstr "Các phần tử đã chọn"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:325
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:318
 msgid "Selected items only"
 msgstr "Chỉ item được chọn"
 
@@ -15722,12 +15737,12 @@ msgid "Session terminated, re-login, please."
 msgstr "Kết thúc phiên làm việc, hãy đăng nhập lại."
 
 #: app/views/popup.tabfilter.edit.php:40
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:74
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:67
 msgid "Set custom time period"
 msgstr "Đặt chu kỳ thời gian tùy chỉnh"
 
 #: app/controllers/CControllerPopupItemTestSend.php:433
-#: app/views/js/popup.itemtestedit.view.js.php:371 include/forms.inc.php:1412
+#: app/views/js/popup.itemtestedit.view.js.php:371 include/forms.inc.php:1417
 #: include/views/js/item.preprocessing.js.php:68
 msgid "Set error to"
 msgstr ""
@@ -15745,7 +15760,7 @@ msgstr "Đặt chế độ kiểm kê máy chủ"
 msgid "Set new value"
 msgstr ""
 
-#: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1411
+#: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1416
 #: include/views/js/item.preprocessing.js.php:67
 msgid "Set value to"
 msgstr ""
@@ -15784,7 +15799,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:85
 #: include/classes/widgets/forms/CWidgetFormProblems.php:202
 #: include/classes/widgets/forms/CWidgetFormProblems.php:203
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:344
 #: include/events.inc.php:188 include/triggers.inc.php:1144
 #: include/views/configuration.item.list.php:171
 #: include/views/configuration.trigger.prototype.edit.php:88
@@ -15853,9 +15868,9 @@ msgstr "Rút ngắn"
 #: app/views/reports.scheduledreport.list.php:54
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:102
 #: include/classes/widgets/forms/CWidgetFormProblems.php:33
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:187
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:259
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/views/js/monitoring.sysmaps.js.php:100 report2.php:546
 msgid "Show"
@@ -15882,7 +15897,7 @@ msgstr "Hiển thị các item không có dữ liệu"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:273
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:266
 #: include/views/configuration.graph.edit.php:114
 msgid "Show legend"
 msgstr "Hiển thị chú thích"
@@ -15903,7 +15918,7 @@ msgstr ""
 msgid "Show operational data"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:306
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:299
 msgid "Show problems"
 msgstr "Hiển thị vấn đề"
 
@@ -16186,8 +16201,8 @@ msgstr "Staircase"
 msgid "Standard items"
 msgstr "Các item chuẩn"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:610
-#: app/controllers/CControllerPopupTriggerExpr.php:728
+#: app/controllers/CControllerPopupTriggerExpr.php:630
+#: app/controllers/CControllerPopupTriggerExpr.php:748
 msgid "Start"
 msgstr ""
 
@@ -16230,8 +16245,8 @@ msgstr "Thời gian bắt đầu khởi động của của máy chủ Zab
 msgid "State"
 msgstr "Tình trạng"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:158
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:230
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:151
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:223
 msgctxt "history source selection method"
 msgid "Static"
 msgstr "Tĩnh"
@@ -16411,7 +16426,7 @@ msgstr "Thẳng"
 msgid "Strict"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:470
+#: app/controllers/CControllerPopupTriggerExpr.php:490
 #: include/triggers.inc.php:1773
 msgid "String"
 msgstr ""
@@ -16674,7 +16689,7 @@ msgstr "Thẻ giá trị"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:79
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:79
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:369
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:67
 #: include/classes/widgets/forms/CWidgetFormWeb.php:61
 #: include/events.inc.php:263 include/forms.inc.php:89
@@ -16870,7 +16885,7 @@ msgstr ""
 #: app/views/js/popup.itemtestedit.view.js.php:573
 #: app/views/popup.itemtestedit.view.php:436
 #: app/views/popup.mediatypetest.edit.php:99
-#: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1452
+#: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
 #: include/views/configuration.host.discovery.edit.php:902
 #: include/views/configuration.host.discovery.edit.php:914
 #: include/views/configuration.item.edit.php:937
@@ -16885,7 +16900,7 @@ msgstr ""
 msgid "Test"
 msgstr "Kiểm tra"
 
-#: include/forms.inc.php:1482
+#: include/forms.inc.php:1487
 msgid "Test all steps"
 msgstr ""
 
@@ -17101,7 +17116,7 @@ msgstr "Năm này"
 msgid "This year so far"
 msgstr "Năm này cho đến nay"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:241
+#: app/controllers/CControllerPopupTriggerExpr.php:261
 msgid "Threshold"
 msgstr "Ngưỡng"
 
@@ -17122,8 +17137,8 @@ msgstr "Thứ năm"
 msgid "Till"
 msgstr "Cho tới"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:49
-#: app/controllers/CControllerPopupTriggerExpr.php:212
+#: app/controllers/CControllerPopupTriggerExpr.php:50
+#: app/controllers/CControllerPopupTriggerExpr.php:232
 #: app/views/hint.box.php:62 app/views/hint.box.php:68
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
@@ -17167,12 +17182,13 @@ msgstr ""
 msgid "Time period"
 msgstr "Chu kỳ thời gian"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:67
-#: app/controllers/CControllerPopupTriggerExpr.php:81
-#: app/controllers/CControllerPopupTriggerExpr.php:151
-#: app/controllers/CControllerPopupTriggerExpr.php:188
-#: app/controllers/CControllerPopupTriggerExpr.php:207
-#: app/controllers/CControllerPopupTriggerExpr.php:236
+#: app/controllers/CControllerPopupTriggerExpr.php:68
+#: app/controllers/CControllerPopupTriggerExpr.php:82
+#: app/controllers/CControllerPopupTriggerExpr.php:152
+#: app/controllers/CControllerPopupTriggerExpr.php:171
+#: app/controllers/CControllerPopupTriggerExpr.php:208
+#: app/controllers/CControllerPopupTriggerExpr.php:227
+#: app/controllers/CControllerPopupTriggerExpr.php:256
 #: include/classes/widgets/CWidgetHelper.php:769
 #: include/classes/widgets/CWidgetHelper.php:845
 #: include/classes/widgets/CWidgetHelper.php:1114
@@ -17209,7 +17225,7 @@ msgstr "Nhãn thời gian"
 #: app/partials/massupdate.valuemaps.tab.php:46
 #: app/partials/timeselector.filter.php:96
 #: app/views/popup.tabfilter.edit.php:49 include/classes/html/CFilter.php:290
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:98
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:91
 #: include/views/js/monitoring.sysmaps.js.php:748
 msgid "To"
 msgstr "To"
@@ -17328,7 +17344,7 @@ msgstr "Khuynh hướng chu kỳ lưu trữ dữ liệu"
 #: app/partials/configuration.filter.items.php:156
 #: app/partials/monitoring.latest.view.html.php:53
 #: app/views/administration.housekeeping.edit.php:138
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:50
 #: include/forms.inc.php:557 include/views/configuration.item.list.php:90
 #: include/views/configuration.item.prototype.list.php:63 items.php:262
 msgid "Trends"
@@ -17828,8 +17844,8 @@ msgid "Unexpected server error."
 msgstr ""
 
 #: app/views/popup.massupdate.item.php:165
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:228
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:149
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:221
 #: include/views/configuration.item.edit.php:661
 #: include/views/configuration.item.prototype.edit.php:640
 msgid "Units"
@@ -17872,7 +17888,7 @@ msgid "Unknown error"
 msgstr "Lỗi không rõ"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1210
+#: app/controllers/CControllerPopupTriggerExpr.php:1244
 #: include/triggers.inc.php:1323
 msgid "Unknown host item, no such item in selected host"
 msgstr "Host item không rõ, không có item trong host được lựa chọn"
@@ -18845,7 +18861,7 @@ msgstr "Giá trị: không có dữ liệu"
 msgid "Valuemap with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:597
+#: app/controllers/CControllerPopupTriggerExpr.php:617
 #: app/views/monitoring.charts.view.php:57
 #: include/views/monitoring.history.php:78
 msgid "Values"
@@ -19125,7 +19141,7 @@ msgstr "Thu thập dữ liệu"
 msgid "With dependencies"
 msgstr ""
 
-#: include/forms.inc.php:1362 include/views/js/item.preprocessing.js.php:215
+#: include/forms.inc.php:1367 include/views/js/item.preprocessing.js.php:215
 msgid "With header row"
 msgstr ""
 
@@ -19191,7 +19207,7 @@ msgstr ""
 msgid "X"
 msgstr "X"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:259
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
 msgid "X-Axis"
 msgstr "trục X"
 
@@ -19234,7 +19250,7 @@ msgstr ""
 msgid "XML to JSON"
 msgstr ""
 
-#: include/forms.inc.php:1283 include/views/js/item.preprocessing.js.php:141
+#: include/forms.inc.php:1288 include/views/js/item.preprocessing.js.php:141
 msgid "XPath"
 msgstr ""
 
@@ -19247,8 +19263,8 @@ msgstr "Y"
 msgid "Y axis MAX value"
 msgstr "Giá trị cực đại của trục Y"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:507
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:484
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:500
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
@@ -19653,11 +19669,11 @@ msgstr "một khoảng thời gian dự kiến"
 msgid "a time unit is expected"
 msgstr "một đơn vị thời gian dự kiến"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:282
+#: app/controllers/CControllerPopupTriggerExpr.php:302
 msgid "abs() - Absolute value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:288
+#: app/controllers/CControllerPopupTriggerExpr.php:308
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr ""
 
@@ -19794,11 +19810,11 @@ msgstr "as Red"
 msgid "ascending"
 msgstr "tăng dần"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:295
+#: app/controllers/CControllerPopupTriggerExpr.php:315
 msgid "ascii() - Returns the ASCII code of the leftmost character of the value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:302
+#: app/controllers/CControllerPopupTriggerExpr.php:322
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr ""
 
@@ -19812,11 +19828,11 @@ msgstr ""
 msgid "at least one override option must be specified"
 msgstr "ít nhất một tùy chọn ghi đè phải được chỉ định"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:309
+#: app/controllers/CControllerPopupTriggerExpr.php:329
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:316
+#: app/controllers/CControllerPopupTriggerExpr.php:336
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr ""
 
@@ -19838,39 +19854,39 @@ msgstr ""
 msgid "avg"
 msgstr "avg"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:329
+#: app/controllers/CControllerPopupTriggerExpr.php:349
 msgid "avg() - Average value of a period T"
 msgstr "avg () - Giá trị trung bình của một khoảng thời gian T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:336
+#: app/controllers/CControllerPopupTriggerExpr.php:356
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:354
+#: app/controllers/CControllerPopupTriggerExpr.php:374
 msgid "bitand() - Bitwise AND"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:367
+#: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "bitlength() - Returns the length in bits"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:374
+#: app/controllers/CControllerPopupTriggerExpr.php:394
 msgid "bitlshift() - Bitwise shift left"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:387
+#: app/controllers/CControllerPopupTriggerExpr.php:407
 msgid "bitnot() - Bitwise NOT"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:394
+#: app/controllers/CControllerPopupTriggerExpr.php:414
 msgid "bitor() - Bitwise OR"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:407
+#: app/controllers/CControllerPopupTriggerExpr.php:427
 msgid "bitrshift() - Bitwise shift right"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:420
+#: app/controllers/CControllerPopupTriggerExpr.php:440
 msgid "bitxor() - Bitwise exclusive OR"
 msgstr ""
 
@@ -19885,14 +19901,14 @@ msgstr "Nhấp nháy"
 msgid "both username and password should be either present or empty"
 msgstr "cả tên người dùng và mật khẩu đều phải có hoặc trống"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:433
+#: app/controllers/CControllerPopupTriggerExpr.php:453
 msgid "bytelength() - Returns the length in bytes"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:142
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:214
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:120
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:135
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:192
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:207
 msgid "calculated"
 msgstr "Tính toán"
 
@@ -20025,19 +20041,19 @@ msgstr "không thể thực hiện yêu cầu API, dữ liệu có thể bị c�
 msgid "cannot update property for templated discovery rule"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:440
+#: app/controllers/CControllerPopupTriggerExpr.php:460
 msgid "cbrt() - Cube root"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:447
+#: app/controllers/CControllerPopupTriggerExpr.php:467
 msgid "ceil() - Rounds up to the nearest greater integer"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:454
+#: app/controllers/CControllerPopupTriggerExpr.php:474
 msgid "change() - Difference between last and previous value"
 msgstr "thay đổi() - Sự khác biệt giữa giá trị cuối cùng và giá trị trước đó"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:460
+#: app/controllers/CControllerPopupTriggerExpr.php:480
 msgid "char() - Returns the character which represents the given ASCII code"
 msgstr ""
 
@@ -20064,7 +20080,7 @@ msgstr ""
 msgid "comma-separated list"
 msgstr "danh sách được phân tách bằng dấu phẩy"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:467
+#: app/controllers/CControllerPopupTriggerExpr.php:487
 msgid "concat() - Returns a string that is the result of concatenating value to string"
 msgstr ""
 
@@ -20078,15 +20094,15 @@ msgstr "cấu hình"
 msgid "contains"
 msgstr "bao gồm"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:480
+#: app/controllers/CControllerPopupTriggerExpr.php:500
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:487
+#: app/controllers/CControllerPopupTriggerExpr.php:507
 msgid "cosh() - The hyperbolic cosine of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:494
+#: app/controllers/CControllerPopupTriggerExpr.php:514
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
 msgstr ""
 
@@ -20094,11 +20110,11 @@ msgstr ""
 msgid "count"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:501
+#: app/controllers/CControllerPopupTriggerExpr.php:521
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr "Count () - Số lượng giá trị được truy xuất thành công V (đáp ứng toán tử O) cho giai đoạn T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:508
+#: app/controllers/CControllerPopupTriggerExpr.php:528
 msgid "countunique() - The number of unique values"
 msgstr ""
 
@@ -20111,15 +20127,15 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:515
+#: app/controllers/CControllerPopupTriggerExpr.php:535
 msgid "date() - Current date"
 msgstr "date() - ngày hiện tại"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:521
+#: app/controllers/CControllerPopupTriggerExpr.php:541
 msgid "dayofmonth() - Day of month"
 msgstr "dayofmonth() - Ngày của tháng"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:527
+#: app/controllers/CControllerPopupTriggerExpr.php:547
 msgid "dayofweek() - Day of week"
 msgstr "dayofweek () - Ngày trong tuần"
 
@@ -20138,7 +20154,7 @@ msgstr "Ngày"
 msgid "default"
 msgstr "Mặc định"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:533
+#: app/controllers/CControllerPopupTriggerExpr.php:553
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr ""
 
@@ -20213,7 +20229,7 @@ msgstr ""
 msgid "does not match"
 msgstr "Không khớp"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:540
+#: app/controllers/CControllerPopupTriggerExpr.php:560
 msgid "e() - Returns Euler's number"
 msgstr ""
 
@@ -20239,11 +20255,11 @@ msgstr "esc_step_from và esc_step_to phải được thiết lập cùng n
 msgid "exists"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:545
+#: app/controllers/CControllerPopupTriggerExpr.php:565
 msgid "exp() - Euler's number at a power of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:552
+#: app/controllers/CControllerPopupTriggerExpr.php:572
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr ""
 
@@ -20255,7 +20271,7 @@ msgstr "Biểu thức trống"
 msgid "failed to parse JSON"
 msgstr "thất bại trong việc phân tích JSON"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:559
+#: app/controllers/CControllerPopupTriggerExpr.php:579
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20269,15 +20285,15 @@ msgstr "đầu tiên"
 msgid "first parameter is expected"
 msgstr "tham số đầu tiên được mong đợi"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:566
+#: app/controllers/CControllerPopupTriggerExpr.php:586
 msgid "first() - The oldest value in the specified time interval"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:573
+#: app/controllers/CControllerPopupTriggerExpr.php:593
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:580
+#: app/controllers/CControllerPopupTriggerExpr.php:600
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr "dự báo () - Dự báo cho t giây tiếp theo dựa trên khoảng thời gian T"
 
@@ -20285,7 +20301,7 @@ msgstr "dự báo () - Dự báo cho t giây tiếp theo dựa trên khoảng th
 msgid "fourth"
 msgstr "Thứ tư"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:587
+#: app/controllers/CControllerPopupTriggerExpr.php:607
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr "fuzzytime () - Chênh lệch giữa giá trị item (dưới dạng dấu thời gian) và dấu thời gian của máy chủ Zabbix nhỏ hơn hoặc bằng T giây (1 - đúng, 0 - sai)"
 
@@ -20328,7 +20344,7 @@ msgstr "Nhóm host"
 
 #: include/classes/widgets/CWidgetHelper.php:628
 #: include/classes/widgets/CWidgetHelper.php:988
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:332
 msgid "host pattern"
 msgstr "Mẫu máy chủ"
 
@@ -20350,7 +20366,7 @@ msgstr "in"
 msgid "in range"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:594
+#: app/controllers/CControllerPopupTriggerExpr.php:614
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
 msgstr ""
 
@@ -20395,7 +20411,7 @@ msgstr "Cú pháp không chính xác khoảng \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:607
+#: app/controllers/CControllerPopupTriggerExpr.php:627
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr ""
 
@@ -20517,7 +20533,7 @@ msgstr "item mẫu"
 msgid "key is empty"
 msgstr "Không có key"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:630
+#: app/controllers/CControllerPopupTriggerExpr.php:650
 msgid "kurtosis() - Measures the \"tailedness\" of the probability distribution"
 msgstr ""
 
@@ -20533,7 +20549,7 @@ msgctxt "week of month"
 msgid "last"
 msgstr "Cuối cùng"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:637
+#: app/controllers/CControllerPopupTriggerExpr.php:657
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Giá trị T cuối cùng (gần đây nhất)"
 
@@ -20541,35 +20557,35 @@ msgstr "last() - Giá trị T cuối cùng (gần đây nhất)"
 msgid "left"
 msgstr "bên trái"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:644
+#: app/controllers/CControllerPopupTriggerExpr.php:664
 msgid "left() - Returns the leftmost count characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:657
+#: app/controllers/CControllerPopupTriggerExpr.php:677
 msgid "length() - Length of last (most recent) T value in characters"
 msgstr ""
 
-#: include/forms.inc.php:1277 include/views/js/item.preprocessing.js.php:134
+#: include/forms.inc.php:1282 include/views/js/item.preprocessing.js.php:134
 msgid "list of characters"
 msgstr "Danh sách kí tự"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:663
+#: app/controllers/CControllerPopupTriggerExpr.php:683
 msgid "log() - Natural logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:670
+#: app/controllers/CControllerPopupTriggerExpr.php:690
 msgid "log10() - Decimal logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:677
+#: app/controllers/CControllerPopupTriggerExpr.php:697
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:684
+#: app/controllers/CControllerPopupTriggerExpr.php:704
 msgid "logseverity() - Log severity of the last log entry for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:711
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20577,7 +20593,7 @@ msgstr ""
 msgid "low-level discovery rule"
 msgstr "Quy tắc phát hiện low-level"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:698
+#: app/controllers/CControllerPopupTriggerExpr.php:718
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
@@ -20609,7 +20625,7 @@ msgstr "macro trống"
 msgid "macro(s)"
 msgstr "macro(s)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:711
+#: app/controllers/CControllerPopupTriggerExpr.php:731
 msgid "mad() - Median absolute deviation"
 msgstr ""
 
@@ -20635,7 +20651,7 @@ msgstr "Khớp với"
 #: include/classes/api/services/CItemGeneral.php:1399
 #: include/classes/graphdraw/CLineGraphDraw.php:1380
 #: include/classes/graphdraw/CLineGraphDraw.php:1394
-#: include/classes/graphdraw/CPieGraphDraw.php:292 include/forms.inc.php:1302
+#: include/classes/graphdraw/CPieGraphDraw.php:292 include/forms.inc.php:1307
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:68
 #: include/views/js/configuration.graph.edit.js.php:139
@@ -20649,7 +20665,7 @@ msgstr "max"
 msgid "max period is less than time filter default period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:718
+#: app/controllers/CControllerPopupTriggerExpr.php:738
 msgid "max() - Maximum value for period T"
 msgstr "max() - Giá trị tối đa cho giai đoạn T"
 
@@ -20663,14 +20679,14 @@ msgstr "số lượng phụ thuộc tối đa đạt đến"
 msgid "maximum number of dependency levels reached"
 msgstr "số lượng mức độ phụ thuộc tối đa đạt được"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:725
+#: app/controllers/CControllerPopupTriggerExpr.php:745
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #: include/classes/graphdraw/CLineGraphDraw.php:1378
 #: include/classes/graphdraw/CLineGraphDraw.php:1391
-#: include/classes/graphdraw/CPieGraphDraw.php:288 include/forms.inc.php:1301
+#: include/classes/graphdraw/CPieGraphDraw.php:288 include/forms.inc.php:1306
 #: include/graphs.inc.php:76
 #: include/views/js/configuration.graph.edit.js.php:66
 #: include/views/js/configuration.graph.edit.js.php:137
@@ -20680,7 +20696,7 @@ msgstr ""
 msgid "min"
 msgstr "min"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:743
+#: app/controllers/CControllerPopupTriggerExpr.php:763
 msgid "min() - Minimum value for period T"
 msgstr "min () - Giá trị tối thiểu cho giai đoạn T"
 
@@ -20695,8 +20711,16 @@ msgstr "độ dài tối thiểu là ký tự %1$s"
 msgid "mm"
 msgstr "mm"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:750
+#: app/controllers/CControllerPopupTriggerExpr.php:770
 msgid "mod() - Division remainder"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:783
+msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:790
+msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr ""
 
 #: include/func.inc.php:583
@@ -20816,7 +20840,7 @@ msgstr ""
 msgid "no permissions to unacknowledge problems"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:763
+#: app/controllers/CControllerPopupTriggerExpr.php:797
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr ""
 
@@ -20837,11 +20861,11 @@ msgstr "not in"
 msgid "not selected"
 msgstr "Không được chọn"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:770
+#: app/controllers/CControllerPopupTriggerExpr.php:804
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now () - Số giây kể từ Epoch"
 
-#: include/forms.inc.php:1269 include/views/js/item.preprocessing.js.php:126
+#: include/forms.inc.php:1274 include/views/js/item.preprocessing.js.php:126
 msgid "number"
 msgstr "số"
 
@@ -20905,7 +20929,7 @@ msgstr ""
 msgid "other"
 msgstr "Khác"
 
-#: include/forms.inc.php:1295 include/views/js/item.preprocessing.js.php:156
+#: include/forms.inc.php:1300 include/views/js/item.preprocessing.js.php:156
 msgid "output"
 msgstr "đầu ra"
 
@@ -20918,33 +20942,33 @@ msgid "path/to/secret:key"
 msgstr ""
 
 #: app/views/popup.httpstep.php:173 app/views/popup.lldoperation.php:76
-#: include/forms.inc.php:1294 include/forms.inc.php:1308
+#: include/forms.inc.php:1299 include/forms.inc.php:1313
 #: include/views/js/item.preprocessing.js.php:155
 #: include/views/js/item.preprocessing.js.php:170
 msgid "pattern"
 msgstr "Mẫu"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:776
+#: app/controllers/CControllerPopupTriggerExpr.php:810
 msgid "percentile() - Percentile P of a period T"
 msgstr "Percile () - Phần trăm P của giai đoạn T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:783
+#: app/controllers/CControllerPopupTriggerExpr.php:817
 msgid "pi() - Returns the Pi constant"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:788
+#: app/controllers/CControllerPopupTriggerExpr.php:822
 msgid "power() - The power of a base value to a power value"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:357
 msgid "problem pattern"
 msgstr "Mẫu vấn đề"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:801
+#: app/controllers/CControllerPopupTriggerExpr.php:835
 msgid "radians() - Converts a value from degrees to radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:808
+#: app/controllers/CControllerPopupTriggerExpr.php:842
 msgid "rand() - A random integer value"
 msgstr ""
 
@@ -20972,15 +20996,15 @@ msgstr ""
 msgid "regular expression"
 msgstr "biểu thức chính quy"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:813
+#: app/controllers/CControllerPopupTriggerExpr.php:847
 msgid "repeat() - Returns a string composed of value repeated count times"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:826
+#: app/controllers/CControllerPopupTriggerExpr.php:860
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
 msgstr ""
 
-#: include/forms.inc.php:1371 include/views/js/item.preprocessing.js.php:224
+#: include/forms.inc.php:1376 include/views/js/item.preprocessing.js.php:224
 msgid "replacement"
 msgstr ""
 
@@ -20988,15 +21012,15 @@ msgstr ""
 msgid "right"
 msgstr "Bên phải "
 
-#: app/controllers/CControllerPopupTriggerExpr.php:844
+#: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "right() - Returns the rightmost count characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:857
+#: app/controllers/CControllerPopupTriggerExpr.php:891
 msgid "round() - Rounds a value to decimal places"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:870
+#: app/controllers/CControllerPopupTriggerExpr.php:904
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr ""
 
@@ -21006,7 +21030,7 @@ msgid "s"
 msgstr "s"
 
 #: app/views/administration.mediatype.edit.php:221
-#: app/views/administration.script.edit.php:189 include/forms.inc.php:1320
+#: app/views/administration.script.edit.php:189 include/forms.inc.php:1325
 #: include/views/configuration.host.discovery.edit.php:232
 #: include/views/configuration.item.edit.php:268
 #: include/views/configuration.item.prototype.edit.php:249
@@ -21014,7 +21038,7 @@ msgstr "s"
 msgid "script"
 msgstr ""
 
-#: include/forms.inc.php:1370 include/views/js/item.preprocessing.js.php:223
+#: include/forms.inc.php:1375 include/views/js/item.preprocessing.js.php:223
 msgid "search string"
 msgstr ""
 
@@ -21028,7 +21052,7 @@ msgstr "giây"
 msgid "second parameter is expected"
 msgstr "tham số thứ hai được kì vọng"
 
-#: include/forms.inc.php:1313 include/views/js/item.preprocessing.js.php:176
+#: include/forms.inc.php:1318 include/views/js/item.preprocessing.js.php:176
 msgid "seconds"
 msgstr ""
 
@@ -21085,31 +21109,31 @@ msgstr "Thiết lập biểu tượng bản đồ hiển thị"
 msgid "sign in as guest"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:883
+#: app/controllers/CControllerPopupTriggerExpr.php:917
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:890
+#: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:897
+#: app/controllers/CControllerPopupTriggerExpr.php:931
 msgid "sinh() - The hyperbolic sine of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:904
+#: app/controllers/CControllerPopupTriggerExpr.php:938
 msgid "skewness() - Measures the asymmetry of the probability distribution"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:911
+#: app/controllers/CControllerPopupTriggerExpr.php:945
 msgid "sqrt() - Square root of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:918
+#: app/controllers/CControllerPopupTriggerExpr.php:952
 msgid "stddevpop() - Population standard deviation"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:925
+#: app/controllers/CControllerPopupTriggerExpr.php:959
 msgid "stddevsamp() - Sample standard deviation"
 msgstr ""
 
@@ -21117,11 +21141,11 @@ msgstr ""
 msgid "sum"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:932
+#: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "sum() - Sum of values of a period T"
 msgstr "tổng() - Tổng giá trị của một khoảng thời gian T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:939
+#: app/controllers/CControllerPopupTriggerExpr.php:973
 msgid "sumofsquares() - The sum of squares"
 msgstr ""
 
@@ -21140,14 +21164,14 @@ msgstr "thông tin được cung cấp không phải là duy nhất"
 #: include/classes/helpers/CTagFilterFieldHelper.php:63
 #: include/classes/helpers/CTagFilterFieldHelper.php:117
 #: include/classes/widgets/CWidgetHelper.php:506
-#: include/classes/widgets/CWidgetHelper.php:550 include/forms.inc.php:1996
+#: include/classes/widgets/CWidgetHelper.php:550 include/forms.inc.php:2001
 #: include/views/configuration.maintenance.edit.php:174
 #: include/views/js/configuration.maintenance.edit.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:60
 msgid "tag"
 msgstr "thẻ"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:946
+#: app/controllers/CControllerPopupTriggerExpr.php:980
 msgid "tan() - The tangent of a value"
 msgstr ""
 
@@ -21221,31 +21245,31 @@ msgstr ""
 msgid "time shift"
 msgstr "thay đổi thời gian"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:953
+#: app/controllers/CControllerPopupTriggerExpr.php:987
 msgid "time() - Current time"
 msgstr "time() - thời gian hiện tại"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:959
+#: app/controllers/CControllerPopupTriggerExpr.php:993
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr "timeleft () - Thời gian để đạt ngưỡng ước tính dựa trên khoảng thời gian T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:966
+#: app/controllers/CControllerPopupTriggerExpr.php:1000
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:973
+#: app/controllers/CControllerPopupTriggerExpr.php:1007
 msgid "trendcount() - Number of successfully retrieved values for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:980
+#: app/controllers/CControllerPopupTriggerExpr.php:1014
 msgid "trendmax() - Maximum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:987
+#: app/controllers/CControllerPopupTriggerExpr.php:1021
 msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:994
+#: app/controllers/CControllerPopupTriggerExpr.php:1028
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
@@ -21271,11 +21295,11 @@ msgstr "mẫu trigger không thể được chuyển sang mẫu hoặc máy ch�
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "trigger với các liên kết không thể được chuyển đến một mẫu hoặc máy chủ khác"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1001
+#: app/controllers/CControllerPopupTriggerExpr.php:1035
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1014
+#: app/controllers/CControllerPopupTriggerExpr.php:1048
 msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
@@ -21408,9 +21432,9 @@ msgstr "Số phiên bản không được hỗ trợ"
 #: include/classes/html/CMacroValue.php:148
 #: include/classes/widgets/CWidgetHelper.php:512
 #: include/classes/widgets/CWidgetHelper.php:566
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
-#: include/forms.inc.php:2001
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:166
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:238
+#: include/forms.inc.php:2006
 #: include/views/configuration.host.discovery.edit.php:186
 #: include/views/configuration.host.discovery.edit.php:324
 #: include/views/configuration.item.edit.php:222
@@ -21547,11 +21571,11 @@ msgstr ""
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1027
+#: app/controllers/CControllerPopupTriggerExpr.php:1061
 msgid "varpop() - Population variance"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1034
+#: app/controllers/CControllerPopupTriggerExpr.php:1068
 msgid "varsamp() - Sample variance"
 msgstr ""
 

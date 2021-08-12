@@ -222,7 +222,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 	DB_ROW			row;
 	DB_ROW			row2;
 	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid, druleid;
-	char			*host, *host_esc, *host_unique, *host_visible, *host_visible_unique, *hostname = NULL;
+	char			*host, *host_esc, *host_unique, *host_visible, *hostname = NULL;
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
 	unsigned char		svc_type, interface_type;
@@ -431,8 +431,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				zbx_free(sql);
 
 				make_hostname(host_visible);	/* replace not-allowed symbols */
-				host_visible_unique = DBget_unique_hostname_by_sample(host_visible, "name");
-				hostname = zbx_strdup(hostname, host_visible_unique);
+				hostname = DBget_unique_hostname_by_sample(host_visible, "name");
 				zbx_free(host_visible);
 
 				*status = HOST_STATUS_MONITORED;
@@ -442,11 +441,11 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host", "name",
 						NULL);
 				zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, host_unique,
-						host_visible_unique);
+						hostname);
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, host_visible_unique);
+				zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
 				zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
 						host_unique);
 
@@ -457,7 +456,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 						ZBX_CONN_DEFAULT);
 
 				zbx_free(host_unique);
-				zbx_free(host_visible_unique);
 
 				add_discovered_host_groups(hostid, &groupids);
 			}
@@ -720,10 +718,12 @@ void	op_host_del(const DB_EVENT *event)
 	zbx_vector_uint64_append(&hostids, hostid);
 	zbx_vector_str_create(&hostnames);
 	zbx_vector_str_append(&hostnames, hostname);
+
 	DBdelete_hosts_with_prototypes(&hostids, &hostnames);
-	zbx_vector_uint64_destroy(&hostids);
+
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
+	zbx_vector_uint64_destroy(&hostids);
 
 	zbx_audit_host_del(hostid, hostname);
 out:
@@ -1002,7 +1002,7 @@ void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids
 	if (0 == (hostid = select_discovered_host(event, &hostname)))
 		goto out;
 
-	if (SUCCEED != DBdelete_template_elements(hostid, del_templateids, &error))
+	if (SUCCEED != DBdelete_template_elements(hostid, hostname, del_templateids, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot unlink template: %s", error);
 		zbx_free(error);
