@@ -52,6 +52,7 @@ $fields = [
 	// ajax
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'name' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action}) && {action} == "expand"'],
 	'source' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action}) && {action} == "expand"']
 ];
 check_fields($fields);
@@ -155,8 +156,9 @@ if (isset($_REQUEST['favobj'])) {
 			exit();
 		}
 		elseif (getRequest('action') === 'expand') {
-			$values = [];
+			$values = ['selements' => [], 'links' => [], 'shapes' => []];
 			$return = [];
+			$name = getRequest('name');
 			$sources = json_decode(getRequest('source'), true);
 
 			foreach ($sources as $num => $source) {
@@ -167,25 +169,33 @@ if (isset($_REQUEST['favobj'])) {
 
 					if (array_key_exists('elementtype', $source) && array_key_exists('elements', $source)
 							&& is_array($source['elements']) && CMapHelper::checkSelementPermissions([$source])) {
-						$values[$num] = $source;
+						$element_type = 'selements';
 					}
 					else {
-						$label = array_key_exists('label', $source) ? $source['label'] : $source['text'];
-						$return[$num] = CMacrosResolverHelper::resolveMapLabelMacros($label);
+						$element_type = array_key_exists('label', $source) ? 'links' : 'shapes';
 					}
+
+					$values[$element_type][$num] = $source;
 				}
 				else {
 					$return[$num] = null;
 				}
 			}
 
-			if ($values) {
-				// Resolve macros in map element labels.
-				$values = CMacrosResolverHelper::resolveMacrosInMapElements($values, ['resolve_element_label' => true]);
+			$values['links'] = CMacrosResolverHelper::resolveMapLinkLabelMacros($values['links'], ['label' => 'label']);
+			$values['shapes'] = CMacrosResolverHelper::resolveMapShapeLabelMacros($name, $values['shapes'],
+				['text' => 'label']
+			);
 
-				foreach ($values as $num => $value) {
-					$return[$num] = $value['label'];
-				}
+			if ($values['selements']) {
+				// Resolve macros in map element labels.
+				$values['selements'] = CMacrosResolverHelper::resolveMacrosInMapElements($values['selements'],
+					['resolve_element_label' => true]
+				);
+			}
+
+			foreach ($values['selements'] + $values['links'] + $values['shapes'] as $num => $value) {
+				$return[$num] = $value['label'];
 			}
 
 			ksort($return);
@@ -233,10 +243,10 @@ if (isset($_REQUEST['sysmapid'])) {
 /*
  * Display
  */
+$sysmap['links'] = CMacrosResolverHelper::resolveMapLinkLabelMacros($sysmap['links'], ['label' => 'expanded']);
 $sysmap['shapes'] = CMacrosResolverHelper::resolveMapShapeLabelMacros($sysmap['name'], $sysmap['shapes'],
 	['text' => 'expanded']
 );
-$sysmap['links'] = CMacrosResolverHelper::resolveMapLinkLabelMacros($sysmap['links'], ['label' => 'expanded']);
 
 $data = [
 	'sysmap' => $sysmap,
