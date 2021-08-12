@@ -1530,13 +1530,13 @@ out:
  *  Return value: The service status.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	service_get_main_status(const zbx_service_t *service)
+int	service_get_main_status(const zbx_service_t *service)
 {
 	int	status = ZBX_SERVICE_STATUS_OK, child_status, i;
 
 	switch (service->algorithm)
 	{
-		case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE:
+		case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL:
 			for (i = 0; i < service->children.values_num; i++)
 			{
 				zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
@@ -1554,7 +1554,7 @@ static int	service_get_main_status(const zbx_service_t *service)
 					status = child->status;
 			}
 			break;
-		case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL:
+		case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE:
 			for (i = 0; i < service->children.values_num; i++)
 			{
 				zbx_service_t	*child = (zbx_service_t *)service->children.values[i];

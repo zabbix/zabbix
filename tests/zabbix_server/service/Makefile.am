@@ -1,7 +1,8 @@
 if SERVER
 SERVER_tests = \
 	service_get_rootcause_eventids \
-	service_get_status
+	service_get_status \
+	service_get_main_status
 
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -75,5 +76,18 @@ service_get_status_LDADD += @SERVER_LIBS@
 service_get_status_LDFLAGS = @SERVER_LDFLAGS@
 
 service_get_status_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/zabbix_server/service
+
+# service_get_main_status
+
+service_get_main_status_SOURCES = \
+	service_get_main_status.c \
+	mock_service.c \
+	mock_service.h
+
+service_get_main_status_LDADD = $(COMMON_LIBS)
+service_get_main_status_LDADD += @SERVER_LIBS@
+service_get_main_status_LDFLAGS = @SERVER_LDFLAGS@
+
+service_get_main_status_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/zabbix_server/service
 
 endif

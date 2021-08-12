@@ -267,25 +267,6 @@ void	mock_init_service_cache(const char *path)
 
 		zbx_vector_ptr_sort(&service->children, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 		zbx_vector_ptr_uniq(&service->children, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-
-		{
-			int	i;
-
-			printf("\n[%s]\n", service->name);
-			printf("  algo:%d status:%d weight:%d\n", service->algorithm, service->status, service->weight);
-			printf("  propagation: rule:%d value:%d\n", service->propagation_rule, service->propagation_value);
-
-			printf("  status calculation rules:\n");
-			for (i = 0; i < service->status_rules.values_num; i++)
-			{
-				zbx_service_rule_t	*r = service->status_rules.values[i];
-
-				printf("    type:%d limit:%d value:%d status:%d\n", r->type, r->limit_status,
-						r->limit_value, r->new_status);
-			}
-
-		}
-
 	}
 }
 
