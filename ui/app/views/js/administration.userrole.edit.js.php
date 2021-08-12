@@ -31,97 +31,99 @@
 
 		disableUiCheckbox() {
 			const usertype = document.querySelector('.js-userrole-usertype');
-			if (!usertype || this.readonly) {
+
+			if (usertype === null || this.readonly) {
 				return  false;
 			}
 
-			const access = {
-				'<?= CRoleHelper::UI_MONITORING_DASHBOARD; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_MONITORING_PROBLEMS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_MONITORING_HOSTS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_MONITORING_OVERVIEW; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_MONITORING_LATEST_DATA; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_MONITORING_MAPS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_MONITORING_DISCOVERY; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_MONITORING_SERVICES; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_INVENTORY_OVERVIEW; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_INVENTORY_HOSTS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_REPORTS_SYSTEM_INFO; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_REPORTS_TOP_TRIGGERS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::UI_REPORTS_AUDIT; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_REPORTS_ACTION_LOG; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_REPORTS_NOTIFICATIONS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_CONFIGURATION_HOST_GROUPS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_CONFIGURATION_TEMPLATES; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_CONFIGURATION_HOSTS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_CONFIGURATION_MAINTENANCE; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_CONFIGURATION_ACTIONS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_CONFIGURATION_DISCOVERY; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_ADMINISTRATION_GENERAL; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_ADMINISTRATION_PROXIES; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_ADMINISTRATION_USER_GROUPS; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_ADMINISTRATION_USER_ROLES; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_ADMINISTRATION_USERS; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_ADMINISTRATION_SCRIPTS; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::UI_ADMINISTRATION_QUEUE; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
-				'<?= CRoleHelper::ACTIONS_EDIT_DASHBOARDS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::ACTIONS_EDIT_MAPS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::ACTIONS_EDIT_MAINTENANCE; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::ACTIONS_CLOSE_PROBLEMS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::ACTIONS_CHANGE_SEVERITY; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::ACTIONS_EXECUTE_SCRIPTS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::ACTIONS_MANAGE_API_TOKENS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
-				'<?= CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::ACTIONS_MANAGE_SERVICES; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>
-			};
+			const access = <?= json_encode([
+				CRoleHelper::UI_MONITORING_DASHBOARD => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_MONITORING_PROBLEMS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_MONITORING_HOSTS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_MONITORING_OVERVIEW => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_MONITORING_LATEST_DATA => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_MONITORING_MAPS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_MONITORING_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_MONITORING_SERVICES => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_INVENTORY_OVERVIEW => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_INVENTORY_HOSTS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_REPORTS_SYSTEM_INFO => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_REPORTS_TOP_TRIGGERS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_REPORTS_AUDIT => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_REPORTS_ACTION_LOG => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_REPORTS_NOTIFICATIONS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_HOST_GROUPS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_TEMPLATES => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_HOSTS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_MAINTENANCE => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_CONFIGURATION_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_GENERAL => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_PROXIES => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_USER_GROUPS => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_USER_ROLES => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_USERS => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_SCRIPTS => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::UI_ADMINISTRATION_QUEUE => USER_TYPE_SUPER_ADMIN,
+				CRoleHelper::ACTIONS_EDIT_DASHBOARDS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::ACTIONS_EDIT_MAPS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::ACTIONS_EDIT_MAINTENANCE => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::ACTIONS_CLOSE_PROBLEMS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::ACTIONS_CHANGE_SEVERITY => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::ACTIONS_MANAGE_API_TOKENS => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::ACTIONS_MANAGE_SERVICES => USER_TYPE_ZABBIX_ADMIN
+			], JSON_FORCE_OBJECT) ?>;
 
-			Object.keys(access).forEach((selector) => {
-				const checkbox = document.querySelector(`[id='${selector}']`);
-				const checkbox_state = checkbox.readOnly;
+			for (const [key, value] of Object.entries(access)) {
+				const checkbox = document.getElementById(key);
 
-				if (usertype.value < access[selector]) {
+				if (usertype.value < value) {
 					checkbox.readOnly = true;
 					checkbox.checked = false;
 				}
 				else {
-					checkbox.readOnly = false;
-					if (checkbox_state) {
+					if (checkbox.readOnly) {
 						checkbox.checked = true;
 					}
+					checkbox.readOnly = false;
 				}
-			});
+			}
 		}
 
 		disableApiSection() {
-			const checkbox_state = document.querySelector('.js-userrole-apiaccess').checked;
 			if (this.readonly) {
 				return false;
 			}
 
-			[...document.querySelectorAll('.js-userrole-apimode input')].map((elem) => {
-				elem.disabled = !checkbox_state;
+			const checkbox_state = document.querySelector('.js-userrole-apiaccess').checked;
+
+			document.querySelectorAll('.js-userrole-apimode input').forEach((element) => {
+				element.disabled = !checkbox_state;
 			});
 
-			$('#api_methods_').multiSelect(!checkbox_state ? 'disable' : 'enable');
+			$('#api_methods_').multiSelect(checkbox_state ? 'enable' : 'disable');
 		}
 	}
 
 	document.addEventListener('DOMContentLoaded', () => {
-		const clone_btn = document.getElementById('clone');
-		const ui_manager = new UserRoleUiManager(<?= $this->data['readonly'] ? 'true' : 'false'; ?>);
-		const type_elem = document.querySelector('.js-userrole-usertype');
+		const ui_manager = new UserRoleUiManager(<?= $this->data['readonly'] ? 'true' : 'false' ?>);
 
-		if (clone_btn !== null) {
-			clone_btn.addEventListener('click', () => {
+		const clone_button = document.getElementById('clone');
+		const type_element = document.querySelector('.js-userrole-usertype');
+
+		if (clone_button !== null) {
+			clone_button.addEventListener('click', () => {
 				if (ui_manager.readonly) {
-					var url = new Curl('zabbix.php?action=userrole.edit');
+					const url = new Curl('zabbix.php?action=userrole.edit');
 
 					document
 						.querySelectorAll('#name, #type')
@@ -134,37 +136,37 @@
 
 				document
 					.querySelectorAll('#roleid, #delete, #clone')
-					.forEach((element) => { element.remove(); });
+					.forEach((element) => {
+						element.remove();
+					});
 
-				const update_btn = document.querySelector('#update');
+				const update_btn = document.getElementById('update');
 				update_btn.innerHTML = <?= json_encode(_('Add')) ?>;
-				update_btn.setAttribute('value', 'userrole.create');
 				update_btn.setAttribute('id', 'add');
+				update_btn.setAttribute('value', 'userrole.create');
 
-				document.querySelector('#name').focus();
+				document.getElementById('name').focus();
 			});
 		}
 
-		if (!type_elem) {
+		if (type_element === null) {
 			return false;
 		}
 
-		type_elem.addEventListener('change', () => {
+		type_element.addEventListener('change', () => {
 			ui_manager.disableUiCheckbox();
 
-			let user_type = type_elem.options[type_elem.selectedIndex].value,
-				$api_methods = $('#api_methods_'),
-				url = $api_methods.multiSelect('getOption', 'url'),
-				popup = $api_methods.multiSelect('getOption', 'popup'),
-				pathname,
-				search;
+			const user_type = type_element.options[type_element.selectedIndex].value;
+			const $api_methods = $('#api_methods_');
+			const url = $api_methods.multiSelect('getOption', 'url');
+			const popup = $api_methods.multiSelect('getOption', 'popup');
 
-			[pathname, search] = url.split('?', 2);
+			const [pathname, search] = url.split('?', 2);
 
-			let params = new URLSearchParams(search);
+			const params = new URLSearchParams(search);
 			params.set('user_type', user_type);
 
-			popup.parameters.user_type = user_type
+			popup.parameters.user_type = user_type;
 
 			$api_methods.multiSelect('modify', {
 				url: pathname + '?' + params.toString(),
@@ -176,6 +178,12 @@
 			.querySelector('.js-userrole-apiaccess')
 			.addEventListener('change', () => {
 				ui_manager.disableApiSection();
+			});
+
+		document
+			.querySelector('.service-r-access')
+			.addEventListener('change', () => {
+				document.querySelector('.js-r-access-services-ms').style.display = '';
 			});
 
 		ui_manager.disableUiCheckbox();

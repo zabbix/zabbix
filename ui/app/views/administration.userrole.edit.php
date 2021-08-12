@@ -78,8 +78,9 @@ else {
 }
 
 $form_grid->addItem(
-	(new CFormField((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header')))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+	new CFormField(
+		(new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header')
+	)
 );
 
 foreach ($data['labels']['sections'] as $section_key => $section_label) {
@@ -111,8 +112,9 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 
 if (!$data['readonly']) {
 	$form_grid->addItem(
-		(new CFormField((new CLabel(_('At least one UI element must be checked.')))->setAsteriskMark()))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+		new CFormField(
+			(new CLabel(_('At least one UI element must be checked.')))->setAsteriskMark()
+		)
 	);
 }
 
@@ -127,9 +129,113 @@ $form_grid->addItem([
 	)
 ]);
 
+$form_grid
+	->addItem(
+		new CFormField(
+			(new CTag('h4', true, _('Access to services')))->addClass('input-section-header')
+		)
+	)
+	->addItem([
+		new CLabel(_('Read-write access to services'), 'service-rw-access'),
+		new CFormField(
+			(new CRadioButtonList('service_rw_access', (int) $data['rules']['service_rw_access']))
+				->setId('service-rw-access')
+				->addClass('js-service-rw-access')
+				->addValue(_('None'), 0)
+				->addValue(_('All'), 1)
+				->addValue(_('Services list'), 2)
+				->setModern(true)
+				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
+		)
+	])
+	->addItem(
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'rw_access_services[]',
+				'object_name' => 'services',
+				'data' => $data['rules'][CRoleHelper::SECTION_API],
+				'disabled' => $data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'services',
+						'srcfld1' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => zbx_formatDomId('services'.'[]'),
+						'user_type' => $data['type'],
+						'disable_selected' => true
+					]
+				]
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addClass('js-rw-access-services-ms')
+		)
+	)
+	->addItem([
+		new CLabel(_('Read-write access to services with tag'), 'service-rw-tag-name'),
+		new CFormField(
+			new CHorList([
+				(new CTextBox('service_rw_tag_name'))
+					->setId('service-rw-tag-name')
+					->setAttribute('placeholder', _('tag'))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+				(new CTextBox('service_rw_tag_value'))
+					->setAttribute('placeholder', _('value'))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			]))
+	])
+	->addItem([
+		new CLabel(_('Read-write access to services'), 'service-r-access'),
+		new CFormField(
+			(new CRadioButtonList('service_r_access', (int) $data['rules']['service_r_access']))
+				->setId('service-r-access')
+				->addClass('js-service-r-access')
+				->addValue(_('None'), 0)
+				->addValue(_('All'), 1)
+				->addValue(_('Services list'), 2)
+				->setModern(true)
+				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
+		)
+	])
+	->addItem(
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'r_access_services[]',
+				'object_name' => 'services',
+				'data' => $data['rules'][CRoleHelper::SECTION_API],
+				'disabled' => $data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'services',
+						'srcfld1' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => zbx_formatDomId('services'.'[]'),
+						'user_type' => $data['type'],
+						'disable_selected' => true
+					]
+				]
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addClass('js-r-access-services-ms')
+		)
+	)
+	->addItem([
+		new CLabel(_('Read-only access to services with tag'), 'service-r-tag-name'),
+		new CFormField(
+			new CHorList([
+				(new CTextBox('service_r_tag_name'))
+					->setId('service-r-tag-name')
+					->setAttribute('placeholder', _('tag'))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+				(new CTextBox('service_r_tag_value'))
+					->setAttribute('placeholder', _('value'))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			]))
+	]);
+
 $form_grid->addItem(
-	(new CFormField((new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+	new CFormField(
+		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
+	)
 );
 
 $modules = [];
@@ -147,20 +253,20 @@ foreach ($data['labels']['modules'] as $moduleid => $label) {
 
 if ($modules) {
 	$form_grid->addItem([
-		(new CFormField(
+		new CFormField(
 			(new CDiv(
 				(new CDiv($modules))
 					->addClass(ZBX_STYLE_COLUMNS)
 					->addClass(ZBX_STYLE_COLUMNS_3)
 			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+		)
 	]);
 }
 else {
 	$form_grid->addItem(
-		(new CFormField((new CLabel(_('No enabled modules found.')))))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+		new CFormField(
+			new CLabel(_('No enabled modules found.'))
+		)
 	);
 }
 
@@ -176,8 +282,9 @@ $form_grid
 		)
 	])
 	->addItem(
-		(new CFormField((new CTag('h4', true, _('Access to API')))->addClass('input-section-header')))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+		new CFormField(
+			(new CTag('h4', true, _('Access to API')))->addClass('input-section-header')
+		)
 	)
 	->addItem([
 		new CLabel(_('Enabled'), $data['readonly'] ? '' : 'api.access'),
@@ -201,35 +308,33 @@ $form_grid
 				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
 				->addClass('js-userrole-apimode')
 		)
-	]);
-
-$form_grid->addItem(
-	(new CFormField(
-		(new CMultiSelect([
-			'name' => 'api_methods[]',
-			'object_name' => 'api_methods',
-			'data' => $data['rules'][CRoleHelper::SECTION_API],
-			'disabled' => (bool) $data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'api_methods',
-					'srcfld1' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => zbx_formatDomId('api_methods'.'[]'),
-					'user_type' => $data['type'],
-					'disable_selected' => true
+	])
+	->addItem(
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'api_methods[]',
+				'object_name' => 'api_methods',
+				'data' => $data['rules'][CRoleHelper::SECTION_API],
+				'disabled' => $data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'api_methods',
+						'srcfld1' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => zbx_formatDomId('api_methods'.'[]'),
+						'user_type' => $data['type'],
+						'disable_selected' => true
+					]
 				]
-			]
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->addClass('js-userrole-ms')
-	))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
-);
-
-$form_grid->addItem(
-	(new CFormField((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addClass('js-userrole-ms')
+		)
+	)
+	->addItem(
+		new CFormField(
+			(new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')
+		)
 );
 
 $actions = [];
@@ -248,8 +353,7 @@ foreach ($data['labels']['actions'] as $action => $label) {
 }
 
 $form_grid->addItem(
-	(new CFormField($actions))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+	new CFormField($actions)
 );
 
 $form_grid->addItem([
@@ -287,15 +391,14 @@ if ($data['roleid'] != 0) {
 }
 
 $form_grid->addItem(
-	(new CFormActions(
+	new CFormActions(
 		($data['roleid'] != 0)
 			? (new CSubmitButton(_('Update'), 'action', 'userrole.update'))
 				->setId('update')
 				->setEnabled(!$data['readonly'])
 			: (new CSubmitButton(_('Add'), 'action', 'userrole.create'))->setId('add'),
 		$buttons
-	))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+	)
 );
 
 $tabs = (new CTabView())->addTab('user_role_tab', _('User role'), $form_grid);
