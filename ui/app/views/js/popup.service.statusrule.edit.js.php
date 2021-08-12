@@ -34,15 +34,15 @@ window.service_status_rule_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		const type_selector = document.getElementById('service_status_rule_type');
+		const type_selector = document.getElementById('service-status-rule-type');
 
 		type_selector.addEventListener('change', (e) => this.typeChange(e.target.value));
 		this.typeChange(type_selector.value)
 	},
 
 	typeChange(type) {
-		const label = document.getElementById('service_status_rule_limit_value_label');
-		const unit = document.getElementById('service_status_rule_limit_value_unit');
+		const label = document.getElementById('service-status-rule-limit-value-label');
+		const unit = document.getElementById('service-status-rule-limit-value-unit');
 
 		switch (type) {
 			case '<?= ZBX_SERVICE_STATUS_RULE_TYPE_N_GE ?>':

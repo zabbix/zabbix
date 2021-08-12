@@ -169,7 +169,7 @@ $service_tab
 				->setId('propagation_rule')
 				->setFocusableElementId('propagation_rule_focusable')
 				->setValue($data['form']['propagation_rule'])
-				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getPropagationRuleNames()))
+				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getStatusPropagationNames()))
 		))->setId('status_propagation_rules_field')
 	]);
 

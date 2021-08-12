@@ -25,7 +25,7 @@
 
 $form = (new CForm())
 	->setId('service-status-rule-form')
-	->setName('service-status-rule-form')
+	->setName('service_status_rule_form')
 	->addVar('edit', $data['is_edit'] ? '1' : null)
 	->addVar('row_index', $data['row_index'])
 	->addItem(getMessages());
@@ -36,47 +36,47 @@ $form->addItem((new CInput('submit'))->addStyle('display: none;'));
 $form_grid = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
-		new CLabel(_('Set status to'), 'service_status_rule_status'),
+		new CLabel(_('Set status to'), 'service-status-rule-new-status-focusable'),
 		new CFormField(
 			(new CSelect('new_status'))
-				->setId('service_status_rule_new_status')
-				->setFocusableElementId('service_status_rule_new_status_focusable')
+				->setId('service-status-rule-new-status')
+				->setFocusableElementId('service-status-rule-new-status-focusable')
 				->setValue($data['form']['new_status'])
-				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getRuleStatusNames()))
+				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getStatusNames()))
 		)
 	])
 	->addItem([
-		new CLabel(_('Condition'), 'service_status_rule_condition'),
+		new CLabel(_('Condition'), 'service-status-rule-type-focusable'),
 		new CFormField(
 			(new CSelect('type'))
-				->setId('service_status_rule_type')
-				->setFocusableElementId('service_status_rule_type_focusable')
+				->setId('service-status-rule-type')
+				->setFocusableElementId('service-status-rule-type-focusable')
 				->setValue($data['form']['type'])
-				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getRuleConditionNames()))
+				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getStatusRuleTypeOptions()))
 				->setOptionTemplate('#{*label}')
 				->setSelectedOptionTemplate('#{*label}')
 		)
 	])
 	->addItem([
-		(new CLabel('N', 'service_status_rule_limit_value'))->setId('service_status_rule_limit_value_label'),
+		(new CLabel('N', 'service-status-rule-limit-value'))->setId('service-status-rule-limit-value-label'),
 		new CFormField([
 			(new CTextBox('limit_value', $data['form']['limit_value'], false, 7))
-				->setId('service_status_rule_limit_value')
+				->setId('service-status-rule-limit-value')
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired(),
 			(new CSpan('%'))
-				->setId('service_status_rule_limit_value_unit')
+				->setId('service-status-rule-limit-value-unit')
 				->addStyle('display: none;')
 		])
 	])
 	->addItem([
-		new CLabel(_('Status'), 'service_status_rule_limit_status'),
+		new CLabel(_('Status'), 'service-status-rule-limit-status-focusable'),
 		new CFormField(
 			(new CSelect('limit_status'))
-				->setId('service_status_rule_limit_status')
-				->setFocusableElementId('service_status_rule_limit_status_focusable')
+				->setId('service-status-rule-limit-status')
+				->setFocusableElementId('service-status-rule-limit-status-focusable')
 				->setValue($data['form']['limit_status'])
-				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getRuleStatusNames()))
+				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getStatusNames()))
 		)
 	]);
 

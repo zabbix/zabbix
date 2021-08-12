@@ -25,7 +25,7 @@
 
 (new CRow([
 	[
-		CServiceHelper::getRuleByCondition((int) $data['new_status'], (int) $data['type'], (int) $data['limit_value'],
+		CServiceHelper::formatStatusRuleType((int) $data['type'], (int) $data['new_status'], (int) $data['limit_value'],
 			(int) $data['limit_status']
 		),
 		new CVar('status_rules['.$data['row_index'].'][new_status]', $data['new_status']),

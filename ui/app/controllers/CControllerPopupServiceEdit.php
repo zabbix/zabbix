@@ -136,50 +136,69 @@ class CControllerPopupServiceEdit extends CController {
 
 		$defaults = DB::getDefaults('services');
 
-		$data = [
-			'title' => $this->service !== null ? _('Service') : _('New service'),
-			'serviceid' => $this->service !== null ? $this->service['serviceid'] : null,
-			'form_action' => $this->service !== null ? 'service.update' : 'service.create',
-			'form' => [
-				'name' => $this->service !== null ? $this->service['name'] : $defaults['name'],
-				'parents' => $parents,
-				'children' => $this->service !== null ? $this->service['children'] : [],
-				'children_problem_tags_html' => $children_problem_tags_html,
-				'algorithm' => $this->service !== null
-					? $this->service['algorithm']
-					: ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
-				'sortorder' => $this->service !== null ? $this->service['sortorder'] : $defaults['sortorder'],
-				'showsla' => $this->service !== null ? $this->service['showsla'] : $defaults['showsla'],
-				'goodsla' => $this->service !== null ? $this->service['goodsla'] : $defaults['goodsla'],
-				'times' => $this->service !== null ? $this->service['times'] : [],
-				'tags' => ($this->service !== null && $this->service['tags'])
-					? $this->service['tags']
-					: [['tag' => '', 'value' => '']],
-				'problem_tags' => ($this->service !== null && $this->service['problem_tags'])
-					? $this->service['problem_tags']
-					: [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
-				'advanced_configuration' => $this->service !== null
-					&& ($this->service['propagation_rule'] != $defaults['propagation_rule']
+		if ($this->service !== null) {
+			$data = [
+				'title' => _('Service'),
+				'serviceid' => $this->service['serviceid'],
+				'form_action' => 'service.update',
+				'form' => [
+					'name' => $this->service['name'],
+					'parents' => $parents,
+					'children' => $this->service['children'],
+					'children_problem_tags_html' => $children_problem_tags_html,
+					'algorithm' => $this->service['algorithm'],
+					'sortorder' => $this->service['sortorder'],
+					'showsla' => $this->service['showsla'],
+					'goodsla' => $this->service['goodsla'],
+					'times' => $this->service['times'],
+					'tags' => $this->service['tags'] ?: [['tag' => '', 'value' => '']],
+					'problem_tags' => $this->service['problem_tags']
+						?: [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
+					'advanced_configuration' => $this->service['status_rules']
+						|| $this->service['propagation_rule'] != $defaults['propagation_rule']
 						|| $this->service['propagation_value'] != $defaults['propagation_value']
-						|| $this->service['weight'] != $defaults['weight']),
-				'status_rules' => $this->service !== null ? $this->service['status_rules'] : [],
-				'propagation_rule' => $this->service !== null
-					? $this->service['propagation_rule']
-					: $defaults['propagation_rule'],
-				'propagation_value_number' => ($this->service !== null && in_array($this->service['propagation_rule'],
-						[ZBX_SERVICE_STATUS_INCREASE, ZBX_SERVICE_STATUS_DECREASE]))
-					? $this->service['propagation_value']
-					: null,
-				'propagation_value_status' => ($this->service !== null
-						&& $this->service['propagation_rule'] == ZBX_SERVICE_STATUS_FIXED)
-					? $this->service['propagation_value']
-					: null,
-				'weight' => $this->service !== null ? $this->service['weight'] : $defaults['weight']
-			],
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		];
+						|| $this->service['weight'] != $defaults['weight'],
+					'status_rules' => $this->service['status_rules'],
+					'propagation_rule' => $this->service['propagation_rule'],
+					'propagation_value_number' => ($this->service['propagation_rule'] == ZBX_SERVICE_STATUS_INCREASE
+							|| $this->service['propagation_rule'] == ZBX_SERVICE_STATUS_DECREASE)
+						? $this->service['propagation_value']
+						: null,
+					'propagation_value_status' => $this->service['propagation_rule'] == ZBX_SERVICE_STATUS_FIXED
+						? $this->service['propagation_value']
+						: null,
+					'weight' => $this->service['weight']
+				]
+			];
+		}
+		else {
+			$data = [
+				'title' => _('New service'),
+				'serviceid' => null,
+				'form_action' => 'service.create',
+				'form' => [
+					'name' => $defaults['name'],
+					'parents' => $parents,
+					'children' => [],
+					'children_problem_tags_html' => $children_problem_tags_html,
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
+					'sortorder' => $defaults['sortorder'],
+					'showsla' => $defaults['showsla'],
+					'goodsla' => $defaults['goodsla'],
+					'times' => [],
+					'tags' => [['tag' => '', 'value' => '']],
+					'problem_tags' => [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
+					'advanced_configuration' => false,
+					'status_rules' => [],
+					'propagation_rule' => $defaults['propagation_rule'],
+					'propagation_value_number' => null,
+					'propagation_value_status' => null,
+					'weight' => $defaults['weight']
+				]
+			];
+		}
+
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

@@ -29,45 +29,45 @@ class CServiceHelper {
 		];
 	}
 
-	public static function getRuleConditionNames(): array {
+	public static function getStatusRuleTypeOptions(): array {
 		return [
 			ZBX_SERVICE_STATUS_RULE_TYPE_N_GE => _s('if at least %2$s child services are %1$s or greater',
-				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N}')
+				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N)')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE => _s('if at least %2$s child services are %1$s or greater',
-				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N%}')
+				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_N_L => _s('if less than %2$s child services are %1$s or less',
-				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N}')
+				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N)')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_NP_L => _s('if less than %2$s child services are %1$s or less',
-				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N%}')
+				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_W_GE => _s('if at least %2$s of child services weight is in %1$s or greater',
-				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{W}')
+				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(W)')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE => _s('if at least %2$s of child services weight is in %1$s or greater',
-				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N%}')
+				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_W_L => _s('if less than %2$s of child services weight is in %1$s or less',
-				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{W}')
+				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(W)')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_WP_L => _s('if less than %2$s of child services weight is in %1$s or less',
-				new CTag('b', true, '{'._('Status').'}'), new CTag('b', true, '{N%}')
+				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
 			)
 		];
 	}
 
-	public static function getRuleByCondition(int $new_status, int $condition, int $number, int $status): string {
-		$status = self::getRuleStatusNames()[$status];
+	public static function formatStatusRuleType(int $type, int $new_status, int $number, int $status): ?CObject {
+		$status = self::getStatusNames()[$status];
 
-		switch ($condition) {
+		switch ($type) {
 			case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
 			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
 				$rule = _n(
 					'if at least %2$s child service is %1$s or greater',
 					'if at least %2$s child services are %1$s or greater',
-					$status, $number
+					new CTag('em', true, $status), new CTag('em', true, $number), $number
 				);
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
@@ -75,29 +75,35 @@ class CServiceHelper {
 				$rule = _n(
 					'if less than %2$s child service is %1$s or less',
 					'if less than %2$s child services are %1$s or less',
-					$status, $number
+					new CTag('em', true, $status), new CTag('em', true, $number), $number
 				);
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
-				$rule = _s('if at least %2$s of child services weight is in %1$s or greater', $status, $number);
+				$rule = _s('if at least %2$s of child services weight is in %1$s or greater',
+					new CTag('em', true, $status), new CTag('em', true, $number));
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
-				$rule = _s('if at least %2$s of child services weight is in %1$s or greater', $status, $number.'%');
+				$rule = _s('if at least %2$s of child services weight is in %1$s or greater',
+					new CTag('em', true, $status), new CTag('em', true, $number).'%');
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
-				$rule = _s('if less than %2$s of child services weight is in %1$s or less', $status, $number);
+				$rule = _s('if less than %2$s of child services weight is in %1$s or less',
+					new CTag('em', true, $status), new CTag('em', true, $number));
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
-				$rule = _s('if less than %2$s of child services weight is in %1$s or less', $status, $number.'%');
+				$rule = _s('if less than %2$s of child services weight is in %1$s or less',
+					new CTag('em', true, $status), new CTag('em', true, $number).'%');
 				break;
 			default:
 				$rule = null;
 		}
 
-		return $rule !== null ? self::getRuleStatusNames()[$new_status].' - '.$rule : '';
+		return $rule !== null
+			? new CObject([new CTag('em', true, self::getStatusNames()[$new_status]), ' - ', $rule])
+			: null;
 	}
 
-	public static function getRuleStatusNames(): array {
+	public static function getStatusNames(): array {
 		$status_names = [-1 => _('OK')];
 
 		foreach (CSeverityHelper::getSeverities() as $severity) {
@@ -107,7 +113,7 @@ class CServiceHelper {
 		return $status_names;
 	}
 
-	public static function getPropagationRuleNames(): array {
+	public static function getStatusPropagationNames(): array {
 		return [
 			ZBX_SERVICE_STATUS_AS_IS => _('As is'),
 			ZBX_SERVICE_STATUS_INCREASE => _('Increase by'),
