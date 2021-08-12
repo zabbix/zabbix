@@ -65,38 +65,33 @@ class CServiceHelper {
 			case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
 			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
 				$rule = _n(
-					'if at least %2$s child service is %1$s or greater',
-					'if at least %2$s child services are %1$s or greater',
+					'if at least %2$s child service has %1$s status or above',
+					'if at least %2$s child services have %1$s status or above',
 					new CTag('em', true, $status), new CTag('em', true, $number), $number
 				);
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
 			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
 				$rule = _n(
-					'if less than %2$s child service is %1$s or less',
-					'if less than %2$s child services are %1$s or less',
+					'if less than %2$s child service has %1$s status or below',
+					'if less than %2$s child services have %1$s status or below',
 					new CTag('em', true, $status), new CTag('em', true, $number), $number
 				);
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
-				$rule = _s('if at least %2$s of child services weight is in %1$s or greater',
-					new CTag('em', true, $status), new CTag('em', true, $number));
-
-				if weight of child services in Average status or below is less than 12345
-
-				$rule = _s('if at least %2$s of child services weight is in %1$s or greater',
+				$rule = _s('if weight of child services with %1$s status or above is at least %2$s',
 					new CTag('em', true, $status), new CTag('em', true, $number));
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
-				$rule = _s('if at least %2$s of child services weight is in %1$s or greater',
+				$rule = _s('if weight of child services with %1$s status or above is at least %2$s',
 					new CTag('em', true, $status), new CTag('em', true, $number).'%');
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
-				$rule = _s('if less than %2$s of child services weight is in %1$s or less',
+				$rule = _s('if weight of child services with %1$s status or below is less than %2$s',
 					new CTag('em', true, $status), new CTag('em', true, $number));
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
-				$rule = _s('if less than %2$s of child services weight is in %1$s or less',
+				$rule = _s('if weight of child services with %1$s status or below is less than %2$s',
 					new CTag('em', true, $status), new CTag('em', true, $number).'%');
 				break;
 			default:
