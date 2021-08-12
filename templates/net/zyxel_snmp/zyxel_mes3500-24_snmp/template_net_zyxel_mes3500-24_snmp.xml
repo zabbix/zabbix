@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-10T18:31:47Z</date>
+   <date>2021-07-23T11:06:20Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template ZYXEL MES3500-24 SNMP</template>
-         <name>Template ZYXEL MES3500-24 SNMP</name>
+         <template>Template Net ZYXEL MES3500-24 SNMP</template>
+         <name>Template Net ZYXEL MES3500-24 SNMP</name>
          <description>ZYXEL MES3500-24&#13;
 &#13;
 MIBs used:&#13;
@@ -93,7 +93,7 @@ Template tooling version used: 0.38</description>
                <snmp_oid>.1.3.6.1.2.1.1.4.0</snmp_oid>
                <key>zyxel.3500_24.contact</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -147,7 +147,7 @@ getting the values.</description>
                <snmp_oid>discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.68.1]</snmp_oid>
                <key>zyxel.3500_24.fwversion</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -194,7 +194,7 @@ return strOut;
                <snmp_oid>.1.3.6.1.2.1.1.6.0</snmp_oid>
                <key>zyxel.3500_24.location</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -220,7 +220,7 @@ The physical location of this node (e.g.,&#13;
                <snmp_oid>.1.3.6.1.2.1.2.2.1.6.1</snmp_oid>
                <key>zyxel.3500_24.mac</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -249,7 +249,7 @@ should contain an octet string of zero length.</description>
                <snmp_oid>.1.3.6.1.2.1.1.1.0</snmp_oid>
                <key>zyxel.3500_24.model</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -287,7 +287,7 @@ printable ASCII characters.</description>
                <snmp_oid>.1.3.6.1.2.1.1.5.0</snmp_oid>
                <key>zyxel.3500_24.name</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -314,7 +314,7 @@ fully-qualified domain name.</description>
                <snmp_oid>.1.3.6.1.4.1.890.1.5.8.68.1.10.0</snmp_oid>
                <key>zyxel.3500_24.serialnumber</key>
                <delay>1h</delay>
-               <history>2w</history>
+               <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>CHAR</value_type>
@@ -452,7 +452,6 @@ Utilization of memory pool in %.</description>
                      </condition>
                   </conditions>
                </filter>
-               <description>An entry in fanRpmTable.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>ZYXEL MES3500-24: Port {#SNMPINDEX}: Administrative status</name>
@@ -635,6 +634,7 @@ or broadcast address at this sub-layer</description>
                      <key>zyxel.3500_24.net.if.in.util[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>last(zyxel.3500_24.net.if.in.traffic[{#SNMPINDEX}]) * (last(zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) &lt;&gt; 0) / 
 ( last(zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100</params>
@@ -650,6 +650,11 @@ or broadcast address at this sub-layer</description>
                            <params>0
 100</params>
                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>return +parseFloat(value).toFixed(0);
+</params>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -852,6 +857,7 @@ those that were discarded or not sent.</description>
                      <key>zyxel.3500_24.net.if.out.util[{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>last(zyxel.3500_24.net.if.out.traffic[{#SNMPINDEX}]) * (last(zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) &lt;&gt; 0) / 
 ( last(zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) + (last(zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100</params>
@@ -867,6 +873,11 @@ those that were discarded or not sent.</description>
                            <params>0
 100</params>
                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>return +parseFloat(value).toFixed(0);
+</params>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -903,7 +914,7 @@ Transmission mode</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.in.ucastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -911,7 +922,7 @@ Transmission mode</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.out.ucastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -919,7 +930,7 @@ Transmission mode</description>
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.in.multicastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -927,7 +938,7 @@ Transmission mode</description>
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.out.multicastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -935,7 +946,7 @@ Transmission mode</description>
                            <sortorder>4</sortorder>
                            <color>FC6EA3</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.in.broadcastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -943,7 +954,7 @@ Transmission mode</description>
                            <sortorder>5</sortorder>
                            <color>6C59DC</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.out.broadcastpkts[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -955,7 +966,7 @@ Transmission mode</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.in.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -963,7 +974,7 @@ Transmission mode</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.out.traffic[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -977,7 +988,7 @@ Transmission mode</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.out.util[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -985,7 +996,7 @@ Transmission mode</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.net.if.in.util[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -994,15 +1005,15 @@ Transmission mode</description>
                </graph_prototypes>
                <overrides>
                   <override>
-                     <name>Trigger disabled</name>
+                     <name>Don't create triggers for matching interface</name>
                      <step>1</step>
                      <filter>
                         <conditions>
                            <condition>
                               <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>.*</value>
+                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
+                              <operator>NOT_MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -1013,29 +1024,6 @@ Transmission mode</description>
                            <value>.*</value>
                            <status>ENABLED</status>
                            <discover>NO_DISCOVER</discover>
-                        </operation>
-                     </operations>
-                  </override>
-                  <override>
-                     <name>Trigger enabled</name>
-                     <step>2</step>
-                     <filter>
-                        <conditions>
-                           <condition>
-                              <macro>{#ZYXEL.IF.NAME}</macro>
-                              <value>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</value>
-                              <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
-                           </condition>
-                        </conditions>
-                     </filter>
-                     <operations>
-                        <operation>
-                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
-                           <operator>REGEXP</operator>
-                           <value>.*</value>
-                           <status>ENABLED</status>
-                           <discover>DISCOVER</discover>
                         </operation>
                      </operations>
                   </override>
@@ -1116,7 +1104,7 @@ Transceiver module DDM data ({#ZYXEL.SFP.DESCRIPTION}).</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.sfp.ddm[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1401,7 +1389,7 @@ The current temperature measured at this sensor</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.temp[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1476,7 +1464,7 @@ The current voltage reading.</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template ZYXEL MES3500-24 SNMP</host>
+                              <host>Template Net ZYXEL MES3500-24 SNMP</host>
                               <key>zyxel.3500_24.volt[{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -1515,7 +1503,7 @@ return JSON.stringify(outArr);
             </macro>
             <macro>
                <macro>{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}</macro>
-               <value>NEED TRIGGERS</value>
+               <value>CHANGE_IF_NEEDED</value>
                <description>Triggers will be created only for interfaces whose description contains the value of this macro</description>
             </macro>
             <macro>
@@ -1582,7 +1570,7 @@ return JSON.stringify(outArr);
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template ZYXEL MES3500-24 SNMP</host>
+                  <host>Template Net ZYXEL MES3500-24 SNMP</host>
                   <key>zyxel.3500_24.cpuusage</key>
                </item>
             </graph_item>

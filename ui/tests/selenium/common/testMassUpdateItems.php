@@ -33,7 +33,7 @@ class testMassUpdateItems extends CWebTest{
 	use PreprocessingTrait;
 
 	const HOSTID = 40001;	// Simple form test host.
-	const RULEID = 133700;	// testFormDiscoveryRule1 on Simple form test host.
+	const RULEID = 43700;	// testFormDiscoveryRule1 on Simple form test host.
 	const HOST_NAME = 'Simple form test host';
 	const AGENT_INTERFACE_ID = 40011;
 	const SNMP2_INTERFACE_ID = 40012;
@@ -1796,10 +1796,7 @@ class testMassUpdateItems extends CWebTest{
 
 		// Get item table and select items.
 		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"]')->asTable()->one();
-		// TODO: Change this when findRows() is improved in TableElement.
-		foreach ($data as $name) {
-			$table->findRow('Name', $name)->select();
-		}
+		$table->findRows('Name', $data)->select();
 
 		// Open mass update form.
 		$this->query('button:Mass update')->one()->click();

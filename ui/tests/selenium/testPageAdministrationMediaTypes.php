@@ -199,9 +199,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select one.
 			[
 				[
-					'rows' => [
-						'Name' => 'Email'
-					],
+					'rows' => ['Email'],
 					'db_name' => 'Email',
 					'used_by_action' => 'Trigger action 3'
 				]
@@ -209,9 +207,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select several.
 			[
 				[
-					'rows' => [
-						['Name' => 'SMS']
-					],
+					'rows' => ['SMS'],
 					'db_name' => ['SMS']
 				]
 			],

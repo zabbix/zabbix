@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/tlsconfig"
 	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
 )
@@ -50,6 +51,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
+	details, err := tlsconfig.CreateDetails(params["sessionName"], params["TLSConnect"],
+		params["TLSCAFile"], params["TLSCertFile"], params["TLSKeyFile"], params["URI"])
+	if err != nil {
+		return nil, zbxerr.ErrorInvalidConfiguration.Wrap(err)
+	}
+
 	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {
 		return nil, err
@@ -60,7 +67,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri)
+	conn, err := p.connMgr.GetConnection(*uri, details)
 	if err != nil {
 		// Special logic of processing connection errors should be used if mysql.ping is requested
 		// because it must return pingFailed if any error occurred.

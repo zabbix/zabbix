@@ -18,15 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/items.inc.php';
-require_once dirname(__FILE__).'/traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../../include/items.inc.php';
+require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 
 /**
  *
  * @backup items
  */
-class testFormItemPreprocessingTest extends CWebTest {
+class testFormPreprocessingTest extends CWebTest {
 
 	const HOST_ID = 40001;		//'Simple form test host'
 
@@ -201,7 +201,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	/**
 	 * @dataProvider getTestSingleStepData
 	 */
-	public function testFormItemPreprocessingTest_TestSingleStep($data) {
+	public function testFormPreprocessingTest_TestSingleStep($data) {
 		$this->openPreprocessing($data);
 
 		foreach ($data['preprocessing'] as $i => $step) {
@@ -401,7 +401,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	/**
 	 * @dataProvider getTestAllStepsData
 	 */
-	public function testFormItemPreprocessingTest_TestAllSteps($data) {
+	public function testFormPreprocessingTest_TestAllSteps($data) {
 		$this->openPreprocessing($data);
 
 		foreach ($data['preprocessing'] as $step) {
