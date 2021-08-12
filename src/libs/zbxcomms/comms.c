@@ -48,6 +48,7 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
 extern int	CONFIG_TIMEOUT;
+extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
 /******************************************************************************
  *                                                                            *
@@ -1146,7 +1147,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					goto out;
 			}
 
-			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], SOMAXCONN))
+			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], CONFIG_TCP_MAX_BACKLOG_SIZE))
 			{
 				zbx_set_socket_strerror("listen() for [[%s]:%s] failed: %s",
 						NULL != ip ? ip : "-", port,
@@ -1319,7 +1320,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			goto out;
 		}
 
-		if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], SOMAXCONN))
+		if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], CONFIG_TCP_MAX_BACKLOG_SIZE))
 		{
 			zbx_set_socket_strerror("listen() for [[%s]:%hu] failed: %s",
 					NULL != ip ? ip : "-", listen_port,

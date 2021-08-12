@@ -35,5 +35,6 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 void	zbx_clean_events(void);
 void	zbx_reset_event_recovery(void);
 void	zbx_export_events(void);
+void	zbx_events_update_itservices(void);
 
 #endif

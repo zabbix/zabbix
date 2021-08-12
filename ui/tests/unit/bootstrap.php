@@ -28,7 +28,6 @@ require_once __DIR__.'/../../include/items.inc.php';
 require_once __DIR__.'/../../include/discovery.inc.php';
 require_once __DIR__.'/../../include/actions.inc.php';
 require_once __DIR__.'/../../include/validate.inc.php';
-require_once __DIR__.'/../../include/services.inc.php';
 require_once __DIR__.'/../../include/db.inc.php';
 
 // register autoloader

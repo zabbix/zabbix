@@ -39,6 +39,7 @@ class DB {
 	const FIELD_TYPE_BLOB = 'blob';
 	const FIELD_TYPE_TEXT = 'text';
 	const FIELD_TYPE_NCLOB = 'nclob';
+	const FIELD_TYPE_CUID = 'cuid';
 
 	private static $schema = null;
 
@@ -381,6 +382,7 @@ class DB {
 			}
 			else {
 				switch ($tableSchema['fields'][$field]['type']) {
+					case self::FIELD_TYPE_CUID:
 					case self::FIELD_TYPE_CHAR:
 						$length = mb_strlen($values[$field]);
 
@@ -498,12 +500,7 @@ class DB {
 	 */
 	public static function insert($table, $values, $getids = true) {
 		$table_schema = self::getSchema($table);
-		$fields = [];
-
-		foreach ($values as $key => $row) {
-			$fields += array_diff_key($row, $fields);
-		}
-
+		$fields = array_reduce($values, 'array_merge', []);
 		$fields = array_intersect_key($fields, $table_schema['fields']);
 
 		foreach ($fields as $field => &$value) {
@@ -514,14 +511,7 @@ class DB {
 		unset($value);
 
 		foreach ($values as $key => &$row) {
-			$row += $fields;
-
-			$ordered_row = [];
-			foreach ($fields as $field => $foo) {
-				$ordered_row[$field] = $row[$field];
-			}
-
-			$row = $ordered_row;
+			$row = array_merge($fields, $row);
 		}
 		unset($row);
 
@@ -554,36 +544,64 @@ class DB {
 	}
 
 	/**
+	 * Add IDs to inserted rows.
+	 *
+	 * @param string $table
+	 * @param array  $values
+	 *
+	 * @return array An array of IDs with the keys preserved.
+	 */
+	private static function addIds(string $table, array &$values): array {
+		$table_schema = self::getSchema($table);
+		$resultids = [];
+
+		if ($table_schema['fields'][$table_schema['key']]['type'] === DB::FIELD_TYPE_ID) {
+			$id = self::reserveIds($table, count($values));
+		}
+
+		foreach ($values as $key => &$row) {
+			switch ($table_schema['fields'][$table_schema['key']]['type']) {
+				case DB::FIELD_TYPE_ID:
+					$resultids[$key] = $id;
+					$row[$table_schema['key']] = $id;
+					$id = bcadd($id, 1, 0);
+					break;
+
+				case DB::FIELD_TYPE_CUID:
+					$id = CCuid::generate();
+					$resultids[$key] = $id;
+					$row[$table_schema['key']] = $id;
+					break;
+			}
+		}
+		unset($row);
+
+		return $resultids;
+	}
+
+	/**
 	 * Insert batch data into DB.
 	 *
 	 * @param string $table
 	 * @param array  $values pair of fieldname => fieldvalue
 	 * @param bool   $getids
 	 *
-	 * @return array    an array of ids with the keys preserved
+	 * @return array An array of IDs with the keys preserved.
 	 */
 	public static function insertBatch($table, $values, $getids = true) {
 		if (empty($values)) {
 			return true;
 		}
 
-		$resultIds = [];
-
+		$resultids = [];
 		$table_schema = self::getSchema($table);
-
-		if ($getids) {
-			$id = self::reserveIds($table, count($values));
-		}
-
 		$mandatory_fields = self::getMandatoryFields($table_schema);
 
-		foreach ($values as $key => &$row) {
-			if ($getids) {
-				$resultIds[$key] = $id;
-				$row[$table_schema['key']] = $id;
-				$id = bcadd($id, 1, 0);
-			}
+		if ($getids) {
+			$resultids = self::addIds($table, $values);
+		}
 
+		foreach ($values as &$row) {
 			$row += $mandatory_fields;
 
 			self::checkValueTypes($table_schema, $row);
@@ -596,7 +614,7 @@ class DB {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 		}
 
-		return $resultIds;
+		return $resultids;
 	}
 
 	/**
@@ -943,6 +961,9 @@ class DB {
 			'output' => [],
 			'countOutput' => false,
 			'filter' => [],
+			'search' => [],
+			'startSearch' => false,
+			'searchByAny' => false,
 			'sortfield' => [],
 			'sortorder' => [],
 			'limit' => null,
@@ -1043,6 +1064,9 @@ class DB {
 		// add filter options
 		$sql_parts = self::applyQueryFilterOptions($table_name, $options, $table_alias, $sql_parts);
 
+		// add search options
+		$sql_parts = self::applyQuerySearchOptions($table_name, $options, $table_alias, $sql_parts);
+
 		// add sort options
 		$sql_parts = self::applyQuerySortOptions($table_name, $options, $table_alias, $sql_parts);
 
@@ -1128,6 +1152,79 @@ class DB {
 		// filters
 		if (is_array($options['filter'])) {
 			$sql_parts = self::dbFilter($table_name, $options, $table_alias, $sql_parts);
+		}
+
+		return $sql_parts;
+	}
+
+	/**
+	 * Modifies the SQL parts to implement all of the search related options.
+	 *
+	 * @param string $table_name
+	 * @param array  $options
+	 * @param array  $options['search']
+	 * @param bool   $options['startSearch']
+	 * @param bool   $options['searchByAny']
+	 * @param string $table_alias
+	 * @param array  $sql_parts
+	 *
+	 * @return array
+	 */
+	private static function applyQuerySearchOptions($table_name, array $options, $table_alias = null,
+			array $sql_parts) {
+		global $DB;
+
+		$table_schema = DB::getSchema($table_name);
+		$unsupported_types = [self::FIELD_TYPE_INT, self::FIELD_TYPE_ID, self::FIELD_TYPE_FLOAT, self::FIELD_TYPE_UINT,
+			self::FIELD_TYPE_BLOB
+		];
+
+		$start = $options['startSearch'] ? '' : '%';
+		$glue = $options['searchByAny'] ? ' OR ' : ' AND ';
+
+		$search = [];
+
+		foreach ($options['search'] as $field_name => $patterns) {
+			if (!array_key_exists($field_name, $table_schema['fields'])) {
+				self::exception(self::SCHEMA_ERROR,
+					vsprintf('%s: field "%s.%s" does not exist.', [__FUNCTION__, $table_name, $field_name])
+				);
+			}
+
+			$field_schema = $table_schema['fields'][$field_name];
+
+			if (in_array($field_schema['type'], $unsupported_types)) {
+				self::exception(self::SCHEMA_ERROR,
+					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
+				);
+			}
+
+			if ($patterns === null) {
+				continue;
+			}
+
+			foreach ((array) $patterns as $pattern) {
+				// escaping parameter that is about to be used in LIKE statement
+				$pattern = mb_strtoupper(strtr($pattern, ['!' => '!!', '%' => '!%', '_' => '!_']));
+				$pattern = $start.$pattern.'%';
+
+				if ($DB['TYPE'] == ZBX_DB_ORACLE && $field_schema['type'] === DB::FIELD_TYPE_NCLOB
+						&& strlen($pattern) > ORACLE_MAX_STRING_SIZE) {
+					$chunks = zbx_dbstr(DB::chunkMultibyteStr($pattern, ORACLE_MAX_STRING_SIZE));
+					$pattern = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
+				}
+				else {
+					$pattern = zbx_dbstr($pattern);
+				}
+
+				$search[] = 'UPPER('.self::fieldId($field_name, $table_alias).') LIKE '.$pattern." ESCAPE '!'";
+			}
+		}
+
+		if ($search) {
+			$sql_parts['where'][] = ($options['searchByAny'] && count($search) > 1)
+				? '('.implode($glue, $search).')'
+				: implode($glue, $search);
 		}
 
 		return $sql_parts;

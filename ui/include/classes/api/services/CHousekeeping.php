@@ -42,10 +42,11 @@ class CHousekeeping extends CApiService {
 	/**
 	 * @var array
 	 */
-	private $output_fields = ['hk_events_mode', 'hk_events_trigger', 'hk_events_internal', 'hk_events_discovery',
-		'hk_events_autoreg', 'hk_services_mode', 'hk_services', 'hk_audit_mode', 'hk_audit', 'hk_sessions_mode',
-		'hk_sessions', 'hk_history_mode', 'hk_history_global', 'hk_history', 'hk_trends_mode', 'hk_trends_global',
-		'hk_trends', 'db_extension', 'compression_status', 'compress_older'];
+	private $output_fields = ['hk_events_mode', 'hk_events_trigger', 'hk_events_service', 'hk_events_internal',
+		'hk_events_discovery', 'hk_events_autoreg', 'hk_services_mode', 'hk_services', 'hk_audit_mode', 'hk_audit',
+		'hk_sessions_mode', 'hk_sessions', 'hk_history_mode', 'hk_history_global', 'hk_history', 'hk_trends_mode',
+		'hk_trends_global', 'hk_trends', 'db_extension', 'compression_status', 'compress_older'
+	];
 
 	/**
 	 * Get housekeeping parameters.
@@ -96,8 +97,8 @@ class CHousekeeping extends CApiService {
 		$upd_config = [];
 
 		// strings
-		$field_names = ['hk_events_trigger', 'hk_events_internal', 'hk_events_discovery', 'hk_events_autoreg',
-			'hk_services', 'hk_audit', 'hk_sessions', 'hk_history', 'hk_trends', 'compress_older'
+		$field_names = ['hk_events_trigger', 'hk_events_service', 'hk_events_internal', 'hk_events_discovery',
+			'hk_events_autoreg', 'hk_services', 'hk_audit', 'hk_sessions', 'hk_history', 'hk_trends', 'compress_older'
 		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $hk) && $hk[$field_name] !== $db_hk[$field_name]) {
@@ -142,6 +143,7 @@ class CHousekeeping extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'hk_events_mode' =>			['type' => API_INT32, 'in' => '0,1'],
 			'hk_events_trigger' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_service' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_events_internal' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_events_discovery' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_events_autoreg' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],

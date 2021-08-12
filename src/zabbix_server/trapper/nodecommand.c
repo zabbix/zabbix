@@ -23,11 +23,13 @@
 #include "db.h"
 #include "log.h"
 #include "../scripts/scripts.h"
+#include "../../libs/zbxaudit/audit.h"
 
 #include "trapper_auth.h"
-#include "nodecommand.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
+
+#include "nodecommand.h"
 
 /******************************************************************************
  *                                                                            *
@@ -80,136 +82,6 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 	zbx_snprintf(error, max_error_len, "Timeout while waiting for remote command result.");
 
 	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: auditlog_global_script                                           *
- *                                                                            *
- * Purpose: record global script execution results into audit log             *
- *                                                                            *
- * Comments: 'hostid' should be always > 0. 'eventid' is > 0 in case of       *
- *           "manual script on event"                                         *
- *                                                                            *
- ******************************************************************************/
-static void	auditlog_global_script(const zbx_script_t *script, zbx_uint64_t hostid, zbx_uint64_t eventid,
-		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *clientip, const char *output,
-		const char *error)
-{
-	int		now;
-	zbx_uint64_t	auditid;
-	char		execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1], eventid_s[MAX_ID_LEN + 1],
-			proxy_hostid_s[MAX_ID_LEN + 1];
-
-	now = time(NULL);
-	auditid = DBget_maxid("auditlog");
-	zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%hhu", script->execute_on);
-
-	zbx_snprintf(hostid_s, sizeof(hostid_s), ZBX_FS_UI64, hostid);
-
-	if (0 != eventid)
-		zbx_snprintf(eventid_s, sizeof(eventid_s), ZBX_FS_UI64, eventid);
-
-	if (0 != proxy_hostid)
-		zbx_snprintf(proxy_hostid_s, sizeof(proxy_hostid_s), ZBX_FS_UI64, proxy_hostid);
-
-	do
-	{
-		zbx_db_insert_t	db_audit, db_details;
-
-		zbx_db_insert_prepare(&db_audit, "auditlog", "auditid", "userid", "clock", "action", "resourcetype",
-				"ip", "resourceid", NULL);
-
-		zbx_db_insert_prepare(&db_details, "auditlog_details", "auditdetailid", "auditid", "table_name",
-				"field_name", "newvalue", NULL);
-
-		DBbegin();
-
-		zbx_db_insert_add_values(&db_audit, auditid, userid, now, AUDIT_ACTION_EXECUTE, AUDIT_RESOURCE_SCRIPT,
-				clientip, script->scriptid);
-
-
-		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "execute_on", execute_on_s);
-
-		if (0 != eventid)
-			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "eventid", eventid_s);
-
-		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "hostid", hostid_s);
-
-		if (0 != proxy_hostid)
-		{
-			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "proxy_hostid",
-					proxy_hostid_s);
-		}
-
-		if (ZBX_SCRIPT_TYPE_WEBHOOK != script->type)
-		{
-			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "command",
-					script->command_orig);
-		}
-
-		if (NULL != output)
-			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "output", output);
-
-		if (NULL != error)
-			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "error", error);
-
-		zbx_db_insert_execute(&db_audit);
-		zbx_db_insert_clean(&db_audit);
-
-		zbx_db_insert_autoincrement(&db_details, "auditdetailid");
-		zbx_db_insert_execute(&db_details);
-		zbx_db_insert_clean(&db_details);
-	}
-	while (ZBX_DB_DOWN == DBcommit());
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_check_user_administration_permissions                        *
- *                                                                            *
- * Purpose: check if the user has specific or default access for              *
- *          administration actions                                            *
- *                                                                            *
- * Return value:  SUCCEED - the access is granted                             *
- *                FAIL    - the access is denied                              *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule)
-{
-	int		ret = FAIL;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
-
-	result = DBselect("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
-			" and (name='%s' or name='%s')", user->roleid, role_rule,
-			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (0 == strcmp(role_rule, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-			else
-				ret = FAIL;
-			break;
-		}
-		else if (0 == strcmp(ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, int *scope, zbx_uint64_t *usrgrpid,
@@ -530,14 +402,14 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
 		if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
-				NULL, &host, NULL, NULL, NULL, user_timezone, &script.command, macro_type, error,
-				sizeof(error)))
+				NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command, macro_type,
+				error, sizeof(error)))
 		{
 			goto fail;
 		}
 
 		if (SUCCEED != substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL, &host,
-				NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type, error,
+				NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type, error,
 				sizeof(error)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -552,7 +424,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		for (i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-					&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone,
+					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone,
 					(char **)&webhook_params.values[i].second, macro_type, error,
 					sizeof(error)))
 			{
@@ -581,8 +453,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		else
 			perror = error;
 
-		auditlog_global_script(&script, host.hostid, eventid, host.proxy_hostid, user->userid, clientip,
-				poutput, perror);
+		zbx_auditlog_global_script(script.type, script.execute_on, script.command_orig, host.hostid, host.name,
+				eventid, host.proxy_hostid, user->userid, user->username, clientip, poutput, perror);
 	}
 fail:
 	if (SUCCEED != ret)
@@ -630,6 +502,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): data:%s ", __func__, data);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_user_init(&user);
 
 	/* check who is connecting, get user details, check access rights */
 
@@ -643,6 +516,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	}
 
 	if (SUCCEED != zbx_check_user_administration_actions_permissions(&user,
+			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
 	{
 		result = zbx_strdup(result, "Permission denied. No role access.");
@@ -741,6 +615,7 @@ finish:
 	zbx_json_free(&j);
 	zbx_free(result);
 	zbx_free(debug);
+	zbx_user_free(&user);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

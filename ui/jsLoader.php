@@ -43,7 +43,7 @@ if (isset($_GET['lang'])) {
 		textdomain('frontend');
 	}
 	// numeric Locale to default
-	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8']);
+	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252']);
 }
 
 // available scripts 'scriptFileName' => 'path relative to js/'
@@ -104,7 +104,6 @@ $availableJScripts = [
 	'class.crangecontrol.js' => '',
 	'class.csuggest.js' => '',
 	'class.csvggraph.js' => '',
-	'class.ctree.js' => '',
 	'class.curl.js' => '',
 	'class.overlaycollection.js' => '',
 	'class.overlay.js' => '',
@@ -129,7 +128,6 @@ $availableJScripts = [
 	'report2.js' => 'pages/',
 	'report4.js' => 'pages/',
 	'setup.js' => 'pages/',
-	'srv_status.js' => 'pages/',
 	'monitoring.overview.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
 	'popup.operation.common.js' => 'pages/'
@@ -276,7 +274,7 @@ $tranStrings = [
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
-		'S_COLOR_IS_NOT_CORRECT' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
+		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).')
 	],
 	'class.notifications.js' => [
 		'S_PROBLEM_ON' => _('Problem on'),
@@ -291,7 +289,7 @@ $tranStrings = [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
 	'class.coverride.js' => [
-		'S_COLOR' => _('colour'),
+		'S_COLOR' => _('color'),
 		'S_TIME_SHIFT' => _('time shift')
 	],
 	'class.cverticalaccordion.js' => [
@@ -318,7 +316,7 @@ $tranStrings = [
 		'Added, %1$s' => _x('Added, %1$s', 'screen reader'),
 		'Removed, %1$s' => _x('Removed, %1$s', 'screen reader'),
 		'%1$s, read only' => _x('%1$s, read only', 'screen reader'),
-		'Can not be removed' => _x('Can not be removed', 'screen reader'),
+		'Cannot be removed' => _x('Cannot be removed', 'screen reader'),
 		'Selected, %1$s in position %2$d of %3$d' => _x('Selected, %1$s in position %2$d of %3$d', 'screen reader'),
 		'Selected, %1$s, read only, in position %2$d of %3$d' => _x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
 		'More than %1$d matches for %2$s found' => _x('More than %1$d matches for %2$s found', 'screen reader'),
@@ -334,6 +332,7 @@ $tranStrings = [
 		'Create trigger' => _('Create trigger'),
 		'Create dependent item' => _('Create dependent item'),
 		'Create dependent discovery rule' => _('Create dependent discovery rule'),
+		'Dashboards' => _('Dashboards'),
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
@@ -388,6 +387,9 @@ $tranStrings = [
 		'Set new value' => _('Set new value'),
 		'path/to/secret:key' => _('path/to/secret:key'),
 		'value' => _('value')
+	],
+	'popup.condition.common.js' => [
+		'Add parent services' => _('Add parent services')
 	]
 ];
 

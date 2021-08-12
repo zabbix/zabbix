@@ -22,5 +22,7 @@
 
 int	check_perm2system(zbx_uint64_t userid);
 char	*get_user_timezone(zbx_uint64_t userid);
+int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
+		const char *role_rule);
 
 #endif /* ZABBIX_ZABBIX_USERS_H_ */

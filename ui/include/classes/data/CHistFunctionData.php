@@ -67,6 +67,9 @@ final class CHistFunctionData {
 			],
 			['required' => false]
 		],
+		'exists_foreach' => [
+			['rules' => [['type' => 'query']]]
+		],
 		'find' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]], 'required' => false],
@@ -91,6 +94,9 @@ final class CHistFunctionData {
 		'fuzzytime' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'time', 'min' => 1]]]
+		],
+		'item_count' => [
+			['rules' => [['type' => 'query']]]
 		],
 		'kurtosis' => [
 			['rules' => [['type' => 'query']]],
@@ -137,6 +143,16 @@ final class CHistFunctionData {
 		'min_foreach' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
+		],
+		'monodec' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(weak|strict)$/']], 'required' => false]
+		],
+		'monoinc' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(weak|strict)$/']], 'required' => false]
 		],
 		'nodata' => [
 			['rules' => [['type' => 'query']]],
@@ -213,6 +229,22 @@ final class CHistFunctionData {
 		]
 	];
 
+	/**
+	 * A subset of history functions for use in calculated item formulas only.
+	 *
+	 * @var array
+	 */
+	private const CALCULATED_ONLY = [
+		'avg_foreach',
+		'count_foreach',
+		'exists_foreach',
+		'item_count',
+		'last_foreach',
+		'max_foreach',
+		'min_foreach',
+		'sum_foreach'
+	];
+
 	private const ITEM_VALUE_TYPES_NUM = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
 	private const ITEM_VALUE_TYPES_LOG = [ITEM_VALUE_TYPE_LOG];
 	private const ITEM_VALUE_TYPES_ALL = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR,
@@ -231,10 +263,12 @@ final class CHistFunctionData {
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'countunique' => self::ITEM_VALUE_TYPES_ALL,
+		'exists_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'find' => self::ITEM_VALUE_TYPES_ALL,
 		'first' => self::ITEM_VALUE_TYPES_ALL,
 		'forecast' => self::ITEM_VALUE_TYPES_NUM,
 		'fuzzytime' => self::ITEM_VALUE_TYPES_NUM,
+		'item_count' => self::ITEM_VALUE_TYPES_ALL,
 		'kurtosis' => self::ITEM_VALUE_TYPES_NUM,
 		'last' => self::ITEM_VALUE_TYPES_ALL,
 		'last_foreach' => self::ITEM_VALUE_TYPES_ALL,
@@ -246,6 +280,8 @@ final class CHistFunctionData {
 		'max_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'min' => self::ITEM_VALUE_TYPES_NUM,
 		'min_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'monodec' =>  self::ITEM_VALUE_TYPES_NUM,
+		'monoinc' =>  self::ITEM_VALUE_TYPES_NUM,
 		'nodata' => self::ITEM_VALUE_TYPES_ALL,
 		'percentile' => self::ITEM_VALUE_TYPES_NUM,
 		'skewness' => self::ITEM_VALUE_TYPES_NUM,
@@ -295,7 +331,11 @@ final class CHistFunctionData {
 			return false;
 		}
 
-		return ($this->options['calculated'] || !self::isAggregating($function));
+		if (!$this->options['calculated'] && in_array($function, self::CALCULATED_ONLY, true)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -308,17 +348,7 @@ final class CHistFunctionData {
 			return self::PARAMETERS;
 		}
 
-		$result = [];
-
-		foreach (self::PARAMETERS as $function => $parameters) {
-			if (self::isAggregating($function)) {
-				continue;
-			}
-
-			$result[$function] = $parameters;
-		}
-
-		return $result;
+		return array_diff_key(self::PARAMETERS, array_flip(self::CALCULATED_ONLY));
 	}
 
 	/**
@@ -331,17 +361,7 @@ final class CHistFunctionData {
 			return self::VALUE_TYPES;
 		}
 
-		$result = [];
-
-		foreach (self::VALUE_TYPES as $function => $value_types) {
-			if (self::isAggregating($function)) {
-				continue;
-			}
-
-			$result[$function] = $value_types;
-		}
-
-		return $result;
+		return array_diff_key(self::VALUE_TYPES, array_flip(self::CALCULATED_ONLY));
 	}
 
 	/**
@@ -357,6 +377,33 @@ final class CHistFunctionData {
 		switch ($function) {
 			case 'avg_foreach':
 			case 'count_foreach':
+			case 'exists_foreach':
+			case 'item_count':
+			case 'last_foreach':
+			case 'max_foreach':
+			case 'min_foreach':
+			case 'sum_foreach':
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Check if the result of aggregating function is further aggregatable.
+	 *
+	 * @static
+	 *
+	 * @param string $function
+	 *
+	 * @return bool
+	 */
+	public static function isAggregatable(string $function): bool {
+		switch ($function) {
+			case 'avg_foreach':
+			case 'count_foreach':
+			case 'exists_foreach':
 			case 'last_foreach':
 			case 'max_foreach':
 			case 'min_foreach':

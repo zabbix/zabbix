@@ -579,10 +579,10 @@ class CScript extends CApiService {
 		if ($action_scriptids) {
 			$actions = API::Action()->get([
 				'output' => ['actionid', 'name'],
-				'scriptids' => array_keys($action_scriptids),
 				'selectOperations' => ['opcommand'],
 				'selectRecoveryOperations' => ['opcommand'],
-				'selectAcknowledgeOperations' => ['opcommand']
+				'selectUpdateOperations' => ['opcommand'],
+				'scriptids' => array_keys($action_scriptids)
 			]);
 
 			if ($actions) {
@@ -607,8 +607,8 @@ class CScript extends CApiService {
 								}
 							}
 
-							if ($action['recoveryOperations']) {
-								foreach ($action['recoveryOperations'] as $operation) {
+							if ($action['recovery_operations']) {
+								foreach ($action['recovery_operations'] as $operation) {
 									if (array_key_exists('opcommand', $operation)
 											&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
 										self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -620,8 +620,8 @@ class CScript extends CApiService {
 								}
 							}
 
-							if ($action['acknowledgeOperations']) {
-								foreach ($action['acknowledgeOperations'] as $operation) {
+							if ($action['update_operations']) {
+								foreach ($action['update_operations'] as $operation) {
 									if (array_key_exists('opcommand', $operation)
 											&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
 										self::exception(ZBX_API_ERROR_PARAMETERS,

@@ -1276,11 +1276,6 @@ abstract class CTriggerGeneral extends CApiService {
 		$save_triggers = $triggers;
 		$this->implode_expressions($triggers, $db_triggers, $triggers_functions, $inherited);
 
-		if ($class === 'CTrigger') {
-			// The list of the triggers with changed priority.
-			$changed_priority_triggerids = [];
-		}
-
 		foreach ($triggers as $tnum => $trigger) {
 			$db_trigger = $db_triggers[$tnum];
 			$upd_trigger = ['values' => [], 'where' => ['triggerid' => $trigger['triggerid']]];
@@ -1324,10 +1319,6 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 			if (array_key_exists('priority', $trigger) && $trigger['priority'] != $db_trigger['priority']) {
 				$upd_trigger['values']['priority'] = $trigger['priority'];
-
-				if ($class === 'CTrigger') {
-					$changed_priority_triggerids[] = $trigger['triggerid'];
-				}
 			}
 			if (array_key_exists('comments', $trigger) && $trigger['comments'] !== $db_trigger['comments']) {
 				$upd_trigger['values']['comments'] = $trigger['comments'];
@@ -1395,11 +1386,6 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		if ($new_tags) {
 			DB::insert('trigger_tag', $new_tags);
-		}
-
-		if ($class === 'CTrigger' && $changed_priority_triggerids
-				&& CTriggerManager::usedInItServices($changed_priority_triggerids)) {
-			updateItServices();
 		}
 
 		if (!$inherited) {

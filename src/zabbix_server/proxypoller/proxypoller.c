@@ -254,6 +254,8 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size)))
 	{
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+
 		if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
@@ -491,7 +493,7 @@ static int	process_proxy(void)
 			proxy.addr = proxy.addr_orig;
 
 			port = zbx_strdup(port, proxy.port_orig);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 					&port, MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == is_ushort(port, &proxy.port))
 			{

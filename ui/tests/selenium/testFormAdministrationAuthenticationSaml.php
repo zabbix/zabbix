@@ -143,7 +143,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'SP name ID format' => 'SP name ID format',
 						'Sign' => ['Messages', 'Assertions', 'AuthN requests', 'Logout requests', 'Logout responses'],
 						'Encrypt' => ['Name ID', 'Assertions'],
-						'Case sensitive login' => true
+						'Case-sensitive login' => true
 					],
 					'check_disabled' => true,
 					'db_check' => [
@@ -246,7 +246,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 				[
 					'username' => 'Admin',
 					'custom_settings' => [
-						'Case sensitive login' => true
+						'Case-sensitive login' => true
 					]
 				]
 			],
@@ -269,7 +269,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 			[
 				[
 					'username' => 'admin-zabbix',
-					'url' => 'services.php',
+					'url' => 'zabbix.php?action=service.list',
 					// Remove the 'regular_login' flag when ZBX-17663 is fixed.
 					'regular_login' => true,
 					'header' => 'Services'
@@ -309,7 +309,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 					'expected' => TEST_BAD,
 					'username' => 'admin',
 					'custom_settings' => [
-						'Case sensitive login' => true
+						'Case-sensitive login' => true
 					],
 					'error_title' => 'You are not logged in',
 					'error_details' => 'Incorrect user name or password or account is temporarily blocked.'
@@ -331,7 +331,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 			'SLO service URL' => PHPUNIT_SLO_SERVICE_URL,
 			'Username attribute' => PHPUNIT_USERNAME_ATTRIBUTE,
 			'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
-			'Case sensitive login' => false
+			'Case-sensitive login' => false
 		];
 		// Override particcular SAMl settings with values from data provider.
 		if (array_key_exists('custom_settings', $data)) {

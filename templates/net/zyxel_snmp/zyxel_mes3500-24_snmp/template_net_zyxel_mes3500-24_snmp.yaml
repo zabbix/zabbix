@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T15:21:05Z'
+  date: '2021-07-22T14:51:53Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -64,7 +64,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.3500_24.contact
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -114,7 +114,7 @@ zabbix_export:
           snmp_oid: 'discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.68.1]'
           key: zyxel.3500_24.fwversion
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'MIB: ZYXEL-MES3500-24-MIB'
@@ -144,7 +144,7 @@ zabbix_export:
           triggers:
             -
               uuid: f3daea29a34b4cf992d3c23ba8a64d2e
-              expression: '(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.fwversion,#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.fwversion,#2))=1 and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.fwversion))>0'
+              expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.fwversion,#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.fwversion,#2) and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.fwversion))>0'
               name: 'ZYXEL MES3500-24: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -157,7 +157,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.3500_24.location
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -181,7 +181,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.3500_24.mac
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -208,7 +208,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.3500_24.model
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -243,7 +243,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.3500_24.name
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -268,7 +268,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.68.1.10.0
           key: zyxel.3500_24.serialnumber
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -287,7 +287,7 @@ zabbix_export:
           triggers:
             -
               uuid: a475d29129664eec82fc7ed85cb74df9
-              expression: '(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber,#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber,#2))=1 and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber))>0'
+              expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber,#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber,#2) and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber))>0'
               name: 'ZYXEL MES3500-24: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
@@ -556,6 +556,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.3500_24.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.3500_24.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -566,6 +567,10 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
                   tag: Application
@@ -638,7 +643,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5a9faa35f7d547a987e78075832cf38e
-                  expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Link down'
@@ -753,6 +758,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.3500_24.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.3500_24.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_24.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -763,6 +769,10 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
                   tag: Application
@@ -862,13 +872,14 @@ zabbix_export:
                     key: 'zyxel.3500_24.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
-              name: 'Trigger disabled'
+              name: 'Don''t create triggers for matching interface'
               step: '1'
               filter:
                 conditions:
                   -
                     macro: '{#ZYXEL.IF.NAME}'
-                    value: '.*'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    operator: NOT_MATCHES_REGEX
                     formulaid: A
               operations:
                 -
@@ -877,22 +888,6 @@ zabbix_export:
                   value: '.*'
                   status: ENABLED
                   discover: NO_DISCOVER
-            -
-              name: 'Trigger enabled'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#ZYXEL.IF.NAME}'
-                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: '.*'
-                  status: ENABLED
-                  discover: DISCOVER
         -
           uuid: 302fdabe174e425d9f32d36694453331
           name: 'SFP with DDM discovery'
@@ -1097,7 +1092,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f84b378d79b74174842cc49af29c2a0c
-                  expression: '(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
@@ -1308,7 +1303,7 @@ zabbix_export:
           description: 'The time interval for SNMP agent availability trigger expression.'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'NEED TRIGGERS'
+          value: 'CHANGE_IF_NEEDED'
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'

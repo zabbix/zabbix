@@ -78,19 +78,6 @@ class CTriggerManager {
 			DB::delete('conditions', ['conditionid' => $conditionids]);
 		}
 
-		// Update IT services.
-		if (self::usedInItServices($del_triggerids)) {
-			DB::update('services', [
-				'values' => [
-					'triggerid' => null,
-					'showsla' => SERVICE_SHOW_SLA_OFF
-				],
-				'where' => ['triggerid' => $del_triggerids]
-			]);
-
-			updateItServices();
-		}
-
 		// Remove trigger sysmap elements.
 		$selement_triggerids = [];
 		$selementids = [];
@@ -142,18 +129,5 @@ class CTriggerManager {
 		DB::delete('trigger_depends', ['triggerid_up' => $del_triggerids]);
 		DB::delete('trigger_tag', ['triggerid' => $del_triggerids]);
 		DB::delete('triggers', ['triggerid' => $del_triggerids]);
-	}
-
-	/**
-	 * Returns true if at least one of the given triggers is used in services.
-	 *
-	 * @param array $triggerids
-	 *
-	 * @return bool
-	 */
-	public static function usedInItServices(array $triggerids) {
-		$db_services = DBselect('SELECT NULL FROM services WHERE '.dbConditionInt('triggerid', $triggerids), 1);
-
-		return (bool) DBfetch($db_services);
 	}
 }

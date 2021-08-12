@@ -419,10 +419,12 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_user_init(&user);
+
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
 		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
-		return;
+		goto out;
 	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
@@ -432,7 +434,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zbx_free(error);
-		return;
+		goto out;
 	}
 
 	zbx_json_init(&json, 1024);
@@ -454,6 +456,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zbx_free(info);
 	zbx_json_free(&json);
-
+out:
+	zbx_user_free(&user);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

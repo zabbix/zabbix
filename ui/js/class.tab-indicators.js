@@ -59,7 +59,7 @@ class TabIndicators {
 		const HOST_DISCOVERY = document.querySelector('#host-discovery-form');
 		const WEB_SCENARIO = document.querySelector('#http-form');
 		const ACTION = document.querySelector('#action-form');
-		const SERVICE = document.querySelector('#services-form');
+		const SERVICE = document.querySelector('#service-form');
 		const PROXY = document.querySelector('#proxy-form');
 		const USER_GROUP = document.querySelector('#user-group-form');
 		const USER = document.querySelector('#user-form');
@@ -206,8 +206,10 @@ class TabIndicatorFactory {
 				return new HttpAuthTabIndicatorItem;
 			case 'Operations':
 				return new OperationsTabIndicatorItem;
-			case 'ServiceDependency':
-				return new ServiceDependencyTabIndicatorItem;
+			case 'Sla':
+				return new SlaTabIndicatorItem;
+			case 'ChildServices':
+				return new ChildServicesTabIndicatorItem;
 			case 'Time':
 				return new TimeTabIndicatorItem;
 			case 'TagFilter':
@@ -266,7 +268,7 @@ class TabIndicatorItem {
 	 * @return {boolean|number} Boolean for mark indicator and number for count indicator
 	 */
 	getValue() {
-		throw 'Fatal error: can not call abstract method.';
+		throw 'Fatal error: cannot call abstract method.';
 	}
 
 	/**
@@ -275,7 +277,7 @@ class TabIndicatorItem {
 	 * @param {HTMLElement} element
 	 */
 	initObserver(element) {
-		throw 'Fatal error: can not call abstract method.';
+		throw 'Fatal error: cannot call abstract method.';
 	}
 
 	/**
@@ -903,7 +905,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			.querySelectorAll('#rec-table tbody tr:not(:last-child)')
 			.length;
 		count += document
-			.querySelectorAll('#ack-table tbody tr:not(:last-child)')
+			.querySelectorAll('#upd-table tbody tr:not(:last-child)')
 			.length;
 
 		return count;
@@ -912,7 +914,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node_op = document.querySelector('#op-table tbody');
 		const target_node_rec = document.querySelector('#rec-table tbody');
-		const target_node_ack = document.querySelector('#ack-table tbody');
+		const target_node_upd = document.querySelector('#upd-table tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
@@ -938,14 +940,41 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			observer_rec.observe(target_node_rec, observer_options);
 		}
 
-		if (target_node_ack) {
-			const observer_ack = new MutationObserver(observer_callback);
-			observer_ack.observe(target_node_ack, observer_options);
+		if (target_node_upd) {
+			const observer_upd = new MutationObserver(observer_callback);
+			observer_upd.observe(target_node_upd, observer_options);
 		}
 	}
 }
 
-class ServiceDependencyTabIndicatorItem extends TabIndicatorItem {
+class SlaTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const element = document.querySelector('#showsla');
+
+		if (element !== null) {
+			return element.checked;
+		}
+
+		return false;
+	}
+
+	initObserver(element) {
+		const target_node = document.querySelector('#showsla');
+
+		if (target_node) {
+			target_node.addEventListener('click', () => {
+				this.addAttributes(element);
+			});
+		}
+	}
+}
+
+class ChildServicesTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_COUNT);
@@ -953,12 +982,12 @@ class ServiceDependencyTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#service_children tbody tr')
+			.querySelectorAll('#children tbody tr')
 			.length;
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#service_children tbody');
+		const target_node = document.querySelector('#children tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true

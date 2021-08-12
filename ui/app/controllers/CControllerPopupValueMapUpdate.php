@@ -95,18 +95,29 @@ class CControllerPopupValueMapUpdate extends CController {
 
 				return false;
 			}
-			elseif ($type == VALUEMAP_MAPPING_TYPE_REGEXP
-					&& @preg_match('/'.str_replace('/', '\/', $value).'/', '') === false) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('invalid regular expression')));
+			elseif ($type == VALUEMAP_MAPPING_TYPE_REGEXP) {
+				if ($value === '') {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('cannot be empty')));
 
-				return false;
+					return false;
+				}
+				elseif (@preg_match('/'.str_replace('/', '\/', $value).'/', '') === false) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('invalid regular expression')));
+
+					return false;
+				}
 			}
-			elseif ($type == VALUEMAP_MAPPING_TYPE_IN_RANGE && $range_parser->parse($value) != CParser::PARSE_SUCCESS) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'),
-					_('invalid range expression')
-				));
+			elseif ($type == VALUEMAP_MAPPING_TYPE_IN_RANGE) {
+				if ($value === '') {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('cannot be empty')));
 
-				return false;
+					return false;
+				}
+				elseif ($range_parser->parse($value) != CParser::PARSE_SUCCESS) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('invalid range expression')));
+
+					return false;
+				}
 			}
 			elseif ($type == VALUEMAP_MAPPING_TYPE_LESS_EQUAL || $type == VALUEMAP_MAPPING_TYPE_GREATER_EQUAL) {
 				if ($number_parser->parse($value) != CParser::PARSE_SUCCESS) {

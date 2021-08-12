@@ -140,7 +140,7 @@ zabbix_export:
           triggers:
             -
               uuid: 76d500211fd9479fafbd0fb7d41ffd68
-              expression: '(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#2))=1 and length(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
+              expression: 'last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
               name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'WildFly version has changed. Ack to close.'
@@ -300,7 +300,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: da5368f2eec040bbb05f13faa6375052
-                  expression: '(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#2))=1 and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group]))>0'
+                  expression: 'last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group]))>0'
                   name: 'WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Server group has changed. Ack to close.'
@@ -329,7 +329,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 79409a9fae6442c9ad655655a752365d
-                  expression: '(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#2))=1 and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status]))>0'
+                  expression: 'last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status]))>0'
                   name: 'WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'Server status has changed. Ack to close.'

@@ -306,6 +306,7 @@ class CXmlConstantName {
 	const DISCOVERY = 'DISCOVERY';
 	const AUTOREGISTRATION = 'AUTOREGISTRATION';
 	// const INTERNAL = 'INTERNAL'; // Duplicate.
+	const SERVICE = 'SERVICE';
 
 	const PROBLEM = 'PROBLEM';
 	const RECOVERY = 'RECOVERY';

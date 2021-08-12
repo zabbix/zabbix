@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T10:31:39Z'
+  date: '2021-07-21T06:36:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -542,6 +542,27 @@ zabbix_export:
               name: 'Zabbix server: Utilization of self-monitoring processes over 75%'
               priority: AVERAGE
         -
+          uuid: 4f6c2b59437c4345b348d78b5d2242db
+          name: 'Zabbix server: Utilization of service manager internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,service manager,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time service manager processes have been busy in the last minute'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              uuid: c4cdbce205e843d6b882503961a15376
+              expression: 'avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of service manager processes over 75%'
+              priority: AVERAGE
+        -
           uuid: cb9a7c4f3373496da97f3e0b8c978366
           name: 'Zabbix server: Utilization of snmp trapper data collector processes, in %'
           type: INTERNAL
@@ -624,6 +645,27 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)<65'
               name: 'Zabbix server: Utilization of trapper processes over 75%'
+              priority: AVERAGE
+        -
+          uuid: ad2199d0152d4deb8259699ebd1f3da5
+          name: 'Zabbix server: Utilization of trigger housekeeper internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,trigger housekeeper,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time trigger housekeeper processes have been busy in the last minute'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              uuid: 5ffa02f393d34c49bcb9eed2b2b89704
+              expression: 'avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of trigger housekeeper processes over 75%'
               priority: AVERAGE
         -
           uuid: 4fd24bdb8935435e8617c9607b9c6ca1
@@ -839,7 +881,7 @@ zabbix_export:
           triggers:
             -
               uuid: 456403a2063c4e2298f9e3f60a7a3180
-              expression: '(last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2))=1 and length(last(/Zabbix server health/zabbix[version]))>0'
+              expression: 'last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2) and length(last(/Zabbix server health/zabbix[version]))>0'
               name: 'Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Zabbix server version has changed. Ack to close.'
@@ -1603,112 +1645,125 @@ zabbix_export:
       ymax_type_1: FIXED
       graph_items:
         -
+          sortorder: '1'
           color: 00EE00
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,timer,avg,busy]'
         -
-          sortorder: '1'
+          sortorder: '2'
           color: 0000EE
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,escalator,avg,busy]'
         -
-          sortorder: '2'
+          sortorder: '3'
           color: FFAA00
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,housekeeper,avg,busy]'
         -
-          sortorder: '3'
+          sortorder: '4'
           color: 00EEEE
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,alerter,avg,busy]'
         -
-          sortorder: '4'
+          sortorder: '5'
           color: '990099'
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,configuration syncer,avg,busy]'
         -
-          sortorder: '5'
+          sortorder: '6'
           color: EE0000
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,history syncer,avg,busy]'
         -
-          sortorder: '6'
+          sortorder: '7'
           color: FF66FF
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,self-monitoring,avg,busy]'
         -
-          sortorder: '7'
+          sortorder: '8'
           color: '009999'
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,task manager,avg,busy]'
         -
-          sortorder: '8'
+          sortorder: '9'
           color: BBBB00
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,ipmi manager,avg,busy]'
         -
-          sortorder: '9'
+          sortorder: '10'
           color: AA0000
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,alert manager,avg,busy]'
         -
-          sortorder: '10'
+          sortorder: '11'
           color: '990000'
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,preprocessing manager,avg,busy]'
         -
-          sortorder: '11'
+          sortorder: '12'
           color: '008800'
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,preprocessing worker,avg,busy]'
         -
-          sortorder: '12'
+          sortorder: '13'
           color: 80B0E0
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,lld manager,avg,busy]'
         -
-          sortorder: '13'
+          sortorder: '14'
           color: 4080B0
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,lld worker,avg,busy]'
         -
-          sortorder: '14'
+          sortorder: '15'
           color: 8000FF
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,alert syncer,avg,busy]'
         -
-          sortorder: '15'
+          sortorder: '16'
           color: 2B5429
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,availability manager,avg,busy]'
         -
-          sortorder: '16'
+          sortorder: '17'
           color: 8048B4
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,report manager,avg,busy]'
         -
-          sortorder: '17'
+          sortorder: '18'
           color: FD5434
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,report writer,avg,busy]'
+        -
+          sortorder: '19'
+          color: 790E1F
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,service manager,avg,busy]'
+        -
+          sortorder: '20'
+          color: 87AC4D
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,trigger housekeeper,avg,busy]'
     -
       uuid: b053dc416ee3422b94e46fb415ea87e6
       name: 'Zabbix server: Zabbix internal queues'

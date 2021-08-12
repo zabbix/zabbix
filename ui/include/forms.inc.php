@@ -1033,6 +1033,11 @@ function getItemFormData(array $item = [], array $options = []) {
 		'hostids' => $data['hostid'],
 		'output' => API_OUTPUT_EXTEND
 	]);
+	// Sort interfaces to be listed starting with one selected as 'main'.
+	CArrayHelper::sort($data['interfaces'], [
+		['field' => 'main', 'order' => ZBX_SORT_DOWN],
+		['field' => 'interfaceid','order' => ZBX_SORT_UP]
+	]);
 
 	if (!$data['is_discovery_rule'] && $data['form'] === 'clone') {
 		if ($data['valuemapid'] != 0) {
@@ -1804,7 +1809,10 @@ function getTriggerFormData(array $data) {
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];
 			$data['url'] = $trigger['url'];
-			$data['discover'] = $trigger['discover'];
+
+			if ($data['parent_discoveryid'] !== null) {
+				$data['discover'] = $trigger['discover'];
+			}
 
 			$db_triggers = DBselect(
 				'SELECT t.triggerid,t.description'.

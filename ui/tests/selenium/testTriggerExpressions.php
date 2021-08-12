@@ -33,7 +33,7 @@ class testTriggerExpressions extends CWebTest {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Check table headers presence in tesing dialog.
-		$table_headers = ['Expression Variable Elements', 'Result type', 'Value',
+		$table_headers = ['Expression variable elements', 'Result type', 'Value',
 						'Expression', 'Result', 'Error'];
 
 		foreach ($table_headers as $header) {

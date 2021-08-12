@@ -29,7 +29,8 @@ $this->addJsFile('multiselect.js');
 
 $this->includeJsFile('reports.auditlog.list.js.php');
 
-$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['action'])));
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', $data['action']));
 
 $select_filter_resourcetype = (new CSelect('filter_resourcetype'))
 	->setId('resourcetype-select')
@@ -55,7 +56,7 @@ $filter_form = (new CFormList())
 					'srctbl' => 'users',
 					'srcfld1' => 'userid',
 					'srcfld2' => 'fullname',
-					'dstfrm' => $filter->getName(),
+					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_userids_'
 				]
 			]
@@ -94,17 +95,11 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['auditlogs'] as $auditlog) {
-	$details = [];
-
-	foreach ($auditlog['details'] as $detail) {
-		$details[] = [$detail['table_name'].'.'.$detail['field_name'].': '.$detail['oldvalue'].
-			' => '.$detail['newvalue'], BR()
-		];
-	}
-
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $auditlog['clock']),
-		$data['users'][$auditlog['userid']],
+		array_key_exists($auditlog['userid'], $data['usernames'])
+			? new CTag('em', true, $data['usernames'][$auditlog['userid']])
+			: $data['users'][$auditlog['userid']],
 		$auditlog['ip'],
 		array_key_exists($auditlog['resourcetype'], $data['resources'])
 			? $data['resources'][$auditlog['resourcetype']]
@@ -114,7 +109,7 @@ foreach ($data['auditlogs'] as $auditlog) {
 			: _('Unknown action'),
 		$auditlog['resourceid'],
 		$auditlog['resourcename'],
-		$details ? $details : $auditlog['note']
+		zbx_nl2br($auditlog['details'])
 	]);
 }
 

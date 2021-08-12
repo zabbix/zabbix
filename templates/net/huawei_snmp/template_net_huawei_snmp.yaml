@@ -206,7 +206,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e379ca4d50a3434e82841e8884a84656
-                  expression: '(last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2))=1 and length(last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Huawei VRP SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
@@ -254,7 +254,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 698067d647424c96addeb3c9f960dd07
-                  expression: '(last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2))=1 and length(last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2) and length(last(/Huawei VRP SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Operating system description has changed'
                   priority: INFO
                   description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'

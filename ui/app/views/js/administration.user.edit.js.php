@@ -27,9 +27,7 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		let $form = $('form[name="user_form"]').submit(function() {
-			$(this).trimValues(['#username', '#name', '#surname', '#password1', '#password2', '#autologout', '#refresh',
-				'#url'
-			]);
+			$(this).trimValues(['#username', '#name', '#surname', '#autologout', '#refresh', '#url']);
 		});
 
 		$('#roleid').change(function() {

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T15:20:13Z'
+  date: '2021-07-22T14:50:17Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -64,7 +64,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.ies6000.contact
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -89,7 +89,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.ies6000.location
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -113,7 +113,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.ies6000.mac
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -140,7 +140,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.ies6000.model
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -175,7 +175,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.ies6000.name
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -857,7 +857,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3fbe4b16a94648089df78829ee7e683f
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Link down'
@@ -1036,13 +1036,14 @@ zabbix_export:
                   return JSON.stringify(outArr);
           overrides:
             -
-              name: 'Trigger disabled'
+              name: 'Don''t create triggers for matching interface'
               step: '1'
               filter:
                 conditions:
                   -
                     macro: '{#ZYXEL.IF.NAME}'
-                    value: '.*'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    operator: NOT_MATCHES_REGEX
                     formulaid: A
               operations:
                 -
@@ -1051,22 +1052,6 @@ zabbix_export:
                   value: '.*'
                   status: ENABLED
                   discover: NO_DISCOVER
-            -
-              name: 'Trigger enabled'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#ZYXEL.IF.NAME}'
-                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: '.*'
-                  status: ENABLED
-                  discover: DISCOVER
         -
           uuid: 8f9073a53cee4e6fb8c36feda5185900
           name: 'Ethernet interface discovery'
@@ -1266,6 +1251,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) <> 0) /( last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -1276,6 +1262,10 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
                   tag: Application
@@ -1442,6 +1432,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.ies6000.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) <> 0) /( last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -1452,6 +1443,10 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
                   tag: Application
@@ -1530,13 +1525,14 @@ zabbix_export:
                     key: 'zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
-              name: 'Trigger disabled'
+              name: 'Don''t create triggers for matching interface'
               step: '1'
               filter:
                 conditions:
                   -
                     macro: '{#ZYXEL.IF.NAME}'
-                    value: '.*'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    operator: NOT_MATCHES_REGEX
                     formulaid: A
               operations:
                 -
@@ -1545,22 +1541,6 @@ zabbix_export:
                   value: '.*'
                   status: ENABLED
                   discover: NO_DISCOVER
-            -
-              name: 'Trigger enabled'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#ZYXEL.IF.NAME}'
-                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: '.*'
-                  status: ENABLED
-                  discover: DISCOVER
         -
           uuid: 10a176c3da924a95939cd35c0d0be862
           name: 'Slot discovery'
@@ -1577,7 +1557,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#ZYXEL.SLOTSTATUS}'
-                value: '{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}'
+                value: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The table which contains the slot information in a chassis.'
@@ -1681,7 +1661,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c62327e51d27445b893e80bf77c9696c
-                  expression: '(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: DSL modem code has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1733,7 +1713,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 63a4bdc73f8c49a7abb914f47e162dec
-                  expression: '(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Driver has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1764,7 +1744,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7a2ef454d9624fd78416d2e1345be9a5
-                  expression: '(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Firmware has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1795,7 +1775,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 537f28be56984664822b574a2064453b
-                  expression: '(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Hardware version has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1867,7 +1847,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3fbbcffe1c46497d89fe0d987a5f6eff
-                  expression: '(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#2))=1 and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Slot {#ZYXEL.SLOT.ID} serial number has changed. Ack to close'
@@ -2079,12 +2059,12 @@ zabbix_export:
           value: '8'
           description: 'Type the minimum signal to noise margin (0-31 dB)'
         -
-          macro: '{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}'
+          macro: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
           value: '1'
           description: 'Filter to exclude discovered slots by status.'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'NEED TRIGGERS'
+          value: 'CHANGE_IF_NEEDED'
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}'

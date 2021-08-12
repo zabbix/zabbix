@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:23Z'
+  date: '2021-06-22T16:33:40Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -178,7 +178,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5124b17918f545758ca5c936332f51cd
-              expression: '(last(/Apache by Zabbix agent/apache.version,#1)<>last(/Apache by Zabbix agent/apache.version,#2))=1 and length(last(/Apache by Zabbix agent/apache.version))>0'
+              expression: 'last(/Apache by Zabbix agent/apache.version,#1)<>last(/Apache by Zabbix agent/apache.version,#2) and length(last(/Apache by Zabbix agent/apache.version))>0'
               name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Apache version has changed. Ack to close.'
@@ -776,13 +776,15 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           preprocessing:
             -
-              type: JSONPATH
-              parameters:
-                - $.ServerMPM
-            -
               type: JAVASCRIPT
               parameters:
-                - 'return JSON.stringify(value === ''event'' ? [{''{#SINGLETON}'': ''''}] : []);'
+                - |
+                  return JSON.stringify(JSON.parse(value).ServerMPM === 'event'
+                      ? [{'{#SINGLETON}': ''}] : []);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
       macros:
         -
           macro: '{$APACHE.PROCESS_NAME}'
@@ -854,16 +856,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -879,16 +881,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid

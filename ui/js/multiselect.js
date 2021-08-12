@@ -245,6 +245,25 @@ jQuery(function($) {
 			});
 
 			return ret;
+		},
+
+		/**
+		 * @return HTMLElement
+		 */
+		getSelectButton: function() {
+			var ret = null;
+
+			this.each(function() {
+				var $obj = $(this);
+
+				if ($obj.data('multiSelect') !== undefined) {
+					ret = $obj.data('multiSelect').select_button[0];
+
+					return false;
+				}
+			});
+
+			return ret;
 		}
 	};
 
@@ -299,7 +318,6 @@ jQuery(function($) {
 				},
 				placeholder: t('type here to search'),
 				data: [],
-				only_hostid: 0,
 				excludeids: [],
 				addNew: false,
 				defaultValue: null,
@@ -337,7 +355,8 @@ jQuery(function($) {
 						 * In such case the "focusout" event (IE) of the search input should not be processed.
 						 */
 						available_false_click: false
-					}
+					},
+					select_button: null
 				};
 
 			ms.values.available_div.on('mousedown', 'li', function() {
@@ -399,38 +418,36 @@ jQuery(function($) {
 				});
 			}
 
-			if (ms.options.popup.parameters != null) {
-				if (typeof ms.options.popup.parameters['only_hostid'] !== 'undefined') {
-					ms.options.only_hostid = ms.options.popup.parameters['only_hostid'];
-				}
-
-				var popup_button = $('<button>', {
-						type: 'button',
-						'class': 'btn-grey',
-						text: ms.options.labels['Select']
-					});
-
-				if (ms.options.disabled) {
-					popup_button.prop('disabled', true);
-				}
-
-				popup_button.on('click', function(event) {
-					var popup_options = ms.options.popup.parameters;
-
-					if (ms.options.popup.filter_preselect_fields) {
-						popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj, MS_ACTION_POPUP));
-					}
-
-					if (typeof popup_options['disable_selected'] !== 'undefined' && popup_options['disable_selected']) {
-						popup_options['disableids'] = Object.keys(ms.values.selected);
-					}
-
-					// Click used instead focus because in patternselect listen only click.
-					$('input[type="text"]', $obj).click();
-					return PopUp('popup.generic', popup_options, null, event.target);
+			if (ms.options.custom_select || ms.options.popup.parameters !== undefined) {
+				ms.select_button = $('<button>', {
+					type: 'button',
+					'class': 'btn-grey',
+					text: ms.options.labels['Select']
 				});
 
-				$obj.after($('<div>', {'class': 'multiselect-button'}).append(popup_button));
+				if (ms.options.disabled) {
+					ms.select_button.prop('disabled', true);
+				}
+
+				if (ms.options.popup.parameters !== undefined) {
+					ms.select_button.on('click', function(event) {
+						var popup_options = ms.options.popup.parameters;
+
+						if (ms.options.popup.filter_preselect_fields) {
+							popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj, MS_ACTION_POPUP));
+						}
+
+						if (typeof popup_options['disable_selected'] !== 'undefined' && popup_options['disable_selected']) {
+							popup_options['disableids'] = Object.keys(ms.values.selected);
+						}
+
+						// Click used instead focus because in patternselect listen only click.
+						$('input[type="text"]', $obj).click();
+						return PopUp('popup.generic', popup_options, null, event.target);
+					});
+				}
+
+				$obj.after($('<div>', {'class': 'multiselect-button'}).append(ms.select_button));
 			}
 		});
 	};
@@ -674,7 +691,7 @@ jQuery(function($) {
 										$aria_live.text(aria_text);
 									}
 									else {
-										$aria_live.text(t('Can not be removed'));
+										$aria_live.text(t('Cannot be removed'));
 									}
 								}
 								else if (e.which == KEY_BACKSPACE) {

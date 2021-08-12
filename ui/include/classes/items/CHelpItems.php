@@ -178,7 +178,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
-					'description' => _('Process CPU utilisation percentage. Returns float')
+					'description' => _('Process CPU utilization percentage. Returns float')
 				],
 				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
@@ -230,7 +230,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
-					'description' => _('CPU utilisation percentage. Returns float')
+					'description' => _('CPU utilization percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',
@@ -254,7 +254,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System time. Returns integer with type as utc; string - with type as local')
+					'description' => _('System time. Returns integer with type as UTC; string - with type as local')
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
@@ -560,7 +560,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
-					'description' => _('Process CPU utilisation percentage. Returns float')
+					'description' => _('Process CPU utilization percentage. Returns float')
 				],
 				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
@@ -612,7 +612,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
-					'description' => _('CPU utilisation percentage. Returns float')
+					'description' => _('CPU utilization percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',
@@ -636,7 +636,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System time. Returns integer with type as utc; string - with type as local')
+					'description' => _('System time. Returns integer with type as UTC; string - with type as local')
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
@@ -946,7 +946,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.hv.hw.uuid[<url>,<uuid>]',
-					'description' => _('VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+					'description' => _('VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
 					'key' => 'vmware.hv.hw.vendor[<url>,<uuid>]',
@@ -1126,7 +1126,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
-					'description' => _('	The average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+					'description' => _('The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
 				],
 				[
 					'key' => 'vmware.vm.storage.totalwritelatency[<url>,<uuid>,<instance>]',
