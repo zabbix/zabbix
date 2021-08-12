@@ -25,21 +25,22 @@
 
 global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
 
+$theme = ZBX_DEFAULT_THEME;
+$scripts = $data['javascript']['files'];
 $page_title = $data['page']['title'];
+
 if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
 	$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER.$page_title;
 }
 
 $pageHeader = new CPageHeader($page_title);
 
-$scripts = $data['javascript']['files'];
-
-$theme = ZBX_DEFAULT_THEME;
 if (!empty($DB['DB'])) {
 	$theme = getUserTheme($data['user']);
 
-	$pageHeader->addStyle(getTriggerSeverityCss());
-	$pageHeader->addStyle(getTriggerStatusCss());
+	$pageHeader
+		->addStyle(getTriggerSeverityCss())
+		->addStyle(getTriggerStatusCss());
 
 	// Perform Zabbix server check only for standard pages.
 	if ($data['config']['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
@@ -66,16 +67,15 @@ $pageHeader
 		->getUrl()
 	);
 
-$jsloader_url = (new CUrl('jsLoader.php'))
-	->setArgument('ver', ZABBIX_VERSION)
-	->setArgument('lang', $data['user']['lang']);
-
 if ($scripts) {
-	$jsloader_url->setArgument('files', $scripts);
+	$pageHeader->addJsFile((new CUrl('jsLoader.php'))
+		->setArgument('ver', ZABBIX_VERSION)
+		->setArgument('lang', $data['user']['lang'])
+		->setArgument('files', $scripts)
+		->getUrl()
+	);
 }
 
-$pageHeader
-	->addJsFile($jsloader_url->getUrl())
-	->display();
+$pageHeader->display();
 
 echo '<body lang="'.CWebUser::getLang().'">';
