@@ -118,12 +118,12 @@ class CControllerServiceCreate extends CController {
 			$this->getInputs($service, ['status_rules', 'propagation_rule']);
 
 			switch ($this->getInput('propagation_rule', DB::getDefault('services', 'propagation_rule'))) {
-				case ZBX_SERVICE_STATUS_INCREASE:
-				case ZBX_SERVICE_STATUS_DECREASE:
+				case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+				case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
 					$service['propagation_value'] = $this->getInput('propagation_value_number', 0);
 					break;
 
-				case ZBX_SERVICE_STATUS_FIXED:
+				case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
 					$service['propagation_value'] = $this->getInput('propagation_value_status', 0);
 					break;
 

@@ -177,7 +177,7 @@ class CService extends CApiService {
 			'goodsla' =>			['type' => API_FLOAT, 'in' => '0:100'],
 			'sortorder' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:999'],
 			'weight' =>				['type' => API_INT32, 'in' => '0:1000000'],
-			'propagation_rule' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_SERVICE_STATUS_AS_IS, ZBX_SERVICE_STATUS_INCREASE, ZBX_SERVICE_STATUS_DECREASE, ZBX_SERVICE_STATUS_IGNORE, ZBX_SERVICE_STATUS_FIXED])],
+			'propagation_rule' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_SERVICE_STATUS_PROPAGATION_AS_IS, ZBX_SERVICE_STATUS_PROPAGATION_INCREASE, ZBX_SERVICE_STATUS_PROPAGATION_DECREASE, ZBX_SERVICE_STATUS_PROPAGATION_IGNORE, ZBX_SERVICE_STATUS_PROPAGATION_FIXED])],
 			'propagation_value' =>	['type' => API_INT32],
 			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_tag', 'tag')],
@@ -286,7 +286,7 @@ class CService extends CApiService {
 			'goodsla' =>			['type' => API_FLOAT, 'in' => '0:100'],
 			'sortorder' =>			['type' => API_INT32, 'in' => '0:999'],
 			'weight' =>				['type' => API_INT32, 'in' => '0:1000000'],
-			'propagation_rule' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_SERVICE_STATUS_AS_IS, ZBX_SERVICE_STATUS_INCREASE, ZBX_SERVICE_STATUS_DECREASE, ZBX_SERVICE_STATUS_IGNORE, ZBX_SERVICE_STATUS_FIXED])],
+			'propagation_rule' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_SERVICE_STATUS_PROPAGATION_AS_IS, ZBX_SERVICE_STATUS_PROPAGATION_INCREASE, ZBX_SERVICE_STATUS_PROPAGATION_DECREASE, ZBX_SERVICE_STATUS_PROPAGATION_IGNORE, ZBX_SERVICE_STATUS_PROPAGATION_FIXED])],
 			'propagation_value' =>	['type' => API_INT32],
 			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('service_tag', 'tag')],
@@ -669,12 +669,12 @@ class CService extends CApiService {
 			}
 
 			switch ($propagation_rule) {
-				case ZBX_SERVICE_STATUS_INCREASE:
-				case ZBX_SERVICE_STATUS_DECREASE:
+				case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+				case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
 					$propagation_values = range(1, TRIGGER_SEVERITY_COUNT - 1);
 					break;
 
-				case ZBX_SERVICE_STATUS_FIXED:
+				case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
 					$propagation_values = array_merge([ZBX_SEVERITY_OK],
 						range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
 					);

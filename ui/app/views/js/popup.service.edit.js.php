@@ -165,13 +165,13 @@ window.service_edit_popup = {
 		document.getElementById('weight_field').style.display = advanced_configuration ? '' : 'none';
 
 		switch (propagation_rule) {
-			case '<?= ZBX_SERVICE_STATUS_INCREASE ?>':
-			case '<?= ZBX_SERVICE_STATUS_DECREASE ?>':
+			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_INCREASE ?>':
+			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_DECREASE ?>':
 				document.getElementById('propagation_value_number').style.display = '';
 				document.getElementById('propagation_value_status').style.display = 'none';
 				break;
 
-			case '<?= ZBX_SERVICE_STATUS_FIXED ?>':
+			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_FIXED ?>':
 				document.getElementById('propagation_value_number').style.display = 'none';
 				document.getElementById('propagation_value_status').style.display = '';
 				break;

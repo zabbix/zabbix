@@ -119,11 +119,11 @@ class CServiceHelper {
 
 	public static function getStatusPropagationNames(): array {
 		return [
-			ZBX_SERVICE_STATUS_AS_IS => _('As is'),
-			ZBX_SERVICE_STATUS_INCREASE => _('Increase by'),
-			ZBX_SERVICE_STATUS_DECREASE => _('Decrease by'),
-			ZBX_SERVICE_STATUS_IGNORE => _('Ignore this service'),
-			ZBX_SERVICE_STATUS_FIXED => _('Fixed status')
+			ZBX_SERVICE_STATUS_PROPAGATION_AS_IS => _('As is'),
+			ZBX_SERVICE_STATUS_PROPAGATION_INCREASE => _('Increase by'),
+			ZBX_SERVICE_STATUS_PROPAGATION_DECREASE => _('Decrease by'),
+			ZBX_SERVICE_STATUS_PROPAGATION_IGNORE => _('Ignore this service'),
+			ZBX_SERVICE_STATUS_PROPAGATION_FIXED => _('Fixed status')
 		];
 	}
 }
