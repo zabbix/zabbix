@@ -1,3 +1,5 @@
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -20,48 +22,36 @@
 package file
 
 import (
-	"crypto/md5"
 	"errors"
 	"fmt"
-	"io"
-	"time"
+	"syscall"
 
-	"zabbix.com/pkg/std"
 	"zabbix.com/pkg/zbxerr"
 )
 
-func md5sum(file std.File, start time.Time, timeout int) (result interface{}, err error) {
-	var bnum int64
-	bnum = 16 * 1024
-	buf := make([]byte, bnum)
-
-	hash := md5.New()
-
-	for bnum > 0 {
-		bnum, _ = io.CopyBuffer(hash, file, buf)
-		if time.Since(start) > time.Duration(timeout)*time.Second {
-			return nil, errors.New("Timeout while processing item.")
-		}
-	}
-
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+// mode2str - permission printable format
+func mode2str(mode uint32) string {
+	return fmt.Sprintf("%04o", mode&07777)
 }
 
-func (p *Plugin) exportMd5sum(params []string) (result interface{}, err error) {
+// exportPermissions - returns 4-digit string containing octal number with Unix permissions
+func (p *Plugin) exportPermissions(params []string) (result interface{}, err error) {
 	if len(params) > 1 {
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
-	if len(params) == 0 || params[0] == "" {
+	if len(params) == 0 || len(params[0]) == 0 {
 		return nil, errors.New("Invalid first parameter.")
 	}
 
-	start := time.Now()
-
-	file, err := stdOs.Open(params[0])
+	info, err := stdOs.Stat(params[0])
 	if err != nil {
-		return nil, zbxerr.New("Cannot open file").Wrap(err)
+		return nil, err
 	}
-	defer file.Close()
 
-	return md5sum(file, start, p.options.Timeout)
+	stat := info.Sys().(*syscall.Stat_t)
+	if stat == nil {
+		return nil, fmt.Errorf("Cannot obtain %s permission information.", params[0])
+	}
+
+	return mode2str(stat.Mode), nil
 }

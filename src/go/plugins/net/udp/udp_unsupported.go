@@ -1,3 +1,5 @@
+// +build windows,386 darwin
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -17,27 +19,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SHA256CRYPT_H
-#define ZABBIX_SHA256CRYPT_H
+package udp
 
-#include "common.h"
+import (
+	"errors"
+)
 
-#define ZBX_SHA256_DIGEST_SIZE	32
-
-/* Structure to save state of computation between the single steps.  */
-typedef struct
-{
-	uint32_t	H[8];
-
-	uint32_t	total[2];
-	uint32_t	buflen;
-	char		buffer[128];	/* NB: always correctly aligned for uint32_t.  */
+// exportNetUdpSocketCount - returns number of UDP sockets that match parameters.
+func (p *Plugin) exportNetUdpSocketCount(params []string) (result int, err error) {
+	return 0, errors.New("Not supported.")
 }
-sha256_ctx;
-
-void	zbx_sha256_init(sha256_ctx *ctx);
-void	zbx_sha256_process_bytes(const void *buffer, size_t len, sha256_ctx *ctx);
-void	*zbx_sha256_finish(sha256_ctx *ctx, void *resbuf);
-void	zbx_sha256_hash(const char *in, char *out);
-
-#endif /* ZABBIX_SHA256CRYPT_H */

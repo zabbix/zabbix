@@ -17,27 +17,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SHA256CRYPT_H
-#define ZABBIX_SHA256CRYPT_H
+package file
 
-#include "common.h"
+import (
+	"crypto/sha256"
+	"errors"
+	"fmt"
+	"io"
+	"time"
 
-#define ZBX_SHA256_DIGEST_SIZE	32
+	"zabbix.com/pkg/std"
+)
 
-/* Structure to save state of computation between the single steps.  */
-typedef struct
-{
-	uint32_t	H[8];
+func sha256sum(file std.File, start time.Time, timeout int) (result interface{}, err error) {
+	var bnum int64
+	bnum = 16 * 1024
+	buf := make([]byte, bnum)
 
-	uint32_t	total[2];
-	uint32_t	buflen;
-	char		buffer[128];	/* NB: always correctly aligned for uint32_t.  */
+	hash := sha256.New()
+
+	for bnum > 0 {
+		bnum, _ = io.CopyBuffer(hash, file, buf)
+		if time.Since(start) > time.Duration(timeout)*time.Second {
+			return nil, errors.New("Timeout while processing item.")
+		}
+	}
+
+	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }
-sha256_ctx;
-
-void	zbx_sha256_init(sha256_ctx *ctx);
-void	zbx_sha256_process_bytes(const void *buffer, size_t len, sha256_ctx *ctx);
-void	*zbx_sha256_finish(sha256_ctx *ctx, void *resbuf);
-void	zbx_sha256_hash(const char *in, char *out);
-
-#endif /* ZABBIX_SHA256CRYPT_H */

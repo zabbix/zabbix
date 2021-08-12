@@ -1,3 +1,5 @@
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -17,27 +19,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SHA256CRYPT_H
-#define ZABBIX_SHA256CRYPT_H
+package file
 
-#include "common.h"
+import (
+	"zabbix.com/pkg/plugin"
+)
 
-#define ZBX_SHA256_DIGEST_SIZE	32
-
-/* Structure to save state of computation between the single steps.  */
-typedef struct
-{
-	uint32_t	H[8];
-
-	uint32_t	total[2];
-	uint32_t	buflen;
-	char		buffer[128];	/* NB: always correctly aligned for uint32_t.  */
+// exportPermissions - returns 4-digit string containing octal number with Unix permissions
+func (p *Plugin) exportPermissions(params []string) (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
 }
-sha256_ctx;
-
-void	zbx_sha256_init(sha256_ctx *ctx);
-void	zbx_sha256_process_bytes(const void *buffer, size_t len, sha256_ctx *ctx);
-void	*zbx_sha256_finish(sha256_ctx *ctx, void *resbuf);
-void	zbx_sha256_hash(const char *in, char *out);
-
-#endif /* ZABBIX_SHA256CRYPT_H */
