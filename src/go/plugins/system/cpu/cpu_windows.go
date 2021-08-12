@@ -38,6 +38,7 @@ type Plugin struct {
 const (
 	modeParam = 2
 	cpuParam  = 1
+	noParam   = 0
 
 	defaultIndex = 60
 )
@@ -87,6 +88,7 @@ func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
 		default:
 			return nil, errors.New("Invalid second parameter.")
 		}
+	case noParam:
 	default:
 		return nil, zbxerr.ErrorTooManyParameters
 	}
