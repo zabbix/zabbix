@@ -1523,7 +1523,8 @@ class C60XmlValidator extends CXmlValidatorGeneral {
 												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 											]]
 										]]
-									]]
+									]],
+									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE]
 								]]
 							]],
 							'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
