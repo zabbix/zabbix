@@ -34,13 +34,13 @@ class CServiceHelper {
 			ZBX_SERVICE_STATUS_RULE_TYPE_N_GE => _s('If at least %2$s child services have %1$s status or above',
 				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N)')
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE => _s('If at least %2$s child services have %1$s status or above',
+			ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE => _s('If at least %2$s of child services have %1$s status or above',
 				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_N_L => _s('If less than %2$s child services have %1$s status or below',
 				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N)')
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_NP_L => _s('If less than %2$s child services have %1$s status or below',
+			ZBX_SERVICE_STATUS_RULE_TYPE_NP_L => _s('If less than %2$s of child services have %1$s status or below',
 				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_W_GE => _s(
@@ -67,19 +67,29 @@ class CServiceHelper {
 
 		switch ($type) {
 			case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
-			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
 				$rule = _n(
 					'If at least %2$s child service has %1$s status or above',
 					'If at least %2$s child services have %1$s status or above',
 					new CTag('em', true, $status), new CTag('em', true, $number), $number
 				);
 				break;
+			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
+				$rule = _s(
+					'If at least %2$s of child services have %1$s status or above',
+					new CTag('em', true, $status), new CTag('em', true, [$number, '%']), $number
+				);
+				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
-			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
 				$rule = _n(
 					'If less than %2$s child service has %1$s status or below',
 					'If less than %2$s child services have %1$s status or below',
 					new CTag('em', true, $status), new CTag('em', true, $number), $number
+				);
+				break;
+			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
+				$rule = _n(
+					'If less than %2$s of child services have %1$s status or below',
+					new CTag('em', true, $status), new CTag('em', true, [$number, '%']), $number
 				);
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
