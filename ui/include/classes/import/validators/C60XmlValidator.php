@@ -1739,7 +1739,6 @@ class C60XmlValidator extends CXmlValidatorGeneral {
 							]]
 						]]
 					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE],
 					'valuemaps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'valuemap', 'rules' => [
 						'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 							'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
