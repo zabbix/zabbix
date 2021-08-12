@@ -3312,6 +3312,11 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 								row[17]))			/* contextname */
 						{
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
+
+							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+									host_prototype->hostid, host_prototype->name);
+
+							zbx_audit_host_prototype_update_json_delete_interface(hostid, interfaceid);
 						}
 					}
 					else
@@ -3328,6 +3333,11 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 								0, 0, NULL, NULL, 0, NULL, NULL, 0, 0, NULL))
 						{
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
+
+							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+									host_prototype->hostid, host_prototype->name);
+							zbx_audit_host_prototype_update_json_delete_interface(hostid,
+									interfaceid);
 						}
 					}
 

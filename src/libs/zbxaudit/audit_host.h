@@ -112,4 +112,5 @@ PREPARE_AUDIT_TEMPLATE_OP_H(attach, AUDIT_DETAILS_ACTION_ATTACH)
 PREPARE_AUDIT_TEMPLATE_OP_H(detach, AUDIT_DETAILS_ACTION_DETACH)
 
 void	zbx_audit_host_prototype_update_json_add_templates(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids);
+void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
 #endif	/* ZABBIX_AUDIT_HOST_H */

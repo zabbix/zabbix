@@ -156,7 +156,7 @@ void	zbx_audit_##resource##_update_json_update_interface_##interface_resource(zb
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(buf, sizeof(buf), #resource".interfaces[%lu]."#interface_resource, interfaceid);		\
+	zbx_snprintf(buf, sizeof(buf), #resource".interfaces[%lu].details."#interface_resource, interfaceid);	\
 	zbx_audit_update_json_update_##type2(hostid, buf, interface_resource##_old, interface_resource##_new);	\
 }														\
 
@@ -196,12 +196,18 @@ void	zbx_audit_##resource##_update_json_add_interfaces(zbx_uint64_t hostid, zbx_
 		audit_key_dns[AUDIT_DETAILS_KEY_LEN], audit_key_port[AUDIT_DETAILS_KEY_LEN];			\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(audit_key_main,  AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].main", interfaceid);	\
-	zbx_snprintf(audit_key_type,  AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].type", interfaceid);	\
-	zbx_snprintf(audit_key_useip, AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].useip", interfaceid);	\
-	zbx_snprintf(audit_key_ip,    AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].ip", interfaceid);	\
-	zbx_snprintf(audit_key_dns,   AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].dns", interfaceid);	\
-	zbx_snprintf(audit_key_port,  AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].port", interfaceid);	\
+	zbx_snprintf(audit_key_main,  AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.main",		\
+			interfaceid);										\
+	zbx_snprintf(audit_key_type,  AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.type",		\
+			interfaceid);										\
+	zbx_snprintf(audit_key_useip, AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.useip",		\
+			interfaceid);										\
+	zbx_snprintf(audit_key_ip,    AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.ip",		\
+			interfaceid);										\
+	zbx_snprintf(audit_key_dns,   AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.dns",		\
+			interfaceid);										\
+	zbx_snprintf(audit_key_port,  AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.port",		\
+			interfaceid);										\
 														\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_main, main_);		\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_type, type);		\
@@ -369,4 +375,14 @@ void	zbx_audit_host_prototype_update_json_add_templates(zbx_uint64_t hostid, zbx
 		zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "hostprototype.templates",
 				templateids->values[i]);
 	}
+}
+
+void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid)
+{
+	char	audit_key_operator[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+	zbx_snprintf(audit_key_operator, AUDIT_DETAILS_KEY_LEN, "hostprototype.interfaces[%lu]", interfaceid);
+
+	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, audit_key_operator);
 }
