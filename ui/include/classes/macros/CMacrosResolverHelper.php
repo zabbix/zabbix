@@ -577,21 +577,6 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Expand functional macros in given map label.
-	 *
-	 * @param string $label			label to expand
-	 * @param array  $replaceHosts	list of hosts in order which they appear in trigger expression if trigger label is
-	 * given, or single host when host label is given
-	 *
-	 * @return string
-	 */
-	public static function resolveMapLabelMacros($label, array $replaceHosts = []) {
-		self::init();
-
-		return self::$macrosResolver->resolveMapLabelMacros($label, $replaceHosts);
-	}
-
-	/**
 	 * Expand functional macros in given map link labels.
 	 *
 	 * @param array  $links
