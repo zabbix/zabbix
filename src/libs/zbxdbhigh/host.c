@@ -2823,7 +2823,7 @@ static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces,
 					if (0 != strcmp(snmp->contextname, contextname))
 					{
 						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT;
-						snmp->contextname_orig = contextname;
+						snmp->contextname_orig = zbx_strdup(NULL, contextname);
 					}
 				}
 				else
