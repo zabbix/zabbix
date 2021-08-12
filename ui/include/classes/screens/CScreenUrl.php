@@ -65,7 +65,7 @@ class CScreenUrl extends CScreenBase {
 			return $item;
 		}
 
-		return makeMessageBox(false, [[
+		return makeMessageBox(ZBX_STYLE_MSG_BAD, [[
 			'type' => 'error',
 			'message' => _s('Provided URL "%1$s" is invalid.', $this->screenitem['url'])
 		]]);
