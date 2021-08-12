@@ -43,7 +43,7 @@ window.service_edit_popup = {
 				<td>#{algorithm}</td>
 				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
 				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>">#{remove}</button>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>"><?= _('Remove') ?></button>
 				</td>
 			</tr>
 		`);
@@ -285,8 +285,7 @@ window.service_edit_popup = {
 				serviceid: service.serviceid,
 				name: service.name,
 				algorithm: this.algorithm_names[service.algorithm],
-				problem_tags_html: service.problem_tags_html,
-				remove: <?= json_encode(_('Remove')) ?>
+				problem_tags_html: service.problem_tags_html
 			}));
 	},
 

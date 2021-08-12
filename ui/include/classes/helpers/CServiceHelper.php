@@ -81,6 +81,11 @@ class CServiceHelper {
 			case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
 				$rule = _s('if at least %2$s of child services weight is in %1$s or greater',
 					new CTag('em', true, $status), new CTag('em', true, $number));
+
+				if weight of child services in Average status or below is less than 12345
+
+				$rule = _s('if at least %2$s of child services weight is in %1$s or greater',
+					new CTag('em', true, $status), new CTag('em', true, $number));
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
 				$rule = _s('if at least %2$s of child services weight is in %1$s or greater',
