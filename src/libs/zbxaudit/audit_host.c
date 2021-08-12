@@ -386,3 +386,52 @@ void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, 
 
 	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, audit_key_operator);
 }
+
+void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
+		const char *macro, const char *value, const char *description, int type)
+{
+	char	audit_key_name[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN],
+		audit_key_description[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_name, sizeof(audit_key_name), "hostprototype.macros[%lu].name", macroid);
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "hostprototype.macros[%lu].value", macroid);
+	zbx_snprintf(audit_key_description, sizeof(audit_key_value), "hostprototype.macros[%lu].description", macroid);
+	zbx_snprintf(audit_key_type, sizeof(audit_key_type), "hostprototype.macros[%lu].type", macroid);
+
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_name, macro);
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_description, description);
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_type, type);
+}
+
+#define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(resource, type1, type2)					\
+void	zbx_audit_host_prototype_update_json_update_hostmacro_##resource(zbx_uint64_t hostid,			\
+		zbx_uint64_t hostmacroid, type1 old_##resource, type1 new_##resource)				\
+{														\
+	char	buf[AUDIT_DETAILS_KEY_LEN];									\
+														\
+	RETURN_IF_AUDIT_OFF();											\
+														\
+	zbx_snprintf(buf, sizeof(buf), "hostprototype.macros[%lu].details."#resource, hostmacroid);		\
+														\
+	zbx_audit_update_json_update_##type2(hostid, buf, old_##resource, new_##resource);			\
+}														\
+
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(name, const char*, string)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(value, const char*, string)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(description, const char*, string)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(type, int, int)
+#undef PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO
+
+void	zbx_aduit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid)
+{
+	char	audit_key_operator[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_operator, AUDIT_DETAILS_KEY_LEN, "hostprototype.macros[%lu]", hostmacroid);
+
+	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, audit_key_operator);
+}

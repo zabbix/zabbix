@@ -113,4 +113,18 @@ PREPARE_AUDIT_TEMPLATE_OP_H(detach, AUDIT_DETAILS_ACTION_DETACH)
 
 void	zbx_audit_host_prototype_update_json_add_templates(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids);
 void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
+
+void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
+		const char *macro, const char *value, const char *description, int type);
+
+#define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(resource, type1, type2)					\
+void	zbx_audit_host_prototype_update_json_update_hostmacro_##resource(zbx_uint64_t hostid,			\
+		zbx_uint64_t hostmacroid, type1 old_##resource, type1 new_##resource);
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(name, const char*, string)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(value, const char*, string)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(description, const char*, string)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(type, int, int)
+
+void	zbx_aduit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid);
+
 #endif	/* ZABBIX_AUDIT_HOST_H */
