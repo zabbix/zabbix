@@ -70,7 +70,7 @@ func numCPU() (numCpu int) {
 }
 
 func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
-	var percpu bool
+	split := 1
 
 	period := historyIndex(defaultIndex)
 	switch len(params) {
@@ -84,7 +84,7 @@ func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
 		switch params[0] {
 		case "", "all":
 		case "percpu":
-			percpu = true
+			split = len(p.cpus) - 1
 		default:
 			return nil, errors.New("Invalid second parameter.")
 		}
@@ -93,11 +93,7 @@ func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
-	if percpu {
-		return p.cpus[0].counterAverage(counterLoad, period, true), nil
-	}
-
-	return p.cpus[0].counterAverage(counterLoad, period, false), nil
+	return p.cpus[0].counterAverage(counterLoad, period, split), nil
 }
 
 func (p *Plugin) Collect() (err error) {

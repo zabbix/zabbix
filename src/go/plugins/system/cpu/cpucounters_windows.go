@@ -41,7 +41,7 @@ func counterByType(name string) (counter cpuCounter) {
 	}
 }
 
-func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex, perCPU bool) (value interface{}) {
+func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex, split int) (value interface{}) {
 	if c.head == c.tail {
 		return
 	}
@@ -65,7 +65,7 @@ func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex, perCPU
 	case counterUtil:
 		return getCounterUtil(tail, head, period)
 	case counterLoad:
-		return getCounterLoad(tail, head, period, perCPU)
+		return getCounterLoad(tail, head, period, split)
 	case counterUnknown:
 		return
 	}
@@ -81,14 +81,10 @@ func getCounterUtil(tail, head *cpuCounters, period historyIndex) interface{} {
 	return (tail.util - head.util) / float64(period)
 }
 
-func getCounterLoad(tail, head *cpuCounters, period historyIndex, perCPU bool) interface{} {
+func getCounterLoad(tail, head *cpuCounters, period historyIndex, split int) interface{} {
 	if tail.load < head.load {
 		return nil
 	}
 
-	if perCPU {
-		return (tail.load - head.load) / float64(numCPU()) / float64(period)
-	}
-
-	return (tail.load - head.load) / float64(period)
+	return (tail.load - head.load) / float64(split) / float64(period)
 }
