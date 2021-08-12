@@ -2128,6 +2128,15 @@ static void	DBhost_interface_free(zbx_interfaces_prototype_t *interface)
 	zbx_free(interface->dns);
 	zbx_free(interface->port);
 
+	if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_IP))
+		zbx_free(interface->ip_orig);
+
+	if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_DNS))
+		zbx_free(interface->dns_orig);
+
+	if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_PORT))
+		zbx_free(interface->port_orig);
+
 	if (INTERFACE_TYPE_SNMP == interface->type)
 	{
 		if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY))
@@ -2716,22 +2725,40 @@ static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces,
 			interface->interfaceid = interfaceid;
 
 			if (interface->main != ifmain)
+			{
 				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_MAIN;
+				interface->main_orig = ifmain;
+			}
 
 			if (interface->type != type)
+			{
 				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_TYPE;
+				interface->type_orig = type;
+			}
 
 			if (interface->useip != useip)
+			{
 				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_USEIP;
+				interface->useip_orig = useip;
+			}
 
 			if (0 != strcmp(interface->ip, ip))
+			{
 				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_IP;
+				interface->ip_orig = zbx_strdup(NULL, ip);
+			}
 
 			if (0 != strcmp(interface->dns, dns))
+			{
 				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_DNS;
+				interface->dns_orig = zbx_strdup(NULL, dns);
+			}
 
 			if (0 != strcmp(interface->port, port))
+			{
 				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_PORT;
+				interface->port_orig = zbx_strdup(NULL, port);
+			}
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
@@ -2796,7 +2823,7 @@ static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces,
 					if (0 != strcmp(snmp->contextname, contextname))
 					{
 						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT;
-						snmp->privprotocol_orig = privprotocol;
+						snmp->contextname_orig = contextname;
 					}
 				}
 				else
