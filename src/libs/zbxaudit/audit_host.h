@@ -60,23 +60,23 @@ void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t hostid, 
 void	zbx_audit_##funcname##_update_json_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid,	\
 		zbx_uint64_t main_, zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns,	\
 		int port);											\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, useip, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, main, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, type, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, ip, const char*, string)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, dns, const char*, string)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, port, int, int)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, useip, zbx_uint64_t, uint64)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, main, zbx_uint64_t, uint64)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, type, zbx_uint64_t, uint64)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, ip, const char*, string)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, dns, const char*, string)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, port, int, int)							\
 /* snmp */													\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, version, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, bulk, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, community, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, securityname, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, securitylevel, int, int)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, authpassphrase, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, privpassphrase, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, authprotocol, zbx_uint64_t, uint64)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, privprotocol, zbx_uint64_t, uint64)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(resource, contextname, const char*, string)					\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, version, zbx_uint64_t, uint64)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, bulk, zbx_uint64_t, uint64)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, community, const char*, string)					\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, securityname, const char*, string)					\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, securitylevel, int, int)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, authpassphrase, const char*, string)					\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, privpassphrase, const char*, string)					\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, authprotocol, zbx_uint64_t, uint64)					\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, privprotocol, zbx_uint64_t, uint64)					\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, contextname, const char*, string)					\
 
 PREPARE_AUDIT_HOST_H(host, AUDIT_RESOURCE_HOST)
 PREPARE_AUDIT_HOST_H(host_prototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
