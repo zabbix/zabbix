@@ -886,7 +886,9 @@ int	zbx_db_check_instanceid(void);
 typedef struct
 {
 	zbx_uint64_t	tagid;
+	char		*tag_orig;
 	char		*tag;
+	char		*value_orig;
 	char		*value;
 #define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000001)
 #define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000002)

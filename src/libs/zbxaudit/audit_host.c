@@ -296,7 +296,6 @@ void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_u
 			custom_interfaces);
 }
 
-
 void	zbx_audit_host_prototype_update_json_add_templateid(zbx_uint64_t hostid, zbx_uint64_t templateid)
 {
 	RETURN_IF_AUDIT_OFF();
@@ -304,7 +303,6 @@ void	zbx_audit_host_prototype_update_json_add_templateid(zbx_uint64_t hostid, zb
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "hostprototype.templateid",
 			templateid);
 }
-
 
 #define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(resource, type1, type2)						\
 void	zbx_audit_host_prototype_update_json_update_##resource(zbx_uint64_t hostid, type1 old_##resource,	\
@@ -353,35 +351,26 @@ void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid
 	zbx_audit_update_json_update_uint64(hostid, audit_key_operator, templateid_old, templateid_new);
 }
 
-#define PREPARE_AUDIT_TEMPLATE_OP(op1, op2)									\
-void	zbx_audit_host_update_json_##op1##_parent_template(zbx_uint64_t hostid, zbx_uint64_t templateid)	\
+#define PREPARE_AUDIT_TEMPLATE_OP(resource, op1, op2)								\
+void	zbx_audit_##resource##_update_json_##op1##_parent_template(zbx_uint64_t hostid,				\
+		zbx_uint64_t templateid)									\
 {														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_audit_update_json_append_uint64(hostid, op2, "host.templates", templateid);				\
+	zbx_audit_update_json_append_uint64(hostid, op2, #resource".templates", templateid);			\
 }														\
 
-PREPARE_AUDIT_TEMPLATE_OP(attach, AUDIT_DETAILS_ACTION_ATTACH)
-PREPARE_AUDIT_TEMPLATE_OP(detach, AUDIT_DETAILS_ACTION_DETACH)
-
-void	zbx_audit_host_prototype_update_json_add_templates(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
-{
-	int	i;
-
-	RETURN_IF_AUDIT_OFF();
-
-	for (i = 0; i < templateids->values_num; i++)
-	{
-		zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "hostprototype.templates",
-				templateids->values[i]);
-	}
-}
+PREPARE_AUDIT_TEMPLATE_OP(host, attach, AUDIT_DETAILS_ACTION_ATTACH)
+PREPARE_AUDIT_TEMPLATE_OP(host, detach, AUDIT_DETAILS_ACTION_DETACH)
+PREPARE_AUDIT_TEMPLATE_OP(host_prototype, attach, AUDIT_DETAILS_ACTION_ATTACH)
+PREPARE_AUDIT_TEMPLATE_OP(host_prototype, detach, AUDIT_DETAILS_ACTION_DETACH)
 
 void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid)
 {
 	char	audit_key_operator[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
+
 	zbx_snprintf(audit_key_operator, AUDIT_DETAILS_KEY_LEN, "hostprototype.interfaces[%lu]", interfaceid);
 
 	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, audit_key_operator);
@@ -434,4 +423,53 @@ void	zbx_aduit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, 
 	zbx_snprintf(audit_key_operator, AUDIT_DETAILS_KEY_LEN, "hostprototype.macros[%lu]", hostmacroid);
 
 	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, audit_key_operator);
+}
+
+void	zbx_audit_host_prototype_update_json_add_tag(zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag,
+		const char* value)
+{
+	char	audit_key_tag[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "hostprototype.tags[%lu].tag", tagid);
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "hostprototype.tags[%lu].value", tagid);
+
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_tag, tag);
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+}
+
+void	zbx_audit_host_prototype_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t tagid,
+		const char* tag_old, const char *tag_new)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "hostprototype.tags[%lu].tag", tagid);
+
+	zbx_audit_update_json_update_string(hostid, buf, tag_old, tag_new);
+}
+
+void	zbx_audit_host_prototype_update_json_update_tag_value(zbx_uint64_t hostid, zbx_uint64_t tagid,
+		const char* value_old, const char *value_new)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "hostprototype.tags[%lu].value", tagid);
+
+	zbx_audit_update_json_update_string(hostid, buf, value_old, value_new);
+}
+
+void	zbx_audit_host_prototype_update_json_delete_tag(zbx_uint64_t hostid, zbx_uint64_t tagid)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "hostprototype.tags[%lu]", tagid);
+
+	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, buf);
 }

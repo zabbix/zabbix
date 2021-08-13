@@ -105,13 +105,15 @@ void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid,
 void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid, zbx_uint64_t groupid,
 		zbx_uint64_t templateid_old, zbx_uint64_t templateid_new);
 
-#define PREPARE_AUDIT_TEMPLATE_OP_H(op1, op2)									\
-void	zbx_audit_host_update_json_##op1##_parent_template(zbx_uint64_t hostid, zbx_uint64_t templateid);	\
+#define PREPARE_AUDIT_TEMPLATE_OP_H(resource, op1, op2)								\
+void	zbx_audit_##resource##_update_json_##op1##_parent_template(zbx_uint64_t hostid,				\
+		zbx_uint64_t templateid);
 
-PREPARE_AUDIT_TEMPLATE_OP_H(attach, AUDIT_DETAILS_ACTION_ATTACH)
-PREPARE_AUDIT_TEMPLATE_OP_H(detach, AUDIT_DETAILS_ACTION_DETACH)
+PREPARE_AUDIT_TEMPLATE_OP_H(host, attach, AUDIT_DETAILS_ACTION_ATTACH)
+PREPARE_AUDIT_TEMPLATE_OP_H(host, detach, AUDIT_DETAILS_ACTION_DETACH)
+PREPARE_AUDIT_TEMPLATE_OP_H(host_prototype, attach, AUDIT_DETAILS_ACTION_ATTACH)
+PREPARE_AUDIT_TEMPLATE_OP_H(host_prototype, detach, AUDIT_DETAILS_ACTION_DETACH)
 
-void	zbx_audit_host_prototype_update_json_add_templates(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids);
 void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
 
 void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
@@ -127,4 +129,14 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(type, int, int)
 
 void	zbx_aduit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid);
 
+void	zbx_audit_host_prototype_update_json_add_tag(zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag,
+		const char* value);
+
+void	zbx_audit_host_prototype_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t tagid,
+		const char* tag_old, const char *tag_new);
+
+void	zbx_audit_host_prototype_update_json_update_tag_value(zbx_uint64_t hostid, zbx_uint64_t tagid,
+		const char* value_old, const char *value_new);
+
+void	zbx_audit_host_prototype_update_json_delete_tag(zbx_uint64_t hostid, zbx_uint64_t tagid);
 #endif	/* ZABBIX_AUDIT_HOST_H */

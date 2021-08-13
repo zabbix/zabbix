@@ -24,6 +24,12 @@
 
 void	zbx_db_tag_free(zbx_db_tag_t *tag)
 {
+	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+		zbx_free(tag->tag_orig);
+
+	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
+		zbx_free(tag->value_orig);
+
 	zbx_free(tag->tag);
 	zbx_free(tag->value);
 	zbx_free(tag);
