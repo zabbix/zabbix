@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-06 19:53+0300\n"
+"POT-Creation-Date: 2021-08-13 19:54+0300\n"
 "PO-Revision-Date: 2014-06-04 11:22+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -151,7 +151,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/func.inc.php:2566
+#: include/func.inc.php:2625
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
@@ -181,7 +181,7 @@ msgstr[2] ""
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
-#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2572
+#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
 #: jsLoader.php:170 jsLoader.php:171 jsLoader.php:172 jsLoader.php:173
 #, c-format
 msgid "%1$s minute"
@@ -233,7 +233,7 @@ msgstr[2] "zostało %1$s prób"
 
 #: app/views/administration.user.edit.php:522
 #: include/classes/widgets/CWidgetConfig.php:283
-#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2579
+#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
 #: jsLoader.php:168 jsLoader.php:169
 #, c-format
 msgid "%1$s second"
@@ -275,7 +275,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, wybrano"
 
-#: include/func.inc.php:1834
+#: include/func.inc.php:1880
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -934,7 +934,7 @@ msgstr ""
 msgid "Add widget"
 msgstr "Dodaj widżet"
 
-#: app/controllers/CControllerPopupImportCompare.php:160
+#: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
 msgstr ""
 
@@ -1099,7 +1099,7 @@ msgstr "Dopuszczalne hosty"
 msgid "Allowed methods"
 msgstr "Dopuszczalne metody"
 
-#: include/classes/setup/CSetupWizard.php:679
+#: include/classes/setup/CSetupWizard.php:682
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternatywnie, można zainstalować to ręcznie:"
 
@@ -1508,7 +1508,7 @@ msgid "Axes"
 msgstr "Osie"
 
 #: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:567
 msgid "Back"
 msgstr "Wstecz"
 
@@ -1809,11 +1809,11 @@ msgstr "Nie można dodać prototypu wykresu"
 msgid "Cannot add group"
 msgstr "Nie można dodać grupy"
 
-#: hosts.php:363
+#: hosts.php:357
 msgid "Cannot add host"
 msgstr "Nie można dodać hosta"
 
-#: host_prototypes.php:296
+#: host_prototypes.php:290
 msgid "Cannot add host prototype"
 msgstr "Nie można dodać prototypu hosta"
 
@@ -1894,7 +1894,7 @@ msgstr "Nie można dodać usługi"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Nie można dodać podmapy. Osiągnięto maksymalną głębokość."
 
-#: templates.php:213
+#: templates.php:207
 msgid "Cannot add template"
 msgstr "Nie można dodać szablonu"
 
@@ -1974,7 +1974,7 @@ msgstr "Problem z zamknięciem: %1$s"
 msgid "Cannot connect to LDAP server."
 msgstr "Nie można połączyć się z serwerem LDAP."
 
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:420
 msgid "Cannot connect to the database."
 msgstr "Nie można połączyć się do bazy danych."
 
@@ -2043,7 +2043,7 @@ msgstr "Nie można utworzyć mapy ikon"
 msgid "Cannot create scheduled report"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:677
+#: include/classes/setup/CSetupWizard.php:678
 msgid "Cannot create the configuration file."
 msgstr "Nie można utworzyć pliku konfiguracyjnego."
 
@@ -2122,7 +2122,7 @@ msgstr[0] "Nie można usunąć grupy"
 msgstr[1] "Nie można usunąć grup"
 msgstr[2] "Nie można usunąć grup"
 
-#: hosts.php:650 hosts.php:671
+#: hosts.php:644 hosts.php:665
 msgid "Cannot delete host"
 msgstr "Nie można usunąć hosta"
 
@@ -2142,7 +2142,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: host_prototypes.php:149 host_prototypes.php:348
+#: host_prototypes.php:149 host_prototypes.php:342
 msgid "Cannot delete host prototypes"
 msgstr "Nie można usunąć prototypów hosta"
 
@@ -2248,7 +2248,7 @@ msgstr "Nie można usunąć wybranych akcji"
 msgid "Cannot delete service"
 msgstr "Nie można usunąć usługi"
 
-#: templates.php:436 templates.php:450 templates.php:483
+#: templates.php:430 templates.php:444 templates.php:477
 msgid "Cannot delete template"
 msgstr "Nie można usunąć szablonu"
 
@@ -2361,7 +2361,7 @@ msgstr[1] "Nie można wyłączyć reguł wykrywania"
 msgstr[2] "Nie można wyłączyć reguł wykrywania"
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
-#: hosts.php:703
+#: hosts.php:697
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Nie można wyłączyć hosta"
@@ -2450,7 +2450,7 @@ msgstr[1] "Nie można włączyć reguł wykrywania"
 msgstr[2] "Nie można włączyć reguł wykrywania"
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
-#: hosts.php:702
+#: hosts.php:696
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Nie można włączyć hosta"
@@ -2972,7 +2972,7 @@ msgstr "Nie można zaktualizować grupy"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Nie można zaktualizować grup dla wykrytego hosta \"%1$s\"."
 
-#: hosts.php:347
+#: hosts.php:341
 msgid "Cannot update host"
 msgstr "Nie można zaktualizować hosta"
 
@@ -2980,7 +2980,7 @@ msgstr "Nie można zaktualizować hosta"
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Nie można zaktualizować ustawień szyfrowania hosta. Należy określić ustawienia połączeń w obu kierunkach."
 
-#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:333
+#: host_prototypes.php:276 host_prototypes.php:306 host_prototypes.php:327
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Nie można zaktualizować prototypu hosta"
@@ -3095,7 +3095,7 @@ msgstr "Nie można zaktualizować usługi"
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "Nie można zaktualizować kroku dla szablonowego scenariusza webowego \"%1$s\": %2$s."
 
-#: templates.php:217
+#: templates.php:211
 msgid "Cannot update template"
 msgstr "Nie można zaktualizować szablonu"
 
@@ -3451,7 +3451,7 @@ msgstr "Powiel"
 
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
-#: app/views/popup.import.compare.php:162 include/func.inc.php:1637
+#: app/views/popup.import.compare.php:162 include/func.inc.php:1656
 #: include/views/js/monitoring.sysmaps.js.php:334
 #: include/views/js/monitoring.sysmaps.js.php:487
 #: include/views/js/monitoring.sysmaps.js.php:611
@@ -3640,7 +3640,7 @@ msgstr "Konfiguracja"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Statystyki cache'a konfiguracji. Cache - bufor (tryby: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:697
+#: include/classes/setup/CSetupWizard.php:700
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Utworzono plik konfiguracji \"%1$s\"."
@@ -3793,7 +3793,7 @@ msgid "Configuration updated"
 msgstr "Zaktualizowano konfigurację"
 
 #: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:427
+#: include/classes/setup/CSetupWizard.php:428
 msgid "Configure DB connection"
 msgstr "Konfiguruj połączenie DB"
 
@@ -3801,7 +3801,7 @@ msgstr "Konfiguruj połączenie DB"
 msgid "Confirmation text"
 msgstr "Tekst potwierdzenia"
 
-#: include/classes/setup/CSetupWizard.php:695
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Gratulacje! Poprawnie zainstalowano interfejs użytkownika Zabbix."
 
@@ -4519,7 +4519,7 @@ msgstr ""
 #: app/controllers/CControllerDashboardList.php:120
 #: app/controllers/CControllerHostDashboardView.php:122
 #: app/controllers/CControllerPopupGeneric.php:384
-#: app/controllers/CControllerPopupImportCompare.php:169
+#: app/controllers/CControllerPopupImportCompare.php:170
 #: app/partials/monitoring.host.view.html.php:38
 #: app/partials/monitoring.host.view.html.php:138
 #: app/partials/monitoring.host.view.html.php:145
@@ -4572,15 +4572,15 @@ msgid "Data storage period"
 msgstr "Czas przechowywania danych"
 
 #: include/classes/setup/CSetupWizard.php:388
-#: include/classes/setup/CSetupWizard.php:533
-#: include/classes/setup/CSetupWizard.php:737
+#: include/classes/setup/CSetupWizard.php:534
+#: include/classes/setup/CSetupWizard.php:740
 msgid "Database TLS CA file"
 msgstr "Plik TLS CA bazy danych"
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
-#: include/classes/setup/CSetupWizard.php:539
-#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:540
+#: include/classes/setup/CSetupWizard.php:748
 msgid "Database TLS certificate file"
 msgstr "Plik certyfikatu TLS bazy danych"
 
@@ -4589,18 +4589,18 @@ msgid "Database TLS certificate files must be read-only"
 msgstr "Pliki certyfikatów TLS bazy danych muszą być tylko do odczytu"
 
 #: include/classes/setup/CSetupWizard.php:412
-#: include/classes/setup/CSetupWizard.php:547
+#: include/classes/setup/CSetupWizard.php:548
 msgid "Database TLS cipher list"
 msgstr "Lista szyfrów TLS bazy danych "
 
 #: include/classes/setup/CSetupWizard.php:370
-#: include/classes/setup/CSetupWizard.php:529
+#: include/classes/setup/CSetupWizard.php:530
 msgid "Database TLS encryption"
 msgstr "Szyfrowanie bazy danych TLS"
 
 #: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:536
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:537
+#: include/classes/setup/CSetupWizard.php:744
 msgid "Database TLS key file"
 msgstr "Plik klucza TLS bazy danych"
 
@@ -4613,7 +4613,7 @@ msgid "Database host"
 msgstr "Host bazy danych"
 
 #: include/classes/setup/CSetupWizard.php:406
-#: include/classes/setup/CSetupWizard.php:542
+#: include/classes/setup/CSetupWizard.php:543
 msgid "Database host verification"
 msgstr "Weryfikacja hosta bazy danych"
 
@@ -4622,34 +4622,34 @@ msgid "Database monitor"
 msgstr "Monitor bazy danych"
 
 #: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:509 setup.php:45
+#: include/classes/setup/CSetupWizard.php:510 setup.php:45
 msgid "Database name"
 msgstr "Nazwa bazy danych"
 
-#: include/classes/setup/CSetupWizard.php:511
+#: include/classes/setup/CSetupWizard.php:512
 msgid "Database password"
 msgstr "Hasło bazy danych"
 
 #: include/classes/setup/CSetupWizard.php:307
-#: include/classes/setup/CSetupWizard.php:508 setup.php:44
+#: include/classes/setup/CSetupWizard.php:509 setup.php:44
 msgid "Database port"
 msgstr "Port bazy danych"
 
 #: include/classes/setup/CSetupWizard.php:319
-#: include/classes/setup/CSetupWizard.php:513
+#: include/classes/setup/CSetupWizard.php:514
 msgid "Database schema"
 msgstr "Schemat bazy danych"
 
-#: include/classes/setup/CSetupWizard.php:507
+#: include/classes/setup/CSetupWizard.php:508
 msgid "Database server"
 msgstr "Serwer bazy danych"
 
 #: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:494
+#: include/classes/setup/CSetupWizard.php:495
 msgid "Database type"
 msgstr "Typ bazy danych"
 
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:511
 msgid "Database user"
 msgstr "Użytkownik bazy danych"
 
@@ -4682,7 +4682,7 @@ msgstr ""
 msgid "Day"
 msgstr "Dzień"
 
-#: include/func.inc.php:2484
+#: include/func.inc.php:2543
 msgid "Day before yesterday"
 msgstr "Przedwczoraj"
 
@@ -4781,12 +4781,12 @@ msgid "Default page display period"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:83
-#: include/classes/setup/CSetupWizard.php:475
+#: include/classes/setup/CSetupWizard.php:476
 msgid "Default theme"
 msgstr "Motyw domyślny"
 
 #: app/views/administration.gui.edit.php:76
-#: include/classes/setup/CSetupWizard.php:468
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Default time zone"
 msgstr "Domyślna strefa czasowa"
 
@@ -5216,7 +5216,7 @@ msgstr "Opis"
 
 #: app/views/administration.mediatype.list.php:81
 #: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:530
-#: include/func.inc.php:1588 include/views/configuration.action.edit.php:174
+#: include/func.inc.php:1601 include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:178
 #: include/views/configuration.action.edit.php:321
 #: include/views/configuration.action.edit.php:407
@@ -5577,7 +5577,7 @@ msgid "Discovery rule updated"
 msgstr "Zaktualizowano regułę wykrywania"
 
 #: app/controllers/CControllerPopupGeneric.php:315
-#: app/controllers/CControllerPopupImportCompare.php:168
+#: app/controllers/CControllerPopupImportCompare.php:169
 #: app/views/configuration.discovery.edit.php:29
 #: app/views/configuration.discovery.list.php:31
 #: app/views/popup.condition.common.php:463 app/views/popup.import.php:36
@@ -5727,7 +5727,7 @@ msgstr "Nie działa"
 msgid "Download image"
 msgstr "Pobierz obraz"
 
-#: include/classes/setup/CSetupWizard.php:681
+#: include/classes/setup/CSetupWizard.php:684
 msgid "Download the configuration file"
 msgstr "Pobranie pliku konfiguracyjnego"
 
@@ -6262,7 +6262,7 @@ msgstr "Błąd"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Błąd w zapytaniu wyszukiwania dla tabeli \"%1$s\"."
 
-#: include/func.inc.php:1631 jsLoader.php:218
+#: include/func.inc.php:1642 jsLoader.php:218
 msgid "Error message"
 msgstr "Komunikat błędu"
 
@@ -6985,7 +6985,7 @@ msgid "GUI access disabled."
 msgstr "Dostęp do GUI wyłączony."
 
 #: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:484
+#: include/classes/setup/CSetupWizard.php:485
 msgid "GUI settings"
 msgstr "Właściwości interfejsu użytkownika"
 
@@ -7022,7 +7022,7 @@ msgid "Get value"
 msgstr "Pobiera wartość"
 
 #: app/views/js/popup.itemtestedit.view.js.php:505
-#: app/views/popup.itemtestedit.view.php:434
+#: app/views/popup.itemtestedit.view.php:431
 msgid "Get value and test"
 msgstr "Pobiera wartość i testuje"
 
@@ -7204,7 +7204,7 @@ msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "Prototypowy wykres o ID \"%1$s\" jest niedostępny."
 
 #: app/controllers/CControllerPopupGeneric.php:275
-#: app/controllers/CControllerPopupImportCompare.php:174
+#: app/controllers/CControllerPopupImportCompare.php:175
 #: include/html.inc.php:468 include/views/configuration.graph.edit.php:35
 #: include/views/configuration.graph.list.php:28
 #: include/views/configuration.host.discovery.list.php:297
@@ -7244,7 +7244,7 @@ msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Istnieje już wykres lub prototyp wykresu o nazwie \"%1$s\"."
 
 #: app/controllers/CControllerPopupGeneric.php:262
-#: app/controllers/CControllerPopupImportCompare.php:166
+#: app/controllers/CControllerPopupImportCompare.php:167
 #: app/partials/monitoring.host.view.html.php:37
 #: app/partials/monitoring.host.view.html.php:127
 #: app/partials/monitoring.host.view.html.php:135
@@ -7342,7 +7342,7 @@ msgstr "Zaktualizowano grupę"
 msgid "Grouping by"
 msgstr "Grupowanie wg"
 
-#: app/controllers/CControllerPopupImportCompare.php:163
+#: app/controllers/CControllerPopupImportCompare.php:164
 #: app/views/administration.user.edit.php:86
 #: app/views/administration.user.list.php:110 app/views/popup.import.php:29
 #: include/views/configuration.host.edit.php:86
@@ -7591,7 +7591,7 @@ msgstr "Ułożenie poziome"
 #: include/classes/screens/CScreenProblem.php:871
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:1165
-#: include/classes/setup/CSetupWizard.php:439
+#: include/classes/setup/CSetupWizard.php:440
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
@@ -7644,7 +7644,7 @@ msgstr "Adres IP hosta"
 msgid "Host access"
 msgstr "Dostęp do hosta"
 
-#: hosts.php:362
+#: hosts.php:356
 msgid "Host added"
 msgstr "Dodano hosta"
 
@@ -7665,12 +7665,12 @@ msgstr "Host nie może posiadać więcej niż jeden interfejs tego samego typu."
 msgid "Host count"
 msgstr "Liczba hostów"
 
-#: hosts.php:650 hosts.php:671
+#: hosts.php:644 hosts.php:665
 msgid "Host deleted"
 msgstr "Usunięto hosta"
 
 #: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:194
-#: hosts.php:700
+#: hosts.php:694
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Wyłączono host"
@@ -7678,7 +7678,7 @@ msgstr[1] "Wyłączono hosty"
 msgstr[2] "Wyłączono hosty"
 
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
-#: hosts.php:699
+#: hosts.php:693
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Włączono host"
@@ -7837,7 +7837,7 @@ msgstr "Prototyp hosta \"%1$s\" istnieje w \"%2$s\", odziedziczony z innego szab
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Prototyp hosta \"%1$s\" istnieje w \"%2$s\"."
 
-#: host_prototypes.php:296
+#: host_prototypes.php:290
 msgid "Host prototype added"
 msgstr "Dodano prototyp hosta"
 
@@ -7853,7 +7853,7 @@ msgstr "Usunięto prototyp hosta"
 msgid "Host prototype macros"
 msgstr "Makra prototypu hosta"
 
-#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:332
+#: host_prototypes.php:276 host_prototypes.php:306 host_prototypes.php:326
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Zaktualizowano prototyp hosta"
@@ -7870,7 +7870,7 @@ msgstr "Istnieje już prototyp hosta z nazwą hosta \"%1$s\" w regule wykrywania
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Istnieje już prototyp hosta z widoczną nazwą \"%1$s\" w regule wykrywania \"%2$s\"."
 
-#: app/controllers/CControllerPopupImportCompare.php:175
+#: app/controllers/CControllerPopupImportCompare.php:176
 #: include/html.inc.php:483
 #: include/views/configuration.host.discovery.list.php:306
 #: include/views/configuration.host.prototype.edit.php:35
@@ -7878,7 +7878,7 @@ msgstr "Istnieje już prototyp hosta z widoczną nazwą \"%1$s\" w regule wykryw
 msgid "Host prototypes"
 msgstr "Prototypy hostów"
 
-#: host_prototypes.php:348
+#: host_prototypes.php:342
 msgid "Host prototypes deleted"
 msgstr "Usunięto prototypy hostów"
 
@@ -7898,7 +7898,7 @@ msgstr "Czas hosta"
 msgid "Host update failed."
 msgstr "Aktualizacja hosta się nie powiodła."
 
-#: hosts.php:346
+#: hosts.php:340
 msgid "Host updated"
 msgstr "Zaktualizowano hosta"
 
@@ -8241,7 +8241,7 @@ msgstr "Obrazy dla wszystkich map zostaną zaktualizowane!"
 msgid "Immediately"
 msgstr "Teraz"
 
-#: app/controllers/CControllerPopupImport.php:164
+#: app/controllers/CControllerPopupImport.php:165
 #: app/views/administration.mediatype.list.php:36
 #: app/views/popup.import.compare.php:152 app/views/popup.import.php:156
 #: include/views/configuration.host.list.php:37
@@ -8300,7 +8300,7 @@ msgid "Inaccessible graph prototype"
 msgstr "Nieosiągalny prototypowy wykres"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:317
-#: host_prototypes.php:467
+#: host_prototypes.php:461
 msgid "Inaccessible group"
 msgstr "Nieosiągalna grupa"
 
@@ -8738,9 +8738,9 @@ msgstr "Błędna nazwa lub wartośc pola \"%1$s\" w warunku WHERE dla tabeli \"%
 msgid "Incorrect fields for sysmap."
 msgstr "Błędne pola dla sysmap."
 
-#: include/classes/setup/CSetupWizard.php:737
-#: include/classes/setup/CSetupWizard.php:741
-#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:748
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "Błędna ścieżka do pliku \"%1$s\": %2$s."
@@ -9512,7 +9512,7 @@ msgid "Insert expression"
 msgstr "Wprowadź wyrażenie"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:702
+#: include/classes/setup/CSetupWizard.php:705
 msgid "Install"
 msgstr "Instalacja"
 
@@ -10047,7 +10047,7 @@ msgstr "Pozycja \"%1$s\" nie istnieje lub nie masz dostępu do tego elementu"
 msgid "Item added"
 msgstr "Dodano pozycję"
 
-#: app/views/popup.itemtestedit.view.php:419
+#: app/views/popup.itemtestedit.view.php:420
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "Pozycja zawiera makra użytkownika z sekretnymi wartościami. Wartości takich makr powinny być wpisywane ręcznie."
 
@@ -10138,7 +10138,7 @@ msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "Prototyp pozycji o ID \"%1$s\" jest niedostępny."
 
 #: app/controllers/CControllerPopupGeneric.php:288
-#: app/controllers/CControllerPopupImportCompare.php:172
+#: app/controllers/CControllerPopupImportCompare.php:173
 #: include/html.inc.php:440
 #: include/views/configuration.host.discovery.list.php:281
 #: include/views/configuration.item.prototype.edit.php:26
@@ -10227,7 +10227,7 @@ msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Pozycja z kluczem \"%1$s\" już istnieje w \"%2$s\"."
 
 #: app/controllers/CControllerPopupGeneric.php:237
-#: app/controllers/CControllerPopupImportCompare.php:167
+#: app/controllers/CControllerPopupImportCompare.php:168
 #: app/partials/dataoverview.table.top.php:29
 #: app/views/administration.queue.overview.php:45
 #: app/views/popup.import.php:35 app/views/search.php:117
@@ -10463,7 +10463,7 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Ostatnia"
 
-#: include/func.inc.php:2537
+#: include/func.inc.php:2596
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -10471,7 +10471,7 @@ msgstr[0] "Ostani %1$d dzień"
 msgstr[1] "Ostatnie %1$d dni"
 msgstr[2] "Ostatnich %1$d dni"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2590
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -10479,7 +10479,7 @@ msgstr[0] "Ostatnia %1$d godzina"
 msgstr[1] "Ostatnie %1$d godziny"
 msgstr[2] "Ostatnich %1$d godzin"
 
-#: include/func.inc.php:2524
+#: include/func.inc.php:2583
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -10487,7 +10487,7 @@ msgstr[0] "Ostatnia %1$d minuta"
 msgstr[1] "Ostatnie %1$d minuty"
 msgstr[2] "Ostatnich %1$d minut"
 
-#: include/func.inc.php:2540
+#: include/func.inc.php:2599
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -10495,7 +10495,7 @@ msgstr[0] "Ostatni %1$d miesiąc"
 msgstr[1] "Ostatnie %1$d miesiące"
 msgstr[2] "Ostatnich %1$d miesięcy"
 
-#: include/func.inc.php:2517
+#: include/func.inc.php:2576
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -10503,7 +10503,7 @@ msgstr[0] "Ostatnia %1$d sekunda"
 msgstr[1] "Ostatnie %1$d sekundy"
 msgstr[2] "Ostatnich %1$d sekund"
 
-#: include/func.inc.php:2543
+#: include/func.inc.php:2602
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -11223,10 +11223,10 @@ msgstr "Zaznacz wybrane"
 msgid "Mask"
 msgstr "Maska"
 
-#: app/controllers/CControllerPopupMassupdateHost.php:445
-#: app/controllers/CControllerPopupMassupdateItem.php:405
-#: app/controllers/CControllerPopupMassupdateTemplate.php:363
-#: app/controllers/CControllerPopupMassupdateTrigger.php:234
+#: app/controllers/CControllerPopupMassupdateHost.php:446
+#: app/controllers/CControllerPopupMassupdateItem.php:406
+#: app/controllers/CControllerPopupMassupdateTemplate.php:364
+#: app/controllers/CControllerPopupMassupdateTrigger.php:235
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/views/configuration.host.list.php:444
 #: include/views/configuration.item.list.php:311
@@ -12064,8 +12064,8 @@ msgid "Next page"
 msgstr "Następna strona"
 
 #: include/classes/setup/CSetupWizard.php:142
-#: include/classes/setup/CSetupWizard.php:429
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:430
+#: include/classes/setup/CSetupWizard.php:567
 msgid "Next step"
 msgstr "Następny krok"
 
@@ -13827,7 +13827,7 @@ msgstr "Odtwórz"
 msgid "Play sound"
 msgstr "Odtwórz dźwięk"
 
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:567
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Proszę sprawdzić parametry konfiguracji. Jeżeli wszystko jest poprawne, należy nacisnąć przycisk \"%1$s\", lub można zmienić parametry konfiguracji przyciskiem \"%2$s\"."
@@ -13840,16 +13840,16 @@ msgstr "Proszę potwierdzić czy chcesz usunąc wszystkie makra."
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:429
+#: include/classes/setup/CSetupWizard.php:430
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Proszę ręcznie utworzyć bazę danych i ustawić parametry konfiguracji dla połączenia do tej bazy. Naciśnij przycisk \"%1$s\", gdy skończysz."
 
-#: include/classes/setup/CSetupWizard.php:885
+#: include/classes/setup/CSetupWizard.php:888
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "Proszę włącznyć \"allow_url_fopen\" wytyczną."
 
-#: include/classes/setup/CSetupWizard.php:457
+#: include/classes/setup/CSetupWizard.php:458
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Proszę wprowadzić nazwę hosta lub adres IP hosta oraz numer portu serwera Zabbix, oraz (opcjonalnie) nazwę instalacji."
 
@@ -13893,7 +13893,7 @@ msgstr "Powielaj pola inwentarza hosta"
 #: app/views/administration.proxy.edit.php:54
 #: app/views/administration.script.edit.php:163
 #: app/views/popup.itemtestedit.view.php:111
-#: include/classes/setup/CSetupWizard.php:444 include/hosts.inc.php:1307
+#: include/classes/setup/CSetupWizard.php:445 include/hosts.inc.php:1307
 #: include/views/configuration.host.list.php:106
 #: include/views/inventory.host.view.php:79 setup.php:62
 msgid "Port"
@@ -13932,7 +13932,7 @@ msgid "Power value"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:564
+#: include/classes/setup/CSetupWizard.php:565
 msgid "Pre-installation summary"
 msgstr "Podsumowanie przed instalacją"
 
@@ -13977,7 +13977,7 @@ msgid "Previous day"
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:92
-#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2487
+#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2546
 msgid "Previous month"
 msgstr "Poprzedni miesiąc"
 
@@ -13993,12 +13993,12 @@ msgid "Previous value"
 msgstr "Poprzednia wartość"
 
 #: app/partials/scheduledreport.formgrid.html.php:91
-#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2486
+#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2545
 msgid "Previous week"
 msgstr "Poprzedni tydzień"
 
 #: app/partials/scheduledreport.formgrid.html.php:93
-#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2488
+#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2547
 msgid "Previous year"
 msgstr "Poprzedni rok"
 
@@ -14718,7 +14718,7 @@ msgctxt "screen reader"
 msgid "Remove, %1$s"
 msgstr "Usuń, %1$s"
 
-#: app/controllers/CControllerPopupImportCompare.php:158
+#: app/controllers/CControllerPopupImportCompare.php:159
 msgid "Removed"
 msgstr ""
 
@@ -15372,7 +15372,7 @@ msgstr "Zapisz jako"
 msgid "Save changes"
 msgstr "Zapisz zmiany"
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:685
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Zapisz jako \"%1$s\""
@@ -16522,8 +16522,8 @@ msgstr "OKres przechowywania"
 msgid "Store credentials in"
 msgstr "Przechowuj dane logowania w"
 
-#: include/classes/setup/CSetupWizard.php:499
 #: include/classes/setup/CSetupWizard.php:500
+#: include/classes/setup/CSetupWizard.php:501
 msgid "Stored in HashiCorp Vault secret"
 msgstr "Przechowane w tajnym sejfie HashiCorp"
 
@@ -16585,7 +16585,7 @@ msgstr ""
 msgid "Success Audit"
 msgstr "Audyt udany"
 
-#: include/func.inc.php:1631 jsLoader.php:217
+#: include/func.inc.php:1641 jsLoader.php:217
 msgid "Success message"
 msgstr "Wiadomość z powodzeniem"
 
@@ -16662,7 +16662,7 @@ msgstr "Czas uruchomienia systemu. Zwraca liczbę całkowitą (znacznik czasu Un
 msgid "System default"
 msgstr "Domyślny systemowy"
 
-#: include/func.inc.php:1659
+#: include/func.inc.php:1678
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "Wystąpił błąd systemowy. Proszę skontaktować się z administratorem Zabbix."
 
@@ -16881,7 +16881,7 @@ msgstr "Szablon \"%1$s\" nie może istnieć bez grupy hostów."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Nie istnieje szablon \"%1$s\" dla hosta \"%2$s\"."
 
-#: templates.php:212
+#: templates.php:206
 msgid "Template added"
 msgstr "Dodano szablon"
 
@@ -16901,7 +16901,7 @@ msgstr "Szablon panelu"
 msgid "Template dashboards"
 msgstr "Szablon paneli"
 
-#: templates.php:436 templates.php:450 templates.php:483
+#: templates.php:430 templates.php:444 templates.php:477
 msgid "Template deleted"
 msgstr "Usunięto szablon"
 
@@ -16925,7 +16925,7 @@ msgstr "Nazwa szablonu"
 msgid "Template trigger"
 msgstr "Wyzwalacz szablonu"
 
-#: templates.php:216
+#: templates.php:210
 msgid "Template updated"
 msgstr "Zaktualizowano szablon"
 
@@ -16950,7 +16950,7 @@ msgstr "Szablon o takiej samej widocznej nazwie \"%s\" już istnieje."
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/controllers/CControllerPopupImportCompare.php:132
-#: app/controllers/CControllerPopupImportCompare.php:164
+#: app/controllers/CControllerPopupImportCompare.php:165
 #: app/partials/configuration.filter.items.php:72
 #: app/partials/popup.operations.php:212
 #: app/views/popup.condition.common.php:352 app/views/popup.import.php:31
@@ -16991,7 +16991,7 @@ msgstr "Zaktualizowane szablony"
 #: app/views/administration.mediatype.list.php:139
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:573
-#: app/views/popup.itemtestedit.view.php:434
+#: app/views/popup.itemtestedit.view.php:431
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
 #: include/views/configuration.host.discovery.edit.php:902
@@ -17082,15 +17082,15 @@ msgstr "Wersja bazy danych Zabbix nie spełnia aktualnych wymagań. Twoja wersja
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "Średni czas zapisu do wirtualnego dysku, <url> - URL usługi VMware, <uuid> - nazwa hosta wirtualnej maszyny VMware, <instance> - instanacja urządzenia dyskowego"
 
-#: hosts.php:324
+#: hosts.php:322
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Sklonowany host zawiera zdefiniowane makra użytkownika o typie \"Secret text\". Wartość i typ tych makr były zresetowane."
 
-#: host_prototypes.php:172
+#: host_prototypes.php:170
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Sklonowany prototyp hosta zawiera zdefiniowane makra użytkownika o typie \"Secret text\". Wartość i typ tych makr były zresetowane."
 
-#: templates.php:184
+#: templates.php:182
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Sklonowany szablon zawiera zdefiniowane makra użytkownika o typie \"Secret text\". Wartość i typ tych makr były zresetowane."
 
@@ -17187,7 +17187,7 @@ msgstr "Wyzwalacz nie jest już wykrywany i zostanie usunięty przy następnym p
 msgid "Theme"
 msgstr "Motyw"
 
-#: include/func.inc.php:2485
+#: include/func.inc.php:2544
 msgid "This day last week"
 msgstr "Ten dzień jest ostatnim dniem tygodnia"
 
@@ -17200,27 +17200,27 @@ msgstr "To pole jest automatycznie uzupełniane przez element \"%1$s\"."
 msgid "This is the test message from Zabbix"
 msgstr "To jest testowa wiadomość z Zabbix."
 
-#: include/func.inc.php:2493 srv_status.php:40
+#: include/func.inc.php:2552 srv_status.php:40
 msgid "This month"
 msgstr "Bieżący miesiąc"
 
-#: include/func.inc.php:2494
+#: include/func.inc.php:2553
 msgid "This month so far"
 msgstr "Ten miesiąc jak dotąd"
 
-#: include/func.inc.php:2491 srv_status.php:39
+#: include/func.inc.php:2550 srv_status.php:39
 msgid "This week"
 msgstr "Ten tydzień"
 
-#: include/func.inc.php:2492
+#: include/func.inc.php:2551
 msgid "This week so far"
 msgstr "Ten tydzień jak dotąd"
 
-#: include/func.inc.php:2495 srv_status.php:41
+#: include/func.inc.php:2554 srv_status.php:41
 msgid "This year"
 msgstr "Ten rok"
 
-#: include/func.inc.php:2496
+#: include/func.inc.php:2555
 msgid "This year so far"
 msgstr "Ten rok jak dotąd"
 
@@ -17344,12 +17344,12 @@ msgstr "Do"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Aby ustawić interfejs hosta wybierz odpowiedni typ pozycji dla każdej pozycji"
 
-#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2489
+#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2548
 #: srv_status.php:38
 msgid "Today"
 msgstr "Dziś"
 
-#: include/func.inc.php:2490
+#: include/func.inc.php:2549
 msgid "Today so far"
 msgstr "Dzisiaj jak dotąd"
 
@@ -17631,7 +17631,7 @@ msgstr[1] "Zaktualizowano prototypy wyzwalaczy"
 msgstr[2] "Zaktualizowano prototypów wyzwalaczy"
 
 #: app/controllers/CControllerPopupGeneric.php:197
-#: app/controllers/CControllerPopupImportCompare.php:173
+#: app/controllers/CControllerPopupImportCompare.php:174
 #: include/html.inc.php:454
 #: include/views/configuration.host.discovery.list.php:289
 #: include/views/configuration.trigger.prototype.edit.php:29
@@ -17668,7 +17668,7 @@ msgid "Trigger updated"
 msgstr "Zaktualizowano wyzwalacz"
 
 #: app/controllers/CControllerPopupGeneric.php:183
-#: app/controllers/CControllerPopupImportCompare.php:165
+#: app/controllers/CControllerPopupImportCompare.php:166
 #: app/partials/configuration.filter.items.php:191
 #: app/partials/monitoring.problem.filter.php:74
 #: app/partials/trigoverview.table.top.php:29
@@ -18209,7 +18209,7 @@ msgstr "Aktualizacja operacji"
 msgid "Update problem"
 msgstr "Problem z aktualizacją"
 
-#: app/controllers/CControllerPopupImportCompare.php:159
+#: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
 msgstr ""
 
@@ -18564,8 +18564,8 @@ msgstr "Login"
 msgid "Username and password"
 msgstr "Nazwa użytkownika i hasło"
 
-#: include/classes/setup/CSetupWizard.php:599
-#: include/classes/setup/CSetupWizard.php:903
+#: include/classes/setup/CSetupWizard.php:600
+#: include/classes/setup/CSetupWizard.php:906
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "Nazwa użytkownika i hasło muszą być przechowywane w tajnych kluczach sejfu \"username\" i \"password\"."
 
@@ -18947,7 +18947,7 @@ msgstr "Mapa wartości \"%s\" już istnieje."
 msgid "Value mapping"
 msgstr "Mapowanie wartości"
 
-#: app/controllers/CControllerPopupImportCompare.php:171
+#: app/controllers/CControllerPopupImportCompare.php:172
 #: app/views/popup.import.php:32
 msgid "Value mappings"
 msgstr "Mapowanie wartości"
@@ -19008,17 +19008,17 @@ msgid "Various information about specific process(es). Returns float"
 msgstr "Różne informacje o okreśłonych proceach. Zwraca liczbę zmiennoprzecinkową"
 
 #: include/classes/setup/CSetupWizard.php:335
-#: include/classes/setup/CSetupWizard.php:518
+#: include/classes/setup/CSetupWizard.php:519
 msgid "Vault API endpoint"
 msgstr "Punkt końcowy sejfu API"
 
 #: include/classes/setup/CSetupWizard.php:350
-#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:525
 msgid "Vault authentication token"
 msgstr "Token autentykacyjny sejfu"
 
 #: include/classes/core/ZBase.php:235
-#: include/classes/setup/CSetupWizard.php:899 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Nieudane połączenie sejfu"
 
@@ -19027,7 +19027,7 @@ msgid "Vault secret"
 msgstr "Tajny sejf"
 
 #: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:521
+#: include/classes/setup/CSetupWizard.php:522
 msgid "Vault secret path"
 msgstr "Tajna ścieżka sejfu"
 
@@ -19114,7 +19114,7 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Ostrzeżenie"
 
-#: jsLoader.php:219
+#: include/func.inc.php:1643 jsLoader.php:219
 msgid "Warning message"
 msgstr "Wiadomość ostrzegająca"
 
@@ -19188,7 +19188,7 @@ msgstr[2] "Włączono scenariusze sieci www"
 msgid "Web scenario updated"
 msgstr "Zaktualizowano scenariusz sieci www"
 
-#: app/controllers/CControllerPopupImportCompare.php:170
+#: app/controllers/CControllerPopupImportCompare.php:171
 #: app/views/popup.import.php:39 include/html.inc.php:400
 msgid "Web scenarios"
 msgstr "Scenariusze sieci www"
@@ -19535,7 +19535,7 @@ msgstr "Rocznie"
 msgid "Yes"
 msgstr "Tak"
 
-#: include/classes/screens/CScreenProblem.php:717 include/func.inc.php:2483
+#: include/classes/screens/CScreenProblem.php:717 include/func.inc.php:2542
 msgid "Yesterday"
 msgstr "Wczoraj"
 
@@ -19656,7 +19656,7 @@ msgid "Zabbix login form"
 msgstr "Formularz logowania Zabbix"
 
 #: app/views/administration.script.edit.php:126
-#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:556
 msgid "Zabbix server"
 msgstr "Serwer Zabbix"
 
@@ -19676,7 +19676,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Zabbix serwer (proxy)"
 
 #: include/classes/setup/CSetupWizard.php:57
-#: include/classes/setup/CSetupWizard.php:455
+#: include/classes/setup/CSetupWizard.php:456
 msgid "Zabbix server details"
 msgstr "Szczegóły serwera Zabbix"
 
@@ -19688,11 +19688,11 @@ msgstr "Serwer Zabbix nie działa: wyświetlane informacje mogą być nieaktualn
 msgid "Zabbix server is running"
 msgstr "Serwer Zabbix jest uruchomiony"
 
-#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:560
 msgid "Zabbix server name"
 msgstr "Nazwa serwera Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:556
+#: include/classes/setup/CSetupWizard.php:557
 msgid "Zabbix server port"
 msgstr "Port serwera Zabbix"
 
@@ -20281,7 +20281,7 @@ msgstr "dni"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:614 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:497
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "domyślny"
@@ -20896,7 +20896,7 @@ msgstr "nazwa"
 msgid "new"
 msgstr "nowy"
 
-#: hosts.php:993 templates.php:637
+#: hosts.php:987 templates.php:631
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "nowy"
