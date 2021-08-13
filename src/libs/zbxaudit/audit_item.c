@@ -232,3 +232,59 @@ PREPARE_AUDIT_ITEM_UPDATE(discover,		int,		int)
 #undef ONLY_ITEM_PROTOTYPE
 #undef ONLY_LLD_RULE
 #undef IT_OR_ITP
+
+void	zbx_audit_discovery_rule_update_json_add_overrides_conditions(zbx_uint64_t itemid,
+		zbx_uint64_t item_conditionid, zbx_uint64_t op, const char *macro, const char *value)
+{
+	char	audit_key_operator[AUDIT_DETAILS_KEY_LEN], audit_key_macro[AUDIT_DETAILS_KEY_LEN],
+		audit_key_value[AUDIT_DETAILS_KEY_LEN];
+
+	zbx_snprintf(audit_key_operator, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.overrides[%lu].filter.conditions.operator", item_conditionid);
+	zbx_snprintf(audit_key_macro, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.overrides[%lu].filter.conditions.macro", item_conditionid);
+	zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.overrides[%lu].filter.conditions.value", item_conditionid);
+
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_operator, op);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_macro, macro);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+}
+
+#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE(resource, type1, type2)						\
+void	zbx_audit_discovery_rule_update_json_update_##resource(zbx_uint64_t itemid,				\
+		zbx_uint64_t item_conditionid, type1 resource##_old, type1 resource##_new)			\
+{														\
+	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
+														\
+	RETURN_IF_AUDIT_OFF();											\
+														\
+	zbx_snprintf(audit_key_##resource, AUDIT_DETAILS_KEY_LEN,						\
+			"discoveryrule.overrides[%lu].filter.conditions."#resource, item_conditionid);		\
+														\
+	zbx_audit_update_json_update_##type2(itemid, audit_key_##resource, resource##_old, resource##_new);	\
+}
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE(operator, int, int)
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE(macro, const char*, string)
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE(value, const char*, string)
+#undef PREPARE_AUDIT_DISCOVERY_RULE_UPDATE
+
+void	zbx_audit_discovery_rule_update_json_delete_overrides_conditions(zbx_uint64_t itemid,
+		zbx_uint64_t item_conditionid)
+{
+	char	audit_key_operator[AUDIT_DETAILS_KEY_LEN], audit_key_macro[AUDIT_DETAILS_KEY_LEN],
+		audit_key_value[AUDIT_DETAILS_KEY_LEN];
+
+RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_operator, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.overrides[%lu].filter.conditions.operator", item_conditionid);
+	zbx_snprintf(audit_key_macro, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.overrides[%lu].filter.conditions.macro", item_conditionid);
+	zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.overrides[%lu].filter.conditions.value", item_conditionid);
+
+	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, audit_key_operator);
+	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, audit_key_macro);
+	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, audit_key_value);
+}

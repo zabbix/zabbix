@@ -87,6 +87,13 @@ static void	update_int_json(struct zbx_json *json, const char *key, int val_old,
 	zbx_json_close(json);
 }
 
+static void	delete_json(struct zbx_json *json, const char *audit_op, const char *key)
+{
+	zbx_json_addarray(json, key);
+	zbx_json_addstring(json, NULL, audit_op, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(json);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_auditlog_global_script                                       *
@@ -335,4 +342,10 @@ void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const char *key, in
 {
 	PREPARE_UPDATE_JSON_APPEND_OP();
 	update_int_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
+}
+
+void	zbx_audit_update_json_delete(const zbx_uint64_t id, const char *audit_op, const char *key)
+{
+	PREPARE_UPDATE_JSON_APPEND_OP();
+	delete_json(&((*found_audit_entry)->details_json), audit_op, key);
 }
