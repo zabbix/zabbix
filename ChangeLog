@@ -963,6 +963,14 @@ New features:
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
+.........T [ZBX-19762] removed unsupported items in Zabbix server templates (abakaldin)
+.........T [ZBX-19749] changed the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
+..F....... [ZBX-18135] fixed warning message close button (agriscenko)
+A......... [ZBX-19341] fixed template export missing inventory mode for Host prototype (jfreibergs)
+..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
+.........T [ZBX-19612] changed host name to visible name for consistency with UI (abiba)
+........S. [ZBX-19737] fixed prometheus preprocessing bug (yurii)
 ........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 A......... [ZBX-19752] fixed multiple types of media type creation having message templates in one API call (gcalenko)
 ..F....... [ZBX-18271] fixed incorrect ordering for tags and overrides in widgets, operations overrides in host prototype form and interface order in item and discovery prototypes forms (gcalenko, Sasha)
