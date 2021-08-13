@@ -496,8 +496,24 @@ static int	DBpatch_5050035(void)
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sort' where idx='web.hosts.php.sort'"))
 		return FAIL;
 
+	return SUCCEED;
+}
+
+static int	DBpatch_5050036(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sortorder' where idx='web.hosts.php.sortorder'"))
 		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050037(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set value_str='host.list' where idx='web.pager.entity' "
 				"and value_str='hosts.php'"))
@@ -547,5 +563,7 @@ DBPATCH_ADD(5050032, 0, 1)
 DBPATCH_ADD(5050033, 0, 1)
 DBPATCH_ADD(5050034, 0, 1)
 DBPATCH_ADD(5050035, 0, 1)
+DBPATCH_ADD(5050036, 0, 1)
+DBPATCH_ADD(5050037, 0, 1)
 
 DBPATCH_END()
