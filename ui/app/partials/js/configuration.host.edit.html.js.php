@@ -498,7 +498,11 @@ $linked_templates = $host_is_discovered
 			);
 
 			$('#tabs').on('tabsactivate change', () => {
-				overlays_stack.end().centerDialog();
+				const overlay = overlays_stack.end();
+
+				if (overlay.hasOwnProperty('centerDialog')) {
+					overlays_stack.end().centerDialog();
+				}
 			});
 
 			var clone_button = document.querySelector('.js-clone-host'),
