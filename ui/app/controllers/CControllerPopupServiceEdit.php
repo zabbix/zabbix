@@ -164,11 +164,11 @@ class CControllerPopupServiceEdit extends CController {
 							$this->service['propagation_rule'] == ZBX_SERVICE_STATUS_PROPAGATION_INCREASE
 							|| $this->service['propagation_rule'] == ZBX_SERVICE_STATUS_PROPAGATION_DECREASE)
 						? $this->service['propagation_value']
-						: null,
+						: 1,
 					'propagation_value_status' =>
 							$this->service['propagation_rule'] == ZBX_SERVICE_STATUS_PROPAGATION_FIXED
 						? $this->service['propagation_value']
-						: null,
+						: ZBX_SEVERITY_OK,
 					'weight' => $this->service['weight']
 				]
 			];

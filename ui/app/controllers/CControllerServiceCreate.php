@@ -62,32 +62,28 @@ class CControllerServiceCreate extends CController {
 		}
 
 		if ($ret && $this->hasInput('advanced_configuration')) {
+			$fields = [];
+
 			switch ($this->getInput('propagation_rule')) {
 				case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
 				case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
-					$propagation_value_ok = $this->hasInput('propagation_value_number')
-						&& $this->getInput('propagation_value_number') >= 1
-						&& $this->getInput('propagation_value_number') < TRIGGER_SEVERITY_COUNT;
+					$fields['propagation_value_number'] = 'required|ge 1|le '.(TRIGGER_SEVERITY_COUNT - 1);
 					break;
 
 				case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
-					$propagation_value_ok = $this->hasInput('propagation_value_status')
-						&& in_array($this->getInput('propagation_value_status'),
-							array_keys(CServiceHelper::getStatusNames())
-						);
-					break;
-
-				default:
-					$propagation_value_ok = true;
+					$fields['propagation_value_status'] =
+						'required|in '.implode(',', array_keys(CServiceHelper::getStatusNames()));
 					break;
 			}
 
-			if (!$propagation_value_ok) {
-				info(_s('Field "%1$s" is mandatory.',
-					CServiceHelper::getStatusPropagationNames()[$this->getInput('propagation_rule')]
-				));
+			if ($fields) {
+				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
-				$ret = false;
+				foreach ($validator->getAllErrors() as $error) {
+					info($error);
+				}
+
+				$ret = !$validator->isErrorFatal() && !$validator->isError();
 			}
 		}
 
