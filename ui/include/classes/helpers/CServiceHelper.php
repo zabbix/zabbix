@@ -99,7 +99,7 @@ class CServiceHelper {
 				);
 				break;
 			case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
-				$rule = _n(
+				$rule = _s(
 					'If less than %2$s of child services have %1$s status or below',
 					new CTag('em', true, $status), new CTag('em', true, [$number, '%']), $number
 				);
