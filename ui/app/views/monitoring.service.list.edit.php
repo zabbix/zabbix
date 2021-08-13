@@ -218,7 +218,7 @@ $filter->addFilterTab(_('Filter'), [
 	->show();
 
 (new CScriptTag('
-	service_list.init('.
+	view.init('.
 		json_encode([
 			'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
 			'mode_switch_url' => $data['view_mode_url'],

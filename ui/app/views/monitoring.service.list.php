@@ -183,7 +183,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	->show();
 
 (new CScriptTag('
-	service_list.init('.
+	view.init('.
 		json_encode([
 			'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
 			'mode_switch_url' => $data['edit_mode_url'],
