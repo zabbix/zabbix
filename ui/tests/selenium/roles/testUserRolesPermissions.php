@@ -1165,7 +1165,6 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			if ($action_status) {
 				$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
-				$this->assertContains('zabbix.php?action=user.token.list', $this->page->getCurrentUrl());
 				$this->changeRoleRule(['Manage API tokens' => false]);
 			}
 			else {
