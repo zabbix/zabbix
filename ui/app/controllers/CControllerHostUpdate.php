@@ -45,7 +45,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 		]);
 
 		if (!$this->host) {
-			return false;
+			access_deny(ACCESS_DENY_OBJECT);
 		}
 
 		$this->host = $this->host[0];

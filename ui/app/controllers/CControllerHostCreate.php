@@ -40,7 +40,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			]);
 
 			if (!$hosts) {
-				$ret = false;
+				access_deny(ACCESS_DENY_OBJECT);
 			}
 		}
 
