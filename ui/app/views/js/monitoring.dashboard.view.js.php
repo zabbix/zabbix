@@ -95,7 +95,7 @@
 			ZABBIX.Dashboard.activate();
 
 			if (web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
-				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, this.edit);
+				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, this.events.applyProperties);
 
 				if (dynamic.has_dynamic_widgets) {
