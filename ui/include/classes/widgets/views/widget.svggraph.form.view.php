@@ -268,7 +268,7 @@ $tab_problems = (new CFormList())
 		CWidgetHelper::getHostPatternSelect($fields['problemhosts'], $form_name)
 	)
 	->addRow(CWidgetHelper::getLabel($fields['severities']),
-		CWidgetHelper::getSeverities((int) $fields['severities'])
+		CWidgetHelper::getSeverities($fields['severities'])
 	)
 	->addRow(CWidgetHelper::getLabel($fields['problem_name']), CWidgetHelper::getTextBox($fields['problem_name']))
 	->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']))
