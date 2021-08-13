@@ -25,6 +25,8 @@ const (
 	counterLoad
 )
 
+const minimumSampleCount = 2
+
 type cpuCounters struct {
 	load float64
 	util float64
@@ -39,7 +41,7 @@ func counterByType(name string) (counter cpuCounter) {
 	}
 }
 
-func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex) (value interface{}) {
+func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex, split int) (value interface{}) {
 	if c.head == c.tail {
 		return
 	}
@@ -48,7 +50,7 @@ func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex) (value
 	if totalnum < 0 {
 		totalnum += maxHistory
 	}
-	if totalnum < 2 {
+	if totalnum < minimumSampleCount {
 		// need at least two samples to calculate change over period
 		return
 	}
@@ -61,17 +63,28 @@ func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex) (value
 
 	switch counter {
 	case counterUtil:
-		if tail.util < head.util {
-			return
-		} else {
-			return (tail.util - head.util) / float64(period)
-		}
+		return getCounterUtil(tail, head, period)
 	case counterLoad:
-		if tail.load < head.load {
-			return
-		} else {
-			return (tail.load - head.load) / float64(numCPU()) / float64(period)
-		}
+		return getCounterLoad(tail, head, period, split)
+	case counterUnknown:
+		return
 	}
+
 	return
+}
+
+func getCounterUtil(tail, head *cpuCounters, period historyIndex) interface{} {
+	if tail.util < head.util {
+		return nil
+	}
+
+	return (tail.util - head.util) / float64(period)
+}
+
+func getCounterLoad(tail, head *cpuCounters, period historyIndex, split int) interface{} {
+	if tail.load < head.load {
+		return nil
+	}
+
+	return (tail.load - head.load) / float64(split) / float64(period)
 }
