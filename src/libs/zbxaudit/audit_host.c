@@ -21,7 +21,7 @@
 #include "audit.h"
 #include "audit_host.h"
 
-#define PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(resource)								\
+#define PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)							\
 	char	audit_key_version[AUDIT_DETAILS_KEY_LEN], audit_key_bulk[AUDIT_DETAILS_KEY_LEN],		\
 		audit_key_community[AUDIT_DETAILS_KEY_LEN], audit_key_securityname[AUDIT_DETAILS_KEY_LEN],	\
 		audit_key_securitylevel[AUDIT_DETAILS_KEY_LEN],							\
@@ -30,34 +30,34 @@
 		audit_key_privprotocol[AUDIT_DETAILS_KEY_LEN], audit_key_contextname[AUDIT_DETAILS_KEY_LEN];	\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(audit_key_version, AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.version",	\
+	zbx_snprintf(audit_key_version, AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[%lu].details.version",	\
 			interfaceid);										\
-	zbx_snprintf(audit_key_bulk, AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.bulk",		\
+	zbx_snprintf(audit_key_bulk, AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[%lu].details.bulk",		\
 			interfaceid);										\
-	zbx_snprintf(audit_key_community, AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.community",	\
-			interfaceid);										\
+	zbx_snprintf(audit_key_community, AUDIT_DETAILS_KEY_LEN,						\
+			#auditentry".interfaces[%lu].details.community", interfaceid);				\
 	zbx_snprintf(audit_key_securityname, AUDIT_DETAILS_KEY_LEN,						\
-			#resource".interfaces[%lu].details.securityname", interfaceid);				\
+			#auditentry".interfaces[%lu].details.securityname", interfaceid);			\
 	zbx_snprintf(audit_key_securitylevel, AUDIT_DETAILS_KEY_LEN,						\
-			#resource".interfaces[%lu].details.securitylevel", interfaceid);			\
+			#auditentry".interfaces[%lu].details.securitylevel", interfaceid);			\
 	zbx_snprintf(audit_key_authpassphrase, AUDIT_DETAILS_KEY_LEN,						\
-			#resource".interfaces[%lu].details.authpassphrase", interfaceid);			\
+			#auditentry".interfaces[%lu].details.authpassphrase", interfaceid);			\
 	zbx_snprintf(audit_key_privpassphrase, AUDIT_DETAILS_KEY_LEN,						\
-			#resource".interfaces[%lu].details.privpassphrase", interfaceid);			\
+			#auditentry".interfaces[%lu].details.privpassphrase", interfaceid);			\
 	zbx_snprintf(audit_key_authprotocol, AUDIT_DETAILS_KEY_LEN,						\
-			#resource".interfaces[%lu].details.authprotocol", interfaceid);				\
+			#auditentry".interfaces[%lu].details.authprotocol", interfaceid);			\
 	zbx_snprintf(audit_key_privprotocol, AUDIT_DETAILS_KEY_LEN,						\
-			#resource".interfaces[%lu].details.privprotocol", interfaceid);				\
+			#auditentry".interfaces[%lu].details.privprotocol", interfaceid);			\
 	zbx_snprintf(audit_key_contextname, AUDIT_DETAILS_KEY_LEN,						\
-			#resource".interfaces[%lu].details.contextname", interfaceid);				\
+			#auditentry".interfaces[%lu].details.contextname", interfaceid);			\
 
-#define PREPARE_AUDIT_SNMP_INTERFACE(resource)									\
-void	zbx_audit_##resource##_update_json_add_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version,	\
+#define PREPARE_AUDIT_SNMP_INTERFACE(funcname, auditentry)							\
+void	zbx_audit_##funcname##_update_json_add_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version,	\
 		zbx_uint64_t bulk, const char *community, const char *securityname, zbx_uint64_t securitylevel,	\
 		const char *authpassphrase, const char *privpassphrase, zbx_uint64_t authprotocol,		\
 		zbx_uint64_t privprotocol, const char *contextname, zbx_uint64_t interfaceid)			\
 {														\
-PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(resource)									\
+PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)								\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_version, version);	\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_bulk, bulk);		\
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_community, community);	\
@@ -77,7 +77,7 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(resource)									\
 			contextname);										\
 }														\
 														\
-void	zbx_audit_##resource##_update_json_update_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version_old,	\
+void	zbx_audit_##funcname##_update_json_update_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version_old,	\
 		zbx_uint64_t version_new, zbx_uint64_t bulk_old,  zbx_uint64_t bulk_new,			\
 		const char *community_old, const char *community_new, const char *securityname_old,		\
 		const char *securityname_new, zbx_uint64_t securitylevel_old, zbx_uint64_t securitylevel_new,	\
@@ -86,7 +86,7 @@ void	zbx_audit_##resource##_update_json_update_snmp_interface(zbx_uint64_t hosti
 		zbx_uint64_t privprotocol_old, zbx_uint64_t privprotocol_new, const char *contextname_old,	\
 		const char *contextname_new, zbx_uint64_t interfaceid)						\
 {														\
-PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(resource)									\
+PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(funcname)									\
 	zbx_audit_update_json_update_uint64(hostid, audit_key_version, version_old, version_new);		\
 	zbx_audit_update_json_update_uint64(hostid, audit_key_bulk, bulk_old, bulk_new);			\
 	zbx_audit_update_json_update_string(hostid, audit_key_community, community_old, community_new);		\
@@ -102,8 +102,8 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(resource)									\
 	zbx_audit_update_json_update_string(hostid, audit_key_contextname, contextname_old, contextname_new);	\
 }														\
 
-PREPARE_AUDIT_SNMP_INTERFACE(host)
-PREPARE_AUDIT_SNMP_INTERFACE(host_prototype)
+PREPARE_AUDIT_SNMP_INTERFACE(host, host)
+PREPARE_AUDIT_SNMP_INTERFACE(host_prototype, hostprototype)
 
 void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid,
 		const char *hostname)
@@ -148,20 +148,20 @@ void	zbx_audit_host_update_json_update_host_status(zbx_uint64_t hostid, int host
 	zbx_audit_update_json_update_int(hostid, "host.status", host_status_old, host_status_new);
 }
 
-#define PREPARE_AUDIT_HOST_INTERFACE(resource, interface_resource, type1, type2)				\
-void	zbx_audit_##resource##_update_json_update_interface_##interface_resource(zbx_uint64_t hostid,		\
+#define PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, interface_resource, type1, type2)			\
+void	zbx_audit_##funcname##_update_json_update_interface_##interface_resource(zbx_uint64_t hostid,		\
 		zbx_uint64_t interfaceid, type1 interface_resource##_old, type1 interface_resource##_new)	\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(buf, sizeof(buf), #resource".interfaces[%lu].details."#interface_resource, interfaceid);	\
+	zbx_snprintf(buf, sizeof(buf), #auditentry".interfaces[%lu].details."#interface_resource, interfaceid);	\
 	zbx_audit_update_json_update_##type2(hostid, buf, interface_resource##_old, interface_resource##_new);	\
 }														\
 
-#define	PREPARE_AUDIT_HOST(resource, audit_resource_flag)							\
-void	zbx_audit_##resource##_create_entry(int audit_action, zbx_uint64_t hostid, const char *name)		\
+#define	PREPARE_AUDIT_HOST(funcname, auditentry, audit_resource_flag)						\
+void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t hostid, const char *name)		\
 {														\
 	zbx_audit_entry_t	local_audit_host_entry, **found_audit_host_entry;				\
 	zbx_audit_entry_t	*local_audit_host_entry_x = &local_audit_host_entry;				\
@@ -187,26 +187,27 @@ void	zbx_audit_##resource##_create_entry(int audit_action, zbx_uint64_t hostid, 
 	}													\
 }														\
 														\
-void	zbx_audit_##resource##_update_json_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid,	\
+void	zbx_audit_##funcname##_update_json_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid,	\
 		zbx_uint64_t main_, zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns,	\
 		int port)											\
 {														\
 	char	audit_key_main[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN],			\
 		audit_key_useip[AUDIT_DETAILS_KEY_LEN], audit_key_ip[AUDIT_DETAILS_KEY_LEN],			\
 		audit_key_dns[AUDIT_DETAILS_KEY_LEN], audit_key_port[AUDIT_DETAILS_KEY_LEN];			\
+														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(audit_key_main,  AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.main",		\
+	zbx_snprintf(audit_key_main,  AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[%lu].details.main",	\
 			interfaceid);										\
-	zbx_snprintf(audit_key_type,  AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.type",		\
+	zbx_snprintf(audit_key_type,  AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[%lu].details.type",	\
 			interfaceid);										\
-	zbx_snprintf(audit_key_useip, AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.useip",		\
+	zbx_snprintf(audit_key_useip, AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[%lu].details.useip",	\
 			interfaceid);										\
-	zbx_snprintf(audit_key_ip,    AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.ip",		\
+	zbx_snprintf(audit_key_ip,    AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[%lu].details.ip",		\
 			interfaceid);										\
-	zbx_snprintf(audit_key_dns,   AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.dns",		\
+	zbx_snprintf(audit_key_dns,   AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[%lu].details.dns",		\
 			interfaceid);										\
-	zbx_snprintf(audit_key_port,  AUDIT_DETAILS_KEY_LEN, #resource".interfaces[%lu].details.port",		\
+	zbx_snprintf(audit_key_port,  AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[%lu].details.port",	\
 			interfaceid);										\
 														\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_main, main_);		\
@@ -217,26 +218,26 @@ void	zbx_audit_##resource##_update_json_add_interfaces(zbx_uint64_t hostid, zbx_
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_port, port);		\
 }														\
 														\
-PREPARE_AUDIT_HOST_INTERFACE(resource, useip, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE(resource, main, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE(resource, type, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE(resource, ip, const char*, string)							\
-PREPARE_AUDIT_HOST_INTERFACE(resource, dns, const char*, string)						\
-PREPARE_AUDIT_HOST_INTERFACE(resource, port, int, int)								\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, useip, zbx_uint64_t, uint64)					\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, main, zbx_uint64_t, uint64)					\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, type, zbx_uint64_t, uint64)					\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, ip, const char*, string)					\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, dns, const char*, string)					\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, port, int, int)						\
 /* snmp */													\
-PREPARE_AUDIT_HOST_INTERFACE(resource, version, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE(resource, bulk, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE(resource, community, const char*, string)						\
-PREPARE_AUDIT_HOST_INTERFACE(resource, securityname, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE(resource, securitylevel, int, int)							\
-PREPARE_AUDIT_HOST_INTERFACE(resource, authpassphrase, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE(resource, privpassphrase, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE(resource, authprotocol, zbx_uint64_t, uint64)					\
-PREPARE_AUDIT_HOST_INTERFACE(resource, privprotocol, zbx_uint64_t, uint64)					\
-PREPARE_AUDIT_HOST_INTERFACE(resource, contextname, const char*, string)					\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, version, zbx_uint64_t, uint64)				\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, bulk, zbx_uint64_t, uint64)					\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, community, const char*, string)				\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, securityname, const char*, string)				\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, securitylevel, int, int)					\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, authpassphrase, const char*, string)				\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, privpassphrase, const char*, string)				\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, authprotocol, zbx_uint64_t, uint64)				\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, privprotocol, zbx_uint64_t, uint64)				\
+PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, contextname, const char*, string)				\
 
-PREPARE_AUDIT_HOST(host, AUDIT_RESOURCE_HOST)
-PREPARE_AUDIT_HOST(host_prototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
+PREPARE_AUDIT_HOST(host, host, AUDIT_RESOURCE_HOST)
+PREPARE_AUDIT_HOST(host_prototype, hostprototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
 #undef PREPARE_AUDIT_HOST
 #undef PREPARE_AUDIT_HOST_INTERFACE
 
@@ -351,19 +352,19 @@ void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid
 	zbx_audit_update_json_update_uint64(hostid, audit_key_operator, templateid_old, templateid_new);
 }
 
-#define PREPARE_AUDIT_TEMPLATE_OP(resource, op1, op2)								\
-void	zbx_audit_##resource##_update_json_##op1##_parent_template(zbx_uint64_t hostid,				\
+#define PREPARE_AUDIT_TEMPLATE_OP(funcname, auditentry, op1, op2)						\
+void	zbx_audit_##funcname##_update_json_##op1##_parent_template(zbx_uint64_t hostid,				\
 		zbx_uint64_t templateid)									\
 {														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_audit_update_json_append_uint64(hostid, op2, #resource".templates", templateid);			\
+	zbx_audit_update_json_append_uint64(hostid, op2, #auditentry".templates", templateid);			\
 }														\
 
-PREPARE_AUDIT_TEMPLATE_OP(host, attach, AUDIT_DETAILS_ACTION_ATTACH)
-PREPARE_AUDIT_TEMPLATE_OP(host, detach, AUDIT_DETAILS_ACTION_DETACH)
-PREPARE_AUDIT_TEMPLATE_OP(host_prototype, attach, AUDIT_DETAILS_ACTION_ATTACH)
-PREPARE_AUDIT_TEMPLATE_OP(host_prototype, detach, AUDIT_DETAILS_ACTION_DETACH)
+PREPARE_AUDIT_TEMPLATE_OP(host, host, attach, AUDIT_DETAILS_ACTION_ATTACH)
+PREPARE_AUDIT_TEMPLATE_OP(host, host, detach, AUDIT_DETAILS_ACTION_DETACH)
+PREPARE_AUDIT_TEMPLATE_OP(host_prototype, hostprototype, attach, AUDIT_DETAILS_ACTION_ATTACH)
+PREPARE_AUDIT_TEMPLATE_OP(host_prototype, hostprototype, detach, AUDIT_DETAILS_ACTION_DETACH)
 
 void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid)
 {
