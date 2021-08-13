@@ -419,7 +419,7 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(description, const char*, string)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(type, int, int)
 #undef PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO
 
-void	zbx_aduit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid)
+void	zbx_audit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 
