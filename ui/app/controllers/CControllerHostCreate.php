@@ -99,10 +99,14 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 				$details[] = $message['message'];
 			}
 
+			ob_start();
+			uncheckTableRows('hosts');
+
 			$output = [
 				'message' => makeMessageBox(true, $messages, _('Host added'), true, false)->toString(),
-				'message_raw' => _('Host added'),
-				'details' => $details
+				'title' => _('Host added'),
+				'details' => $details,
+				'script_inline' => ob_get_clean()
 			];
 		}
 

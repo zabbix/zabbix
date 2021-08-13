@@ -192,7 +192,7 @@ async function handle_hostaction_response(response, host_form = null) {
 				postMessageDetails(MESSAGE_TYPE_SUCCESS, response.details);
 			}
 
-			postMessageOk(response.message_raw);
+			postMessageOk(response.title);
 			location.replace(host_popup.original_url);
 		}
 	}

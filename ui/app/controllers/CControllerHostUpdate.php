@@ -112,10 +112,14 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				$details[] = $message['message'];
 			}
 
+			ob_start();
+			uncheckTableRows('hosts');
+
 			$output = [
 				'message' => makeMessageBox(true, $messages, _('Host updated'), true, false)->toString(),
-				'message_raw' => _('Host updated'),
-				'details' => $details
+				'title' => _('Host updated'),
+				'details' => $details,
+				'script_inline' => ob_get_clean()
 			];
 		}
 

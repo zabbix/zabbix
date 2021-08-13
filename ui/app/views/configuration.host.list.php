@@ -26,6 +26,10 @@
 $this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('configuration.host.list.js.php');
 
+if ($data['uncheck']) {
+	uncheckTableRows('hosts');
+}
+
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->setControls((new CTag('nav', true, (new CList())
