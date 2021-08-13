@@ -96,4 +96,17 @@ PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_H(value, const char*, string)
 void	zbx_audit_discovery_rule_update_json_delete_overrides_conditions(zbx_uint64_t itemid,
 		zbx_uint64_t item_conditionid);
 
+void	zbx_audit_discovery_rule_update_json_add_discovery_rule_preproc(zbx_uint64_t itemid,
+		zbx_uint64_t item_preprocid, int step, int type, const char *params, int error_handler,
+		const char *error_handler_params);
+
+#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC_H(resource, type1, type2)					\
+void	zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_##resource(zbx_uint64_t itemid,	\
+		zbx_uint64_t preprocid, type1 resource##_old, type1 resource##_new);
+
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC_H(type, int, int)
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC_H(params, const char*, string)
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC_H(error_handler, int, int)
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC_H(error_handler_params, const char*, string)
+
 #endif	/* ZABBIX_AUDIT_ITEM_H */

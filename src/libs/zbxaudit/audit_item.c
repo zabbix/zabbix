@@ -288,3 +288,48 @@ RETURN_IF_AUDIT_OFF();
 	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, audit_key_macro);
 	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, audit_key_value);
 }
+
+void	zbx_audit_discovery_rule_update_json_add_discovery_rule_preproc(zbx_uint64_t itemid,
+		zbx_uint64_t item_preprocid, int step, int type, const char *params, int error_handler,
+		const char *error_handler_params)
+{
+	char	audit_key_step[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN],
+		audit_key_params[AUDIT_DETAILS_KEY_LEN], audit_key_error_handler[AUDIT_DETAILS_KEY_LEN],
+		audit_key_error_handler_params[AUDIT_DETAILS_KEY_LEN];
+
+	zbx_snprintf(audit_key_step, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.preprocessing[%lu].step", item_preprocid);
+	zbx_snprintf(audit_key_type, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.preprocessing[%lu].type", item_preprocid);
+	zbx_snprintf(audit_key_params, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.preprocessing[%lu].params", item_preprocid);
+	zbx_snprintf(audit_key_error_handler, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.preprocessing[%lu].error_handler", item_preprocid);
+	zbx_snprintf(audit_key_error_handler_params, AUDIT_DETAILS_KEY_LEN,
+			"discoveryrule.preprocessing[%lu].error_handler_params", item_preprocid);
+
+	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, step);
+	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_type, type);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_params, params);
+	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, error_handler);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, error_handler_params);
+}
+
+#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(resource, type1, type2)					\
+void	zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_##resource(zbx_uint64_t itemid,	\
+		zbx_uint64_t preprocid, type1 resource##_old, type1 resource##_new)				\
+{														\
+	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
+														\
+	RETURN_IF_AUDIT_OFF();											\
+														\
+	zbx_snprintf(audit_key_##resource, AUDIT_DETAILS_KEY_LEN,						\
+			"discoveryrule.preprocessing[%lu]."#resource, preprocid);				\
+														\
+	zbx_audit_update_json_update_##type2(itemid, audit_key_##resource, resource##_old, resource##_new);	\
+}
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(type, int, int)
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(params, const char*, string)
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(error_handler, int, int)
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(error_handler_params, const char*, string)
+#undef PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC

@@ -47,9 +47,13 @@ struct _zbx_template_item_preproc_t
 
 	zbx_uint64_t	upd_flags;
 	int		step;
+	int		type_orig;
 	int		type;
+	char		*params_orig;
 	char		*params;
+	int		error_handler_orig;
 	int		error_handler;
+	char		*error_handler_params_orig;
 	char		*error_handler_params;
 };
 
@@ -1241,6 +1245,12 @@ out:
 
 static void	zbx_item_preproc_free(zbx_template_item_preproc_t *preproc)
 {
+	if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_PARAMS))
+		zbx_free(preproc->params_orig);
+
+	if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS))
+		zbx_free(preproc->error_handler_params_orig);
+
 	zbx_free(preproc->params);
 	zbx_free(preproc->error_handler_params);
 	zbx_free(preproc);
@@ -1437,6 +1447,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 	zbx_template_item_preproc_t	*preproc;
 	zbx_vector_uint64_t		deleteids;
 	zbx_db_insert_t			db_insert;
+	zbx_uint64_t			new_preprocid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1474,6 +1485,8 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 
 	if (0 != new_preproc_num)
 	{
+		new_preprocid = DBget_maxid_num("item_preproc", new_preproc_num);
+
 		zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params",
 				"error_handler", "error_handler_params", NULL);
 	}
@@ -1489,9 +1502,16 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 			preproc = (zbx_template_item_preproc_t *)item->item_preprocs.values[j];
 			if (0 == preproc->item_preprocid)
 			{
-				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), item->itemid, preproc->step,
+				zbx_db_insert_add_values(&db_insert, new_preprocid, item->itemid, preproc->step,
 						preproc->type, preproc->params, preproc->error_handler,
 						preproc->error_handler_params);
+
+				zbx_audit_discovery_rule_update_json_add_discovery_rule_preproc(item->itemid,
+						new_preprocid, preproc->step, preproc->type, preproc->params,
+						preproc->error_handler, preproc->error_handler_params);
+
+				new_preprocid++;
+
 				continue;
 			}
 
@@ -1504,6 +1524,9 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stype=%d", d, preproc->type);
 				d = ",";
+
+				zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_type(item->itemid,
+						preproc->item_preprocid, preproc->type_orig, preproc->type);
 			}
 
 			if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_PARAMS))
@@ -1515,6 +1538,9 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 
 				zbx_free(params_esc);
 				d = ",";
+
+				zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_params(item->itemid,
+						preproc->item_preprocid, preproc->params_orig, preproc->params);
 			}
 
 			if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_ERROR_HANDLER))
@@ -1522,6 +1548,10 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serror_handler=%d", d,
 						preproc->error_handler);
 				d = ",";
+
+				zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_error_handler(
+						item->itemid, preproc->item_preprocid, preproc->error_handler_orig,
+						preproc->error_handler);
 			}
 
 			if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS))
@@ -1533,6 +1563,10 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 						params_esc);
 
 				zbx_free(params_esc);
+
+				zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_error_handler_params(
+						item->itemid, preproc->item_preprocid, preproc->error_handler_params_orig,
+						preproc->error_handler_params);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where item_preprocid=" ZBX_FS_UI64 ";\n",
@@ -1540,7 +1574,6 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
-
 	}
 
 	if (0 != update_preproc_num)
@@ -2628,6 +2661,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 			if (ppdst->type != ppsrc->type)
 			{
+				ppdst->type_orig = ppdst->type;
 				ppdst->type = ppsrc->type;
 				ppdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_TYPE;
 			}
@@ -2635,6 +2669,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 			if (0 != strcmp(ppdst->params, buffer))
 			{
+				ppdst->params_orig = zbx_strdup(NULL, buffer);
 				zbx_free(ppdst->params);
 				ppdst->params = buffer;
 				buffer = NULL;
@@ -2643,6 +2678,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 			if (ppdst->error_handler != ppsrc->error_handler)
 			{
+				ppdst->error_handler_orig = ppdst->error_handler;
 				ppdst->error_handler = ppsrc->error_handler;
 				ppdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_ERROR_HANDLER;
 			}
@@ -2651,6 +2687,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 			if (0 != strcmp(ppdst->error_handler_params, buffer))
 			{
+				ppdst->error_handler_params_orig = zbx_strdup(NULL, ppdst->error_handler_params);
 				zbx_free(ppdst->error_handler_params);
 				ppdst->error_handler_params = buffer;
 				buffer = NULL;
