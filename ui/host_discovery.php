@@ -275,10 +275,7 @@ if (getRequest('itemid', false)) {
 
 		foreach ($override['operations'] as &$operation) {
 			if (array_key_exists('optag', $operation)) {
-				CArrayHelper::sort($operation['optag'], [
-					['field' => 'tag', 'order' => ZBX_SORT_UP],
-					['field' => 'value', 'order' => ZBX_SORT_UP]
-				]);
+				CArrayHelper::sort($operation['optag'], ['tag', 'value']);
 				$operation['optag'] = array_values($operation['optag']);
 			}
 		}
@@ -853,9 +850,7 @@ if (hasRequest('form')) {
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
-		CArrayHelper::sort($data['overrides'], [
-			['field' => 'step', 'order' => ZBX_SORT_UP]
-		]);
+		CArrayHelper::sort($data['overrides'], ['step']);
 	}
 	// clone form
 	elseif (hasRequest('clone')) {

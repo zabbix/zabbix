@@ -76,5 +76,5 @@ void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key,
 void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, uint64_t value_old,
 		uint64_t value_new);
 void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const char *key, int value_old, int value_new);
-void	zbx_audit_update_json_delete(const zbx_uint64_t id,  const char *audit_op, const char *key);
+void	zbx_audit_update_json_delete(const zbx_uint64_t id, const char *audit_op, const char *key);
 #endif	/* ZABBIX_AUDIT_H */

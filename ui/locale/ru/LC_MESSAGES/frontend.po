@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 19:55+0300\n"
+"POT-Creation-Date: 2021-08-06 19:55+0300\n"
 "PO-Revision-Date: 2021-06-17 14:02+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -75,7 +75,7 @@ msgstr ""
 msgid "\"ruleid\" of dependent item and master item should match"
 msgstr ""
 
-#: include/forms.inc.php:1288
+#: include/forms.inc.php:1293
 #: include/views/configuration.host.discovery.edit.php:815
 #: include/views/js/configuration.host.discovery.edit.js.php:98
 #: include/views/js/item.preprocessing.js.php:148
@@ -371,7 +371,7 @@ msgstr "500 последних значений"
 msgid "<empty string>"
 msgstr "<пустая строка>"
 
-#: include/forms.inc.php:1336 include/views/js/item.preprocessing.js.php:197
+#: include/forms.inc.php:1341 include/views/js/item.preprocessing.js.php:197
 msgid "<label name>"
 msgstr "<имя метки>"
 
@@ -379,7 +379,7 @@ msgstr "<имя метки>"
 msgid "<manual>"
 msgstr "<вручную>"
 
-#: include/forms.inc.php:1334 include/forms.inc.php:1342
+#: include/forms.inc.php:1339 include/forms.inc.php:1347
 #: include/views/js/item.preprocessing.js.php:195
 #: include/views/js/item.preprocessing.js.php:204
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
@@ -466,7 +466,7 @@ msgstr "API токен обновлен"
 msgid "API tokens"
 msgstr "API токены"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:319
+#: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "Abscissa"
 msgstr "Ось абсцисс"
 
@@ -674,7 +674,7 @@ msgstr "Действие обновлено"
 #: include/classes/screens/CScreenProblem.php:902
 #: include/classes/screens/CScreenProblem.php:1171
 #: include/classes/screens/CScreenProblem.php:1232 include/events.inc.php:291
-#: include/forms.inc.php:1217 include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:69 jsLoader.php:144
 #: jsLoader.php:172 jsLoader.php:187 jsLoader.php:201 jsLoader.php:327
 #: tr_events.php:182
@@ -782,8 +782,8 @@ msgstr "Активно до"
 #: app/views/popup.triggerwizard.php:116 app/views/popup.triggerwizard.php:150
 #: app/views/popup.valuemap.edit.php:60 app/views/popup.valuemap.edit.php:126
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
-#: include/classes/widgets/CWidgetHelper.php:530 include/forms.inc.php:1476
-#: include/forms.inc.php:2040 include/views/configuration.action.edit.php:133
+#: include/classes/widgets/CWidgetHelper.php:530 include/forms.inc.php:1481
+#: include/forms.inc.php:2045 include/views/configuration.action.edit.php:133
 #: include/views/configuration.action.edit.php:305
 #: include/views/configuration.action.edit.php:389
 #: include/views/configuration.action.edit.php:465
@@ -946,6 +946,8 @@ msgstr "Добавить группу пользователей"
 msgid "Add widget"
 msgstr "Добавить виджет"
 
+#: app/controllers/CControllerAuditLogList.php:283
+#: app/controllers/CControllerAuditLogList.php:294
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Added"
 msgstr "Добавлено"
@@ -1149,7 +1151,7 @@ msgstr "И"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:80
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:80
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:370
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:68
 #: include/classes/widgets/forms/CWidgetFormWeb.php:62
 #: include/views/configuration.action.edit.php:122
@@ -1348,6 +1350,10 @@ msgstr "Должен быть выбран по крайней мере один
 msgid "At least one user or user group must be specified."
 msgstr "Необходимо указать по крайней мере одного пользователя или группу пользователей."
 
+#: app/controllers/CControllerAuditLogList.php:290
+msgid "Attached"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:341
 msgid "Attempt interval"
 msgstr "Интервал попыток"
@@ -1448,9 +1454,9 @@ msgstr "Автор"
 msgid "Authorization"
 msgstr "Авторизация"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:157
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:229
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:150
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:222
 msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Авто"
@@ -1587,8 +1593,8 @@ msgstr "Имя для подключения (Bind DN)"
 msgid "Bind password"
 msgstr "Пароль подключения (Bind password)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:377
-#: app/controllers/CControllerPopupTriggerExpr.php:410
+#: app/controllers/CControllerPopupTriggerExpr.php:397
+#: app/controllers/CControllerPopupTriggerExpr.php:430
 msgid "Bits to shift"
 msgstr "Битов для сдвига"
 
@@ -1823,7 +1829,7 @@ msgstr "Не удалось добавить зависимость от узл�
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr "Не удалось добавить зависимость от триггера \"%1$s:%2$s\" к несуществующему триггеру \"%3$s:%4$s\"."
 
-#: host_discovery.php:702
+#: host_discovery.php:717
 msgid "Cannot add discovery rule"
 msgstr "Не удалось добавить правило обнаружения"
 
@@ -1963,9 +1969,9 @@ msgstr "Не удалось привязать анонимно к LDAP серв
 msgid "Cannot bind to LDAP server."
 msgstr "Не удалось привязать к LDAP серверу."
 
-#: include/forms.inc.php:1861 include/forms.inc.php:1868
-#: include/forms.inc.php:1878 include/forms.inc.php:1912
-#: include/forms.inc.php:1919 include/forms.inc.php:1929
+#: include/forms.inc.php:1866 include/forms.inc.php:1873
+#: include/forms.inc.php:1883 include/forms.inc.php:1917
+#: include/forms.inc.php:1924 include/forms.inc.php:1934
 #, c-format
 msgid "Cannot build expression tree: %1$s."
 msgstr "Не удалось построить дерево выражения: %1$s."
@@ -2119,14 +2125,14 @@ msgstr[2] "Не удалось удалить панели"
 msgid "Cannot delete dependency"
 msgstr "Не удалось удалить зависимость"
 
-#: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:397
+#: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:412
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Не удалось удалить правило обнаружения"
 msgstr[1] "Не удалось удалить правила обнаружения"
 msgstr[2] "Не удалось удалить правила обнаружения"
 
-#: host_discovery.php:745
+#: host_discovery.php:760
 msgid "Cannot delete discovery rules"
 msgstr "Не удалось удалить правила обнаружения"
 
@@ -2388,7 +2394,7 @@ msgstr[0] "Не удалось деактивировать корреляцию
 msgstr[1] "Не удалось деактивировать корреляции"
 msgstr[2] "Не удалось деактивировать корреляции"
 
-#: app/controllers/CControllerDiscoveryDisable.php:74 host_discovery.php:735
+#: app/controllers/CControllerDiscoveryDisable.php:74 host_discovery.php:750
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Не удалось деактивировать правило обнаружения"
@@ -2477,7 +2483,7 @@ msgstr[0] "Не удалось активировать корреляцию"
 msgstr[1] "Не удалось активировать корреляции"
 msgstr[2] "Не удалось активировать корреляции"
 
-#: app/controllers/CControllerDiscoveryEnable.php:75 host_discovery.php:734
+#: app/controllers/CControllerDiscoveryEnable.php:75 host_discovery.php:749
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Не удалось активировать правило обнаружения"
@@ -2693,7 +2699,7 @@ msgstr[0] "Не удалось импортировать шаблон \"%1$s\",
 msgstr[1] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
 msgstr[2] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1438
+#: app/controllers/CControllerPopupTriggerExpr.php:1472
 msgid "Cannot insert trigger expression"
 msgstr "Не удалось вставить выражение триггера"
 
@@ -2740,17 +2746,17 @@ msgstr "Невозможно обновить массово видимое им
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
 msgstr "Невозможно передать дубликаты ID шаблонов для соединения: %1$s."
 
-#: include/classes/db/DB.php:941
+#: include/classes/db/DB.php:929
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "Невозможно выполнить запрос удаления из таблицы \"%1$s\" без выражения where."
 
-#: include/classes/db/DB.php:654
+#: include/classes/db/DB.php:642
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Невозможно выполнить запрос обновления таблицы \"%1$s\" без значений."
 
-#: include/classes/db/DB.php:667
+#: include/classes/db/DB.php:655
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Невозможно выполнить запрос обновления таблицы \"%1$s\" без выражения where."
@@ -2796,7 +2802,7 @@ msgstr "Не удалось сохранить виджет \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Не удалось отправить команду, проверьте соединение с Zabbix сервером \"%1$s\"."
 
-#: host_discovery.php:409 host_discovery.php:765 items.php:952 items.php:1146
+#: host_discovery.php:424 host_discovery.php:780 items.php:952 items.php:1146
 msgid "Cannot send request"
 msgstr "Не удалось отправить запрос"
 
@@ -2975,7 +2981,7 @@ msgid "Cannot update correlation"
 msgstr "Не удалось обновить корреляцию"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
-#: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:705
+#: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:720
 msgid "Cannot update discovery rule"
 msgstr "Не удалось обновить правило обнаружения"
 
@@ -3288,9 +3294,9 @@ msgstr "Строка символов включена"
 msgid "Character string not included"
 msgstr "Строка символов не включена"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:701
-#: app/controllers/CControllerPopupTriggerExpr.php:873
-#: app/controllers/CControllerPopupTriggerExpr.php:1004
+#: app/controllers/CControllerPopupTriggerExpr.php:721
+#: app/controllers/CControllerPopupTriggerExpr.php:907
+#: app/controllers/CControllerPopupTriggerExpr.php:1038
 msgid "Chars"
 msgstr "Символы"
 
@@ -3607,7 +3613,7 @@ msgstr "Сжатие"
 msgid "Concurrent sessions"
 msgstr "Одновременные сессии"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1461
+#: app/controllers/CControllerPopupTriggerExpr.php:1495
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 msgid "Condition"
 msgstr "Условие"
@@ -3771,7 +3777,7 @@ msgstr "Настройка прокси"
 msgid "Configuration of regular expressions"
 msgstr "Настройка регулярных выражений"
 
-#: app/controllers/CControllerScriptEdit.php:204
+#: app/controllers/CControllerScriptEdit.php:208
 #: app/controllers/CControllerScriptList.php:197
 msgid "Configuration of scripts"
 msgstr "Настройка скриптов"
@@ -4103,10 +4109,10 @@ msgstr "Корреляция обновлена"
 msgid "Could not save image!"
 msgstr "Не удалось сохранить изображение!"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:50
-#: app/controllers/CControllerPopupTriggerExpr.php:647
-#: app/controllers/CControllerPopupTriggerExpr.php:816
-#: app/controllers/CControllerPopupTriggerExpr.php:847
+#: app/controllers/CControllerPopupTriggerExpr.php:51
+#: app/controllers/CControllerPopupTriggerExpr.php:667
+#: app/controllers/CControllerPopupTriggerExpr.php:850
+#: app/controllers/CControllerPopupTriggerExpr.php:881
 msgid "Count"
 msgstr "Количество"
 
@@ -4441,8 +4447,8 @@ msgstr "Пользовательское сообщение"
 msgid "Custom multiplier"
 msgstr "Пользовательский множитель"
 
-#: app/views/js/popup.itemtestedit.view.js.php:381 include/forms.inc.php:1216
-#: include/forms.inc.php:1431 include/views/js/item.preprocessing.js.php:64
+#: app/views/js/popup.itemtestedit.view.js.php:381 include/forms.inc.php:1221
+#: include/forms.inc.php:1436 include/views/js/item.preprocessing.js.php:64
 msgid "Custom on fail"
 msgstr "Другое при ошибке"
 
@@ -4593,7 +4599,7 @@ msgid "Data overview"
 msgstr "Обзор данных"
 
 #: include/classes/widgets/CWidgetHelper.php:1154
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:34
 #: include/classes/widgets/views/widget.svggraph.form.view.php:290
 msgid "Data set"
 msgstr "Набор данных"
@@ -4754,8 +4760,8 @@ msgstr "Дек."
 msgid "December"
 msgstr "Декабрь"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:860
-#: app/controllers/CControllerPopupTriggerExpr.php:1017
+#: app/controllers/CControllerPopupTriggerExpr.php:894
+#: app/controllers/CControllerPopupTriggerExpr.php:1051
 msgid "Decimal places"
 msgstr "Число десятичных знаков"
 
@@ -5161,6 +5167,10 @@ msgstr "Удалить триггер?"
 msgid "Delete web scenario?"
 msgstr "Удалить веб-сценарий?"
 
+#: app/controllers/CControllerAuditLogList.php:297
+msgid "Deleted"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1494
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
@@ -5251,6 +5261,10 @@ msgstr "Состояние развертывания"
 #: include/views/inventory.host.view.php:127
 msgid "Description"
 msgstr "Описание"
+
+#: app/controllers/CControllerAuditLogList.php:290
+msgid "Detached"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:82
 #: app/views/reports.auditlog.list.php:94 include/blocks.inc.php:530
@@ -5443,7 +5457,7 @@ msgstr "Отбрасывать не изменившееся"
 msgid "Discard unchanged with heartbeat"
 msgstr "Отбрасывать не изменившееся с периодическим контролем"
 
-#: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1410
+#: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1415
 #: include/views/js/item.preprocessing.js.php:66
 msgid "Discard value"
 msgstr "Отбросить значение"
@@ -5584,32 +5598,32 @@ msgstr "Правило обнаружения \"%1$s\" нельзя скопир
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr "Правило обнаружения \"%1$s\" используется в \"%2$s\" действии."
 
-#: app/controllers/CControllerDiscoveryCreate.php:85 host_discovery.php:702
+#: app/controllers/CControllerDiscoveryCreate.php:85 host_discovery.php:717
 msgid "Discovery rule created"
 msgstr "Правило обнаружения создано"
 
-#: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:397
+#: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:412
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Правило обнаружения удалено"
 msgstr[1] "Правила обнаружения удалены"
 msgstr[2] "Правила обнаружения удалены"
 
-#: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:732
+#: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:747
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Правило обнаружения деактивировано"
 msgstr[1] "Правила обнаружения деактивированы"
 msgstr[2] "Правила обнаружения деактивированы"
 
-#: app/controllers/CControllerDiscoveryEnable.php:72 host_discovery.php:731
+#: app/controllers/CControllerDiscoveryEnable.php:72 host_discovery.php:746
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Правило обнаружения активировано"
 msgstr[1] "Правила обнаружения активированы"
 msgstr[2] "Правила обнаружения активированы"
 
-#: app/controllers/CControllerDiscoveryUpdate.php:95 host_discovery.php:705
+#: app/controllers/CControllerDiscoveryUpdate.php:95 host_discovery.php:720
 msgid "Discovery rule updated"
 msgstr "Правило обнаружения обновлено"
 
@@ -5624,7 +5638,7 @@ msgstr "Правило обнаружения обновлено"
 msgid "Discovery rules"
 msgstr "Правила обнаружения"
 
-#: host_discovery.php:745
+#: host_discovery.php:760
 msgid "Discovery rules deleted"
 msgstr "Правила обнаружения удалены"
 
@@ -5682,7 +5696,7 @@ msgstr "Отображено с %1$s до %2$s из %3$s найденных"
 msgid "Displaying options"
 msgstr "Опции отображения"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:753
+#: app/controllers/CControllerPopupTriggerExpr.php:773
 msgid "Division denominator"
 msgstr "Знаменатель деления"
 
@@ -6573,8 +6587,8 @@ msgstr "Выражение не может быть пустым"
 msgid "Expression constructor"
 msgstr "Конструктор выражения"
 
-#: include/forms.inc.php:1862 include/forms.inc.php:1869
-#: include/forms.inc.php:1879
+#: include/forms.inc.php:1867 include/forms.inc.php:1874
+#: include/forms.inc.php:1884
 msgid "Expression syntax error."
 msgstr "Синтаксическая ошибка в выражении."
 
@@ -6885,8 +6899,8 @@ msgctxt "page navigation"
 msgid "First"
 msgstr "Первая"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:217
-#: app/controllers/CControllerPopupTriggerExpr.php:246
+#: app/controllers/CControllerPopupTriggerExpr.php:237
+#: app/controllers/CControllerPopupTriggerExpr.php:266
 msgid "Fit"
 msgstr "Аппроксимация"
 
@@ -6973,7 +6987,7 @@ msgstr "Пятница"
 #: app/views/popup.service.time.edit.php:61
 #: app/views/popup.service.time.edit.php:124
 #: app/views/popup.tabfilter.edit.php:44 include/classes/html/CFilter.php:282
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:79
 #: include/views/js/monitoring.sysmaps.js.php:748 report4.php:191
 msgid "From"
 msgstr "От"
@@ -7554,7 +7568,7 @@ msgstr "Подсвечивать всю строку"
 #: include/classes/screens/CScreenProblem.php:1320
 #: include/classes/screens/CScreenProblem.php:1325
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
 #: jsLoader.php:346
@@ -7578,7 +7592,7 @@ msgstr "История очищена"
 msgid "History clearing can take a long time. Continue?"
 msgstr "Очистка истории может занять продолжительное время. Продолжить?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:54
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:47
 msgid "History data selection"
 msgstr "Выбор данных истории"
 
@@ -8739,7 +8753,7 @@ msgstr "Некорректное значение eventobject."
 msgid "Incorrect eventsource value."
 msgstr "Некорректное значение eventsource."
 
-#: include/classes/db/DB.php:674 include/classes/db/DB.php:948
+#: include/classes/db/DB.php:662 include/classes/db/DB.php:936
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Некорректное имя поля \"%1$s\" или значение в выражении where для таблицы \"%2$s\"."
@@ -8869,7 +8883,7 @@ msgstr "Некорректный тип значений элемента дан
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Указан некорректный тип элемента данных \"%1$s\" для функции триггера \"%2$s\"."
 
-#: include/forms.inc.php:1511
+#: include/forms.inc.php:1516
 msgid "Incorrect list of items."
 msgstr "Некорректный список элементов данных."
 
@@ -9642,7 +9656,7 @@ msgstr "Ошибочное содержимое YAML файла."
 msgid "Invalid action condition: %1$s."
 msgstr "Ошибочное условие действия: %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1428
+#: app/controllers/CControllerPopupTriggerExpr.php:1462
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr "Ошибочное условие: %1$s."
@@ -9668,7 +9682,7 @@ msgstr "Ошибочный email адрес у способа оповещени
 #: app/controllers/CControllerPopupMassupdateItem.php:210
 #: app/controllers/CControllerPopupMassupdateItem.php:222
 #: disc_prototypes.php:352 disc_prototypes.php:357 disc_prototypes.php:370
-#: host_discovery.php:437 host_discovery.php:443 host_discovery.php:456
+#: host_discovery.php:452 host_discovery.php:458 host_discovery.php:471
 #: items.php:560 items.php:565 items.php:578
 #, c-format
 msgid "Invalid interval \"%1$s\"."
@@ -9867,8 +9881,8 @@ msgstr "Ошибочные параметры метода."
 #: include/classes/validators/CApiInputValidator.php:2444
 #: include/classes/validators/CApiInputValidator.php:2451
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:130
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
 #, c-format
 msgid "Invalid parameter \"%1$s\": %2$s."
 msgstr "Ошибочный параметр \"%1$s\": %2$s."
@@ -10084,7 +10098,7 @@ msgstr[2] "Элементы данных активированы"
 msgid "Item in \"not supported\" state"
 msgstr "Элемент данных в \"неподдерживаемом\" состоянии"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1421
+#: app/controllers/CControllerPopupTriggerExpr.php:1455
 msgid "Item not selected"
 msgstr "Элемент данных не выбран"
 
@@ -10242,7 +10256,7 @@ msgstr "Элемент данных с ключом \"%1$s\" уже сущест
 #: include/views/configuration.template.list.php:118
 #: include/views/configuration.template.list.php:206
 #: include/views/inventory.host.view.php:182
-#: include/views/inventory.host.view.php:215 items.php:1297
+#: include/views/inventory.host.view.php:215 items.php:1292
 msgid "Items"
 msgstr "Элементы данных"
 
@@ -10328,7 +10342,7 @@ msgid "Japanese (ja_JP)"
 msgstr "Японский (ja_JP)"
 
 #: app/views/administration.mediatype.edit.php:220
-#: app/views/administration.script.edit.php:188 include/forms.inc.php:1319
+#: app/views/administration.script.edit.php:188 include/forms.inc.php:1324
 #: include/items.inc.php:1863
 #: include/views/configuration.host.discovery.edit.php:231
 #: include/views/configuration.item.edit.php:267
@@ -10553,16 +10567,17 @@ msgstr "График за последний месяц"
 msgid "Last name"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:61
-#: app/controllers/CControllerPopupTriggerExpr.php:75
-#: app/controllers/CControllerPopupTriggerExpr.php:89
-#: app/controllers/CControllerPopupTriggerExpr.php:102
-#: app/controllers/CControllerPopupTriggerExpr.php:123
-#: app/controllers/CControllerPopupTriggerExpr.php:132
-#: app/controllers/CControllerPopupTriggerExpr.php:145
-#: app/controllers/CControllerPopupTriggerExpr.php:182
-#: app/controllers/CControllerPopupTriggerExpr.php:201
-#: app/controllers/CControllerPopupTriggerExpr.php:230
+#: app/controllers/CControllerPopupTriggerExpr.php:62
+#: app/controllers/CControllerPopupTriggerExpr.php:76
+#: app/controllers/CControllerPopupTriggerExpr.php:90
+#: app/controllers/CControllerPopupTriggerExpr.php:103
+#: app/controllers/CControllerPopupTriggerExpr.php:124
+#: app/controllers/CControllerPopupTriggerExpr.php:133
+#: app/controllers/CControllerPopupTriggerExpr.php:146
+#: app/controllers/CControllerPopupTriggerExpr.php:165
+#: app/controllers/CControllerPopupTriggerExpr.php:202
+#: app/controllers/CControllerPopupTriggerExpr.php:221
+#: app/controllers/CControllerPopupTriggerExpr.php:250
 msgid "Last of"
 msgstr "За последние"
 
@@ -10626,10 +10641,10 @@ msgstr "Размещение"
 msgid "Left"
 msgstr "По левой стороне"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:143
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
 msgid "Left Y"
 msgstr "Ось Y слева"
 
@@ -10641,8 +10656,8 @@ msgstr "Обрезать слева"
 msgid "Legend"
 msgstr "Легенда"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:615
-#: app/controllers/CControllerPopupTriggerExpr.php:733
+#: app/controllers/CControllerPopupTriggerExpr.php:635
+#: app/controllers/CControllerPopupTriggerExpr.php:753
 msgid "Length"
 msgstr "Длина"
 
@@ -11224,9 +11239,9 @@ msgstr "Пометить остальное"
 msgid "Mark selected"
 msgstr "Пометить выбранное"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:357
-#: app/controllers/CControllerPopupTriggerExpr.php:397
-#: app/controllers/CControllerPopupTriggerExpr.php:423
+#: app/controllers/CControllerPopupTriggerExpr.php:377
+#: app/controllers/CControllerPopupTriggerExpr.php:417
+#: app/controllers/CControllerPopupTriggerExpr.php:443
 msgid "Mask"
 msgstr "Маска"
 
@@ -11270,13 +11285,13 @@ msgstr "Совпадение регулярному выражению"
 msgid "Mathematical functions"
 msgstr "Математические функции"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:344
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:143
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:213
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:215
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
+#: app/controllers/CControllerPopupTriggerExpr.php:364
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:134
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:206
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
 msgid "Max"
 msgstr "Макс"
 
@@ -11313,7 +11328,7 @@ msgstr "Максимально допустимая версия базы дан
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:259
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:451
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:444
 #: include/validate.inc.php:477
 #, c-format
 msgid "Maximum time period to display is %1$s day."
@@ -11510,11 +11525,11 @@ msgstr "Microsoft Edge"
 msgid "Middle"
 msgstr "По середине"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:339
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:126
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:198
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
+#: app/controllers/CControllerPopupTriggerExpr.php:359
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:119
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:191
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:193
 msgid "Min"
 msgstr "Мин"
 
@@ -11565,7 +11580,7 @@ msgstr "Минимальная важность"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:244
 #: include/classes/mvc/CController.php:252
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:446
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:439
 #: include/validate.inc.php:470
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
@@ -11614,7 +11629,7 @@ msgstr "Отсутствуют элементы данных для протот
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Отсутствует ключ \"%1$s\" для узла сети \"%2$s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:222
+#: app/controllers/CControllerPopupTriggerExpr.php:242
 #: app/views/administration.proxy.list.php:48
 #: app/views/administration.proxy.list.php:74 report2.php:201
 msgid "Mode"
@@ -11889,7 +11904,7 @@ msgstr "NTLM"
 #: app/views/reports.scheduledreport.list.php:49 disc_prototypes.php:44
 #: graphs.php:43 host_discovery.php:50 httpconf.php:42
 #: include/classes/screens/CScreenHttpTest.php:113
-#: include/classes/widgets/CWidgetHelper.php:67 include/forms.inc.php:1214
+#: include/classes/widgets/CWidgetHelper.php:67 include/forms.inc.php:1219
 #: include/hosts.inc.php:109 include/views/configuration.action.edit.php:48
 #: include/views/configuration.action.edit.php:59
 #: include/views/configuration.action.list.php:68
@@ -12394,7 +12409,7 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 #: app/controllers/CControllerWidgetMapView.php:70
 #: app/controllers/CControllerWidgetPlainTextView.php:88
 #: app/views/monitoring.widget.graph.view.php:42 disc_prototypes.php:750
-#: host_discovery.php:795 hostinventoriesoverview.php:74
+#: host_discovery.php:810 hostinventoriesoverview.php:74
 #: include/classes/api/services/CAction.php:1582
 #: include/classes/api/services/CAction.php:1863
 #: include/classes/api/services/CAction.php:2872
@@ -12794,7 +12809,7 @@ msgstr "Количество потоков процессора гиперви�
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Количество процессоров виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:286
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
 msgstr "Количество строк"
 
@@ -13229,7 +13244,7 @@ msgstr "Опции"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:81
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:81
 #: include/classes/widgets/forms/CWidgetFormProblems.php:96
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:371
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:69
 #: include/classes/widgets/forms/CWidgetFormWeb.php:63
 #: include/triggers.inc.php:1241
@@ -13358,7 +13373,7 @@ msgstr "Переопределить период хранения динами�
 msgid "Override with name \"%1$s\" already exists."
 msgstr "Замещение с \"%1$s\" именем уже существует."
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:409
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:402
 #: include/classes/widgets/views/widget.svggraph.form.view.php:296
 #: include/views/configuration.host.discovery.edit.php:867
 #: include/views/configuration.host.discovery.edit.php:884
@@ -13635,7 +13650,7 @@ msgstr "Параметр \"%1$s\" устарел."
 
 #: app/views/administration.mediatype.edit.php:212
 #: app/views/administration.script.edit.php:180
-#: include/classes/debug/CProfiler.php:182 include/forms.inc.php:1215
+#: include/classes/debug/CProfiler.php:182 include/forms.inc.php:1220
 #: include/views/configuration.host.discovery.edit.php:223
 #: include/views/configuration.item.edit.php:259
 #: include/views/configuration.item.prototype.edit.php:240
@@ -13761,7 +13776,7 @@ msgstr "Вставить виджет"
 msgid "Paste without external links"
 msgstr "Вставить без внешних связей"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:829
+#: app/controllers/CControllerPopupTriggerExpr.php:863
 #: app/views/monitoring.charts.view.php:107
 msgid "Pattern"
 msgstr "Шаблон"
@@ -13779,7 +13794,7 @@ msgstr "Пиковое использование памяти: %1$s"
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Процент времени, когда виртуальной машине не удалось запуститься по причине конкурирования за доступ к физическим CPU, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:193
+#: app/controllers/CControllerPopupTriggerExpr.php:213
 msgid "Percentage"
 msgstr "Проценты"
 
@@ -13816,7 +13831,7 @@ msgstr "Выполнение DNS запроса. Возвращает строк
 msgid "Period"
 msgstr "Период"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:94
+#: app/controllers/CControllerPopupTriggerExpr.php:95
 msgid "Period shift"
 msgstr "Сдвиг периода"
 
@@ -13974,7 +13989,7 @@ msgstr "Тип Post"
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr "Потребляемая мощность, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <макс> - максимально разрешенная потребляемая мощность"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:791
+#: app/controllers/CControllerPopupTriggerExpr.php:825
 msgid "Power value"
 msgstr "Значение степени"
 
@@ -14125,7 +14140,7 @@ msgstr "Уровень привилегий"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:76
 #: include/classes/widgets/forms/CWidgetFormProblems.php:204
 #: include/classes/widgets/forms/CWidgetFormProblems.php:205
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:356
 #: include/views/configuration.item.list.php:203
 #: include/views/configuration.trigger.prototype.list.php:166
 #: include/views/configuration.triggers.list.php:95
@@ -14150,7 +14165,7 @@ msgid "Problem expression"
 msgstr "Выражение проблемы"
 
 #: include/classes/widgets/CWidgetConfig.php:57
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:331
 msgid "Problem hosts"
 msgstr "Узлы сети с проблемами"
 
@@ -14505,8 +14520,8 @@ msgstr "Восстановление"
 msgid "Recovery expression"
 msgstr "Выражение восстановления"
 
-#: include/forms.inc.php:1913 include/forms.inc.php:1920
-#: include/forms.inc.php:1930
+#: include/forms.inc.php:1918 include/forms.inc.php:1925
+#: include/forms.inc.php:1935
 msgid "Recovery expression syntax error."
 msgstr "Синтаксическая ошибка в выражении восстановления."
 
@@ -14663,8 +14678,8 @@ msgstr "Удаленная команда"
 #: include/classes/helpers/CTagFilterFieldHelper.php:82
 #: include/classes/helpers/CTagFilterFieldHelper.php:135
 #: include/classes/widgets/CWidgetHelper.php:518
-#: include/classes/widgets/CWidgetHelper.php:571 include/forms.inc.php:1456
-#: include/forms.inc.php:2004 include/views/configuration.action.edit.php:97
+#: include/classes/widgets/CWidgetHelper.php:571 include/forms.inc.php:1461
+#: include/forms.inc.php:2009 include/views/configuration.action.edit.php:97
 #: include/views/configuration.action.edit.php:259
 #: include/views/configuration.action.edit.php:287
 #: include/views/configuration.action.edit.php:371
@@ -14817,8 +14832,8 @@ msgstr "Замена"
 msgid "Replace dependencies"
 msgstr "Заменить зависимости"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:620
-#: app/controllers/CControllerPopupTriggerExpr.php:834
+#: app/controllers/CControllerPopupTriggerExpr.php:640
+#: app/controllers/CControllerPopupTriggerExpr.php:868
 msgid "Replacement"
 msgstr "Замена"
 
@@ -14878,7 +14893,7 @@ msgstr "Запрос тела"
 msgid "Request body type"
 msgstr "Типа запроса тела"
 
-#: host_discovery.php:409 host_discovery.php:765 items.php:952 items.php:1146
+#: host_discovery.php:424 host_discovery.php:780 items.php:952 items.php:1146
 msgid "Request sent successfully"
 msgstr "Запрос успешно отправлен"
 
@@ -15126,10 +15141,10 @@ msgstr "Отменить изменения"
 msgid "Right"
 msgstr "По правой стороне"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:187
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:215
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:193
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
 msgid "Right Y"
 msgstr "Ось Y справа"
 
@@ -15348,12 +15363,12 @@ msgstr "SQL запросов: %1$s (selects: %2$s | executes: %3$s)"
 msgid "SQL query"
 msgstr "SQL запрос"
 
-#: include/classes/db/DB.php:958
+#: include/classes/db/DB.php:946
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "Ошибка при выполнении SQL запроса \"%1$s\""
 
-#: include/classes/db/DB.php:626 include/classes/db/DB.php:685
+#: include/classes/db/DB.php:614 include/classes/db/DB.php:673
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Ошибка при выполнении SQL запроса \"%1$s\"."
@@ -15716,7 +15731,7 @@ msgstr "Выбранные и все другие проблемы связан�
 msgid "Selected elements"
 msgstr "Выбранные элементы"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:325
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:318
 msgid "Selected items only"
 msgstr "Только выбранные элементы данных"
 
@@ -15953,12 +15968,12 @@ msgid "Session terminated, re-login, please."
 msgstr "Сессия завершена, пожалуйста, зайдите повторно в систему."
 
 #: app/views/popup.tabfilter.edit.php:40
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:74
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:67
 msgid "Set custom time period"
 msgstr "Пользовательский период времени"
 
 #: app/controllers/CControllerPopupItemTestSend.php:433
-#: app/views/js/popup.itemtestedit.view.js.php:371 include/forms.inc.php:1412
+#: app/views/js/popup.itemtestedit.view.js.php:371 include/forms.inc.php:1417
 #: include/views/js/item.preprocessing.js.php:68
 msgid "Set error to"
 msgstr "Задать ошибку в"
@@ -15976,7 +15991,7 @@ msgstr "Задать режим инвентарных данных узлов �
 msgid "Set new value"
 msgstr "Задать новое значение"
 
-#: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1411
+#: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1416
 #: include/views/js/item.preprocessing.js.php:67
 msgid "Set value to"
 msgstr "Задать значение в"
@@ -16015,7 +16030,7 @@ msgstr "Настройки"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:85
 #: include/classes/widgets/forms/CWidgetFormProblems.php:202
 #: include/classes/widgets/forms/CWidgetFormProblems.php:203
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:344
 #: include/events.inc.php:188 include/triggers.inc.php:1144
 #: include/views/configuration.item.list.php:171
 #: include/views/configuration.trigger.prototype.edit.php:88
@@ -16084,9 +16099,9 @@ msgstr "Сокращённое"
 #: app/views/reports.scheduledreport.list.php:54
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:102
 #: include/classes/widgets/forms/CWidgetFormProblems.php:33
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:187
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:259
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/views/js/monitoring.sysmaps.js.php:100 report2.php:546
 msgid "Show"
@@ -16113,7 +16128,7 @@ msgstr "Элементы данных без истории"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:273
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:266
 #: include/views/configuration.graph.edit.php:114
 msgid "Show legend"
 msgstr "Легенда"
@@ -16134,7 +16149,7 @@ msgstr "Отображение количества записей"
 msgid "Show operational data"
 msgstr "Оперативные данные"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:306
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:299
 msgid "Show problems"
 msgstr "Проблемы"
 
@@ -16417,8 +16432,8 @@ msgstr "Лестница"
 msgid "Standard items"
 msgstr "Стандартные элементы данных"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:610
-#: app/controllers/CControllerPopupTriggerExpr.php:728
+#: app/controllers/CControllerPopupTriggerExpr.php:630
+#: app/controllers/CControllerPopupTriggerExpr.php:748
 msgid "Start"
 msgstr "Начало"
 
@@ -16461,8 +16476,8 @@ msgstr "Время запуска Zabbix сервера, Unix timestamp."
 msgid "State"
 msgstr "Статус"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:158
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:230
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:151
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:223
 msgctxt "history source selection method"
 msgid "Static"
 msgstr "Статическое"
@@ -16642,7 +16657,7 @@ msgstr "Straight"
 msgid "Strict"
 msgstr "Строгий"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:470
+#: app/controllers/CControllerPopupTriggerExpr.php:490
 #: include/triggers.inc.php:1773
 msgid "String"
 msgstr "Строка"
@@ -16905,7 +16920,7 @@ msgstr "Значение тега"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:79
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:79
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:369
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:67
 #: include/classes/widgets/forms/CWidgetFormWeb.php:61
 #: include/events.inc.php:263 include/forms.inc.php:89
@@ -17101,7 +17116,7 @@ msgstr "Шаблоны обновлены"
 #: app/views/js/popup.itemtestedit.view.js.php:573
 #: app/views/popup.itemtestedit.view.php:436
 #: app/views/popup.mediatypetest.edit.php:99
-#: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1452
+#: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
 #: include/views/configuration.host.discovery.edit.php:902
 #: include/views/configuration.host.discovery.edit.php:914
 #: include/views/configuration.item.edit.php:937
@@ -17116,7 +17131,7 @@ msgstr "Шаблоны обновлены"
 msgid "Test"
 msgstr "Тест"
 
-#: include/forms.inc.php:1482
+#: include/forms.inc.php:1487
 msgid "Test all steps"
 msgstr "Тест всех шагов"
 
@@ -17336,7 +17351,7 @@ msgstr "Этот год"
 msgid "This year so far"
 msgstr "В этом году"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:241
+#: app/controllers/CControllerPopupTriggerExpr.php:261
 msgid "Threshold"
 msgstr "Порог"
 
@@ -17357,8 +17372,8 @@ msgstr "Четверг"
 msgid "Till"
 msgstr "До"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:49
-#: app/controllers/CControllerPopupTriggerExpr.php:212
+#: app/controllers/CControllerPopupTriggerExpr.php:50
+#: app/controllers/CControllerPopupTriggerExpr.php:232
 #: app/views/hint.box.php:62 app/views/hint.box.php:68
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
@@ -17402,12 +17417,13 @@ msgstr "Время последнего обращения прокси. Имя 
 msgid "Time period"
 msgstr "Период времени"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:67
-#: app/controllers/CControllerPopupTriggerExpr.php:81
-#: app/controllers/CControllerPopupTriggerExpr.php:151
-#: app/controllers/CControllerPopupTriggerExpr.php:188
-#: app/controllers/CControllerPopupTriggerExpr.php:207
-#: app/controllers/CControllerPopupTriggerExpr.php:236
+#: app/controllers/CControllerPopupTriggerExpr.php:68
+#: app/controllers/CControllerPopupTriggerExpr.php:82
+#: app/controllers/CControllerPopupTriggerExpr.php:152
+#: app/controllers/CControllerPopupTriggerExpr.php:171
+#: app/controllers/CControllerPopupTriggerExpr.php:208
+#: app/controllers/CControllerPopupTriggerExpr.php:227
+#: app/controllers/CControllerPopupTriggerExpr.php:256
 #: include/classes/widgets/CWidgetHelper.php:769
 #: include/classes/widgets/CWidgetHelper.php:845
 #: include/classes/widgets/CWidgetHelper.php:1114
@@ -17444,7 +17460,7 @@ msgstr "Отметка времени"
 #: app/partials/massupdate.valuemaps.tab.php:46
 #: app/partials/timeselector.filter.php:96
 #: app/views/popup.tabfilter.edit.php:49 include/classes/html/CFilter.php:290
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:98
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:91
 #: include/views/js/monitoring.sysmaps.js.php:748
 msgid "To"
 msgstr "К"
@@ -17563,7 +17579,7 @@ msgstr "Период хранения динамики изменений"
 #: app/partials/configuration.filter.items.php:156
 #: app/partials/monitoring.latest.view.html.php:53
 #: app/views/administration.housekeeping.edit.php:138
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:50
 #: include/forms.inc.php:557 include/views/configuration.item.list.php:90
 #: include/views/configuration.item.prototype.list.php:63 items.php:262
 msgid "Trends"
@@ -18071,8 +18087,8 @@ msgid "Unexpected server error."
 msgstr ""
 
 #: app/views/popup.massupdate.item.php:165
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:228
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:149
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:221
 #: include/views/configuration.item.edit.php:661
 #: include/views/configuration.item.prototype.edit.php:640
 msgid "Units"
@@ -18115,7 +18131,7 @@ msgid "Unknown error"
 msgstr "Неизвестная ошибка"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1210
+#: app/controllers/CControllerPopupTriggerExpr.php:1244
 #: include/triggers.inc.php:1323
 msgid "Unknown host item, no such item in selected host"
 msgstr "Неизвестный элемент данных узла сети, такого элемента данных нет у выбранного узла сети"
@@ -19100,7 +19116,7 @@ msgstr "Значение: нет данных"
 msgid "Valuemap with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Преобразование значений с ID \"%1$s\" недоступно на \"%2$s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:597
+#: app/controllers/CControllerPopupTriggerExpr.php:617
 #: app/views/monitoring.charts.view.php:57
 #: include/views/monitoring.history.php:78
 msgid "Values"
@@ -19384,7 +19400,7 @@ msgstr "Со cбором данных"
 msgid "With dependencies"
 msgstr "С зависимостями"
 
-#: include/forms.inc.php:1362 include/views/js/item.preprocessing.js.php:215
+#: include/forms.inc.php:1367 include/views/js/item.preprocessing.js.php:215
 msgid "With header row"
 msgstr "Со строкой заголовка"
 
@@ -19450,7 +19466,7 @@ msgstr ""
 msgid "X"
 msgstr "X"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:259
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
 msgid "X-Axis"
 msgstr "Ось X"
 
@@ -19493,7 +19509,7 @@ msgstr "Ожидается XML"
 msgid "XML to JSON"
 msgstr "XML в JSON"
 
-#: include/forms.inc.php:1283 include/views/js/item.preprocessing.js.php:141
+#: include/forms.inc.php:1288 include/views/js/item.preprocessing.js.php:141
 msgid "XPath"
 msgstr "XPath"
 
@@ -19506,8 +19522,8 @@ msgstr "Y"
 msgid "Y axis MAX value"
 msgstr "МАКС значение оси Y"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:507
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:484
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:500
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr "МАКС значение оси Y должно быть больше чем МИН значение оси Y"
 
@@ -19912,11 +19928,11 @@ msgstr "ожидался период времени"
 msgid "a time unit is expected"
 msgstr "ожидается единица времени"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:282
+#: app/controllers/CControllerPopupTriggerExpr.php:302
 msgid "abs() - Absolute value"
 msgstr "abs() - Абсолютное значение"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:288
+#: app/controllers/CControllerPopupTriggerExpr.php:308
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - Арккосинус значения в виде угла, в радианах."
 
@@ -20053,11 +20069,11 @@ msgstr "красным"
 msgid "ascending"
 msgstr "по возрастанию"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:295
+#: app/controllers/CControllerPopupTriggerExpr.php:315
 msgid "ascii() - Returns the ASCII code of the leftmost character of the value"
 msgstr "ascii() - Возвращает ASCII самого левого символа значения"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:302
+#: app/controllers/CControllerPopupTriggerExpr.php:322
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "asin() - Арксинус значения в виде угла, в радианах."
 
@@ -20071,11 +20087,11 @@ msgstr "необходимо выбрать по крайней мере оди�
 msgid "at least one override option must be specified"
 msgstr "должна быть указана по крайней мере одна опция перезаписи"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:309
+#: app/controllers/CControllerPopupTriggerExpr.php:329
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
 msgstr "atan() - Арктангенс значения в виде угла, в радианах"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:316
+#: app/controllers/CControllerPopupTriggerExpr.php:336
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() - Арктангенс координат ординаты (exprue) и абсциссы, заданный углом, в радианах."
 
@@ -20097,39 +20113,39 @@ msgstr "авторегистрация"
 msgid "avg"
 msgstr "сред"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:329
+#: app/controllers/CControllerPopupTriggerExpr.php:349
 msgid "avg() - Average value of a period T"
 msgstr "avg() - Среднее значение за период Т"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:336
+#: app/controllers/CControllerPopupTriggerExpr.php:356
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - Проверка, входит ли значение в заданный диапазон (1 - в диапазоне, 0 - в противном случае)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:354
+#: app/controllers/CControllerPopupTriggerExpr.php:374
 msgid "bitand() - Bitwise AND"
 msgstr "band() - Побитовое И"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:367
+#: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "bitlength() - Returns the length in bits"
 msgstr "bitlength() - Возвращает длину в битах"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:374
+#: app/controllers/CControllerPopupTriggerExpr.php:394
 msgid "bitlshift() - Bitwise shift left"
 msgstr "bitlshift() - Битовый сдвиг слева"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:387
+#: app/controllers/CControllerPopupTriggerExpr.php:407
 msgid "bitnot() - Bitwise NOT"
 msgstr "bitnot() - Побитовое НЕ"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:394
+#: app/controllers/CControllerPopupTriggerExpr.php:414
 msgid "bitor() - Bitwise OR"
 msgstr "bitor() - Побитовое ИЛИ"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:407
+#: app/controllers/CControllerPopupTriggerExpr.php:427
 msgid "bitrshift() - Bitwise shift right"
 msgstr "bitrshift() - Битовый сдвиг справа"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:420
+#: app/controllers/CControllerPopupTriggerExpr.php:440
 msgid "bitxor() - Bitwise exclusive OR"
 msgstr "bitxor() - Битовое исключающее ИЛИ"
 
@@ -20144,14 +20160,14 @@ msgstr "мигание"
 msgid "both username and password should be either present or empty"
 msgstr "как имя пользователя, так и пароль должны присутствовать или быть пустыми"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:433
+#: app/controllers/CControllerPopupTriggerExpr.php:453
 msgid "bytelength() - Returns the length in bytes"
 msgstr "bytelength() - Возвращает длину в байтах"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:142
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:214
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:120
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:135
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:192
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:207
 msgid "calculated"
 msgstr "вычисляемое"
 
@@ -20284,19 +20300,19 @@ msgstr "не удалось выполнить Scroll API запрос, данн
 msgid "cannot update property for templated discovery rule"
 msgstr "не удалось обновить свойство у правила обнаружения из шаблона"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:440
+#: app/controllers/CControllerPopupTriggerExpr.php:460
 msgid "cbrt() - Cube root"
 msgstr "cbrt() - Корень третьей степени"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:447
+#: app/controllers/CControllerPopupTriggerExpr.php:467
 msgid "ceil() - Rounds up to the nearest greater integer"
 msgstr "ceil() - Округление до ближайшего большего целого числа"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:454
+#: app/controllers/CControllerPopupTriggerExpr.php:474
 msgid "change() - Difference between last and previous value"
 msgstr "change() - Разница между последним и предыдущим значениями"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:460
+#: app/controllers/CControllerPopupTriggerExpr.php:480
 msgid "char() - Returns the character which represents the given ASCII code"
 msgstr "char() - Возвращает символ, который задается указанным ASCII кодом"
 
@@ -20323,7 +20339,7 @@ msgstr ""
 msgid "comma-separated list"
 msgstr "список, разделенный запятыми"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:467
+#: app/controllers/CControllerPopupTriggerExpr.php:487
 msgid "concat() - Returns a string that is the result of concatenating value to string"
 msgstr "concat() - Возвращает строку, которая является результатом объединения значения и строки"
 
@@ -20337,15 +20353,15 @@ msgstr "настройка"
 msgid "contains"
 msgstr "содержит"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:480
+#: app/controllers/CControllerPopupTriggerExpr.php:500
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
 msgstr "cos() - Косинус значения, где значением является угол, в радианах."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:487
+#: app/controllers/CControllerPopupTriggerExpr.php:507
 msgid "cosh() - The hyperbolic cosine of a value"
 msgstr "cosh() - Гиперболический косинус значения"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:494
+#: app/controllers/CControllerPopupTriggerExpr.php:514
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
 msgstr "cot() - Котангенс значения, где значением является угол, в радианах."
 
@@ -20353,11 +20369,11 @@ msgstr "cot() - Котангенс значения, где значением �
 msgid "count"
 msgstr "кол-во"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:501
+#: app/controllers/CControllerPopupTriggerExpr.php:521
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr "count() - Количество успешно полученных значений V (которым удовлетворяет оператор О) за период Т"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:508
+#: app/controllers/CControllerPopupTriggerExpr.php:528
 msgid "countunique() - The number of unique values"
 msgstr "countunique() - Количество уникальных значений"
 
@@ -20370,15 +20386,15 @@ msgstr "д"
 msgid "d.M"
 msgstr "d.M"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:515
+#: app/controllers/CControllerPopupTriggerExpr.php:535
 msgid "date() - Current date"
 msgstr "date() - Текущая дата"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:521
+#: app/controllers/CControllerPopupTriggerExpr.php:541
 msgid "dayofmonth() - Day of month"
 msgstr "dayofmonth() - День месяца"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:527
+#: app/controllers/CControllerPopupTriggerExpr.php:547
 msgid "dayofweek() - Day of week"
 msgstr "dayofweek() - День недели"
 
@@ -20397,7 +20413,7 @@ msgstr "дней"
 msgid "default"
 msgstr "по умолчанию"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:533
+#: app/controllers/CControllerPopupTriggerExpr.php:553
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Конвертация значения из радианов в градусы"
 
@@ -20472,7 +20488,7 @@ msgstr "не существует"
 msgid "does not match"
 msgstr "не соответствует"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:540
+#: app/controllers/CControllerPopupTriggerExpr.php:560
 msgid "e() - Returns Euler's number"
 msgstr "e() - Возвращает число Эйлера"
 
@@ -20498,11 +20514,11 @@ msgstr "esc_step_from и esc_step_to должны устанавливаться
 msgid "exists"
 msgstr "существует"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:545
+#: app/controllers/CControllerPopupTriggerExpr.php:565
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() - Число Эйлера в степени значения"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:552
+#: app/controllers/CControllerPopupTriggerExpr.php:572
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1() - Число Эйлера в степени значения минус 1"
 
@@ -20514,7 +20530,7 @@ msgstr "пустое выражение"
 msgid "failed to parse JSON"
 msgstr "ошибка при разборе JSON"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:559
+#: app/controllers/CControllerPopupTriggerExpr.php:579
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
 msgstr "find() - Проверка наличия шаблона V (который удволетворяет оператору O) за период T (1 - соответствует, 0 - не соответствует)"
 
@@ -20528,15 +20544,15 @@ msgstr "первый"
 msgid "first parameter is expected"
 msgstr "ожидается первый параметр"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:566
+#: app/controllers/CControllerPopupTriggerExpr.php:586
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - Самое старое значение за указанный период времени"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:573
+#: app/controllers/CControllerPopupTriggerExpr.php:593
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - Округление до ближайшего меньшего целого числа"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:580
+#: app/controllers/CControllerPopupTriggerExpr.php:600
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr "forecast() - Прогноз значения через t секунд на основе периода Т"
 
@@ -20544,7 +20560,7 @@ msgstr "forecast() - Прогноз значения через t секунд �
 msgid "fourth"
 msgstr "четвёртый"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:587
+#: app/controllers/CControllerPopupTriggerExpr.php:607
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr "fuzzytime() - Разница между значением элемента данных (в виде отметки времени) и отметкой времени Zabbix сервера меньше чем или равна T секундам (1 - правда, 0 - ложь)"
 
@@ -20587,7 +20603,7 @@ msgstr "группа узла сети"
 
 #: include/classes/widgets/CWidgetHelper.php:628
 #: include/classes/widgets/CWidgetHelper.php:988
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:332
 msgid "host pattern"
 msgstr "шаблон узла сети"
 
@@ -20609,7 +20625,7 @@ msgstr "в"
 msgid "in range"
 msgstr "в диапазоне"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:594
+#: app/controllers/CControllerPopupTriggerExpr.php:614
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
 msgstr "in() - Проверяет равно ли значение одному из перечисленных значений (1 - равно, 0 - в противном случае)"
 
@@ -20654,7 +20670,7 @@ msgstr "некорректный синтаксис около \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr "некорректное использование функции \"%1$s\""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:607
+#: app/controllers/CControllerPopupTriggerExpr.php:627
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() - Добавление указанных символов или пробелов в строку символов, начиная от указанной позиции в строке"
 
@@ -20776,7 +20792,7 @@ msgstr "шаблон элемента данных"
 msgid "key is empty"
 msgstr "ключ пустой"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:630
+#: app/controllers/CControllerPopupTriggerExpr.php:650
 msgid "kurtosis() - Measures the \"tailedness\" of the probability distribution"
 msgstr "kurtosis() - Измерение \"островершинности\" в распределении вероятностей"
 
@@ -20792,7 +20808,7 @@ msgctxt "week of month"
 msgid "last"
 msgstr "посл"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:637
+#: app/controllers/CControllerPopupTriggerExpr.php:657
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Последнее (наиболее новое) значение Т"
 
@@ -20800,35 +20816,35 @@ msgstr "last() - Последнее (наиболее новое) значени
 msgid "left"
 msgstr "слева"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:644
+#: app/controllers/CControllerPopupTriggerExpr.php:664
 msgid "left() - Returns the leftmost count characters"
 msgstr "left() - Возвращает самые левые символы"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:657
+#: app/controllers/CControllerPopupTriggerExpr.php:677
 msgid "length() - Length of last (most recent) T value in characters"
 msgstr "length() - Длина последнего (самого свежего) значения T в количестве символов"
 
-#: include/forms.inc.php:1277 include/views/js/item.preprocessing.js.php:134
+#: include/forms.inc.php:1282 include/views/js/item.preprocessing.js.php:134
 msgid "list of characters"
 msgstr "список символов"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:663
+#: app/controllers/CControllerPopupTriggerExpr.php:683
 msgid "log() - Natural logarithm"
 msgstr "log() - Натуральный логарифм"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:670
+#: app/controllers/CControllerPopupTriggerExpr.php:690
 msgid "log10() - Decimal logarithm"
 msgstr "log10() - Обыкновенный логарифм"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:677
+#: app/controllers/CControllerPopupTriggerExpr.php:697
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
 msgstr "logeventid() - Соответствие ID события последней записи журнала регулярному выражению V за период T (1 - соответствует, 0 - не соответствует)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:684
+#: app/controllers/CControllerPopupTriggerExpr.php:704
 msgid "logseverity() - Log severity of the last log entry for period T"
 msgstr "logseverity() - Важность журнала последней записи журнала за период T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:711
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Соответствие источника журнала последней записи журнала параметру V за период Е (1 - соответствует, 0 - не соответствует)"
 
@@ -20836,7 +20852,7 @@ msgstr "logsource() - Соответствие источника журнала
 msgid "low-level discovery rule"
 msgstr "правило низкоуровневого обнаружения"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:698
+#: app/controllers/CControllerPopupTriggerExpr.php:718
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr "ltrim() - Удаление указанных символов с начала строки"
 
@@ -20868,7 +20884,7 @@ msgstr "макрос пустой"
 msgid "macro(s)"
 msgstr "макрос(ы)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:711
+#: app/controllers/CControllerPopupTriggerExpr.php:731
 msgid "mad() - Median absolute deviation"
 msgstr "mad() - Абсолютное отклонение среднего"
 
@@ -20894,7 +20910,7 @@ msgstr "совпадает"
 #: include/classes/api/services/CItemGeneral.php:1399
 #: include/classes/graphdraw/CLineGraphDraw.php:1380
 #: include/classes/graphdraw/CLineGraphDraw.php:1394
-#: include/classes/graphdraw/CPieGraphDraw.php:292 include/forms.inc.php:1302
+#: include/classes/graphdraw/CPieGraphDraw.php:292 include/forms.inc.php:1307
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:68
 #: include/views/js/configuration.graph.edit.js.php:139
@@ -20908,7 +20924,7 @@ msgstr "макс"
 msgid "max period is less than time filter default period"
 msgstr "макс. период меньше чем период фильтра времени по умолчанию"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:718
+#: app/controllers/CControllerPopupTriggerExpr.php:738
 msgid "max() - Maximum value for period T"
 msgstr "max() - Максимальное значение за период Т"
 
@@ -20922,14 +20938,14 @@ msgstr "достигнуто максимальное количество за�
 msgid "maximum number of dependency levels reached"
 msgstr "достигнуто максимальное количество уровней зависимостей"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:725
+#: app/controllers/CControllerPopupTriggerExpr.php:745
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr "mid() - Возвращает подстроку, начиная с позиции символа, указанной с начала для N символов"
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #: include/classes/graphdraw/CLineGraphDraw.php:1378
 #: include/classes/graphdraw/CLineGraphDraw.php:1391
-#: include/classes/graphdraw/CPieGraphDraw.php:288 include/forms.inc.php:1301
+#: include/classes/graphdraw/CPieGraphDraw.php:288 include/forms.inc.php:1306
 #: include/graphs.inc.php:76
 #: include/views/js/configuration.graph.edit.js.php:66
 #: include/views/js/configuration.graph.edit.js.php:137
@@ -20939,7 +20955,7 @@ msgstr "mid() - Возвращает подстроку, начиная с по�
 msgid "min"
 msgstr "мин"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:743
+#: app/controllers/CControllerPopupTriggerExpr.php:763
 msgid "min() - Minimum value for period T"
 msgstr "min() - Минимальное значение за период Т"
 
@@ -20954,9 +20970,17 @@ msgstr "минимальная длина %1$s символов"
 msgid "mm"
 msgstr "мм"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:750
+#: app/controllers/CControllerPopupTriggerExpr.php:770
 msgid "mod() - Division remainder"
 msgstr "mod() - Остаток от деления"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:783
+msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:790
+msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
+msgstr ""
 
 #: include/func.inc.php:583
 msgctxt "millisecond short"
@@ -21075,7 +21099,7 @@ msgstr "нет прав создавать и редактировать кар�
 msgid "no permissions to unacknowledge problems"
 msgstr "нет прав отменять подтверждение проблем"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:763
+#: app/controllers/CControllerPopupTriggerExpr.php:797
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr "nodata() - Отсутствие данных полученных за период времени T (1 - правда, 0 - ложь), Режим (strict - игнорировать задержку прокси при отправке данных)"
 
@@ -21096,11 +21120,11 @@ msgstr "не в"
 msgid "not selected"
 msgstr "не выбрано"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:770
+#: app/controllers/CControllerPopupTriggerExpr.php:804
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Количество секунд начиная с Epoch"
 
-#: include/forms.inc.php:1269 include/views/js/item.preprocessing.js.php:126
+#: include/forms.inc.php:1274 include/views/js/item.preprocessing.js.php:126
 msgid "number"
 msgstr "число"
 
@@ -21164,7 +21188,7 @@ msgstr "или"
 msgid "other"
 msgstr "другое"
 
-#: include/forms.inc.php:1295 include/views/js/item.preprocessing.js.php:156
+#: include/forms.inc.php:1300 include/views/js/item.preprocessing.js.php:156
 msgid "output"
 msgstr "вывод"
 
@@ -21177,33 +21201,33 @@ msgid "path/to/secret:key"
 msgstr "путь/к/секрету:ключ"
 
 #: app/views/popup.httpstep.php:173 app/views/popup.lldoperation.php:76
-#: include/forms.inc.php:1294 include/forms.inc.php:1308
+#: include/forms.inc.php:1299 include/forms.inc.php:1313
 #: include/views/js/item.preprocessing.js.php:155
 #: include/views/js/item.preprocessing.js.php:170
 msgid "pattern"
 msgstr "шаблон"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:776
+#: app/controllers/CControllerPopupTriggerExpr.php:810
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile() - Процентиль P за период Т"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:783
+#: app/controllers/CControllerPopupTriggerExpr.php:817
 msgid "pi() - Returns the Pi constant"
 msgstr "pi() - Возвращает Пи константу"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:788
+#: app/controllers/CControllerPopupTriggerExpr.php:822
 msgid "power() - The power of a base value to a power value"
 msgstr "power() - Степень основного значения к значению степени"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:357
 msgid "problem pattern"
 msgstr "шаблон проблем"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:801
+#: app/controllers/CControllerPopupTriggerExpr.php:835
 msgid "radians() - Converts a value from degrees to radians"
 msgstr "radians() - Конвертация значения из градусов в радианы"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:808
+#: app/controllers/CControllerPopupTriggerExpr.php:842
 msgid "rand() - A random integer value"
 msgstr "rand() - Случайное целое число"
 
@@ -21231,15 +21255,15 @@ msgstr "регулярное выражение"
 msgid "regular expression"
 msgstr "регулярное выражение"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:813
+#: app/controllers/CControllerPopupTriggerExpr.php:847
 msgid "repeat() - Returns a string composed of value repeated count times"
 msgstr "repeat() - Возвращает строку состоящую из значений, которые повторяются указанное количество раз"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:826
+#: app/controllers/CControllerPopupTriggerExpr.php:860
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
 msgstr "replace() - Поиск шаблона, входящего в значение, и замена на заменитель"
 
-#: include/forms.inc.php:1371 include/views/js/item.preprocessing.js.php:224
+#: include/forms.inc.php:1376 include/views/js/item.preprocessing.js.php:224
 msgid "replacement"
 msgstr "замена"
 
@@ -21247,15 +21271,15 @@ msgstr "замена"
 msgid "right"
 msgstr "справа"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:844
+#: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Возвращает количество самых правых символов"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:857
+#: app/controllers/CControllerPopupTriggerExpr.php:891
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Округление значение до десятичных знаков"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:870
+#: app/controllers/CControllerPopupTriggerExpr.php:904
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - Удаление указанных символов с конца строки"
 
@@ -21265,7 +21289,7 @@ msgid "s"
 msgstr "с"
 
 #: app/views/administration.mediatype.edit.php:221
-#: app/views/administration.script.edit.php:189 include/forms.inc.php:1320
+#: app/views/administration.script.edit.php:189 include/forms.inc.php:1325
 #: include/views/configuration.host.discovery.edit.php:232
 #: include/views/configuration.item.edit.php:268
 #: include/views/configuration.item.prototype.edit.php:249
@@ -21273,7 +21297,7 @@ msgstr "с"
 msgid "script"
 msgstr "скрипт"
 
-#: include/forms.inc.php:1370 include/views/js/item.preprocessing.js.php:223
+#: include/forms.inc.php:1375 include/views/js/item.preprocessing.js.php:223
 msgid "search string"
 msgstr "строка поиска"
 
@@ -21287,7 +21311,7 @@ msgstr "второй"
 msgid "second parameter is expected"
 msgstr "ожидается второй параметр"
 
-#: include/forms.inc.php:1313 include/views/js/item.preprocessing.js.php:176
+#: include/forms.inc.php:1318 include/views/js/item.preprocessing.js.php:176
 msgid "seconds"
 msgstr "секунды"
 
@@ -21344,31 +21368,31 @@ msgstr "показать соответствия иконок"
 msgid "sign in as guest"
 msgstr "войти как гость"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:883
+#: app/controllers/CControllerPopupTriggerExpr.php:917
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
 msgstr "signum() - Возвращает -1 - если значение отрицательное, 0 - если значение ноль, 1 - если значение положительное"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:890
+#: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
 msgstr "sin() - Синус значения, где само значение представляет собой угол, в радианах."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:897
+#: app/controllers/CControllerPopupTriggerExpr.php:931
 msgid "sinh() - The hyperbolic sine of a value"
 msgstr "sinh() - Гиперболический синус значения"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:904
+#: app/controllers/CControllerPopupTriggerExpr.php:938
 msgid "skewness() - Measures the asymmetry of the probability distribution"
 msgstr "skewness() - Измерение асимметрии распределения вероятностей"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:911
+#: app/controllers/CControllerPopupTriggerExpr.php:945
 msgid "sqrt() - Square root of a value"
 msgstr "sqrt() - Квадратный корень значения"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:918
+#: app/controllers/CControllerPopupTriggerExpr.php:952
 msgid "stddevpop() - Population standard deviation"
 msgstr "stddevpop() - Среднеквадратическое отклонение"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:925
+#: app/controllers/CControllerPopupTriggerExpr.php:959
 msgid "stddevsamp() - Sample standard deviation"
 msgstr "stddevsamp() - Выборочное среднеквадратическое отклонение"
 
@@ -21376,11 +21400,11 @@ msgstr "stddevsamp() - Выборочное среднеквадратическ
 msgid "sum"
 msgstr "сумма"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:932
+#: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - Сумма значений за период Т"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:939
+#: app/controllers/CControllerPopupTriggerExpr.php:973
 msgid "sumofsquares() - The sum of squares"
 msgstr "sumofsquares() - Сумма квадратов"
 
@@ -21399,14 +21423,14 @@ msgstr "заданная учётная запись не уникальна"
 #: include/classes/helpers/CTagFilterFieldHelper.php:63
 #: include/classes/helpers/CTagFilterFieldHelper.php:117
 #: include/classes/widgets/CWidgetHelper.php:506
-#: include/classes/widgets/CWidgetHelper.php:550 include/forms.inc.php:1996
+#: include/classes/widgets/CWidgetHelper.php:550 include/forms.inc.php:2001
 #: include/views/configuration.maintenance.edit.php:174
 #: include/views/js/configuration.maintenance.edit.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:60
 msgid "tag"
 msgstr "тег"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:946
+#: app/controllers/CControllerPopupTriggerExpr.php:980
 msgid "tan() - The tangent of a value"
 msgstr "tan() - Тангенс значения"
 
@@ -21480,31 +21504,31 @@ msgstr "период времени фильтра по умолчанию пр�
 msgid "time shift"
 msgstr "сдвиг времени"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:953
+#: app/controllers/CControllerPopupTriggerExpr.php:987
 msgid "time() - Current time"
 msgstr "time() - Текущее время"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:959
+#: app/controllers/CControllerPopupTriggerExpr.php:993
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr "timeleft() - Время достижения порога вычисленное на основе периода Т"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:966
+#: app/controllers/CControllerPopupTriggerExpr.php:1000
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr "trendavg() - Среднее значение за период Т с точным сдвигом периода"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:973
+#: app/controllers/CControllerPopupTriggerExpr.php:1007
 msgid "trendcount() - Number of successfully retrieved values for period T"
 msgstr "trendcount() - Количество успешно полученных значений за период Т"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:980
+#: app/controllers/CControllerPopupTriggerExpr.php:1014
 msgid "trendmax() - Maximum value for period T with exact period shift"
 msgstr "trendmax() - Максимальное значение за период Т с точным сдвигом периода"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:987
+#: app/controllers/CControllerPopupTriggerExpr.php:1021
 msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr "trendmin() - Минимальное значение за период Т с точным сдвигом периода"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:994
+#: app/controllers/CControllerPopupTriggerExpr.php:1028
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr "trendsum() - Сумма значений за период Т с точным сдвигом периода"
 
@@ -21530,11 +21554,11 @@ msgstr "прототип триггера нельзя переместить в
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "триггер со связями нельзя переместить в другой шаблон или узел сети"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1001
+#: app/controllers/CControllerPopupTriggerExpr.php:1035
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr "trim() - Удаление указанных символов с начала и конца строки"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1014
+#: app/controllers/CControllerPopupTriggerExpr.php:1048
 msgid "truncate() - Truncates a value to decimal places"
 msgstr "truncate() - Усечение значения до десятичных знаков"
 
@@ -21667,9 +21691,9 @@ msgstr "неподдерживаемый номер версии"
 #: include/classes/html/CMacroValue.php:148
 #: include/classes/widgets/CWidgetHelper.php:512
 #: include/classes/widgets/CWidgetHelper.php:566
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
-#: include/forms.inc.php:2001
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:166
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:238
+#: include/forms.inc.php:2006
 #: include/views/configuration.host.discovery.edit.php:186
 #: include/views/configuration.host.discovery.edit.php:324
 #: include/views/configuration.item.edit.php:222
@@ -21806,11 +21830,11 @@ msgstr "значение второго параметра слишком дли
 msgid "value of third parameter must be one of %1$s"
 msgstr "значением третьего параметра должно быть %1$s"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1027
+#: app/controllers/CControllerPopupTriggerExpr.php:1061
 msgid "varpop() - Population variance"
 msgstr "varpop() - Дисперсия генеральной совокупности"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1034
+#: app/controllers/CControllerPopupTriggerExpr.php:1068
 msgid "varsamp() - Sample variance"
 msgstr "varsamp() - Выборочная дисперсия"
 
