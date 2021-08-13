@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-06 19:52+0300\n"
+"POT-Creation-Date: 2021-08-13 19:52+0300\n"
 "PO-Revision-Date: 2021-03-19 17:58+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -269,7 +269,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, vybrané"
 
-#: include/func.inc.php:1853
+#: include/func.inc.php:1898
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -967,7 +967,7 @@ msgstr "Povolit manuální zavření"
 msgid "Allowed hosts"
 msgstr "Povolení hosté"
 
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:473
 msgid "Alternatively, you can install it manually:"
 msgstr "Eventuálně to můžete nainstalovat manuálně:"
 
@@ -1422,7 +1422,7 @@ msgid "Axes"
 msgstr "Osy"
 
 #: include/classes/setup/CSetupWizard.php:132
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Back"
 msgstr "Zpět"
 
@@ -1714,11 +1714,11 @@ msgstr "Není možné přidat prototyp grafu"
 msgid "Cannot add group"
 msgstr "Nelze přidat skupinu"
 
-#: hosts.php:737
+#: hosts.php:731
 msgid "Cannot add host"
 msgstr "Nelze přidat hosta"
 
-#: host_prototypes.php:251
+#: host_prototypes.php:245
 msgid "Cannot add host prototype"
 msgstr "Není možné přidat prototyp hosta"
 
@@ -1817,7 +1817,7 @@ msgstr "Nelze přidat slide-show"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Nelze přidat dílčí mapy. Dosáhla maximální intenzity."
 
-#: templates.php:518
+#: templates.php:512
 msgid "Cannot add template"
 msgstr "Nelze přidat šablonu"
 
@@ -1967,7 +1967,7 @@ msgstr "Nelze vytvořit mapu ikon"
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Nelze vytvořit novou aplikaci, webový scénář je již k aplikaci přiřazen."
 
-#: include/classes/setup/CSetupWizard.php:467
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Cannot create the configuration file."
 msgstr "Není možné vytvořit konfigurační soubor."
 
@@ -2044,7 +2044,7 @@ msgstr[0] "Nelze smazat skupinu"
 msgstr[1] "Nelze smazat skupinu"
 msgstr[2] "Nelze smazat skupinu"
 
-#: hosts.php:974 hosts.php:995
+#: hosts.php:968 hosts.php:989
 msgid "Cannot delete host"
 msgstr "Nelze smazat hostitele"
 
@@ -2064,7 +2064,7 @@ msgstr[0] "Nelze odstranit skupinu hostů, protože údržba \"%1$s\" musí obsa
 msgstr[1] "Nelze odstranit vybrané skupiny hostů, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta nebo skupinu hostů. "
 msgstr[2] "Nelze odstranit vybrané skupiny hostů, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta nebo skupinu hostů. "
 
-#: host_prototypes.php:132 host_prototypes.php:303
+#: host_prototypes.php:132 host_prototypes.php:297
 msgid "Cannot delete host prototypes"
 msgstr "Není možné smazat prototypy hostů"
 
@@ -2170,7 +2170,7 @@ msgstr "Nelze smazat službu"
 msgid "Cannot delete slide show"
 msgstr "Není možné smazat prezentaci"
 
-#: templates.php:706 templates.php:720 templates.php:753
+#: templates.php:700 templates.php:714 templates.php:747
 msgid "Cannot delete template"
 msgstr "Nelze smazat šablonu"
 
@@ -2280,7 +2280,7 @@ msgstr[1] "Není možné vypnout pravidla nálezu"
 msgstr[2] "Není možné vypnout pravidla nálezu"
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
-#: hosts.php:1027
+#: hosts.php:1021
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Není možné vypnout hosta"
@@ -2353,7 +2353,7 @@ msgstr[1] "Nelze umožnit pravidla nálezu"
 msgstr[2] "Nelze umožnit pravidla nálezu"
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
-#: hosts.php:1026
+#: hosts.php:1020
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Není možné povolit hosta"
@@ -2911,7 +2911,7 @@ msgstr "Nelze upravit skupinu"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Není možné aktualizovat skupiny pro objeveného hosta \"%1$s\"."
 
-#: hosts.php:721
+#: hosts.php:715
 msgid "Cannot update host"
 msgstr "Nelze upravit hostitele"
 
@@ -2919,14 +2919,14 @@ msgstr "Nelze upravit hostitele"
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Nelze aktualizovat nastavení šifrování hostitele. Měly by být upřesněny nastavení připojení pro oba směry."
 
-#: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:288
+#: host_prototypes.php:220 host_prototypes.php:261 host_prototypes.php:282
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Nelze aktualizovat host prototyp"
 msgstr[1] "Nelze aktualizovat host prototyp"
 msgstr[2] "Nelze aktualizovat host prototyp"
 
-#: hosts.php:708
+#: hosts.php:702
 msgid "Cannot update hosts"
 msgstr "Nelze aktualizovat hosty"
 
@@ -3025,7 +3025,7 @@ msgstr "Není možné aktualizovat prezentaci"
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "Nelze aktualizovat krok šablony webového scénáře \"%1$s\": %2$s."
 
-#: templates.php:522
+#: templates.php:516
 msgid "Cannot update template"
 msgstr "Nelze upravit šablonu"
 
@@ -3033,7 +3033,7 @@ msgstr "Nelze upravit šablonu"
 msgid "Cannot update templated applications."
 msgstr "Není možné aktualizovat aplikace patřící šabloně."
 
-#: templates.php:501
+#: templates.php:495
 msgid "Cannot update templates"
 msgstr "Nelze aktualizovat šablony"
 
@@ -3374,7 +3374,7 @@ msgstr "Hodiny"
 msgid "Clone"
 msgstr "Vytvořit kopii"
 
-#: include/func.inc.php:1651 include/views/js/monitoring.sysmaps.js.php:318
+#: include/func.inc.php:1669 include/views/js/monitoring.sysmaps.js.php:318
 #: include/views/js/monitoring.sysmaps.js.php:471
 #: include/views/js/monitoring.sysmaps.js.php:595
 #: include/views/js/monitoring.sysmaps.js.php:700
@@ -3572,7 +3572,7 @@ msgstr "Nastavení"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Nastavení cache statistik. Cache - buffer (mod: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:484
+#: include/classes/setup/CSetupWizard.php:488
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Konfigurační soubor \"%1$s\" vytvořený."
@@ -3745,7 +3745,7 @@ msgid "Configuration updated"
 msgstr "Nastavení bylo aktualizováno"
 
 #: include/classes/setup/CSetupWizard.php:50
-#: include/classes/setup/CSetupWizard.php:328
+#: include/classes/setup/CSetupWizard.php:330
 msgid "Configure DB connection"
 msgstr "Nastavení DB připojení"
 
@@ -3753,7 +3753,7 @@ msgstr "Nastavení DB připojení"
 msgid "Confirmation text"
 msgstr "Potvrzující text"
 
-#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:486
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Gratulace! Právě jste úspěšně nainstalovali Zabbix frontend."
 
@@ -4438,15 +4438,15 @@ msgid "Data storage period"
 msgstr "Doba ukládání dat"
 
 #: include/classes/setup/CSetupWizard.php:288
-#: include/classes/setup/CSetupWizard.php:387
-#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:389
+#: include/classes/setup/CSetupWizard.php:528
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:686
 #: include/classes/setup/CSetupWizard.php:300
-#: include/classes/setup/CSetupWizard.php:393
-#: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:395
+#: include/classes/setup/CSetupWizard.php:536
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4455,18 +4455,18 @@ msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:312
-#: include/classes/setup/CSetupWizard.php:400
+#: include/classes/setup/CSetupWizard.php:402
 msgid "Database TLS cipher list"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:270
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Database TLS encryption"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:390
-#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:392
+#: include/classes/setup/CSetupWizard.php:532
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4479,7 +4479,7 @@ msgid "Database host"
 msgstr "Databázový server"
 
 #: include/classes/setup/CSetupWizard.php:306
-#: include/classes/setup/CSetupWizard.php:396
+#: include/classes/setup/CSetupWizard.php:398
 msgid "Database host verification"
 msgstr ""
 
@@ -4488,34 +4488,34 @@ msgid "Database monitor"
 msgstr "Monitor databáze"
 
 #: include/classes/setup/CSetupWizard.php:251
-#: include/classes/setup/CSetupWizard.php:377 setup.php:44
+#: include/classes/setup/CSetupWizard.php:379 setup.php:44
 msgid "Database name"
 msgstr "Jméno databáze"
 
-#: include/classes/setup/CSetupWizard.php:379
+#: include/classes/setup/CSetupWizard.php:381
 msgid "Database password"
 msgstr "Heslo databáze"
 
 #: include/classes/setup/CSetupWizard.php:243
-#: include/classes/setup/CSetupWizard.php:376 setup.php:43
+#: include/classes/setup/CSetupWizard.php:378 setup.php:43
 msgid "Database port"
 msgstr "Port databáze"
 
 #: include/classes/setup/CSetupWizard.php:256
-#: include/classes/setup/CSetupWizard.php:381
+#: include/classes/setup/CSetupWizard.php:383
 msgid "Database schema"
 msgstr "Databázové schéma"
 
-#: include/classes/setup/CSetupWizard.php:375
+#: include/classes/setup/CSetupWizard.php:377
 msgid "Database server"
 msgstr "Databázový server"
 
 #: include/classes/setup/CSetupWizard.php:230
-#: include/classes/setup/CSetupWizard.php:370
+#: include/classes/setup/CSetupWizard.php:372
 msgid "Database type"
 msgstr "Typ databáze"
 
-#: include/classes/setup/CSetupWizard.php:378
+#: include/classes/setup/CSetupWizard.php:380
 msgid "Database user"
 msgstr "Databázový uživatel"
 
@@ -4544,7 +4544,7 @@ msgstr "Datum koupě HW"
 msgid "Day"
 msgstr "Den"
 
-#: include/func.inc.php:2521
+#: include/func.inc.php:2585
 msgid "Day before yesterday"
 msgstr "Předevčírem"
 
@@ -5049,7 +5049,7 @@ msgstr "Popis"
 
 #: app/views/administration.mediatype.list.php:77
 #: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:617
-#: include/func.inc.php:1606 include/views/configuration.action.edit.php:169
+#: include/func.inc.php:1618 include/views/configuration.action.edit.php:169
 #: include/views/configuration.action.edit.php:173
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:419
@@ -5504,7 +5504,7 @@ msgstr "Nedostupné"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:471
+#: include/classes/setup/CSetupWizard.php:475
 msgid "Download the configuration file"
 msgstr "Stáhnout konfigurační soubor"
 
@@ -6069,7 +6069,7 @@ msgstr "Chyba"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Chyba ve vyhledávacím požadavku nad tabulkou \"%1$s\"."
 
-#: include/func.inc.php:1645 jsLoader.php:168
+#: include/func.inc.php:1655 jsLoader.php:168
 msgid "Error message"
 msgstr "Chybná zpráva"
 
@@ -6742,7 +6742,7 @@ msgid "Get value"
 msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:485
-#: app/views/popup.itemtestedit.view.php:314
+#: app/views/popup.itemtestedit.view.php:311
 msgid "Get value and test"
 msgstr ""
 
@@ -7362,7 +7362,7 @@ msgstr "Vodorovné zarovnání"
 #: include/classes/screens/CScreenProblem.php:901
 #: include/classes/screens/CScreenProblem.php:1152
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:340
+#: include/classes/setup/CSetupWizard.php:342
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -7423,7 +7423,7 @@ msgstr "IP hostitele"
 msgid "Host access"
 msgstr "Přístup hostitele"
 
-#: hosts.php:736
+#: hosts.php:730
 msgid "Host added"
 msgstr "Host byl přidán"
 
@@ -7445,12 +7445,12 @@ msgstr "Host nemůže mít více než jedno předvolené rozhraní daného typu.
 msgid "Host count"
 msgstr "Počet hostů"
 
-#: hosts.php:974 hosts.php:995
+#: hosts.php:968 hosts.php:989
 msgid "Host deleted"
 msgstr "Host byl smazán"
 
 #: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:194
-#: hosts.php:1024
+#: hosts.php:1018
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Host vypnutý"
@@ -7458,7 +7458,7 @@ msgstr[1] "Hosty vypnuté"
 msgstr[2] "Hosty vypnuté"
 
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
-#: hosts.php:1023
+#: hosts.php:1017
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Host povolen"
@@ -7634,7 +7634,7 @@ msgstr "Prototyp hosta \"%1$s\" již existuje na \"%2$s\", zděděný z jiné š
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Prototyp hosta \"%1$s\" již existuje na \"%2$s\"."
 
-#: host_prototypes.php:251
+#: host_prototypes.php:245
 msgid "Host prototype added"
 msgstr "Prototyp hosta byl přidán"
 
@@ -7646,7 +7646,7 @@ msgstr "Prototyp hosta byl smazán"
 msgid "Host prototype macros"
 msgstr ""
 
-#: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:287
+#: host_prototypes.php:220 host_prototypes.php:261 host_prototypes.php:281
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Host prototyp aktualizovaný"
@@ -7670,7 +7670,7 @@ msgstr "Prototyp hosta s viditelným názvem \"%1$s\" již existuje ve pravidle 
 msgid "Host prototypes"
 msgstr "Prototypy hostů"
 
-#: host_prototypes.php:303
+#: host_prototypes.php:297
 msgid "Host prototypes deleted"
 msgstr "Prototypy hostů byly smazány"
 
@@ -7695,7 +7695,7 @@ msgstr "Čas hosta"
 msgid "Host update failed."
 msgstr "Aktualizace hosta selhala."
 
-#: hosts.php:720
+#: hosts.php:714
 msgid "Host updated"
 msgstr "Host byl aktualizován"
 
@@ -7775,7 +7775,7 @@ msgstr "Hosté a skupiny"
 msgid "Hosts location"
 msgstr "Umístění hostů"
 
-#: hosts.php:702
+#: hosts.php:696
 msgid "Hosts updated"
 msgstr "Hosty byly aktualizovány"
 
@@ -8086,7 +8086,7 @@ msgid "Inaccessible graph prototype"
 msgstr ""
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:290
-#: host_prototypes.php:415
+#: host_prototypes.php:409
 msgid "Inaccessible group"
 msgstr "Nepřístupná skupina"
 
@@ -8535,9 +8535,9 @@ msgstr "Neplatné jméno pole \"%1$s\" nebo hodnota údaje pro tabulku \"%2$s\".
 msgid "Incorrect fields for sysmap."
 msgstr "Neplatné pole pro sysmap."
 
-#: include/classes/setup/CSetupWizard.php:524
 #: include/classes/setup/CSetupWizard.php:528
 #: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:536
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9374,7 +9374,7 @@ msgid "Insert expression"
 msgstr "Vložit výraz"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:489
+#: include/classes/setup/CSetupWizard.php:493
 msgid "Install"
 msgstr "Instalovat"
 
@@ -9955,7 +9955,7 @@ msgstr "Položka \"%1$s\" na \"%2$s\": aplikaci \"%3$s\" neexistuje."
 msgid "Item added"
 msgstr "Položka byla přidána"
 
-#: app/views/popup.itemtestedit.view.php:299
+#: app/views/popup.itemtestedit.view.php:300
 msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
 msgstr ""
 
@@ -10367,7 +10367,7 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Poslední"
 
-#: include/func.inc.php:2574
+#: include/func.inc.php:2638
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -10375,7 +10375,7 @@ msgstr[0] "Poslední %1$d den"
 msgstr[1] "Posledních %1$d dnů"
 msgstr[2] "Posledních %1$d dnů"
 
-#: include/func.inc.php:2568
+#: include/func.inc.php:2632
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -10383,7 +10383,7 @@ msgstr[0] "Poslední %1$d hodinu"
 msgstr[1] "Posledních %1$d hodin"
 msgstr[2] "Posledních %1$d hodin"
 
-#: include/func.inc.php:2561
+#: include/func.inc.php:2625
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -10391,7 +10391,7 @@ msgstr[0] "Poslední %1$d minutu"
 msgstr[1] "Posledních %1$d minut"
 msgstr[2] "Posledních %1$d minut"
 
-#: include/func.inc.php:2577
+#: include/func.inc.php:2641
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -10399,7 +10399,7 @@ msgstr[0] "Poslední %1$d měsíc"
 msgstr[1] "Posledních %1$d měsíců"
 msgstr[2] "Posledních %1$d měsíců"
 
-#: include/func.inc.php:2554
+#: include/func.inc.php:2618
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -10407,7 +10407,7 @@ msgstr[0] "Poslední %1$d sekundu"
 msgstr[1] "Posledních %1$d sekund"
 msgstr[2] "Posledních %1$d sekund"
 
-#: include/func.inc.php:2580
+#: include/func.inc.php:2644
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -11881,8 +11881,8 @@ msgid "Next page"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:126
-#: include/classes/setup/CSetupWizard.php:330
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Next step"
 msgstr "Další krok"
 
@@ -13710,7 +13710,7 @@ msgstr "Přehrát"
 msgid "Play sound"
 msgstr "Přehrávat zvuk"
 
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:421
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Zkontrolujte konfigurační parametry. Je-li vše v pořádku, stiskni \"%1$s\" tlačítko, nebo \"%2$s\" tlačítko pro změnu konfiguračních parametrů."
@@ -13719,12 +13719,12 @@ msgstr "Zkontrolujte konfigurační parametry. Je-li vše v pořádku, stiskni \
 msgid "Please confirm that you want to remove all macros."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:332
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Prosím, vytvořit databázi ručně, a nastav konfigurační parametry pro připojení k této databázi. Stiskni \"%1$s\" tlačítko pokud jsi to udělal."
 
-#: include/classes/setup/CSetupWizard.php:359
+#: include/classes/setup/CSetupWizard.php:361
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Prosím, zadej název hostitele nebo host IP addresu a číslo portu Zabbix serveru, stejně jako jméno instalace (volitelné)."
 
@@ -13769,7 +13769,7 @@ msgstr "Vyplň pole host inventáře"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:123
-#: include/classes/setup/CSetupWizard.php:345 include/hosts.inc.php:1444
+#: include/classes/setup/CSetupWizard.php:347 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13800,7 +13800,7 @@ msgid "Post type"
 msgstr "Typ zprávy"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:417
+#: include/classes/setup/CSetupWizard.php:419
 msgid "Pre-installation summary"
 msgstr "Shrnutí před instalací"
 
@@ -13837,7 +13837,7 @@ msgstr "Před. čas"
 msgid "Preview"
 msgstr "Náhled"
 
-#: include/func.inc.php:2524
+#: include/func.inc.php:2588
 msgid "Previous month"
 msgstr "Předchozí měsíc"
 
@@ -13849,11 +13849,11 @@ msgstr ""
 msgid "Previous value"
 msgstr "Předchozí hodnota"
 
-#: include/func.inc.php:2523
+#: include/func.inc.php:2587
 msgid "Previous week"
 msgstr "Předchozí týden"
 
-#: include/func.inc.php:2525
+#: include/func.inc.php:2589
 msgid "Previous year"
 msgstr "Předchozí rok"
 
@@ -15178,7 +15178,7 @@ msgstr "Sobota"
 msgid "Save changes"
 msgstr "Ulož změny"
 
-#: include/classes/setup/CSetupWizard.php:472
+#: include/classes/setup/CSetupWizard.php:476
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Uložte jej jako \"%1$s\""
@@ -16442,7 +16442,7 @@ msgstr "Podmapa"
 msgid "Success Audit"
 msgstr "Úspěšný audit"
 
-#: include/func.inc.php:1645 jsLoader.php:167
+#: include/func.inc.php:1654 jsLoader.php:167
 msgid "Success message"
 msgstr "Zpráva úspěšná"
 
@@ -16507,7 +16507,7 @@ msgstr "Doba nastartování systému. Návratová hodnota celé číslo (Unix ti
 msgid "System default"
 msgstr "Výchozí nastavení"
 
-#: include/func.inc.php:1672
+#: include/func.inc.php:1690
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "Nastala chyba systému. Kontaktujte prosím administrátora Zabbixu."
 
@@ -16699,7 +16699,7 @@ msgstr "Template \"%1$s\" nemůže být bez hostitelské skupiny."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Šablona \"%1$s\" pro host \"%2$s\" neexistuje."
 
-#: templates.php:517
+#: templates.php:511
 msgid "Template added"
 msgstr "Šablona přidána"
 
@@ -16711,7 +16711,7 @@ msgstr ""
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Šablona nemůže být připojená k jiné šabloně víc jak jednou, včetně propojení přes jiné šablony."
 
-#: templates.php:706 templates.php:720 templates.php:753
+#: templates.php:700 templates.php:714 templates.php:747
 msgid "Template deleted"
 msgstr "Šablona byla smazána"
 
@@ -16745,7 +16745,7 @@ msgstr "Šablona obrazovek"
 msgid "Template trigger"
 msgstr "Šablona spouštěče"
 
-#: templates.php:521
+#: templates.php:515
 msgid "Template updated"
 msgstr "Šablona byla aktualizována"
 
@@ -16794,7 +16794,7 @@ msgstr "Šablony"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Šablony \"%1$s\" odpojené od hostů \"%2$s\"."
 
-#: templates.php:495
+#: templates.php:489
 msgid "Templates updated"
 msgstr "Šablony aktualizovány"
 
@@ -16803,7 +16803,7 @@ msgstr "Šablony aktualizovány"
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:508
-#: app/views/popup.itemtestedit.view.php:314
+#: app/views/popup.itemtestedit.view.php:311
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1455
 #: include/views/configuration.host.discovery.edit.php:790
@@ -16906,15 +16906,15 @@ msgstr "Aplikace není objevena a již bude smazána v %1$s (%2$s %3$s)."
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Aplikace není objevena a již bude odstraněna při příštím objevovacím pravidle bude zpracováno."
 
-#: hosts.php:351
+#: hosts.php:349
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
-#: host_prototypes.php:155
+#: host_prototypes.php:153
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
-#: templates.php:203
+#: templates.php:201
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
@@ -17005,7 +17005,7 @@ msgstr "Aplikace web scénáře patří k jinému hostu, než je host web scén�
 msgid "Theme"
 msgstr "Téma"
 
-#: include/func.inc.php:2522
+#: include/func.inc.php:2586
 msgid "This day last week"
 msgstr "Tento den v minulém týdnu"
 
@@ -17018,11 +17018,11 @@ msgstr ""
 msgid "This is the test message from Zabbix"
 msgstr "Toto je nová testovací zpráva ze Zabbixu"
 
-#: include/func.inc.php:2530 srv_status.php:40
+#: include/func.inc.php:2594 srv_status.php:40
 msgid "This month"
 msgstr "Tento měsíc"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2595
 msgid "This month so far"
 msgstr "Prozatím tento měsíc"
 
@@ -17034,19 +17034,19 @@ msgstr "Tento sloupec obrazovky není prázdny. Přesto smazat?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Tento řádek obrazovky není prázdny. Přesto smazat?"
 
-#: include/func.inc.php:2528 srv_status.php:39
+#: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
 msgstr "Tento týden"
 
-#: include/func.inc.php:2529
+#: include/func.inc.php:2593
 msgid "This week so far"
 msgstr "Prozatím tento týden"
 
-#: include/func.inc.php:2532 srv_status.php:41
+#: include/func.inc.php:2596 srv_status.php:41
 msgid "This year"
 msgstr "Tento rok"
 
-#: include/func.inc.php:2533
+#: include/func.inc.php:2597
 msgid "This year so far"
 msgstr "Prozatím tento rok"
 
@@ -17175,12 +17175,12 @@ msgstr "Do"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Na nastavení rozhraní hosta označte jeden typ položky pro všechny položky"
 
-#: include/classes/screens/CScreenProblem.php:730 include/func.inc.php:2526
+#: include/classes/screens/CScreenProblem.php:730 include/func.inc.php:2590
 #: srv_status.php:38
 msgid "Today"
 msgstr "Dnes"
 
-#: include/func.inc.php:2527
+#: include/func.inc.php:2591
 msgid "Today so far"
 msgstr "Dnes prozatím"
 
@@ -18896,7 +18896,7 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Varování"
 
-#: jsLoader.php:169
+#: include/func.inc.php:1656 jsLoader.php:169
 msgid "Warning message"
 msgstr ""
 
@@ -19296,7 +19296,7 @@ msgstr "Ročně"
 msgid "Yes"
 msgstr "Ano"
 
-#: include/classes/screens/CScreenProblem.php:738 include/func.inc.php:2520
+#: include/classes/screens/CScreenProblem.php:738 include/func.inc.php:2584
 msgid "Yesterday"
 msgstr "Včera"
 
@@ -19443,7 +19443,7 @@ msgstr "Přihlašovací formulář Zabbixu"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:408
+#: include/classes/setup/CSetupWizard.php:410
 msgid "Zabbix server"
 msgstr "Zabbix server"
 
@@ -19461,7 +19461,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Zabbix server (proxy)"
 
 #: include/classes/setup/CSetupWizard.php:54
-#: include/classes/setup/CSetupWizard.php:357
+#: include/classes/setup/CSetupWizard.php:359
 msgid "Zabbix server details"
 msgstr "Podrobnosti Zabbix serveru"
 
@@ -19478,11 +19478,11 @@ msgstr "Zabbix server běží"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Zabbix server používá kontrolní interval \"%1$s\"."
 
-#: include/classes/setup/CSetupWizard.php:412
+#: include/classes/setup/CSetupWizard.php:414
 msgid "Zabbix server name"
 msgstr "Zabbix server jméno"
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Zabbix server port"
 msgstr "Port Zabbix serveru"
 
@@ -19952,7 +19952,7 @@ msgid "days"
 msgstr "dní"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:372
+#: include/classes/setup/CSetupWizard.php:374
 #: include/classes/widgets/CWidgetHelper.php:70
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
@@ -20441,8 +20441,8 @@ msgstr "název"
 msgid "new"
 msgstr "nový"
 
-#: disc_prototypes.php:1297 disc_prototypes.php:1321 hosts.php:1389
-#: include/views/configuration.item.massupdate.php:417 templates.php:954
+#: disc_prototypes.php:1297 disc_prototypes.php:1321 hosts.php:1383
+#: include/views/configuration.item.massupdate.php:417 templates.php:948
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "nový"

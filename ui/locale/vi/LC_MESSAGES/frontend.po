@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-06 19:52+0300\n"
+"POT-Creation-Date: 2021-08-13 19:52+0300\n"
 "PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -239,7 +239,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, chọn"
 
-#: include/func.inc.php:1853
+#: include/func.inc.php:1898
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -929,7 +929,7 @@ msgstr "Cho phép đóng bằng tay"
 msgid "Allowed hosts"
 msgstr "Những host được phép"
 
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:473
 msgid "Alternatively, you can install it manually:"
 msgstr "Ngoài ra, bạn có thể cài đặt thủ công:"
 
@@ -1378,7 +1378,7 @@ msgid "Axes"
 msgstr "Trục"
 
 #: include/classes/setup/CSetupWizard.php:132
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Back"
 msgstr "Quay lại"
 
@@ -1670,11 +1670,11 @@ msgstr "Không thể thêm kiểu biểu đồ"
 msgid "Cannot add group"
 msgstr "Không thể thêm nhóm"
 
-#: hosts.php:737
+#: hosts.php:731
 msgid "Cannot add host"
 msgstr "Không thể thêm host"
 
-#: host_prototypes.php:251
+#: host_prototypes.php:245
 msgid "Cannot add host prototype"
 msgstr "Không thể thêm kiểu host"
 
@@ -1771,7 +1771,7 @@ msgstr "Không thể thêm slide show"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Không thể thêm các sơ đồ con. Độ sâu tối đa đạt được."
 
-#: templates.php:518
+#: templates.php:512
 msgid "Cannot add template"
 msgstr "Không thể thêm template"
 
@@ -1915,7 +1915,7 @@ msgstr "Không thể tạo biểu tượng sơ đồ"
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Không thể tạo ứng dụng mới, web scenario được sẵn sàng gán cho ứng dụng."
 
-#: include/classes/setup/CSetupWizard.php:467
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Cannot create the configuration file."
 msgstr "Không thể tạo tập tin cấu hình."
 
@@ -1986,7 +1986,7 @@ msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Không thể xóa nhóm"
 
-#: hosts.php:974 hosts.php:995
+#: hosts.php:968 hosts.php:989
 msgid "Cannot delete host"
 msgstr "Không thể xóa host"
 
@@ -2002,7 +2002,7 @@ msgid "Cannot delete host group because maintenance \"%1$s\" must contain at lea
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
 msgstr[0] "Không thể xóa nhóm thiết bị đang bảo trì \"%1$s\" phải chứa ít nhất 1 hoặc 1 nhóm thiết bị. "
 
-#: host_prototypes.php:132 host_prototypes.php:303
+#: host_prototypes.php:132 host_prototypes.php:297
 msgid "Cannot delete host prototypes"
 msgstr "Không thể xóa các kiểu host"
 
@@ -2098,7 +2098,7 @@ msgstr "Không thể xóa dịch vụ"
 msgid "Cannot delete slide show"
 msgstr "Không thể xóa slide show"
 
-#: templates.php:706 templates.php:720 templates.php:753
+#: templates.php:700 templates.php:714 templates.php:747
 msgid "Cannot delete template"
 msgstr "Không thể xóa template"
 
@@ -2196,7 +2196,7 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Không thể vô hiệu quy tắc khám phá"
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
-#: hosts.php:1027
+#: hosts.php:1021
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Không thể vô hiệu thiết bị"
@@ -2251,7 +2251,7 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Không thể kích hoạt quy tắc khám phá"
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
-#: hosts.php:1026
+#: hosts.php:1020
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Không thể kích hoạt thiết bị"
@@ -2789,7 +2789,7 @@ msgstr "Không thể cập nhật nhóm"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Không thể cập nhật các nhóm cho host được phát hiện \"%1$s\"."
 
-#: hosts.php:721
+#: hosts.php:715
 msgid "Cannot update host"
 msgstr "Không thể cập nhật máy chủ"
 
@@ -2797,12 +2797,12 @@ msgstr "Không thể cập nhật máy chủ"
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Không thể cập nhật cài đặt mật mã máy chủ. Cài đặt kết nối cho cả hướng được chỉ rõ."
 
-#: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:288
+#: host_prototypes.php:220 host_prototypes.php:261 host_prototypes.php:282
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Không thể cập nhật prototype thiết bị"
 
-#: hosts.php:708
+#: hosts.php:702
 msgid "Cannot update hosts"
 msgstr "Không thể cập nhật các host"
 
@@ -2899,7 +2899,7 @@ msgstr "Không thể cập nhật slide show"
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "Không thể cập nhật bước cho một mẫu web scenario \"%1$s\": %2$s."
 
-#: templates.php:522
+#: templates.php:516
 msgid "Cannot update template"
 msgstr "Không thể cập nhật template"
 
@@ -2907,7 +2907,7 @@ msgstr "Không thể cập nhật template"
 msgid "Cannot update templated applications."
 msgstr "Không thể cập nhật các template ứng dụng."
 
-#: templates.php:501
+#: templates.php:495
 msgid "Cannot update templates"
 msgstr "Không thể cập nhật mẫu"
 
@@ -3244,7 +3244,7 @@ msgstr "Đồng hồ"
 msgid "Clone"
 msgstr "Tạo bản sao"
 
-#: include/func.inc.php:1651 include/views/js/monitoring.sysmaps.js.php:318
+#: include/func.inc.php:1669 include/views/js/monitoring.sysmaps.js.php:318
 #: include/views/js/monitoring.sysmaps.js.php:471
 #: include/views/js/monitoring.sysmaps.js.php:595
 #: include/views/js/monitoring.sysmaps.js.php:700
@@ -3442,7 +3442,7 @@ msgstr "Cấu hình"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Cấu hình thống kê cache. Cache - buffer (chế độ: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:484
+#: include/classes/setup/CSetupWizard.php:488
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Tập tin cấu hình \"%1$s\" đã tạo."
@@ -3615,7 +3615,7 @@ msgid "Configuration updated"
 msgstr "Cấu hình đã cập nhật"
 
 #: include/classes/setup/CSetupWizard.php:50
-#: include/classes/setup/CSetupWizard.php:328
+#: include/classes/setup/CSetupWizard.php:330
 msgid "Configure DB connection"
 msgstr "Cấu hình kết nối DB"
 
@@ -3623,7 +3623,7 @@ msgstr "Cấu hình kết nối DB"
 msgid "Confirmation text"
 msgstr "Xác nhận văn bản"
 
-#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:486
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Chúc mừng! Bạn đã cài đặt thành công Zabbix frontend."
 
@@ -4313,15 +4313,15 @@ msgid "Data storage period"
 msgstr "Chu kì lưu trữ dữ liệu"
 
 #: include/classes/setup/CSetupWizard.php:288
-#: include/classes/setup/CSetupWizard.php:387
-#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:389
+#: include/classes/setup/CSetupWizard.php:528
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:686
 #: include/classes/setup/CSetupWizard.php:300
-#: include/classes/setup/CSetupWizard.php:393
-#: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:395
+#: include/classes/setup/CSetupWizard.php:536
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4330,18 +4330,18 @@ msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:312
-#: include/classes/setup/CSetupWizard.php:400
+#: include/classes/setup/CSetupWizard.php:402
 msgid "Database TLS cipher list"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:270
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Database TLS encryption"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:390
-#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:392
+#: include/classes/setup/CSetupWizard.php:532
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4354,7 +4354,7 @@ msgid "Database host"
 msgstr "Cơ sở dữ liệu host"
 
 #: include/classes/setup/CSetupWizard.php:306
-#: include/classes/setup/CSetupWizard.php:396
+#: include/classes/setup/CSetupWizard.php:398
 msgid "Database host verification"
 msgstr ""
 
@@ -4363,34 +4363,34 @@ msgid "Database monitor"
 msgstr "Cơ sở dữ liệu theo dõi"
 
 #: include/classes/setup/CSetupWizard.php:251
-#: include/classes/setup/CSetupWizard.php:377 setup.php:44
+#: include/classes/setup/CSetupWizard.php:379 setup.php:44
 msgid "Database name"
 msgstr "Tên cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:379
+#: include/classes/setup/CSetupWizard.php:381
 msgid "Database password"
 msgstr "Mật khẩu cơ sở dữ liệu"
 
 #: include/classes/setup/CSetupWizard.php:243
-#: include/classes/setup/CSetupWizard.php:376 setup.php:43
+#: include/classes/setup/CSetupWizard.php:378 setup.php:43
 msgid "Database port"
 msgstr "Cổng sơ sở dữ liệu"
 
 #: include/classes/setup/CSetupWizard.php:256
-#: include/classes/setup/CSetupWizard.php:381
+#: include/classes/setup/CSetupWizard.php:383
 msgid "Database schema"
 msgstr "Giản đồ cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:375
+#: include/classes/setup/CSetupWizard.php:377
 msgid "Database server"
 msgstr "Máy chủ cơ sở dữ liệu"
 
 #: include/classes/setup/CSetupWizard.php:230
-#: include/classes/setup/CSetupWizard.php:370
+#: include/classes/setup/CSetupWizard.php:372
 msgid "Database type"
 msgstr "Kiểu cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:378
+#: include/classes/setup/CSetupWizard.php:380
 msgid "Database user"
 msgstr "Người dùng cơ sở dữ liệu"
 
@@ -4419,7 +4419,7 @@ msgstr "Ngày đã mua HW"
 msgid "Day"
 msgstr "Ngày"
 
-#: include/func.inc.php:2521
+#: include/func.inc.php:2585
 msgid "Day before yesterday"
 msgstr "Ngày trước hôm qua"
 
@@ -4922,7 +4922,7 @@ msgstr "Mô tả"
 
 #: app/views/administration.mediatype.list.php:77
 #: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:617
-#: include/func.inc.php:1606 include/views/configuration.action.edit.php:169
+#: include/func.inc.php:1618 include/views/configuration.action.edit.php:169
 #: include/views/configuration.action.edit.php:173
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:419
@@ -5373,7 +5373,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr "Tải xuống hình ảnh"
 
-#: include/classes/setup/CSetupWizard.php:471
+#: include/classes/setup/CSetupWizard.php:475
 msgid "Download the configuration file"
 msgstr "Tải xuống tệp tin cấu hình"
 
@@ -5938,7 +5938,7 @@ msgstr "Lỗi"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Lỗi trong yêu cầu tìm kiếm cho bảng \"%1$s\"."
 
-#: include/func.inc.php:1645 jsLoader.php:168
+#: include/func.inc.php:1655 jsLoader.php:168
 msgid "Error message"
 msgstr "Tin nhắn lỗi"
 
@@ -6609,7 +6609,7 @@ msgid "Get value"
 msgstr "Lấy giá trị"
 
 #: app/views/js/popup.itemtestedit.view.js.php:485
-#: app/views/popup.itemtestedit.view.php:314
+#: app/views/popup.itemtestedit.view.php:311
 msgid "Get value and test"
 msgstr "Nhận giá trị và kiểm tra"
 
@@ -7225,7 +7225,7 @@ msgstr "Sắp xếp theo chiều ngang"
 #: include/classes/screens/CScreenProblem.php:901
 #: include/classes/screens/CScreenProblem.php:1152
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:340
+#: include/classes/setup/CSetupWizard.php:342
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -7284,7 +7284,7 @@ msgstr "Host IP"
 msgid "Host access"
 msgstr "Kết nối host"
 
-#: hosts.php:736
+#: hosts.php:730
 msgid "Host added"
 msgstr "Host được thêm vào"
 
@@ -7306,18 +7306,18 @@ msgstr "Host không thể có nhiều hơn một interface mặc định cu
 msgid "Host count"
 msgstr "Đếm host"
 
-#: hosts.php:974 hosts.php:995
+#: hosts.php:968 hosts.php:989
 msgid "Host deleted"
 msgstr "Host đã xóa"
 
 #: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:194
-#: hosts.php:1024
+#: hosts.php:1018
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Thiết bị đã bị vô hiệu"
 
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
-#: hosts.php:1023
+#: hosts.php:1017
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Thiết bị đã được kích hoạt"
@@ -7491,7 +7491,7 @@ msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa t
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\"."
 
-#: host_prototypes.php:251
+#: host_prototypes.php:245
 msgid "Host prototype added"
 msgstr "Kiểu host được thêm vào"
 
@@ -7503,7 +7503,7 @@ msgstr "Kiểu host bị xóa"
 msgid "Host prototype macros"
 msgstr "Máy chủ macro nguyên mẫu"
 
-#: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:287
+#: host_prototypes.php:220 host_prototypes.php:261 host_prototypes.php:281
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Prototype thiết bị đã được cập nhật"
@@ -7525,7 +7525,7 @@ msgstr "Kiểu host với tên hiển thị \"%1$s\" đã tồn tại trong
 msgid "Host prototypes"
 msgstr "Các kiểu host"
 
-#: host_prototypes.php:303
+#: host_prototypes.php:297
 msgid "Host prototypes deleted"
 msgstr "Các kiểu host đã xóa"
 
@@ -7550,7 +7550,7 @@ msgstr "Thời gian của host"
 msgid "Host update failed."
 msgstr "Host cập nhật thất bại."
 
-#: hosts.php:720
+#: hosts.php:714
 msgid "Host updated"
 msgstr "Host đã cập nhật"
 
@@ -7630,7 +7630,7 @@ msgstr "Máy chủ và nhóm"
 msgid "Hosts location"
 msgstr "Vị trí các host"
 
-#: hosts.php:702
+#: hosts.php:696
 msgid "Hosts updated"
 msgstr "Các host đã cập nhật"
 
@@ -7941,7 +7941,7 @@ msgid "Inaccessible graph prototype"
 msgstr "Đồ thị nguyên mẫu không thể tiếp cận"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:290
-#: host_prototypes.php:415
+#: host_prototypes.php:409
 msgid "Inaccessible group"
 msgstr "Nhóm không thể tiếp cận"
 
@@ -8390,9 +8390,9 @@ msgstr "Trường có tên \"%1$s\" không chính xác hoặc giá trị �
 msgid "Incorrect fields for sysmap."
 msgstr "Các trường đối với sysmap không chính xác."
 
-#: include/classes/setup/CSetupWizard.php:524
 #: include/classes/setup/CSetupWizard.php:528
 #: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:536
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9229,7 +9229,7 @@ msgid "Insert expression"
 msgstr "Chèn biểu thức"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:489
+#: include/classes/setup/CSetupWizard.php:493
 msgid "Install"
 msgstr "Cài đặt"
 
@@ -9810,7 +9810,7 @@ msgstr "Item \"%1$s\" trên \"%2$s\": ứng dụng \"%3$s\" không tồn tại
 msgid "Item added"
 msgstr "Item đã được thêm vào"
 
-#: app/views/popup.itemtestedit.view.php:299
+#: app/views/popup.itemtestedit.view.php:300
 msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
 msgstr "Mục chứa macro người dùng định nghĩa loại \"Secret text\". Giá trị của macro phải được nhập thủ công."
 
@@ -10214,37 +10214,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Giá trị cuối cùng"
 
-#: include/func.inc.php:2574
+#: include/func.inc.php:2638
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "%1$d ngày cuối"
 
-#: include/func.inc.php:2568
+#: include/func.inc.php:2632
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "%1$d giờ cuối"
 
-#: include/func.inc.php:2561
+#: include/func.inc.php:2625
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "%1$d phút cuối"
 
-#: include/func.inc.php:2577
+#: include/func.inc.php:2641
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "%1$d tháng cuối"
 
-#: include/func.inc.php:2554
+#: include/func.inc.php:2618
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "%1$d giây cuối"
 
-#: include/func.inc.php:2580
+#: include/func.inc.php:2644
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -11698,8 +11698,8 @@ msgid "Next page"
 msgstr "Trang tiếp theo"
 
 #: include/classes/setup/CSetupWizard.php:126
-#: include/classes/setup/CSetupWizard.php:330
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Next step"
 msgstr "Bước tiếp theo"
 
@@ -13525,7 +13525,7 @@ msgstr "Phát"
 msgid "Play sound"
 msgstr "Phát âm thanh"
 
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:421
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Vui lòng kiểm tra các thông số cấu hình. Nếu tất cả đều chính xác, nhấn nút \"%1$s\" hoặc nút \"%2$s\" để thay đổi các tham số cấu hình."
@@ -13534,12 +13534,12 @@ msgstr "Vui lòng kiểm tra các thông số cấu hình. Nếu tất cả đ�
 msgid "Please confirm that you want to remove all macros."
 msgstr "Vui lòng xác nhận rằng bạn muốn xóa tất cả các macro."
 
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:332
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Vui lòng tạo cơ sở dữ liệu theo cách thủ công và đặt các tham số cấu hình để kết nối với cơ sở dữ liệu này. Nhấn nút \"%1$s\" khi hoàn tất."
 
-#: include/classes/setup/CSetupWizard.php:359
+#: include/classes/setup/CSetupWizard.php:361
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Vui lòng nhập tên máy chủ hoặc địa chỉ IP máy chủ và số cổng của máy chủ Zabbix, cũng như tên cài đặt (tùy chọn)."
 
@@ -13584,7 +13584,7 @@ msgstr "Gắn linh kiện vào trường host còn lại"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:123
-#: include/classes/setup/CSetupWizard.php:345 include/hosts.inc.php:1444
+#: include/classes/setup/CSetupWizard.php:347 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13615,7 +13615,7 @@ msgid "Post type"
 msgstr "Loại thư"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:417
+#: include/classes/setup/CSetupWizard.php:419
 msgid "Pre-installation summary"
 msgstr "Tóm tắt chuẩn bị cài đặt"
 
@@ -13652,7 +13652,7 @@ msgstr "Thời điểm trước"
 msgid "Preview"
 msgstr "Xem trước"
 
-#: include/func.inc.php:2524
+#: include/func.inc.php:2588
 msgid "Previous month"
 msgstr "Tháng trước"
 
@@ -13664,11 +13664,11 @@ msgstr "Trang trước"
 msgid "Previous value"
 msgstr "Giá trị trước"
 
-#: include/func.inc.php:2523
+#: include/func.inc.php:2587
 msgid "Previous week"
 msgstr "Quay lại tuần trước"
 
-#: include/func.inc.php:2525
+#: include/func.inc.php:2589
 msgid "Previous year"
 msgstr "Quay lại năm trước"
 
@@ -14989,7 +14989,7 @@ msgstr "Thứ bảy"
 msgid "Save changes"
 msgstr "Lưu thay đổi"
 
-#: include/classes/setup/CSetupWizard.php:472
+#: include/classes/setup/CSetupWizard.php:476
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Lưu thành \"%1$s\""
@@ -16251,7 +16251,7 @@ msgstr "Submap"
 msgid "Success Audit"
 msgstr "Kiểm nghiệm thành công"
 
-#: include/func.inc.php:1645 jsLoader.php:167
+#: include/func.inc.php:1654 jsLoader.php:167
 msgid "Success message"
 msgstr "Tin chắn thành công"
 
@@ -16316,7 +16316,7 @@ msgstr "Thời gian khởi động hệ thống. Trả về kiểu integer (đơ
 msgid "System default"
 msgstr "Mặc định hệ thống"
 
-#: include/func.inc.php:1672
+#: include/func.inc.php:1690
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "Xảy ra lỗi hệ thống. Vui lòng liên hệ với quản trị viên Zabbix."
 
@@ -16508,7 +16508,7 @@ msgstr "Mẫu \"%1$s\" không thể nằm ngoài nhóm máy chủ."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Template \"%1$s\" cho host \"%2$s\" không tồn tại."
 
-#: templates.php:517
+#: templates.php:511
 msgid "Template added"
 msgstr "Template đã được thêm vào"
 
@@ -16520,7 +16520,7 @@ msgstr "Các thuộc tính mẫu và máy chủ được kế thừa thông qua 
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Template không thể liên kết được đến template khác nhiều hơn một lần thậm chí thông qua các template khác."
 
-#: templates.php:706 templates.php:720 templates.php:753
+#: templates.php:700 templates.php:714 templates.php:747
 msgid "Template deleted"
 msgstr "Template đã bị xóa"
 
@@ -16554,7 +16554,7 @@ msgstr "Màn hình mẫu"
 msgid "Template trigger"
 msgstr "Kích hoạt mẫu"
 
-#: templates.php:521
+#: templates.php:515
 msgid "Template updated"
 msgstr "Template đã được cập nhật"
 
@@ -16603,7 +16603,7 @@ msgstr "Mẫu"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Template \"%1$s\" không liên kết từ các host \"%2$s\"."
 
-#: templates.php:495
+#: templates.php:489
 msgid "Templates updated"
 msgstr "Các mẫu đã được cập nhật"
 
@@ -16612,7 +16612,7 @@ msgstr "Các mẫu đã được cập nhật"
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:508
-#: app/views/popup.itemtestedit.view.php:314
+#: app/views/popup.itemtestedit.view.php:311
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1455
 #: include/views/configuration.host.discovery.edit.php:790
@@ -16715,15 +16715,15 @@ msgstr "Ứng dụng không được dò tìm nữa và sẽ bị xóa trong %1$
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Ứng dụng không được dò tìm nữa và sẽ bị xóa trong lần xử lý dò tìm tiếp theo."
 
-#: hosts.php:351
+#: hosts.php:349
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Máy chủ nhân bản chứa các macro do người dùng xác định với loại \"Văn bản bí mật\". Giá trị và loại của các macro này đã được đặt lại."
 
-#: host_prototypes.php:155
+#: host_prototypes.php:153
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Nguyên mẫu máy chủ nhân bản chứa các macro do người dùng xác định với loại \"Văn bản bí mật\". Giá trị và loại của các macro này đã được đặt lại."
 
-#: templates.php:203
+#: templates.php:201
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Mẫu nhân bản chứa các macro do người dùng xác định với loại \"Văn bản bí mật\". Giá trị và loại của các macro này đã được đặt lại."
 
@@ -16810,7 +16810,7 @@ msgstr "Ứng dụng web scenario thuộc về một host khác hơn so vơ
 msgid "Theme"
 msgstr "Giao diện"
 
-#: include/func.inc.php:2522
+#: include/func.inc.php:2586
 msgid "This day last week"
 msgstr "Ngày cuối tuần"
 
@@ -16823,11 +16823,11 @@ msgstr "Trường này được tự động điền theo mục \"%1$s\"."
 msgid "This is the test message from Zabbix"
 msgstr "Đây là thông báo thử nghiệm từ Zabbix"
 
-#: include/func.inc.php:2530 srv_status.php:40
+#: include/func.inc.php:2594 srv_status.php:40
 msgid "This month"
 msgstr "Tháng này"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2595
 msgid "This month so far"
 msgstr "Tháng này đến nay"
 
@@ -16839,19 +16839,19 @@ msgstr "Cột screen này không được để trống. Xóa nó?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Hàng screen này không được để trống. Xóa chúng?"
 
-#: include/func.inc.php:2528 srv_status.php:39
+#: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
 msgstr "Tuần này"
 
-#: include/func.inc.php:2529
+#: include/func.inc.php:2593
 msgid "This week so far"
 msgstr "Tuần này cho đến nay"
 
-#: include/func.inc.php:2532 srv_status.php:41
+#: include/func.inc.php:2596 srv_status.php:41
 msgid "This year"
 msgstr "Năm này"
 
-#: include/func.inc.php:2533
+#: include/func.inc.php:2597
 msgid "This year so far"
 msgstr "Năm này cho đến nay"
 
@@ -16980,12 +16980,12 @@ msgstr "Đến"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Để thiết lập một host interface chọn một kiểu item duy nhất cho tất cả các item"
 
-#: include/classes/screens/CScreenProblem.php:730 include/func.inc.php:2526
+#: include/classes/screens/CScreenProblem.php:730 include/func.inc.php:2590
 #: srv_status.php:38
 msgid "Today"
 msgstr "Hôm nay"
 
-#: include/func.inc.php:2527
+#: include/func.inc.php:2591
 msgid "Today so far"
 msgstr "Hôm nay"
 
@@ -18681,7 +18681,7 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Cảnh báo"
 
-#: jsLoader.php:169
+#: include/func.inc.php:1656 jsLoader.php:169
 msgid "Warning message"
 msgstr "Tin nhắn cảnh báo"
 
@@ -19077,7 +19077,7 @@ msgstr "Hàng năm"
 msgid "Yes"
 msgstr "Có"
 
-#: include/classes/screens/CScreenProblem.php:738 include/func.inc.php:2520
+#: include/classes/screens/CScreenProblem.php:738 include/func.inc.php:2584
 msgid "Yesterday"
 msgstr "Hôm qua"
 
@@ -19224,7 +19224,7 @@ msgstr "Mẫu đăng nhập zabbix"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:408
+#: include/classes/setup/CSetupWizard.php:410
 msgid "Zabbix server"
 msgstr "Máy chủ Zabbix"
 
@@ -19245,7 +19245,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Máy chủ zabbix (proxy)"
 
 #: include/classes/setup/CSetupWizard.php:54
-#: include/classes/setup/CSetupWizard.php:357
+#: include/classes/setup/CSetupWizard.php:359
 msgid "Zabbix server details"
 msgstr "Chi tiết máy chủ zabbix"
 
@@ -19262,11 +19262,11 @@ msgstr "Máy chủ Zabbix đang hoạt động"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Máy chủ Zabbix đang hoạt động khoảng thời gian kiểm tra \"%1$s\"."
 
-#: include/classes/setup/CSetupWizard.php:412
+#: include/classes/setup/CSetupWizard.php:414
 msgid "Zabbix server name"
 msgstr "Tên máy chủ Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Zabbix server port"
 msgstr "Cổng máy chủ Zabbix"
 
@@ -19736,7 +19736,7 @@ msgid "days"
 msgstr "ngày"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:372
+#: include/classes/setup/CSetupWizard.php:374
 #: include/classes/widgets/CWidgetHelper.php:70
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
@@ -20225,8 +20225,8 @@ msgstr "tên"
 msgid "new"
 msgstr "mới"
 
-#: disc_prototypes.php:1297 disc_prototypes.php:1321 hosts.php:1389
-#: include/views/configuration.item.massupdate.php:417 templates.php:954
+#: disc_prototypes.php:1297 disc_prototypes.php:1321 hosts.php:1383
+#: include/views/configuration.item.massupdate.php:417 templates.php:948
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "mới"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-06 19:52+0300\n"
+"POT-Creation-Date: 2021-08-13 19:52+0300\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -239,7 +239,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s건 선택"
 
-#: include/func.inc.php:1853
+#: include/func.inc.php:1898
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -929,7 +929,7 @@ msgstr "수동으로 클로즈 허가"
 msgid "Allowed hosts"
 msgstr "허가된 호스트"
 
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:473
 msgid "Alternatively, you can install it manually:"
 msgstr "혹은, 수동으로 인스톨 하실 수 있습니다:"
 
@@ -1378,7 +1378,7 @@ msgid "Axes"
 msgstr "축"
 
 #: include/classes/setup/CSetupWizard.php:132
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Back"
 msgstr "돌아가기"
 
@@ -1670,11 +1670,11 @@ msgstr "그래프 프로토타입을 추가할 수 없습니다"
 msgid "Cannot add group"
 msgstr "그룹을 추가할 수 없습니다"
 
-#: hosts.php:737
+#: hosts.php:731
 msgid "Cannot add host"
 msgstr "호스트를 추가할 수 없습니다"
 
-#: host_prototypes.php:251
+#: host_prototypes.php:245
 msgid "Cannot add host prototype"
 msgstr "호스트 프로토타입을 추가할 수 없습니다"
 
@@ -1771,7 +1771,7 @@ msgstr "슬라이드 쇼를 추가할 수 없습니다"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "서브맵을 추가할 수 없습니다. 최대 계층에 도달하였습니다."
 
-#: templates.php:518
+#: templates.php:512
 msgid "Cannot add template"
 msgstr "템플릿을 추가할 수 없습니다"
 
@@ -1915,7 +1915,7 @@ msgstr "아이콘 맵을 작성할 수 없습니다"
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "신규 어플리케이션을 작성할 수 없습니다. Web시나리오가 어플리케이션에 할당되어 있습니다."
 
-#: include/classes/setup/CSetupWizard.php:467
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Cannot create the configuration file."
 msgstr "설정 파일을 작성할 수 없습니다."
 
@@ -1986,7 +1986,7 @@ msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "그룹을 삭제할 수 없습니다"
 
-#: hosts.php:974 hosts.php:995
+#: hosts.php:968 hosts.php:989
 msgid "Cannot delete host"
 msgstr "호스트를 삭제할 수 없습니다"
 
@@ -2002,7 +2002,7 @@ msgid "Cannot delete host group because maintenance \"%1$s\" must contain at lea
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
 msgstr[0] ""
 
-#: host_prototypes.php:132 host_prototypes.php:303
+#: host_prototypes.php:132 host_prototypes.php:297
 msgid "Cannot delete host prototypes"
 msgstr "호스트 프로토타입을 삭제할 수 없습니다"
 
@@ -2098,7 +2098,7 @@ msgstr "서비스를 삭제할 수 없습니다"
 msgid "Cannot delete slide show"
 msgstr "슬라이드쇼를 삭제할 수 없습니다"
 
-#: templates.php:706 templates.php:720 templates.php:753
+#: templates.php:700 templates.php:714 templates.php:747
 msgid "Cannot delete template"
 msgstr "템플릿을 삭제할 수 없습니다"
 
@@ -2196,7 +2196,7 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "디스커버리 규칙을 비활성화 할 수 없습니다."
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
-#: hosts.php:1027
+#: hosts.php:1021
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "호스트를 비활성화 할 수 없습니다."
@@ -2251,7 +2251,7 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "디스커버리 규칙을 활성화 할 수 없습니다."
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
-#: hosts.php:1026
+#: hosts.php:1020
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "호스트를 활성화 할 수 없습니다."
@@ -2789,7 +2789,7 @@ msgstr "그룹을 갱신할 수 없습니다"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "발견된 호스트 \"%1$s\"의 그룹을 갱신할 수 없습니다"
 
-#: hosts.php:721
+#: hosts.php:715
 msgid "Cannot update host"
 msgstr "호스트를 갱신할 수 없습니다"
 
@@ -2797,12 +2797,12 @@ msgstr "호스트를 갱신할 수 없습니다"
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "호스트의 암호화 설정을 갱신할 수 없습니다. 양 측의 접속설정을 확인할 필요가 있습니다."
 
-#: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:288
+#: host_prototypes.php:220 host_prototypes.php:261 host_prototypes.php:282
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "호스트 프로토타입을 갱신할 수 없습니다"
 
-#: hosts.php:708
+#: hosts.php:702
 msgid "Cannot update hosts"
 msgstr "호스트를 갱신할 수 없습니다"
 
@@ -2899,7 +2899,7 @@ msgstr "슬라이드쇼를 갱신할 수 없습니다"
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "템플릿으로 된 Web 시나리오 \"%1$s\"의 스탭을 갱신할 수 없습니다. : %2$s."
 
-#: templates.php:522
+#: templates.php:516
 msgid "Cannot update template"
 msgstr "템플릿을 갱신할 수 없습니다"
 
@@ -2907,7 +2907,7 @@ msgstr "템플릿을 갱신할 수 없습니다"
 msgid "Cannot update templated applications."
 msgstr "템플릿의 어플리케이션을 갱신할 수 없습니다"
 
-#: templates.php:501
+#: templates.php:495
 msgid "Cannot update templates"
 msgstr ""
 
@@ -3244,7 +3244,7 @@ msgstr "시각"
 msgid "Clone"
 msgstr "복제"
 
-#: include/func.inc.php:1651 include/views/js/monitoring.sysmaps.js.php:318
+#: include/func.inc.php:1669 include/views/js/monitoring.sysmaps.js.php:318
 #: include/views/js/monitoring.sysmaps.js.php:471
 #: include/views/js/monitoring.sysmaps.js.php:595
 #: include/views/js/monitoring.sysmaps.js.php:700
@@ -3442,7 +3442,7 @@ msgstr "설정"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "설정한 캐쉬의 통계. cache - buffer (mode: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:484
+#: include/classes/setup/CSetupWizard.php:488
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "설정 파일 \"%1$s\"를 작성하였습니다."
@@ -3615,7 +3615,7 @@ msgid "Configuration updated"
 msgstr "설정을 갱신하였습니다"
 
 #: include/classes/setup/CSetupWizard.php:50
-#: include/classes/setup/CSetupWizard.php:328
+#: include/classes/setup/CSetupWizard.php:330
 msgid "Configure DB connection"
 msgstr "DB접속 설정"
 
@@ -3623,7 +3623,7 @@ msgstr "DB접속 설정"
 msgid "Confirmation text"
 msgstr "확인 텍스트"
 
-#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:486
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "축하합니다! Zabbix frontend 설치가 종료되었습니다."
 
@@ -4302,15 +4302,15 @@ msgid "Data storage period"
 msgstr "데이터 보존기간"
 
 #: include/classes/setup/CSetupWizard.php:288
-#: include/classes/setup/CSetupWizard.php:387
-#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:389
+#: include/classes/setup/CSetupWizard.php:528
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:686
 #: include/classes/setup/CSetupWizard.php:300
-#: include/classes/setup/CSetupWizard.php:393
-#: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:395
+#: include/classes/setup/CSetupWizard.php:536
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4319,18 +4319,18 @@ msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:312
-#: include/classes/setup/CSetupWizard.php:400
+#: include/classes/setup/CSetupWizard.php:402
 msgid "Database TLS cipher list"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:270
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Database TLS encryption"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:390
-#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:392
+#: include/classes/setup/CSetupWizard.php:532
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4343,7 +4343,7 @@ msgid "Database host"
 msgstr "데이터베이스 호스트"
 
 #: include/classes/setup/CSetupWizard.php:306
-#: include/classes/setup/CSetupWizard.php:396
+#: include/classes/setup/CSetupWizard.php:398
 msgid "Database host verification"
 msgstr ""
 
@@ -4352,34 +4352,34 @@ msgid "Database monitor"
 msgstr "데이터베이스 모니터"
 
 #: include/classes/setup/CSetupWizard.php:251
-#: include/classes/setup/CSetupWizard.php:377 setup.php:44
+#: include/classes/setup/CSetupWizard.php:379 setup.php:44
 msgid "Database name"
 msgstr "데이터베이스 이름"
 
-#: include/classes/setup/CSetupWizard.php:379
+#: include/classes/setup/CSetupWizard.php:381
 msgid "Database password"
 msgstr "데이터베이스 패스워드"
 
 #: include/classes/setup/CSetupWizard.php:243
-#: include/classes/setup/CSetupWizard.php:376 setup.php:43
+#: include/classes/setup/CSetupWizard.php:378 setup.php:43
 msgid "Database port"
 msgstr "데이터베이스 포트"
 
 #: include/classes/setup/CSetupWizard.php:256
-#: include/classes/setup/CSetupWizard.php:381
+#: include/classes/setup/CSetupWizard.php:383
 msgid "Database schema"
 msgstr "데이터베이스 스키마"
 
-#: include/classes/setup/CSetupWizard.php:375
+#: include/classes/setup/CSetupWizard.php:377
 msgid "Database server"
 msgstr "데이터베이스 서버"
 
 #: include/classes/setup/CSetupWizard.php:230
-#: include/classes/setup/CSetupWizard.php:370
+#: include/classes/setup/CSetupWizard.php:372
 msgid "Database type"
 msgstr "데이터베이스 타입"
 
-#: include/classes/setup/CSetupWizard.php:378
+#: include/classes/setup/CSetupWizard.php:380
 msgid "Database user"
 msgstr "데이터베이스 유저"
 
@@ -4408,7 +4408,7 @@ msgstr "하드웨어 구입일"
 msgid "Day"
 msgstr "일"
 
-#: include/func.inc.php:2521
+#: include/func.inc.php:2585
 msgid "Day before yesterday"
 msgstr "그저께"
 
@@ -4911,7 +4911,7 @@ msgstr "이름"
 
 #: app/views/administration.mediatype.list.php:77
 #: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:617
-#: include/func.inc.php:1606 include/views/configuration.action.edit.php:169
+#: include/func.inc.php:1618 include/views/configuration.action.edit.php:169
 #: include/views/configuration.action.edit.php:173
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:419
@@ -5363,7 +5363,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:471
+#: include/classes/setup/CSetupWizard.php:475
 msgid "Download the configuration file"
 msgstr "설정 파일 다운로드"
 
@@ -5928,7 +5928,7 @@ msgstr "에러"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "테이블 \"%1$s\"의 검색 리퀘스트를 실패하였습니다."
 
-#: include/func.inc.php:1645 jsLoader.php:168
+#: include/func.inc.php:1655 jsLoader.php:168
 msgid "Error message"
 msgstr "에러 메세지"
 
@@ -6599,7 +6599,7 @@ msgid "Get value"
 msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:485
-#: app/views/popup.itemtestedit.view.php:314
+#: app/views/popup.itemtestedit.view.php:311
 msgid "Get value and test"
 msgstr ""
 
@@ -7215,7 +7215,7 @@ msgstr "가로 위치"
 #: include/classes/screens/CScreenProblem.php:901
 #: include/classes/screens/CScreenProblem.php:1152
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:340
+#: include/classes/setup/CSetupWizard.php:342
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -7274,7 +7274,7 @@ msgstr "호스트 IP 주소"
 msgid "Host access"
 msgstr "호스트 접속"
 
-#: hosts.php:736
+#: hosts.php:730
 msgid "Host added"
 msgstr "호스트를 추가하였습니다"
 
@@ -7296,18 +7296,18 @@ msgstr "호스트에 같은 타입의 기본 인터페이스는 2개 이상 설�
 msgid "Host count"
 msgstr "호스트 수"
 
-#: hosts.php:974 hosts.php:995
+#: hosts.php:968 hosts.php:989
 msgid "Host deleted"
 msgstr "호스트를 삭제하였습니다"
 
 #: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:194
-#: hosts.php:1024
+#: hosts.php:1018
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "호스트를 비활성화 하였습니다"
 
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
-#: hosts.php:1023
+#: hosts.php:1017
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "호스트를 활성화 하였습니다"
@@ -7481,7 +7481,7 @@ msgstr "호스트 프로토타입 \"%1$s\"는 \"%2$s\"에 이미 존재하고 �
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "호스트 프로토타입 \"%1$s\"는 \"%2$s\"에 이미 존재하고 있습니다."
 
-#: host_prototypes.php:251
+#: host_prototypes.php:245
 msgid "Host prototype added"
 msgstr "호스트 프로토타입을 추가하였습니다."
 
@@ -7493,7 +7493,7 @@ msgstr "호스트 프로토타입을 삭제하였습니다."
 msgid "Host prototype macros"
 msgstr ""
 
-#: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:287
+#: host_prototypes.php:220 host_prototypes.php:261 host_prototypes.php:281
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] " 호스트 프로토타입을 갱신하였습니다"
@@ -7515,7 +7515,7 @@ msgstr "호스트의 표시명 \"%1$s\"를 가진 호스트 프로토타입은 �
 msgid "Host prototypes"
 msgstr "호스트 프로토타입"
 
-#: host_prototypes.php:303
+#: host_prototypes.php:297
 msgid "Host prototypes deleted"
 msgstr "호스트 프로토타입을 삭제하였습니다"
 
@@ -7540,7 +7540,7 @@ msgstr "호스트 시간"
 msgid "Host update failed."
 msgstr "호스트의 갱신에 실패하였습니다."
 
-#: hosts.php:720
+#: hosts.php:714
 msgid "Host updated"
 msgstr "호스트를 갱신하였습니다"
 
@@ -7620,7 +7620,7 @@ msgstr "호스트와 그룹"
 msgid "Hosts location"
 msgstr "호스트의 위치"
 
-#: hosts.php:702
+#: hosts.php:696
 msgid "Hosts updated"
 msgstr "호스트를 갱신하였습니다"
 
@@ -7931,7 +7931,7 @@ msgid "Inaccessible graph prototype"
 msgstr ""
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:290
-#: host_prototypes.php:415
+#: host_prototypes.php:409
 msgid "Inaccessible group"
 msgstr "접근할 수 없는 그룹"
 
@@ -8380,9 +8380,9 @@ msgstr "테이블 \"%2$s\"에 where 스테이트먼트의 필드 \"%1$s\"의 이
 msgid "Incorrect fields for sysmap."
 msgstr "맵의 설정이 올바르지 않습니다."
 
-#: include/classes/setup/CSetupWizard.php:524
 #: include/classes/setup/CSetupWizard.php:528
 #: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:536
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9219,7 +9219,7 @@ msgid "Insert expression"
 msgstr "조건식의 삽입"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:489
+#: include/classes/setup/CSetupWizard.php:493
 msgid "Install"
 msgstr "설치"
 
@@ -9800,7 +9800,7 @@ msgstr "\"%2$s\" 상의 아이템 \"%1$s\": 어플리케이션 \"%3$s\"는 존�
 msgid "Item added"
 msgstr "아이템을 추가하였습니다"
 
-#: app/views/popup.itemtestedit.view.php:299
+#: app/views/popup.itemtestedit.view.php:300
 msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
 msgstr ""
 
@@ -10204,37 +10204,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "최근"
 
-#: include/func.inc.php:2574
+#: include/func.inc.php:2638
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "최신 %1$d 일간"
 
-#: include/func.inc.php:2568
+#: include/func.inc.php:2632
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "최신 %1$d 시간"
 
-#: include/func.inc.php:2561
+#: include/func.inc.php:2625
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "최신 %1$d 분간"
 
-#: include/func.inc.php:2577
+#: include/func.inc.php:2641
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "최신 %1$d 개월간"
 
-#: include/func.inc.php:2554
+#: include/func.inc.php:2618
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "최신 %1$d 초간"
 
-#: include/func.inc.php:2580
+#: include/func.inc.php:2644
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -11688,8 +11688,8 @@ msgid "Next page"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:126
-#: include/classes/setup/CSetupWizard.php:330
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Next step"
 msgstr "다음 스텝"
 
@@ -13515,7 +13515,7 @@ msgstr "재생"
 msgid "Play sound"
 msgstr "사운드 재생"
 
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:421
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "설정 값을 확인해주세요. 올바른 값이면 \"%1$s\"버튼을 눌러 주세요. 아니면 \"%2$s\" 버튼을 눌러 설정값을 수정해 주세요."
@@ -13524,12 +13524,12 @@ msgstr "설정 값을 확인해주세요. 올바른 값이면 \"%1$s\"버튼을 
 msgid "Please confirm that you want to remove all macros."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:332
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "데이터베이스를 수동으로 작성해주세요. 그리고 데이터베이스에 접속하기 위한 설정치를 설정해 주세요. 종료하였다면 \"%1$s\"버튼을 눌러주세요."
 
-#: include/classes/setup/CSetupWizard.php:359
+#: include/classes/setup/CSetupWizard.php:361
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Zabbix 서버의 호스트명이나 호스트 IP주소와 포트 번호를 입력해주세요. 필요하다면 이름도 입력해주세요 (옵션)."
 
@@ -13574,7 +13574,7 @@ msgstr "호스트 인벤토리 필드의 자동설정"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:123
-#: include/classes/setup/CSetupWizard.php:345 include/hosts.inc.php:1444
+#: include/classes/setup/CSetupWizard.php:347 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13605,7 +13605,7 @@ msgid "Post type"
 msgstr "포스트 형식"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:417
+#: include/classes/setup/CSetupWizard.php:419
 msgid "Pre-installation summary"
 msgstr "설치 사전 준비 요약"
 
@@ -13642,7 +13642,7 @@ msgstr ""
 msgid "Preview"
 msgstr "미리보기"
 
-#: include/func.inc.php:2524
+#: include/func.inc.php:2588
 msgid "Previous month"
 msgstr "저번 달"
 
@@ -13654,11 +13654,11 @@ msgstr ""
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2523
+#: include/func.inc.php:2587
 msgid "Previous week"
 msgstr "저번 주"
 
-#: include/func.inc.php:2525
+#: include/func.inc.php:2589
 msgid "Previous year"
 msgstr "작년"
 
@@ -14979,7 +14979,7 @@ msgstr "토"
 msgid "Save changes"
 msgstr "변경을 저장"
 
-#: include/classes/setup/CSetupWizard.php:472
+#: include/classes/setup/CSetupWizard.php:476
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "\"%1$s\"로 저장하였습니다"
@@ -16241,7 +16241,7 @@ msgstr "서브맵"
 msgid "Success Audit"
 msgstr "성공 감사"
 
-#: include/func.inc.php:1645 jsLoader.php:167
+#: include/func.inc.php:1654 jsLoader.php:167
 msgid "Success message"
 msgstr "성공 메세지"
 
@@ -16306,7 +16306,7 @@ msgstr "시스템 부팅 시간. UNIX의 타임스탬프로 integer를 리턴."
 msgid "System default"
 msgstr "시스템 기본"
 
-#: include/func.inc.php:1672
+#: include/func.inc.php:1690
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "시스템 에러가 발생했습니다. Zabbix관리자에게 연락해주세요."
 
@@ -16498,7 +16498,7 @@ msgstr "템플릿 \"%1$s\"에 호스트그룹을 설정해주세요."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "호스트\"%2$s\"의 템플릿\"%1$s\"는 존재하지 않습니다."
 
-#: templates.php:517
+#: templates.php:511
 msgid "Template added"
 msgstr "템플릿을 추가하였습니다"
 
@@ -16510,7 +16510,7 @@ msgstr ""
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "템플릿은 복수 템플릿과 링크될 수 없습니다 (다른 템플릿을 경유해도 불가)."
 
-#: templates.php:706 templates.php:720 templates.php:753
+#: templates.php:700 templates.php:714 templates.php:747
 msgid "Template deleted"
 msgstr "템플릿을 삭제하였습니다"
 
@@ -16544,7 +16544,7 @@ msgstr "템플릿스크린"
 msgid "Template trigger"
 msgstr "템플릿트리거"
 
-#: templates.php:521
+#: templates.php:515
 msgid "Template updated"
 msgstr "템플릿을 갱신하였습니다"
 
@@ -16593,7 +16593,7 @@ msgstr "템플릿"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "템플릿 \"%1$s\"와 호스트\"%2$s\"의 링크를 삭제하였습니다."
 
-#: templates.php:495
+#: templates.php:489
 msgid "Templates updated"
 msgstr ""
 
@@ -16602,7 +16602,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:508
-#: app/views/popup.itemtestedit.view.php:314
+#: app/views/popup.itemtestedit.view.php:311
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1455
 #: include/views/configuration.host.discovery.edit.php:790
@@ -16705,15 +16705,15 @@ msgstr "어플리케이션이 디스커버리할 수 없게 되었기 때문에 
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 어플리케이션을 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
 
-#: hosts.php:351
+#: hosts.php:349
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
-#: host_prototypes.php:155
+#: host_prototypes.php:153
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
-#: templates.php:203
+#: templates.php:201
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
@@ -16800,7 +16800,7 @@ msgstr "Web시나리오가 설정되어있는 호스트와 다른 호스트에 �
 msgid "Theme"
 msgstr "테마"
 
-#: include/func.inc.php:2522
+#: include/func.inc.php:2586
 msgid "This day last week"
 msgstr "저번주의 오늘"
 
@@ -16813,11 +16813,11 @@ msgstr ""
 msgid "This is the test message from Zabbix"
 msgstr ""
 
-#: include/func.inc.php:2530 srv_status.php:40
+#: include/func.inc.php:2594 srv_status.php:40
 msgid "This month"
 msgstr "이번 달"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2595
 msgid "This month so far"
 msgstr "이번 달의 지금까지"
 
@@ -16829,19 +16829,19 @@ msgstr "스크린의 열은 공백이 아닙니다. 삭제합니까?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "스크린의 행은 공백이 아닙니다. 삭제합니까?"
 
-#: include/func.inc.php:2528 srv_status.php:39
+#: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
 msgstr "이번주"
 
-#: include/func.inc.php:2529
+#: include/func.inc.php:2593
 msgid "This week so far"
 msgstr "저번주의 지금까지"
 
-#: include/func.inc.php:2532 srv_status.php:41
+#: include/func.inc.php:2596 srv_status.php:41
 msgid "This year"
 msgstr "올해"
 
-#: include/func.inc.php:2533
+#: include/func.inc.php:2597
 msgid "This year so far"
 msgstr "올해의 지금까지"
 
@@ -16970,12 +16970,12 @@ msgstr "종료"
 msgid "To set a host interface select a single item type for all items"
 msgstr "모든 아이템은 하나의 호스트 인터페이스를 선택할 필요가 있습니다"
 
-#: include/classes/screens/CScreenProblem.php:730 include/func.inc.php:2526
+#: include/classes/screens/CScreenProblem.php:730 include/func.inc.php:2590
 #: srv_status.php:38
 msgid "Today"
 msgstr "오늘"
 
-#: include/func.inc.php:2527
+#: include/func.inc.php:2591
 msgid "Today so far"
 msgstr "오늘의 지금까지"
 
@@ -18671,7 +18671,7 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "경고"
 
-#: jsLoader.php:169
+#: include/func.inc.php:1656 jsLoader.php:169
 msgid "Warning message"
 msgstr ""
 
@@ -19067,7 +19067,7 @@ msgstr "연간"
 msgid "Yes"
 msgstr "예"
 
-#: include/classes/screens/CScreenProblem.php:738 include/func.inc.php:2520
+#: include/classes/screens/CScreenProblem.php:738 include/func.inc.php:2584
 msgid "Yesterday"
 msgstr "어제"
 
@@ -19214,7 +19214,7 @@ msgstr "Zabbix의 로그인 화면"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:408
+#: include/classes/setup/CSetupWizard.php:410
 msgid "Zabbix server"
 msgstr "Zabbix 서버"
 
@@ -19232,7 +19232,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Zabbix 서버 (프록시)"
 
 #: include/classes/setup/CSetupWizard.php:54
-#: include/classes/setup/CSetupWizard.php:357
+#: include/classes/setup/CSetupWizard.php:359
 msgid "Zabbix server details"
 msgstr "Zabbix서버 상세정보"
 
@@ -19249,11 +19249,11 @@ msgstr "Zabbix 서버 가동 중"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Zabbix 서버의 동작체크간격 \"%1$s\"."
 
-#: include/classes/setup/CSetupWizard.php:412
+#: include/classes/setup/CSetupWizard.php:414
 msgid "Zabbix server name"
 msgstr "Zabbix 서버 이름"
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Zabbix server port"
 msgstr "Zabbix 서버 포트"
 
@@ -19724,7 +19724,7 @@ msgid "days"
 msgstr "일"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:372
+#: include/classes/setup/CSetupWizard.php:374
 #: include/classes/widgets/CWidgetHelper.php:70
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
@@ -20213,8 +20213,8 @@ msgstr "이름"
 msgid "new"
 msgstr "신규"
 
-#: disc_prototypes.php:1297 disc_prototypes.php:1321 hosts.php:1389
-#: include/views/configuration.item.massupdate.php:417 templates.php:954
+#: disc_prototypes.php:1297 disc_prototypes.php:1321 hosts.php:1383
+#: include/views/configuration.item.massupdate.php:417 templates.php:948
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "신규"
