@@ -44,19 +44,51 @@ class CControllerServiceUpdate extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
+		if ($ret && $this->hasInput('advanced_configuration')) {
+			$fields = [
+				'propagation_rule' => 'required'
+			];
+
 			if ($this->getInput('weight', '') !== '') {
-				$validator = new CNewValidator([
-					'weight' => $this->getInput('weight')
-				], [
-					'weight' => 'int32|ge 0|le 1000000'
-				]);
+				$fields['weight'] = 'int32|ge 0|le 1000000';
+			}
 
-				foreach ($validator->getAllErrors() as $error) {
-					info($error);
-				}
+			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
-				$ret = !$validator->isErrorFatal() && !$validator->isError();
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			$ret = !$validator->isErrorFatal() && !$validator->isError();
+		}
+
+		if ($ret && $this->hasInput('advanced_configuration')) {
+			switch ($this->getInput('propagation_rule')) {
+				case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+				case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+					$propagation_value_ok = $this->hasInput('propagation_value_number')
+						&& $this->getInput('propagation_value_number') >= 1
+						&& $this->getInput('propagation_value_number') < TRIGGER_SEVERITY_COUNT;
+					break;
+
+				case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+					$propagation_value_ok = $this->hasInput('propagation_value_status')
+						&& in_array($this->getInput('propagation_value_status'),
+							array_keys(CServiceHelper::getStatusNames())
+						);
+					break;
+
+				default:
+					$propagation_value_ok = true;
+					break;
+			}
+
+			if (!$propagation_value_ok) {
+				info(_s('Field "%1$s" is mandatory.',
+					CServiceHelper::getStatusPropagationNames()[$this->getInput('propagation_rule')]
+				));
+
+				$ret = false;
 			}
 		}
 
