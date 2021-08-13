@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-08-11T06:14:15Z</date>
+    <date>2021-08-13T03:15:08Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -706,7 +706,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Availability statistics of Zabbix value cache.Percentage of used buffer</description>
+                    <description>Availability statistics of Zabbix value cache. Percentage of used buffer</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
