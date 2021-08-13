@@ -183,14 +183,12 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	->show();
 
 (new CScriptTag('
-	view.init('.
-		json_encode([
-			'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
-			'mode_switch_url' => $data['edit_mode_url'],
-			'refresh_url' => $data['refresh_url'],
-			'refresh_interval' => $data['refresh_interval']
-		]).
-	');'
-))
+	view.init('.json_encode([
+		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
+		'mode_switch_url' => $data['edit_mode_url'],
+		'refresh_url' => $data['refresh_url'],
+		'refresh_interval' => $data['refresh_interval']
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

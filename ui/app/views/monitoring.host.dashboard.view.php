@@ -184,13 +184,13 @@ if (count($data['dashboard']['pages']) > 1
 		->show();
 
 	(new CScriptTag('
-		initializeView(
-			'.json_encode($data['host']).',
-			'.json_encode($data['dashboard']).',
-			'.json_encode($data['widget_defaults']).',
-			'.json_encode($data['time_period']).',
-			'.json_encode($web_layout_mode).'
-		);
+		view.init('.json_encode([
+			'host' => $data['host'],
+			'dashboard' => $data['dashboard'],
+			'widget_defaults' => $data['widget_defaults'],
+			'time_period' => $data['time_period'],
+			'web_layout_mode' => $web_layout_mode
+		]).');
 	'))
 		->setOnDocumentReady()
 		->show();

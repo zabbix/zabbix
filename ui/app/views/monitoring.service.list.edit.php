@@ -218,15 +218,13 @@ $filter->addFilterTab(_('Filter'), [
 	->show();
 
 (new CScriptTag('
-	view.init('.
-		json_encode([
-			'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
-			'mode_switch_url' => $data['view_mode_url'],
-			'refresh_url' => $data['refresh_url'],
-			'refresh_interval' => $data['refresh_interval'],
-			'back_url' => $data['back_url']
-		]).
-	');'
-))
+	view.init('.json_encode([
+		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
+		'mode_switch_url' => $data['view_mode_url'],
+		'refresh_url' => $data['refresh_url'],
+		'refresh_interval' => $data['refresh_interval'],
+		'back_url' => $data['back_url']
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

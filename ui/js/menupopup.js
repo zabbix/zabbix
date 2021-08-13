@@ -495,7 +495,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 					clickCallback: function () {
 						jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-						PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+						PopUp('popup.dashboard.share.edit', popup_options, 'dashboard_share_edit', trigger_elmnt);
 					},
 					disabled: !options.editable
 				},
