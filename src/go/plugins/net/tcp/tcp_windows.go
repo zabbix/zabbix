@@ -61,5 +61,6 @@ func init() {
 		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
 		"net.tcp.port", "Checks if it is possible to make TCP connection to specified port.",
 		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
-		"net.tcp.service.perf", "Checks performance of TCP service.")
+		"net.tcp.service.perf", "Checks performance of TCP service.",
+		"net.tcp.socket.count", "Returns number of TCP sockets that match parameters.")
 }
