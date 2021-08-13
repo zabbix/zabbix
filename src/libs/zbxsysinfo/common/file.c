@@ -1483,6 +1483,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	/* permissions */
 	tmp = get_file_permissions(&buf);
 	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_PERMISSIONS, tmp, ZBX_JSON_TYPE_STRING);
+	zbx_free(tmp);
 
 	/* uid */
 	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_UID, (zbx_uint64_t)buf.st_uid);
@@ -1521,7 +1522,6 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	ret =  SYSINFO_RET_OK;
 err:
 	zbx_json_free(&j);
-	zbx_free(tmp);
 
 	return ret;
 }
