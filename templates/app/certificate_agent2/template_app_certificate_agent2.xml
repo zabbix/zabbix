@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-08-05T09:20:49Z</date>
+   <date>2021-08-09T16:55:38Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -32,7 +32,7 @@ Template tooling version used: 0.39</description>
          </applications>
          <items>
             <item>
-               <name>Cert: Alternative names</name>
+               <name>Cert: Subject alternative name</name>
                <type>DEPENDENT</type>
                <key>cert.alternative_names</key>
                <delay>0</delay>
@@ -82,7 +82,7 @@ Template tooling version used: 0.39</description>
                </master_item>
             </item>
             <item>
-               <name>Cert: Last check message</name>
+               <name>Cert: Last validation status</name>
                <type>DEPENDENT</type>
                <key>cert.message</key>
                <delay>0</delay>
@@ -107,7 +107,7 @@ Template tooling version used: 0.39</description>
                </master_item>
             </item>
             <item>
-               <name>Cert: Not after</name>
+               <name>Cert: Expires on</name>
                <type>DEPENDENT</type>
                <key>cert.not_after</key>
                <delay>0</delay>
@@ -131,8 +131,8 @@ Template tooling version used: 0.39</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>({last()} - {now()}) / 86400 &lt; {$CERT.NOTAFTER.MIN.WARN}</expression>
-                     <name>Cert: SSL certificate expires soon (less than {$CERT.NOTAFTER.MIN.WARN} days)</name>
+                     <expression>({last()} - {now()}) / 86400 &lt; {$CERT.EXPIRY.WARN}</expression>
+                     <name>Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days)</name>
                      <priority>WARNING</priority>
                      <description>The SSL certificate should be updated or it will become untrusted.</description>
                      <dependencies>
@@ -145,7 +145,7 @@ Template tooling version used: 0.39</description>
                </triggers>
             </item>
             <item>
-               <name>Cert: Not before</name>
+               <name>Cert: Valid from</name>
                <type>DEPENDENT</type>
                <key>cert.not_before</key>
                <delay>0</delay>
@@ -194,7 +194,7 @@ Template tooling version used: 0.39</description>
                </master_item>
             </item>
             <item>
-               <name>Cert: Serial</name>
+               <name>Cert: Serial number</name>
                <type>DEPENDENT</type>
                <key>cert.serial_number</key>
                <delay>0</delay>
@@ -385,7 +385,7 @@ There could be multiple valid certificates on some installations. In this case, 
          </items>
          <macros>
             <macro>
-               <macro>{$CERT.NOTAFTER.MIN.WARN}</macro>
+               <macro>{$CERT.EXPIRY.WARN}</macro>
                <value>7</value>
                <description>Number of days until the certificate expires.</description>
             </macro>
