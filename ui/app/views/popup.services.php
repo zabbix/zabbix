@@ -25,7 +25,7 @@
 
 $form = (new CForm())
 	->cleanItems()
-	->setName('services-form');
+	->setName('services_form');
 
 $controls = (new CForm())
 	->cleanItems()
@@ -34,13 +34,12 @@ $controls = (new CForm())
 	->addVar('exclude_serviceids', $data['exclude_serviceids'])
 	->addItem(
 		(new CList())
-			->addItem(new CLabel(_('Name'), 'services_filter_name'))
+			->addItem(new CLabel(_('Name'), 'services-filter-name'))
 			->addItem(
 				(new CTextBox('filter_name', $data['filter']['name']))
-					->setId('services_filter_name')
+					->setId('services-filter-name')
 					->setAttribute('autofocus', 'autofocus')
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-
 			)
 			->addItem(new CSubmitButton(_('Apply')))
 			->addItem(

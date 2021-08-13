@@ -25,7 +25,7 @@
 
 $form = (new CForm())
 	->setId('service-list')
-	->setName('service-list')
+	->setName('service_list')
 	->addVar('back_url', $data['back_url']);
 
 $header = [

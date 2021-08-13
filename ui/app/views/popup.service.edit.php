@@ -25,7 +25,7 @@
 
 $form = (new CForm())
 	->setId('service-form')
-	->setName('service-form')
+	->setName('service_form')
 	->addVar('action', $data['form_action'])
 	->addVar('serviceid', $data['serviceid'])
 	->addItem(getMessages());
