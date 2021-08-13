@@ -281,14 +281,29 @@ class CMacrosResolverGeneral {
 	 *
 	 * @param array  $texts
 	 * @param array  $types
-	 * @param bool   $types['usermacros']
-	 * @param array  $types['macros'][][<macro_patterns>]
-	 * @param array  $types['macros_n'][][<macro_patterns>]
-	 * @param array  $types['macros_an'][][<macro_patterns>]
-	 * @param array  $types['macro_funcs_n'][][<macro_patterns>]
-	 * @param bool   $types['references']
-	 * @param bool   $types['lldmacros']
-	 * @param bool   $types['functionids']
+	 * @param bool   $types['usermacros']                         Extract user macros. For example, "{$MACRO}".
+	 * @param array  $types['macros'][][<macro_patterns>]         Extract macros. For example, "{HOST.HOST}".
+	 * @param array  $types['macros_n'][][<macro_patterns>]       Extract macros with optional numeric index.
+	 *                                                              For example, "{HOST.HOST<1-9>}".
+	 * @param array  $types['macros_an'][][<macro_patterns>]      Extract macros with optional numeric or alphabetic
+	 *                                                              index. For example, "{EVENT.TAGS.Service}".
+	 * @param array  $types['macro_funcs_n'][][<macro_patterns>]  Extract macros with optional numeric index and macro
+	 *                                                              function.
+	 *                                                              For example, "{{ITEM.VALUE<1-9>}.func(param)}".
+	 * @param bool   $types['references']                         Extract dollar-sign references. For example, "$5".
+	 * @param bool   $types['lldmacros']                          Extract low-level discovery macros.
+	 *                                                              For example, "{#LLD.MACRO}".
+	 * @param bool   $types['functionids']                        Extract numeric macros. For example, "{12345}".
+	 * @param bool   $types['expr_macros']                        Extract expression macros.
+	 *                                                              For example, "{?func(/host/key, param)}".
+	 * @param bool   $types['expr_macros_n']                      Extract expression macros with with the ability to
+	 *                                                              specify a {HOST.HOST<1-9>} macro or an empty host
+	 *                                                              name instead of a hostname.
+	 *                                                              For example,
+	 *                                                                "{?func(/host/key, param)}",
+	 *                                                                "{?func(/{HOST.HOST}/key, param)}",
+	 *                                                                "{?func(/{HOST.HOST5}/key, param)}",
+	 *                                                                "{?func(//key, param)}".
 	 *
 	 * @return array
 	 */
@@ -303,6 +318,7 @@ class CMacrosResolverGeneral {
 		$extract_lldmacros = array_key_exists('lldmacros', $types);
 		$extract_functionids = array_key_exists('functionids', $types);
 		$extract_expr_macros = array_key_exists('expr_macros', $types);
+		$extract_expr_macros_n = array_key_exists('expr_macros_n', $types);
 
 		if ($extract_usermacros) {
 			$macros['usermacros'] = [];
@@ -378,6 +394,12 @@ class CMacrosResolverGeneral {
 			$macros['expr_macros'] = [];
 
 			$expr_macro_parser = new CExpressionMacroParser();
+		}
+
+		if ($extract_expr_macros_n) {
+			$macros['expr_macros_n'] = [];
+
+			$expr_macro_parser_n = new CExpressionMacroParser(['host_macro_n' => true, 'empty_host' => true]);
 		}
 
 		foreach ($texts as $text) {
@@ -496,6 +518,26 @@ class CMacrosResolverGeneral {
 								: ''
 						];
 						$pos += $expr_macro_parser->getLength() - 1;
+						continue;
+					}
+				}
+
+				if ($extract_expr_macros_n && $expr_macro_parser_n->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$tokens = $expr_macro_parser_n
+						->getExpressionParser()
+						->getResult()
+						->getTokens();
+
+					if (self::isCalculableExpression($tokens)) {
+						$macros['expr_macros_n'][$expr_macro_parser_n->getMatch()] = [
+							'function' => $tokens[0]['data']['function'],
+							'host' => $tokens[0]['data']['parameters'][0]['data']['host'],
+							'key' => $tokens[0]['data']['parameters'][0]['data']['item'],
+							'sec_num' => array_key_exists(1, $tokens[0]['data']['parameters'])
+								? $tokens[0]['data']['parameters'][1]['data']['sec_num']
+								: ''
+						];
+						$pos += $expr_macro_parser_n->getLength() - 1;
 						continue;
 					}
 				}
@@ -1125,7 +1167,7 @@ class CMacrosResolverGeneral {
 
 		$function_data = [];
 
-		foreach ($macros as $macro => &$data) {
+		foreach ($macros as $macro => $data) {
 			if ($data['function'] === 'last') {
 				$function_data['last'][$data['host']][$data['key']][] = $macro;
 			}
@@ -1133,7 +1175,6 @@ class CMacrosResolverGeneral {
 				$function_data['other'][$data['host']][$data['key']][$data['function']][$data['sec_num']][] = $macro;
 			}
 		}
-		unset($data);
 
 		foreach ($function_data as $ftype => $hosts) {
 			foreach ($hosts as $host => $keys) {
@@ -1185,6 +1226,7 @@ class CMacrosResolverGeneral {
 
 		return $macro_values;
 	}
+
 	/**
 	 * Is type available.
 	 *
@@ -1194,15 +1236,6 @@ class CMacrosResolverGeneral {
 	 */
 	protected function isTypeAvailable($type) {
 		return in_array($type, $this->configs[$this->config]['types']);
-	}
-
-	/**
-	 * Get source field.
-	 *
-	 * @return string
-	 */
-	protected function getSource() {
-		return $this->configs[$this->config]['source'];
 	}
 
 	/**

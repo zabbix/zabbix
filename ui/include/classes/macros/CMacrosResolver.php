@@ -67,11 +67,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => ['user'],
 			'method' => 'resolveTexts'
 		],
-		'graphName' => [
-			'types' => ['graphFunctionalItem'],
-			'source' => 'name',
-			'method' => 'resolveGraph'
-		],
 		'widgetURL' => [
 			'types' => ['host', 'hostId', 'interfaceWithoutPort', 'user'],
 			'source' => 'url',
@@ -1243,256 +1238,93 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
+	 * Resolve {HOST.HOST<1-9} and empty plaseholders in the expression macros.
+	 *   For example:
+	 *     {$last(/ /key)} => {$last(/Zabbix server/key)}
+	 *     {$last(/MySQL server/key)} => {$last(/MySQL server/key)}
+	 *     {$last(/{HOST.HOST}/key)} => {$last(/host/key)}
 	 *
-	 * @param array  $graphs							list or hashmap of graphs
-	 * @param string $graphs[]['name']				string in which macros should be resolved
-	 * @param array  $graphs[]['items']				list of graph items
-	 * @param int    $graphs[]['items'][n]['hostid']	graph n-th item corresponding host Id
-	 * @param string $graphs[]['items'][n]['host']	graph n-th item corresponding host name
+	 * @param string	$macro            [IN]     Original macro.
+	 * @param array		$data             [IN/OUT] Data, returned by CHistFunctionParser.
+	 * @param string	$data['host']
+	 * @param array		$items            [IN]    The list of graph items.
+	 * @param string	$items[]['host']
 	 *
-	 * @return string	inputted data with resolved source field
+	 * @return string
 	 */
-	private function resolveGraph($graphs) {
-		if ($this->isTypeAvailable('graphFunctionalItem')) {
-			$sourceKeyName = $this->getSource();
-
-			$sourceStringList = [];
-			$itemsList = [];
-
-			foreach ($graphs as $graph) {
-				$sourceStringList[] = $graph[$sourceKeyName];
-				$itemsList[] = $graph['items'];
+	private static function resolveExpressionMacroHost(string $macro, array &$data, array $items): string {
+		if ($data['host'] === '' || $data['host'][0] == '{') {
+			if ($data['host'] === '') {
+				$reference = 0;
+				$pattern = '#//#';
+			}
+			else {
+				$macro_parser = new CMacroParser([
+					'macros' => ['{HOST.HOST}'],
+					'ref_type' => CMacroParser::REFERENCE_NUMERIC
+				]);
+				$macro_parser->parse($data['host']);
+				$reference = $macro_parser->getReference();
+				$reference = ($reference == 0) ? 0 : $reference - 1;
+				$pattern = '#/\{HOST\.HOST[1-9]?\}/#';
 			}
 
-			$resolvedStringList = $this->resolveGraphsFunctionalItemMacros($sourceStringList, $itemsList);
-			$resolvedString = reset($resolvedStringList);
-
-			foreach ($graphs as &$graph) {
-				$graph[$sourceKeyName] = $resolvedString;
-				$resolvedString = next($resolvedStringList);
+			if (!array_key_exists($reference, $items)) {
+				return $macro;
 			}
-			unset($graph);
+
+			$data['host'] = $items[$reference]['host'];
+
+			// Replace {HOST.HOST<1-9>} macro with real host name.
+			return preg_replace($pattern, '/'.$data['host'].'/', $macro, 1);
 		}
+
+		return $macro;
+	}
+
+	/**
+	 * Resolve expression macros. For example, {?func(/host/key, param)} or {?func(/{HOST.HOST1}/key, param)}.
+	 *
+	 * @param array  $graphs
+	 * @param string $graphs[]['name']
+	 * @param array  $graphs[]['items']
+	 * @param string $graphs[]['items'][]['host']
+	 *
+	 * @return array	Inputted data with resolved graph name.
+	 */
+	public static function resolveGraphNames(array $graphs): array {
+		$types = ['expr_macros_n' => true];
+		$macros = ['expr_macros' => []];
+		$macro_values = [];
+
+		foreach ($graphs as $key => $graph) {
+			$matched_macros = self::extractMacros([$graph['name']], $types);
+
+			foreach ($matched_macros['expr_macros_n'] as $macro => $data) {
+				$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+
+				$_macro = self::resolveExpressionMacroHost($macro, $data, $graph['items']);
+				if (!array_key_exists($_macro, $macros['expr_macros'])) {
+					$macros['expr_macros'][$_macro] = $data;
+				}
+				$macros['expr_macros'][$_macro]['links'][$macro][] = $key;
+			}
+		}
+
+		foreach (self::getExpressionMacros($macros['expr_macros'], []) as $_macro => $value) {
+			foreach ($macros['expr_macros'][$_macro]['links'] as $macro => $keys) {
+				foreach ($keys as $key) {
+					$macro_values[$key][$macro] = $value;
+				}
+			}
+		}
+
+		foreach ($graphs as $key => &$graph) {
+			$graph['name'] = strtr($graph['name'], $macro_values[$key]);
+		}
+		unset($graph);
 
 		return $graphs;
-	}
-
-	/**
-	 * Resolve functional macros, like {hostname:key.function(param)}.
-	 * If macro can not be resolved it is replaced with UNRESOLVED_MACRO_STRING string i.e. "*UNKNOWN*".
-	 *
-	 * Supports function "last", "min", "max" and "avg".
-	 * Supports seconds as parameters, except "last" function.
-	 * Second parameter like {hostname:key.last(0,86400) and offsets like {hostname:key.last(#1)} are not supported.
-	 * Supports postfixes s,m,h,d and w for parameter.
-	 *
-	 * @param array  $sourceStringList			list of strings from graphs in which macros should be resolved
-	 * @param array  $itemsList					list of lists of graph items used in graphs
-	 * @param int    $itemsList[n][m]['hostid']	n-th graph m-th item corresponding host ID
-	 * @param string $itemsList[n][m]['host']	n-th graph m-th item corresponding host name
-	 *
-	 * @return array	list of strings, possibly with macros in them replaced with resolved values
-	 */
-	private function resolveGraphsFunctionalItemMacros(array $sourceStringList, array $itemsList) {
-		$hostKeyPairs = [];
-		$matchesList = [];
-
-		$items = reset($itemsList);
-		foreach ($sourceStringList as $sourceString) {
-
-			/*
-			 * Extract all macros into $matches - keys: macros, hosts, keys, functions and parameters are used
-			 * searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
-			 */
-			preg_match_all('/(?P<macros>{'.
-				'(?P<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
-				'(?P<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
-				'(?P<functions>(last|max|min|avg))\('.
-				'(?P<parameters>([0-9]+['.ZBX_TIME_SUFFIXES.']?)?)'.
-				'\)}{1})/Uux', $sourceString, $matches, PREG_OFFSET_CAPTURE);
-
-			foreach ($matches['hosts'] as $i => &$host) {
-				$host[0] = $this->resolveGraphPositionalMacros($host[0], $items);
-
-				if ($host[0] !== UNRESOLVED_MACRO_STRING) {
-					// Take note that resolved host has a such key (and it is used in a macro).
-					if (!isset($hostKeyPairs[$host[0]])) {
-						$hostKeyPairs[$host[0]] = [];
-					}
-					$hostKeyPairs[$host[0]][$matches['keys'][$i][0]] = true;
-				}
-			}
-			unset($host);
-
-			// Remember match for later use.
-			$matchesList[] = $matches;
-
-			$items = next($itemsList);
-		}
-
-		/*
-		 * If no host/key pairs found in macro-like parts of source string then there is nothing to do but return
-		 * source strings as they are.
-		 */
-		if (!$hostKeyPairs) {
-			return $sourceStringList;
-		}
-
-		// Build item retrieval query from host-key pairs and get all necessary items for all source strings.
-		$queryParts = [];
-		foreach ($hostKeyPairs as $host => $keys) {
-			$queryParts[] = '(h.host='.zbx_dbstr($host).' AND '.dbConditionString('i.key_', array_keys($keys)).')';
-		}
-		$items = DBfetchArrayAssoc(DBselect(
-			'SELECT h.host,i.key_,i.itemid,i.value_type,i.units,i.valuemapid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND ('.join(' OR ', $queryParts).')'
-		), 'itemid');
-
-		foreach ($matches['functions'] as $function) {
-			if ($function[0] === 'last') {
-				$items = self::getItemsValueMaps($items);
-				break;
-			}
-		}
-
-		// Get items for which user has permission.
-		$allowedItems = API::Item()->get([
-			'itemids' => array_keys($items),
-			'webitems' => true,
-			'output' => ['itemid', 'value_type', 'lastvalue', 'lastclock'],
-			'preservekeys' => true
-		]);
-
-		// Get map item data only for those allowed items and set "value_type" for allowed items.
-		foreach ($items as $item) {
-			if (isset($allowedItems[$item['itemid']])) {
-				$item['lastvalue'] = $allowedItems[$item['itemid']]['lastvalue'];
-				$item['lastclock'] = $allowedItems[$item['itemid']]['lastclock'];
-				$hostKeyPairs[$item['host']][$item['key_']] = $item;
-			}
-		}
-
-		/*
-		 * Replace macros with their corresponding values in graph strings and replace macros with their resolved
-		 * values in source strings.
-		 */
-		$matches = reset($matchesList);
-		foreach ($sourceStringList as &$sourceString) {
-
-			/*
-			 * We iterate array backwards so that replacing unresolved macro string (see lower) with actual value
-			 * does not mess up originally captured offsets.
-			 */
-			$i = count($matches['macros']);
-
-			while ($i--) {
-				$host = $matches['hosts'][$i][0];
-				$key = $matches['keys'][$i][0];
-				$function = $matches['functions'][$i][0];
-				$parameter = $matches['parameters'][$i][0];
-
-				// If host is real and item exists and has permissions.
-				if ($host !== UNRESOLVED_MACRO_STRING && is_array($hostKeyPairs[$host][$key])) {
-					$item = $hostKeyPairs[$host][$key];
-
-					// Macro function is "last".
-					if ($function == 'last') {
-						$value = ($item['lastclock'] > 0)
-							? formatHistoryValue($item['lastvalue'], $item)
-							: UNRESOLVED_MACRO_STRING;
-					}
-					// For other macro functions ("max", "min" or "avg") get item value.
-					else {
-						$value = getItemFunctionalValue($item, $function, $parameter);
-					}
-				}
-				// Or if there is no item with given key in given host, or there is no permissions to that item.
-				else {
-					$value = UNRESOLVED_MACRO_STRING;
-				}
-
-				/*
-				 * Replace macro string with actual, resolved string value. This is safe because we start from far
-				 * end of $sourceString.
-				 */
-				$sourceString = substr_replace($sourceString, $value, $matches['macros'][$i][1],
-					strlen($matches['macros'][$i][0])
-				);
-			}
-
-			// Advance to next matches for next $sourceString.
-			$matches = next($matchesList);
-		}
-		unset($sourceString);
-
-		return $sourceStringList;
-	}
-
-	/**
-	 * Resolve positional macros, like {HOST.HOST2}.
-	 * If macro can not be resolved it is replaced with UNRESOLVED_MACRO_STRING string i.e. "*UNKNOWN*"
-	 * Supports HOST.HOST<1..9> macros.
-	 *
-	 * @param string	$str				string in which macros should be resolved
-	 * @param array		$items				list of graph items
-	 * @param int 		$items[n]['hostid'] graph n-th item corresponding host Id
-	 * @param string	$items[n]['host']   graph n-th item corresponding host name
-	 *
-	 * @return string	string with macros replaces with corresponding values
-	 */
-	private function resolveGraphPositionalMacros($str, $items) {
-		// Extract all macros into $matches.
-		preg_match_all('/{(('.self::PATTERN_HOST_INTERNAL.')('.self::PATTERN_MACRO_PARAM.'))\}/', $str, $matches);
-
-		// Match found groups if ever regexp should change.
-		$matches['macroType'] = $matches[2];
-		$matches['position'] = $matches[3];
-
-		// Build structure of macros: $macroList['HOST.HOST'][2] = 'host name';
-		$macroList = [];
-
-		// $matches[3] contains positions, e.g., '',1,2,2,3,...
-		foreach ($matches['position'] as $i => $position) {
-			// Take care of macro without positional index.
-			$posInItemList = ($position === '') ? 0 : $position - 1;
-
-			// Init array.
-			if (!isset($macroList[$matches['macroType'][$i]])) {
-				$macroList[$matches['macroType'][$i]] = [];
-			}
-
-			// Skip computing for duplicate macros.
-			if (isset($macroList[$matches['macroType'][$i]][$position])) {
-				continue;
-			}
-
-			// Positional index larger than item count, resolve to UNKNOWN.
-			if (!isset($items[$posInItemList])) {
-				$macroList[$matches['macroType'][$i]][$position] = UNRESOLVED_MACRO_STRING;
-
-				continue;
-			}
-
-			// Retrieve macro replacement data.
-			switch ($matches['macroType'][$i]) {
-				case 'HOSTNAME':
-				case 'HOST.HOST':
-					$macroList[$matches['macroType'][$i]][$position] = $items[$posInItemList]['host'];
-					break;
-			}
-		}
-
-		// Replace macros with values in $str.
-		foreach ($macroList as $macroType => $positions) {
-			foreach ($positions as $position => $replacement) {
-				$str = str_replace('{'.$macroType.$position.'}', $replacement, $str);
-			}
-		}
-
-		return $str;
 	}
 
 	/**

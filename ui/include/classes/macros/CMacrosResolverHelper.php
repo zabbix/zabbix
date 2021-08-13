@@ -438,86 +438,77 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
+	 * Resolve expression macros. For example, {?func(/host/key, param)} or {?func(/{HOST.HOST1}/key, param)}.
 	 *
 	 * @static
 	 *
-	 * @param type   $name					string in which macros should be resolved
-	 * @param array  $items					list of graph items
-	 * @param int    $items[n]['hostid']	graph n-th item corresponding host Id
-	 * @param string $items[n]['host']		graph n-th item corresponding host name
+	 * @param string $name
+	 * @param array  $items
+	 * @param string $items[]['hostid']
+	 * @param string $items[]['host']
 	 *
-	 * @return string	string with macros replaced with corresponding values
+	 * @return string  A graph name with resolved macros.
 	 */
 	public static function resolveGraphName($name, array $items) {
 		self::init();
 
-		$graph = self::$macrosResolver->resolve([
-			'config' => 'graphName',
-			'data' => [['name' => $name, 'items' => $items]]
-		]);
-		$graph = reset($graph);
-
-		return $graph['name'];
+		return self::$macrosResolver->resolveGraphNames([['name' => $name, 'items' => $items]])[0]['name'];
 	}
 
 	/**
-	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
-	 * ! if same graph will be passed more than once only name for first entry will be resolved.
+	 * Resolve expression macros. For example, {?func(/host/key, param)} or {?func(/{HOST.HOST1}/key, param)}.
 	 *
 	 * @static
 	 *
-	 * @param array  $data					list or hashmap of graphs
-	 * @param int    $data[n]['graphid']	id of graph
-	 * @param string $data[n]['name']		name of graph
+	 * @param array  $graphs
+	 * @param string $graphs[]['graphid']
+	 * @param string $graphs[]['name']
 	 *
-	 * @return array	inputted data with resolved names
+	 * @return array	Inputted data with resolved graph name.
 	 */
-	public static function resolveGraphNameByIds(array $data) {
+	public static function resolveGraphNameByIds(array $graphs) {
 		self::init();
 
-		$graphIds = [];
-		$graphMap = [];
-		foreach ($data as $graph) {
-			// skip graphs without macros
-			if (strpos($graph['name'], '{') !== false) {
-				$graphMap[$graph['graphid']] = [
+		$_graphs = [];
+
+		foreach ($graphs as $graph) {
+			// Skip graphs without expression macros.
+			if (strpos($graph['name'], '{?') !== false) {
+				$_graphs[$graph['graphid']] = [
 					'graphid' => $graph['graphid'],
 					'name' => $graph['name'],
 					'items' => []
 				];
-				$graphIds[$graph['graphid']] = $graph['graphid'];
 			}
 		}
 
+		if (!$_graphs) {
+			return $graphs;
+		}
+
 		$items = DBfetchArray(DBselect(
-			'SELECT i.hostid,gi.graphid,h.host'.
+			'SELECT gi.graphid,h.host'.
 			' FROM graphs_items gi,items i,hosts h'.
 			' WHERE gi.itemid=i.itemid'.
 				' AND i.hostid=h.hostid'.
-				' AND '.dbConditionInt('gi.graphid', $graphIds).
+				' AND '.dbConditionInt('gi.graphid', array_keys($_graphs)).
 			' ORDER BY gi.sortorder'
 		));
 
 		foreach ($items as $item) {
-			$graphMap[$item['graphid']]['items'][] = ['hostid' => $item['hostid'], 'host' => $item['host']];
+			$_graphs[$item['graphid']]['items'][] = ['host' => $item['host']];
 		}
 
-		$graphMap = self::$macrosResolver->resolve([
-			'config' => 'graphName',
-			'data' => $graphMap
-		]);
+		$_graphs = self::$macrosResolver->resolveGraphNames($_graphs);
 
-		$resolvedGraph = reset($graphMap);
-		foreach ($data as &$graph) {
-			if ($resolvedGraph && $graph['graphid'] === $resolvedGraph['graphid']) {
-				$graph['name'] = $resolvedGraph['name'];
-				$resolvedGraph = next($graphMap);
+		foreach ($graphs as &$graph) {
+			if (array_key_exists($graph['graphid'], $_graphs)) {
+				$graph['name'] = $_graphs[$graph['graphid']]['name'];
 			}
 		}
 		unset($graph);
 
-		return $data;
+		return $graphs;
 	}
 
 	/**
