@@ -31,33 +31,45 @@ class CServiceHelper {
 
 	public static function getStatusRuleTypeOptions(): array {
 		return [
-			ZBX_SERVICE_STATUS_RULE_TYPE_N_GE => _s('If at least %2$s child services have %1$s status or above',
-				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N)')
+			ZBX_SERVICE_STATUS_RULE_TYPE_N_GE => _s(
+				'If at least %2$s child services have %1$s status or above',
+				(new CSpan(_('Status')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER),
+				(new CSpan(_('N')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER)
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE => _s('If at least %2$s of child services have %1$s status or above',
-				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
+			ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE => _s(
+				'If at least %2$s of child services have %1$s status or above',
+				(new CSpan(_('Status')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER),
+				(new CSpan(_('N%')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER)
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_N_L => _s('If less than %2$s child services have %1$s status or below',
-				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N)')
+			ZBX_SERVICE_STATUS_RULE_TYPE_N_L => _s(
+				'If less than %2$s child services have %1$s status or below',
+				(new CSpan(_('Status')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER),
+				(new CSpan(_('N')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER)
 			),
-			ZBX_SERVICE_STATUS_RULE_TYPE_NP_L => _s('If less than %2$s of child services have %1$s status or below',
-				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
+			ZBX_SERVICE_STATUS_RULE_TYPE_NP_L => _s(
+				'If less than %2$s of child services have %1$s status or below',
+				(new CSpan(_('Status')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER),
+				(new CSpan(_('N%')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER)
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_W_GE => _s(
 				'If weight of child services with %1$s status or above is at least %2$s',
-				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(W)')
+				(new CSpan(_('Status')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER),
+				(new CSpan(_('W')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER)
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE => _s(
 				'If weight of child services with %1$s status or above is at least %2$s',
-				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
+				(new CSpan(_('Status')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER),
+				(new CSpan(_('N%')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER)
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_W_L => _s(
 				'If weight of child services with %1$s status or below is less than %2$s',
-				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(W)')
+				(new CSpan(_('Status')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER),
+				(new CSpan(_('W')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER)
 			),
 			ZBX_SERVICE_STATUS_RULE_TYPE_WP_L => _s(
 				'If weight of child services with %1$s status or below is less than %2$s',
-				new CTag('b', true, '('._('Status').')'), new CTag('b', true, '(N%)')
+				(new CSpan(_('Status')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER),
+				(new CSpan(_('N%')))->addClass(ZBX_STYLE_TEXT_PLACEHOLDER)
 			)
 		];
 	}

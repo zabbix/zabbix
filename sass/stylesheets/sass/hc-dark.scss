@@ -233,6 +233,9 @@ $toc-title-bg-color: #dddddd;
 $diff-added-bg-color: transparent;
 $diff-removed-bg-color: transparent;
 
+// Text
+$text-placeholder-color: #000000;
+
 // Important! @import string should come after variables.
 @import 'screen.scss';
 
