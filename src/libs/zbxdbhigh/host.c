@@ -3648,7 +3648,10 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 
 		for (i = 0; i < del_hostmacroids->values_num; i++)
-			zbx_aduit_host_prototype_update_json_delete_hostmacro(host_prototype->hostid, hostmacroid);
+		{
+			zbx_aduit_host_prototype_update_json_delete_hostmacro(host_prototype->hostid,
+					del_hostmacroids->values[i]);
+		}
 	}
 
 	if (0 != del_tagids->values_num)
@@ -3670,7 +3673,10 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 
 		for (i = 0; i < del_snmpids->values_num; i++)
-			zbx_audit_host_prototype_update_json_delete_interface(host_prototype->hostid, interfaceid);
+		{
+			zbx_audit_host_prototype_update_json_delete_interface(host_prototype->hostid,
+					del_snmpids->values[i]);
+		}
 	}
 
 	if (0 != del_interfaceids->values_num)
@@ -3681,7 +3687,10 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 
 		for (i = 0; i < del_interfaceids->values_num; i++)
-			zbx_audit_host_prototype_update_json_delete_interface(host_prototype->hostid, interfaceid);
+		{
+			zbx_audit_host_prototype_update_json_delete_interface(host_prototype->hostid,
+					del_interfaceids->values[i]);
+		}
 	}
 
 	if (0 != new_group_prototypes)
