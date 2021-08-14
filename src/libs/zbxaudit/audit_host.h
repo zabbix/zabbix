@@ -127,7 +127,7 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(value, const char*, string)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(description, const char*, string)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(type, int, int)
 
-void	zbx_aduit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid);
+void	zbx_audit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid);
 
 void	zbx_audit_host_prototype_update_json_add_tag(zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag,
 		const char* value);

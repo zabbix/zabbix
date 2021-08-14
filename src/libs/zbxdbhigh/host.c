@@ -3548,7 +3548,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	char				*sql1 = NULL, *sql2 = NULL, *name_esc, *value_esc;
 	size_t				sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
 					sql2_alloc = ZBX_KIBIBYTE, sql2_offset = 0;
-	zbx_host_prototype_t		*host_prototype;
 	zbx_group_prototype_t		*group_prototype;
 	zbx_macros_prototype_t		*hostmacro;
 	zbx_db_tag_t			*tag;
@@ -3569,6 +3568,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
+		zbx_host_prototype_t	*host_prototype;
+
 		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
 		if (0 == host_prototype->hostid)
@@ -3608,9 +3609,25 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			tag = host_prototype->tags.values[j];
 
 			if (0 == tag->tagid)
+			{
 				new_tags++;
+			}
 			else if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
+			{
 				zbx_vector_db_tag_ptr_append(&upd_tags, tag);
+
+				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+				{
+					zbx_audit_host_prototype_update_json_update_tag_tag(host_prototype->hostid,
+							tag->tagid, tag->tag_orig, tag->tag);
+				}
+
+				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
+				{
+					zbx_audit_host_prototype_update_json_update_tag_value(host_prototype->hostid,
+							tag->tagid, tag->value_orig, tag->value);
+				}
+			}
 		}
 
 		for (j = 0; j < host_prototype->interfaces.values_num; j++)
@@ -3736,6 +3753,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
+		zbx_host_prototype_t	*host_prototype;
+
 		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
 		if (0 == host_prototype->hostid)
@@ -4063,9 +4082,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 						value_esc);
 				zbx_free(value_esc);
 				delim = ',';
-
-				zbx_audit_host_prototype_update_json_update_tag_tag(host_prototype->hostid, tag->tagid,
-						tag->tag_orig, tag->tag);
 			}
 
 			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
@@ -4074,9 +4090,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%cvalue='%s'", delim,
 						value_esc);
 				zbx_free(value_esc);
-
-				zbx_audit_host_prototype_update_json_update_tag_value(host_prototype->hostid, tag->tagid,
-						tag->value_orig, tag->value);
 			}
 
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
