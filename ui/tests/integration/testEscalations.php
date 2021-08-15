@@ -342,7 +342,6 @@ class testEscalations extends CIntegrationTest {
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
-		
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute', true, 5, 2);
 
 		$response = $this->call('alert.get', [
