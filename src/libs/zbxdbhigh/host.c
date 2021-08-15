@@ -3016,7 +3016,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
  *                                                                            *
  * Parameters: host_prototypes - [IN/OUT] list of host prototypes             *
  *                                   should be sorted by templateid           *
- *             del_tagids    - [OUT] list of host tagids which                *
+ *             del_tagids      - [OUT] list of host tagids which              *
  *                                   should be deleted                        *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
@@ -3073,12 +3073,9 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 			host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 		}
 
-		tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
-		tag->tagid = 0;
-		tag->flags = 0;
-		tag->tag = zbx_strdup(NULL, row[1]);
-		tag->value = zbx_strdup(NULL, row[2]);
 
+		tag = zbx_db_tag_create(row[1], row[2]);
+		tag->tagid = 0;
 		zbx_vector_db_tag_ptr_append(&host_prototype->tags, tag);
 	}
 	DBfree_result(result);
