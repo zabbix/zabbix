@@ -51,7 +51,7 @@ void	zbx_audit_host_update_json_update_inventory_mode(zbx_uint64_t hostid, int i
 void	zbx_audit_host_update_json_update_host_status(zbx_uint64_t hostid, int host_status_old,
 		int host_status_new);
 
-#define PREPARE_AUDIT_HOST_INTERFACE_H(funcname, interface_resource, type1, type2) 				\
+#define PREPARE_AUDIT_HOST_INTERFACE_H(funcname, interface_resource, type1) 					\
 void	zbx_audit_##funcname##_update_json_update_interface_##interface_resource(zbx_uint64_t hostid,		\
 		zbx_uint64_t interfaceid, type1 interface_resource##_old, type1 interface_resource##_new);	\
 
@@ -60,23 +60,23 @@ void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t hostid, 
 void	zbx_audit_##funcname##_update_json_add_interfaces(zbx_uint64_t hostid, zbx_uint64_t interfaceid,	\
 		zbx_uint64_t main_, zbx_uint64_t type, zbx_uint64_t useip, const char *ip, const char *dns,	\
 		int port);											\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, useip, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, main, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, type, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, ip, const char*, string)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, dns, const char*, string)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, port, int, int)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, useip, zbx_uint64_t)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, main, zbx_uint64_t)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, type, zbx_uint64_t)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, ip, const char*)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, dns, const char*)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, port, int)								\
 /* snmp */													\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, version, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, bulk, zbx_uint64_t, uint64)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, community, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, securityname, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, securitylevel, int, int)						\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, authpassphrase, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, privpassphrase, const char*, string)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, authprotocol, zbx_uint64_t, uint64)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, privprotocol, zbx_uint64_t, uint64)					\
-PREPARE_AUDIT_HOST_INTERFACE_H(funcname, contextname, const char*, string)					\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, version, zbx_uint64_t)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, bulk, zbx_uint64_t)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, community, const char*)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, securityname, const char*)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, securitylevel, int)							\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, authpassphrase, const char*)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, privpassphrase, const char*)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, authprotocol, zbx_uint64_t)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, privprotocol, zbx_uint64_t)						\
+PREPARE_AUDIT_HOST_INTERFACE_H(funcname, contextname, const char*)						\
 
 PREPARE_AUDIT_HOST_H(host, AUDIT_RESOURCE_HOST)
 PREPARE_AUDIT_HOST_H(host_prototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
@@ -90,14 +90,14 @@ void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_u
 		int status, int discover, int custom_interfaces);
 void	zbx_audit_host_prototype_update_json_add_templateid(zbx_uint64_t hostid, zbx_uint64_t templateid);
 
-#define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(resource, type1, type2)						\
+#define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(resource, type1)							\
 void	zbx_audit_host_prototype_update_json_update_##resource(zbx_uint64_t hostid, type1 old_##resource,	\
 		type1 new_##resource);										\
 
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(name, const char*, string)
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(status, int, int)
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(discover, int, int)
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(custom_interfaces, int, int)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(name, const char*)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(status, int)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(discover, int)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(custom_interfaces, int)
 
 void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, const char* name,
 		zbx_uint64_t groupid, zbx_uint64_t templateid);
@@ -105,27 +105,27 @@ void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid,
 void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid, zbx_uint64_t groupid,
 		zbx_uint64_t templateid_old, zbx_uint64_t templateid_new);
 
-#define PREPARE_AUDIT_TEMPLATE_OP_H(funcname, op1, op2)								\
+#define PREPARE_AUDIT_TEMPLATE_OP_H(funcname, op1)								\
 void	zbx_audit_##funcname##_update_json_##op1##_parent_template(zbx_uint64_t hostid,				\
 		zbx_uint64_t templateid);
 
-PREPARE_AUDIT_TEMPLATE_OP_H(host, attach, AUDIT_DETAILS_ACTION_ATTACH)
-PREPARE_AUDIT_TEMPLATE_OP_H(host, detach, AUDIT_DETAILS_ACTION_DETACH)
-PREPARE_AUDIT_TEMPLATE_OP_H(host_prototype, attach, AUDIT_DETAILS_ACTION_ATTACH)
-PREPARE_AUDIT_TEMPLATE_OP_H(host_prototype, detach, AUDIT_DETAILS_ACTION_DETACH)
+PREPARE_AUDIT_TEMPLATE_OP_H(host, attach)
+PREPARE_AUDIT_TEMPLATE_OP_H(host, detach)
+PREPARE_AUDIT_TEMPLATE_OP_H(host_prototype, attach)
+PREPARE_AUDIT_TEMPLATE_OP_H(host_prototype, detach)
 
 void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
 
 void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
 		const char *macro, const char *value, const char *description, int type);
 
-#define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(resource, type1, type2)					\
+#define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(resource, type1)					\
 void	zbx_audit_host_prototype_update_json_update_hostmacro_##resource(zbx_uint64_t hostid,			\
 		zbx_uint64_t hostmacroid, type1 old_##resource, type1 new_##resource);
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(name, const char*, string)
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(value, const char*, string)
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(description, const char*, string)
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(type, int, int)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(name, const char*)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(value, const char*)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(description, const char*)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(type, int)
 
 void	zbx_audit_host_prototype_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid);
 

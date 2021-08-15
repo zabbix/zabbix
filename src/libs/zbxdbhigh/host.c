@@ -1985,7 +1985,6 @@ static void	DBgroup_prototypes_clean(zbx_vector_ptr_t *group_prototypes)
 typedef struct
 {
 	zbx_uint64_t	hostmacroid;
-	char		*macro_orig;
 	char		*macro;
 	char		*value_orig;
 	char		*value;
@@ -2279,6 +2278,10 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		host_prototype->flags = ZBX_FLAG_HPLINK_RESET_FLAG;
 		ZBX_STR2UCHAR(host_prototype->discover, row[5]);
 		ZBX_STR2UCHAR(host_prototype->custom_interfaces, row[6]);
+		host_prototype->name_orig = NULL;
+		host_prototype->status_orig = 0;
+		host_prototype->discover_orig = 0;
+		host_prototype->custom_interfaces_orig = 0;
 
 		zbx_vector_ptr_append(host_prototypes, host_prototype);
 		zbx_vector_uint64_append(&itemids, host_prototype->itemid);
@@ -2559,6 +2562,7 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 		group_prototype->name = zbx_strdup(NULL, row[1]);
 		ZBX_DBROW2UINT64(group_prototype->groupid, row[2]);
 		ZBX_STR2UINT64(group_prototype->templateid, row[3]);
+		group_prototype->templateid_orig = 0;
 
 		zbx_vector_ptr_append(&host_prototype->group_prototypes, group_prototype);
 	}
@@ -2934,6 +2938,9 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 		hostmacro->description = zbx_strdup(NULL, row[3]);
 		ZBX_STR2UCHAR(hostmacro->type, row[4]);
 		hostmacro->flags = ZBX_FLAG_HPMACRO_RESET_FLAG;
+		hostmacro->value_orig = NULL;
+		hostmacro->description_orig = NULL;
+		hostmacro->type_orig = 0;
 
 		zbx_vector_macros_append(&host_prototype->hostmacros, hostmacro);
 	}
@@ -3248,6 +3255,12 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
 		interface->flags = ZBX_FLAG_HPINTERFACE_RESET_FLAG;
+		interface->main_orig = 0;
+		interface->type_orig = 0;
+		interface->useip_orig = 0;
+		interface->ip_orig = NULL;
+		interface->dns_orig = NULL;
+		interface->port_orig = NULL;
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
@@ -3267,6 +3280,16 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 			snmp->contextname = zbx_strdup(NULL, row[16]);
 			snmp->flags = ZBX_FLAG_HPINTERFACE_SNMP_RESET_FLAG;
 			interface->data.snmp = snmp;
+			snmp->community_orig = NULL;
+			snmp->securityname_orig = NULL;
+			snmp->authpassphrase_orig = NULL;
+			snmp->privpassphrase_orig = NULL;
+			snmp->contextname_orig = NULL;
+			snmp->securitylevel_orig = 0;
+			snmp->authprotocol_orig = 0;
+			snmp->privprotocol_orig = 0;
+			snmp->version_orig = 0;
+			snmp->bulk_orig = 0;
 		}
 		else
 			interface->data.snmp = NULL;
