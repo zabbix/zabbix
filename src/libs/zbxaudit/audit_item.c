@@ -164,6 +164,71 @@ void	zbx_audit_item_add_data(zbx_uint64_t itemid, const zbx_template_item_t *ite
 #undef IT_OR_ITP
 }
 
+void	zbx_audit_item_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
+		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid)
+{
+	RETURN_IF_AUDIT_OFF();
+
+#define IT(s) "item."#s
+#define ADD_JSON_S(x)	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT(x), item->x)
+#define ADD_JSON_UI(x)	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(x), item->x)
+#define ADD_JSON_P_S(x)	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT(x), item_prototype->x)
+#define ADD_JSON_P_UI(x)	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(x),\
+		item_prototype->x)
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(itemid), itemid);
+	ADD_JSON_S(delay);
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(hostid), hostid);
+	ADD_JSON_S(name);
+	ADD_JSON_S(key); // API HAS 'key_' , but SQL 'key'
+	ADD_JSON_P_UI(type);
+	ADD_JSON_P_UI(value_type);
+	ADD_JSON_S(history);
+	ADD_JSON_S(trends);
+	ADD_JSON_UI(status);
+	ADD_JSON_P_S(trapper_hosts);
+	ADD_JSON_S(units);
+	ADD_JSON_P_S(formula);
+	ADD_JSON_P_S(logtimefmt);
+	ADD_JSON_P_UI(valuemapid);
+	ADD_JSON_S(params);
+	ADD_JSON_S(ipmi_sensor);
+	ADD_JSON_S(snmp_oid);
+	ADD_JSON_P_UI(authtype);
+	ADD_JSON_S(username);
+	ADD_JSON_S(password);
+	ADD_JSON_P_S(publickey);
+	ADD_JSON_P_S(privatekey);
+	ADD_JSON_S(description);
+	ADD_JSON_P_UI(interfaceid);
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, "item.flags", ZBX_FLAG_DISCOVERY_CREATED);
+	ADD_JSON_S(jmx_endpoint);
+	ADD_JSON_UI(master_itemid);
+	ADD_JSON_S(timeout);
+	ADD_JSON_S(url);
+	ADD_JSON_S(query_fields);
+	ADD_JSON_S(posts);
+	ADD_JSON_S(status_codes);
+	ADD_JSON_P_UI(follow_redirects);
+	ADD_JSON_P_UI(post_type);
+	ADD_JSON_S(http_proxy);
+	ADD_JSON_S(headers);
+	ADD_JSON_P_UI(retrieve_mode);
+	ADD_JSON_P_UI(request_method);
+	ADD_JSON_P_UI(output_format);
+	ADD_JSON_S(ssl_cert_file);
+	ADD_JSON_S(ssl_key_file);
+	ADD_JSON_S(ssl_key_password);
+	ADD_JSON_P_UI(verify_peer);
+	ADD_JSON_P_UI(verify_host);
+	ADD_JSON_P_UI(allow_traps);
+
+#undef ADD_JSON_UI
+#undef ADD_JSON_S
+#undef ADD_JSON_P_UI
+#undef ADD_JSON_P_S
+#undef IT
+}
+
 #define IT_OR_ITP(s) ONLY_ITEM ? "item."#s : (ONLY_ITEM_PROTOTYPE ? "itemprototype."#s : "discoveryrule."#s)
 #define PREPARE_AUDIT_ITEM_UPDATE(resource, type1, type2)							\
 void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,				\
@@ -226,6 +291,7 @@ PREPARE_AUDIT_ITEM_UPDATE(verify_peer,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(verify_host,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(allow_traps,		int,		int)
 PREPARE_AUDIT_ITEM_UPDATE(discover,		int,		int)
+PREPARE_AUDIT_ITEM_UPDATE(key,			const char*,	string)
 #undef PREPARE_AUDIT_ITEM_UPDATE
 
 #undef ONLY_ITEM

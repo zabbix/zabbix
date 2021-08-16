@@ -24,9 +24,12 @@
 #include "audit.h"
 
 #include "../zbxdbhigh/template.h"
+#include "../../zabbix_server/lld/lld.h"
 
 void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name);
 void	zbx_audit_item_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item, zbx_uint64_t hostid);
+void	zbx_audit_item_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
+		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid);
 
 
 #define PREPARE_AUDIT_ITEM_UPDATE_H(resource, type1, type2)				\
@@ -82,6 +85,7 @@ PREPARE_AUDIT_ITEM_UPDATE_H(verify_peer, int, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(verify_host, int, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(allow_traps, int, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(discover, int, int)
+PREPARE_AUDIT_ITEM_UPDATE_H(key, const char*, string)
 
 void	zbx_audit_discovery_rule_update_json_add_overrides_conditions(zbx_uint64_t itemid,
 		zbx_uint64_t item_conditionid, zbx_uint64_t op, const char *macro, const char *value);
