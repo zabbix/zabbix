@@ -1035,6 +1035,9 @@ class CDashboardPage extends CBaseComponent {
 				.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW)
 				.showAtDefaultPosition();
 		}
+		else {
+			this._widget_placeholder.hide();
+		}
 	}
 
 	_activateWidgetPlaceholder() {
