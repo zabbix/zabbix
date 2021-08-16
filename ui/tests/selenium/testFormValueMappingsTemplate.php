@@ -30,8 +30,6 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 	 * Function creates the given value mappings for the specified template.
 	 */
 	public static function prepareTemplateValueMappings() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('valuemap.create', [
 			[
 				'name' => self::UPDATE_VALUEMAP1,
