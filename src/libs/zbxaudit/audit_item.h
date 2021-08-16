@@ -109,4 +109,16 @@ PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC_H(params, const char*, string)
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC_H(error_handler, int, int)
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC_H(error_handler_params, const char*, string)
 
+void	zbx_audit_item_update_json_add_params(zbx_uint64_t itemid, int item_flags, zbx_uint64_t item_parameter_id,
+		const char *name, const char *value);
+
+#define PREPARE_AUDIT_ITEM_PARAMS_UPDATE_H(resource) \
+void	zbx_audit_item_update_json_update_params_##resource(zbx_uint64_t itemid, int item_flags, \
+zbx_uint64_t item_parameter_id, const char *resource##_orig, const char *resource);
+
+PREPARE_AUDIT_ITEM_PARAMS_UPDATE_H(name)
+PREPARE_AUDIT_ITEM_PARAMS_UPDATE_H(value)
+
+void	zbx_audit_item_delete_params(zbx_uint64_t itemid, int item_flags, zbx_uint64_t item_parameter_id);
+
 #endif	/* ZABBIX_AUDIT_ITEM_H */
