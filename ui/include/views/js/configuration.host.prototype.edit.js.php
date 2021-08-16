@@ -158,6 +158,8 @@
 	}
 
 	jQuery(function() {
+		'use strict';
+
 		const interface_source_switcher = new InterfaceSourceSwitcher(
 			document.getElementById('interfaces-table'),
 			document.getElementById('custom_interfaces'),
@@ -236,5 +238,49 @@
 			jQuery('#tbl_group_prototypes').find('input').prop('readonly', true);
 			jQuery('#tbl_group_prototypes').find('button').prop('disabled', true);
 		<?php endif ?>
+
+		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+			jQuery('#tls_issuer, #tls_subject').closest('li').toggle(jQuery('#tls_in_cert').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>);
+
+			jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').toggle(jQuery('#tls_in_psk').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>);
+		});
+
+		jQuery('input[name=inventory_mode]').click(function() {
+			// Action depending on which button was clicked.
+			var inventoryFields = jQuery('#inventorylist :input:gt(2)');
+
+			switch (this.value) {
+				case '<?= HOST_INVENTORY_DISABLED ?>':
+					inventoryFields.prop('disabled', true);
+					jQuery('.populating_item').hide();
+					break;
+				case '<?= HOST_INVENTORY_MANUAL ?>':
+					inventoryFields.prop('disabled', false);
+					jQuery('.populating_item').hide();
+					break;
+				case '<?= HOST_INVENTORY_AUTOMATIC ?>':
+					inventoryFields.prop('disabled', false);
+					inventoryFields.filter('.linked_to_item').prop('disabled', true);
+					jQuery('.populating_item').show();
+					break;
+			}
+		});
+
+		// Refresh field visibility on document load.
+		let tls_accept = jQuery('#tls_accept').val();
+
+		if ((tls_accept & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
+			jQuery('#tls_in_none').prop('checked', true);
+		}
+		if ((tls_accept & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
+			jQuery('#tls_in_psk').prop('checked', true);
+		}
+		if ((tls_accept & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
+			jQuery('#tls_in_cert').prop('checked', true);
+		}
+
+		jQuery('input[name=tls_connect]').trigger('change');
 	});
 </script>

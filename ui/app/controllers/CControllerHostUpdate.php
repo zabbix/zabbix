@@ -116,7 +116,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 			uncheckTableRows('hosts');
 
 			$output = [
-				'message' => makeMessageBox(true, $messages, _('Host updated'), true, false)->toString(),
+				'message' => makeMessageBox(ZBX_STYLE_MSG_GOOD, $messages, _('Host updated'), true, false)->toString(),
 				'title' => _('Host updated'),
 				'details' => $details,
 				'script_inline' => ob_get_clean()
