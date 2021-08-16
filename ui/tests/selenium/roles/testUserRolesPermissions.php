@@ -281,7 +281,7 @@ class testUserRolesPermissions extends CWebTest {
 			// Check that problem actions works after they were turned on.
 			if ($action_status === false) {
 				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-				$row->query('link', 'No')->one()->waitUntilCLickable()->click();
+				$row->getColumn('Ack')->query('link:No')->one()->waitUntilCLickable()->click();
 
 				if ($data['activityid'] === 'message') {
 					$dialog->query('id:message')->one()->fill('test_text');
@@ -354,7 +354,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->page->open('overview.php?type=0')->waitUntilReady();
 			$this->query('class:list-table')->asTable()->one()->findRow('Triggers', '1_trigger_Disaster')
 					->getColumn('1_Host_to_check_Monitoring_Overview')->query('xpath://td[@class="disaster-bg cursor-pointer"]')
-							->one()->click();
+					->one()->click();
 			$this->page->waitUntilReady();
 
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
@@ -1041,10 +1041,10 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
 		foreach ([true, false] as $action_status) {
-			$main_section = $this->query('xpath://ul[@class="menu-main"]')->query('link', $data['section']);
+			$main_section = $this->query('link', $data['section'])->waitUntilVisible()->one();
 
 			if ($data['section'] !== 'Monitoring') {
-				$main_section->waitUntilReady()->one()->click();
+				$main_section->click();
 				$element = $this->query('xpath://a[text()="'.$data['section'].'"]/../ul[@class="submenu"]')->one();
 				CElementQuery::wait()->until(function () use ($element) {
 					return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
@@ -1052,7 +1052,7 @@ class testUserRolesPermissions extends CWebTest {
 				});
 			}
 
-			$this->assertEquals($action_status, $main_section->one()->parents('tag:li')->query('link', $data['page'])->exists());
+			$this->assertEquals($action_status, $main_section->parents('tag:li')->query('link', $data['page'])->exists());
 
 			if ($action_status) {
 				if (array_key_exists('user_roles', $data)) {
@@ -1165,6 +1165,7 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			if ($action_status) {
 				$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
+				$this->assertEquals('API tokens', $this->page->getTitle());
 				$this->changeRoleRule(['Manage API tokens' => false]);
 			}
 			else {
