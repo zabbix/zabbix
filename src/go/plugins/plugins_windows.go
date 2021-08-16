@@ -42,6 +42,7 @@ import (
 	_ "zabbix.com/plugins/vfs/file"
 	_ "zabbix.com/plugins/vfs/fs"
 	_ "zabbix.com/plugins/vm/memory"
+	_ "zabbix.com/plugins/vm/vmemory"
 	_ "zabbix.com/plugins/web/certificate"
 	_ "zabbix.com/plugins/web/page"
 	_ "zabbix.com/plugins/windows/eventlog"
