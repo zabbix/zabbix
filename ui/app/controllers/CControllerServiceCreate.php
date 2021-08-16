@@ -33,7 +33,7 @@ class CControllerServiceCreate extends CController {
 			'propagation_rule' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusPropagationNames())),
 			'propagation_value_number' =>	'int32',
 			'propagation_value_status' =>	'int32',
-			'weight'					=>	'string',
+			'weight' =>						'string',
 			'showsla' =>					'in 1',
 			'goodsla' =>					'string',
 			'times' =>						'array',
