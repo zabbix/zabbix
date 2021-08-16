@@ -32,8 +32,6 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	 * Function creates the given API tokens in the test branch.
 	 */
 	public static function prepareTokenData() {
-		CDataHelper::setSessionId(null);
-
 		$response = CDataHelper::call('token.create', [
 			[
 				'name' => 'Admin reference token',
