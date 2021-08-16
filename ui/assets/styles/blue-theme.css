@@ -6465,3 +6465,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     content: '\2013';
     float: left;
     margin-left: -1em; }
+
+.audit-show-details-wrapper {
+  position: absolute;
+  text-align: right;
+  top: 5px;
+  right: 5px; }

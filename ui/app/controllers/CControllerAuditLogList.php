@@ -30,6 +30,7 @@ class CControllerAuditLogList extends CController {
 			'filter_set' =>				'in 1',
 			'filter_userids' =>			'array_db users.userid',
 			'filter_resourceid' =>		'string',
+			'filter_recordsetid' =>		'string',
 			'from' =>					'range_time',
 			'to' =>						'range_time'
 		];
@@ -70,6 +71,7 @@ class CControllerAuditLogList extends CController {
 			'resourcetype' => CProfile::get('web.auditlog.filter.resourcetype', -1),
 			'auditlog_action' => CProfile::get('web.auditlog.filter.action', -1),
 			'resourceid' => CProfile::get('web.auditlog.filter.resourceid', ''),
+			'recordsetid' => CProfile::get('web.auditlog.filter.recordsetid', ''),
 			'action' => $this->getAction(),
 			'actions' => self::getActionsList(),
 			'resources' => self::getResourcesList(),
@@ -93,9 +95,13 @@ class CControllerAuditLogList extends CController {
 			$filter['resourceid'] = $data['resourceid'];
 		}
 
+		if ($data['recordsetid'] !== '' && CNewValidator::isCuid($data['recordsetid'])) {
+			$filter['recordsetid'] = $data['recordsetid'];
+		}
+
 		$params = [
 			'output' => ['auditid', 'userid', 'username', 'clock', 'action', 'resourcetype', 'ip', 'resourceid',
-				'resourcename', 'details'
+				'resourcename', 'details', 'recordsetid'
 			],
 			'filter' => $filter,
 			'sortfield' => 'clock',
@@ -244,6 +250,9 @@ class CControllerAuditLogList extends CController {
 			PROFILE_TYPE_INT
 		);
 		CProfile::update('web.auditlog.filter.resourceid', $this->getInput('filter_resourceid', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.auditlog.filter.recordsetid', $this->getInput('filter_recordsetid', ''),
+			PROFILE_TYPE_STR
+		);
 	}
 
 	private function deleteProfiles(): void {
@@ -251,6 +260,7 @@ class CControllerAuditLogList extends CController {
 		CProfile::delete('web.auditlog.filter.action');
 		CProfile::delete('web.auditlog.filter.resourcetype');
 		CProfile::delete('web.auditlog.filter.resourceid');
+		CProfile::delete('web.auditlog.filter.recordsetid');
 	}
 
 	private function sanitizeUsersForMultiselect(array $users): array {
@@ -265,7 +275,10 @@ class CControllerAuditLogList extends CController {
 
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
-			if ($auditlog['action'] != CAudit::ACTION_UPDATE && $auditlog['action'] != CAudit::ACTION_EXECUTE) {
+			$auditlog['short_details'] = '';
+			$auditlog['show_more_button'] = '0';
+
+			if (!in_array($auditlog['action'], [CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_EXECUTE])) {
 				continue;
 			}
 
@@ -276,19 +289,27 @@ class CControllerAuditLogList extends CController {
 				continue;
 			}
 
-			$auditlog['details'] = $this->formatDetails($details, $auditlog['action']);
+			$details = $this->formatDetails($details, $auditlog['action']);
+
+			$auditlog['details'] = implode("\n", $details);
+			$auditlog['short_details'] = implode("\n", array_slice($details, 0, 2));
+
+			if (count($details) > 2) {
+				$auditlog['show_more_button'] = '1';
+			}
 		}
 		unset($auditlog);
 
 		return $auditlogs;
 	}
 
-	private function formatDetails(array $details, string $action): string {
+	private function formatDetails(array $details, string $action): array {
 		$new_details = [];
 		foreach ($details as $key => $detail) {
 			switch ($action) {
+				case CAudit::ACTION_ADD:
 				case CAudit::ACTION_UPDATE:
-					$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
+					$new_details[] = $this->makeDetailString($key, $detail);
 					break;
 				case CAudit::ACTION_EXECUTE:
 					$new_details[] = sprintf('%s: %s', $key, $detail[1]);
@@ -296,8 +317,33 @@ class CControllerAuditLogList extends CController {
 			}
 		}
 
-		natsort($new_details);
+		sort($new_details);
 
-		return implode("\n", $new_details);
+		return $new_details;
+	}
+
+	private function makeDetailString(string $key, array $detail) {
+		switch ($detail[0]) {
+			case CAudit::METHOD_ADD:
+				return array_key_exists(1, $detail)
+					? sprintf('%s: %s (%s)', $key, $detail[1], _('Added'))
+					: sprintf('%s: %s', $key, _('Added'));
+			case CAudit::METHOD_ATTACH:
+				return array_key_exists(1, $detail)
+					? sprintf('%s: %s (%s)', $key, $detail[1], _('Attached'))
+					: sprintf('%s: %s', $key, _('Attached'));
+			case CAudit::METHOD_DETACH:
+				return array_key_exists(1, $detail)
+					? sprintf('%s: %s (%s)', $key, $detail[1], _('Detached'))
+					: sprintf('%s: %s', $key, _('Detached'));
+			case CAudit::METHOD_DELETE:
+				return array_key_exists(1, $detail)
+					? sprintf('%s: %s (%s)', $key, $detail[1], _('Deleted'))
+					: sprintf('%s: %s', $key, _('Deleted'));
+			case CAudit::METHOD_UPDATE:
+				return array_key_exists(1, $detail)
+					? sprintf('%s: %s => %s', $key, $detail[2], $detail[1])
+					: sprintf('%s: %s', $key, _('Updated'));
+		}
 	}
 }

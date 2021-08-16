@@ -131,4 +131,28 @@
 	document.addEventListener('DOMContentLoaded', () => {
 		new resourceInputManage();
 	}, false);
+
+	function openAuditDetails(details) {
+		const textarea = document.createElement('textarea');
+		textarea.style.resize = 'none';
+		textarea.style.width = '100%';
+		textarea.style.height = '350px';
+		textarea.innerHTML = details;
+
+		overlayDialogue({
+			title: <?= json_encode(_('Details')) ?>,
+			content: textarea,
+			class: 'modal-popup modal-popup-generic',
+			buttons: [
+				{
+					title: <?= json_encode(_('Ok')) ?>,
+					cancel: true,
+					class: '<?= ZBX_STYLE_BTN_ALT ?>',
+					action: () => {
+						return true;
+					}
+				}
+			]
+		});
+	}
 </script>
