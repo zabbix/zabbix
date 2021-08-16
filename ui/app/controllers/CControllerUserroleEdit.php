@@ -131,7 +131,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'roleid' => 0,
 			'name' => $db_defaults['name'],
 			'type' => $db_defaults['type'],
-			'readonly' => $db_defaults['readonly'],
+			'readonly' => (bool) $db_defaults['readonly'],
 			'labels' => [
 				'sections' => $section_labels,
 				'rules' => $rules_labels,
@@ -144,7 +144,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$data['roleid'] = $this->role['roleid'];
 			$data['name'] = $this->role['name'];
 			$data['type'] = $this->role['type'];
-			$data['readonly'] = $this->role['readonly'];
+			$data['readonly'] = (bool) $this->role['readonly'];
 		}
 		else {
 			// The input value will be set in case of read-only role cloning.

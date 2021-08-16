@@ -66,13 +66,13 @@ if ($data['readonly'] || $data['is_own_role']) {
 }
 else {
 	$form_grid->addItem([
-		(new CLabel(_('User type'), 'label-type')),
+		(new CLabel(_('User type'), 'label-user-type')),
 		new CFormField(
 			(new CSelect('type'))
-				->setFocusableElementId('label-type')
+				->setId('user-type')
+				->setFocusableElementId('label-user-type')
 				->setValue($data['type'])
 				->addOptions(CSelect::createOptionsFromArray(user_type2str()))
-				->addClass('js-userrole-usertype')
 		)
 	]);
 }
@@ -287,14 +287,13 @@ $form_grid
 		)
 	)
 	->addItem([
-		new CLabel(_('Enabled'), $data['readonly'] ? '' : 'api.access'),
+		new CLabel(_('Enabled'), $data['readonly'] ? '' : 'api-access'),
 		new CFormField(
 			(new CCheckBox('api_access', 1))
-				->setId('api.access')
+				->setId('api-access')
 				->setChecked($data['rules'][CRoleHelper::API_ACCESS])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
-				->addClass('js-userrole-apiaccess')
 		)
 	])
 	->addItem([
@@ -406,3 +405,11 @@ $tabs = (new CTabView())->addTab('user_role_tab', _('User role'), $form_grid);
 $form->addItem((new CTabView())->addTab('user_role_tab', _('User role'), $form_grid));
 $widget->addItem($form);
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'readonly' => $data['readonly']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

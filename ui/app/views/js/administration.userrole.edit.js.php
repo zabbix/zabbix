@@ -23,17 +23,34 @@
  * @var CView $this
  */
 ?>
-<script type="text/javascript">
-	class UserRoleUiManager {
-		constructor(readonly = false) {
+
+<script>
+	const view = {
+		readonly: false,
+
+		init({readonly}) {
 			this.readonly = readonly;
-		}
 
-		disableUiCheckbox() {
-			const usertype = document.querySelector('.js-userrole-usertype');
+			const usertype_select = document.getElementById('user-type');
+			if (usertype_select !== null) {
+				usertype_select.addEventListener('change', this.events.usertypeChange);
 
-			if (usertype === null || this.readonly) {
-				return  false;
+				this.updateCheckboxes(usertype_select.value);
+			}
+
+			document
+				.getElementById('api-access')
+				.addEventListener('change', this.events.apiaccessChange);
+
+			const clone_button = document.getElementById('clone');
+			if (clone_button !== null) {
+				clone_button.addEventListener('click', this.events.cloneClick);
+			}
+		},
+
+		updateCheckboxes(user_type) {
+			if (this.readonly) {
+				return;
 			}
 
 			const access = <?= json_encode([
@@ -83,80 +100,26 @@
 				CRoleHelper::ACTIONS_MANAGE_SERVICES => USER_TYPE_ZABBIX_ADMIN
 			], JSON_FORCE_OBJECT) ?>;
 
-			for (const [key, value] of Object.entries(access)) {
-				const checkbox = document.getElementById(key);
+			for (const [id, value] of Object.entries(access)) {
+				const checkbox = document.getElementById(id);
 
-				if (usertype.value < value) {
+				if (user_type < value) {
 					checkbox.readOnly = true;
 					checkbox.checked = false;
-				}
-				else {
+				} else {
 					if (checkbox.readOnly) {
 						checkbox.checked = true;
 					}
 					checkbox.readOnly = false;
 				}
 			}
-		}
+		},
 
-		disableApiSection() {
+		updateApiMethodsMultiselect(user_type) {
 			if (this.readonly) {
-				return false;
+				return;
 			}
 
-			const checkbox_state = document.querySelector('.js-userrole-apiaccess').checked;
-
-			document.querySelectorAll('.js-userrole-apimode input').forEach((element) => {
-				element.disabled = !checkbox_state;
-			});
-
-			$('#api_methods_').multiSelect(checkbox_state ? 'enable' : 'disable');
-		}
-	}
-
-	document.addEventListener('DOMContentLoaded', () => {
-		const ui_manager = new UserRoleUiManager(<?= $this->data['readonly'] ? 'true' : 'false' ?>);
-
-		const clone_button = document.getElementById('clone');
-		const type_element = document.querySelector('.js-userrole-usertype');
-
-		if (clone_button !== null) {
-			clone_button.addEventListener('click', () => {
-				if (ui_manager.readonly) {
-					const url = new Curl('zabbix.php?action=userrole.edit');
-
-					document
-						.querySelectorAll('#name, #type')
-						.forEach((element) => {
-							url.setArgument(element.getAttribute('name'), element.getAttribute('value'));
-						});
-
-					redirect(url.getUrl(), 'post', 'action', undefined, false, true);
-				}
-
-				document
-					.querySelectorAll('#roleid, #delete, #clone')
-					.forEach((element) => {
-						element.remove();
-					});
-
-				const update_btn = document.getElementById('update');
-				update_btn.innerHTML = <?= json_encode(_('Add')) ?>;
-				update_btn.setAttribute('id', 'add');
-				update_btn.setAttribute('value', 'userrole.create');
-
-				document.getElementById('name').focus();
-			});
-		}
-
-		if (type_element === null) {
-			return false;
-		}
-
-		type_element.addEventListener('change', () => {
-			ui_manager.disableUiCheckbox();
-
-			const user_type = type_element.options[type_element.selectedIndex].value;
 			const $api_methods = $('#api_methods_');
 			const url = $api_methods.multiSelect('getOption', 'url');
 			const popup = $api_methods.multiSelect('getOption', 'popup');
@@ -172,20 +135,57 @@
 				url: pathname + '?' + params.toString(),
 				popup: popup
 			});
-		});
+		},
 
-		document
-			.querySelector('.js-userrole-apiaccess')
-			.addEventListener('change', () => {
-				ui_manager.disableApiSection();
+		updateApiAccess(is_apiaccess_checked) {
+			if (this.readonly) {
+				return;
+			}
+
+			document.querySelectorAll('.js-userrole-apimode input').forEach((element) => {
+				element.disabled = !is_apiaccess_checked;
 			});
 
-		document
-			.querySelector('.service-r-access')
-			.addEventListener('change', () => {
-				document.querySelector('.js-r-access-services-ms').style.display = '';
-			});
+			$('#api_methods_').multiSelect(is_apiaccess_checked ? 'enable' : 'disable');
+		},
 
-		ui_manager.disableUiCheckbox();
-	});
+		events: {
+			usertypeChange(e) {
+				view.updateCheckboxes(e.target.value);
+				view.updateApiMethodsMultiselect(e.target.value);
+			},
+
+			apiaccessChange(e) {
+				view.updateApiAccess(e.target.checked);
+			},
+
+			cloneClick() {
+				if (this.readonly) {
+					const url = new Curl('zabbix.php');
+					url.setArgument('action', 'userrole.edit');
+
+					document
+						.querySelectorAll('#name, #user-type')
+						.forEach((element) => {
+							url.setArgument(element.getAttribute('name'), element.getAttribute('value'));
+						});
+
+					redirect(url.getUrl(), 'post', 'action', undefined, false, true);
+				}
+
+				document
+					.querySelectorAll('#roleid, #delete, #clone')
+					.forEach((element) => {
+						element.remove();
+					});
+
+				const update_button = document.getElementById('update');
+				update_button.textContent = <?= json_encode(_('Add')) ?>;
+				update_button.setAttribute('id', 'add');
+				update_button.setAttribute('value', 'userrole.create');
+
+				document.getElementById('name').focus();
+			}
+		}
+	}
 </script>
