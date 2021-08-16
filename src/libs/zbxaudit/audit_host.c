@@ -410,7 +410,7 @@ void	zbx_audit_host_prototype_update_json_update_hostmacro_##resource(zbx_uint64
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(buf, sizeof(buf), "hostprototype.macros[" ZBX_FS_UI64 "].details."#resource, hostmacroid);	\
+	zbx_snprintf(buf, sizeof(buf), "hostprototype.macros[" ZBX_FS_UI64 "]."#resource, hostmacroid);	\
 														\
 	zbx_audit_update_json_update_##type2(hostid, buf, old_##resource, new_##resource);			\
 }														\

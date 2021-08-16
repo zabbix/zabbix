@@ -3906,7 +3906,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					zbx_free(value_esc);
 					d = ",";
 
-					zbx_audit_host_prototype_update_json_update_hostmacro_name(
+					zbx_audit_host_prototype_update_json_update_hostmacro_value(
 							host_prototype->hostid, hostmacro->hostmacroid,
 							((0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_TYPE) &&
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type_orig) ||
