@@ -1755,6 +1755,8 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 				zbx_vector_ptr_append(&children, child);
 		}
 	}
+	else
+		zbx_vector_ptr_append_array(&children, service->children.values, service->children.values_num);
 
 	for (i = 0; i < causes.values_num; i++)
 	{
@@ -1830,7 +1832,7 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 		/* children with 0 weight cannot affect weight based rule, skip them */
 		for (i = 0; i < children.values_num; )
 		{
-			zbx_service_t	*child = (zbx_service_t *)causes.values[i];
+			zbx_service_t	*child = (zbx_service_t *)children.values[i];
 
 			if (0 == child->weight)
 				zbx_vector_ptr_remove(&children, i);
@@ -1850,7 +1852,7 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 
 			zbx_vector_ptr_remove(&children, index);
 			zbx_vector_ptr_append(services, child);
-			service_get_causes(child, n_rule->limit_status, services);
+			service_get_causes(child, w_rule->limit_status, services);
 		}
 	}
 
@@ -1859,10 +1861,18 @@ out:
 	zbx_vector_ptr_destroy(&children);
 }
 
-static void	service_get_rootcause_eventids(const zbx_service_t *parent, zbx_vector_uint64_t *eventids)
+void	service_get_rootcause_eventids(const zbx_service_t *parent, zbx_vector_uint64_t *eventids)
 {
 	zbx_vector_ptr_t	services;
 	int			i, j;
+
+	for (j = 0; j < parent->service_problems.values_num; j++)
+	{
+		zbx_service_problem_t	*service_problem;
+
+		service_problem = (zbx_service_problem_t *)parent->service_problems.values[j];
+		zbx_vector_uint64_append(eventids, service_problem->eventid);
+	}
 
 	zbx_vector_ptr_create(&services);
 
