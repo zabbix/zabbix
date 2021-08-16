@@ -2694,7 +2694,7 @@ static int	DBhost_prototypes_macro_make(zbx_vector_macros_t *hostmacros, zbx_uin
 			if (hostmacro->type != type)
 			{
 				hostmacro->flags |= ZBX_FLAG_HPMACRO_UPDATE_TYPE;
-				hostmacro->type = type;
+				hostmacro->type_orig = type;
 			}
 
 			return SUCCEED;
@@ -3888,7 +3888,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 						(int)hostmacro->type);
 
 				zbx_audit_host_prototype_update_json_add_hostmacro(host_prototype->hostid,
-						new_hostmacroid, hostmacro->macro, hostmacro->value,
+						new_hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
+						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
 						hostmacro->description, (int)hostmacro->type);
 				new_hostmacroid++;
 			}
@@ -3907,7 +3908,11 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 					zbx_audit_host_prototype_update_json_update_hostmacro_name(
 							host_prototype->hostid, hostmacro->hostmacroid,
-							hostmacro->value_orig, hostmacro->value);
+							(0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_TYPE) &&
+							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type_orig) ?
+							ZBX_MACRO_SECRET_MASK : hostmacro->value_orig,
+							(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
+							ZBX_MACRO_SECRET_MASK : hostmacro->value);
 				}
 
 				if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_DESCRIPTION))
