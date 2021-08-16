@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
+ * @onBefore prepareUserData
+ *
  * @backup config, users
  */
 class testPasswordComplexity extends CWebTest {
@@ -41,6 +43,45 @@ class testPasswordComplexity extends CWebTest {
 	 * @var integer
 	 */
 	protected static $userid;
+
+	/**
+	 * Password for user which is being changed in scenarios.
+	 *
+	 * @var string
+	 */
+	protected static $user_password = 'Iamrobot1!';
+
+	/**
+	 * Password for Admin which is being changed in scenarios.
+	 *
+	 * @var string
+	 */
+	protected static $admin_password = 'zabbix';
+
+	/**
+	 * Add user for updating.
+	 */
+	public function prepareUserData() {
+		CDataHelper::setSessionId(null);
+
+		$response = CDataHelper::call('user.create', [
+			[
+				'username' => 'update-user',
+				'passwd' => 'Iamrobot1!',
+				'autologin' => 1,
+				'autologout' => 0,
+				'roleid' => 1,
+				'usrgrps' => [
+					[
+						'usrgrpid' => '7'
+					]
+				]
+			]
+		]);
+
+		$this->assertArrayHasKey('userids', $response);
+		self::$userid = $response['userids'][0];
+	}
 
 	/**
 	 * Check authentication form fields layout.
@@ -194,10 +235,10 @@ class testPasswordComplexity extends CWebTest {
 		}
 	}
 
-	public function getUserPasswordData() {
+	public function getCommonPasswordData() {
 		return [
-			// Check default password complexity settings.
 			[
+				// Check default password complexity settings.
 				[
 					'auth_fields' => [
 						'Minimum password length' => '8',
@@ -702,7 +743,12 @@ class testPasswordComplexity extends CWebTest {
 						"\nmust not be one of common or context-specific passwords",
 					'error' => 'Incorrect value for field "/1/passwd": must contain at least one special character.'
 				]
-			],
+			]
+		];
+	}
+
+	public function getUserPasswordData() {
+		return [
 			[
 				[
 					'expected' => TEST_BAD,
@@ -922,56 +968,61 @@ class testPasswordComplexity extends CWebTest {
 	/**
 	 * Check user creation with password complexity rules.
 	 *
+	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getUserPasswordData
 	 */
 	public function testPasswordComplexity_CreateUserPassword($data) {
-		$this->checkPasswordComplexity($data);
+		$this->checkPasswordComplexity($data, self::$admin_password);
 	}
 
 	/**
-	 * Add user for updating.
+	 * Check user changes his own password accordingly to complexity rules.
+	 *
+	 * @dataProvider getCommonPasswordData
+	 * @dataProvider getUserPasswordData
 	 */
-	public function prepareUserData() {
-		CDataHelper::setSessionId(null);
+	public function testPasswordComplexity_ChangeOwnUserPassword($data) {
+		$own = true;
+		$update = true;
+		$userid = self::$userid;
+		$this->checkPasswordComplexity($data, self::$admin_password, $userid, $update, $own, self::$user_password,);
+	}
 
-		$response = CDataHelper::call('user.create', [
-			[
-				'username' => 'update-user',
-				'passwd' => 'Iamrobot1!',
-				'roleid' => 1,
-				'usrgrps' => [
-					[
-						'usrgrpid' => '7'
-					]
-				]
-			]
-		]);
-
-		$this->assertArrayHasKey('userids', $response);
-		self::$userid = $response['userids'][0];
+	/**
+	 * Check Admin changes his own password accordingly to complexity rules.
+	 *
+	 * @dataProvider getCommonPasswordData
+	 * @dataProvider getAdminPasswordData
+	 */
+	public function testPasswordComplexity_ChangeOwnAdminPassword($data) {
+		$own = true;
+		$update = true;
+		$userid = 1;
+		$this->checkPasswordComplexity($data, self::$admin_password, $userid, $update, $own);
 	}
 
 	/**
 	 * Check user update with password complexity rules.
 	 *
-	 * @onBeforeOnce prepareUserData
-	 *
+	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getUserPasswordData
 	 */
 	public function testPasswordComplexity_UpdateUserPassword($data) {
 		$update = true;
-		$this->checkPasswordComplexity($data, $update);
+		$userid = self::$userid;
+		$this->checkPasswordComplexity($data, self::$admin_password, $userid, $update);
 	}
 
 	/**
-	 * Check user creation with password complexity rules.
+	 * Check admin user password update accordingly to complexity rules.
 	 *
+	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getAdminPasswordData
 	 */
 	public function testPasswordComplexity_UpdateAdminPassword($data) {
-		self::$userid = 1;
+		$userid = 1;
 		$update = true;
-		$this->checkPasswordComplexity($data, $update);
+		$this->checkPasswordComplexity($data, self::$admin_password, $userid, $update);
 	}
 
 	/**
@@ -980,26 +1031,40 @@ class testPasswordComplexity extends CWebTest {
 	 * @param array      $data       data provider
 	 * @param boolean    $update     false if create, true if update
 	 */
-	private function checkPasswordComplexity($data, $update = false) {
+	private function checkPasswordComplexity($data, $admin_password, $userid = null, $update = false, $own = false,
+			$user_password = null
+	) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM users');
+			$old_hash = CDBHelper::getHash('SELECT * FROM users ORDER BY userid');
 		}
 
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$this->page->userLogin('Admin', $admin_password);
+		$this->page->open('zabbix.php?action=authentication.edit');
 		$auth_form = $this->query('name:form_auth')->asForm()->waitUntilPresent()->one();
 		$auth_form->fill($data['auth_fields']);
 		$auth_form->submit();
 		$this->page->waitUntilReady();
-		// Uncomment this when ZBX-19669 is fixed.
+		// TODO: Uncomment this when ZBX-19669 is fixed.
 //		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$this->assertEquals($data['db_passwd_check_rules'],
 			CDBHelper::getValue('SELECT passwd_check_rules FROM config'));
 
 		if ($update) {
-			$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$userid);
-			$this->query('button:Change password')->waitUntilClickable()->one()->click();
-			$this->query('id:password1')->waitUntilPresent()->one();
-			$this->query('id:password2')->waitUntilPresent()->one();
+			if ($own) {
+				if ($userid === 1) {
+					$this->page->open('zabbix.php?action=userprofile.edit');
+					$this->clickChangePassword();
+				}
+				else {
+					$this->page->userLogin('update-user', $user_password);
+					$this->page->open('zabbix.php?action=userprofile.edit');
+					$this->clickChangePassword();
+				}
+			}
+			else {
+				$this->page->login()->open('zabbix.php?action=user.edit&userid='.$userid);
+				$this->clickChangePassword();
+			}
 		}
 		else {
 			$this->page->login()->open('zabbix.php?action=user.edit');
@@ -1007,11 +1072,11 @@ class testPasswordComplexity extends CWebTest {
 
 		// Check user password creation accordingly to complexity settings.
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
-		$username = (self::$userid === 1)
+		$username = ($userid === 1)
 			? 'Admin'
 			: ($update ? 'update-user' : 'username'.time());
 
-		if ($update === false){
+		if ($update === false && $own === false){
 			$user_form->fill([
 				'Username' => $username,
 				'Groups' => ['Zabbix administrators']
@@ -1045,7 +1110,7 @@ class testPasswordComplexity extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'add').' user', $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM users'));
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM users ORDER BY userid'));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'User '.($update ? 'updated' : 'added'));
@@ -1055,9 +1120,26 @@ class testPasswordComplexity extends CWebTest {
 
 			// Check success login with new password.
 			$this->page->userLogin($username, $data['Password']);
-			$this->assertTrue($this->query('xpath://a[@title="'.((self::$userid === 1) ? 'Admin (Zabbix Administrator)'
+			$this->assertTrue($this->query('xpath://a[@title="'.(($userid === 1) ? 'Admin (Zabbix Administrator)'
 					: $username).'" and text()="User settings"]')->exists()
 			);
+
+			// Write new password for next case.
+			if (($userid === 1) && ($own || $update)) {
+				self::$admin_password = $data['Password'];
+			}
+			elseif ($own) {
+				self::$user_password = $data['Password'];
+			}
 		}
+	}
+
+	/**
+	 * Click button "Change password" and wait until both password fields are editable.
+	 */
+	private function clickChangePassword() {
+		$this->query('button:Change password')->waitUntilClickable()->one()->click();
+		$this->query('id:password1')->waitUntilPresent()->one();
+		$this->query('id:password2')->waitUntilPresent()->one();
 	}
 }
