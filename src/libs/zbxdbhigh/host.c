@@ -3572,7 +3572,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	zbx_macros_prototype_t		*hostmacro;
 	zbx_db_tag_t			*tag;
 	zbx_interfaces_prototype_t	*interface;
-	zbx_uint64_t			hostid = 0, hosttemplateid = 0, group_prototypeid = 0, hostmacroid = 0,
+	zbx_uint64_t			hostid = 0, hosttemplateid = 0, group_prototypeid = 0, new_hostmacroid = 0,
 					hosttagid = 0, interfaceid = 0;
 	int				i, j, new_hosts = 0, new_hosts_templates = 0, new_group_prototypes = 0,
 					upd_group_prototypes = 0, new_hostmacros = 0, upd_hostmacros = 0,
@@ -3743,7 +3743,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 	if (0 != new_hostmacros)
 	{
-		hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
+		new_hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
 		zbx_db_insert_prepare(&db_insert_hmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value",
 				"description", "type", NULL);
@@ -3883,14 +3883,14 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 			if (0 == hostmacro->hostmacroid)
 			{
-				zbx_db_insert_add_values(&db_insert_hmacro, hostmacroid, host_prototype->hostid,
+				zbx_db_insert_add_values(&db_insert_hmacro, new_hostmacroid, host_prototype->hostid,
 						hostmacro->macro, hostmacro->value, hostmacro->description,
 						(int)hostmacro->type);
 
-				zbx_audit_host_prototype_update_json_add_hostmacro(host_prototype->hostid, hostmacroid,
-						hostmacro->macro, hostmacro->value, hostmacro->description,
-						(int)hostmacro->type);
-				hostmacroid++;
+				zbx_audit_host_prototype_update_json_add_hostmacro(host_prototype->hostid,
+						new_hostmacroid, hostmacro->macro, hostmacro->value,
+						hostmacro->description, (int)hostmacro->type);
+				new_hostmacroid++;
 			}
 			else if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE))
 			{
@@ -3906,8 +3906,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					d = ",";
 
 					zbx_audit_host_prototype_update_json_update_hostmacro_name(
-							host_prototype->hostid, hostmacroid, hostmacro->value_orig,
-							hostmacro->value);
+							host_prototype->hostid, hostmacro->hostmacroid,
+							hostmacro->value_orig, hostmacro->value);
 				}
 
 				if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_DESCRIPTION))
@@ -3919,7 +3919,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					d = ",";
 
 					zbx_audit_host_prototype_update_json_update_hostmacro_description(
-							host_prototype->hostid, hostmacroid,
+							host_prototype->hostid, hostmacro->hostmacroid,
 							hostmacro->description_orig, hostmacro->description);
 				}
 
@@ -3929,7 +3929,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 							d, hostmacro->type);
 
 					zbx_audit_host_prototype_update_json_update_hostmacro_type(
-							host_prototype->hostid, hostmacroid,
+							host_prototype->hostid, hostmacro->hostmacroid,
 							hostmacro->type_orig, hostmacro->type);
 				}
 
