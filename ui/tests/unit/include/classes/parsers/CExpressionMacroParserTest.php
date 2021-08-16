@@ -75,6 +75,16 @@ class CExpressionMacroParserTest extends TestCase {
 				'match' => '',
 				'length' => 0
 			]],
+			['text {? last(/{HOST.HOST6}/key, #25) } text', ['host_macro' => true], 5, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'length' => 0
+			]],
+			['text {? last(/{HOST.HOST}/key, #25) } text', ['host_macro' => true], 5, [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '{? last(/{HOST.HOST}/key, #25) }',
+				'length' => 32
+			]],
 			['text {? last(/{HOST.HOST}/key, #25) } text', ['host_macro_n' => true], 5, [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '{? last(/{HOST.HOST}/key, #25) }',
