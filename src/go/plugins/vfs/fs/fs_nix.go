@@ -55,7 +55,7 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 		}
 
 		if bytes.Total > 0 && inodes.Total > 0 {
-			fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes}
+			fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes}
 		}
 	}
 

@@ -1354,7 +1354,7 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
 	}
 	else
 	{
-		zbx_variant_set_ui64(value, results.values_num);
+		zbx_variant_set_ui64(value, (zbx_uint64_t)results.values_num);
 		zbx_vector_dbl_destroy(&results);
 	}
 }

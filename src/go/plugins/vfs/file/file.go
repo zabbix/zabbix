@@ -57,6 +57,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.exportRegmatch(params)
 	case "vfs.file.md5sum":
 		return p.exportMd5sum(params)
+	case "vfs.file.owner":
+		return p.exportOwner(params)
+	case "vfs.file.permissions":
+		return p.exportPermissions(params)
+	case "vfs.file.get":
+		return p.exportGet(params)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
@@ -88,5 +94,8 @@ func init() {
 		"vfs.file.size", "Returns file size.",
 		"vfs.file.regexp", "Find string in a file.",
 		"vfs.file.regmatch", "Find string in a file.",
-		"vfs.file.md5sum", "Returns MD5 checksum of file.")
+		"vfs.file.md5sum", "Returns MD5 checksum of file.",
+		"vfs.file.owner", "Returns the ownership of a file.",
+		"vfs.file.permissions", "Returns 4-digit string containing octal number with Unix permissions.",
+		"vfs.file.get", "Return json object with information about a file.")
 }
