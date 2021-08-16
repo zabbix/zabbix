@@ -22,8 +22,29 @@
 #include "log.h"
 #include "../zbxalgo/vectorimpl.h"
 
+zbx_db_tag_t		*zbx_db_tag_create(const char *tag_tag, const char *tag_value)
+{
+	zbx_db_tag_t		*tag;
+
+	tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+	tag->flags = ZBX_FLAG_DB_TAG_UNSET;
+	tag->tag = zbx_strdup(NULL, tag_tag);
+	tag->value = zbx_strdup(NULL, tag_value);
+	tag->tag_orig = NULL;
+	tag->value_orig = NULL;
+
+	return tag;
+}
+
+
 void	zbx_db_tag_free(zbx_db_tag_t *tag)
 {
+	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+		zbx_free(tag->tag_orig);
+
+	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
+		zbx_free(tag->value_orig);
+
 	zbx_free(tag->tag);
 	zbx_free(tag->value);
 	zbx_free(tag);

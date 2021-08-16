@@ -1,6 +1,9 @@
 Changes for 6.0.0alpha1
 
 New features:
+A.F.I...S. [ZBXNEXT-6813] changed UI language from en_GB to en_US (rlataria)
+.........T [ZBXNEXT-6765] added template Cloudflare by HTTP (mchudinov)
+...G...... [ZBXNEXT-6688] added new items for Agent and Agent2 (asestakovs, MVekslers)
 .........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
 A.F.....S. [ZBXNEXT-6601] added monoinc() and monodec() functions (arimdjonoks)
 ........S. [ZBXNEXT-6470,ZBXNEXT-6768] implemented audit for server (except for linking and LLD) (arimdjonoks)
@@ -35,6 +38,14 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
+.........T [ZBX-19749] changed tags, the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
+..F....... [ZBX-18135] fixed warning message close button (agriscenko)
+..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
+........S. [ZBX-19767] fixed memory errors when server links updated template hostprototype with new interface (asestakovs)
+.........T [ZBX-19612] changed host name to visible name for consistency with UI (abiba)
+........S. [ZBX-19741] fixed database upgrade patch failing due to large query (vso)
+........S. [ZBX-19737] fixed prometheus preprocessing bug (yurii)
 ........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 ........S. [ZBX-19660] fixed script permission check when executing on current host (wiper)
 A......... [ZBX-19752] fixed multiple types of media type creation having message templates in one API call (gcalenko)
@@ -153,12 +164,22 @@ A......... [ZBX-8999] fixed exporting of images separately from other objects (I
 Changes for 5.4.4rc1
 
 New features:
+.........T [ZBXNEXT-6765] added template Cloudflare by HTTP (mchudinov)
 .........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
 A.F....... [ZBXNEXT-6528,ZBXNEXT-6569] improved performance of graphs and graphs prototypes configuration process (rlataria, Sasha, vmaksimovs)
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 
 Bug fixes:
+...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
+A......... [ZBX-19341] fixed template export missing inventory mode for Host prototype (jfreibergs)
+.........T [ZBX-19749] changed tags, the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
+..F....... [ZBX-18135] fixed warning message close button (agriscenko)
+..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
+........S. [ZBX-19767] fixed memory errors when server links updated template hostprototype with new interface (asestakovs)
+.........T [ZBX-19612] changed host name to visible name for consistency with UI (abiba)
+........S. [ZBX-19741] fixed database upgrade patch failing due to large query (vso)
+........S. [ZBX-19737] fixed prometheus preprocessing bug (yurii)
 ........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 A......... [ZBX-19752] fixed multiple types of media type creation having message templates in one API call (gcalenko)
 ........S. [ZBX-19660] fixed script permission check when executing on current host (wiper)
@@ -1115,6 +1136,14 @@ New features:
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
+.........T [ZBX-19762] removed unsupported items in Zabbix server templates (abakaldin)
+.........T [ZBX-19749] changed the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
+..F....... [ZBX-18135] fixed warning message close button (agriscenko)
+A......... [ZBX-19341] fixed template export missing inventory mode for Host prototype (jfreibergs)
+..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
+.........T [ZBX-19612] changed host name to visible name for consistency with UI (abiba)
+........S. [ZBX-19737] fixed prometheus preprocessing bug (yurii)
 ........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 A......... [ZBX-19752] fixed multiple types of media type creation having message templates in one API call (gcalenko)
 ..F....... [ZBX-18271] fixed incorrect ordering for tags and overrides in widgets, operations overrides in host prototype form and interface order in item and discovery prototypes forms (gcalenko, Sasha)
@@ -3291,6 +3320,7 @@ Changes for 4.0.33rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
 ........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 ..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
 ..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)

@@ -381,11 +381,9 @@ static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
 			host = (zbx_lld_host_t *)hosts->values[i];
 		}
 
-		tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+		tag = zbx_db_tag_create(row[2], row[3]);
 		ZBX_STR2UINT64(tag->tagid, row[0]);
-		tag->tag = zbx_strdup(NULL, row[2]);
-		tag->value = zbx_strdup(NULL, row[3]);
-		tag->flags = 0;
+
 		zbx_vector_db_tag_ptr_append(&host->tags, tag);
 	}
 out:
@@ -2161,10 +2159,7 @@ static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
-
-		tag->tag = zbx_strdup(NULL, row[0]);
-		tag->value = zbx_strdup(NULL, row[1]);
+		tag = zbx_db_tag_create(row[0], row[1]);
 
 		zbx_vector_db_tag_ptr_append(tags, tag);
 	}
@@ -2294,9 +2289,7 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 		if (SUCCEED != lld_tag_validate(new_tags.values, new_tags.values_num, tag, value, info))
 			continue;
 
-		proto_tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
-		proto_tag->tag = tag;
-		proto_tag->value = value;
+		proto_tag = zbx_db_tag_create(tag, value);
 		zbx_vector_db_tag_ptr_append(&new_tags, proto_tag);
 
 		tag = NULL;

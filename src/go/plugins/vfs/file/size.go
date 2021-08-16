@@ -20,22 +20,62 @@
 package file
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"os"
+
+	"zabbix.com/pkg/zbxerr"
 )
 
 // Export -
 func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
-	if len(params) != 1 {
+	if len(params) == 0 || len(params) > 2 {
 		return nil, errors.New("Invalid number of parameters.")
 	}
 	if "" == params[0] {
 		return nil, errors.New("Invalid first parameter.")
 	}
+	mode := "bytes"
+	if len(params) == 2 && len(params[1]) != 0 {
+		mode = params[1]
+	}
 
-	if f, err := stdOs.Stat(params[0]); err == nil {
-		return f.Size(), nil
-	} else {
-		return nil, fmt.Errorf("Cannot obtain file information: %s", err)
+	switch mode {
+	case "bytes":
+		if f, err := stdOs.Stat(params[0]); err == nil {
+			return f.Size(), nil
+		} else {
+			return nil, zbxerr.New("Cannot obtain file information").Wrap(err)
+		}
+	case "lines":
+		return newlineCounter(params[0])
+	default:
+		return nil, errors.New("Invalid second parameter.")
+	}
+}
+
+// lineCounter - count number of newline in file
+func newlineCounter(fileName string) (result interface{}, err error) {
+	var file *os.File
+	if file, err = os.Open(fileName); err != nil {
+		return nil, zbxerr.New("Invalid first parameter").Wrap(err)
+	}
+	defer file.Close()
+	buf := make([]byte, 64*1024)
+	var count int64 = 0
+	lineSep := []byte{'\n'}
+
+	for {
+		c, err := file.Read(buf)
+		count += int64(bytes.Count(buf[:c], lineSep))
+
+		switch {
+		case err == io.EOF:
+			return count, nil
+		case err != nil:
+			return nil, zbxerr.New(fmt.Sprintf("Invalid file content")).Wrap(err)
+		}
 	}
 }
