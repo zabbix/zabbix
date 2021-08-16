@@ -878,7 +878,7 @@ class CMediatype extends CApiService {
 		}
 
 		if ($ins_media_type_message) {
-			DB::insertBatch('media_type_message', $ins_media_type_message);
+			DB::insert('media_type_message', $ins_media_type_message);
 		}
 
 		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $mediatypes);

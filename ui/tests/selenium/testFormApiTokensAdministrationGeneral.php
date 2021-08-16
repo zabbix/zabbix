@@ -32,8 +32,6 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	 * Function creates the given API tokens in the test branch.
 	 */
 	public static function prepareTokenData() {
-		CDataHelper::setSessionId(null);
-
 		$response = CDataHelper::call('token.create', [
 			[
 				'name' => 'Admin reference token',
@@ -201,7 +199,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 						'User' => 'Admin',
 						'Description' => 'Token that is already expired when created',
 						'Set expiration date and time' => true,
-						'Expires at' => '2038-01-01 00:00:00',
+						'Expires at' => '1970-01-01 00:00:00',
 						'Enabled' => true
 					],
 					'already_expired' => true,

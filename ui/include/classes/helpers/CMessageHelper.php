@@ -26,6 +26,7 @@ class CMessageHelper {
 
 	public const MESSAGE_TYPE_ERROR   = 'error';
 	public const MESSAGE_TYPE_SUCCESS = 'success';
+	public const MESSAGE_TYPE_WARNING = 'warning';
 
 	/**
 	 * @var string
@@ -69,6 +70,9 @@ class CMessageHelper {
 		if ($message['type'] === self::MESSAGE_TYPE_SUCCESS) {
 			self::addSuccess($message['message']);
 		}
+		elseif ($message['type'] === self::MESSAGE_TYPE_WARNING) {
+			self::addWarning($message['message']);
+		}
 		else {
 			self::addError($message['message'], $message['source']);
 		}
@@ -100,6 +104,18 @@ class CMessageHelper {
 	public static function addSuccess(string $message): void {
 		self::$messages[] = [
 			'type' => self::MESSAGE_TYPE_SUCCESS,
+			'message' => $message
+		];
+	}
+
+	/**
+	 * Add message with type warning.
+	 *
+	 * @param string $message
+	 */
+	public static function addWarning(string $message): void {
+		self::$messages[] = [
+			'type' => self::MESSAGE_TYPE_WARNING,
 			'message' => $message
 		];
 	}

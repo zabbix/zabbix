@@ -72,9 +72,6 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 				'mediatypeid', 'alerttype'
 			],
 			'selectMediatypes' => ['name', 'maxattempts'],
-			'filter' => [
-				'alerttype' => ALERT_TYPE_MESSAGE
-			],
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => $show_lines

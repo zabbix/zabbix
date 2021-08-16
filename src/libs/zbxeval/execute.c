@@ -2571,7 +2571,6 @@ static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const z
 static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	int		i;
 	zbx_variant_t	*arg, ret_value;
 
 	if (1 != token->opt)
@@ -2589,7 +2588,7 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 				ctx->expression + token->loc.l);
 	}
 
-	zbx_variant_set_ui64(&ret_value, arg->data.dbl_vector->values_num);
+	zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)arg->data.dbl_vector->values_num);
 
 	eval_function_return(token->opt, &ret_value, output);
 

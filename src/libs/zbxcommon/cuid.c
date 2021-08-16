@@ -38,25 +38,47 @@
 #define HOST_TMP_36_BASE_BUF_LEN	10
 #define RAND_TMP_36_BASE_BUF_LEN	10
 
+#define PAD_FILL_CHAR			'0'
+
 static char	host_block[HOST_TMP_36_BASE_BUF_LEN];
 
-static void	pad(char *input, size_t pad_size)
+/******************************************************************************
+ *                                                                            *
+ * Function: pad                                                              *
+ *                                                                            *
+ * Purpose: modify string in-place to the specified length as required by     *
+ *          CUID algorithm                                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     input       - [IN/OUT] input string and result                         *
+ *     input_alloc - [IN] buffer size where the input string is stored. It    *
+ *                   should be larger than 'pad_size'.                        *
+ *     pad_size    - [IN] target length                                       *
+ *     fill_char   - [IN] character used to fill target string if there are   *
+ *                   not enough existing characters                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	pad(char *input, size_t input_alloc, size_t pad_size, char fill_char)
 {
-	size_t	i, input_len;
+	size_t	input_len;
 
-	input_len = strlen(input);
+	if (pad_size == (input_len = strlen(input)))
+		return;
 
-	if (pad_size > input_len)
+	if (pad_size > input_len)	/* make string longer by prepending fill_char s */
 	{
-		for (i = 0; i < input_len; i++)
-			input[i + pad_size - input_len] = input[i];
-		memset(input, '0', pad_size-input_len);
+		if (pad_size + 1 > input_alloc || input_len + 1 > input_alloc)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return;
+		}
+
+		memmove(input + pad_size - input_len, input, input_len);
+		memset(input, fill_char, pad_size - input_len);
 	}
-	else
-	{
-		for (i = 0; i < pad_size; i++)
-			input[i] = input[i + input_len - pad_size];
-	}
+	else				/* make string shorter by keeping only last characters */
+		memmove(input, input + input_len - pad_size, pad_size);
+
 	input[pad_size] = '\0';
 }
 
@@ -130,8 +152,8 @@ static void	zbx_cuid_init(void)
 	for (i = 0; i < hostname_len; i++)
 		hostname_num = hostname_num + (size_t)hostname[i];
 
-	from_decimal(host_block, 10, hostname_num);
-	pad(host_block, CUID_HOSTNAME_BLOCK_SIZE);
+	from_decimal(host_block, CUID_BASE_36, hostname_num);
+	pad(host_block, sizeof(host_block), CUID_HOSTNAME_BLOCK_SIZE, PAD_FILL_CHAR);
 	zbx_free(hostname);
 }
 
@@ -171,20 +193,20 @@ void	zbx_new_cuid(char *cuid)
 	struct timeval	current_time;
 
 	from_decimal(counter, CUID_BASE_36, next());
-	pad(counter, CUID_BLOCK_SIZE);
+	pad(counter, sizeof(counter), CUID_BLOCK_SIZE, PAD_FILL_CHAR);
 
 	from_decimal(pid_block, CUID_BASE_36, (size_t)getpid());
-	pad(pid_block, CUID_PID_BLOCK_SIZE);
+	pad(pid_block, sizeof(pid_block), CUID_PID_BLOCK_SIZE, PAD_FILL_CHAR);
 
 	gettimeofday(&current_time, NULL);
 	from_decimal(timestamp, CUID_BASE_36, (size_t)(current_time.tv_sec * 1000 + current_time.tv_usec / 1000));
 
 	from_decimal(rand_block_1, CUID_BASE_36, (size_t)rand());
-	pad(rand_block_1, CUID_BLOCK_SIZE);
+	pad(rand_block_1, sizeof(rand_block_1), CUID_BLOCK_SIZE, PAD_FILL_CHAR);
 
 	from_decimal(rand_block_2, CUID_BASE_36, (size_t)rand());
-	pad(rand_block_2, CUID_BLOCK_SIZE);
+	pad(rand_block_2, sizeof(rand_block_2), CUID_BLOCK_SIZE, PAD_FILL_CHAR);
 
-	zbx_snprintf(fingerprint, sizeof(fingerprint), "%s%s", host_block, pid_block);
+	zbx_snprintf(fingerprint, sizeof(fingerprint), "%s%s", pid_block, host_block);
 	zbx_snprintf(cuid, CUID_LEN, "c%s%s%s%s%s", timestamp, counter, fingerprint, rand_block_1, rand_block_2);
 }
