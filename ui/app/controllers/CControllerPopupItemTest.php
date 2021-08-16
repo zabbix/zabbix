@@ -1015,9 +1015,11 @@ abstract class CControllerPopupItemTest extends CController {
 						? $macros_posted[$macro]
 						: '';
 
-					if (($inputs['post_type'] == ZBX_POSTTYPE_JSON || $inputs['post_type'] == ZBX_POSTTYPE_XML)
-							&& $field === 'posts' && !is_numeric($macro_value)) {
+					if ($inputs['post_type'] == ZBX_POSTTYPE_JSON && $field === 'posts' && !is_numeric($macro_value)) {
 						$macro_value = json_encode($macro_value);
+					}
+					elseif ($inputs['post_type'] == ZBX_POSTTYPE_XML && $field === 'posts') {
+						$macro_value = htmlentities($macro_value);
 					}
 
 					$inputs[$field] = substr_replace($inputs[$field], $macro_value, $pos, strlen($macro));
