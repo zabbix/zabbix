@@ -653,7 +653,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->assertHeader('User roles');
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
-		$this->assertEquals($roles, $this->query('class:js-userrole-usertype')->one()->asZDropdown()->getOptions()->asText());
+		$this->assertEquals($roles, $this->query('id:user-type')->one()->asZDropdown()->getOptions()->asText());
 
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
@@ -669,7 +669,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->removeFocus();
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
-			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
+			$this->query('id:user-type')->one()->asZDropdown()->select($role);
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 
 			// List of API requests.
