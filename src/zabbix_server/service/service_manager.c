@@ -1726,6 +1726,20 @@ out:
 	return status;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: service_get_causes                                               *
+ *                                                                            *
+ * Purpose: get services that caused the target service to be in the          *
+ *          specified severity state                                          *
+ *                                                                            *
+ * Parameters: service   - [IN] the service                                   *
+ *             serverity - [IN] the required severity                         *
+ *             eventids  - [OUT] the services                                 *
+ *                                                                            *
+ * Comments: The returned list includes children, grandchildren etc           *
+ *                                                                            *
+ ******************************************************************************/
 static void	service_get_causes(const zbx_service_t *service, int severity, zbx_vector_ptr_t *services)
 {
 	int			status, child_status, i, index;
@@ -1861,6 +1875,16 @@ out:
 	zbx_vector_ptr_destroy(&children);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: service_get_rootcause_eventids                                   *
+ *                                                                            *
+ * Purpose: get root cause eventids for the service                           *
+ *                                                                            *
+ * Parameters: parent   - [IN] the service                                    *
+ *             eventids - [OUT] the event identifierse                        *
+ *                                                                            *
+ ******************************************************************************/
 void	service_get_rootcause_eventids(const zbx_service_t *parent, zbx_vector_uint64_t *eventids)
 {
 	zbx_vector_ptr_t	services;
