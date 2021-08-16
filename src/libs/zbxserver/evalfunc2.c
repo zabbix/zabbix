@@ -2512,6 +2512,168 @@ out:
 	return ret;
 }
 
+/* flags for evaluate_MONO() */
+#define MONOINC		0
+#define MONODEC		1
+
+#define CHECK_MONOTONICITY(type, mode_op, epsi_op)					\
+	for (i = 0; i < values.values_num - 1; i++)					\
+	{										\
+		if (0 == strict && values.values[i + 1].value.type mode_op		\
+				(epsi_op + values.values[i].value.type))		\
+		{									\
+			res = 0;							\
+			break;								\
+		}									\
+		else if (1 == strict && values.values[i + 1].value.type mode_op##=	\
+				(epsi_op + values.values[i].value.type ) )		\
+		{									\
+			res = 0;							\
+			break;								\
+		}									\
+	}										\
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_MONO                                                    *
+ *                                                                            *
+ * Purpose: evaluate functions 'monoinc' and 'monodec' for the item           *
+ *                                                                            *
+ * Parameters: value      - [OUT] the function return value                   *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] mode, strict or weak monotonicity            *
+ *             ts         - [IN] the function execution time                  *
+ *             gradient   - [IN] check increase or decrease of monotonicity   *
+ *             error      - [OUT] the error message if function failed        *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_MONO(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		int gradient, char **error)
+{
+	int				arg1, i, num, time_shift, strict = 0, ret = FAIL, seconds = 0, nvalues = 0;
+	char				*arg2 = NULL;
+	zbx_uint64_t			res;
+	zbx_value_type_t		arg1_type;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			ts_end = *ts;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+	{
+		*error = zbx_strdup(*error, "invalid value type");
+		goto out;
+	}
+
+	num = num_param(parameters);
+
+	if (1 > num || 2 < num )
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
+			ZBX_VALUE_NONE == arg1_type)
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (1 < num && (SUCCEED != get_function_parameter_str(parameters, 2, &arg2) ||
+			('\0' != *arg2 && 0 == (strict = (0 == strcmp("strict", arg2))) &&
+			0 != strcmp("weak", arg2))))
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+
+	ts_end.sec -= time_shift;
+
+	switch (arg1_type)
+	{
+		case ZBX_VALUE_SECONDS:
+			seconds = arg1;
+			break;
+		case ZBX_VALUE_NVALUES:
+			nvalues = arg1;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto out;
+	}
+
+	if (0 < values.values_num)
+	{
+		res = 1;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			if (MONOINC == gradient)
+			{
+				CHECK_MONOTONICITY(dbl, >, +ZBX_DOUBLE_EPSILON);
+			}
+			else if (MONODEC == gradient)
+			{
+				CHECK_MONOTONICITY(dbl, <, -ZBX_DOUBLE_EPSILON);
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+			}
+		}
+		else if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
+		{
+			if (MONOINC == gradient)
+			{
+				CHECK_MONOTONICITY(ui64, >, 0);
+			}
+			else if (MONODEC == gradient)
+			{
+				CHECK_MONOTONICITY(ui64, <, 0);
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+			}
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+		}
+		zbx_variant_set_ui64(value, res);
+		ret = SUCCEED;
+	}
+	else
+	{
+		if (MONOINC == gradient)
+			zabbix_log(LOG_LEVEL_DEBUG, "result for MONOINC is empty");
+		else if (MONODEC == gradient)
+			zabbix_log(LOG_LEVEL_DEBUG, "result for MONODEC is empty");
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
+
+		*error = zbx_strdup(*error, "not enough data");
+	}
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+	zbx_free(arg2);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
 		zbx_vector_dbl_t *values)
 {
@@ -2720,6 +2882,14 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	else if (0 == strcmp(function, "varsamp"))
 	{
 		ret = evaluate_statistical_func(value, item, parameter, ts, zbx_eval_calc_varsamp, 2, error);
+	}
+	else if (0 == strcmp(function, "monoinc"))
+	{
+		ret = evaluate_MONO(value, item, parameter, ts, MONOINC, error);
+	}
+	else if (0 == strcmp(function, "monodec"))
+	{
+		ret = evaluate_MONO(value, item, parameter, ts, MONODEC, error);
 	}
 	else
 	{

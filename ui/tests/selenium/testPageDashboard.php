@@ -71,13 +71,13 @@ class testPageDashboard extends CLegacyWebTest {
 				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
 				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
 			}
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favorite graphs');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Favorite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[5]//h4", 'Problems');
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Problems by severity']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Local']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[2]//h4[text()='Host availability']");
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[1]//h4", 'System information');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Favorite graphs');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favorite maps');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Problems');
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Problems by severity']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Local']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Host availability']");
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'System information');
 
 			// Logout.
 			$this->zbxTestLogout();

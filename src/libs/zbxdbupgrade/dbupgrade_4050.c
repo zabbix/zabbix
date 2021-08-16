@@ -730,10 +730,10 @@ typedef struct
 }
 dbu_interface_t;
 
-ZBX_PTR_VECTOR_DECL(dbu_interface, dbu_interface_t);
-ZBX_PTR_VECTOR_IMPL(dbu_interface, dbu_interface_t);
-ZBX_PTR_VECTOR_DECL(dbu_snmp_if, dbu_snmp_if_t);
-ZBX_PTR_VECTOR_IMPL(dbu_snmp_if, dbu_snmp_if_t);
+ZBX_PTR_VECTOR_DECL(dbu_interface, dbu_interface_t)
+ZBX_PTR_VECTOR_IMPL(dbu_interface, dbu_interface_t)
+ZBX_PTR_VECTOR_DECL(dbu_snmp_if, dbu_snmp_if_t)
+ZBX_PTR_VECTOR_IMPL(dbu_snmp_if, dbu_snmp_if_t)
 
 static void	db_interface_free(dbu_interface_t interface)
 {

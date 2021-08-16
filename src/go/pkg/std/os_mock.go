@@ -25,7 +25,6 @@ package std
 
 import (
 	"bytes"
-	"errors"
 	"os"
 	"syscall"
 	"time"
@@ -62,7 +61,7 @@ type fileStat struct {
 
 func (o *mockOs) Open(name string) (File, error) {
 	if data, ok := o.files[name]; !ok {
-		return nil, errors.New("file does not exist")
+		return nil, os.ErrNotExist
 	} else {
 		return &mockFile{bytes.NewBuffer(data)}, nil
 	}
@@ -94,7 +93,7 @@ func (o *fileStat) Sys() interface{} {
 
 func (o *mockOs) Stat(name string) (os.FileInfo, error) {
 	if data, ok := o.files[name]; !ok {
-		return nil, errors.New("file does not exist")
+		return nil, os.ErrNotExist
 	} else {
 		var fs fileStat
 

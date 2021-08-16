@@ -10101,7 +10101,7 @@ void	zbx_interface_availability_free(zbx_interface_availability_t *availability)
 	zbx_free(availability);
 }
 
-ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *);
+ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_agent_availability_init                                      *

@@ -244,6 +244,7 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn);
 int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	KERNEL_OPENFILES(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -257,7 +258,9 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_TCP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_UDP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -342,10 +345,12 @@ zbx_mpoint_t;
 
 #define ZBX_LLD_MACRO_FSNAME		"{#FSNAME}"
 #define ZBX_LLD_MACRO_FSTYPE		"{#FSTYPE}"
+#define ZBX_LLD_MACRO_FSLABEL		"{#FSLABEL}"
 #define ZBX_LLD_MACRO_FSDRIVETYPE	"{#FSDRIVETYPE}"
 
 #define ZBX_SYSINFO_TAG_FSNAME			"fsname"
 #define ZBX_SYSINFO_TAG_FSTYPE			"fstype"
+#define ZBX_SYSINFO_TAG_FSLABEL			"fslabel"
 #define ZBX_SYSINFO_TAG_FSDRIVETYPE		"fsdrivetype"
 #define ZBX_SYSINFO_TAG_BYTES			"bytes"
 #define ZBX_SYSINFO_TAG_INODES			"inodes"
@@ -354,6 +359,20 @@ zbx_mpoint_t;
 #define ZBX_SYSINFO_TAG_USED			"used"
 #define ZBX_SYSINFO_TAG_PFREE			"pfree"
 #define ZBX_SYSINFO_TAG_PUSED			"pused"
+
+#define ZBX_SYSINFO_FILE_TAG_TYPE		"type"
+#define ZBX_SYSINFO_FILE_TAG_USER		"user"
+#define ZBX_SYSINFO_FILE_TAG_GROUP		"group"
+#define ZBX_SYSINFO_FILE_TAG_PERMISSIONS	"permissions"
+#define ZBX_SYSINFO_FILE_TAG_SID		"SID"
+#define ZBX_SYSINFO_FILE_TAG_UID		"uid"
+#define ZBX_SYSINFO_FILE_TAG_GID		"gid"
+#define ZBX_SYSINFO_FILE_TAG_SIZE		"size"
+#define ZBX_SYSINFO_FILE_TAG_TIME		"time"
+#define ZBX_SYSINFO_FILE_TAG_TIMESTAMP		"timestamp"
+#define ZBX_SYSINFO_FILE_TAG_TIME_ACCESS	"access"
+#define ZBX_SYSINFO_FILE_TAG_TIME_MODIFY	"modify"
+#define ZBX_SYSINFO_FILE_TAG_TIME_CHANGE	"change"
 
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint);

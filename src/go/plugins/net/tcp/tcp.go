@@ -41,6 +41,8 @@ const (
 	errorInvalidFirstParam  = "Invalid first parameter."
 	errorInvalidSecondParam = "Invalid second parameter."
 	errorInvalidThirdParam  = "Invalid third parameter."
+	errorInvalidFourthParam = "Invalid fourth parameter."
+	errorInvalidFifthParam  = "Invalid fifth parameter."
 	errorTooManyParams      = "Too many parameters."
 	errorUnsupportedMetric  = "Unsupported metric."
 )
@@ -523,6 +525,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		} else if key == "net.tcp.service.perf" {
 			return p.exportNetServicePerf(params), nil
 		}
+	case "net.tcp.socket.count":
+		return p.exportNetTcpSocketCount(params)
 	}
 
 	/* SHOULD_NEVER_HAPPEN */

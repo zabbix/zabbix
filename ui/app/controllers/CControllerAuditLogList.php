@@ -265,18 +265,10 @@ class CControllerAuditLogList extends CController {
 
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
-			if ($auditlog['action'] != AUDIT_ACTION_UPDATE && $auditlog['action'] != AUDIT_ACTION_EXECUTE) {
-				continue;
+			if (in_array($auditlog['action'], [AUDIT_ACTION_UPDATE, AUDIT_ACTION_ADD, AUDIT_ACTION_EXECUTE])) {
+				$details = json_decode($auditlog['details'], true);
+				$auditlog['details'] = is_array($details) ? $this->formatDetails($details, $auditlog['action']) : '';
 			}
-
-			$details = json_decode($auditlog['details'], true);
-
-			if (!$details) {
-				$auditlog['details'] = '';
-				continue;
-			}
-
-			$auditlog['details'] = $this->formatDetails($details, $auditlog['action']);
 		}
 		unset($auditlog);
 
@@ -287,8 +279,27 @@ class CControllerAuditLogList extends CController {
 		$new_details = [];
 		foreach ($details as $key => $detail) {
 			switch ($action) {
+				case AUDIT_ACTION_ADD:
+					$new_details[] = sprintf('%s: %s', $key, (count($detail) > 1) ? $detail[1] : _('Added'));
+					break;
 				case AUDIT_ACTION_UPDATE:
-					$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
+					switch ($detail[0]) {
+						case AUIDT_DETAILS_ACTION_ATTACH:
+						case AUIDT_DETAILS_ACTION_DETACH:
+							$new_details[] = sprintf('%s: %s (%s)', $key, $detail[1],
+								($detail[0] === AUIDT_DETAILS_ACTION_ATTACH) ? _('Attached') : _('Detached')
+							);
+							break;
+						case AUIDT_DETAILS_ACTION_ADD:
+							$new_details[] = sprintf('%s: %s', $key, (count($detail) > 1) ? $detail[1] : _('Added'));
+							break;
+						case AUIDT_DETAILS_ACTION_DELETE:
+							$new_details[] = sprintf('%s: %s', $key, _('Deleted'));
+							break;
+						default:
+							$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
+							break;
+					}
 					break;
 				case AUDIT_ACTION_EXECUTE:
 					$new_details[] = sprintf('%s: %s', $key, $detail[1]);
