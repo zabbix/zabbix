@@ -66,7 +66,7 @@ $table_users = (new CTable())
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(3)
-		))->setId('user_list_footer')
+		))->setId('user-list-footer')
 	)
 	->addStyle('width: 100%;');
 

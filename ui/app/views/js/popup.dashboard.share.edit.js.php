@@ -147,7 +147,7 @@ window.dashboard_share_edit_popup = {
 						continue;
 					}
 
-					document.getElementById('user_list_footer')
+					document.getElementById('user-list-footer')
 						.insertAdjacentHTML('beforebegin', this.user_row_template.evaluate(value));
 
 					document
