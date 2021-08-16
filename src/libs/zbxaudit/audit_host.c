@@ -415,7 +415,6 @@ void	zbx_audit_host_prototype_update_json_update_hostmacro_##resource(zbx_uint64
 	zbx_audit_update_json_update_##type2(hostid, buf, old_##resource, new_##resource);			\
 }														\
 
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(name, const char*, string)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(value, const char*, string)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(description, const char*, string)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO(type, int, int)

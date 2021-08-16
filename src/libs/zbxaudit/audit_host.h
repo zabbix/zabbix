@@ -122,7 +122,6 @@ void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx
 #define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(resource, type1)					\
 void	zbx_audit_host_prototype_update_json_update_hostmacro_##resource(zbx_uint64_t hostid,			\
 		zbx_uint64_t hostmacroid, type1 old_##resource, type1 new_##resource);
-PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(name, const char*)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(value, const char*)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(description, const char*)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_HOSTMACRO_H(type, int)
