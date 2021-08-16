@@ -148,16 +148,11 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 		zbx_free(interface->data.snmp->privpassphrase);
 		zbx_free(interface->data.snmp->contextname);
 
-		if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY))
-			zbx_free(interface->data.snmp->community_orig);
-		if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME))
-			zbx_free(interface->data.snmp->securityname_orig);
-		if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS))
-			zbx_free(interface->data.snmp->authpassphrase_orig);
-		if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS))
-			zbx_free(interface->data.snmp->privpassphrase_orig);
-		if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT))
-			zbx_free(interface->data.snmp->contextname_orig);
+		zbx_free(interface->data.snmp->community_orig);
+		zbx_free(interface->data.snmp->securityname_orig);
+		zbx_free(interface->data.snmp->authpassphrase_orig);
+		zbx_free(interface->data.snmp->privpassphrase_orig);
+		zbx_free(interface->data.snmp->contextname_orig);
 
 		zbx_free(interface->data.snmp);
 	}
@@ -3754,13 +3749,18 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
 			ZBX_STR2UCHAR(snmp->version, row[7]);
 			ZBX_STR2UCHAR(snmp->bulk, row[8]);
 			snmp->community = zbx_strdup(NULL, row[9]);
+			snmp->community_orig = NULL;
 			snmp->securityname = zbx_strdup(NULL, row[10]);
+			snmp->securityname_orig = NULL;
 			ZBX_STR2UCHAR(snmp->securitylevel, row[11]);
 			snmp->authpassphrase = zbx_strdup(NULL, row[12]);
+			snmp->authpassphrase_orig = NULL;
 			snmp->privpassphrase = zbx_strdup(NULL, row[13]);
+			snmp->privpassphrase_orig = NULL;
 			ZBX_STR2UCHAR(snmp->authprotocol, row[14]);
 			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
 			snmp->contextname = zbx_strdup(NULL, row[16]);
+			snmp->contextname_orig = NULL;
 			interface->data.snmp = snmp;
 			interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 		}
