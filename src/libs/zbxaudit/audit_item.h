@@ -121,4 +121,15 @@ PREPARE_AUDIT_ITEM_PARAMS_UPDATE_H(value)
 
 void	zbx_audit_item_delete_params(zbx_uint64_t itemid, int item_flags, zbx_uint64_t item_parameter_id);
 
+
+void	zbx_audit_discovery_rule_update_json_add_lld_macro_path(zbx_uint64_t itemid,
+		zbx_uint64_t lld_macro_pathid, const char *lld_macro, const char *path);
+#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(resource)						\
+void	zbx_audit_discovery_rule_update_json_update_lld_macro_path_##resource(zbx_uint64_t itemid,		\
+		zbx_uint64_t lld_macro_pathid, const char *resource##_old, const char *resource##_new);
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(lld_macro)
+PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(path)
+void	zbx_audit_discovery_rule_update_json_delete_lld_macro_path(zbx_uint64_t itemid,
+		zbx_uint64_t lld_macro_pathid);
+
 #endif	/* ZABBIX_AUDIT_ITEM_H */

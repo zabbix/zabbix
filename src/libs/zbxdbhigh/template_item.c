@@ -1887,7 +1887,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 
 				zbx_free(value_esc);
 
-				zbx_audit_item_update_json_update_params_name(item->itemid, item->flags,
+				zbx_audit_item_update_json_update_params_value(item->itemid, item->flags,
 						param->item_parameterid, param->value_orig, param->value);
 			}
 
@@ -1945,6 +1945,7 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 	int				i, j, new_lld_macro_num = 0, update_lld_macro_num = 0, delete_lld_macro_num = 0;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t			new_lld_macro_pathid;
 	zbx_template_item_t		*item;
 	zbx_template_lld_macro_t	*lld_macro;
 	zbx_vector_uint64_t		deleteids;
@@ -1965,6 +1966,8 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 			if (0 != (lld_macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, lld_macro->lld_macro_pathid);
+				zbx_audit_discovery_rule_update_json_delete_lld_macro_path(item->itemid,
+						lld_macro->lld_macro_pathid);
 				continue;
 			}
 
@@ -1999,6 +2002,8 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 	{
 		zbx_db_insert_prepare(&db_insert, "lld_macro_path", "lld_macro_pathid", "itemid", "lld_macro", "path",
 				NULL);
+
+		new_lld_macro_pathid = DBget_maxid_num("lld_macro_path", new_lld_macro_num);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -2012,8 +2017,13 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 			lld_macro = (zbx_template_lld_macro_t *)item->item_lld_macros.values[j];
 			if (0 == lld_macro->lld_macro_pathid)
 			{
-				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), item->itemid, lld_macro->lld_macro,
-						lld_macro->path);
+				zbx_db_insert_add_values(&db_insert, new_lld_macro_pathid, item->itemid,
+						lld_macro->lld_macro, lld_macro->path);
+
+				zbx_audit_discovery_rule_update_json_add_lld_macro_path(item->itemid,
+						new_lld_macro_pathid, lld_macro->lld_macro, lld_macro->path);
+
+				new_lld_macro_pathid++;
 				continue;
 			}
 
@@ -2031,6 +2041,9 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 
 				zbx_free(lld_macro_esc);
 				d = ",";
+
+				zbx_audit_discovery_rule_update_json_update_lld_macro_path_lld_macro(item->itemid,
+						lld_macro->lld_macro_pathid, lld_macro->lld_macro, lld_macro->path);
 			}
 
 			if (0 != (lld_macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_PATH))
@@ -2041,6 +2054,10 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spath='%s'", d, path_esc);
 
 				zbx_free(path_esc);
+
+				zbx_audit_discovery_rule_update_json_update_lld_macro_path_path(item->itemid,
+						lld_macro->lld_macro_pathid, lld_macro->lld_macro, lld_macro->path);
+
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where lld_macro_pathid=" ZBX_FS_UI64 ";\n",
