@@ -285,8 +285,6 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 * Add preprocessing steps to templated LLD for cloning.
 	 */
 	public function prepareСloneTemplatedLLDPreprocessing() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('discoveryrule.update', [
 			'itemid' => '15011',
 			'preprocessing' => self::CLONE_PREPROCESSING
@@ -305,8 +303,6 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 * Add preprocessing steps to LLD for cloning.
 	 */
 	public function prepareCloneLLDPreprocessing() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('discoveryrule.update', [
 			'itemid' => self::CLONE_LLDID,
 			'preprocessing' => self::CLONE_PREPROCESSING
