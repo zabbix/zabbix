@@ -72,7 +72,7 @@ class testPageTemplateDashboards extends CWebTest {
 		$dashboards_count = count(self::DASHBOARDS);
 		$this->assertTableStats($dashboards_count);
 
-		$all_dashboards = $this->query('id:all_dashboards')->one()->asCheckbox();
+		$all_dashboards = $this->query('id:all_dashboards')->asCheckbox()->one();
 		foreach ([false, true, false] as $checkbox_state) {
 			$expected_count = ($checkbox_state) ? $dashboards_count : 0;
 

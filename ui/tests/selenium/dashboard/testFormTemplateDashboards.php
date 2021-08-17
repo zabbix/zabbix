@@ -197,10 +197,10 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->checkDialogue('Dashboard properties');
 
 		// Check the default new dashboard state (title, empty, editable).
-		$dashboard = CDashboardElement::find()->one()->asDashboard()->waitUntilVisible();
+		$dashboard = CDashboardElement::find()->asDashboard()->one()->waitUntilVisible();
 		$this->assertEquals('Dashboards', $dashboard->getTitle());
-		$dashboard->isEditable();
-		$dashboard->isEmpty();
+		$this->assertTrue($dashboard->isEditable());
+		$this->assertTrue($dashboard->isEmpty());
 
 		$controls = $dashboard->getControls();
 		$control_buttons = [
@@ -213,7 +213,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 		// Check dashboard controls and their corresponding actions.
 		foreach ($control_buttons as $selector) {
-			$this->assertTrue($controls->query($selector)->one()->isValid());
+			$this->assertTrue($controls->query($selector)->one(false)->isValid());
 
 			switch ($selector) {
 				case 'id:dashboard-config':
@@ -257,7 +257,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->checkPopup($page_popup_items, 'ACTIONS');
 
 		// Close the dashboard and corresponding popups so that the next scenario would start without alerts.
-		$this->closeDialogues();
+		$this->closeDialogue();
 	}
 
 	public static function getWidgetLayoutData() {
@@ -426,14 +426,14 @@ class testFormTemplateDashboards extends CWebTest {
 
 		// Select the required type of widget.
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
-		$widget_dialogue = COverlayDialogElement::find()->one()->asForm()->waitUntilReady();
-		$widget_dialogue->getField('Type')->fill($data['type']);
-		COverlayDialogElement::find()->one()->waitUntilReady();
+		$widget_dialog = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$widget_dialog->getField('Type')->fill($data['type']);
+		COverlayDialogElement::find()->waitUntilReady();
 
 		// Check form fields and their attributes based on field type.
 		foreach ($data['fields'] as $field_details) {
-			$field = $widget_dialogue->getField($field_details['name']);
-			$default_value = array_key_exists('value', $field_details) ? $field_details['value'] : '';
+			$field = $widget_dialog->getField($field_details['name']);
+			$default_value = CTestArrayHelper::get($field_details, 'value', '');
 
 			switch (CTestArrayHelper::get($field_details, 'type', 'input')) {
 				case 'input':
@@ -463,10 +463,10 @@ class testFormTemplateDashboards extends CWebTest {
 					break;
 			}
 		}
-		$this->assertTrue($widget_dialogue->getField('Show header')->getValue());
+		$this->assertTrue($widget_dialog->getField('Show header')->getValue());
 
 		// Close editing dashboard so that next test case would not failed with "Unexpected alert" error.
-		$this->closeDialogues();
+		$this->closeDialogue();
 	}
 
 	public static function getDashboardPropertiesData() {
@@ -528,7 +528,7 @@ class testFormTemplateDashboards extends CWebTest {
 	}
 
 	/**
-	 * Function that checks validation of the Dashboard properties overlay dialogue when creating a dashboard.
+	 * Function that checks validation of the Dashboard properties overlay dialog when creating a dashboard.
 	 *
 	 * @backupOnce dashboard
 	 *
@@ -537,7 +537,7 @@ class testFormTemplateDashboards extends CWebTest {
 	public function testFormTemplateDashboards_DashboardPropertiesCreate($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
-		$form = COverlayDialogElement::find()->one()->asForm()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		$form->fill($data['dashboard_properties']);
 		$old_values = $form->getFields()->asValues();
@@ -547,7 +547,7 @@ class testFormTemplateDashboards extends CWebTest {
 	}
 
 	/**
-	 * Function that checks validation of Dashboard properties overlay dialogue update operations.
+	 * Function that checks validation of Dashboard properties overlay dialog update operations.
 	 *
 	 * @backupOnce dashboard
 	 *
@@ -556,7 +556,7 @@ class testFormTemplateDashboards extends CWebTest {
 	public function testFormTemplateDashboards_DashboardPropertiesUpdate($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
 		$this->query('id:dashboard-config')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->one()->asForm()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		$form->fill($data['dashboard_properties']);
 		$old_values = $form->getFields()->asValues();
@@ -595,7 +595,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
 		$this->query('id:dashboard-config')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->one()->asForm()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->fill($fields);
 		$form->submit();
 
@@ -1000,10 +1000,10 @@ class testFormTemplateDashboards extends CWebTest {
 	public function testFormTemplateDashboards_CreateWidget($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$empty_dashboardid);
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->one()->asForm()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		$form->fill($data['fields']);
-		COverlayDialogElement::find()->one()->waitUntilReady();
+		COverlayDialogElement::find()->waitUntilReady();
 		// Trimming is only triggered together with an on-change event which is generated once focus is removed.
 		$this->page->removeFocus();
 		$old_values = $form->getFields()->asValues();
@@ -1032,7 +1032,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$form = CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
 		$form->fill($data['fields']);
 		$this->page->removeFocus();
-		COverlayDialogElement::find()->one()->waitUntilReady();
+		COverlayDialogElement::find()->waitUntilReady();
 		$old_values = $form->getFields()->asValues();
 		$form->submit();
 
@@ -1050,7 +1050,7 @@ class testFormTemplateDashboards extends CWebTest {
 	public function testFormTemplateDashboards_ViewDashboardOnHost() {
 		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::HOST_FOR_TEMPLATE);
 		$this->page->waitUntilReady();
-		$this->query('id:dashboardid')->one()->asZDropdown()->select('Dashboard with all widgets');
+		$this->query('id:dashboardid')->asZDropdown()->one()->select('Dashboard with all widgets');
 
 		$skip_selectors = [
 			'class:clock',
@@ -1068,9 +1068,9 @@ class testFormTemplateDashboards extends CWebTest {
 	}
 
 	/**
-	 * Functions that checks the layout of the "Dashboard properties" and "Add widget" overlay dialogues.
+	 * Functions that checks the layout of the "Dashboard properties" and "Add widget" overlay dialogs.
 	 *
-	 * @param string	$title	The title of the overlay dialogue.
+	 * @param string	$title	The title of the overlay dialog.
 	 */
 	private function checkDialogue($title) {
 		if ($title === 'Dashboard properties') {
@@ -1088,14 +1088,14 @@ class testFormTemplateDashboards extends CWebTest {
 			];
 			$buttons = ['Add', 'Cancel'];
 		}
-		$buttons = ['Apply', 'Cancel'];
-		$dialogue = COverlayDialogElement::find()->one()->waitUntilVisible();
-		$form = $dialogue->asForm();
-		$this->assertEquals($title, $dialogue->getTitle());
 
-		foreach($dialogue->query('button', $buttons)->all() as $button) {
-			$this->assertTrue($button->isClickable());
-		}
+		$dialog = COverlayDialogElement::find()->one()->waitUntilVisible();
+		$form = $dialog->asForm();
+		$this->assertEquals($title, $dialog->getTitle());
+
+		$this->assertEquals(2, $dialog->getFooter()->query('button', $buttons)->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		);
 
 		foreach ($parameters as $name => $value) {
 			$this->assertEquals($value, $form->getField($name)->getValue());
@@ -1109,7 +1109,7 @@ class testFormTemplateDashboards extends CWebTest {
 					$form->getField('Type')->getOptions()->asText()
 			);
 		}
-		COverlayDialogElement::find()->one()->close();
+		$dialog->close();
 	}
 
 	/**
@@ -1131,11 +1131,12 @@ class testFormTemplateDashboards extends CWebTest {
 	}
 
 	/**
-	 * Function that closes all dialogues and alerts on a template dashboard before proceeding to the next test.
+	 * Function that closes an overlay dialog and alert on a template dashboard before proceeding to the next test.
 	 */
-	private function closeDialogues() {
-		if (COverlayDialogElement::find()->one(false)->isValid()) {
-			COverlayDialogElement::find()->one()->close();
+	private function closeDialogue() {
+		$overlay = COverlayDialogElement::find()->one(false);
+		if ($overlay->isValid()) {
+			$overlay->close();
 		}
 		$this->query('link:Cancel')->one()->forceClick();
 
@@ -1161,11 +1162,11 @@ class testFormTemplateDashboards extends CWebTest {
 				if (array_key_exists('trim', $data)) {
 					$old_values[$data['trim']] = trim($old_values[$data['trim']]);
 				}
-				$form = COverlayDialogElement::find()->one()->asForm()->waitUntilVisible();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 				$this->assertEquals($old_values, $form->getFields()->asValues());
 			}
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
-			$this->closeDialogues();
+			$this->closeDialogue();
 		}
 		else {
 			// Wait for widgets to be present as dashboard is slow when there ame many widgets on it.
@@ -1174,7 +1175,7 @@ class testFormTemplateDashboards extends CWebTest {
 					$data['fields']['Name'] = trim($data['fields']['Name']);
 				}
 				$name = ($data['fields']['Name'] === '') ? 'Local' : $data['fields']['Name'];
-				CDashboardElement::find()->one()->asDashboard()->getWidget($name)->waitUntilVisible();
+				CDashboardElement::find()->asDashboard()->one()->getWidget($name)->waitUntilVisible();
 			}
 			$this->query('button:Save changes')->one()->click();
 
@@ -1199,11 +1200,11 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->page->waitUntilReady();
 
 			if ($check !== 'dashboard action') {
-				$reopened_form = CDashboardElement::find()->one()->asDashboard()->getWidget($name)->edit();
+				$reopened_form = CDashboardElement::find()->asDashboard()->one()->getWidget($name)->edit();
 			}
 			else {
 				$this->query('id:dashboard-config')->one()->click();
-				$reopened_form = COverlayDialogElement::find()->one()->asForm()->waitUntilVisible();
+				$reopened_form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 
 			$this->assertEquals($created_values, $reopened_form->getFields()->asValues());

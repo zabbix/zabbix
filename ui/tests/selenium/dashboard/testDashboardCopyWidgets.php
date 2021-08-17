@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup widget, profiles
@@ -38,6 +39,17 @@ class testDashboardCopyWidgets extends CWebTest {
 	private static $dashboardid_with_widgets;
 	private static $empty_dashboardid;
 	private static $templated_page_id;
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
 
 	/**
 	 * Function creates template dashboards and defines the corresponding dashboard IDs.
@@ -142,7 +154,8 @@ class testDashboardCopyWidgets extends CWebTest {
 		self::$dashboardid_with_widgets = $response['dashboardids'][0];
 		self::$empty_dashboardid = $response['dashboardids'][1];
 		self::$templated_page_id = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE name='
-				.zbx_dbstr(self::TEMPLATED_PAGE_NAME));
+				.zbx_dbstr(self::TEMPLATED_PAGE_NAME)
+		);
 	}
 
 	/**
@@ -202,7 +215,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			self::$replaced_widget_name = $name;
 		}
 
-		// Use the apropriate dashboard and page in case of templated dashboard widgets.
+		// Use the appropriate dashboard and page in case of templated dashboard widgets.
 		if ($templated) {
 			$dashboard_id = self::$dashboardid_with_widgets;
 			$new_dashboard_id = self::$empty_dashboardid;
@@ -313,7 +326,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		// For templated dashboards the below SQL is executed faster than the corresponding record is added to DB.
 		if ($templated) {
-			sleep(1);
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		}
 		$copied_widget_size = CDBHelper::getRow('SELECT w.width, w.height'.
 				' FROM widget w WHERE EXISTS ('.
@@ -505,7 +518,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			case 'same dashboard':
 				$this->query('id:dashboard-add')->one()->click();
 				CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
-				sleep(1);
+				$dashboard->query('xpath:(//span[@title="Page with widgets"])[2]')->waitUntilVisible()->one();
 				$this->assertEquals(2, $dashboard->query('xpath://span[@title="Page with widgets"]')->all()->count());
 				break;
 
@@ -515,8 +528,9 @@ class testDashboardCopyWidgets extends CWebTest {
 
 				$this->query('id:dashboard-add')->one()->click();
 				CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
-				sleep(1);
-				$this->assertEquals(1, $dashboard->query('xpath://span[@title="Page with widgets"]')->all()->count());
+				$this->assertEquals(1, $dashboard->query('xpath://span[@title="Page with widgets"]')
+						->waitUntilVisible()->all()->count()
+				);
 				break;
 
 			case 'another template':
@@ -532,11 +546,12 @@ class testDashboardCopyWidgets extends CWebTest {
 	}
 
 	/**
-	 * Function that closes all dialogues and alerts on a template dashboard before proceeding to the next test.
+	 * Function that closes all dialogs and alerts on a template dashboard before proceeding to the next test.
 	 */
 	private function closeDialogues() {
-		if (COverlayDialogElement::find()->one(false)->isValid()) {
-			COverlayDialogElement::find()->one()->close();
+		$overlay = COverlayDialogElement::find()->one(false);
+		if ($overlay->isValid()) {
+			$overlay->close();
 		}
 		$this->query('link:Cancel')->one()->forceClick();
 
