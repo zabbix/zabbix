@@ -56,7 +56,7 @@ class CSeverityHelper {
 	 * @return string|null
 	 */
 	public static function getStyle(?int $severity, bool $type = true): ?string {
-		if ($type === null) {
+		if (!$type) {
 			return ZBX_STYLE_NORMAL_BG;
 		}
 

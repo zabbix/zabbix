@@ -323,13 +323,13 @@
 
 				curl.setArgument('action', 'dashboard.view');
 
-				if (this.dashboard.dashboardid !== null) {
-					curl.setArgument('dashboardid', this.dashboard.dashboardid);
+				if (view.dashboard.dashboardid !== null) {
+					curl.setArgument('dashboardid', view.dashboard.dashboardid);
 				}
 
-				if (this.has_time_selector) {
-					curl.setArgument('from', this.time_period.from);
-					curl.setArgument('to', this.time_period.to);
+				if (view.has_time_selector) {
+					curl.setArgument('from', view.time_period.from);
+					curl.setArgument('to', view.time_period.to);
 				}
 
 				if (host !== null) {
