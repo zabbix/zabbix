@@ -18,22 +18,93 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup items
  */
-class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
+class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 
-	const HOST_ID = 40001;
-	const INHERITANCE_TEMPLATE_ID	= 15000;		// 'Inheritance test template'
-	const INHERITANCE_HOST_ID		= 15001;		// 'Template inheritance test host'
-
-	public $link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID;
+	public $link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID;
 	public $ready_link = 'host_discovery.php?form=update&itemid=';
 	public $button = 'Create discovery rule';
 	public $success_message = 'Discovery rule created';
 	public $fail_message = 'Cannot add discovery rule';
+
+	const HOSTID = 40001;
+	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
+	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
+	const INHERITANCE_LLDID			= 15016;	// 'Template inheritance test host' -> 'testInheritanceDiscoveryRule'
+	const CLONE_LLDID				= 133800;	// 'Simple form test host' -> 'testFormDiscoveryRule1'
+	const CLONE_PREPROCESSING = [
+		[
+			'type' => '5',
+			'params' => "regular expression pattern \noutput template",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '11',
+			'params' => '/document/item/value/text()',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '12',
+			'params' => '$.document.item.value parameter.',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '15',
+			'params' => 'regular expression pattern for not matching',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '16',
+			'params' => '/json/path',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '17',
+			'params' => '/xml/path',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '20',
+			'params' => '7',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '24',
+			'params' => ".\n/\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '25',
+			'params' => "1\n2",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '21',
+			'params' => 'test script',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '23',
+			'params' => 'metric',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		]
+	];
 
 	/*
 	 * Preprocessing data for LLD successful creation.
@@ -199,30 +270,66 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getLLDPrometheusData
 	 * @dataProvider getCustomOnFailValidationData
 	 */
-	public function testFormLowLevelDiscoveryPreprocessing_CreateAllSteps($data) {
+	public function testFormPreprocessingLowLevelDiscovery_CreateAllSteps($data) {
 		$this->checkCreate($data);
 	}
 
 	/**
 	 * @dataProvider getCommonPreprocessingTrailingSpacesData
 	 */
-	public function testFormLowLevelDiscoveryPreprocessing_TrailingSpaces($data) {
+	public function testFormPreprocessingLowLevelDiscovery_TrailingSpaces($data) {
 		$this->checkTrailingSpaces($data);
+	}
+
+	/**
+	 * Add preprocessing steps to templated LLD for cloning.
+	 */
+	public function prepareСloneTemplatedLLDPreprocessing() {
+		CDataHelper::call('discoveryrule.update', [
+			'itemid' => '15011',
+			'preprocessing' => self::CLONE_PREPROCESSING
+		]);
+	}
+
+	/**
+	 * @onBefore prepareСloneTemplatedLLDPreprocessing
+	 */
+	public function testFormPreprocessingLowLevelDiscovery_CloneTemplatedLLD() {
+		$link = 'host_discovery.php?form=update&itemid='.self::INHERITANCE_LLDID;
+		$this->checkCloneItem($link, 'Discovery rule', $templated = true);
+	}
+
+	/**
+	 * Add preprocessing steps to LLD for cloning.
+	 */
+	public function prepareCloneLLDPreprocessing() {
+		CDataHelper::call('discoveryrule.update', [
+			'itemid' => self::CLONE_LLDID,
+			'preprocessing' => self::CLONE_PREPROCESSING
+		]);
+	}
+
+	/**
+	 * @onBefore prepareCloneLLDPreprocessing
+	 */
+	public function testFormPreprocessingLowLevelDiscovery_CloneLLD() {
+		$link = 'host_discovery.php?form=update&itemid='.self::CLONE_LLDID;
+		$this->checkCloneItem($link, 'Discovery rule');
 	}
 
 	/**
 	 * @dataProvider getCommonCustomOnFailData
 	 */
-	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFail($data) {
+	public function testFormPreprocessingLowLevelDiscovery_CustomOnFail($data) {
 		$this->checkCustomOnFail($data);
 	}
 
 	/**
 	 * @dataProvider getCommonInheritancePreprocessing
 	 */
-	public function testFormLowLevelDiscoveryPreprocessing_PreprocessingInheritanceFromTemplate($data) {
-		$this->link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::INHERITANCE_TEMPLATE_ID;
-		$host_link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::INHERITANCE_HOST_ID;
+	public function testFormPreprocessingLowLevelDiscovery_PreprocessingInheritanceFromTemplate($data) {
+		$this->link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::INHERITANCE_TEMPLATEID;
+		$host_link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::INHERITANCE_HOSTID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}

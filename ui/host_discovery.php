@@ -257,6 +257,21 @@ if (getRequest('itemid', false)) {
 	}
 	$_REQUEST['hostid'] = $item['hostid'];
 	$host = reset($item['hosts']);
+
+	foreach ($item['overrides'] as &$override) {
+		if (!array_key_exists('operations', $override)) {
+			continue;
+		}
+
+		foreach ($override['operations'] as &$operation) {
+			if (array_key_exists('optag', $operation)) {
+				CArrayHelper::sort($operation['optag'], ['tag', 'value']);
+				$operation['optag'] = array_values($operation['optag']);
+			}
+		}
+		unset($operation);
+	}
+	unset($override);
 }
 elseif ($hostid) {
 	$hosts = API::Host()->get([
@@ -790,20 +805,13 @@ if (hasRequest('form')) {
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
-		CArrayHelper::sort($data['overrides'], [
-			['field' => 'step', 'order' => ZBX_SORT_UP]
-		]);
+		CArrayHelper::sort($data['overrides'], ['step']);
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
 		unset($data['itemid']);
 		$data['form'] = 'clone';
 	}
-
-	// Sort interfaces to be listed starting with one selected as 'main'.
-	CArrayHelper::sort($data['interfaces'], [
-		['field' => 'main', 'order' => ZBX_SORT_DOWN]
-	]);
 
 	if ($data['type'] != ITEM_TYPE_JMX) {
 		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;

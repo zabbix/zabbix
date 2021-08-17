@@ -189,6 +189,10 @@ class CConfigFile {
 
 			$this->check();
 
+			if (is_link($file)) {
+				$file = readlink($file);
+			}
+
 			$file_is_writable = ((!file_exists($file) && is_writable(dirname($file))) || is_writable($file));
 
 			if ($file_is_writable && file_put_contents($file, $this->getString())) {

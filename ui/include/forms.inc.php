@@ -1147,6 +1147,11 @@ function getItemFormData(array $item = [], array $options = []) {
 		'hostids' => $data['hostid'],
 		'output' => API_OUTPUT_EXTEND
 	]);
+	// Sort interfaces to be listed starting with one selected as 'main'.
+	CArrayHelper::sort($data['interfaces'], [
+		['field' => 'main', 'order' => ZBX_SORT_DOWN],
+		['field' => 'interfaceid','order' => ZBX_SORT_UP]
+	]);
 
 	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] == 0
 			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {

@@ -1,8 +1,29 @@
 Changes for 5.0.15rc1
 
 New features:
+.........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
+...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
+.........T [ZBX-19762] removed unsupported items in Zabbix server templates (abakaldin)
+.........T [ZBX-19749] changed the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
+..F....... [ZBX-18135] fixed warning message close button (agriscenko)
+A......... [ZBX-19341] fixed template export missing inventory mode for Host prototype (jfreibergs)
+..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
+.........T [ZBX-19612] changed host name to visible name for consistency with UI (abiba)
+........S. [ZBX-19737] fixed prometheus preprocessing bug (yurii)
+........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
+A......... [ZBX-19752] fixed multiple types of media type creation having message templates in one API call (gcalenko)
+..F....... [ZBX-18271] fixed incorrect ordering for tags and overrides in widgets, operations overrides in host prototype form and interface order in item and discovery prototypes forms (gcalenko, Sasha)
+.D........ [ZBX-18523] added documentation for Hostname parameter in sender (dgoloscapov)
+..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
+...G...... [ZBX-19116] fixed system.cpu.util for agent2 not working in non-English Windows (arimdjonoks)
+..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
+A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
+...G...... [ZBX-19732] fixed Zabbix agent2 not starting when ListenIP is set to 0.0.0.0 (vso)
+.........T [ZBX-19692] fixed issues with Zyxel templates (abakaldin)
+A......... [ZBX-19124] fixed PHP runtime errors when passed incorrect value for "output" option (Sasha)
 A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
 ........S. [ZBX-19715] fixed high memory usage in trappers and proxy pollers when sending configuration to Zabbix proxy (vso)
 
@@ -2168,6 +2189,10 @@ Changes for 4.0.33rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
+........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
+..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
+..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
 A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
 ........S. [ZBX-19134] fixed not supported icmpping item when server catches a signal (dgoloscapov)
 ...G...PS. [ZBX-19505] fixed automatic log rotation accessing deleted log files for longer than required (vso)

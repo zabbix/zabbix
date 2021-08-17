@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2021-08-09T16:55:38Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template App Website certificate by Zabbix agent 2</template>
+         <name>Template App Website certificate by Zabbix agent 2</name>
+         <description>The template to monitor TLS/SSL certificate on the website by Zabbix agent 2 that works without any external scripts.&#13;
+Zabbix agent 2 with the WebCertificate plugin requests certificate using the web.certificate.get key and returns JSON with certificate attributes.&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring&#13;
+&#13;
+Template tooling version used: 0.39</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>General</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Cert: Subject alternative name</name>
+               <type>DEPENDENT</type>
+               <key>cert.alternative_names</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.x509.alternative_names</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cert: Issuer</name>
+               <type>DEPENDENT</type>
+               <key>cert.issuer</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>The field identifies the entity that has signed and issued the certificate.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.x509.issuer</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cert: Last validation status</name>
+               <type>DEPENDENT</type>
+               <key>cert.message</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Last check result message.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.result.message</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cert: Expires on</name>
+               <type>DEPENDENT</type>
+               <key>cert.not_after</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <units>unixtime</units>
+               <description>The date on which the certificate validity period ends.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.x509.not_after.timestamp</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>({last()} - {now()}) / 86400 &lt; {$CERT.EXPIRY.WARN}</expression>
+                     <name>Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days)</name>
+                     <priority>WARNING</priority>
+                     <description>The SSL certificate should be updated or it will become untrusted.</description>
+                     <dependencies>
+                        <dependency>
+                           <name>Cert: SSL certificate is invalid</name>
+                           <expression>{Template App Website certificate by Zabbix agent 2:cert.validation.str("invalid")} = 1</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Cert: Valid from</name>
+               <type>DEPENDENT</type>
+               <key>cert.not_before</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <status>ENABLED</status>
+               <units>unixtime</units>
+               <description>The date on which the certificate validity period begins.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.x509.not_before.timestamp</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cert: Public key algorithm</name>
+               <type>DEPENDENT</type>
+               <key>cert.public_key_algorithm</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>The digital signature algorithm is used to verify the signature of a certificate.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.x509.public_key_algorithm</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cert: Serial number</name>
+               <type>DEPENDENT</type>
+               <key>cert.serial_number</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>The serial number is a positive integer assigned by the CA to each certificate. It is unique for each certificate issued by a given CA. Non-conforming CAs may issue certificates with serial numbers that are negative or zero.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.x509.serial_number</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cert: Fingerprint</name>
+               <type>DEPENDENT</type>
+               <key>cert.sha1_fingerprint</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.sha1_fingerprint</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1</expression>
+                     <name>Cert: Fingerprint has changed (new version: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.&#13;
+There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Cert: Signature algorithm</name>
+               <type>DEPENDENT</type>
+               <key>cert.signature_algorithm</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>The algorithm identifier for the algorithm used by the CA to sign the certificate.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.x509.signature_algorithm</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cert: Subject</name>
+               <type>DEPENDENT</type>
+               <key>cert.subject</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>The field identifies the entity associated with the public key stored in the subject public key field.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.x509.subject</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cert: Validation result</name>
+               <type>DEPENDENT</type>
+               <key>cert.validation</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>The certificate validation result. Possible values: valid/invalid/valid-but-self-signed</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.result.value</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{str("invalid")} = 1</expression>
+                     <name>Cert: SSL certificate is invalid</name>
+                     <priority>HIGH</priority>
+                     <description>SSL certificate has expired or it is issued for another domain.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Cert: Version</name>
+               <type>DEPENDENT</type>
+               <key>cert.version</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>CHAR</value_type>
+               <description>The version of the encoded certificate.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.x509.version</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cert: Get</name>
+               <key>web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]</key>
+               <delay>15m</delay>
+               <history>0h</history>
+               <trends>0</trends>
+               <status>ENABLED</status>
+               <value_type>TEXT</value_type>
+               <description>Returns the JSON with attributes of a certificate of the requested site.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+         </items>
+         <macros>
+            <macro>
+               <macro>{$CERT.EXPIRY.WARN}</macro>
+               <value>7</value>
+               <description>Number of days until the certificate expires.</description>
+            </macro>
+            <macro>
+               <macro>{$CERT.WEBSITE.HOSTNAME}</macro>
+               <value>&lt;Put DNS name&gt;</value>
+               <description>The website DNS name for the connection.</description>
+            </macro>
+            <macro>
+               <macro>{$CERT.WEBSITE.IP}</macro>
+               <description>The website IP address for the connection.</description>
+            </macro>
+            <macro>
+               <macro>{$CERT.WEBSITE.PORT}</macro>
+               <value>443</value>
+               <description>The TLS/SSL port number of the website.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+</zabbix_export>

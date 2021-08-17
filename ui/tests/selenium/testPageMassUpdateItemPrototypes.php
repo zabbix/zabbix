@@ -31,8 +31,6 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 	 * Add items for mass updating.
 	 */
 	public function prepareItemPrototypesData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('itemprototype.create', [
 			[
 				'hostid' => self::HOSTID,
@@ -367,8 +365,6 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 	 * Add items with preprocessing for mass updating.
 	 */
 	public function prepareItemPrototypePreprocessingData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('itemprototype.create', [
 			[
 				'hostid' => self::HOSTID,

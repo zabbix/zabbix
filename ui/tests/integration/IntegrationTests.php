@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
 require_once dirname(__FILE__).'/testItemState.php';
+require_once dirname(__FILE__).'/testEscalations.php';
 
 class IntegrationTests {
 	public static function suite() {
@@ -32,6 +33,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
 		$suite->addTestSuite('testItemState');
+		$suite->addTestSuite('testEscalations');
 
 		return $suite;
 	}
