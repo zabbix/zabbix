@@ -87,6 +87,7 @@ else {
 			$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
 				&& array_key_exists('hostmacroid', $macro)
 			);
+			$macro_value->setReadonly($readonly || ($macro['inherited_type'] & ZBX_PROPERTY_BOTH));
 		}
 
 		if (array_key_exists('value', $macro)) {
@@ -95,7 +96,9 @@ else {
 
 		$row = [
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+			(new CCol($macro_value))
+				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+				->addClass(ZBX_STYLE_NOWRAP)
 		];
 
 		if (!$data['readonly']) {
@@ -167,7 +170,9 @@ else {
 						->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
 						->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
-						->setReadonly($readonly)
+						->setReadonly($readonly || (
+							($macro['type'] == ZBX_MACRO_TYPE_SECRET) && ($macro['inherited_type'] & ZBX_PROPERTY_BOTH)
+						))
 				))
 					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 					->setColSpan(count($row))

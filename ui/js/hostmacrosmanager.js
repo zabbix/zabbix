@@ -136,7 +136,7 @@ class HostMacrosManager {
 
 				if (macro_child('inherited_type').val() & macros_manager.ZBX_PROPERTY_OWN) {
 					const macro_type = macro_child('inherited_macro_type').val(),
-						$dropdown_btn = macro_child('type_btn'),
+						$dropdown_btn = macro_child('type_button'),
 						dropdown_btn_classes = {
 							[macros_manager.ZBX_MACRO_TYPE_TEXT]: macros_manager.ZBX_STYLE_ICON_TEXT,
 							[macros_manager.ZBX_MACRO_TYPE_SECRET]: macros_manager.ZBX_STYLE_ICON_INVISIBLE,
@@ -159,9 +159,9 @@ class HostMacrosManager {
 						.trigger('change');
 					macro_child('value')
 						.prop('readonly', true)
+						.prop('disabled', true)
 						.val(macro_child('inherited_value').val())
 						.trigger('input')
-						.prop('disabled', macro_type == macros_manager.ZBX_MACRO_TYPE_SECRET)
 							.closest('.input-group')
 							.find('.btn-undo')
 							.hide();
@@ -173,10 +173,14 @@ class HostMacrosManager {
 						.val(macro_child('inherited_type').val() | macros_manager.ZBX_PROPERTY_OWN);
 					macro_child('value')
 						.prop('readonly', false)
-						.focus();
+						.prop('disabled', false)
+						.focus()
+							.closest('.input-group')
+							.find('.btn-undo')
+							.hide();
 					macro_child('value_btn').prop('disabled', false);
 					macro_child('description').prop('readonly', false);
-					macro_child('type_btn')
+					macro_child('type_button')
 						.prop('disabled', false)
 						.attr({'aria-haspopup': 'true'});
 					macro_child('change').text(t('Remove'));
