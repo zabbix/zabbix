@@ -707,13 +707,7 @@ class CDashboardPage extends CBaseComponent {
 			this._grid_min_rows = Math.max(this._grid_min_rows, Math.min(this._max_rows, min_rows));
 		}
 
-		let num_rows = this._getNumOccupiedRows();
-
-		if (this._is_edit_mode) {
-			num_rows = Math.min(this._max_rows, num_rows + this._grid_pad_rows);
-		}
-
-		num_rows = Math.max(this._grid_min_rows, num_rows);
+		let num_rows = Math.max(this._grid_min_rows, this._getNumOccupiedRows());
 
 		let height = this._cell_height * num_rows;
 
@@ -1928,11 +1922,15 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			widgetEnter: (e) => {
+				const widget = e.detail.target;
+
 				if (this._is_edit_mode) {
+					const pos = widget.getPos();
+
+					this._resizeGrid(pos.y + pos.height + this._grid_pad_rows);
+
 					this.resetWidgetPlaceholder();
 				}
-
-				const widget = e.detail.target;
 
 				if (!widget.isEntered()) {
 					widget.enter();
