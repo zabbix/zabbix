@@ -233,6 +233,8 @@ class CPage {
 	 */
 	public function logout() {
 		try {
+			$this->open('setup.php');
+
 			$session = (self::$cookie === null)
 					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_session'), 'value')
 					: self::$cookie['value'];

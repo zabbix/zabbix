@@ -1032,8 +1032,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @param boolean    $update     false if create, true if update
 	 */
 	private function checkPasswordComplexity($data, $admin_password, $userid = null, $update = false, $own = false,
-			$user_password = null
-	) {
+			$user_password = null) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash('SELECT * FROM users ORDER BY userid');
 		}
