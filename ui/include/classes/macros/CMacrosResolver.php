@@ -1940,8 +1940,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		foreach ($selements as $key => $selement) {
 			$elementtype = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
-					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
-					&& array_key_exists('hostid', $selement['elements'][0]))
+					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
 				? SYSMAP_ELEMENT_TYPE_HOST
 				: $selement['elementtype'];
 
@@ -1994,14 +1993,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					if (array_key_exists('host', $matched_macros['macros'])) {
 						foreach ($matched_macros['macros']['host'] as $macro) {
-							switch ($macro) {
-								case '{HOST.ID}':
-									$macro_values[$key][$macro] = $selement['elements'][0]['hostid'];
-									break;
+							if (array_key_exists('hostid', $selement['elements'][0])) {
+								switch ($macro) {
+									case '{HOST.ID}':
+										$macro_values[$key][$macro] = $selement['elements'][0]['hostid'];
+										break;
 
-								default:
-									$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
-									$macros['host'][$selement['elements'][0]['hostid']][$key] = true;
+									default:
+										$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+										$macros['host'][$selement['elements'][0]['hostid']][$key] = true;
+								}
+							}
+							else {
+								$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
 							}
 						}
 					}
@@ -2009,14 +2013,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					if (array_key_exists('interface', $matched_macros['macros'])) {
 						foreach ($matched_macros['macros']['interface'] as $macro) {
 							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
-							$macros['interface'][$selement['elements'][0]['hostid']][$key] = true;
+							if (array_key_exists('hostid', $selement['elements'][0])) {
+								$macros['interface'][$selement['elements'][0]['hostid']][$key] = true;
+							}
 						}
 					}
 
 					if (array_key_exists('inventory', $matched_macros['macros'])) {
 						foreach ($matched_macros['macros']['inventory'] as $macro) {
 							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
-							$macros['inventory'][$selement['elements'][0]['hostid']][$key] = true;
+							if (array_key_exists('hostid', $selement['elements'][0])) {
+								$macros['inventory'][$selement['elements'][0]['hostid']][$key] = true;
+							}
 						}
 					}
 
@@ -2065,7 +2073,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					foreach ($matched_macros['expr_macros_host'] as $macro => $data) {
 						$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
 						if ($data['host'] === '' || $data['host'][0] === '{') {
-							$macros['expr_macros_host'][$selement['elements'][0]['hostid']][$key][$macro] = $data;
+							if (array_key_exists('hostid', $selement['elements'][0])) {
+								$macros['expr_macros_host'][$selement['elements'][0]['hostid']][$key][$macro] = $data;
+							}
 						}
 						else {
 							if (!array_key_exists($macro, $macros['expr_macros'])) {
