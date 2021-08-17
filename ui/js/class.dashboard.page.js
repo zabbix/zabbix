@@ -127,13 +127,7 @@ class CDashboardPage extends CBaseComponent {
 	activate() {
 		this._state = DASHBOARD_PAGE_STATE_ACTIVE;
 
-		if (this._is_edit_mode) {
-			this._resizeGrid(this._getNumOccupiedRows() + this._grid_pad_rows);
-		}
-		else {
-			this._resizeGrid();
-		}
-
+		this._resizeGrid();
 		this._activateEvents();
 
 		for (const widget of this._widgets.keys()) {
@@ -225,7 +219,7 @@ class CDashboardPage extends CBaseComponent {
 		this._initWidgetResizing();
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
-			this._resizeGrid(this._getNumOccupiedRows() + this._grid_pad_rows);
+			this._resizeGrid();
 
 			this._activateWidgetDragging();
 			this._activateWidgetResizing();
@@ -706,8 +700,8 @@ class CDashboardPage extends CBaseComponent {
 	};
 
 	_resizeGrid(min_rows = null) {
-		if (min_rows === 0) {
-			this._grid_min_rows = null;
+		if (min_rows == 0) {
+			this._grid_min_rows = 0;
 		}
 		else if (min_rows !== null) {
 			this._grid_min_rows = Math.max(this._grid_min_rows, Math.min(this._max_rows, min_rows));
@@ -715,9 +709,11 @@ class CDashboardPage extends CBaseComponent {
 
 		let num_rows = this._getNumOccupiedRows();
 
-		if (this._grid_min_rows !== null) {
-			num_rows = Math.max(num_rows, this._grid_min_rows);
+		if (this._is_edit_mode) {
+			num_rows = Math.min(this._max_rows, num_rows + this._grid_pad_rows);
 		}
+
+		num_rows = Math.max(this._grid_min_rows, num_rows);
 
 		let height = this._cell_height * num_rows;
 
