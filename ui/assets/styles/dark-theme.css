@@ -6481,7 +6481,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   position: absolute;
   text-align: right;
   top: 5px;
-  right: 5px; }
+  right: 10px; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }

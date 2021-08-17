@@ -6425,7 +6425,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   position: absolute;
   text-align: right;
   top: 5px;
-  right: 5px; }
+  right: 10px; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #ffffff; }

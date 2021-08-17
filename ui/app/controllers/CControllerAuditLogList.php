@@ -276,7 +276,11 @@ class CControllerAuditLogList extends CController {
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
 			$auditlog['short_details'] = '';
-			$auditlog['show_more_button'] = '0';
+			$auditlog['show_more_button'] = 0;
+
+			if ($auditlog['resourcename'] != '') {
+				$auditlog['short_details'] .= _('Description').': '.$auditlog['resourcename'];
+			}
 
 			if (!in_array($auditlog['action'], [CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_EXECUTE])) {
 				continue;
@@ -284,18 +288,22 @@ class CControllerAuditLogList extends CController {
 
 			$details = json_decode($auditlog['details'], true);
 
-			if (!$details) {
+			if (!is_array($details) || count($details) == 0) {
 				$auditlog['details'] = '';
 				continue;
 			}
 
 			$details = $this->formatDetails($details, $auditlog['action']);
 
+			if ($auditlog['short_details'] != '') {
+				$auditlog['short_details'] .= "\n\n";
+			}
+
 			$auditlog['details'] = implode("\n", $details);
-			$auditlog['short_details'] = implode("\n", array_slice($details, 0, 2));
+			$auditlog['short_details'] .= implode("\n", array_slice($details, 0, 2));
 
 			if (count($details) > 2) {
-				$auditlog['show_more_button'] = '1';
+				$auditlog['show_more_button'] = 1;
 			}
 		}
 		unset($auditlog);
@@ -309,10 +317,8 @@ class CControllerAuditLogList extends CController {
 			switch ($action) {
 				case CAudit::ACTION_ADD:
 				case CAudit::ACTION_UPDATE:
-					$new_details[] = $this->makeDetailString($key, $detail);
-					break;
 				case CAudit::ACTION_EXECUTE:
-					$new_details[] = sprintf('%s: %s', $key, $detail[1]);
+					$new_details[] = $this->makeDetailString($key, $detail);
 					break;
 			}
 		}
@@ -322,12 +328,10 @@ class CControllerAuditLogList extends CController {
 		return $new_details;
 	}
 
-	private function makeDetailString(string $key, array $detail) {
+	private function makeDetailString(string $key, array $detail): string {
 		switch ($detail[0]) {
 			case CAudit::METHOD_ADD:
-				return array_key_exists(1, $detail)
-					? sprintf('%s: %s (%s)', $key, $detail[1], _('Added'))
-					: sprintf('%s: %s', $key, _('Added'));
+				return sprintf('%s: %s', $key, array_key_exists(1, $detail) ? $detail[1] : _('Added'));
 			case CAudit::METHOD_ATTACH:
 				return array_key_exists(1, $detail)
 					? sprintf('%s: %s (%s)', $key, $detail[1], _('Attached'))
@@ -337,9 +341,7 @@ class CControllerAuditLogList extends CController {
 					? sprintf('%s: %s (%s)', $key, $detail[1], _('Detached'))
 					: sprintf('%s: %s', $key, _('Detached'));
 			case CAudit::METHOD_DELETE:
-				return array_key_exists(1, $detail)
-					? sprintf('%s: %s (%s)', $key, $detail[1], _('Deleted'))
-					: sprintf('%s: %s', $key, _('Deleted'));
+				return sprintf('%s: %s', $key, _('Deleted'));
 			case CAudit::METHOD_UPDATE:
 				return array_key_exists(1, $detail)
 					? sprintf('%s: %s => %s', $key, $detail[2], $detail[1])

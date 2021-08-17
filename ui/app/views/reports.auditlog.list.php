@@ -112,12 +112,10 @@ foreach ($data['auditlogs'] as $auditlog) {
 			? $data['actions'][$auditlog['action']]
 			: _('Unknown action'),
 		$auditlog['recordsetid'],
-		[zbx_nl2br(_('Description').': '.$auditlog['resourcename']."\n\n".$auditlog['short_details']),
+		[zbx_nl2br($auditlog['short_details']),
 			($auditlog['show_more_button'] == 1)
 				? (new CDiv (
-					(new CButton(null, _('Details')))
-						->onClick('openAuditDetails('.json_encode($auditlog['details']).')')
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CLinkAction(_('Details')))->onClick('openAuditDetails('.json_encode($auditlog['details']).')')
 				))->addClass('audit-show-details-wrapper')
 				: ''
 		]
