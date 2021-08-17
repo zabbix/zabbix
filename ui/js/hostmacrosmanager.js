@@ -131,7 +131,7 @@ class HostMacrosManager {
 				* @return {JQuerySelector} Element/input related to current macro.
 				*/
 				function macro_child(id_postfix) {
-					return $('#macros_'+macro_num+'_'+id_postfix);
+					return $('#macros_' + macro_num + '_' + id_postfix);
 				}
 
 				if (macro_child('inherited_type').val() & macros_manager.ZBX_PROPERTY_OWN) {
@@ -190,7 +190,7 @@ class HostMacrosManager {
 	}
 
 	initMacroFields($parent) {
-		$('.'+this.ZBX_STYLE_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field').each((index, textarea) => {
+		$('.' + this.ZBX_STYLE_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field').each((index, textarea) => {
 			const $textarea = $(textarea);
 
 			if ($textarea.hasClass('macro')) {

@@ -36,7 +36,7 @@ class CControllerHostEdit extends CController {
 	/**
 	 * Clone hostid.
 	 *
-	 * @var ?int
+	 * @var ?string
 	 */
 	protected $clone_hostid;
 
@@ -120,6 +120,10 @@ class CControllerHostEdit extends CController {
 				$this->host = [['hostid' => null]];
 			}
 			else {
+				$data['tableTitles'] = getHostInventories();
+				$data['tableTitles'] = zbx_toHash($data['tableTitles'], 'db_field');
+				$inventoryFields = array_keys($data['tableTitles']);
+
 				$this->host = API::Host()->get([
 					'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
 						'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
@@ -128,12 +132,14 @@ class CControllerHostEdit extends CController {
 					'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
 					'selectGroups' => ['groupid'],
 					'selectHostDiscovery' => ['parent_hostid'],
-					'selectInterfaces' => API_OUTPUT_EXTEND,
-					'selectInventory' => API_OUTPUT_EXTEND,
+					'selectInterfaces' => ['interfaceid', 'type', 'available', 'error', 'details', 'ip', 'dns', 'port',
+						'useip'
+					],
+					'selectInventory' => $inventoryFields,
 					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
 					'selectParentTemplates' => ['templateid', 'name'],
-					'selectTags' => API_OUTPUT_EXTEND,
-					'selectValueMaps' => API_OUTPUT_EXTEND,
+					'selectTags' => ['tag', 'value'],
+					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 					'hostids' => $this->getInput('hostid'),
 					'editable' => true
 				]);
@@ -292,7 +298,7 @@ class CControllerHostEdit extends CController {
 	 * @return void
 	 */
 	protected function extendProxies(?array &$proxies): void {
-		if ((int) $this->host['flags'] === ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$proxies = ($this->host['proxy_hostid'] !== '0')
 				? API::Proxy()->get([
 					'output' => ['host', 'proxyid'],
@@ -377,7 +383,7 @@ class CControllerHostEdit extends CController {
 			$inputs['macros'] = array_map(function ($macro) use (&$secrets_reset) {
 				unset($macro['hostmacroid']);
 
-				if ((int) $macro['type'] === ZBX_MACRO_TYPE_SECRET) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
 					$secrets_reset = true;
 					$macro = ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $macro;
 				}

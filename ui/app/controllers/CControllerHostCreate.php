@@ -55,7 +55,9 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			'groups' => $this->processHostGroups($this->getInput('groups', [])),
 			'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
 			'tags' => $this->processTags($this->getInput('tags', [])),
-			'templates' => $this->processTemplates([$this->getInput('add_templates', [])]),
+			'templates' => $this->processTemplates([
+				$this->getInput('add_templates', []), $this->getInput('templates', [])
+			]),
 			'macros' => $this->processUserMacros($this->getInput('macros', [])),
 			'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) != HOST_INVENTORY_DISABLED)
 				? $this->getInput('host_inventory', [])
@@ -82,16 +84,17 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 		$host = CArrayHelper::renameKeys($host, ['visiblename' => 'name']);
 
 		$full_clone = $this->hasInput('full_clone');
-		$src_hostid = $this->getInput('clone_hostid', false);
+		$src_hostid = $this->getInput('clone_hostid', '');
 
 		if ($src_hostid) {
-			$host = $this->extendHostCloneEncryption($host, (int) $src_hostid);
+			$host = $this->extendHostCloneEncryption($host, $src_hostid);
 		}
 
 		$hostids = API::Host()->create($host);
 
-		if ($hostids !== false && $this->createValueMaps((int) $hostids['hostids'][0])
-				&& (!$full_clone || $this->copyFromCloneSourceHost((int) $src_hostid, (int) $hostids['hostids'][0]))) {
+		if ($hostids !== false && $this->createValueMaps($hostids['hostids'][0], $this->getInput('valuemaps', []),
+					$this->hasInput('full_clone') || $this->hasInput('clone')
+				) && (!$full_clone || $this->copyFromCloneSourceHost($src_hostid, $hostids['hostids'][0]))) {
 			$messages = get_and_clear_messages();
 			$details = [];
 
@@ -110,24 +113,34 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			];
 		}
 
-		if (!$output && ($messages = getMessages()) !== null) {
-			$output = ['errors' => $messages->toString()];
+		if (!$output) {
+			if (($messages = getMessages()) !== null) {
+				$output = ['errors' => $messages->toString()];
+			}
+
+			if ($hostids !== false) {
+				API::Host()->delete([$hostids['hostids'][0]]);
+			}
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		$response = $output
+			? (new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+			: new CControllerResponseFatal();
+
+		$this->setResponse($response);
 	}
 
 	/**
 	 * Copy write-only PSK fields values from source host to the new host. Used to clone host.
 	 *
-	 * @param array $host                New host data to update.
-	 * @param array $host['tls_connect'] Type of connection to host.
-	 * @param array $host['tls_accept']  Type(s) of connection from host.
-	 * @param int   $src_hostid          ID of host to copy data from.
+	 * @param array  $host                New host data to update.
+	 * @param array  $host['tls_connect'] Type of connection to host.
+	 * @param array  $host['tls_accept']  Type(s) of connection from host.
+	 * @param string $src_hostid          ID of host to copy data from.
 	 *
 	 * @return array New host data with PSK, identity added (if applicable).
 	 */
-	private function extendHostCloneEncryption(array $host, int $src_hostid): array {
+	private function extendHostCloneEncryption(array $host, string $src_hostid): array {
 		if ($host['tls_connect'] == HOST_ENCRYPTION_PSK || ($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
 			// Add values to PSK fields from cloned host.
 			$clone_hosts = API::Host()->get([
@@ -148,16 +161,23 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	/**
 	 * Create valuemaps.
 	 *
-	 * @param int $hostid
+	 * @param string $hostid      Target hostid.
+	 * @param array  $valuemaps   Submitted value maps.
+	 * @param bool   $clone_mode  Whether to cleanup existing ids.
 	 *
 	 * @return bool
 	 */
-	private function createValueMaps(int $hostid): bool {
-		$valuemaps = array_map(function ($valuemap) use ($hostid) {
-			return $valuemap + ['hostid' => $hostid];
-		}, $this->getInput('valuemaps', []));
+	private function createValueMaps(string $hostid, array $valuemaps, $clone_mode = false): bool {
+		foreach($valuemaps as $key => $valuemap) {
+			if ($clone_mode) {
+				unset($valuemap['valuemapid']);
+			}
+
+			$valuemaps[$key] = $valuemap + ['hostid' => $hostid];
+		}
 
 		if ($valuemaps && !API::ValueMap()->create($valuemaps)) {
+			CMessageHelper::addError(_s('Could not process "%1$s".', _('Value mapping')));
 			return false;
 		}
 
@@ -167,12 +187,12 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	/**
 	 * Copy http tests, items, triggers, discovery rules and graphs from source host to target host.
 	 *
-	 * @param int $src_hostid  Source hostid.
-	 * @param int $hostid      Target hostid.
+	 * @param string $src_hostid  Source hostid.
+	 * @param string $hostid      Target hostid.
 	 *
 	 * @return bool
 	 */
-	private function copyFromCloneSourceHost(int $src_hostid, int $hostid): bool {
+	private function copyFromCloneSourceHost(string $src_hostid, string $hostid): bool {
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
 		if (!copyHttpTests($src_hostid, $hostid)) {
 			return false;

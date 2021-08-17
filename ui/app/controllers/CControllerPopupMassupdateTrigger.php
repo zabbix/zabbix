@@ -100,7 +100,7 @@ class CControllerPopupMassupdateTrigger extends CController {
 				}
 
 				// Remove inherited tags.
-				if (array_key_exists('type', $tag) && !((int) $tag['type'] & ZBX_PROPERTY_OWN)) {
+				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
 					unset($tags[$key]);
 				}
 				else {

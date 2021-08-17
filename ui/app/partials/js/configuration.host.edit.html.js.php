@@ -28,7 +28,6 @@ $linked_templates = $host_is_discovered
 	? array_column($data['host']['parentTemplates'], 'templateid')
 	: [];
 ?>
-
 <?php if (!$host_is_discovered): ?>
 	<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
 		<?= (new CRow([

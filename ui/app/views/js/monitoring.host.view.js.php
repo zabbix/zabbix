@@ -117,7 +117,7 @@
 			* @param {array} groupids Filtered host group IDs.
 			*/
 			updateCreateHostButton: function(groupids) {
-				$('.'+ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).attr('data-hostgroups', JSON.stringify(groupids));
+				$('.' + ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).attr('data-hostgroups', JSON.stringify(groupids));
 			},
 			bindDataEvents: function(deferred) {
 				var that = this;
