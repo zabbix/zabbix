@@ -381,7 +381,7 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 				childList: true,
 				subtree: true
 			},
-			multiselect_node = document.querySelector('#add_templates_ .multiselect-list'),
+			multiselect_node = document.querySelector('#add_templates_').parentNode,
 			linked_node = document.querySelector('#linked-template');
 
 		const observer_callback = (mutationList, _observer) => {
