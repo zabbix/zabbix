@@ -509,42 +509,10 @@ static int	DBpatch_5050037(void)
 
 static int	DBpatch_5050038(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	int	ret = FAIL;
+	if (ZBX_DB_OK > DBexecute("update role_rule set name='services.write' where name='actions.manage_services'"))
+		return FAIL;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	result = DBselect("select role_ruleid,name from role_rule where name='actions.manage_services'");
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update role_rule set name='services.write' where "
-				"role_ruleid=%s;\n", row[0]);
-
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-			goto out;
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
-	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	DBfree_result(result);
-	zbx_free(sql);
-
-	return ret;
+	return SUCCEED;
 }
 
 #endif

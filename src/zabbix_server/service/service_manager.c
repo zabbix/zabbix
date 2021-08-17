@@ -2338,33 +2338,19 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 	zbx_vector_uint64_destroy(&serviceids);
 }
 
-static void	get_parent_service_tags(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		zbx_service_t *service, zbx_vector_tags_t *tags)
+static void	get_parent_serviceids(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		zbx_service_t *service)
 {
-	int	i;
-
-	if (NULL == service)
-		return;
+	zbx_uint64_t	i;
 
 	for (i = 0; i < service->parents.values_num; i++)
 	{
-		int				j;
 		zbx_service_t	*parent;
 
-		parent = (zbx_service_t *)(service->parents.values[i]);
+		parent = (zbx_service_t*)(service->parents.values[i]);
+		zbx_service_serialize_id(data, data_alloc, data_offset, parent->serviceid);
 
-		for (j = 0; j < parent->tags.values_num; j++)
-		{
-			zbx_service_tag_t *stag = parent->tags.values[j];
-			zbx_tag_t *tag = (zbx_tag_t*)malloc(sizeof(zbx_tag_t));
-			tag->tag = zbx_strdup(NULL, stag->name);
-			tag->value = zbx_strdup(NULL, stag->value);
-			zbx_vector_tags_append(tags, tag);
-		}
-
-		get_parent_service_tags(data, data_alloc, data_offset, (zbx_service_t*)parent->parents.values[j], tags);
-
-		zbx_service_serialize_parent_service(data, data_alloc, data_offset, parent->serviceid, tags);
+		get_parent_serviceids(data, data_alloc, data_offset, parent);
 	}
 }
 
@@ -2372,26 +2358,20 @@ static void	process_parentlist(const zbx_ipc_message_t *message, zbx_service_man
 		zbx_ipc_client_t *client)
 {
 	unsigned char		*data = NULL;
-	size_t				data_alloc = 0, data_offset = 0;
+	size_t			data_alloc = 0, data_offset = 0;
 	zbx_uint64_t		child_serviceid = 0;
-	zbx_service_t		*service, service_local, *parent_service = NULL;
-	zbx_vector_tags_t	tags;
+	zbx_service_t		*service, service_local;
 
 	zbx_deserialize_uint64(message->data, &child_serviceid);
 
 	service_local.serviceid = child_serviceid;
 
-	if (NULL == (service = zbx_hashset_search(&service_manager->services, &service_local)))
-		return;
-
-	zbx_vector_tags_create(&tags);
-	get_parent_service_tags(&data, &data_alloc, &data_offset, service, &tags);
+	if (NULL != (service = zbx_hashset_search(&service_manager->services, &service_local)))
+		get_parent_serviceids(&data, &data_alloc, &data_offset, service);
 
 	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset);
 
 	zbx_free(data);
-	zbx_vector_tags_clear(&tags);
-	zbx_vector_tags_destroy(&tags);
 }
 
 static void	service_manager_init(zbx_service_manager_t *service_manager)

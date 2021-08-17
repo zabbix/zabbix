@@ -29,13 +29,6 @@
 #include "zbxalgo.h"
 #include "zbxservice.h"
 
-typedef struct
-{
-	zbx_uint64_t		serviceid;
-	zbx_vector_tags_t	tags;
-}
-zbx_parent_service_t;
-
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
 		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags);
 void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events);
