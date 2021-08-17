@@ -276,7 +276,7 @@ class CControllerAuditLogList extends CController {
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
 			$auditlog['short_details'] = '';
-			$auditlog['show_more_button'] = 0;
+			$auditlog['details_button'] = 0;
 
 			if ($auditlog['resourcename'] != '') {
 				$auditlog['short_details'] .= _('Description').': '.$auditlog['resourcename'];
@@ -293,17 +293,18 @@ class CControllerAuditLogList extends CController {
 				continue;
 			}
 
-			$details = $this->formatDetails($details, $auditlog['action']);
-
+			// Add space after description string.
 			if ($auditlog['short_details'] != '') {
 				$auditlog['short_details'] .= "\n\n";
 			}
+
+			$details = $this->formatDetails($details, $auditlog['action']);
 
 			$auditlog['details'] = implode("\n", $details);
 			$auditlog['short_details'] .= implode("\n", array_slice($details, 0, 2));
 
 			if (count($details) > 2) {
-				$auditlog['show_more_button'] = 1;
+				$auditlog['details_button'] = 1;
 			}
 		}
 		unset($auditlog);

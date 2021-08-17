@@ -6427,6 +6427,12 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   top: 5px;
   right: 10px; }
 
+.audit-details-popup-wrapper {
+  margin: 5px 10px; }
+  .audit-details-popup-wrapper .audit-details-popup-textarea {
+    width: 100%;
+    height: 135px; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #ffffff; }
 .sidebar button:focus {

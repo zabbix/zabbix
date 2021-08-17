@@ -127,32 +127,38 @@
 		}
 	}
 
-	// Initialize class when DOM ready.
-	document.addEventListener('DOMContentLoaded', () => {
-		new resourceInputManage();
-	}, false);
-
 	function openAuditDetails(details) {
+		const wrapper = document.createElement('div');
+		wrapper
+			.classList
+			.add('audit-details-popup-wrapper');
+
 		const textarea = document.createElement('textarea');
-		textarea.style.resize = 'none';
-		textarea.style.width = '100%';
-		textarea.style.height = '350px';
+		textarea.readOnly = true;
 		textarea.innerHTML = details;
+		textarea
+			.classList
+			.add('audit-details-popup-textarea', 'active-readonly');
+
+		wrapper.appendChild(textarea)
 
 		overlayDialogue({
 			title: <?= json_encode(_('Details')) ?>,
-			content: textarea,
+			content: wrapper,
 			class: 'modal-popup modal-popup-generic',
 			buttons: [
 				{
 					title: <?= json_encode(_('Ok')) ?>,
 					cancel: true,
 					class: '<?= ZBX_STYLE_BTN_ALT ?>',
-					action: () => {
-						return true;
-					}
+					action: () => true
 				}
 			]
 		});
 	}
+
+	// Initialize class when DOM ready.
+	document.addEventListener('DOMContentLoaded', () => {
+		new resourceInputManage();
+	}, false);
 </script>
