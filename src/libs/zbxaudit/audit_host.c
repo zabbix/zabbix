@@ -267,6 +267,66 @@ PREPARE_AUDIT_HOST_UPDATE(tls_psk, const char*, string)
 PREPARE_AUDIT_HOST_UPDATE(custom_interfaces, int, int)
 #undef PREPARE_AUDIT_HOST_UPDATE
 
+void	zbx_audit_host_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, sizeof(buf), "host.interfaces[" ZBX_FS_UI64 "]", interfaceid);
+
+	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, buf);
+}
+
+void	zbx_audit_host_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
+		const char *macro, const char *value, const char *description, int type)
+{
+	char	audit_key_name[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN],
+		audit_key_description[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_name, sizeof(audit_key_name), "host.macros[" ZBX_FS_UI64 "].name", macroid);
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "host.macros[" ZBX_FS_UI64 "].value", macroid);
+	zbx_snprintf(audit_key_description, sizeof(audit_key_value), "host.macros[" ZBX_FS_UI64
+			"].description", macroid);
+	zbx_snprintf(audit_key_type, sizeof(audit_key_type), "host.macros[" ZBX_FS_UI64 "].type", macroid);
+
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_name, macro);
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_description, description);
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_type, type);
+}
+
+#define PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO(resource, type1, type2)					\
+void	zbx_audit_host_update_json_update_hostmacro_##resource(zbx_uint64_t hostid,			\
+		zbx_uint64_t hostmacroid, type1 old_##resource, type1 new_##resource)				\
+{														\
+	char	buf[AUDIT_DETAILS_KEY_LEN];									\
+														\
+	RETURN_IF_AUDIT_OFF();											\
+														\
+	zbx_snprintf(buf, sizeof(buf), "host.macros[" ZBX_FS_UI64 "]."#resource, hostmacroid);	\
+														\
+	zbx_audit_update_json_update_##type2(hostid, buf, old_##resource, new_##resource);			\
+}														\
+
+PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO(value, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO(description, const char*, string)
+PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO(type, int, int)
+#undef PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO
+
+void	zbx_audit_host_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, sizeof(buf), "host.macros[" ZBX_FS_UI64 "]", hostmacroid);
+
+	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, buf);
+}
+
 void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
@@ -325,6 +385,55 @@ void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *hos
 			tls_psk_identity);
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_psk", tls_psk);
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.custom_interfaces", custom_interfaces);
+}
+
+void	zbx_audit_host_update_json_add_tag(zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag,
+		const char* value)
+{
+	char	audit_key_tag[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "host.tags[" ZBX_FS_UI64 "].tag", tagid);
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "host.tags[" ZBX_FS_UI64 "].value", tagid);
+
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_tag, tag);
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+}
+
+void	zbx_audit_host_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t tagid,
+		const char* tag_old, const char *tag_new)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "host.tags[" ZBX_FS_UI64 "].tag", tagid);
+
+	zbx_audit_update_json_update_string(hostid, buf, tag_old, tag_new);
+}
+
+void	zbx_audit_host_update_json_update_tag_value(zbx_uint64_t hostid, zbx_uint64_t tagid,
+		const char* value_old, const char *value_new)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "host.tags[" ZBX_FS_UI64 "].value", tagid);
+
+	zbx_audit_update_json_update_string(hostid, buf, value_old, value_new);
+}
+
+void	zbx_audit_host_update_json_delete_tag(zbx_uint64_t hostid, zbx_uint64_t tagid)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "host.tags[" ZBX_FS_UI64 "]", tagid);
+
+	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
 
 void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname)
