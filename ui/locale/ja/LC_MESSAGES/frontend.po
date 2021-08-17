@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-06 19:53+0300\n"
+"POT-Creation-Date: 2021-08-13 19:54+0300\n"
 "PO-Revision-Date: 2021-06-14 04:53+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -141,7 +141,7 @@ msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
 msgstr[0] "%1$s ホストがメンテナンス中"
 
-#: include/func.inc.php:2566
+#: include/func.inc.php:2625
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
@@ -165,7 +165,7 @@ msgstr[0] "メッセージ%1$s件"
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
-#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2572
+#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
 #: jsLoader.php:170 jsLoader.php:171 jsLoader.php:172 jsLoader.php:173
 #, c-format
 msgid "%1$s minute"
@@ -207,7 +207,7 @@ msgstr[0] "リトライ残り%1$s回"
 
 #: app/views/administration.user.edit.php:522
 #: include/classes/widgets/CWidgetConfig.php:283
-#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2579
+#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
 #: jsLoader.php:168 jsLoader.php:169
 #, c-format
 msgid "%1$s second"
@@ -245,7 +245,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s件選択済"
 
-#: include/func.inc.php:1834
+#: include/func.inc.php:1880
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -889,7 +889,7 @@ msgstr "ユーザーグループを追加"
 msgid "Add widget"
 msgstr "ウィジェットの追加"
 
-#: app/controllers/CControllerPopupImportCompare.php:160
+#: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
 msgstr "追加しました"
 
@@ -1054,7 +1054,7 @@ msgstr "許可されたホスト"
 msgid "Allowed methods"
 msgstr "許可されたメソッド"
 
-#: include/classes/setup/CSetupWizard.php:679
+#: include/classes/setup/CSetupWizard.php:682
 msgid "Alternatively, you can install it manually:"
 msgstr "代わりに、手動でインストールすることができます:"
 
@@ -1463,7 +1463,7 @@ msgid "Axes"
 msgstr "軸"
 
 #: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:567
 msgid "Back"
 msgstr "戻る"
 
@@ -1764,11 +1764,11 @@ msgstr "グラフのプロトタイプを追加できません"
 msgid "Cannot add group"
 msgstr "グループを追加できません"
 
-#: hosts.php:363
+#: hosts.php:357
 msgid "Cannot add host"
 msgstr "ホストを追加できません"
 
-#: host_prototypes.php:296
+#: host_prototypes.php:290
 msgid "Cannot add host prototype"
 msgstr "ホストのプロトタイプを追加できません"
 
@@ -1847,7 +1847,7 @@ msgstr "サービスを追加できません"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "サブマップを追加できません。最大の階層に到達しました。"
 
-#: templates.php:213
+#: templates.php:207
 msgid "Cannot add template"
 msgstr "テンプレートを追加できません"
 
@@ -1927,7 +1927,7 @@ msgstr "障害をクローズできません: %1$s。"
 msgid "Cannot connect to LDAP server."
 msgstr "LDAPサーバーに接続できません。"
 
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:420
 msgid "Cannot connect to the database."
 msgstr "データベースに接続できません。"
 
@@ -1990,7 +1990,7 @@ msgstr "アイコンのマッピングを作成できません"
 msgid "Cannot create scheduled report"
 msgstr "定期レポートを作成できません"
 
-#: include/classes/setup/CSetupWizard.php:677
+#: include/classes/setup/CSetupWizard.php:678
 msgid "Cannot create the configuration file."
 msgstr "設定ファイルが作成できません。"
 
@@ -2059,7 +2059,7 @@ msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "グループを削除できません"
 
-#: hosts.php:650 hosts.php:671
+#: hosts.php:644 hosts.php:665
 msgid "Cannot delete host"
 msgstr "ホストを削除できません"
 
@@ -2075,7 +2075,7 @@ msgid "Cannot delete host group because maintenance \"%1$s\" must contain at lea
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
 msgstr[0] "メンテナンス\"%1$s\"は少なくとも1つのホストかホストグループが必要なのでホストグループを削除できません。"
 
-#: host_prototypes.php:149 host_prototypes.php:348
+#: host_prototypes.php:149 host_prototypes.php:342
 msgid "Cannot delete host prototypes"
 msgstr "ホストのプロトタイプを削除できません"
 
@@ -2169,7 +2169,7 @@ msgstr "選択したアクションを削除できません。"
 msgid "Cannot delete service"
 msgstr "サービスを削除できません"
 
-#: templates.php:436 templates.php:450 templates.php:483
+#: templates.php:430 templates.php:444 templates.php:477
 msgid "Cannot delete template"
 msgstr "テンプレートを削除できません"
 
@@ -2268,7 +2268,7 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "ディスカバリルールを無効にできません"
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
-#: hosts.php:703
+#: hosts.php:697
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "ホストを無効にできません"
@@ -2335,7 +2335,7 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "ディスカバリルールを有効にできません"
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
-#: hosts.php:702
+#: hosts.php:696
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "ホストを有効にできません"
@@ -2835,7 +2835,7 @@ msgstr "グループを更新できません"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "ディスカバリされたホスト\"%1$s\"のグループを更新できません。"
 
-#: hosts.php:347
+#: hosts.php:341
 msgid "Cannot update host"
 msgstr "ホストを更新できません"
 
@@ -2843,7 +2843,7 @@ msgstr "ホストを更新できません"
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "ホストの暗号化設定が更新できません。両方向の接続設定を指定する必要があります。"
 
-#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:333
+#: host_prototypes.php:276 host_prototypes.php:306 host_prototypes.php:327
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "ホストのプロトタイプを更新できません"
@@ -2954,7 +2954,7 @@ msgstr "サービスを更新できません"
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "テンプレート化されたWebシナリオ\"%1$s\"のステップが更新できません:%2$s。"
 
-#: templates.php:217
+#: templates.php:211
 msgid "Cannot update template"
 msgstr "テンプレートを更新できません"
 
@@ -3306,7 +3306,7 @@ msgstr "複製"
 
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
-#: app/views/popup.import.compare.php:162 include/func.inc.php:1637
+#: app/views/popup.import.compare.php:162 include/func.inc.php:1656
 #: include/views/js/monitoring.sysmaps.js.php:334
 #: include/views/js/monitoring.sysmaps.js.php:487
 #: include/views/js/monitoring.sysmaps.js.php:611
@@ -3495,7 +3495,7 @@ msgstr "設定"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "設定したキャッシュの統計。cache - buffer (mode: pfree, total, used, free)。"
 
-#: include/classes/setup/CSetupWizard.php:697
+#: include/classes/setup/CSetupWizard.php:700
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "設定ファイル\"%1$s\"を作成しました。"
@@ -3648,7 +3648,7 @@ msgid "Configuration updated"
 msgstr "設定を更新しました"
 
 #: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:427
+#: include/classes/setup/CSetupWizard.php:428
 msgid "Configure DB connection"
 msgstr "データベース接続設定"
 
@@ -3656,7 +3656,7 @@ msgstr "データベース接続設定"
 msgid "Confirmation text"
 msgstr "確認テキスト"
 
-#: include/classes/setup/CSetupWizard.php:695
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "おめでとうございます！Webインターフェースのインストールが終了しました。"
 
@@ -4366,7 +4366,7 @@ msgstr "ID\"%1$s\"のダッシュボードは使用できません。"
 #: app/controllers/CControllerDashboardList.php:120
 #: app/controllers/CControllerHostDashboardView.php:122
 #: app/controllers/CControllerPopupGeneric.php:384
-#: app/controllers/CControllerPopupImportCompare.php:169
+#: app/controllers/CControllerPopupImportCompare.php:170
 #: app/partials/monitoring.host.view.html.php:38
 #: app/partials/monitoring.host.view.html.php:138
 #: app/partials/monitoring.host.view.html.php:145
@@ -4419,15 +4419,15 @@ msgid "Data storage period"
 msgstr "データ保存期間"
 
 #: include/classes/setup/CSetupWizard.php:388
-#: include/classes/setup/CSetupWizard.php:533
-#: include/classes/setup/CSetupWizard.php:737
+#: include/classes/setup/CSetupWizard.php:534
+#: include/classes/setup/CSetupWizard.php:740
 msgid "Database TLS CA file"
 msgstr "データベースのTLS CAファイル"
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
-#: include/classes/setup/CSetupWizard.php:539
-#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:540
+#: include/classes/setup/CSetupWizard.php:748
 msgid "Database TLS certificate file"
 msgstr "データベースのTLS証明書ファイル"
 
@@ -4436,18 +4436,18 @@ msgid "Database TLS certificate files must be read-only"
 msgstr "データベースのTLS証明書ファイルは読み込み専用にしてください"
 
 #: include/classes/setup/CSetupWizard.php:412
-#: include/classes/setup/CSetupWizard.php:547
+#: include/classes/setup/CSetupWizard.php:548
 msgid "Database TLS cipher list"
 msgstr "データベースのTLS暗号化方式リスト"
 
 #: include/classes/setup/CSetupWizard.php:370
-#: include/classes/setup/CSetupWizard.php:529
+#: include/classes/setup/CSetupWizard.php:530
 msgid "Database TLS encryption"
 msgstr "データベースのTLS暗号化"
 
 #: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:536
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:537
+#: include/classes/setup/CSetupWizard.php:744
 msgid "Database TLS key file"
 msgstr "データベースのTLSキーファイル"
 
@@ -4460,7 +4460,7 @@ msgid "Database host"
 msgstr "データベースホスト"
 
 #: include/classes/setup/CSetupWizard.php:406
-#: include/classes/setup/CSetupWizard.php:542
+#: include/classes/setup/CSetupWizard.php:543
 msgid "Database host verification"
 msgstr "データベースのホスト検証"
 
@@ -4469,34 +4469,34 @@ msgid "Database monitor"
 msgstr "データベースモニタ"
 
 #: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:509 setup.php:45
+#: include/classes/setup/CSetupWizard.php:510 setup.php:45
 msgid "Database name"
 msgstr "データベース名"
 
-#: include/classes/setup/CSetupWizard.php:511
+#: include/classes/setup/CSetupWizard.php:512
 msgid "Database password"
 msgstr "データベースパスワード"
 
 #: include/classes/setup/CSetupWizard.php:307
-#: include/classes/setup/CSetupWizard.php:508 setup.php:44
+#: include/classes/setup/CSetupWizard.php:509 setup.php:44
 msgid "Database port"
 msgstr "データベースポート"
 
 #: include/classes/setup/CSetupWizard.php:319
-#: include/classes/setup/CSetupWizard.php:513
+#: include/classes/setup/CSetupWizard.php:514
 msgid "Database schema"
 msgstr "データベーススキーマ"
 
-#: include/classes/setup/CSetupWizard.php:507
+#: include/classes/setup/CSetupWizard.php:508
 msgid "Database server"
 msgstr "データベースサーバー"
 
 #: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:494
+#: include/classes/setup/CSetupWizard.php:495
 msgid "Database type"
 msgstr "データベースタイプ"
 
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:511
 msgid "Database user"
 msgstr "データベースユーザー"
 
@@ -4529,7 +4529,7 @@ msgstr "日付と時刻関数"
 msgid "Day"
 msgstr "日"
 
-#: include/func.inc.php:2484
+#: include/func.inc.php:2543
 msgid "Day before yesterday"
 msgstr "一昨日"
 
@@ -4628,12 +4628,12 @@ msgid "Default page display period"
 msgstr "デフォルトのページ表示間隔"
 
 #: app/views/administration.gui.edit.php:83
-#: include/classes/setup/CSetupWizard.php:475
+#: include/classes/setup/CSetupWizard.php:476
 msgid "Default theme"
 msgstr "デフォルトのテーマ"
 
 #: app/views/administration.gui.edit.php:76
-#: include/classes/setup/CSetupWizard.php:468
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Default time zone"
 msgstr "デフォルトのタイムゾーン"
 
@@ -5063,7 +5063,7 @@ msgstr "説明"
 
 #: app/views/administration.mediatype.list.php:81
 #: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:530
-#: include/func.inc.php:1588 include/views/configuration.action.edit.php:174
+#: include/func.inc.php:1601 include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:178
 #: include/views/configuration.action.edit.php:321
 #: include/views/configuration.action.edit.php:407
@@ -5418,7 +5418,7 @@ msgid "Discovery rule updated"
 msgstr "ディスカバリのルールを更新しました"
 
 #: app/controllers/CControllerPopupGeneric.php:315
-#: app/controllers/CControllerPopupImportCompare.php:168
+#: app/controllers/CControllerPopupImportCompare.php:169
 #: app/views/configuration.discovery.edit.php:29
 #: app/views/configuration.discovery.list.php:31
 #: app/views/popup.condition.common.php:463 app/views/popup.import.php:36
@@ -5568,7 +5568,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr "イメージのダウンロード"
 
-#: include/classes/setup/CSetupWizard.php:681
+#: include/classes/setup/CSetupWizard.php:684
 msgid "Download the configuration file"
 msgstr "設定ファイルのダウンロード"
 
@@ -6103,7 +6103,7 @@ msgstr "エラー"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 
-#: include/func.inc.php:1631 jsLoader.php:218
+#: include/func.inc.php:1642 jsLoader.php:218
 msgid "Error message"
 msgstr "エラーメッセージ"
 
@@ -6824,7 +6824,7 @@ msgid "GUI access disabled."
 msgstr "GUIアクセスを無効にしました"
 
 #: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:484
+#: include/classes/setup/CSetupWizard.php:485
 msgid "GUI settings"
 msgstr "GUI設定"
 
@@ -6861,7 +6861,7 @@ msgid "Get value"
 msgstr "値の取得"
 
 #: app/views/js/popup.itemtestedit.view.js.php:505
-#: app/views/popup.itemtestedit.view.php:434
+#: app/views/popup.itemtestedit.view.php:431
 msgid "Get value and test"
 msgstr "値の取得とテスト"
 
@@ -7041,7 +7041,7 @@ msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"のグラフのプロトタイプは使用できません。"
 
 #: app/controllers/CControllerPopupGeneric.php:275
-#: app/controllers/CControllerPopupImportCompare.php:174
+#: app/controllers/CControllerPopupImportCompare.php:175
 #: include/html.inc.php:468 include/views/configuration.graph.edit.php:35
 #: include/views/configuration.graph.list.php:28
 #: include/views/configuration.host.discovery.list.php:297
@@ -7081,7 +7081,7 @@ msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "\"%1$s\"の名前を持つグラフはグラフもしくはグラフのプロトタイプにすでに存在します。"
 
 #: app/controllers/CControllerPopupGeneric.php:262
-#: app/controllers/CControllerPopupImportCompare.php:166
+#: app/controllers/CControllerPopupImportCompare.php:167
 #: app/partials/monitoring.host.view.html.php:37
 #: app/partials/monitoring.host.view.html.php:127
 #: app/partials/monitoring.host.view.html.php:135
@@ -7177,7 +7177,7 @@ msgstr "グループを更新しました"
 msgid "Grouping by"
 msgstr "次によるグルーピング"
 
-#: app/controllers/CControllerPopupImportCompare.php:163
+#: app/controllers/CControllerPopupImportCompare.php:164
 #: app/views/administration.user.edit.php:86
 #: app/views/administration.user.list.php:110 app/views/popup.import.php:29
 #: include/views/configuration.host.edit.php:86
@@ -7426,7 +7426,7 @@ msgstr "横位置"
 #: include/classes/screens/CScreenProblem.php:871
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:1165
-#: include/classes/setup/CSetupWizard.php:439
+#: include/classes/setup/CSetupWizard.php:440
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
@@ -7477,7 +7477,7 @@ msgstr "ホストのIPアドレス"
 msgid "Host access"
 msgstr "ホストアクセス"
 
-#: hosts.php:362
+#: hosts.php:356
 msgid "Host added"
 msgstr "ホストを追加しました"
 
@@ -7498,18 +7498,18 @@ msgstr "ホストに同じタイプのデフォルトインターフェースは
 msgid "Host count"
 msgstr "ホスト数"
 
-#: hosts.php:650 hosts.php:671
+#: hosts.php:644 hosts.php:665
 msgid "Host deleted"
 msgstr "ホストを削除しました"
 
 #: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:194
-#: hosts.php:700
+#: hosts.php:694
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "ホストを無効にしました"
 
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
-#: hosts.php:699
+#: hosts.php:693
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "ホストを有効にしました"
@@ -7666,7 +7666,7 @@ msgstr "ホストのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在し�
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "ホストのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在しています。"
 
-#: host_prototypes.php:296
+#: host_prototypes.php:290
 msgid "Host prototype added"
 msgstr "ホストのプロトタイプを追加しました"
 
@@ -7682,7 +7682,7 @@ msgstr "ホストのプロトタイプを削除しました"
 msgid "Host prototype macros"
 msgstr "ホストのプロトタイプのマクロ"
 
-#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:332
+#: host_prototypes.php:276 host_prototypes.php:306 host_prototypes.php:326
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "ホストのプロトタイプを更新しました"
@@ -7697,7 +7697,7 @@ msgstr "ホスト名\"%1$s\"を持つホストのプロトタイプはディス�
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "ホストの表示名\"%1$s\"を持つホストのプロトタイプはディスカバリルール\"%2$s\"にすでに存在しています。"
 
-#: app/controllers/CControllerPopupImportCompare.php:175
+#: app/controllers/CControllerPopupImportCompare.php:176
 #: include/html.inc.php:483
 #: include/views/configuration.host.discovery.list.php:306
 #: include/views/configuration.host.prototype.edit.php:35
@@ -7705,7 +7705,7 @@ msgstr "ホストの表示名\"%1$s\"を持つホストのプロトタイプは�
 msgid "Host prototypes"
 msgstr "ホストのプロトタイプ"
 
-#: host_prototypes.php:348
+#: host_prototypes.php:342
 msgid "Host prototypes deleted"
 msgstr "ホストのプロトタイプを削除しました"
 
@@ -7725,7 +7725,7 @@ msgstr "ホスト時間"
 msgid "Host update failed."
 msgstr "ホストの更新に失敗しました"
 
-#: hosts.php:346
+#: hosts.php:340
 msgid "Host updated"
 msgstr "ホストを更新しました"
 
@@ -8068,7 +8068,7 @@ msgstr "すべてのマップのイメージがアップデートされます！
 msgid "Immediately"
 msgstr "すぐに"
 
-#: app/controllers/CControllerPopupImport.php:164
+#: app/controllers/CControllerPopupImport.php:165
 #: app/views/administration.mediatype.list.php:36
 #: app/views/popup.import.compare.php:152 app/views/popup.import.php:156
 #: include/views/configuration.host.list.php:37
@@ -8127,7 +8127,7 @@ msgid "Inaccessible graph prototype"
 msgstr "アクセスできないグラフのプロトタイプ"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:317
-#: host_prototypes.php:467
+#: host_prototypes.php:461
 msgid "Inaccessible group"
 msgstr "アクセスできないグループ"
 
@@ -8565,9 +8565,9 @@ msgstr "テーブル\"%2$s\"へのwhereステートメントのフィールド\"
 msgid "Incorrect fields for sysmap."
 msgstr "マップの設定が正しくありません。"
 
-#: include/classes/setup/CSetupWizard.php:737
-#: include/classes/setup/CSetupWizard.php:741
-#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:748
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "\"%1$s\": %2$sのファイルパスが正しくありません。"
@@ -9339,7 +9339,7 @@ msgid "Insert expression"
 msgstr "条件式の挿入"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:702
+#: include/classes/setup/CSetupWizard.php:705
 msgid "Install"
 msgstr "インストール"
 
@@ -9874,7 +9874,7 @@ msgstr "アイテム\"%1$s\"が存在しないかアクセス権限がありま�
 msgid "Item added"
 msgstr "アイテムを追加しました"
 
-#: app/views/popup.itemtestedit.view.php:419
+#: app/views/popup.itemtestedit.view.php:420
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "アイテムは秘密な値を持つユーザー定義マクロを含んでいます。これらのマクロの値は手動で入力する必要があります。"
 
@@ -9957,7 +9957,7 @@ msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"のアイテムのプロトタイプは使用できません。"
 
 #: app/controllers/CControllerPopupGeneric.php:288
-#: app/controllers/CControllerPopupImportCompare.php:172
+#: app/controllers/CControllerPopupImportCompare.php:173
 #: include/html.inc.php:440
 #: include/views/configuration.host.discovery.list.php:281
 #: include/views/configuration.item.prototype.edit.php:26
@@ -10046,7 +10046,7 @@ msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2$s\"にすでに存在します。"
 
 #: app/controllers/CControllerPopupGeneric.php:237
-#: app/controllers/CControllerPopupImportCompare.php:167
+#: app/controllers/CControllerPopupImportCompare.php:168
 #: app/partials/dataoverview.table.top.php:29
 #: app/views/administration.queue.overview.php:45
 #: app/views/popup.import.php:35 app/views/search.php:117
@@ -10282,37 +10282,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "最後"
 
-#: include/func.inc.php:2537
+#: include/func.inc.php:2596
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "最新の%1$d日間"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2590
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "最新の%1$d時間"
 
-#: include/func.inc.php:2524
+#: include/func.inc.php:2583
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "最新の%1$d分間"
 
-#: include/func.inc.php:2540
+#: include/func.inc.php:2599
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "最新の%1$dヶ月間"
 
-#: include/func.inc.php:2517
+#: include/func.inc.php:2576
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "最新の%1$d秒間"
 
-#: include/func.inc.php:2543
+#: include/func.inc.php:2602
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -11030,10 +11030,10 @@ msgstr "選択をマーク"
 msgid "Mask"
 msgstr "マスク"
 
-#: app/controllers/CControllerPopupMassupdateHost.php:445
-#: app/controllers/CControllerPopupMassupdateItem.php:405
-#: app/controllers/CControllerPopupMassupdateTemplate.php:363
-#: app/controllers/CControllerPopupMassupdateTrigger.php:234
+#: app/controllers/CControllerPopupMassupdateHost.php:446
+#: app/controllers/CControllerPopupMassupdateItem.php:406
+#: app/controllers/CControllerPopupMassupdateTemplate.php:364
+#: app/controllers/CControllerPopupMassupdateTrigger.php:235
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/views/configuration.host.list.php:444
 #: include/views/configuration.item.list.php:311
@@ -11853,8 +11853,8 @@ msgid "Next page"
 msgstr "次のページ"
 
 #: include/classes/setup/CSetupWizard.php:142
-#: include/classes/setup/CSetupWizard.php:429
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:430
+#: include/classes/setup/CSetupWizard.php:567
 msgid "Next step"
 msgstr "次のステップ"
 
@@ -13614,7 +13614,7 @@ msgstr "再生"
 msgid "Play sound"
 msgstr "サウンド再生"
 
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:567
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "設定値を確認してください。正しければ\"%1$s\"ボタンを押してください。もしくは、\"%2$s\"ボタンを押して設定値を修正してください。"
@@ -13627,16 +13627,16 @@ msgstr "すべてのマクロを削除してよいか確認してください。
 msgid "Please confirm that you want to remove all value mappings."
 msgstr "すべての値のマッピングを削除してよいか確認してください。"
 
-#: include/classes/setup/CSetupWizard.php:429
+#: include/classes/setup/CSetupWizard.php:430
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "データベースを手動で作成してください。そしてデータベースに接続するための設定値を設定してください。終了したら\"%1$s\"ボタンを押してください。"
 
-#: include/classes/setup/CSetupWizard.php:885
+#: include/classes/setup/CSetupWizard.php:888
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "\"allow_url_fopen\"ディレクティブを有効にしてください。"
 
-#: include/classes/setup/CSetupWizard.php:457
+#: include/classes/setup/CSetupWizard.php:458
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Zabbixサーバーのホスト名かホストのIPアドレスとポート番号をを入力してください。必要に応じて名前も入力してください。"
 
@@ -13680,7 +13680,7 @@ msgstr "ホストインベントリフィールドの自動設定"
 #: app/views/administration.proxy.edit.php:54
 #: app/views/administration.script.edit.php:163
 #: app/views/popup.itemtestedit.view.php:111
-#: include/classes/setup/CSetupWizard.php:444 include/hosts.inc.php:1307
+#: include/classes/setup/CSetupWizard.php:445 include/hosts.inc.php:1307
 #: include/views/configuration.host.list.php:106
 #: include/views/inventory.host.view.php:79 setup.php:62
 msgid "Port"
@@ -13719,7 +13719,7 @@ msgid "Power value"
 msgstr "指数"
 
 #: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:564
+#: include/classes/setup/CSetupWizard.php:565
 msgid "Pre-installation summary"
 msgstr "インストール事前準備概要"
 
@@ -13764,7 +13764,7 @@ msgid "Previous day"
 msgstr "前日"
 
 #: app/partials/scheduledreport.formgrid.html.php:92
-#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2487
+#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2546
 msgid "Previous month"
 msgstr "先月"
 
@@ -13780,12 +13780,12 @@ msgid "Previous value"
 msgstr "前の値"
 
 #: app/partials/scheduledreport.formgrid.html.php:91
-#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2486
+#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2545
 msgid "Previous week"
 msgstr "先週"
 
 #: app/partials/scheduledreport.formgrid.html.php:93
-#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2488
+#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2547
 msgid "Previous year"
 msgstr "去年"
 
@@ -14501,7 +14501,7 @@ msgctxt "screen reader"
 msgid "Remove, %1$s"
 msgstr "%1$sの削除"
 
-#: app/controllers/CControllerPopupImportCompare.php:158
+#: app/controllers/CControllerPopupImportCompare.php:159
 msgid "Removed"
 msgstr "削除しました"
 
@@ -15155,7 +15155,7 @@ msgstr "保存する"
 msgid "Save changes"
 msgstr "変更を保存"
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:685
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "\"%1$s\"として保存しました"
@@ -16297,8 +16297,8 @@ msgstr "保存期間"
 msgid "Store credentials in"
 msgstr "資格情報保存先"
 
-#: include/classes/setup/CSetupWizard.php:499
 #: include/classes/setup/CSetupWizard.php:500
+#: include/classes/setup/CSetupWizard.php:501
 msgid "Stored in HashiCorp Vault secret"
 msgstr "HashiCorp Vaultのシークレット内に保存"
 
@@ -16360,7 +16360,7 @@ msgstr "配信先"
 msgid "Success Audit"
 msgstr "成功の監査"
 
-#: include/func.inc.php:1631 jsLoader.php:217
+#: include/func.inc.php:1641 jsLoader.php:217
 msgid "Success message"
 msgstr "成功メッセージ"
 
@@ -16437,7 +16437,7 @@ msgstr "システムのブート時刻。UNIXのタイムスタンプで整数�
 msgid "System default"
 msgstr "システムデフォルト"
 
-#: include/func.inc.php:1659
+#: include/func.inc.php:1678
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "システムエラーが発生しました。Zabbix管理者に連絡してください。"
 
@@ -16656,7 +16656,7 @@ msgstr "テンプレート\"%1$s\"にホストグループを設定してくだ�
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "ホスト\"%2$s\"のテンプレート\"%1$s\"は存在しません。"
 
-#: templates.php:212
+#: templates.php:206
 msgid "Template added"
 msgstr "テンプレートを追加しました"
 
@@ -16676,7 +16676,7 @@ msgstr "テンプレートのダッシュボード"
 msgid "Template dashboards"
 msgstr "テンプレートのダッシュボード"
 
-#: templates.php:436 templates.php:450 templates.php:483
+#: templates.php:430 templates.php:444 templates.php:477
 msgid "Template deleted"
 msgstr "テンプレートを削除しました"
 
@@ -16700,7 +16700,7 @@ msgstr "テンプレート名"
 msgid "Template trigger"
 msgstr "テンプレートトリガー"
 
-#: templates.php:216
+#: templates.php:210
 msgid "Template updated"
 msgstr "テンプレートを更新しました"
 
@@ -16725,7 +16725,7 @@ msgstr "同じ表示名\"%1$s\"を持つテンプレートがすでに存在し�
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/controllers/CControllerPopupImportCompare.php:132
-#: app/controllers/CControllerPopupImportCompare.php:164
+#: app/controllers/CControllerPopupImportCompare.php:165
 #: app/partials/configuration.filter.items.php:72
 #: app/partials/popup.operations.php:212
 #: app/views/popup.condition.common.php:352 app/views/popup.import.php:31
@@ -16766,7 +16766,7 @@ msgstr "テンプレートを更新しました"
 #: app/views/administration.mediatype.list.php:139
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:573
-#: app/views/popup.itemtestedit.view.php:434
+#: app/views/popup.itemtestedit.view.php:431
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
 #: include/views/configuration.host.discovery.edit.php:902
@@ -16857,15 +16857,15 @@ msgstr "Zabbix用データベースのバージョンが必要なバージョン
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "仮想ディスクへの書き込み平均時間、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - ディスクデバイスのインスタンス"
 
-#: hosts.php:324
+#: hosts.php:322
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "クローンしたホストは\"隠しテキスト\"タイプのユーザー定義マクロを含んでいます。それらのマクロの値とタイプはリセットされました。"
 
-#: host_prototypes.php:172
+#: host_prototypes.php:170
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "クローンしたホストのプロトタイプには、\"隠しテキスト\"タイプのユーザー定義マクロが含まれています。 これらのマクロの値とタイプはリセットされました。"
 
-#: templates.php:184
+#: templates.php:182
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "クローンしたテンプレートは\"隠しテキスト\"タイプのユーザー定義マクロを含んでいます。それらのマクロの値とタイプはリセットされました。"
 
@@ -16958,7 +16958,7 @@ msgstr "トリガーはディスカバリされなかったので次のディス
 msgid "Theme"
 msgstr "テーマ"
 
-#: include/func.inc.php:2485
+#: include/func.inc.php:2544
 msgid "This day last week"
 msgstr "先週の今日"
 
@@ -16971,27 +16971,27 @@ msgstr "このフィールドはアイテム\"%1$s\"によって自動的に設�
 msgid "This is the test message from Zabbix"
 msgstr "これはZabbixからのテストメッセージです"
 
-#: include/func.inc.php:2493 srv_status.php:40
+#: include/func.inc.php:2552 srv_status.php:40
 msgid "This month"
 msgstr "今月"
 
-#: include/func.inc.php:2494
+#: include/func.inc.php:2553
 msgid "This month so far"
 msgstr "今月(現在まで)"
 
-#: include/func.inc.php:2491 srv_status.php:39
+#: include/func.inc.php:2550 srv_status.php:39
 msgid "This week"
 msgstr "今週"
 
-#: include/func.inc.php:2492
+#: include/func.inc.php:2551
 msgid "This week so far"
 msgstr "今週(現在まで)"
 
-#: include/func.inc.php:2495 srv_status.php:41
+#: include/func.inc.php:2554 srv_status.php:41
 msgid "This year"
 msgstr "今年"
 
-#: include/func.inc.php:2496
+#: include/func.inc.php:2555
 msgid "This year so far"
 msgstr "今年(現在まで)"
 
@@ -17115,12 +17115,12 @@ msgstr "終了"
 msgid "To set a host interface select a single item type for all items"
 msgstr "すべてのアイテムのため1つのホストインターフェースを選択する必要があります"
 
-#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2489
+#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2548
 #: srv_status.php:38
 msgid "Today"
 msgstr "今日"
 
-#: include/func.inc.php:2490
+#: include/func.inc.php:2549
 msgid "Today so far"
 msgstr "今日(現在まで)"
 
@@ -17394,7 +17394,7 @@ msgid_plural "Trigger prototypes updated"
 msgstr[0] "トリガーのプロトタイプを更新しました"
 
 #: app/controllers/CControllerPopupGeneric.php:197
-#: app/controllers/CControllerPopupImportCompare.php:173
+#: app/controllers/CControllerPopupImportCompare.php:174
 #: include/html.inc.php:454
 #: include/views/configuration.host.discovery.list.php:289
 #: include/views/configuration.trigger.prototype.edit.php:29
@@ -17431,7 +17431,7 @@ msgid "Trigger updated"
 msgstr "トリガーを更新しました"
 
 #: app/controllers/CControllerPopupGeneric.php:183
-#: app/controllers/CControllerPopupImportCompare.php:165
+#: app/controllers/CControllerPopupImportCompare.php:166
 #: app/partials/configuration.filter.items.php:191
 #: app/partials/monitoring.problem.filter.php:74
 #: app/partials/trigoverview.table.top.php:29
@@ -17970,7 +17970,7 @@ msgstr "更新時の実行内容"
 msgid "Update problem"
 msgstr "障害更新"
 
-#: app/controllers/CControllerPopupImportCompare.php:159
+#: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
 msgstr "更新しました"
 
@@ -18315,8 +18315,8 @@ msgstr "ユーザー名"
 msgid "Username and password"
 msgstr "ユーザー名とパスワード"
 
-#: include/classes/setup/CSetupWizard.php:599
-#: include/classes/setup/CSetupWizard.php:903
+#: include/classes/setup/CSetupWizard.php:600
+#: include/classes/setup/CSetupWizard.php:906
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "ユーザー名とパスワードはVaultのシークレットキー内の\"username\"と\"password\"として保存してください。"
 
@@ -18698,7 +18698,7 @@ msgstr "値のマッピング\"%1$s\"はすでに存在します。"
 msgid "Value mapping"
 msgstr "値のマッピング"
 
-#: app/controllers/CControllerPopupImportCompare.php:171
+#: app/controllers/CControllerPopupImportCompare.php:172
 #: app/views/popup.import.php:32
 msgid "Value mappings"
 msgstr "値のマッピング"
@@ -18759,17 +18759,17 @@ msgid "Various information about specific process(es). Returns float"
 msgstr "特定のプロセスに関する様々な情報。浮動小数点値を返す"
 
 #: include/classes/setup/CSetupWizard.php:335
-#: include/classes/setup/CSetupWizard.php:518
+#: include/classes/setup/CSetupWizard.php:519
 msgid "Vault API endpoint"
 msgstr "VaultのAPIエンドポイント"
 
 #: include/classes/setup/CSetupWizard.php:350
-#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:525
 msgid "Vault authentication token"
 msgstr "Vaultの認証トークン"
 
 #: include/classes/core/ZBase.php:235
-#: include/classes/setup/CSetupWizard.php:899 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Vaultへの接続に失敗しました。"
 
@@ -18778,7 +18778,7 @@ msgid "Vault secret"
 msgstr "Vaultのシークレット"
 
 #: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:521
+#: include/classes/setup/CSetupWizard.php:522
 msgid "Vault secret path"
 msgstr "Vaultのシークレットパス"
 
@@ -18865,7 +18865,7 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "警告"
 
-#: jsLoader.php:219
+#: include/func.inc.php:1643 jsLoader.php:219
 msgid "Warning message"
 msgstr "警告メッセージ"
 
@@ -18935,7 +18935,7 @@ msgstr[0] "Webシナリオを有効にしました"
 msgid "Web scenario updated"
 msgstr "Webシナリオを更新しました"
 
-#: app/controllers/CControllerPopupImportCompare.php:170
+#: app/controllers/CControllerPopupImportCompare.php:171
 #: app/views/popup.import.php:39 include/html.inc.php:400
 msgid "Web scenarios"
 msgstr "Webシナリオ"
@@ -19282,7 +19282,7 @@ msgstr "毎年"
 msgid "Yes"
 msgstr "はい"
 
-#: include/classes/screens/CScreenProblem.php:717 include/func.inc.php:2483
+#: include/classes/screens/CScreenProblem.php:717 include/func.inc.php:2542
 msgid "Yesterday"
 msgstr "昨日"
 
@@ -19403,7 +19403,7 @@ msgid "Zabbix login form"
 msgstr "Zabbixのログイン画面"
 
 #: app/views/administration.script.edit.php:126
-#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:556
 msgid "Zabbix server"
 msgstr "Zabbixサーバー"
 
@@ -19423,7 +19423,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Zabbixサーバーまたはプロキシ"
 
 #: include/classes/setup/CSetupWizard.php:57
-#: include/classes/setup/CSetupWizard.php:455
+#: include/classes/setup/CSetupWizard.php:456
 msgid "Zabbix server details"
 msgstr "Zabbixサーバーの詳細"
 
@@ -19435,11 +19435,11 @@ msgstr "Zabbixサーバーが動作していません (画面のリフレッシ�
 msgid "Zabbix server is running"
 msgstr "Zabbixサーバーの起動"
 
-#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:560
 msgid "Zabbix server name"
 msgstr "Zabbixサーバー名"
 
-#: include/classes/setup/CSetupWizard.php:556
+#: include/classes/setup/CSetupWizard.php:557
 msgid "Zabbix server port"
 msgstr "Zabbixサーバーのポート"
 
@@ -20028,7 +20028,7 @@ msgstr "日"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:614 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:497
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "デフォルト"
@@ -20643,7 +20643,7 @@ msgstr "名前"
 msgid "new"
 msgstr "新規"
 
-#: hosts.php:993 templates.php:637
+#: hosts.php:987 templates.php:631
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "新規"

@@ -53,8 +53,6 @@ class testFormTemplateDashboards extends CWebTest {
 	 * Function creates template dashboards and defines the corresponding dashboard IDs.
 	 */
 	public static function prepareTemplateDashboardsData() {
-		CDataHelper::setSessionId(null);
-
 		$response = CDataHelper::call('templatedashboard.create', [
 			[
 				'templateid' => self::UPDATE_TEMPLATEID,
@@ -180,7 +178,6 @@ class testFormTemplateDashboards extends CWebTest {
 	 * Function that links the template with dashboards to "Empty host" host.
 	 */
 	public static function prepareHostLinkageToTemplateData() {
-		CDataHelper::setSessionId(null);
 		CDataHelper::call('host.update', [
 			'hostid' => self::HOST_FOR_TEMPLATE,
 			'templates' => [

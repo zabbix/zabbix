@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-06 19:53+0300\n"
+"POT-Creation-Date: 2021-08-13 19:54+0300\n"
 "PO-Revision-Date: 2021-06-17 14:02+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -151,7 +151,7 @@ msgstr[0] "%1$s узел сети в обслуживании"
 msgstr[1] "%1$s узла сети в обслуживании"
 msgstr[2] "%1$s узлов сети в обслуживании"
 
-#: include/func.inc.php:2566
+#: include/func.inc.php:2625
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
@@ -181,7 +181,7 @@ msgstr[2] "%1$s сообщений"
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
-#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2572
+#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
 #: jsLoader.php:170 jsLoader.php:171 jsLoader.php:172 jsLoader.php:173
 #, c-format
 msgid "%1$s minute"
@@ -233,7 +233,7 @@ msgstr[2] "%1$s попыток осталось"
 
 #: app/views/administration.user.edit.php:522
 #: include/classes/widgets/CWidgetConfig.php:283
-#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2579
+#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
 #: jsLoader.php:168 jsLoader.php:169
 #, c-format
 msgid "%1$s second"
@@ -275,7 +275,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, выбрано"
 
-#: include/func.inc.php:1834
+#: include/func.inc.php:1880
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -933,7 +933,7 @@ msgstr "Добавить группу пользователей"
 msgid "Add widget"
 msgstr "Добавить виджет"
 
-#: app/controllers/CControllerPopupImportCompare.php:160
+#: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
 msgstr "Добавлено"
 
@@ -1098,7 +1098,7 @@ msgstr "Разрешенные хосты"
 msgid "Allowed methods"
 msgstr "Разрешенные методы"
 
-#: include/classes/setup/CSetupWizard.php:679
+#: include/classes/setup/CSetupWizard.php:682
 msgid "Alternatively, you can install it manually:"
 msgstr "В качестве альтернативы, вы можете установить его вручную:"
 
@@ -1511,7 +1511,7 @@ msgid "Axes"
 msgstr "Оси"
 
 #: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:567
 msgid "Back"
 msgstr "Назад"
 
@@ -1812,11 +1812,11 @@ msgstr "Не удалось добавить прототип графика"
 msgid "Cannot add group"
 msgstr "Не удалось добавить группу"
 
-#: hosts.php:363
+#: hosts.php:357
 msgid "Cannot add host"
 msgstr "Не удалось добавить узел сети"
 
-#: host_prototypes.php:296
+#: host_prototypes.php:290
 msgid "Cannot add host prototype"
 msgstr "Не удалось добавить прототип узлов сети"
 
@@ -1897,7 +1897,7 @@ msgstr "Невозможно добавить услугу"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Не удалось добавить подкарты. Достигнута максимальная глубина."
 
-#: templates.php:213
+#: templates.php:207
 msgid "Cannot add template"
 msgstr "Не удалось добавить шаблон"
 
@@ -1977,7 +1977,7 @@ msgstr "Не удалось закрыть проблему: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "Не удалось подключиться к LDAP серверу."
 
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:420
 msgid "Cannot connect to the database."
 msgstr "Не возможно подключиться к базе данных."
 
@@ -2046,7 +2046,7 @@ msgstr "Не удалось создать соответствие иконок
 msgid "Cannot create scheduled report"
 msgstr "Не удалось создать регулярный отчет"
 
-#: include/classes/setup/CSetupWizard.php:677
+#: include/classes/setup/CSetupWizard.php:678
 msgid "Cannot create the configuration file."
 msgstr "Не возможно создать конфигурационный файл."
 
@@ -2125,7 +2125,7 @@ msgstr[0] "Не удалось удалить группу"
 msgstr[1] "Не удалось удалить группы"
 msgstr[2] "Не удалось удалить группы"
 
-#: hosts.php:650 hosts.php:671
+#: hosts.php:644 hosts.php:665
 msgid "Cannot delete host"
 msgstr "Не удалось удалить узел сети"
 
@@ -2145,7 +2145,7 @@ msgstr[0] "Не удалось удалить группу узлов сети �
 msgstr[1] "Не удалось удалить группы узлов сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
 msgstr[2] "Не удалось удалить групп узлов сети так как обслуживание \"%1$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
 
-#: host_prototypes.php:149 host_prototypes.php:348
+#: host_prototypes.php:149 host_prototypes.php:342
 msgid "Cannot delete host prototypes"
 msgstr "Не удалось удалить прототипы узлов сети"
 
@@ -2251,7 +2251,7 @@ msgstr "Не удалось удалить выбранные действия"
 msgid "Cannot delete service"
 msgstr "Не удалось удалить услугу"
 
-#: templates.php:436 templates.php:450 templates.php:483
+#: templates.php:430 templates.php:444 templates.php:477
 msgid "Cannot delete template"
 msgstr "Не удалось удалить шаблон"
 
@@ -2364,7 +2364,7 @@ msgstr[1] "Не удалось деактивировать правила об�
 msgstr[2] "Не удалось деактивировать правила обнаружения"
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
-#: hosts.php:703
+#: hosts.php:697
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Не удалось деактивировать узел сети"
@@ -2453,7 +2453,7 @@ msgstr[1] "Не удалось активировать правила обна�
 msgstr[2] "Не удалось активировать правила обнаружения"
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
-#: hosts.php:702
+#: hosts.php:696
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Не удалось активировать узел сети"
@@ -2975,7 +2975,7 @@ msgstr "Не удалось обновить группу"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Не удалось обновить группы для обнаруженного узла сети \"%1$s\"."
 
-#: hosts.php:347
+#: hosts.php:341
 msgid "Cannot update host"
 msgstr "Не удалось обновить узел сети"
 
@@ -2983,7 +2983,7 @@ msgstr "Не удалось обновить узел сети"
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Не удалось обновить настройки шифрования узла сети. Необходимо указать настройки соединения в обе стороны."
 
-#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:333
+#: host_prototypes.php:276 host_prototypes.php:306 host_prototypes.php:327
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Не удалось обновить прототип узлов сети"
@@ -3098,7 +3098,7 @@ msgstr "Невозможно обновить услугу"
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "Не удалось обновить шаг унаследованного из шаблона веб-сценария \"%1$s\": %2$s."
 
-#: templates.php:217
+#: templates.php:211
 msgid "Cannot update template"
 msgstr "Не удалось обновить шаблон"
 
@@ -3454,7 +3454,7 @@ msgstr "Клонировать"
 
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
-#: app/views/popup.import.compare.php:162 include/func.inc.php:1637
+#: app/views/popup.import.compare.php:162 include/func.inc.php:1656
 #: include/views/js/monitoring.sysmaps.js.php:334
 #: include/views/js/monitoring.sysmaps.js.php:487
 #: include/views/js/monitoring.sysmaps.js.php:611
@@ -3643,7 +3643,7 @@ msgstr "Настройка"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Статистика конфигурационного кэша. Кэш - буфер (режимы: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:697
+#: include/classes/setup/CSetupWizard.php:700
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Файл конфигурации \"%1$s\" создан."
@@ -3796,7 +3796,7 @@ msgid "Configuration updated"
 msgstr "Настройки обновлены"
 
 #: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:427
+#: include/classes/setup/CSetupWizard.php:428
 msgid "Configure DB connection"
 msgstr "Настройка подключения к БД"
 
@@ -3804,7 +3804,7 @@ msgstr "Настройка подключения к БД"
 msgid "Confirmation text"
 msgstr "Текст подтверждения"
 
-#: include/classes/setup/CSetupWizard.php:695
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Поздравляем! Вы успешно установили Zabbix веб-интерфейс."
 
@@ -4522,7 +4522,7 @@ msgstr "Панель с ID \"%1$s\" недоступна."
 #: app/controllers/CControllerDashboardList.php:120
 #: app/controllers/CControllerHostDashboardView.php:122
 #: app/controllers/CControllerPopupGeneric.php:384
-#: app/controllers/CControllerPopupImportCompare.php:169
+#: app/controllers/CControllerPopupImportCompare.php:170
 #: app/partials/monitoring.host.view.html.php:38
 #: app/partials/monitoring.host.view.html.php:138
 #: app/partials/monitoring.host.view.html.php:145
@@ -4575,15 +4575,15 @@ msgid "Data storage period"
 msgstr "Период хранения данных"
 
 #: include/classes/setup/CSetupWizard.php:388
-#: include/classes/setup/CSetupWizard.php:533
-#: include/classes/setup/CSetupWizard.php:737
+#: include/classes/setup/CSetupWizard.php:534
+#: include/classes/setup/CSetupWizard.php:740
 msgid "Database TLS CA file"
 msgstr "Файл TLS CA базы данных"
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
-#: include/classes/setup/CSetupWizard.php:539
-#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:540
+#: include/classes/setup/CSetupWizard.php:748
 msgid "Database TLS certificate file"
 msgstr "Файл TLS сертификата базы данных"
 
@@ -4592,18 +4592,18 @@ msgid "Database TLS certificate files must be read-only"
 msgstr "Файлы TLS сертификатов базы данных должны быть только на чтение"
 
 #: include/classes/setup/CSetupWizard.php:412
-#: include/classes/setup/CSetupWizard.php:547
+#: include/classes/setup/CSetupWizard.php:548
 msgid "Database TLS cipher list"
 msgstr "Список TLS шифров базы данных"
 
 #: include/classes/setup/CSetupWizard.php:370
-#: include/classes/setup/CSetupWizard.php:529
+#: include/classes/setup/CSetupWizard.php:530
 msgid "Database TLS encryption"
 msgstr "TLS шифрование базы данных"
 
 #: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:536
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:537
+#: include/classes/setup/CSetupWizard.php:744
 msgid "Database TLS key file"
 msgstr "Файл TLS ключа базы данных"
 
@@ -4616,7 +4616,7 @@ msgid "Database host"
 msgstr "Хост базы данных"
 
 #: include/classes/setup/CSetupWizard.php:406
-#: include/classes/setup/CSetupWizard.php:542
+#: include/classes/setup/CSetupWizard.php:543
 msgid "Database host verification"
 msgstr "Сверка хоста базы данных"
 
@@ -4625,34 +4625,34 @@ msgid "Database monitor"
 msgstr "Монитор баз данных"
 
 #: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:509 setup.php:45
+#: include/classes/setup/CSetupWizard.php:510 setup.php:45
 msgid "Database name"
 msgstr "Имя базы данных"
 
-#: include/classes/setup/CSetupWizard.php:511
+#: include/classes/setup/CSetupWizard.php:512
 msgid "Database password"
 msgstr "Пароль от базы данных"
 
 #: include/classes/setup/CSetupWizard.php:307
-#: include/classes/setup/CSetupWizard.php:508 setup.php:44
+#: include/classes/setup/CSetupWizard.php:509 setup.php:44
 msgid "Database port"
 msgstr "Порт базы данных"
 
 #: include/classes/setup/CSetupWizard.php:319
-#: include/classes/setup/CSetupWizard.php:513
+#: include/classes/setup/CSetupWizard.php:514
 msgid "Database schema"
 msgstr "Схема базы данных"
 
-#: include/classes/setup/CSetupWizard.php:507
+#: include/classes/setup/CSetupWizard.php:508
 msgid "Database server"
 msgstr "Сервер базы данных"
 
 #: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:494
+#: include/classes/setup/CSetupWizard.php:495
 msgid "Database type"
 msgstr "Тип базы данных"
 
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:511
 msgid "Database user"
 msgstr "Имя пользователя от базы данных"
 
@@ -4685,7 +4685,7 @@ msgstr "Функции даты и времени"
 msgid "Day"
 msgstr "День"
 
-#: include/func.inc.php:2484
+#: include/func.inc.php:2543
 msgid "Day before yesterday"
 msgstr "За день до вчера"
 
@@ -4784,12 +4784,12 @@ msgid "Default page display period"
 msgstr "Период отображения страницы по умолчанию"
 
 #: app/views/administration.gui.edit.php:83
-#: include/classes/setup/CSetupWizard.php:475
+#: include/classes/setup/CSetupWizard.php:476
 msgid "Default theme"
 msgstr "Тема по умолчанию"
 
 #: app/views/administration.gui.edit.php:76
-#: include/classes/setup/CSetupWizard.php:468
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Default time zone"
 msgstr "Часовой пояс по умолчанию"
 
@@ -5219,7 +5219,7 @@ msgstr "Описание"
 
 #: app/views/administration.mediatype.list.php:81
 #: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:530
-#: include/func.inc.php:1588 include/views/configuration.action.edit.php:174
+#: include/func.inc.php:1601 include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:178
 #: include/views/configuration.action.edit.php:321
 #: include/views/configuration.action.edit.php:407
@@ -5580,7 +5580,7 @@ msgid "Discovery rule updated"
 msgstr "Правило обнаружения обновлено"
 
 #: app/controllers/CControllerPopupGeneric.php:315
-#: app/controllers/CControllerPopupImportCompare.php:168
+#: app/controllers/CControllerPopupImportCompare.php:169
 #: app/views/configuration.discovery.edit.php:29
 #: app/views/configuration.discovery.list.php:31
 #: app/views/popup.condition.common.php:463 app/views/popup.import.php:36
@@ -5730,7 +5730,7 @@ msgstr "Недоступен"
 msgid "Download image"
 msgstr "Загрузить изображение"
 
-#: include/classes/setup/CSetupWizard.php:681
+#: include/classes/setup/CSetupWizard.php:684
 msgid "Download the configuration file"
 msgstr "Загрузить конфигурационный файл"
 
@@ -6265,7 +6265,7 @@ msgstr "Ошибка"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Ошибка в запросе поиска в таблицу \"%1$s\"."
 
-#: include/func.inc.php:1631 jsLoader.php:218
+#: include/func.inc.php:1642 jsLoader.php:218
 msgid "Error message"
 msgstr "Сообщение об ошибке"
 
@@ -6988,7 +6988,7 @@ msgid "GUI access disabled."
 msgstr "Доступ к веб-интерфейсу деактивирован."
 
 #: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:484
+#: include/classes/setup/CSetupWizard.php:485
 msgid "GUI settings"
 msgstr "Настройки веб-интерфейса"
 
@@ -7025,7 +7025,7 @@ msgid "Get value"
 msgstr "Получить значение"
 
 #: app/views/js/popup.itemtestedit.view.js.php:505
-#: app/views/popup.itemtestedit.view.php:434
+#: app/views/popup.itemtestedit.view.php:431
 msgid "Get value and test"
 msgstr "Получить значение и протестировать"
 
@@ -7207,7 +7207,7 @@ msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "Прототип графиков с ID \"%1$s\" недоступен."
 
 #: app/controllers/CControllerPopupGeneric.php:275
-#: app/controllers/CControllerPopupImportCompare.php:174
+#: app/controllers/CControllerPopupImportCompare.php:175
 #: include/html.inc.php:468 include/views/configuration.graph.edit.php:35
 #: include/views/configuration.graph.list.php:28
 #: include/views/configuration.host.discovery.list.php:297
@@ -7247,7 +7247,7 @@ msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "График с именем \"%1$s\" уже существует в графиках или в прототипах графиков."
 
 #: app/controllers/CControllerPopupGeneric.php:262
-#: app/controllers/CControllerPopupImportCompare.php:166
+#: app/controllers/CControllerPopupImportCompare.php:167
 #: app/partials/monitoring.host.view.html.php:37
 #: app/partials/monitoring.host.view.html.php:127
 #: app/partials/monitoring.host.view.html.php:135
@@ -7345,7 +7345,7 @@ msgstr "Прототипы групп"
 msgid "Grouping by"
 msgstr "Сгруппировать по"
 
-#: app/controllers/CControllerPopupImportCompare.php:163
+#: app/controllers/CControllerPopupImportCompare.php:164
 #: app/views/administration.user.edit.php:86
 #: app/views/administration.user.list.php:110 app/views/popup.import.php:29
 #: include/views/configuration.host.edit.php:86
@@ -7594,7 +7594,7 @@ msgstr "Выравнивание по горизонтали"
 #: include/classes/screens/CScreenProblem.php:871
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:1165
-#: include/classes/setup/CSetupWizard.php:439
+#: include/classes/setup/CSetupWizard.php:440
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
@@ -7647,7 +7647,7 @@ msgstr "IP адрес узла сети"
 msgid "Host access"
 msgstr "Доступ к узлам сети"
 
-#: hosts.php:362
+#: hosts.php:356
 msgid "Host added"
 msgstr "Узел сети добавлен"
 
@@ -7668,12 +7668,12 @@ msgstr "У узла сети не может быть более одного и
 msgid "Host count"
 msgstr "Количество узлов сети"
 
-#: hosts.php:650 hosts.php:671
+#: hosts.php:644 hosts.php:665
 msgid "Host deleted"
 msgstr "Узел сети удален"
 
 #: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:194
-#: hosts.php:700
+#: hosts.php:694
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Узел сети деактивирован"
@@ -7681,7 +7681,7 @@ msgstr[1] "Узлы сети деактивированы"
 msgstr[2] "Узлы сети деактивированы"
 
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
-#: hosts.php:699
+#: hosts.php:693
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Узел сети активирован"
@@ -7840,7 +7840,7 @@ msgstr "Прототип узлов сети \"%1$s\" уже существуе�
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Прототип узлов сети \"%1$s\" уже существует у \"%2$s\"."
 
-#: host_prototypes.php:296
+#: host_prototypes.php:290
 msgid "Host prototype added"
 msgstr "Прототип узлов сети добавлен"
 
@@ -7856,7 +7856,7 @@ msgstr "Прототип узлов сети удален"
 msgid "Host prototype macros"
 msgstr "Макросы прототипов узлов сети"
 
-#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:332
+#: host_prototypes.php:276 host_prototypes.php:306 host_prototypes.php:326
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Прототип узлов сети обновлен"
@@ -7873,7 +7873,7 @@ msgstr "Прототип узла сети с именем узла сети \"%
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
-#: app/controllers/CControllerPopupImportCompare.php:175
+#: app/controllers/CControllerPopupImportCompare.php:176
 #: include/html.inc.php:483
 #: include/views/configuration.host.discovery.list.php:306
 #: include/views/configuration.host.prototype.edit.php:35
@@ -7881,7 +7881,7 @@ msgstr "Прототип узла сети с видимым именем \"%1$s
 msgid "Host prototypes"
 msgstr "Прототипы узлов сети"
 
-#: host_prototypes.php:348
+#: host_prototypes.php:342
 msgid "Host prototypes deleted"
 msgstr "Прототипы узлов сети удалены"
 
@@ -7901,7 +7901,7 @@ msgstr "Время на узле сети"
 msgid "Host update failed."
 msgstr "Ошибка при обновлении узла сети."
 
-#: hosts.php:346
+#: hosts.php:340
 msgid "Host updated"
 msgstr "Узел сети обновлен"
 
@@ -8244,7 +8244,7 @@ msgstr "Изображения для всех карт сетей будут о
 msgid "Immediately"
 msgstr "Незамедлительно"
 
-#: app/controllers/CControllerPopupImport.php:164
+#: app/controllers/CControllerPopupImport.php:165
 #: app/views/administration.mediatype.list.php:36
 #: app/views/popup.import.compare.php:152 app/views/popup.import.php:156
 #: include/views/configuration.host.list.php:37
@@ -8303,7 +8303,7 @@ msgid "Inaccessible graph prototype"
 msgstr "Недоступный прототип графиков"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:317
-#: host_prototypes.php:467
+#: host_prototypes.php:461
 msgid "Inaccessible group"
 msgstr "Недоступная группа"
 
@@ -8741,9 +8741,9 @@ msgstr "Некорректное имя поля \"%1$s\" или значени�
 msgid "Incorrect fields for sysmap."
 msgstr "Некорректные поля для карты сети."
 
-#: include/classes/setup/CSetupWizard.php:737
-#: include/classes/setup/CSetupWizard.php:741
-#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:748
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "Некорректный путь к файлу для \"%1$s\": %2$s."
@@ -9515,7 +9515,7 @@ msgid "Insert expression"
 msgstr "Вставить выражение"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:702
+#: include/classes/setup/CSetupWizard.php:705
 msgid "Install"
 msgstr "Установка"
 
@@ -10050,7 +10050,7 @@ msgstr "Элемент данных \"%1$s\" не существует или у
 msgid "Item added"
 msgstr "Элемент данных добавлен"
 
-#: app/views/popup.itemtestedit.view.php:419
+#: app/views/popup.itemtestedit.view.php:420
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "Элемент данных содержит пользовательский макрос со скрытыми значениями. Значения таких макросов необходимо ввести вручную."
 
@@ -10141,7 +10141,7 @@ msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "Прототип элементов данных с ID \"%1$s\" недоступен."
 
 #: app/controllers/CControllerPopupGeneric.php:288
-#: app/controllers/CControllerPopupImportCompare.php:172
+#: app/controllers/CControllerPopupImportCompare.php:173
 #: include/html.inc.php:440
 #: include/views/configuration.host.discovery.list.php:281
 #: include/views/configuration.item.prototype.edit.php:26
@@ -10230,7 +10230,7 @@ msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Элемент данных с ключом \"%1$s\" уже существует у \"%2$s\"."
 
 #: app/controllers/CControllerPopupGeneric.php:237
-#: app/controllers/CControllerPopupImportCompare.php:167
+#: app/controllers/CControllerPopupImportCompare.php:168
 #: app/partials/dataoverview.table.top.php:29
 #: app/views/administration.queue.overview.php:45
 #: app/views/popup.import.php:35 app/views/search.php:117
@@ -10466,7 +10466,7 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Последняя"
 
-#: include/func.inc.php:2537
+#: include/func.inc.php:2596
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -10474,7 +10474,7 @@ msgstr[0] "Последний %1$d день"
 msgstr[1] "Последние %1$d дня"
 msgstr[2] "Последние %1$d дней"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2590
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -10482,7 +10482,7 @@ msgstr[0] "Последний %1$d час"
 msgstr[1] "Последние %1$d часа"
 msgstr[2] "Последние %1$d часов"
 
-#: include/func.inc.php:2524
+#: include/func.inc.php:2583
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -10490,7 +10490,7 @@ msgstr[0] "Последняя %1$d минута"
 msgstr[1] "Последние %1$d минуты"
 msgstr[2] "Последние %1$d минут"
 
-#: include/func.inc.php:2540
+#: include/func.inc.php:2599
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -10498,7 +10498,7 @@ msgstr[0] "Последний %1$d месяц"
 msgstr[1] "Последние %1$d месяца"
 msgstr[2] "Последние %1$d месяцев"
 
-#: include/func.inc.php:2517
+#: include/func.inc.php:2576
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -10506,7 +10506,7 @@ msgstr[0] "Последняя %1$d секунда"
 msgstr[1] "Последние %1$d секунды"
 msgstr[2] "Последние %1$d секунд"
 
-#: include/func.inc.php:2543
+#: include/func.inc.php:2602
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -11226,10 +11226,10 @@ msgstr "Пометить выбранное"
 msgid "Mask"
 msgstr "Маска"
 
-#: app/controllers/CControllerPopupMassupdateHost.php:445
-#: app/controllers/CControllerPopupMassupdateItem.php:405
-#: app/controllers/CControllerPopupMassupdateTemplate.php:363
-#: app/controllers/CControllerPopupMassupdateTrigger.php:234
+#: app/controllers/CControllerPopupMassupdateHost.php:446
+#: app/controllers/CControllerPopupMassupdateItem.php:406
+#: app/controllers/CControllerPopupMassupdateTemplate.php:364
+#: app/controllers/CControllerPopupMassupdateTrigger.php:235
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/views/configuration.host.list.php:444
 #: include/views/configuration.item.list.php:311
@@ -12067,8 +12067,8 @@ msgid "Next page"
 msgstr "Следующая страница"
 
 #: include/classes/setup/CSetupWizard.php:142
-#: include/classes/setup/CSetupWizard.php:429
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:430
+#: include/classes/setup/CSetupWizard.php:567
 msgid "Next step"
 msgstr "Далее"
 
@@ -13830,7 +13830,7 @@ msgstr "Воспроизвести"
 msgid "Play sound"
 msgstr "Воспроизведение звукового сигнала"
 
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:567
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Пожалуйста, проверьте параметры конфигурации. Если все верно, нажмите кнопку \"%1$s\" или кнопку \"%2$s\" для изменения параметров конфигурации."
@@ -13843,16 +13843,16 @@ msgstr "Пожалуйста, подтвердите, что вы хотите �
 msgid "Please confirm that you want to remove all value mappings."
 msgstr "Пожалуйста, подтвердите, что хотите удалить все преобразования значений."
 
-#: include/classes/setup/CSetupWizard.php:429
+#: include/classes/setup/CSetupWizard.php:430
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Пожалуйста, создайте базу данных вручную и укажите параметры конфигурации для соединения с этой базой. Нажмите кнопку \"%1$s\" при завершении."
 
-#: include/classes/setup/CSetupWizard.php:885
+#: include/classes/setup/CSetupWizard.php:888
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "Пожалуйста, включите \"allow_url_fopen\" директиву."
 
-#: include/classes/setup/CSetupWizard.php:457
+#: include/classes/setup/CSetupWizard.php:458
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Пожалуйста, укажите имя хоста или IP адрес хоста и номер порта Zabbix сервера, а так же имя инсталляции (опционально)."
 
@@ -13896,7 +13896,7 @@ msgstr "Заполнение поля инвентаря узла сети"
 #: app/views/administration.proxy.edit.php:54
 #: app/views/administration.script.edit.php:163
 #: app/views/popup.itemtestedit.view.php:111
-#: include/classes/setup/CSetupWizard.php:444 include/hosts.inc.php:1307
+#: include/classes/setup/CSetupWizard.php:445 include/hosts.inc.php:1307
 #: include/views/configuration.host.list.php:106
 #: include/views/inventory.host.view.php:79 setup.php:62
 msgid "Port"
@@ -13935,7 +13935,7 @@ msgid "Power value"
 msgstr "Значение степени"
 
 #: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:564
+#: include/classes/setup/CSetupWizard.php:565
 msgid "Pre-installation summary"
 msgstr "Предварительный обзор инсталляции"
 
@@ -13980,7 +13980,7 @@ msgid "Previous day"
 msgstr "Предыдущий день"
 
 #: app/partials/scheduledreport.formgrid.html.php:92
-#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2487
+#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2546
 msgid "Previous month"
 msgstr "Предыдущий месяц"
 
@@ -13996,12 +13996,12 @@ msgid "Previous value"
 msgstr "Предыдущее значение"
 
 #: app/partials/scheduledreport.formgrid.html.php:91
-#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2486
+#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2545
 msgid "Previous week"
 msgstr "Предыдущая неделя"
 
 #: app/partials/scheduledreport.formgrid.html.php:93
-#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2488
+#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2547
 msgid "Previous year"
 msgstr "Предыдущий год"
 
@@ -14721,7 +14721,7 @@ msgctxt "screen reader"
 msgid "Remove, %1$s"
 msgstr "Удаление, %1$s"
 
-#: app/controllers/CControllerPopupImportCompare.php:158
+#: app/controllers/CControllerPopupImportCompare.php:159
 msgid "Removed"
 msgstr "Удалено"
 
@@ -15375,7 +15375,7 @@ msgstr "Сохранить как"
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:685
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Сохранить как \"%1$s\""
@@ -16525,8 +16525,8 @@ msgstr "Период хранения"
 msgid "Store credentials in"
 msgstr "Хранение учётных данных в"
 
-#: include/classes/setup/CSetupWizard.php:499
 #: include/classes/setup/CSetupWizard.php:500
+#: include/classes/setup/CSetupWizard.php:501
 msgid "Stored in HashiCorp Vault secret"
 msgstr "Хранение в HashiCorp Vault секрете"
 
@@ -16588,7 +16588,7 @@ msgstr "Подписки"
 msgid "Success Audit"
 msgstr "Аудит успеха"
 
-#: include/func.inc.php:1631 jsLoader.php:217
+#: include/func.inc.php:1641 jsLoader.php:217
 msgid "Success message"
 msgstr "Сообщение об успехе"
 
@@ -16665,7 +16665,7 @@ msgstr "Время загрузки системы. Возвращает цел�
 msgid "System default"
 msgstr "Системное по умолчанию"
 
-#: include/func.inc.php:1659
+#: include/func.inc.php:1678
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "Произошла системная ошибка. Пожалуйста, свяжитесь с администратором Zabbix."
 
@@ -16884,7 +16884,7 @@ msgstr "Шаблон \"%1$s\" не может быть без группы уз�
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Шаблон \"%1$s\" для узла сети \"%2$s\" не существует."
 
-#: templates.php:212
+#: templates.php:206
 msgid "Template added"
 msgstr "Шаблон добавлен"
 
@@ -16904,7 +16904,7 @@ msgstr "Шаблон панели"
 msgid "Template dashboards"
 msgstr "Шаблоны панелей"
 
-#: templates.php:436 templates.php:450 templates.php:483
+#: templates.php:430 templates.php:444 templates.php:477
 msgid "Template deleted"
 msgstr "Шаблон удален"
 
@@ -16928,7 +16928,7 @@ msgstr "Имя шаблона"
 msgid "Template trigger"
 msgstr "Шаблонный триггер"
 
-#: templates.php:216
+#: templates.php:210
 msgid "Template updated"
 msgstr "Шаблон обновлен"
 
@@ -16953,7 +16953,7 @@ msgstr "Шаблон с таким же видимым именем \"%1$s\" у�
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/controllers/CControllerPopupImportCompare.php:132
-#: app/controllers/CControllerPopupImportCompare.php:164
+#: app/controllers/CControllerPopupImportCompare.php:165
 #: app/partials/configuration.filter.items.php:72
 #: app/partials/popup.operations.php:212
 #: app/views/popup.condition.common.php:352 app/views/popup.import.php:31
@@ -16994,7 +16994,7 @@ msgstr "Шаблоны обновлены"
 #: app/views/administration.mediatype.list.php:139
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:573
-#: app/views/popup.itemtestedit.view.php:434
+#: app/views/popup.itemtestedit.view.php:431
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
 #: include/views/configuration.host.discovery.edit.php:902
@@ -17085,15 +17085,15 @@ msgstr "Версия базы данных Zabbix не соответствуе�
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "Среднее время записи на виртуальный диск, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
-#: hosts.php:324
+#: hosts.php:322
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Склонированный узел сети содержит пользовательские макросы с типом \"Скрытый текст\". Значения и тип этих макросов сброшены."
 
-#: host_prototypes.php:172
+#: host_prototypes.php:170
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Склонированный прототип узлов сети содержит пользовательские макросы с типом \"Скрытый текст\". Значения и тип этих макросов сброшены."
 
-#: templates.php:184
+#: templates.php:182
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Склонированный шаблон содержит пользовательские макросы с типом \"Скрытый текст\". Значения и тип этих макросов сброшены."
 
@@ -17190,7 +17190,7 @@ msgstr "Триггер более не обнаруживается и буде�
 msgid "Theme"
 msgstr "Тема"
 
-#: include/func.inc.php:2485
+#: include/func.inc.php:2544
 msgid "This day last week"
 msgstr "Этот день прошлой недели"
 
@@ -17203,27 +17203,27 @@ msgstr "Это поле автоматически заполняется \"%1$s
 msgid "This is the test message from Zabbix"
 msgstr "Это тестовое сообщение от Zabbix"
 
-#: include/func.inc.php:2493 srv_status.php:40
+#: include/func.inc.php:2552 srv_status.php:40
 msgid "This month"
 msgstr "Этот месяц"
 
-#: include/func.inc.php:2494
+#: include/func.inc.php:2553
 msgid "This month so far"
 msgstr "В этом месяце"
 
-#: include/func.inc.php:2491 srv_status.php:39
+#: include/func.inc.php:2550 srv_status.php:39
 msgid "This week"
 msgstr "Эта неделя"
 
-#: include/func.inc.php:2492
+#: include/func.inc.php:2551
 msgid "This week so far"
 msgstr "На этой неделе"
 
-#: include/func.inc.php:2495 srv_status.php:41
+#: include/func.inc.php:2554 srv_status.php:41
 msgid "This year"
 msgstr "Этот год"
 
-#: include/func.inc.php:2496
+#: include/func.inc.php:2555
 msgid "This year so far"
 msgstr "В этом году"
 
@@ -17347,12 +17347,12 @@ msgstr "К"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Чтобы задать интерфейс узла сети выберите один тип элемента данных из всех элементов данных"
 
-#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2489
+#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2548
 #: srv_status.php:38
 msgid "Today"
 msgstr "Сегодня"
 
-#: include/func.inc.php:2490
+#: include/func.inc.php:2549
 msgid "Today so far"
 msgstr "Сегодня до сих пор"
 
@@ -17634,7 +17634,7 @@ msgstr[1] "Прототипы триггеров обновлены"
 msgstr[2] "Прототипы триггеров обновлены"
 
 #: app/controllers/CControllerPopupGeneric.php:197
-#: app/controllers/CControllerPopupImportCompare.php:173
+#: app/controllers/CControllerPopupImportCompare.php:174
 #: include/html.inc.php:454
 #: include/views/configuration.host.discovery.list.php:289
 #: include/views/configuration.trigger.prototype.edit.php:29
@@ -17671,7 +17671,7 @@ msgid "Trigger updated"
 msgstr "Триггер обновлен"
 
 #: app/controllers/CControllerPopupGeneric.php:183
-#: app/controllers/CControllerPopupImportCompare.php:165
+#: app/controllers/CControllerPopupImportCompare.php:166
 #: app/partials/configuration.filter.items.php:191
 #: app/partials/monitoring.problem.filter.php:74
 #: app/partials/trigoverview.table.top.php:29
@@ -18212,7 +18212,7 @@ msgstr "Операции обновления"
 msgid "Update problem"
 msgstr "Обновление проблемы"
 
-#: app/controllers/CControllerPopupImportCompare.php:159
+#: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
 msgstr "Обновлено"
 
@@ -18567,8 +18567,8 @@ msgstr "Имя пользователя"
 msgid "Username and password"
 msgstr "Имя пользователя и пароль"
 
-#: include/classes/setup/CSetupWizard.php:599
-#: include/classes/setup/CSetupWizard.php:903
+#: include/classes/setup/CSetupWizard.php:600
+#: include/classes/setup/CSetupWizard.php:906
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "Имя пользователя и пароль должны храниться в ключах \"username\" и \"password\" Хранилища секретов."
 
@@ -18950,7 +18950,7 @@ msgstr "Преобразование значений \"%1$s\" уже сущес
 msgid "Value mapping"
 msgstr "Преобразование значений"
 
-#: app/controllers/CControllerPopupImportCompare.php:171
+#: app/controllers/CControllerPopupImportCompare.php:172
 #: app/views/popup.import.php:32
 msgid "Value mappings"
 msgstr "Преобразования значений"
@@ -19011,17 +19011,17 @@ msgid "Various information about specific process(es). Returns float"
 msgstr "Различная информация о указанном процессе(ах). Возвращает число с плавающей точкой"
 
 #: include/classes/setup/CSetupWizard.php:335
-#: include/classes/setup/CSetupWizard.php:518
+#: include/classes/setup/CSetupWizard.php:519
 msgid "Vault API endpoint"
 msgstr "API endpoint Хранилища"
 
 #: include/classes/setup/CSetupWizard.php:350
-#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:525
 msgid "Vault authentication token"
 msgstr "Токен аутентификации Хранилища"
 
 #: include/classes/core/ZBase.php:235
-#: include/classes/setup/CSetupWizard.php:899 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Ошибка подключения к Хранилищу."
 
@@ -19030,7 +19030,7 @@ msgid "Vault secret"
 msgstr "Секрет Хранилища"
 
 #: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:521
+#: include/classes/setup/CSetupWizard.php:522
 msgid "Vault secret path"
 msgstr "Путь к секрету Хранилища"
 
@@ -19117,7 +19117,7 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Предупреждение"
 
-#: jsLoader.php:219
+#: include/func.inc.php:1643 jsLoader.php:219
 msgid "Warning message"
 msgstr "Предупреждающее сообщение"
 
@@ -19191,7 +19191,7 @@ msgstr[2] "Веб-сценарии активированы"
 msgid "Web scenario updated"
 msgstr "Веб-сценарий обновлен"
 
-#: app/controllers/CControllerPopupImportCompare.php:170
+#: app/controllers/CControllerPopupImportCompare.php:171
 #: app/views/popup.import.php:39 include/html.inc.php:400
 msgid "Web scenarios"
 msgstr "Веб-сценарии"
@@ -19538,7 +19538,7 @@ msgstr "Ежегодно"
 msgid "Yes"
 msgstr "Да"
 
-#: include/classes/screens/CScreenProblem.php:717 include/func.inc.php:2483
+#: include/classes/screens/CScreenProblem.php:717 include/func.inc.php:2542
 msgid "Yesterday"
 msgstr "Вчера"
 
@@ -19659,7 +19659,7 @@ msgid "Zabbix login form"
 msgstr "Диалог входа в систему Zabbix"
 
 #: app/views/administration.script.edit.php:126
-#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:556
 msgid "Zabbix server"
 msgstr "Zabbix сервер"
 
@@ -19679,7 +19679,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Zabbix сервер (прокси)"
 
 #: include/classes/setup/CSetupWizard.php:57
-#: include/classes/setup/CSetupWizard.php:455
+#: include/classes/setup/CSetupWizard.php:456
 msgid "Zabbix server details"
 msgstr "Детали Zabbix сервера"
 
@@ -19691,11 +19691,11 @@ msgstr "Zabbix сервер не запущен: отображаемая инф
 msgid "Zabbix server is running"
 msgstr "Zabbix сервер запущен"
 
-#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:560
 msgid "Zabbix server name"
 msgstr "Имя сервера Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:556
+#: include/classes/setup/CSetupWizard.php:557
 msgid "Zabbix server port"
 msgstr "Порт Zabbix сервера"
 
@@ -20284,7 +20284,7 @@ msgstr "дней"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:614 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:497
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "по умолчанию"
@@ -20899,7 +20899,7 @@ msgstr "название"
 msgid "new"
 msgstr "новый"
 
-#: hosts.php:993 templates.php:637
+#: hosts.php:987 templates.php:631
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "новый"

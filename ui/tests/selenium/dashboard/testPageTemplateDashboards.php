@@ -36,8 +36,6 @@ class testPageTemplateDashboards extends CWebTest {
 	const DASHBOARDS_2_DELETE = ['1st dashboard', 'middle dashboard'];
 
 	public static function prepareTemplateDashboardsData() {
-		CDataHelper::setSessionId(null);
-
 		foreach (self::DASHBOARDS as $dashboard) {
 			CDataHelper::call('templatedashboard.create', [
 				[
