@@ -309,7 +309,7 @@ function make_small_eventlist(array $startEvent) {
 		'severity_name_4' => $config['severity_name_4'],
 		'severity_name_5' => $config['severity_name_5']
 	];
-	$actions = getEventsActionsIconsData($events, $triggers, $r_events);
+	$actions = getEventsActionsIconsData($events, $triggers);
 	$users = API::User()->get([
 		'output' => ['alias', 'name', 'surname'],
 		'userids' => array_keys($actions['userids']),
