@@ -517,7 +517,9 @@ static int	DBpatch_5050037(void)
 
 	if (ZBX_DB_OK > DBexecute("update profiles set value_str='host.list' where idx='web.pager.entity' "
 				"and value_str='hosts.php'"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
