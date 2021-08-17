@@ -1224,14 +1224,13 @@ function eventType($type = null) {
  *
  * @param array $events    Array with event objects with acknowledges.
  * @param array $triggers  Array of triggers.
- * @param array $r_events  Array with related recovery event data (optional).
  *
  * @return array
  */
-function getEventsActionsIconsData(array $events, array $triggers, array $r_events = []) {
+function getEventsActionsIconsData(array $events, array $triggers) {
 	$messages = getEventsMessages($events);
 	$severities = getEventsSeverityChanges($events, $triggers);
-	$actions = getEventsAlertsOverview($events, $r_events);
+	$actions = getEventsAlertsOverview($events);
 
 	return [
 		'data' => [
@@ -1351,13 +1350,11 @@ function getEventsSeverityChanges(array $events, array $triggers) {
  * @param array  $events                 Array with event objects with acknowledges.
  * @param string $events[]['eventid']    Problem event ID.
  * @param string $events[]['r_eventid']  OK event ID.
- * @param array  $r_events               Array with related recovery event data (optional).
  *
  * @return array  List indexed by eventid containing overview on event alerts.
  */
-function getEventsAlertsOverview(array $events, array $r_events = []): array {
+function getEventsAlertsOverview(array $events): array {
 	$alert_eventids = [];
-	$r_eventids = [];
 	$actions = [];
 	$event_alert_state = [];
 
@@ -1368,16 +1365,7 @@ function getEventsAlertsOverview(array $events, array $r_events = []): array {
 		// Get alerts for related recovery events.
 		if ($event['r_eventid'] != 0) {
 			$alert_eventids[$event['r_eventid']] = true;
-			$r_eventids[$event['r_eventid']] = true;
 		}
-	}
-
-	if ($r_eventids && !$r_events) {
-		$r_events = API::Event()->get([
-			'output' => ['clock'],
-			'eventids' => array_keys($r_eventids),
-			'preservekeys' => true
-		]);
 	}
 
 	if ($alert_eventids) {

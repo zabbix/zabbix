@@ -338,7 +338,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		])
 		: [];
 
-	$actions = getEventsActionsIconsData($events, $triggers, $r_events);
+	$actions = getEventsActionsIconsData($events, $triggers);
 	$users = API::User()->get([
 		'output' => ['username', 'name', 'surname'],
 		'userids' => array_keys($actions['userids']),
