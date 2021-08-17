@@ -25,16 +25,19 @@ if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }
 
-if (array_key_exists('data', $data)) {
-	switch ($data['type']) {
-		case 'eventlist':
-			$output['data'] = makeEventList($data['data'])->toString();
-			break;
+if (array_key_exists('actions', $data)) {
+	$foot_note = $data['foot_note']
+		? (new CDiv(
+			(new CDiv(
+				(new CDiv($data['foot_note']))
+					->addClass(ZBX_STYLE_TABLE_STATS)
+			))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+		))->addClass(ZBX_STYLE_TABLE_PAGING)
+		: null;
 
-		case 'eventactions':
-			$output['data'] = makeEventActionsList($data['data'])->toString();
-			break;
-	}
+	$output['data'] = (new CObject([
+		makeEventActionsTable($data['actions'], $data['users'], $data['mediatypes'], $data['config']), $foot_note
+	]))->toString();
 }
 
 echo json_encode($output);
