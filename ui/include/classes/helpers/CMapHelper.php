@@ -636,6 +636,7 @@ class CMapHelper {
 						'border_width' => 3,
 						'border_color' => $theme['maingridcolor'],
 						'background_color' => '',
+						'text' => '',
 						'zindex' => -1
 					];
 				}

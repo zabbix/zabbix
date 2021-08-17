@@ -1940,7 +1940,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		foreach ($selements as $key => $selement) {
 			$elementtype = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
-					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
+					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
+					&& array_key_exists('hostid', $selement['elements'][0]))
 				? SYSMAP_ELEMENT_TYPE_HOST
 				: $selement['elementtype'];
 

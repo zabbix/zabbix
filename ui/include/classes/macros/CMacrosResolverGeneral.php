@@ -2007,6 +2007,10 @@ class CMacrosResolverGeneral {
 		$expr_macro_values = self::getExpressionMacros($expr_macros, []);
 
 		foreach ($expr_macros as $macro => $expr_macro) {
+			if (!array_key_exists($macro, $expr_macro_values)) {
+				continue;
+			}
+
 			foreach ($expr_macro['links'] as $_macro => $keys) {
 				foreach ($keys as $key) {
 					$macro_values[$key][$_macro] = $expr_macro_values[$macro];
