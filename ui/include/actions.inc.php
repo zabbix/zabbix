@@ -1355,7 +1355,7 @@ function getEventsSeverityChanges(array $events, array $triggers) {
  *
  * @return array  List indexed by eventid containing overview on event alerts.
  */
-function getEventsAlertsOverview(array $events, array $r_events = []) {
+function getEventsAlertsOverview(array $events, array $r_events = []): array {
 	$alert_eventids = [];
 	$r_eventids = [];
 	$actions = [];
@@ -1772,7 +1772,8 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButton {
  * @param string $actions[]['error']           Error message in case of failed alert (only for ZBX_EVENT_HISTORY_ALERT).
  * @param array  $users                        User name, surname and alias.
  * @param array  $mediatypes                   Mediatypes with maxattempts value and description.
- * @param string $mediatypes[]['description']  Mediatype description.
+ * @param string $mediatypes[]['name']         Mediatype name.
+ * @param string $mediatypes[]['maxattempts']  Maximum attempts for this mediatype.
  *
  * @return CTableInfo
  */
