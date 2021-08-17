@@ -223,7 +223,7 @@ class CAudit {
 
 	public static function log(int $resource, int $action, array $objects, ?array $old_objects): void {
 		if (!self::isAuditEnable() && ($resource != self::RESOURCE_SETTINGS
-					&& !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
+					|| !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
 			return;
 		}
 
