@@ -75,7 +75,7 @@ class CControllerHintboxActionlist extends CController {
 
 		$mediatypes = $actions['mediatypeids']
 			? API::MediaType()->get([
-				'output' => ['description'],
+				'output' => ['name', 'maxattempts'],
 				'mediatypeids' => array_keys($actions['mediatypeids']),
 				'preservekeys' => true
 			])
