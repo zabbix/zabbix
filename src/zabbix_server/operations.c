@@ -909,7 +909,7 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 	{
 		zbx_vector_uint64_t	hostgroupids, found_groupids;
 		DB_RESULT		result2;
-		DB_ROW                  row;
+		DB_ROW			row;
 
 		DBfree_result(result);
 
