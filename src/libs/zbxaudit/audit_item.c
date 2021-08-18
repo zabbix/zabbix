@@ -241,11 +241,11 @@ void	zbx_audit_discovery_rule_update_json_add_overrides_conditions(zbx_uint64_t 
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_operator, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_operator, sizeof(audit_key_operator),
 			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions.operator", item_conditionid);
-	zbx_snprintf(audit_key_macro, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_macro, sizeof(audit_key_macro),
 			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions.macro", item_conditionid);
-	zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value),
 			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions.value", item_conditionid);
 
 	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_operator, op);
@@ -261,7 +261,7 @@ void	zbx_audit_discovery_rule_update_json_update_##resource(zbx_uint64_t itemid,
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(audit_key_##resource, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource),					\
 			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions."#resource,			\
 			item_conditionid);									\
 														\
@@ -279,7 +279,7 @@ void	zbx_audit_discovery_rule_update_json_delete_overrides_conditions(zbx_uint64
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(buf, sizeof(buf),
 			"discoveryrule.overrides[" ZBX_FS_UI64 "]", item_conditionid);
 
 	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, buf);
@@ -295,15 +295,15 @@ void	zbx_audit_discovery_rule_update_json_add_discovery_rule_preproc(zbx_uint64_
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_step, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_step, sizeof(audit_key_step),
 			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].step", item_preprocid);
-	zbx_snprintf(audit_key_type, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_type, sizeof(audit_key_type),
 			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].type", item_preprocid);
-	zbx_snprintf(audit_key_params, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_params, sizeof(audit_key_params),
 			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].params", item_preprocid);
-	zbx_snprintf(audit_key_error_handler, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_error_handler, sizeof(audit_key_error_handler),
 			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].error_handler", item_preprocid);
-	zbx_snprintf(audit_key_error_handler_params, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_error_handler_params, sizeof(audit_key_error_handler_params),
 			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].error_handler_params", item_preprocid);
 
 	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, step);
@@ -321,7 +321,7 @@ void	zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_##resour
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(audit_key_##resource, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource),					\
 			"discoveryrule.preprocessing[" ZBX_FS_UI64 "]."#resource, preprocid);			\
 														\
 	zbx_audit_update_json_update_##type2(itemid, audit_key_##resource, resource##_old, resource##_new);	\
@@ -335,17 +335,17 @@ PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(error_handler_params, const char*, s
 #define ITEM_RESOURCE_KEY_RESOLVE(resource, nested)								\
 	if (AUDIT_RESOURCE_ITEM == resource_type)								\
 	{													\
-		zbx_snprintf(audit_key_##resource, AUDIT_DETAILS_KEY_LEN, "item.parameters[" ZBX_FS_UI64	\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "item.parameters[" ZBX_FS_UI64 \
 				"]"#nested#resource, item_parameter_id);					\
 	}													\
 	else if (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)						\
 	{													\
-		zbx_snprintf(audit_key_##resource, AUDIT_DETAILS_KEY_LEN, "itemprototype.parameters["		\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "itemprototype.parameters["	\
 				ZBX_FS_UI64 "]"#nested#resource, item_parameter_id);				\
 	}													\
 	else if (AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)						\
 	{													\
-		zbx_snprintf(audit_key_##resource, AUDIT_DETAILS_KEY_LEN, "discoveryrule.parameters["		\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.parameters["	\
 				ZBX_FS_UI64 "]"#resource, item_parameter_id);					\
 	}													\
 	else													\
@@ -406,9 +406,9 @@ void	zbx_audit_discovery_rule_update_json_add_lld_macro_path(zbx_uint64_t itemid
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_lld_macro, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_lld_macro, sizeof(audit_key_lld_macro),
 			"discoveryrule.lld_macro_paths[" ZBX_FS_UI64 "].lld_macro", lld_macro_pathid);
-	zbx_snprintf(audit_key_path, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_path, sizeof(audit_key_lld_macro),
 			"discoveryrule.lld_macro_paths[" ZBX_FS_UI64 "].path", lld_macro_pathid);
 
 	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_lld_macro, lld_macro);
@@ -423,7 +423,7 @@ void	zbx_audit_discovery_rule_update_json_update_lld_macro_path_##resource(zbx_u
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(audit_key_##resource, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource),					\
 			"discoveryrule.lld_macro_paths[" ZBX_FS_UI64 "]."#resource, lld_macro_pathid);		\
 														\
 	zbx_audit_update_json_update_string(itemid, audit_key_##resource, resource##_old, resource##_new);	\
@@ -442,4 +442,117 @@ void	zbx_audit_discovery_rule_update_json_delete_lld_macro_path(zbx_uint64_t ite
 	zbx_snprintf(buf, sizeof(buf),"discoveryrule.lld_macro_paths[" ZBX_FS_UI64 "]", lld_macro_pathid);
 
 	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, buf);
+}
+
+void zbx_audit_discovery_rule_update_json_add_lld_override(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+		const char *name, int step, int stop)
+{
+	char	audit_key_name[AUDIT_DETAILS_KEY_LEN], audit_key_step[AUDIT_DETAILS_KEY_LEN],
+		audit_key_stop[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_name, sizeof(audit_key_name), "discoveryrule.overrides[" ZBX_FS_UI64 "].name",
+			overrideid);
+
+	zbx_snprintf(audit_key_step, sizeof(audit_key_step), "discoveryrule.overrides[" ZBX_FS_UI64 "].step",
+			overrideid);
+
+	zbx_snprintf(audit_key_stop, sizeof(audit_key_stop), "discoveryrule.overrides[" ZBX_FS_UI64 "].stop",
+			overrideid);
+
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_name, name);
+	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, step);
+	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_stop, stop);
+}
+
+void zbx_audit_discovery_rule_update_json_add_lld_override_filter(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+		int evaltype, const char *formula)
+{
+	char	audit_key_evaltype[AUDIT_DETAILS_KEY_LEN], audit_key_formula[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_evaltype, sizeof(audit_key_evaltype), "discoveryrule.overrides[" ZBX_FS_UI64
+			"].filter.evaltype", overrideid);
+
+	zbx_snprintf(audit_key_formula, sizeof(audit_key_formula), "discoveryrule.overrides[" ZBX_FS_UI64
+			"].filter.formula", overrideid);
+
+	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_evaltype, evaltype);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_formula, formula);
+}
+
+void zbx_audit_discovery_rule_update_json_add_lld_override_condition(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+		zbx_uint64_t override_conditionid, int operator, const char *macro, const char *value)
+{
+	char	audit_key_operator[AUDIT_DETAILS_KEY_LEN], audit_key_macro[AUDIT_DETAILS_KEY_LEN],
+		audit_key_value[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_operator, sizeof(audit_key_operator), "discoveryrule.overrides[" ZBX_FS_UI64
+		"].conditions[" ZBX_FS_UI64 "].operator", overrideid, override_conditionid);
+
+	zbx_snprintf(audit_key_macro, sizeof(audit_key_macro), "discoveryrule.overrides[" ZBX_FS_UI64 "].conditions["
+			ZBX_FS_UI64 "].macro", overrideid, override_conditionid);
+
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "discoveryrule.overrides[" ZBX_FS_UI64 "].conditions["
+			ZBX_FS_UI64 "].value", overrideid, override_conditionid);
+
+	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_operator, operator);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_macro, macro);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+}
+
+#define PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(resource, type, type2)					\
+void	zbx_audit_discovery_rule_update_json_add_lld_override_##resource(zbx_uint64_t itemid,			\
+		zbx_uint64_t overrideid, zbx_uint64_t resource##_id, type resource)				\
+{														\
+	char	buf[AUDIT_DETAILS_KEY_LEN];									\
+														\
+	RETURN_IF_AUDIT_OFF();											\
+														\
+	zbx_snprintf(buf, sizeof(buf), "discoveryrule.overrides[" ZBX_FS_UI64					\
+			"].operations[" ZBX_FS_UI64 "]."#resource, overrideid, resource##_id);			\
+														\
+	zbx_audit_update_json_append_##type2(itemid, AUDIT_DETAILS_ACTION_ADD, buf, resource);			\
+}
+
+PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(opstatus, int, int)
+PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(opdiscover, int, int)
+PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(opperiod, const char*, string)
+PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(optrends, const char*, string)
+PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(ophistory, const char*, string)
+PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(opseverity, int, int)
+PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD(opinventory, int, int)
+
+void	zbx_audit_discovery_rule_update_json_add_lld_override_optag(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+		zbx_uint64_t lld_override_optagid, const char *tag, const char *value)
+{
+	char	audit_key_tag[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "discoveryrule.overrides[" ZBX_FS_UI64
+			"].optag[" ZBX_FS_UI64 "].tag", overrideid, lld_override_optagid);
+
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "discoveryrule.overrides[" ZBX_FS_UI64
+			"].optag[" ZBX_FS_UI64 "].value", overrideid, lld_override_optagid);
+
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_tag, tag);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+}
+
+void	zbx_audit_discovery_rule_update_json_add_lld_override_optemplate(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+		zbx_uint64_t lld_override_optemplateid, zbx_uint64_t templateid)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, sizeof(buf), "discoveryrule.overrides[" ZBX_FS_UI64
+			"].optemplateid[" ZBX_FS_UI64 "].templateid", overrideid, lld_override_optemplateid);
+
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, buf, templateid);
 }
