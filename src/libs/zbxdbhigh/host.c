@@ -4147,7 +4147,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 	if (0 != new_tags)
 	{
-		zbx_db_insert_autoincrement(&db_insert_tag, "hosttagid");
 		zbx_db_insert_execute(&db_insert_tag);
 		zbx_db_insert_clean(&db_insert_tag);
 	}
