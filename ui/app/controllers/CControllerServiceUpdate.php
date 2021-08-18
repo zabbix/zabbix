@@ -132,14 +132,12 @@ class CControllerServiceUpdate extends CController {
 			$service['tags'][] = $tag;
 		}
 
-		if ($service['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK) {
-			foreach ($this->getInput('problem_tags', []) as $problem_tag) {
-				if ($problem_tag['tag'] === '' && $problem_tag['value'] === '') {
-					continue;
-				}
-
-				$service['problem_tags'][] = $problem_tag;
+		foreach ($this->getInput('problem_tags', []) as $problem_tag) {
+			if ($problem_tag['tag'] === '' && $problem_tag['value'] === '') {
+				continue;
 			}
+
+			$service['problem_tags'][] = $problem_tag;
 		}
 
 		foreach ($this->getInput('parent_serviceids', []) as $serviceid) {

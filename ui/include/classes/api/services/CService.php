@@ -730,16 +730,6 @@ class CService extends CApiService {
 				? $service['algorithm']
 				: $db_services[$service['serviceid']]['algorithm'];
 
-			if (array_key_exists('problem_tags', $service)) {
-				$has_problem_tags = count($service['problem_tags']) > 0;
-			}
-			elseif ($db_services !== null) {
-				$has_problem_tags = $db_services[$service['serviceid']]['problem_tags'] > 0;
-			}
-			else {
-				$has_problem_tags = false;
-			}
-
 			if ($algorithm == ZBX_SERVICE_STATUS_CALC_SET_OK) {
 				$showsla = array_key_exists('showsla', $service)
 					? $service['showsla']
@@ -750,14 +740,16 @@ class CService extends CApiService {
 						_s('Service "%1$s" cannot show SLA for the selected status calculation rule.', $name)
 					);
 				}
+			}
 
-				if ($has_problem_tags) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Service "%1$s" cannot have problem tags with the selected status calculation rule.',
-							$name
-						)
-					);
-				}
+			if (array_key_exists('problem_tags', $service)) {
+				$has_problem_tags = count($service['problem_tags']) > 0;
+			}
+			elseif ($db_services !== null) {
+				$has_problem_tags = $db_services[$service['serviceid']]['problem_tags'] > 0;
+			}
+			else {
+				$has_problem_tags = false;
 			}
 
 			if (array_key_exists('children', $service)) {
