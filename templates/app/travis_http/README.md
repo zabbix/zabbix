@@ -45,7 +45,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Repos metrics discovery |<p>Metrics for Repos statistics</p> |DEPENDENT |travis.repos.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Repos metrics discovery |<p>Metrics for Repos statistics.</p> |DEPENDENT |travis.repos.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Items collected
 

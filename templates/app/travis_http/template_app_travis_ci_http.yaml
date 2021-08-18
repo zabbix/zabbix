@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-08-18T12:17:15Z'
+  date: '2021-08-18T12:34:02Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -97,7 +97,7 @@ zabbix_export:
           name: 'Travis: Get health'
           type: HTTP_AGENT
           key: travis.get_health
-          history: 1h
+          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Getting home JSON using Travis API.'
@@ -255,7 +255,7 @@ zabbix_export:
           type: DEPENDENT
           key: travis.repos.discovery
           delay: '0'
-          description: 'Metrics for Repos statistics'
+          description: 'Metrics for Repos statistics.'
           item_prototypes:
             -
               uuid: 3ff94b65151e4378b3ef46d049aff1f7
