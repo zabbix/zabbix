@@ -37,33 +37,38 @@ const host_popup = {
 	 * Sets up listeners for elements marked to start host edit/create popup.
 	 */
 	initActionButtons() {
-		document.addEventListener('click', (e) => {
-			const node = e.target;
-
-			if (node.classList.contains(ZBX_STYLE_ZABBIX_HOST_POPUPCREATE)) {
-				const host_data = (typeof node.dataset.hostgroups !== 'undefined')
-					? { groupids: JSON.parse(node.dataset.hostgroups) }
-					: {},
+		document.querySelectorAll('.' + ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).forEach((element) => {
+			element.addEventListener('click', (e) => {
+				const node = e.target,
+					host_data = (typeof node.dataset.hostgroups !== 'undefined')
+						? { groupids: JSON.parse(node.dataset.hostgroups) }
+						: {},
 					url = new Curl('zabbix.php', false);
 
 				this.edit(host_data);
 				url.setArgument('action', 'host.create');
 				history.pushState({}, '', url.getUrl());
-			}
-			else if (node.classList.contains(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)) {
-				let hostid = null;
+			});
+		});
 
-				if (typeof node.hostid !== 'undefined' && typeof node.dataset.hostid !== 'undefined') {
-					hostid = node.dataset.hostid;
-				}
-				else {
-					hostid = new Curl(node.href).getArgument('hostid')
-				}
+		document.addEventListener('click', (e) => {
+			let node = e.target,
+				hostid = null;
 
-				e.preventDefault();
-				this.edit({hostid});
-				history.pushState({}, '', node.getAttribute('href'));
+			if (!node.classList.contains(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)) {
+				return;
 			}
+
+			if (typeof node.hostid !== 'undefined' && typeof node.dataset.hostid !== 'undefined') {
+				hostid = node.dataset.hostid;
+			}
+			else {
+				hostid = new Curl(node.href).getArgument('hostid')
+			}
+
+			e.preventDefault();
+			this.edit({hostid});
+			history.pushState({}, '', node.getAttribute('href'));
 		}, {capture: true});
 	},
 
