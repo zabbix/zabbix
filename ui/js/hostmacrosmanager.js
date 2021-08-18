@@ -34,16 +34,22 @@ class HostMacrosManager {
 	}
 
 	load(show_inherited_macros = 0, templateids = []) {
-		let url = new Curl('zabbix.php');
-		url.setArgument('action', 'hostmacros.list');
-
-		$.ajax(url.getUrl(), {
-			data: {
+		let url = new Curl('zabbix.php'),
+			post_params = {
 				macros: this.getMacros(),
 				show_inherited_macros: +show_inherited_macros,
 				templateids: templateids,
 				readonly: +this.readonly
-			},
+			};
+
+		if (typeof this.parent_hostid !== 'undefined' && this.parent_hostid !== null) {
+			post_params.parent_hostid = this.parent_hostid;
+		}
+
+		url.setArgument('action', 'hostmacros.list');
+
+		$.ajax(url.getUrl(), {
+			data: post_params,
 			dataType: 'json',
 			method: 'POST',
 			beforeSend: () => {

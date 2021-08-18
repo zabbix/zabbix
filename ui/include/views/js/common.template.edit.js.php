@@ -134,7 +134,8 @@
 
 		window.macros_manager = new HostMacrosManager(<?= json_encode([
 			'properties' => [
-				'readonly' => $data['readonly']
+				'readonly' => $data['readonly'],
+				'parent_hostid' =>  array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
 			],
 			'defines' => [
 				'ZBX_STYLE_TEXTAREA_FLEXIBLE' => ZBX_STYLE_TEXTAREA_FLEXIBLE,

@@ -193,6 +193,7 @@ $templates_tab = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABE
 if ($host_is_discovered) {
 	$linked_template_table = (new CTable())
 		->setHeader([_('Name')])
+		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->setId('linked-template')
 		->addStyle('width: 100%;');
 
@@ -227,6 +228,7 @@ if ($host_is_discovered) {
 else {
 	$linked_template_table = (new CTable())
 		->setHeader([_('Name'), _('Action')])
+		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->setId('linked-template')
 		->setAttribute('style', 'width: 100%;');
 

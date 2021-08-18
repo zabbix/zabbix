@@ -213,7 +213,7 @@ $linked_templates = $host_is_discovered
 		getAssignedTemplates() {
 			const linked_templateids = [];
 
-			document.querySelectorAll('[name="templates[]').forEach((input) => {
+			document.querySelectorAll('[name^="templates["').forEach((input) => {
 				linked_templateids.push(input.value);
 			});
 
@@ -228,7 +228,8 @@ $linked_templates = $host_is_discovered
 
 			this.macros_manager = new HostMacrosManager(<?= json_encode([
 				'properties' => [
-					'readonly' => $host_is_discovered
+					'readonly' => $host_is_discovered,
+					'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
 				],
 				'defines' => [
 					'ZBX_STYLE_TEXTAREA_FLEXIBLE' => ZBX_STYLE_TEXTAREA_FLEXIBLE,
