@@ -31,7 +31,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	protected function checkPermissions(): bool {
 		$ret = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 
-		if ($ret && $this->hasInput('clone_hostid')) {
+		if ($ret && $this->hasInput('clone_hostid') && $this->hasInput('full_clone')) {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'hostids' => $this->getInput('clone_hostid')
