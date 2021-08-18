@@ -1152,18 +1152,25 @@ class CApiService {
 	// }
 
 	/**
-	 * Add audit records.
+	 * Legacy method to add audit log records.
 	 *
-	 * @param int    $action        AUDIT_ACTION_*
-	 * @param int    $resourcetype  AUDIT_RESOURCE_*
-	 * @param array  $objects
-	 * @param array  $objects_old
+	 * @param int   $action        CAudit::ACTION_*
+	 * @param int   $resourcetype  CAudit::RESOURCE_*
+	 * @param array $objects
+	 * @param array $objects_old
 	 */
 	protected function addAuditBulk($action, $resourcetype, array $objects, array $objects_old = null) {
 		CAuditOld::addBulk(self::$userData, $action, $resourcetype, $objects, $objects_old);
 	}
 
-	protected function addNewAuditBulk($action, array $objects, array $objects_old = null) {
+	/**
+	 * Add audit log records.
+	 *
+	 * @param int   $action       CAudit::ACTION_*
+	 * @param array $objects
+	 * @param array $objects_old
+	 */
+	protected function addAuditLog($action, array $objects, array $objects_old = null): void {
 		CAudit::log(static::AUDIT_RESOURCE, $action, $objects, $objects_old);
 	}
 

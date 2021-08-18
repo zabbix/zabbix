@@ -33,37 +33,37 @@ class CAuditOld {
 		CAudit::RESOURCE_ACTION => 				['actionid', 'name', 'actions', 'action'],
 		CAudit::RESOURCE_AUTHENTICATION =>		['configid', null, 'config', 'authentication'],
 		CAudit::RESOURCE_AUTH_TOKEN =>			['tokenid', 'name', 'token', 'token'],
-		CAudit::RESOURCE_AUTOREGISTRATION =>		['configid', null, 'config', 'autoregistration'],
+		CAudit::RESOURCE_AUTOREGISTRATION =>	['configid', null, 'config', 'autoregistration'],
 		CAudit::RESOURCE_CORRELATION =>			['correlationid', 'name', 'correlation', 'correlation'],
-		CAudit::RESOURCE_DASHBOARD =>				['dashboardid', 'name', 'dashboard', 'dashboard'],
+		CAudit::RESOURCE_DASHBOARD =>			['dashboardid', 'name', 'dashboard', 'dashboard'],
 		CAudit::RESOURCE_DISCOVERY_RULE =>		['druleid', 'name', 'drules', 'drule'],
-		CAudit::RESOURCE_GRAPH =>					['graphid', 'name', 'graphs', 'graph'],
+		CAudit::RESOURCE_GRAPH =>				['graphid', 'name', 'graphs', 'graph'],
 		CAudit::RESOURCE_GRAPH_PROTOTYPE =>		['graphid', 'name', 'graphs', 'graphprototype'],
-		CAudit::RESOURCE_HOST =>					['hostid', 'name', 'hosts', 'host'],
+		CAudit::RESOURCE_HOST =>				['hostid', 'name', 'hosts', 'host'],
 		CAudit::RESOURCE_HOST_GROUP =>			['groupid', 'name', 'groups', 'hostgroup'],
 		CAudit::RESOURCE_HOST_PROTOTYPE =>		['hostid', 'host', 'hosts', 'hostprototype'],
-		CAudit::RESOURCE_HOUSEKEEPING =>			['configid', null, 'config', 'housekeeping'],
-		CAudit::RESOURCE_ICON_MAP =>				['iconmapid', 'name', 'icon_map', 'iconmap'],
-		CAudit::RESOURCE_IMAGE =>					['imageid', 'name', 'images', 'image'],
+		CAudit::RESOURCE_HOUSEKEEPING =>		['configid', null, 'config', 'housekeeping'],
+		CAudit::RESOURCE_ICON_MAP =>			['iconmapid', 'name', 'icon_map', 'iconmap'],
+		CAudit::RESOURCE_IMAGE =>				['imageid', 'name', 'images', 'image'],
 		CAudit::RESOURCE_IT_SERVICE =>			['serviceid', 'name', 'services', 'service'],
-		CAudit::RESOURCE_ITEM =>					['itemid', 'name', 'items', 'item'],
+		CAudit::RESOURCE_ITEM =>				['itemid', 'name', 'items', 'item'],
 		CAudit::RESOURCE_ITEM_PROTOTYPE =>		['itemid', 'name', 'items', 'itemprototype'],
-		CAudit::RESOURCE_MACRO =>					['globalmacroid', 'macro', 'globalmacro', 'usermacro'],
+		CAudit::RESOURCE_MACRO =>				['globalmacroid', 'macro', 'globalmacro', 'usermacro'],
 		CAudit::RESOURCE_MAINTENANCE =>			['maintenanceid', 'name', 'maintenances', 'maintenance'],
 		CAudit::RESOURCE_MAP =>					['sysmapid', 'name', 'sysmaps', 'map'],
 		CAudit::RESOURCE_MEDIA_TYPE =>			['mediatypeid', 'name', 'media_type', 'mediatype'],
 		CAudit::RESOURCE_MODULE =>				['moduleid', 'id', 'module', 'module'],
-		CAudit::RESOURCE_PROXY =>					['proxyid', 'host', 'hosts', 'proxy'],
-		CAudit::RESOURCE_SCENARIO =>				['httptestid', 'name', 'httptest', 'httptest'],
-		CAudit::RESOURCE_SCHEDULED_REPORT =>		['reportid', 'name', 'report', 'report'],
+		CAudit::RESOURCE_PROXY =>				['proxyid', 'host', 'hosts', 'proxy'],
+		CAudit::RESOURCE_SCENARIO =>			['httptestid', 'name', 'httptest', 'httptest'],
+		CAudit::RESOURCE_SCHEDULED_REPORT =>	['reportid', 'name', 'report', 'report'],
 		CAudit::RESOURCE_SCRIPT =>				['scriptid', 'name', 'scripts', 'script'],
-		CAudit::RESOURCE_SETTINGS =>				['configid', null, 'config', 'settings'],
-		CAudit::RESOURCE_TEMPLATE =>				['templateid', 'name', 'hosts', 'template'],
+		CAudit::RESOURCE_SETTINGS =>			['configid', null, 'config', 'settings'],
+		CAudit::RESOURCE_TEMPLATE =>			['templateid', 'name', 'hosts', 'template'],
 		CAudit::RESOURCE_TRIGGER =>				['triggerid', 'description', 'triggers', 'trigger'],
-		CAudit::RESOURCE_TRIGGER_PROTOTYPE =>		['triggerid', 'description', 'triggers', 'triggerprototype'],
-		CAudit::RESOURCE_USER =>					['userid', 'username', 'users', 'user'],
+		CAudit::RESOURCE_TRIGGER_PROTOTYPE =>	['triggerid', 'description', 'triggers', 'triggerprototype'],
+		CAudit::RESOURCE_USER =>				['userid', 'username', 'users', 'user'],
 		CAudit::RESOURCE_USER_GROUP =>			['usrgrpid', 'name', 'usrgrp', 'usergroup'],
-		CAudit::RESOURCE_VALUE_MAP =>				['valuemapid', 'name', 'valuemaps', 'valuemap'],
+		CAudit::RESOURCE_VALUE_MAP =>			['valuemapid', 'name', 'valuemaps', 'valuemap'],
 		CAudit::RESOURCE_TEMPLATE_DASHBOARD =>	['dashboardid', 'name', 'dashboard', 'templatedashboard']
 	];
 
@@ -123,8 +123,8 @@ class CAuditOld {
 	 * Add audit records.
 	 *
 	 * @param array $userdata      CApiService::$userData
-	 * @param int   $action        AUDIT_ACTION_*
-	 * @param int   $resourcetype  AUDIT_RESOURCE_*
+	 * @param int   $action        CAudit::ACTION_*
+	 * @param int   $resourcetype  CAudit::RESOURCE_*
 	 * @param array $objects
 	 * @param array $objects_old
 	 */

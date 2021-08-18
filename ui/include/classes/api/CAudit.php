@@ -222,7 +222,7 @@ class CAudit {
 	];
 
 	public static function log(int $resource, int $action, array $objects, ?array $old_objects): void {
-		if (!self::isAuditEnable() && ($resource != self::RESOURCE_SETTINGS
+		if (!self::isAuditEnabled() && ($resource != self::RESOURCE_SETTINGS
 					|| !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
 			return;
 		}
@@ -268,7 +268,7 @@ class CAudit {
 		return $recordsetid;
 	}
 
-	private static function isAuditEnable(): bool {
+	private static function isAuditEnabled(): bool {
 		return CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
 	}
 
