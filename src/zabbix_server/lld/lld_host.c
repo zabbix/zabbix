@@ -2308,7 +2308,12 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 		if (SUCCEED != lld_tag_validate(new_tags.values, new_tags.values_num, tag, value, info))
 			continue;
 
-		proto_tag = zbx_db_tag_create(tag, value);
+		proto_tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+		proto_tag->flags = ZBX_FLAG_DB_TAG_UNSET;
+		proto_tag->tag = tag;
+		proto_tag->value = value;
+		proto_tag->tag_orig = NULL;
+		proto_tag->value_orig = NULL;
 		zbx_vector_db_tag_ptr_append(&new_tags, proto_tag);
 
 		tag = NULL;
@@ -3387,7 +3392,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	if (0 != new_tags)
 	{
-		zbx_db_insert_autoincrement(&db_insert_tag, "hosttagid");
 		zbx_db_insert_execute(&db_insert_tag);
 		zbx_db_insert_clean(&db_insert_tag);
 	}
