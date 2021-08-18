@@ -193,8 +193,8 @@ class CControllerPopupServiceEdit extends CController {
 					'advanced_configuration' => false,
 					'status_rules' => [],
 					'propagation_rule' => $defaults['propagation_rule'],
-					'propagation_value_number' => null,
-					'propagation_value_status' => null,
+					'propagation_value_number' => 1,
+					'propagation_value_status' => ZBX_SEVERITY_OK,
 					'weight' => $defaults['weight']
 				]
 			];
