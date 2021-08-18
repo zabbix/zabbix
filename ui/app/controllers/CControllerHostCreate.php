@@ -175,7 +175,6 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 		}
 
 		if ($valuemaps && !API::ValueMap()->create($valuemaps)) {
-			CMessageHelper::addError(_s('Could not process "%1$s".', _('Value mapping')));
 			return false;
 		}
 
