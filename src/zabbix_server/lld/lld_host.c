@@ -859,6 +859,12 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		host->status = status_proto;
 		host->inventory_mode = inventory_mode_proto;
 		host->custom_interfaces = custom_iface;
+		host->ipmi_username_orig = NULL;
+		host->ipmi_password_orig = NULL;
+		host->tls_issuer_orig = NULL;
+		host->tls_subject_orig = NULL;
+		host->tls_psk_identity_orig = NULL;
+		host->tls_psk_orig = NULL;
 
 		zbx_vector_uint64_create(&host->lnk_templateids);
 
