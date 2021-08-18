@@ -887,7 +887,7 @@ char	*zbx_email_make_body(const char *message, unsigned char content_type,  cons
 
 	zbx_snprintf_alloc(&body, &body_alloc, &body_offset,
 			"--" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n"
-			"Content-Type: %s; charset=\"UTF-8\"\r\n"
+			"Content-Type: %s\r\n"
 			"Content-Transfer-Encoding: base64\r\n"
 			"Content-Disposition: attachment; filename=\"%s\"\r\n"
 			"\r\n"
