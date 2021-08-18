@@ -100,7 +100,7 @@ class CControllerPopupMassupdateTrigger extends CController {
 				}
 
 				// Remove inherited tags.
-				if (array_key_exists('type', $tag) && !((int) $tag['type'] & ZBX_PROPERTY_OWN)) {
+				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
 					unset($tags[$key]);
 				}
 				else {
@@ -222,7 +222,8 @@ class CControllerPopupMassupdateTrigger extends CController {
 				}
 			}
 			else {
-				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
+				$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
+					->toString();
 			}
 
 			$this->setResponse(

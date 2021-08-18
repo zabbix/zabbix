@@ -95,9 +95,12 @@ const host_popup = {
 
 /**
  * Handles host deletion from list, popup or fullscreen form.
- * @param {HTMLFormElement} host_form Host form if called from popup/fullscreen. Null assumes delete from list.
+ *
+ * @param {HTMLFormElement} host_form           Host form if called from popup/fullscreen.
+ * Null assumes delete from list.
  * @param {HTMLInputElement} host_form{#hostid} Input expected to be present when passing form.
- * @returns {bool} Always false, to prevent button submit.
+ *
+ * @return {bool} Always false, to prevent button submit.
  */
 function hosts_delete(host_form = null) {
 	const curl = new Curl('zabbix.php');
@@ -128,6 +131,7 @@ function hosts_delete(host_form = null) {
 
 /**
  * Show error/success messages from host actions, refreshes originator pages/lists on success.
+ *
  * @param {Promise} response Fetch promise.
  * @param {string|undefined} response{error} More "deep"/automated errors, from e.g. permissions, maintenance checks.
  * @param {string|undefined} response{errors} Controller-level failures, validation errors.
@@ -192,7 +196,7 @@ async function handle_hostaction_response(response, host_form = null) {
 				postMessageDetails(MESSAGE_TYPE_SUCCESS, response.details);
 			}
 
-			postMessageOk(response.message_raw);
+			postMessageOk(response.title);
 			location.replace(host_popup.original_url);
 		}
 	}

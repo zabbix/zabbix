@@ -91,23 +91,24 @@ class HostMacrosManager {
 		var $macros = jQuery('input[name^="macros"], textarea[name^="macros"]', this.$container).not(':disabled'),
 			macros = {};
 
-		// Find the correct macro inputs and prepare to submit them via AJAX. matches[1] - index, matches[2] field name.
+		// Find the correct macro inputs and prepare to submit them via AJAX.
 		$macros.each(function() {
-			var $this = $(this),
-				matches = $this.attr('name').match(/macros\[(\d+)\]\[(\w+)\]/);
+			var $this = $(this);
+			const [, macro_num, field] = $this.attr('name').match(/macros\[(\d+)\]\[(\w+)\]/);
 
-			if (!macros.hasOwnProperty(matches[1])) {
-				macros[matches[1]] = new Object();
+			if (!macros.hasOwnProperty(macro_num)) {
+				macros[macro_num] = new Object();
 			}
 
-			macros[matches[1]][matches[2]] = $this.val();
+			macros[macro_num][field] = $this.val();
 		});
 
 		return macros;
 	}
 
 	initMacroTable(show_inherited_macros) {
-		var $parent = this.getMacroTable();
+		var $parent = this.getMacroTable(),
+			macros_manager = this;
 
 		show_inherited_macros = +show_inherited_macros;
 
@@ -119,70 +120,70 @@ class HostMacrosManager {
 			.on('click', 'button.element-table-add', () => {
 				this.initMacroFields($parent);
 			})
-			.on('click', 'button.element-table-change', function() {
+			.on('click', 'button.element-table-change', function () {
 				const macro_num = $(this).attr('id').split('_')[1];
 
-				if ($('#macros_' + macro_num + '_inherited_type').val() & this.ZBX_PROPERTY_OWN) {
-					const macro_type = $('#macros_' + macro_num + '_inherited_macro_type').val();
+				/**
+				* References elements of current macro's scope (row).
+				*
+				* @param {string} id_postfix Postfix of element ID for current macro.
+				*
+				* @return {JQuerySelector} Element/input related to current macro.
+				*/
+				function macro_child(id_postfix) {
+					return $('#macros_' + macro_num + '_' + id_postfix);
+				}
 
-					$('#macros_' + macro_num + '_inherited_type')
-						.val($('#macros_' + macro_num + '_inherited_type').val() & (~this.ZBX_PROPERTY_OWN));
+				if (macro_child('inherited_type').val() & macros_manager.ZBX_PROPERTY_OWN) {
+					const macro_type = macro_child('inherited_macro_type').val(),
+						$dropdown_btn = macro_child('type_button'),
+						dropdown_btn_classes = {
+							[macros_manager.ZBX_MACRO_TYPE_TEXT]: macros_manager.ZBX_STYLE_ICON_TEXT,
+							[macros_manager.ZBX_MACRO_TYPE_SECRET]: macros_manager.ZBX_STYLE_ICON_INVISIBLE,
+							[macros_manager.ZBX_MACRO_TYPE_VAULT]: macros_manager.ZBX_STYLE_ICON_SECRET_TEXT
+						};
 
-					$('#macros_' + macro_num + '_description')
+					macro_child('inherited_type')
+						.val(macro_child('inherited_type').val() & (~macros_manager.ZBX_PROPERTY_OWN));
+					macro_child('description')
 						.prop('readonly', true)
-						.val($('#macros_' + macro_num + '_inherited_description').val())
+						.val(macro_child('inherited_description').val())
 						.trigger('input');
-
-					const $dropdown_btn = $('#macros_' + macro_num + '_type_btn');
-
-					const dropdown_btn_classes = {
-						[this.ZBX_MACRO_TYPE_TEXT]: this.ZBX_STYLE_ICON_TEXT,
-						[this.ZBX_MACRO_TYPE_SECRET]: this.ZBX_STYLE_ICON_INVISIBLE,
-						[this.ZBX_MACRO_TYPE_VAULT]: this.ZBX_STYLE_ICON_SECRET_TEXT
-					};
-
 					$dropdown_btn
 						.removeClass()
-						.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[macro_type]].join(' '));
-
+						.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[macro_type]].join(' '))
+						.prop('disabled', true)
+						.attr({'aria-haspopup': false});
 					$('input[type=hidden]', $dropdown_btn.parent())
 						.val(macro_type)
 						.trigger('change');
-
-					$dropdown_btn
-						.prop('disabled', true)
-						.attr({'aria-haspopup': false});
-
-					$('#macros_' + macro_num + '_value')
+					macro_child('value')
 						.prop('readonly', true)
-						.val($('#macros_' + macro_num + '_inherited_value').val())
-						.trigger('input');
-
-					if (macro_type == this.ZBX_MACRO_TYPE_SECRET) {
-						$('#macros_' + macro_num + '_value').prop('disabled', true);
-					}
-
-					$('#macros_' + macro_num + '_value_btn')
 						.prop('disabled', true)
-					$('#macros_' + macro_num + '_value')
-						.closest('.input-group')
-						.find('.btn-undo')
-						.hide();
-
-					$('#macros_' + macro_num + '_change').text(t('S_CHANGE'));
+						.val(macro_child('inherited_value').val())
+						.trigger('input')
+							.closest('.input-group')
+							.find('.btn-undo')
+							.hide();
+					macro_child('value_btn').prop('disabled', true);
+					macro_child('change').text(t('S_CHANGE'));
 				}
 				else {
-					$('#macros_' + macro_num + '_inherited_type')
-						.val($('#macros_' + macro_num + '_inherited_type').val() | this.ZBX_PROPERTY_OWN);
-					$('#macros_' + macro_num + '_value')
+					macro_child('inherited_type')
+						.val(macro_child('inherited_type').val() | macros_manager.ZBX_PROPERTY_OWN);
+					macro_child('value')
 						.prop('readonly', false)
-						.focus();
-					$('#macros_' + macro_num + '_value_btn').prop('disabled', false);
-					$('#macros_' + macro_num + '_description').prop('readonly', false);
-					$('#macros_' + macro_num + '_type_btn')
+						.prop('disabled', false)
+						.focus()
+							.closest('.input-group')
+							.find('.btn-undo')
+							.hide();
+					macro_child('value_btn').prop('disabled', false);
+					macro_child('description').prop('readonly', false);
+					macro_child('type_button')
 						.prop('disabled', false)
 						.attr({'aria-haspopup': 'true'});
-					$('#macros_' + macro_num + '_change').text(t('Remove'));
+					macro_child('change').text(t('Remove'));
 				}
 			})
 			.on('afteradd.dynamicRows', function() {
@@ -193,7 +194,7 @@ class HostMacrosManager {
 	}
 
 	initMacroFields($parent) {
-		$('.'+this.ZBX_STYLE_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field').each((index, textarea) => {
+		$('.' + this.ZBX_STYLE_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field').each((index, textarea) => {
 			const $textarea = $(textarea);
 
 			if ($textarea.hasClass('macro')) {

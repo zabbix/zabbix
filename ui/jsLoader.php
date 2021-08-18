@@ -19,11 +19,6 @@
 **/
 
 
-if (empty($_GET['files']) && !array_key_exists('showGuiMessaging', $_GET)) {
-	// Scripts get loaded by second jsLoader call.
-	return;
-}
-
 // get language translations
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';

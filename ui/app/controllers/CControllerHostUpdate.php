@@ -45,7 +45,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 		]);
 
 		if (!$this->host) {
-			return false;
+			access_deny(ACCESS_DENY_OBJECT);
 		}
 
 		$this->host = $this->host[0];
@@ -64,8 +64,8 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 			'groups' => $this->processHostGroups($this->getInput('groups', [])),
 			'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
 			'tags' => $this->processTags($this->getInput('tags', [])),
-			'templates' => $this->processTemplates([$this->getInput('add_templates', []),
-				$this->getInput('templates', [])
+			'templates' => $this->processTemplates([
+				$this->getInput('add_templates', []), $this->getInput('templates', [])
 			]),
 			'clear_templates' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
 			'macros' => $this->processUserMacros($this->getInput('macros', [])),
@@ -104,7 +104,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 
 		$hostids = API::Host()->update($host);
 
-		if ($hostids !== false && $this->processValueMaps()) {
+		if ($hostids !== false && $this->processValueMaps($this->getInput('valuemaps', []))) {
 			$messages = get_and_clear_messages();
 			$details = [];
 
@@ -112,10 +112,14 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				$details[] = $message['message'];
 			}
 
+			ob_start();
+			uncheckTableRows('hosts');
+
 			$output = [
-				'message' => makeMessageBox(true, $messages, _('Host updated'), true, false)->toString(),
-				'message_raw' => _('Host updated'),
-				'details' => $details
+				'message' => makeMessageBox(ZBX_STYLE_MSG_GOOD, $messages, _('Host updated'), true, false)->toString(),
+				'title' => _('Host updated'),
+				'details' => $details,
+				'script_inline' => ob_get_clean()
 			];
 		}
 
@@ -123,16 +127,21 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 			$output = ['errors' => $messages->toString()];
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		$response = $output
+			? (new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+			: new CControllerResponseFatal();
+
+		$this->setResponse($response);
 	}
 
 	/**
 	 * Save valuemaps.
 	 *
-	 * @return bool
+	 * @param array $valuemaps Submitted valuemaps.
+	 *
+	 * @return bool Whether mappings saved/deleted.
 	 */
-	private function processValueMaps(): bool {
-		$valuemaps = $this->getInput('valuemaps', []);
+	private function processValueMaps(array $valuemaps): bool {
 		$ins_valuemaps = [];
 		$upd_valuemaps = [];
 

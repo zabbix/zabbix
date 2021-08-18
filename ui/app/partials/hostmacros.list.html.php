@@ -76,7 +76,7 @@ else {
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol($macro_value))
 				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
-				->addClass('nowrap'),
+				->addClass(ZBX_STYLE_NOWRAP),
 			(new CCol(
 				(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)

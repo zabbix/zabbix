@@ -26,6 +26,10 @@
 $this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('configuration.host.list.js.php');
 
+if ($data['uncheck']) {
+	uncheckTableRows('hosts');
+}
+
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->setControls((new CTag('nav', true, (new CList())
@@ -325,7 +329,7 @@ foreach ($data['hosts'] as $host) {
 
 	$info_icons = [];
 
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && (int) $host['hostDiscovery']['ts_delete'] != 0) {
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
 		$info_icons[] = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
 	}
 

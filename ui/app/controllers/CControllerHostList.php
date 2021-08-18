@@ -42,6 +42,7 @@ class CControllerHostList extends CController {
 			'filter_tags'         => 'array',
 			'sort'                => 'in name,status',
 			'sortorder'           => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck'             => 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -225,7 +226,9 @@ class CControllerHostList extends CController {
 				'status', 'tls_connect', 'tls_accept'
 			],
 			'selectParentTemplates' => ['templateid', 'name'],
-			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'selectInterfaces' => ['interfaceid', 'type', 'available', 'error', 'details', 'ip', 'dns', 'port',
+				'useip'
+			],
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
@@ -347,7 +350,8 @@ class CControllerHostList extends CController {
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],
-			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			'uncheck' => ($this->getInput('uncheck', 0) == 1)
 		];
 
 		$response = new CControllerResponseData($data);

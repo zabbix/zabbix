@@ -427,15 +427,19 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			}
 
 			if ($this->getInput('return_to', '') === 'hosts') {
-				$requested_host_enable = ($this->getInput('status', HOST_STATUS_NOT_MONITORED) == HOST_STATUS_MONITORED);
+				$requested_host_enable = ($this->getInput('status', HOST_STATUS_NOT_MONITORED)
+						== HOST_STATUS_MONITORED);
 				$hosts_count = is_array($result) ? count($result['hostids']) : count($hosts);
+				$host_list_curl = (new CUrl('zabbix.php'))
+					->setArgument('action', 'host.list')
+					->setArgument('page', CPagerHelper::loadPage('host.list', null));
 
 				if ($result) {
 					$messageSuccess = $requested_host_enable
 						? _n('Host enabled', 'Hosts enabled', $hosts_count)
 						: _n('Host disabled', 'Hosts disabled', $hosts_count);
 
-					uncheckTableRows();
+					$host_list_curl->setArgument('uncheck', 1);
 					CMessageHelper::setSuccessTitle($messageSuccess);
 				}
 				else {
@@ -446,30 +450,28 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					CMessageHelper::setErrorTitle($messageFailed);
 				}
 
-				$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-					->setArgument('action', 'host.list')
-					->setArgument('page', CPagerHelper::loadPage('host.list', null))
-				);
-
+				$response = new CControllerResponseRedirect($host_list_curl);
 				$this->setResponse($response);
 
 				return;
 			}
 
 			if ($result) {
-				$messages = CMessageHelper::getMessages();
-				$output = ['title' => _('Hosts updated')];
-				if (count($messages)) {
+				ob_start();
+				uncheckTableRows('hosts');
+
+				$output = ['title' => _('Hosts updated'), 'script_inline' => ob_get_clean()];
+
+				if ($messages = CMessageHelper::getMessages()) {
 					$output['messages'] = array_column($messages, 'message');
 				}
 			}
 			else {
-				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
+				$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
+					->toString();
 			}
 
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			);
+			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 		}
 		else {
 			$data = [

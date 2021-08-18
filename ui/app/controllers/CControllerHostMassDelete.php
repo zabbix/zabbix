@@ -62,8 +62,8 @@ class CControllerHostMassDelete extends CController {
 
 		if ($result) {
 			$output += [
-				'message' => makeMessageBox(true, [], _('Host deleted'), true, false)->toString(),
-				'message_raw' => _('Host deleted')
+				'message' => makeMessageBox(ZBX_STYLE_MSG_GOOD, [], _('Host deleted'), true, false)->toString(),
+				'title' => _('Host deleted')
 			];
 		}
 		else {
