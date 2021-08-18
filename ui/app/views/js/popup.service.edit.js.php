@@ -179,10 +179,8 @@ window.service_edit_popup = {
 			default:
 				document.getElementById('propagation_value_number').style.display = 'none';
 				document.getElementById('propagation_value_status').style.display = 'none';
+				document.getElementById('status_propagation_value_field').style.display = 'none';
 		}
-
-		document.getElementById('problem_tags_label').style.display = status_enabled ? '' : 'none';
-		document.getElementById('problem_tags_field').style.display = status_enabled ? '' : 'none';
 
 		document.getElementById('showsla').disabled = !status_enabled;
 		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
@@ -301,7 +299,7 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-			title: <?= json_encode(_('Add child services')); ?>,
+			title: <?= json_encode(_('Add child services')) ?>,
 			exclude_serviceids
 		}, 'services', document.activeElement);
 
@@ -324,7 +322,7 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-			title: <?= json_encode(_('Add parent services')); ?>,
+			title: <?= json_encode(_('Add parent services')) ?>,
 			exclude_serviceids
 		}, 'services', document.activeElement);
 

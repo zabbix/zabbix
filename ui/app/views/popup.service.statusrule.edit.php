@@ -59,15 +59,17 @@ $form_grid = (new CFormGrid())
 	])
 	->addItem([
 		(new CLabel('N', 'service-status-rule-limit-value'))->setId('service-status-rule-limit-value-label'),
-		new CFormField([
-			(new CTextBox('limit_value', $data['form']['limit_value'], false, 7))
-				->setId('service-status-rule-limit-value')
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAriaRequired(),
-			(new CSpan('%'))
-				->setId('service-status-rule-limit-value-unit')
-				->addStyle('display: none;')
-		])
+		new CFormField(
+			new CHorList([
+				(new CTextBox('limit_value', $data['form']['limit_value'], false, 7))
+					->setId('service-status-rule-limit-value')
+					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+					->setAriaRequired(),
+				(new CSpan('%'))
+					->setId('service-status-rule-limit-value-unit')
+					->addStyle('display: none;')
+			])
+		)
 	])
 	->addItem([
 		new CLabel(_('Status'), 'service-status-rule-limit-status-focusable'),

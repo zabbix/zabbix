@@ -58,53 +58,49 @@ $service_tab = (new CFormGrid())
 		new CFormField($parent_services)
 	])
 	->addItem([
-		(new CLabel(_('Problem tags')))->setId('problem_tags_label'),
-		(new CFormField())
-			->setId('problem_tags_field')
-			->addItem([
-				(new CDiv())
-					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-					->addItem([
-						(new CTable())
-							->setId('problem_tags')
-							->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-							->setHeader(
-								(new CRowHeader([_('Name'), _('Operation'), _('Value'), _('Action')]))
-									->addClass(ZBX_STYLE_GREY)
-							)
-							->setFooter(
-								(new CCol(
-									(new CSimpleButton(_('Add')))
-										->addClass(ZBX_STYLE_BTN_LINK)
-										->addClass('element-table-add')
-								))
-							),
-						(new CScriptTemplate('problem-tag-row-tmpl'))
-							->addItem(
-								(new CRow([
-									(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
-										DB::getFieldLength('service_problem_tag', 'tag')
-									))
-										->setAttribute('placeholder', _('tag'))
-										->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-									(new CSelect('problem_tags[#{rowNum}][operator]'))
-										->addOptions(CSelect::createOptionsFromArray([
-											SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
-											SERVICE_TAG_OPERATOR_LIKE => _('Contains')
-										]))
-										->setValue(SERVICE_TAG_OPERATOR_EQUAL),
-									(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
-										DB::getFieldLength('service_problem_tag', 'value')
-									))
-										->setAttribute('placeholder', _('value'))
-										->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-									(new CSimpleButton(_('Remove')))
-										->addClass(ZBX_STYLE_BTN_LINK)
-										->addClass('element-table-remove')
-								]))->addClass('form_row')
-							)
-					])
-			])
+		new CLabel(_('Problem tags')),
+		new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('problem_tags')
+					->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+					->setHeader(
+						(new CRowHeader([_('Name'), _('Operation'), _('Value'), _('Action')]))
+							->addClass(ZBX_STYLE_GREY)
+					)
+					->setFooter(
+						(new CCol(
+							(new CSimpleButton(_('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('element-table-add')
+						))
+					),
+				(new CScriptTemplate('problem-tag-row-tmpl'))
+					->addItem(
+						(new CRow([
+							(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
+								DB::getFieldLength('service_problem_tag', 'tag')
+							))
+								->setAttribute('placeholder', _('tag'))
+								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+							(new CSelect('problem_tags[#{rowNum}][operator]'))
+								->addOptions(CSelect::createOptionsFromArray([
+									SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
+									SERVICE_TAG_OPERATOR_LIKE => _('Contains')
+								]))
+								->setValue(SERVICE_TAG_OPERATOR_EQUAL),
+							(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
+								DB::getFieldLength('service_problem_tag', 'value')
+							))
+								->setAttribute('placeholder', _('value'))
+								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+							(new CSimpleButton(_('Remove')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('element-table-remove')
+						]))->addClass('form_row')
+					)
+			]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		)
 	])
 	->addItem([
 		(new CLabel(_('Sort order (0->999)'), 'sortorder'))->setAsteriskMark(),
@@ -185,8 +181,7 @@ foreach (range(1, TRIGGER_SEVERITY_COUNT - 1) as $value) {
 
 $propagation_value_status = (new CSeverity('propagation_value_status',
 	$data['form']['propagation_value_status'] !== null ? (int) $data['form']['propagation_value_status'] : null
-))
-	->addValue(_('OK'), ZBX_SEVERITY_OK, ZBX_STYLE_NORMAL_BG);
+))->addValue(_('OK'), ZBX_SEVERITY_OK, ZBX_STYLE_NORMAL_BG);
 
 $service_tab
 	->addItem([
@@ -229,11 +224,12 @@ $sla_tab = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		new CLabel(_('SLA'), 'showsla'),
-		new CFormField([
-			(new CCheckBox('showsla'))->setChecked($data['form']['showsla'] == SERVICE_SHOW_SLA_ON),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CTextBox('goodsla', $data['form']['goodsla'], false, 8))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-		])
+		new CFormField(
+			new CHorList([
+				(new CCheckBox('showsla'))->setChecked($data['form']['showsla'] == SERVICE_SHOW_SLA_ON),
+				(new CTextBox('goodsla', $data['form']['goodsla'], false, 8))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			])
+		)
 	])
 	->addItem([
 		new CLabel(_('Service times')),
