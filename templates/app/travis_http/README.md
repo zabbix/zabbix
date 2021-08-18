@@ -45,16 +45,16 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Repos metrics discovery |<p>Metrics for Repos statistics</p> |DEPENDENT |travis.repos.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Repos metrics discovery |<p>Metrics for Repos statistics</p> |DEPENDENT |travis.repos.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Travis |Travis: Get health |<p>Getting home JSON using Travis API.</p> |HTTP_AGENT |travis.get_health<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED<p>- JAVASCRIPT: `if (JSON.parse(value).config) {     return 1 } else {     return 0 }`</p> |
+|Travis |Travis: Get health |<p>Getting home JSON using Travis API.</p> |HTTP_AGENT |travis.get_health<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED<p>- JAVASCRIPT: `return JSON.parse(value).config ? 1 : 0`</p> |
 |Travis |Travis: Jobs passed |<p>Total count of passed jobs in all repos.</p> |DEPENDENT |travis.jobs.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs.length()`</p> |
-|Travis |Travis: Jobs active |<p>Active jobs in all repos.</p> |DEPENDENT |travis.jobs.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs[?(@.state== "started")].length()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
-|Travis |Travis: Jobs in queue |<p>Jobs in queue in all repos.</p> |DEPENDENT |travis.jobs.queue<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs[?(@.state== "received")].length()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|Travis |Travis: Jobs active |<p>Active jobs in all repos.</p> |DEPENDENT |travis.jobs.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs[?(@.state == "started")].length()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|Travis |Travis: Jobs in queue |<p>Jobs in queue in all repos.</p> |DEPENDENT |travis.jobs.queue<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs[?(@.state == "received")].length()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |Travis |Travis: Builds |<p>Total count of builds in all repos.</p> |DEPENDENT |travis.builds.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.builds.length()`</p> |
 |Travis |Travis: Builds duration |<p>Sum of all builds durations in all repos.</p> |DEPENDENT |travis.builds.duration<p>**Preprocessing**:</p><p>- JSONPATH: `$..duration.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Travis |Travis: Repo [{#SLUG}]: Cache files |<p>Count of cache files in {#SLUG} repo.</p> |DEPENDENT |travis.repo.caches.files[{#SLUG}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.caches.length()`</p> |
@@ -78,8 +78,8 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Travis: Service is unavailable! |<p>Travis API is unavailable. Please check if the correct {$TRAVIS.API.URL} and {$TRAVIS.API.TOKEN} are set.</p> |`{TEMPLATE_NAME:travis.get_health.last()}=0` |HIGH |<p>Manual close: YES</p> |
-|Travis: Failed to fetch home page (or no data for 30m)! |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:travis.get_health.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p> |
+|Travis: Service is unavailable |<p>Travis API is unavailable. Please check if the correct macros are set.</p> |`{TEMPLATE_NAME:travis.get_health.last()}=0` |HIGH |<p>Manual close: YES</p> |
+|Travis: Failed to fetch home page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:travis.get_health.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p> |
 |Travis: Repo [{#SLUG}]: Percent of successful builds are < {$TRAVIS.BUILDS.SUCCESS.PERCENT}% |<p>Low successful builds rate.</p> |`{TEMPLATE_NAME:travis.repo.builds.passed.pct[{#SLUG}].last()}<{$TRAVIS.BUILDS.SUCCESS.PERCENT}` |WARNING |<p>Manual close: YES</p> |
 |Travis: Repo [{#SLUG}]: Last build status is 'errored' |<p>Last build status is errored.</p> |`{TEMPLATE_NAME:travis.repo.last_build.state[{#SLUG}].str(errored)}=1` |WARNING |<p>Manual close: YES</p> |
 

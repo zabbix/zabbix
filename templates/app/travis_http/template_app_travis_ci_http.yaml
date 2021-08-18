@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-08-16T14:59:34Z'
+  date: '2021-08-18T12:17:15Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -111,14 +111,8 @@ zabbix_export:
             -
               type: JAVASCRIPT
               parameters:
-                - |
-                  if (JSON.parse(value).config) {
-                  return 1
-                  } else {
-                  return 0
-                  }
+                - 'return JSON.parse(value).config ? 1 : 0'
           url: 'https://{$TRAVIS.API.URL}/'
-          status_codes: ''
           headers:
             -
               name: Travis-API-Version
@@ -134,16 +128,16 @@ zabbix_export:
             -
               uuid: 6baed695cac34d349a42ab6e8295910d
               expression: 'nodata(/Travis CI by HTTP/travis.get_health,30m)=1'
-              name: 'Travis: Failed to fetch home page (or no data for 30m)!'
+              name: 'Travis: Failed to fetch home page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
             -
               uuid: e8398acab5a74505a85ade5d3ca5f590
               expression: 'last(/Travis CI by HTTP/travis.get_health)=0'
-              name: 'Travis: Service is unavailable!'
+              name: 'Travis: Service is unavailable'
               priority: HIGH
-              description: 'Travis API is unavailable. Please check if the correct {$TRAVIS.API.URL} and {$TRAVIS.API.TOKEN} are set.'
+              description: 'Travis API is unavailable. Please check if the correct macros are set.'
               manual_close: 'YES'
         -
           uuid: 5a01061d1f3d48f8ad0beb4d32e2168d
@@ -205,7 +199,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.jobs[?(@.state== "started")].length()'
+                - '$.jobs[?(@.state == "started")].length()'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
@@ -226,7 +220,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.jobs[?(@.state== "received")].length()'
+                - '$.jobs[?(@.state == "received")].length()'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
@@ -595,10 +589,14 @@ zabbix_export:
                   var result = [];
                   
                   JSON.parse(value).repositories.forEach(function (e) {
-                  result.push({ '{#ID}': e.id, '{#SLUG}': e.slug, '{#DESCRIPTION}': e.description});
+                  result.push({ '{#ID}': e.id, '{#SLUG}': e.slug });
                   });
                   
                   return JSON.stringify(result)
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       macros:
         -
           macro: '{$TRAVIS.API.TOKEN}'
