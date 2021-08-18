@@ -210,6 +210,7 @@ zabbix_export:
                     for (i in channel_event_tags) {
                         if (channel_event_tags[i].tag.includes("__message_ts_" + params.channel)) {
                             fields.thread_ts = channel_event_tags[i].value;
+                            break;
                         }
                     }
                 }
@@ -224,7 +225,7 @@ zabbix_export:
                     )
                 ];
         
-                resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
+                resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
                 if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {
                     throw resp.error;
@@ -245,6 +246,7 @@ zabbix_export:
                     for (i in channel_event_tags) {
                         if (channel_event_tags[i].tag.includes("__channel_id_" + params.channel)) {
                             fields.channel = channel_event_tags[i].value;
+                            continue;
                         }
                         if (channel_event_tags[i].tag.includes("__message_ts_" + params.channel)) {
                             fields.ts = channel_event_tags[i].value;
