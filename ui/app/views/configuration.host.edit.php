@@ -27,7 +27,7 @@ $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->set
 
 $data += [
 	'form_name' => 'host-form',
-	'buttons' => ((int) $data['hostid'] === 0)
+	'buttons' => ($data['hostid'] == 0)
 		? [
 			new CSubmit('add', _('Add')),
 			$cancel_button
