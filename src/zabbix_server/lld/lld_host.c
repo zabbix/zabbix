@@ -1078,6 +1078,8 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 				/* host groups which should be unlinked */
 				ZBX_STR2UINT64(hostgroupid, row[2]);
 				zbx_vector_uint64_append(del_hostgroupids, hostgroupid);
+				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, host->name);
+				zbx_audit_hostgroup_update_json_detach(hostid, hostgroupid, groupid);
 			}
 			else
 			{
@@ -1782,6 +1784,10 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 
 			zbx_db_insert_add_values(&db_insert, group->groupid, group->name,
 					(int)ZBX_FLAG_DISCOVERY_CREATED);
+			zbx_audit_host_group_create_entry(AUDIT_ACTION_ADD, group->groupid, group->name);
+
+			zbx_audit_host_group_update_json_add_details(group->groupid, group->name,
+					(int)ZBX_FLAG_DISCOVERY_CREATED);
 
 			if (FAIL != (j = zbx_vector_ptr_bsearch(group_prototypes, &group->group_prototypeid,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -1809,11 +1815,16 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 			if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
 			{
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hstgrp set ");
+				zbx_audit_host_group_create_entry(AUDIT_ACTION_UPDATE, group->groupid, group->name);
+
 				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
 				{
 					name_esc = DBdyn_escape_string(group->name);
 
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
+
+					zbx_audit_host_group_update_json_update_name(group->groupid,group->name_orig,
+							name_esc);
 
 					zbx_free(name_esc);
 				}

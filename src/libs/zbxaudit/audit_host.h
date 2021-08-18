@@ -127,6 +127,7 @@ void	zbx_audit_host_update_json_update_tag_value(zbx_uint64_t hostid, zbx_uint64
 void	zbx_audit_host_update_json_delete_tag(zbx_uint64_t hostid, zbx_uint64_t tagid);
 
 void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid);
+void	zbx_audit_hostgroup_update_json_detach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid);
 void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
 		zbx_vector_uint64_t *groupids);
 void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname);
@@ -187,4 +188,16 @@ void	zbx_audit_host_prototype_update_json_update_tag_value(zbx_uint64_t hostid, 
 		const char* value_old, const char *value_new);
 
 void	zbx_audit_host_prototype_update_json_delete_tag(zbx_uint64_t hostid, zbx_uint64_t tagid);
+
+void	zbx_audit_host_group_create_entry(int audit_action, zbx_uint64_t groupid, const char *name);
+void	zbx_audit_host_group_del(zbx_uint64_t groupid, const char *name);
+void	zbx_audit_host_group_update_json_add_details(zbx_uint64_t groupid, const char *name, int flags);
+
+#define PREPARE_AUDIT_HOST_GROUP_UPDATE_H(resource, type1, type2)						\
+void	zbx_audit_host_group_update_json_update_##resource(zbx_uint64_t groupid, type1 old_##resource,		\
+		type1 new_##resource);										\
+
+PREPARE_AUDIT_HOST_GROUP_UPDATE_H(name, const char*, string)
+#undef PREPARE_AUDIT_HOST_UPDATE_H
+
 #endif	/* ZABBIX_AUDIT_HOST_H */

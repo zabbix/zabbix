@@ -337,6 +337,16 @@ void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t ho
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, buf, groupid);
 }
 
+void	zbx_audit_hostgroup_update_json_detach(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, sizeof(buf), "host.groups[" ZBX_FS_UI64 "]", hostgroupid);
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_DETACH, buf, groupid);
+}
+
 void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
 		zbx_vector_uint64_t *groupids)
 {
@@ -638,3 +648,58 @@ void	zbx_audit_host_prototype_update_json_delete_tag(zbx_uint64_t hostid, zbx_ui
 
 	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
+
+void	zbx_audit_host_group_create_entry(int audit_action, zbx_uint64_t groupid, const char *name)
+{
+	zbx_audit_entry_t	local_audit_group_entry, **found_audit_group_entry;
+	zbx_audit_entry_t	*local_audit_group_entry_x = &local_audit_group_entry;
+
+	RETURN_IF_AUDIT_OFF();
+
+	local_audit_group_entry.id = groupid;
+
+	found_audit_group_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
+			&(local_audit_group_entry_x));
+	if (NULL == found_audit_group_entry)
+	{
+		zbx_audit_entry_t	*local_audit_group_entry_insert;
+
+		local_audit_group_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
+		local_audit_group_entry_insert->id = groupid;
+		local_audit_group_entry_insert->name = zbx_strdup(NULL, name);
+		local_audit_group_entry_insert->audit_action = audit_action;
+		local_audit_group_entry_insert->resource_type =  AUDIT_RESOURCE_HOST_GROUP;
+;
+		zbx_json_init(&(local_audit_group_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_group_entry_insert,
+				sizeof(local_audit_group_entry_insert));
+	}
+}
+
+void	zbx_audit_host_group_del(zbx_uint64_t groupid, const char *name)
+{
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_audit_host_group_create_entry(AUDIT_ACTION_DELETE, groupid, name);
+}
+
+void	zbx_audit_host_group_update_json_add_details(zbx_uint64_t groupid, const char *name, int flags)
+{
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_audit_update_json_append_string(groupid, AUDIT_DETAILS_ACTION_ADD, "group.name", name);
+	zbx_audit_update_json_append_int(groupid, AUDIT_DETAILS_ACTION_ADD, "group.flags", flags);
+}
+
+#define PREPARE_AUDIT_HOST_GROUP_UPDATE(resource, type1, type2)							\
+void	zbx_audit_host_group_update_json_update_##resource(zbx_uint64_t groupid, type1 old_##resource,		\
+		type1 new_##resource)										\
+{														\
+	RETURN_IF_AUDIT_OFF();											\
+														\
+	zbx_audit_update_json_update_##type2(groupid, "group."#resource, old_##resource, new_##resource);	\
+}														\
+
+PREPARE_AUDIT_HOST_GROUP_UPDATE(name, const char*, string)
+
+#undef PREPARE_AUDIT_HOST_GROUP_UPDATE
