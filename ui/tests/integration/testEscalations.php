@@ -31,13 +31,9 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 class testEscalations extends CIntegrationTest {
 
 	private static $hostid;
-	private static $trapper_itemid;
-	private static $vfs_itemid;
-	private static $maintenanceid;
 	private static $triggerid;
 	private static $maint_start_tm;
 	private static $trigger_actionid;
-	private static $internal_actionid;
 
 	const TRAPPER_ITEM_NAME = 'trap';
 	const HOST_NAME = 'test_actions';
@@ -81,7 +77,6 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('interfaces', $response['result'][0]);
 		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
-		$interfaceid = $response['result'][0]['interfaces'][0]['interfaceid'];
 
 		// Create trapper item
 		$response = $this->call('item.create', [
@@ -93,7 +88,6 @@ class testEscalations extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
-		self::$trapper_itemid = $response['result']['itemids'][0];
 
 		// Create trigger
 		$response = $this->call('trigger.create', [
@@ -103,22 +97,6 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertEquals(1, count($response['result']['triggerids']));
 		self::$triggerid = $response['result']['triggerids'][0];
-
-		// Create item for testing alerting on internal event
-		$this->assertTrue(@file_put_contents(self::ITEM_UNSUPP_FILENAME, 'text') !== false);
-		$response = $this->call('item.create', [
-			'name' => 'File contents of'.self::ITEM_UNSUPP_FILENAME,
-			'key_' => 'vfs.file.contents['.self::ITEM_UNSUPP_FILENAME.']',
-			'type' => ITEM_TYPE_ZABBIX,
-			'hostid' => self::$hostid,
-			'interfaceid' => $interfaceid,
-			'value_type' => ITEM_VALUE_TYPE_TEXT,
-			'delay' => '4s',
-			'status' => ITEM_STATUS_ACTIVE
-		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-		self::$vfs_itemid = $response['result']['itemids'][0];
 
 		// Create trigger action
 		$response = $this->call('action.create', [
@@ -170,62 +148,6 @@ class testEscalations extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['actionids']));
 		self::$trigger_actionid = $response['result']['actionids'][0];
 
-		// Create internal action
-		$response = $this->call('action.create', [
-			'esc_period' => '1m',
-			'eventsource' => 3,
-			'status' => 0,
-			'filter' => [
-				'conditions' => [
-					[
-						'conditiontype' => CONDITION_TYPE_HOST,
-						'formulaid' => 'B',
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => self::$hostid
-					],
-					[
-						'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
-						'formulaid' => 'A',
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => '0'
-					]
-				],
-				'evaltype' => CONDITION_EVAL_TYPE_AND
-			],
-			'name' => 'Not supported item on '.self::HOST_NAME,
-			'operations' => [
-						[
-						'esc_period' => 0,
-						'esc_step_from' => 1,
-						'esc_step_to' => 1,
-						'evaltype' => 0,
-						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => [
-							'default_msg' => 1,
-							'mediatypeid' => 0
-						],
-						'opmessage_grp' => [
-							['usrgrpid' => 7]
-						]
-			]],
-			'recovery_operations' => [
-				[
-					'evaltype' => 0,
-					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => [
-						'default_msg' => 1,
-						'mediatypeid' => 0
-					],
-					'opmessage_grp' => [
-						['usrgrpid' => 7]
-					]
-				]
-			]
-		]);
-		$this->assertArrayHasKey('actionids', $response['result']);
-		$this->assertEquals(1, count($response['result']['actionids']));
-		self::$internal_actionid = $response['result']['actionids'];
-
 		return true;
 	}
 
@@ -237,7 +159,8 @@ class testEscalations extends CIntegrationTest {
 	public function serverConfigurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4
+				'DebugLevel' => 4,
+				'LogFileSize' => 20
 			]
 		];
 	}
