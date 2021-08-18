@@ -624,16 +624,16 @@ $icon-widget-btn: (
 	}
 }
 
-.add-child-btn {
-	background: url($sprite-path) no-repeat -359px -551px !important;
+.btn-add {
+	background: url($sprite-path) no-repeat -357px -550px !important;
 }
 
-.edit-item-btn {
-	background: url($sprite-path) no-repeat -359px -478px !important;
+.btn-edit {
+	background: url($sprite-path) no-repeat -357px -477px !important;
 }
 
-.import-items-btn {
-	background: url($sprite-path) no-repeat -359px -515px !important;
+.btn-import {
+	background: url($sprite-path) no-repeat -357px -514px !important;
 }
 
 .drag-icon {
@@ -854,17 +854,6 @@ a.link-action {
 %form-input-style {
 	&:focus {
 		box-shadow: 0 0 0 1px $blue;
-	}
-}
-
-.progress-bar-container {
-	a {
-		&:hover,
-		&:focus {
-			.progress-bar-label {
-				color: #ffffff !important;
-			}
-		}
 	}
 }
 

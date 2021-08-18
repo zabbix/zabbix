@@ -32,7 +32,7 @@ $shape_border_types = [
 
 $horizontal_align_types = [
 	SYSMAP_SHAPE_LABEL_HALIGN_LEFT		=> _('Left'),
-	SYSMAP_SHAPE_LABEL_HALIGN_CENTER	=> _('Centre'),
+	SYSMAP_SHAPE_LABEL_HALIGN_CENTER	=> _('Center'),
 	SYSMAP_SHAPE_LABEL_HALIGN_RIGHT		=> _('Right')
 ];
 
@@ -378,7 +378,7 @@ function createFontSelect(string $name): CSelect {
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CTextBox('font_size'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							_('Colour'),
+							_('Color'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CColor('font_color', '#{color}'))->appendColorPickerJs(false),
 							BR(),
@@ -399,7 +399,7 @@ function createFontSelect(string $name): CSelect {
 					)
 					->addRow(_('Background'),
 						(new CDiv([
-							_('Colour'),
+							_('Color'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CColor('background_color', '#{color}'))->appendColorPickerJs(false)
 						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
@@ -419,7 +419,7 @@ function createFontSelect(string $name): CSelect {
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CTextBox('border_width'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							_('Colour'),
+							_('Color'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							(new CColor('border_color', '#{color}'))->appendColorPickerJs(false)
 						]))
@@ -538,7 +538,7 @@ function createFontSelect(string $name): CSelect {
 					)
 					->addRow((new CCheckBox('chkbox_font_color'))
 							->setId('chkboxFontColor')
-							->setLabel(_('Font colour')),
+							->setLabel(_('Font color')),
 						(new CColor('mass_font_color', '#{color}'))->appendColorPickerJs(false),
 						null, 'shape_figure_row'
 					)
@@ -562,7 +562,7 @@ function createFontSelect(string $name): CSelect {
 					)
 					->addRow((new CCheckBox('chkbox_background'))
 							->setId('chkboxBackground')
-							->setLabel(_('Background colour')),
+							->setLabel(_('Background color')),
 						(new CColor('mass_background_color', '#{color}'))->appendColorPickerJs(false),
 						null, 'shape_figure_row'
 					)
@@ -593,8 +593,8 @@ function createFontSelect(string $name): CSelect {
 							->setLabel((new CDiv())
 								->addClass('form-input-margin')
 								->addClass('switchable-content')
-								->setAttribute('data-value', _('Border colour'))
-								->setAttribute('data-value-2', _('Line colour'))
+								->setAttribute('data-value', _('Border color'))
+								->setAttribute('data-value-2', _('Line color'))
 							),
 						(new CColor('mass_border_color', '#{color}'))->appendColorPickerJs(false)
 					)
@@ -783,13 +783,13 @@ function createFontSelect(string $name): CSelect {
 								GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
 							]))
 					)
-					->addRow(_('Colour (OK)'),
+					->addRow(_('Color (OK)'),
 						(new CColor('color', '#{color}'))->appendColorPickerJs(false)
 					)
 					->addRow(_('Link indicators'),
 						(new CDiv([
 							(new CTable())
-								->setHeader([_('Trigger'), _('Type'), _('Colour'), _('Action')])
+								->setHeader([_('Trigger'), _('Type'), _('Color'), _('Action')])
 								->setAttribute('style', 'width: 100%;')
 								->setId('linkTriggerscontainer'),
 							(new CButton(null, _('Add')))

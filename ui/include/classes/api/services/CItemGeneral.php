@@ -2250,14 +2250,14 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($dep_item['hostid'] != $master_item['hostid']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'master_itemid', _('hostid of dependent item and master item should match')
+					'master_itemid', _('"hostid" of dependent item and master item should match')
 				));
 			}
 
 			if ($this instanceof CItemPrototype && $master_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
 					&& $dep_item['ruleid'] != $master_item['ruleid']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'master_itemid', _('ruleid of dependent item and master item should match')
+					'master_itemid', _('"ruleid" of dependent item and master item should match')
 				));
 			}
 

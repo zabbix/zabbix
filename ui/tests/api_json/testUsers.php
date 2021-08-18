@@ -70,7 +70,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => 7]
 					]
 				],
-				'expected_error' => 'User with username "Admin" already exists.'
+				'expected_error' => 'Incorrect value for field "/1/passwd": must be at least 8 characters long.'
 			],
 			[
 				'user' => [
@@ -173,7 +173,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with nonexistent group id',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '123456']
 					]
@@ -225,7 +225,7 @@ class testUsers extends CAPITest {
 					[
 						'username' => 'API user create 1',
 						'roleid' => 1,
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -238,7 +238,7 @@ class testUsers extends CAPITest {
 					[
 						'username' => '☺',
 						'roleid' => 1,
-						'passwd' => '☺',
+						'passwd' => 'O0o@O0o@',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -251,7 +251,7 @@ class testUsers extends CAPITest {
 					[
 						'username' => 'УТФ Юзер',
 						'roleid' => 1,
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -264,7 +264,7 @@ class testUsers extends CAPITest {
 					[
 						'username' => 'API user create with media',
 						'roleid' => 1,
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						],
@@ -330,7 +330,7 @@ class testUsers extends CAPITest {
 		$user = [
 			'username' => 'API user create with multiple emails',
 			'roleid' => 1,
-			'passwd' => 'zabbix',
+			'passwd' => 'Z@bb1x1234',
 			'usrgrps' => [
 				['usrgrpid' => 7]
 			],
@@ -406,7 +406,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '2',
-					'passwd' => 'zabbix'
+					'passwd' => 'Z@bb1x1234'
 				]],
 				'expected_error' => 'Not allowed to set password for user "guest".'
 			],
@@ -561,7 +561,7 @@ class testUsers extends CAPITest {
 					[
 						'userid' => '9',
 						'username' => 'API user updated',
-						'passwd' => 'zabbix1',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -574,7 +574,7 @@ class testUsers extends CAPITest {
 					[
 						'userid' => '9',
 						'username' => 'УТФ Юзер обновлённ',
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						]
@@ -587,7 +587,7 @@ class testUsers extends CAPITest {
 					[
 						'userid' => '9',
 						'username' => 'API user update with media',
-						'passwd' => 'zabbix',
+						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						],
@@ -627,7 +627,7 @@ class testUsers extends CAPITest {
 				$this->assertEquals($dbRowUser['surname'], '');
 				$this->assertEquals($dbRowUser['autologin'], 0);
 				$this->assertEquals($dbRowUser['autologout'], '15m');
-				$this->assertEquals($dbRowUser['lang'], 'en_GB');
+				$this->assertEquals($dbRowUser['lang'], 'en_US');
 				$this->assertEquals($dbRowUser['refresh'], '30s');
 				$this->assertEquals($dbRowUser['rows_per_page'], 50);
 				$this->assertEquals($dbRowUser['theme'], 'default');
@@ -831,7 +831,7 @@ class testUsers extends CAPITest {
 					],
 					'lang' => '123456'
 				],
-				'expected_error' => 'Invalid parameter "/1/lang": value must be one of default, en_GB, en_US, bg_BG, ca_ES, zh_CN, '
+				'expected_error' => 'Invalid parameter "/1/lang": value must be one of default, en_US, bg_BG, ca_ES, zh_CN, '
 				. 'zh_TW, cs_CZ, nl_NL, fi_FI, fr_FR, ka_GE, de_DE, el_GR, he_IL, hu_HU, id_ID, it_IT, ko_KR, ja_JP, lv_LV, '
 				. 'lt_LT, nb_NO, fa_IR, pl_PL, pt_BR, pt_PT, ro_RO, ru_RU, sk_SK, es_ES, sv_SE, tr_TR, uk_UA, vi_VN.'
 			],
@@ -885,7 +885,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid roleid',
 					'roleid' => 0,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					]
@@ -1020,7 +1020,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with nonexistent media type id',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1054,7 +1054,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1105,7 +1105,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1122,7 +1122,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty second email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1139,7 +1139,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1156,7 +1156,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1173,7 +1173,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1190,7 +1190,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1207,7 +1207,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1224,7 +1224,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1241,7 +1241,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid email',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1532,7 +1532,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'all-parameters',
 					'roleid' => 3,
-					'passwd' => 'zabbix',
+					'passwd' => 'Z@bb1x1234',
 					'usrgrps' => [['usrgrpid' => 7]],
 					'medias' => [
 							[
@@ -1926,7 +1926,7 @@ class testUsers extends CAPITest {
 		$this->assertTrue(array_key_exists('error', $res));
 
 		['error' => ['data' => $error]] = $res;
-		$this->assertEquals($error, 'Not authorised.');
+		$this->assertEquals($error, 'Not authorized.');
 	}
 
 	public function testUsers_AuthTokenDisabled() {
@@ -1952,7 +1952,7 @@ class testUsers extends CAPITest {
 		$this->assertTrue(array_key_exists('error', $res));
 
 		['error' => ['data' => $error]] = $res;
-		$this->assertEquals($error, 'Not authorised.');
+		$this->assertEquals($error, 'Not authorized.');
 	}
 
 	public function testUsers_AuthTokenExpired() {
@@ -2124,7 +2124,7 @@ class testUsers extends CAPITest {
 		]);
 
 		$this->assertTrue(array_key_exists('error', $res), 'Expected error to occur.');
-		$this->assertEquals($res['error']['data'], 'Not authorised.');
+		$this->assertEquals($res['error']['data'], 'Not authorized.');
 	}
 
 	public function testUsers_LoginBlocked() {

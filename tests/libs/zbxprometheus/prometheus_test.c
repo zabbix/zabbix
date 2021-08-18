@@ -44,6 +44,12 @@ static zbx_prometheus_condition_test_t	*prometheus_condition_dup(zbx_prometheus_
 		case ZBX_PROMETHEUS_CONDITION_OP_EQUAL_VALUE:
 			test_condition->op = zbx_strdup(NULL, "==");
 			break;
+		case ZBX_PROMETHEUS_CONDITION_OP_NOT_EQUAL:
+			test_condition->op = zbx_strdup(NULL, "!=");
+			break;
+		case ZBX_PROMETHEUS_CONDITION_OP_REGEX_NOT_MATCHED:
+			test_condition->op = zbx_strdup(NULL, "!~");
+			break;
 	}
 
 	return test_condition;

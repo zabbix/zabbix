@@ -130,6 +130,10 @@ class CMathFunctionValidatorTest extends TestCase {
 			['cot(1)', ['rc' => true, 'error' => null]],
 			['cot(1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "cot"']],
 
+			['count()', ['rc' => false, 'error' => 'invalid number of parameters in function "count"']],
+			['count(1)', ['rc' => true, 'error' => null]],
+			['count(1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "count"']],
+
 			['date()', ['rc' => true, 'error' => null]],
 			['date(1)', ['rc' => false, 'error' => 'invalid number of parameters in function "date"']],
 
@@ -304,7 +308,7 @@ class CMathFunctionValidatorTest extends TestCase {
 	public function testMathFunctionValidator(string $source, array $expected) {
 		$expression_parser = new CExpressionParser();
 		$math_function_validator = new CMathFunctionValidator([
-			'parameters' => (new CMathFunctionData())->getParameters()
+			'parameters' => (new CMathFunctionData(['calculated' => true]))->getParameters()
 		]);
 		$expression_parser->parse($source);
 		$tokens = $expression_parser->getResult()->getTokens();

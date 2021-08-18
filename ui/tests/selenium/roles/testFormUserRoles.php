@@ -97,7 +97,7 @@ class testFormUserRoles extends CWebTest {
 		CDataHelper::call('user.create', [
 			[
 				'username' => 'super_role_check',
-				'passwd' => 'zabbix',
+				'passwd' => 'test5678',
 				'roleid' => self::$super_roleid,
 				'usrgrps' => [
 					[
@@ -909,7 +909,7 @@ class testFormUserRoles extends CWebTest {
 	 * Checking, that created super admin can't change it's own role.
 	 */
 	public function testFormUserRoles_SuperAdmin() {
-		$this->page->userLogin('super_role_check', 'zabbix');
+		$this->page->userLogin('super_role_check', 'test5678');
 		$this->page->open('zabbix.php?action=userrole.list')->waitUntilReady();
 		$this->query('link:super_role')->one()->click();
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();

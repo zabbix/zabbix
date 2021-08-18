@@ -29,7 +29,9 @@ class CWarning extends Ctag {
 		if ($messages) {
 			parent::addItem(
 				(new CDiv(
-					(new CList($messages))->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
+					(new CList($messages))
+						->addClass(ZBX_STYLE_LIST_DASHED)
+						->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
 				))->addClass(ZBX_STYLE_MSG_DETAILS)
 			);
 		}

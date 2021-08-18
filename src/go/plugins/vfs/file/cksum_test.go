@@ -30,7 +30,7 @@ import (
 
 var CrcFile = "1234"
 
-func TestFileCksum(t *testing.T) {
+func TestFileCksumDefault(t *testing.T) {
 	stdOs = std.NewMockOs()
 
 	impl.options.Timeout = 3
@@ -44,6 +44,63 @@ func TestFileCksum(t *testing.T) {
 		} else {
 			if crc != 3582362371 {
 				t.Errorf("vfs.file.cksum returned invalid result")
+			}
+		}
+	}
+}
+
+func TestFileCksumCrc32(t *testing.T) {
+	stdOs = std.NewMockOs()
+
+	impl.options.Timeout = 3
+
+	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt", "crc32"}, nil); err != nil {
+		t.Errorf("vfs.file.cksum[text.txt,crc32] returned error %s", err.Error())
+	} else {
+		if crc, ok := result.(uint32); !ok {
+			t.Errorf("vfs.file.cksum[text.txt,crc32] returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if crc != 3582362371 {
+				t.Errorf("vfs.file.cksum[text.txt,crc32] returned invalid result")
+			}
+		}
+	}
+}
+
+func TestFileCksumMd5(t *testing.T) {
+	stdOs = std.NewMockOs()
+
+	impl.options.Timeout = 3
+
+	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt", "md5"}, nil); err != nil {
+		t.Errorf("vfs.file.cksum[text.txt,md5] returned error %s", err.Error())
+	} else {
+		if md5sum, ok := result.(string); !ok {
+			t.Errorf("vfs.file.cksum[text.txt,md5] returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if md5sum != "81dc9bdb52d04dc20036dbd8313ed055" {
+				t.Errorf("vfs.file.cksum[text.txt,md5] returned invalid result")
+			}
+		}
+	}
+}
+
+func TestFileCksumSha256sum(t *testing.T) {
+	stdOs = std.NewMockOs()
+
+	impl.options.Timeout = 3
+
+	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt", "sha256"}, nil); err != nil {
+		t.Errorf("vfs.file.cksum[text.txt,sha256] returned error %s", err.Error())
+	} else {
+		if sha256, ok := result.(string); !ok {
+			t.Errorf("vfs.file.cksum[text.txt,sha256] returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if sha256 != "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4" {
+				t.Errorf("vfs.file.cksum[text.txt,sha256] returned invalid result")
 			}
 		}
 	}

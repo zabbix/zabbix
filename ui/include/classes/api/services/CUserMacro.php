@@ -81,6 +81,7 @@ class CUserMacro extends CApiService {
 			'globalmacroids'			=> null,
 			'templateids'				=> null,
 			'globalmacro'				=> null,
+			'inherited'					=> null,
 			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
@@ -137,6 +138,7 @@ class CUserMacro extends CApiService {
 			$options['selectGroups'] = null;
 			$options['selectTemplates'] = null;
 			$options['selectHosts'] = null;
+			$options['inherited'] = null;
 		}
 
 		// globalmacroids
@@ -149,6 +151,13 @@ class CUserMacro extends CApiService {
 		if (!is_null($options['hostmacroids'])) {
 			zbx_value2array($options['hostmacroids']);
 			$sqlParts['where'][] = dbConditionInt('hm.hostmacroid', $options['hostmacroids']);
+		}
+
+		// inherited
+		if (!is_null($options['inherited'])) {
+			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['where'][] = $options['inherited'] ? 'h.templateid IS NOT NULL' : 'h.templateid IS NULL';
+			$sqlParts['where']['hmh'] = 'hm.hostid=h.hostid';
 		}
 
 		// groupids
@@ -264,19 +273,19 @@ class CUserMacro extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'macro')],
-			'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'value')],
-			'type' =>			['type' => API_INT32, 'in' => ZBX_MACRO_TYPE_TEXT.','.ZBX_MACRO_TYPE_SECRET.','.ZBX_MACRO_TYPE_VAULT],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
+			'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'value')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('globalmacro', 'value')]
+			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacros, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(zbx_objectValues($globalmacros, 'macro'));
-
-		foreach ($globalmacros as $macro) {
-			$this->checkMacroValue($macro);
-		}
+		$this->checkDuplicates($globalmacros);
 	}
 
 	/**
@@ -292,25 +301,7 @@ class CUserMacro extends CApiService {
 		foreach ($globalmacros as $globalmacro) {
 			$db_globalmacro = $db_globalmacros[$globalmacro['globalmacroid']];
 
-			$upd_globalmacro = [];
-
-			// strings
-			foreach (['macro', 'value', 'description'] as $field_name) {
-				if (array_key_exists($field_name, $globalmacro)
-						&& $globalmacro[$field_name] !== $db_globalmacro[$field_name]) {
-					$upd_globalmacro[$field_name] = $globalmacro[$field_name];
-				}
-			}
-
-			// integers
-			if (array_key_exists('type', $globalmacro) && $globalmacro['type'] != $db_globalmacro['type']) {
-				$upd_globalmacro['type'] = $globalmacro['type'];
-			}
-
-			if (array_key_exists('type', $upd_globalmacro) && $db_globalmacro['type'] == ZBX_MACRO_TYPE_SECRET
-					&& !array_key_exists('value', $globalmacro)) {
-				$upd_globalmacro['value'] = '';
-			}
+			$upd_globalmacro = DB::getUpdatedValues('globalmacro', $globalmacro, $db_globalmacro);
 
 			if ($upd_globalmacro) {
 				$upd_globalmacros[] = [
@@ -326,33 +317,7 @@ class CUserMacro extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $globalmacros, $db_globalmacros);
 
-		return ['globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid')];
-	}
-
-	/**
-	 * Returns macro without spaces and curly braces.
-	 *
-	 * @param string $macro
-	 *
-	 * @return string
-	 */
-	private function trimMacro($macro) {
-		$user_macro_parser = new CUserMacroParser();
-
-		$user_macro_parser->parse($macro);
-
-		$macro = $user_macro_parser->getMacro();
-		$context = $user_macro_parser->getContext();
-		$regex = $user_macro_parser->getRegex();
-
-		if ($context !== null) {
-			$macro .= ':'.$context;
-		}
-		elseif ($regex !== null) {
-			$macro .= ':'.CUserMacroParser::REGEX_PREFIX.$regex;
-		}
-
-		return $macro;
+		return ['globalmacroids' => array_column($globalmacros, 'globalmacroid')];
 	}
 
 	/**
@@ -369,83 +334,91 @@ class CUserMacro extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['globalmacroid'], ['macro']], 'fields' => [
 			'globalmacroid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('globalmacro', 'macro')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
 			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'value')],
-			'type' =>			['type' => API_INT32, 'in' => ZBX_MACRO_TYPE_TEXT.','.ZBX_MACRO_TYPE_SECRET.','.ZBX_MACRO_TYPE_VAULT],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacros, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_globalmacros = DB::select('globalmacro', [
 			'output' => ['globalmacroid', 'macro', 'value', 'description', 'type'],
-			'globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid'),
+			'globalmacroids' => array_column($globalmacros, 'globalmacroid'),
 			'preservekeys' => true
 		]);
 
-		$macros = [];
+		if (count($globalmacros) != count($db_globalmacros)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-		foreach ($globalmacros as $index => $globalmacro) {
-			if (!array_key_exists($globalmacro['globalmacroid'], $db_globalmacros)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		$globalmacros = $this->extendObjectsByKey($globalmacros, $db_globalmacros, 'globalmacroid', ['type']);
 
+		foreach ($globalmacros as $index => &$globalmacro) {
 			$db_globalmacro = $db_globalmacros[$globalmacro['globalmacroid']];
 
-			if (!array_key_exists('type', $globalmacro)) {
-				$globalmacros[$index]['type'] = $db_globalmacro['type'];
+			if ($globalmacro['type'] != $db_globalmacro['type']) {
+				if ($db_globalmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$globalmacro += ['value' => ''];
+				}
+
+				if ($globalmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
+					$globalmacro += ['value' => $db_globalmacro['value']];
+				}
 			}
 
-			// Use database value to bypass Vault macro validation in case if no value is given.
-			if ($globalmacros[$index]['type'] == ZBX_MACRO_TYPE_VAULT && !array_key_exists('value', $globalmacro)) {
-				$globalmacros[$index]['value'] = $db_globalmacro['value'];
-			}
-
-			if (array_key_exists('macro', $globalmacro)
-					&& $this->trimMacro($globalmacro['macro']) !== $this->trimMacro($db_globalmacro['macro'])) {
-				$macros[] = $globalmacro['macro'];
+			if (array_key_exists('value', $globalmacro) && $globalmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
+				if (!CApiInputValidator::validate(['type' => API_VAULT_SECRET], $globalmacro['value'],
+						'/'.($index + 1).'/value', $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
 			}
 		}
+		unset($globalmacro);
 
-		if ($macros) {
-			$this->checkDuplicates($macros);
-		}
-
-		foreach ($globalmacros as $macro) {
-			$this->checkMacroValue($macro);
-		}
+		$this->checkDuplicates($globalmacros, $db_globalmacros);
 	}
 
 	/**
 	 * Check for duplicated macros.
 	 *
-	 * @param array $macros
+	 * @param array      $globalmacros
+	 * @param string     $globalmacros[]['globalmacroid']  (optional if $db_globalmacros is null)
+	 * @param string     $globalmacros[]['macro']          (optional if $db_globalmacros is not null)
+	 * @param array|null $db_globalmacros
 	 *
 	 * @throws APIException if macros already exists.
 	 */
-	private function checkDuplicates(array $macros) {
-		$user_macro_parser = new CUserMacroParser();
+	private function checkDuplicates(array $globalmacros, array $db_globalmacros = null): void {
+		$macros = [];
+
+		foreach ($globalmacros as $globalmacro) {
+			if ($db_globalmacros === null || (array_key_exists('macro', $globalmacro)
+					&& CApiInputValidator::trimMacro($globalmacro['macro'])
+						!== CApiInputValidator::trimMacro($db_globalmacros[$globalmacro['globalmacroid']]['macro']))) {
+				$macros[] = $globalmacro['macro'];
+			}
+		}
+
+		if (!$macros) {
+			return;
+		}
 
 		$db_globalmacros = DB::select('globalmacro', [
 			'output' => ['macro']
 		]);
 
-		$uniq_macros = [];
+		$db_macros = [];
 
 		foreach ($db_globalmacros as $db_globalmacro) {
-			$uniq_macros[$this->trimMacro($db_globalmacro['macro'])] = true;
+			$db_macros[CApiInputValidator::trimMacro($db_globalmacro['macro'])] = true;
 		}
 
 		foreach ($macros as $macro) {
-			$macro_orig = $macro;
-			$macro = $this->trimMacro($macro);
-
-			if (array_key_exists($macro, $uniq_macros)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists.', $macro_orig));
+			if (array_key_exists(CApiInputValidator::trimMacro($macro), $db_macros)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists.', $macro));
 			}
-			$uniq_macros[$macro] = true;
 		}
 	}
 
@@ -475,6 +448,7 @@ class CUserMacro extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacroids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -485,121 +459,216 @@ class CUserMacro extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($globalmacroids as $globalmacroid) {
-			if (!array_key_exists($globalmacroid, $db_globalmacros)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($globalmacroids) != count($db_globalmacros)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $hostmacros
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array $hostmacros) {
-		if (!$hostmacros) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	protected function validateCreate(array &$hostmacros) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'macro']], 'fields' => [
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
+			'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')]
+			]],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $hostmacros, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// Check the data required for authorization first.
-		foreach ($hostmacros as $hostmacro) {
-			$this->checkHostId($hostmacro);
-		}
-
-		$this->checkHostPermissions(array_unique(zbx_objectValues($hostmacros, 'hostid')));
-
-		foreach ($hostmacros as $hostmacro) {
-			$this->checkMacro($hostmacro);
-			$this->checkUnsupportedFields('hostmacro', $hostmacro,
-				_s('Wrong fields for macro "%1$s".', $hostmacro['macro']));
-			$this->checkMacroType($hostmacro);
-			$this->checkMacroValue($hostmacro);
-		}
-
-		$this->checkDuplicateMacros($hostmacros);
-		$this->checkIfHostMacrosDontRepeat($hostmacros);
+		$this->checkHostPermissions(array_unique(array_column($hostmacros, 'hostid')));
+		$this->checkHostDuplicates($hostmacros);
 	}
 
 	/**
-	 * Add new host macros.
-	 *
-	 * @param array $hostmacros an array of host macros
+	 * @param array $hostmacros
 	 *
 	 * @return array
 	 */
 	public function create(array $hostmacros) {
-		$hostmacros = zbx_toArray($hostmacros);
-
 		$this->validateCreate($hostmacros);
 
-		$hostmacroids = DB::insert('hostmacro', $hostmacros);
+		$this->createReal($hostmacros);
 
-		return ['hostmacroids' => $hostmacroids];
+		if ($tpl_hostmacros = $this->getMacrosToInherit($hostmacros)) {
+			$this->inherit($tpl_hostmacros);
+		}
+
+		return ['hostmacroids' => array_column($hostmacros, 'hostmacroid')];
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
+	 * Inserts hostmacros records into the database.
 	 *
+	 * @param array $hostmacros
+	 */
+	private function createReal(array &$hostmacros): void {
+		$hostmacroids = DB::insert('hostmacro', $hostmacros);
+
+		foreach ($hostmacros as $index => &$hostmacro) {
+			$hostmacro['hostmacroid'] = $hostmacroids[$index];
+		}
+		unset($hostmacro);
+	}
+
+	/**
 	 * @param array $hostmacros
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $hostmacros) {
-		if (!$hostmacros) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	protected function validateUpdate(array &$hostmacros, array &$db_hostmacros = null) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
+			'hostmacroid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $hostmacros, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$required_fields = ['hostmacroid'];
+		$db_hostmacros = $this->get([
+			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'description'],
+			'hostmacroids' => array_column($hostmacros, 'hostmacroid'),
+			'editable' => true,
+			'inherited' => false,
+			'preservekeys' => true
+		]);
 
+		if (count($hostmacros) != count($db_hostmacros)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		// CUserMacro::get does not return secret values. Loading directly from the database.
+		$options = [
+			'output' => ['hostmacroid', 'value'],
+			'hostmacroids' => array_keys($db_hostmacros)
+		];
+		$db_hostmacro_values = DBselect(DB::makeSql('hostmacro', $options));
+
+		while ($db_hostmacro_value = DBfetch($db_hostmacro_values)) {
+			$db_hostmacros[$db_hostmacro_value['hostmacroid']] += $db_hostmacro_value;
+		}
+
+		$hostmacros = $this->extendObjectsByKey($hostmacros, $db_hostmacros, 'hostmacroid', ['hostid', 'type']);
+
+		foreach ($hostmacros as $index => &$hostmacro) {
+			$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
+
+			if ($hostmacro['type'] != $db_hostmacro['type']) {
+				if ($db_hostmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$hostmacro += ['value' => ''];
+				}
+
+				if ($hostmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
+					$hostmacro += ['value' => $db_hostmacro['value']];
+				}
+			}
+
+			if (array_key_exists('value', $hostmacro) && $hostmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
+				if (!CApiInputValidator::validate(['type' => API_VAULT_SECRET], $hostmacro['value'],
+						'/'.($index + 1).'/value', $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+		}
+		unset($hostmacro);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'macro']], 'fields' => [
+			'hostid' =>	['type' => API_ID],
+			'macro' =>	['type' => API_USER_MACRO]
+		]];
+
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $hostmacros, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$this->checkHostDuplicates($hostmacros, $db_hostmacros);
+	}
+
+	/**
+	 * Checks if any of the given host macros already exist on the corresponding hosts. If the macros are updated and
+	 * the "hostmacroid" field is set, the method will only fail, if a macro with a different hostmacroid exists.
+	 * Assumes the "macro", "hostid" and "hostmacroid" fields are valid.
+	 *
+	 * @param array      $hostmacros
+	 * @param string     $hostmacros[]['hostmacroid']  (optional if $db_hostmacros is null)
+	 * @param string     $hostmacros[]['hostid']
+	 * @param string     $hostmacros[]['macro']        (optional if $db_hostmacros is not null)
+	 * @param array|null $db_hostmacros
+	 *
+	 * @throws APIException if any of the given macros already exist.
+	 */
+	private function checkHostDuplicates(array $hostmacros, array $db_hostmacros = null) {
+		$macro_names = [];
+		$existing_macros = [];
+
+		// Parse each macro, get unique names and, if context exists, narrow down the search.
+		foreach ($hostmacros as $index => $hostmacro) {
+			if ($db_hostmacros !== null && (!array_key_exists('macro', $hostmacro)
+					|| CApiInputValidator::trimMacro($hostmacro['macro'])
+						=== CApiInputValidator::trimMacro($db_hostmacros[$hostmacro['hostmacroid']]['macro']))) {
+				unset($hostmacros[$index]);
+
+				continue;
+			}
+
+			$trimmed_macro = CApiInputValidator::trimMacro($hostmacro['macro']);
+			[$macro_name] = explode(':', $trimmed_macro, 2);
+			$macro_name = !isset($trimmed_macro[strlen($macro_name)]) ? '{$'.$macro_name : '{$'.$macro_name.':';
+
+			$macro_names[$macro_name] = true;
+			$existing_macros[$hostmacro['hostid']] = [];
+		}
+
+		if (!$existing_macros) {
+			return;
+		}
+
+		$options = [
+			'output' => ['hostmacroid', 'hostid', 'macro'],
+			'filter' => ['hostid' => array_keys($existing_macros)],
+			'search' => ['macro' => array_keys($macro_names)],
+			'searchByAny' => true,
+			'startSearch' => true
+		];
+
+		$db_hostmacros = DBselect(DB::makeSql('hostmacro', $options));
+
+		// Collect existing unique macro names and their contexts for each host.
+		while ($db_hostmacro = DBfetch($db_hostmacros)) {
+			$trimmed_macro = CApiInputValidator::trimMacro($db_hostmacro['macro']);
+
+			$existing_macros[$db_hostmacro['hostid']][$trimmed_macro] = $db_hostmacro['hostmacroid'];
+		}
+
+		// Compare each macro name and context to existing one.
 		foreach ($hostmacros as $hostmacro) {
-			$missing_keys = array_diff($required_fields, array_keys($hostmacro));
+			$hostid = $hostmacro['hostid'];
+			$trimmed_macro = CApiInputValidator::trimMacro($hostmacro['macro']);
 
-			if ($missing_keys) {
+			if (array_key_exists($trimmed_macro, $existing_macros[$hostid])) {
+				$hosts = DB::select('hosts', [
+					'output' => ['name'],
+					'hostids' => $hostid
+				]);
+
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('User macro missing parameters: %1$s', implode(', ', $missing_keys))
+					_s('Macro "%1$s" already exists on "%2$s".', $hostmacro['macro'], $hosts[0]['name'])
 				);
 			}
 		}
-
-		// Make sure we have all the data we need.
-		$hostmacros = $this->extendObjects($this->tableName(), $hostmacros, ['macro', 'hostid', 'type', 'value']);
-
-		$db_hostmacros = DB::select($this->tableName(), [
-			'output' => ['hostmacroid', 'hostid', 'macro'],
-			'hostmacroids' => zbx_objectValues($hostmacros, 'hostmacroid')
-		]);
-
-		// Check if the macros exist in host.
-		$this->checkIfHostMacrosExistIn(zbx_objectValues($hostmacros, 'hostmacroid'), $db_hostmacros);
-
-		// Check the data required for authorization first.
-		foreach ($hostmacros as $hostmacro) {
-			$this->checkHostId($hostmacro);
-		}
-
-		// Check permissions for all affected hosts.
-		$affected_hostids = array_merge(zbx_objectValues($db_hostmacros, 'hostid'),
-			zbx_objectValues($hostmacros, 'hostid')
-		);
-		$affected_hostids = array_unique($affected_hostids);
-		$this->checkHostPermissions($affected_hostids);
-
-		foreach ($hostmacros as $hostmacro) {
-			$this->checkMacro($hostmacro);
-			$this->checkUnsupportedFields('hostmacro', $hostmacro,
-				_s('Wrong fields for macro "%1$s".', $hostmacro['macro'])
-			);
-			$this->checkMacroType($hostmacro);
-			$this->checkMacroValue($hostmacro);
-		}
-
-		$this->checkDuplicateMacros($hostmacros);
-		$this->checkIfHostMacrosDontRepeat($hostmacros);
 	}
 
 	/**
@@ -610,61 +679,68 @@ class CUserMacro extends CApiService {
 	 * @return array
 	 */
 	public function update($hostmacros) {
-		$hostmacros = zbx_toArray($hostmacros);
+		$this->validateUpdate($hostmacros, $db_hostmacros);
 
-		$this->validateUpdate($hostmacros);
+		$this->updateReal($hostmacros, $db_hostmacros);
 
-		$db_macros = DB::select('hostmacro', [
-			'output' => ['type'],
-			'filter' => ['hostmacroid' => array_column($hostmacros, 'hostmacroid')],
-			'preservekeys' => true
-		]);
-		$data = [];
-
-		foreach ($hostmacros as $macro) {
-			$db_macro = $db_macros[$macro['hostmacroid']];
-
-			if (array_key_exists('type', $macro) && $macro['type'] != $db_macro['type']
-					&& $db_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
-				$macro += ['value' => ''];
-			}
-
-			$hostmacroid = $macro['hostmacroid'];
-			unset($macro['hostmacroid']);
-
-			$data[] = [
-				'values' => $macro,
-				'where' => ['hostmacroid' => $hostmacroid]
-			];
+		if ($tpl_hostmacros = $this->getMacrosToInherit($hostmacros, $db_hostmacros)) {
+			$this->inherit($tpl_hostmacros);
 		}
-
-		DB::update('hostmacro', $data);
 
 		return ['hostmacroids' => array_column($hostmacros, 'hostmacroid')];
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
+	 * Updates hostmacros records in the database.
 	 *
+	 * @param array $hostmacros
+	 * @param array $db_hostmacros
+	 */
+	private function updateReal(array $hostmacros, array $db_hostmacros) {
+		$upd_hostmacros = [];
+
+		foreach ($hostmacros as $hostmacro) {
+			$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
+
+			$upd_hostmacro = DB::getUpdatedValues('hostmacro', $hostmacro, $db_hostmacro);
+
+			if ($upd_hostmacro) {
+				$upd_hostmacros[] = [
+					'values' => $upd_hostmacro,
+					'where' => ['hostmacroid' => $hostmacro['hostmacroid']]
+				];
+			}
+		}
+
+		if ($upd_hostmacros) {
+			DB::update('hostmacro', $upd_hostmacros);
+		}
+	}
+
+	/**
 	 * @param array $hostmacroids
+	 * @param array $db_hostmacros
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $hostmacroids) {
-		if (!$hostmacroids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	protected function validateDelete(array &$hostmacroids, array &$db_hostmacros = null) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $hostmacroids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_hostmacros = API::getApiService()->select('hostmacro', [
-			'output' => ['hostid', 'hostmacroid'],
-			'hostmacroids' => $hostmacroids
+		$db_hostmacros = $this->get([
+			'output' => ['hostmacroid', 'hostid', 'macro'],
+			'hostmacroids' => $hostmacroids,
+			'editable' => true,
+			'inherited' => false,
+			'preservekeys' => true
 		]);
 
-		// Check permissions for all affected hosts.
-		$this->checkHostPermissions(array_unique(zbx_objectValues($db_hostmacros, 'hostid')));
-
-		// Check if the macros exist in host.
-		$this->checkIfHostMacrosExistIn($hostmacroids, $db_hostmacros);
+		if (count($hostmacroids) != count($db_hostmacros)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 	}
 
 	/**
@@ -675,379 +751,235 @@ class CUserMacro extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $hostmacroids) {
-		$this->validateDelete($hostmacroids);
+		$this->validateDelete($hostmacroids, $db_hostmacros);
 
 		DB::delete('hostmacro', ['hostmacroid' => $hostmacroids]);
+
+		if ($tpl_hostmacros = $this->getMacrosToInherit($db_hostmacros)) {
+			$this->inherit($tpl_hostmacros, true);
+		}
 
 		return ['hostmacroids' => $hostmacroids];
 	}
 
 	/**
-	 * Replace macros on hosts/templates.
-	 * $macros input array has hostid as key and array of that host macros as value.
-	 *
-	 * @param array $macros
-	 */
-	public function replaceMacros(array $macros) {
-		$hostids = array_keys($macros);
-
-		$this->checkHostPermissions($hostids);
-
-		$db_hosts = API::Host()->get([
-			'output' => ['hostmacroid'],
-			'hostids' => $hostids,
-			'selectMacros' => API_OUTPUT_EXTEND,
-			'templated_hosts' => true,
-			'preservekeys' => true
-		]);
-
-		$hostmacroids_to_delete = [];
-		$hostmacros_to_update = [];
-		$hostmacros_to_add = [];
-
-		foreach ($macros as $hostid => $hostmacros) {
-			$db_hostmacros = zbx_toHash($db_hosts[$hostid]['macros'], 'hostmacroid');
-
-			/*
-			 * Look for db macros which hostmacroids are not in list of new macros. If there are any,
-			 * they should be deleted.
-			 */
-			$hostmacroids = zbx_toHash($hostmacros, 'hostmacroid');
-
-			foreach ($db_hostmacros as $db_hostmacro) {
-				if (!array_key_exists($db_hostmacro['hostmacroid'], $hostmacroids)) {
-					$hostmacroids_to_delete[] = $db_hostmacro['hostmacroid'];
-				}
-			}
-
-			// if macro has hostmacroid it should be updated otherwise created as new
-			foreach ($hostmacros as $hostmacro) {
-				if (array_key_exists('hostmacroid', $hostmacro)
-						&& array_key_exists($hostmacro['hostmacroid'], $db_hostmacros)) {
-					$hostmacros_to_update[] = $hostmacro;
-				}
-				else {
-					$hostmacro['hostid'] = $hostid;
-					$hostmacros_to_add[] = $hostmacro;
-				}
-			}
-		}
-
-		if ($hostmacroids_to_delete) {
-			$this->delete($hostmacroids_to_delete);
-		}
-
-		if ($hostmacros_to_add) {
-			$this->create($hostmacros_to_add);
-		}
-
-		if ($hostmacros_to_update) {
-			$this->update($hostmacros_to_update);
-		}
-	}
-
-	/**
-	 * Validates the "macro" field.
-	 *
-	 * @param array $macro
-	 * @param string $macro['macro']
-	 *
-	 * @throws APIException if the field is not valid.
-	 */
-	protected function checkMacro(array $macro) {
-		$missing_keys = array_diff(['macro'], array_keys($macro));
-
-		if ($missing_keys) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('User macro missing parameters: %1$s', implode(', ', $missing_keys))
-			);
-		}
-
-		$user_macro_parser = new CUserMacroParser();
-
-		if ($user_macro_parser->parse($macro['macro']) != CParser::PARSE_SUCCESS) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Invalid macro "%1$s": %2$s.', $macro['macro'], $user_macro_parser->getError())
-			);
-		}
-	}
-
-	/**
-	 * Validate the "type" field.
-	 *
-	 * @param array $macro
-	 */
-	protected function checkMacroType(array $macro) {
-		if (array_key_exists('type', $macro)
-				&& !in_array($macro['type'], [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid type for macro "%1$s".', $macro['macro']));
-		}
-	}
-
-	/**
-	 * Validate the "value" field.
-	 *
-	 * @param array  $macro
-	 * @param int    $macro['type']
-	 * @param string $macro['value']
-	 *
-	 * @throws APIException if the field is empty.
-	 */
-	protected function checkMacroValue(array $macro) {
-		if (!array_key_exists('type', $macro) || $macro['type'] != ZBX_MACRO_TYPE_VAULT) {
-			return;
-		}
-
-		if ($macro['value'] === '') {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Invalid value for macro "%1$s": %2$s.', $macro['macro'], _('cannot be empty'))
-			);
-		}
-
-		$vault_secret_parser = new CVaultSecretParser();
-
-		if ($vault_secret_parser->parse($macro['value']) != CParser::PARSE_SUCCESS) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Invalid value for macro "%1$s": %2$s.', $macro['macro'], $vault_secret_parser->getError())
-			);
-		}
-	}
-
-	/**
-	 * Validates the "hostid" field.
-	 *
-	 * @param array $hostmacro
-	 *
-	 * @throws APIException if the field is empty.
-	 */
-	protected function checkHostId(array $hostmacro) {
-		if (!array_key_exists('hostid', $hostmacro) || zbx_empty($hostmacro['hostid'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('No host given for macro "%1$s".', $hostmacro['macro']));
-		}
-
-		if (!is_numeric($hostmacro['hostid'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid hostid for macro "%1$s".', $hostmacro['macro']));
-		}
-	}
-
-	/**
 	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
 	 *
-	 * @param array $hostids    an array of host or template IDs
+	 * @param array $hostids  An array of host or template IDs.
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts.
 	 */
 	protected function checkHostPermissions(array $hostids) {
-		if ($hostids) {
-			$hostids = array_unique($hostids);
-
-			$count = API::Host()->get([
-				'countOutput' => true,
-				'hostids' => $hostids,
-				'filter' => [
-					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
-				],
-				'editable' => true
-			]);
-
-			if ($count == count($hostids)) {
-				return;
-			}
-
-			$count += API::Template()->get([
-				'countOutput' => true,
-				'templateids' => $hostids,
-				'filter' => [
-					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
-				],
-				'editable' => true
-			]);
-
-			if ($count == count($hostids)) {
-				return;
-			}
-
-			$count += API::HostPrototype()->get([
-				'countOutput' => true,
-				'hostids' => $hostids,
-				'editable' => true
-			]);
-
-			if ($count != count($hostids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-	}
-
-	/**
-	 * Checks if the given macros contain duplicates. Assumes the "macro" field is valid.
-	 *
-	 * @param array $macros
-	 *
-	 * @throws APIException if the given macros contain duplicates.
-	 */
-	protected function checkDuplicateMacros(array $macros) {
-		if (count($macros) <= 1) {
-			return;
-		}
-
-		$existing_macros = [];
-		$user_macro_parser = new CUserMacroParser();
-
-		foreach ($macros as $macro) {
-			// Global macros don't have a 'hostid'.
-			$hostid = array_key_exists('hostid', $macro) ? $macro['hostid'] : 1;
-
-			$user_macro_parser->parse($macro['macro']);
-
-			$macro_name = $user_macro_parser->getMacro();
-			$context = $user_macro_parser->getContext();
-			$regex = $user_macro_parser->getRegex();
-
-			/*
-			 * Macros with same name can have different contexts. A macro with no context is not the same
-			 * as a macro with an empty context.
-			 */
-			if (array_key_exists($hostid, $existing_macros)
-					&& array_key_exists($macro_name, $existing_macros[$hostid])) {
-				$has_context = in_array($context, array_column($existing_macros[$hostid][$macro_name], 'context'),
-					true
-				);
-				$context_exists = ($context !== null && $has_context);
-
-				$has_regex = in_array($regex, array_column($existing_macros[$hostid][$macro_name], 'regex'), true);
-				$regex_exists = ($regex !== null && $has_regex);
-
-				$is_macro_without_context = ($context === null && $regex === null);
-
-				if (($is_macro_without_context && $has_context && $has_regex) || ($context_exists || $regex_exists)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
-				}
-			}
-
-			$existing_macros[$hostid][$macro_name][] = ['context' => $context, 'regex' => $regex];
-		}
-	}
-
-	/**
-	 * Checks if any of the given host macros already exist on the corresponding hosts. If the macros are updated and
-	 * the "hostmacroid" field is set, the method will only fail, if a macro with a different hostmacroid exists.
-	 * Assumes the "macro", "hostid" and "hostmacroid" fields are valid.
-	 *
-	 * @param array $hostmacros
-	 * @param int $hostmacros[]['hostmacroid']
-	 * @param int $hostmacros[]['hostid']
-	 * @param string $hostmacros['macro']
-	 *
-	 * @throws APIException if any of the given macros already exist.
-	 */
-	protected function checkIfHostMacrosDontRepeat(array $hostmacros) {
-		if (!$hostmacros) {
-			return;
-		}
-
-		$macro_names = [];
-		$user_macro_parser = new CUserMacroParser();
-
-		// Parse each macro, get unique names and, if context exists, narrow down the search.
-		foreach ($hostmacros as $hostmacro) {
-			$user_macro_parser->parse($hostmacro['macro']);
-
-			$macro_name = $user_macro_parser->getMacro();
-			$context = $user_macro_parser->getContext();
-			$regex = $user_macro_parser->getRegex();
-
-			if ($context === null && $regex === null) {
-				$macro_names['{$'.$macro_name] = true;
-			}
-			else {
-				// Narrow down the search for macros with contexts.
-				$macro_names['{$'.$macro_name.':'] = true;
-			}
-		}
-
-		// When updating with empty array, don't select any data from database.
-		$db_hostmacros = API::getApiService()->select($this->tableName(), [
-			'output' => ['hostmacroid', 'hostid', 'macro'],
-			'filter' => ['hostid' => array_unique(array_column($hostmacros, 'hostid'))],
-			'search' => ['macro' => array_keys($macro_names)],
-			'searchByAny' => true
+		$count = API::Host()->get([
+			'countOutput' => true,
+			'hostids' => $hostids,
+			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+			],
+			'editable' => true
 		]);
 
-		$existing_macros = [];
-
-		// Collect existing unique macro names and their contexts for each host.
-		foreach ($db_hostmacros as $db_hostmacro) {
-			$user_macro_parser->parse($db_hostmacro['macro']);
-
-			$macro_name = $user_macro_parser->getMacro();
-			$context = $user_macro_parser->getContext();
-			$regex = $user_macro_parser->getRegex();
-
-			$existing_macros[$db_hostmacro['hostid']][$macro_name][$db_hostmacro['hostmacroid']] =
-				['context' => $context, 'regex' => $regex];
+		if ($count == count($hostids)) {
+			return;
 		}
 
-		// Compare each macro name and context to existing one.
-		foreach ($hostmacros as $hostmacro) {
-			$hostid = $hostmacro['hostid'];
+		$count += API::Template()->get([
+			'countOutput' => true,
+			'templateids' => $hostids,
+			'editable' => true
+		]);
 
-			$user_macro_parser->parse($hostmacro['macro']);
+		if ($count == count($hostids)) {
+			return;
+		}
 
-			$macro_name = $user_macro_parser->getMacro();
-			$context = $user_macro_parser->getContext();
-			$regex = $user_macro_parser->getRegex();
+		$count += API::HostPrototype()->get([
+			'countOutput' => true,
+			'hostids' => $hostids,
+			'editable' => true,
+			'inherited' => false
+		]);
 
-			if (array_key_exists($hostid, $existing_macros)
-					&& array_key_exists($macro_name, $existing_macros[$hostid])) {
-				$has_context = ($context !== null && in_array($context,
-					array_column($existing_macros[$hostid][$macro_name], 'context'), true
-				));
-				$has_regex = ($regex !== null && in_array($regex,
-					array_column($existing_macros[$hostid][$macro_name], 'regex'), true
-				));
-				$is_macro_without_context = ($context === null && $regex === null);
+		if ($count != count($hostids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
 
-				if ($is_macro_without_context || $has_context || $has_regex) {
-					foreach ($existing_macros[$hostid][$macro_name] as $hostmacroid => $macro_details) {
-						if ((!array_key_exists('hostmacroid', $hostmacro)
-									|| bccomp($hostmacro['hostmacroid'], $hostmacroid) != 0)
-								&& $context === $macro_details['context'] && $regex === $macro_details['regex']) {
-							$hosts = API::getApiService()->select('hosts', [
-								'output' => ['name'],
-								'hostids' => $hostmacro['hostid']
-							]);
+	/**
+	 * Forms the array of hostmacros, which are support the inheritance, from the passed hostmacros array.
+	 *
+	 * @param array      $hostmacros
+	 * @param string     $hostmacros[]['hostmacroid']
+	 * @param string     $hostmacros[]['hostid']
+	 * @param string     $hostmacros[]['macro']                  (optional)
+	 * @param string     $hostmacros[]['value']                  (optional)
+	 * @param string     $hostmacros[]['description']            (optional)
+	 * @param int        $hostmacros[]['type']                   (optional)
+	 * @param array|null $db_hostmacros                          Used to set the old macro name in case when it was
+	 *                                                           updated.
+	 * @param string     $db_hostmacros[<hostmacroid>]['macro']
+	 *
+	 * @return array
+	 */
+	private function getMacrosToInherit(array $hostmacros, array $db_hostmacros = null): array {
+		$templated_host_prototypeids = DBfetchColumn(DBselect(
+			'SELECT hd.hostid'.
+			' FROM host_discovery hd,items i,hosts h'.
+			' WHERE hd.parent_itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND h.status='.HOST_STATUS_TEMPLATE.
+				' AND '.dbConditionId('hd.hostid', array_unique(array_column($hostmacros, 'hostid')))
+		), 'hostid');
 
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Macro "%1$s" already exists on "%2$s".', $hostmacro['macro'], $hosts[0]['name'])
-							);
-						}
-					}
+		if (!$templated_host_prototypeids) {
+			return [];
+		}
+
+		foreach ($hostmacros as $index => &$hostmacro) {
+			if (!in_array($hostmacro['hostid'], $templated_host_prototypeids)) {
+				unset($hostmacros[$index]);
+
+				continue;
+			}
+
+			if ($db_hostmacros) {
+				$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
+				$hostmacro += array_intersect_key($db_hostmacro, array_flip(['macro']));
+
+				if ($hostmacro['macro'] !== $db_hostmacro['macro']) {
+					$hostmacro['macro_old'] = $db_hostmacro['macro'];
+				}
+			}
+		}
+		unset($hostmacro);
+
+		return $hostmacros;
+	}
+
+	/**
+	 * Prepares and returns an array of child hostmacros, inherited from hostmacros $tpl_hostmacros on the all hosts.
+	 *
+	 * @param array  $tpl_hostmacros
+	 * @param string $tpl_hostmacros[]['hostmacroid']
+	 * @param string $tpl_hostmacros[]['hostid']
+	 * @param string $tpl_hostmacros[]['macro']
+	 * @param string $tpl_hostmacros[]['value']        (optional)
+	 * @param string $tpl_hostmacros[]['description']  (optional)
+	 * @param int    $tpl_hostmacros[]['type']         (optional)
+	 * @param string $tpl_hostmacros[]['macro_old']    (optional)
+	 * @param array  $ins_hostmacros
+	 * @param array  $upd_hostmacros
+	 * @param array  $db_hostmacros
+	 */
+	private function prepareInheritedObjects(array $tpl_hostmacros, array &$ins_hostmacros = null,
+			array &$upd_hostmacros = null, array &$db_hostmacros = null): void {
+		$ins_hostmacros = [];
+		$upd_hostmacros = [];
+		$db_hostmacros = [];
+
+		$templateids_hostids = [];
+		$hostids = [];
+
+		$options = [
+			'output' => ['hostid', 'templateid'],
+			'filter' => ['templateid' => array_unique(array_column($tpl_hostmacros, 'hostid'))]
+		];
+		$chd_hosts = DBselect(DB::makeSql('hosts', $options));
+
+		while ($chd_host = DBfetch($chd_hosts)) {
+			$templateids_hostids[$chd_host['templateid']][] = $chd_host['hostid'];
+			$hostids[] = $chd_host['hostid'];
+		}
+
+		if (!$templateids_hostids) {
+			return;
+		}
+
+		$macros = [];
+		foreach ($tpl_hostmacros as $tpl_hostmacro) {
+			if (array_key_exists('macro_old', $tpl_hostmacro)) {
+				$macros[$tpl_hostmacro['macro_old']] = true;
+			}
+			else {
+				$macros[$tpl_hostmacro['macro']] = true;
+			}
+		}
+
+		$chd_hostmacros = DB::select('hostmacro', [
+			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'value', 'description'],
+			'filter' => ['hostid' => $hostids, 'macro' => array_keys($macros)],
+			'preservekeys' => true
+		]);
+
+		$host_macros = array_fill_keys($hostids, []);
+
+		foreach ($chd_hostmacros as $hostmacroid => $hostmacro) {
+			$host_macros[$hostmacro['hostid']][$hostmacro['macro']] = $hostmacroid;
+		}
+
+		foreach ($tpl_hostmacros as $tpl_hostmacro) {
+			$templateid = $tpl_hostmacro['hostid'];
+
+			if (!array_key_exists($templateid, $templateids_hostids)) {
+				continue;
+			}
+
+			foreach ($templateids_hostids[$templateid] as $hostid) {
+				if (array_key_exists('macro_old', $tpl_hostmacro)) {
+					$hostmacroid = $host_macros[$hostid][$tpl_hostmacro['macro_old']];
+
+					$upd_hostmacros[] = ['hostmacroid' => $hostmacroid, 'hostid' => $hostid] + $tpl_hostmacro;
+					$db_hostmacros[$hostmacroid] = $chd_hostmacros[$hostmacroid];
+
+					unset($chd_hostmacros[$hostmacroid], $host_macros[$hostid][$tpl_hostmacro['macro_old']]);
+				}
+				elseif (array_key_exists($tpl_hostmacro['macro'], $host_macros[$hostid])) {
+					$hostmacroid = $host_macros[$hostid][$tpl_hostmacro['macro']];
+
+					$upd_hostmacros[] = ['hostmacroid' => $hostmacroid, 'hostid' => $hostid] + $tpl_hostmacro;
+					$db_hostmacros[$hostmacroid] = $chd_hostmacros[$hostmacroid];
+
+					unset($chd_hostmacros[$hostmacroid], $host_macros[$hostid][$tpl_hostmacro['macro']]);
+				}
+				else {
+					$ins_hostmacros[] = ['hostid' => $hostid] + $tpl_hostmacro;
 				}
 			}
 		}
 	}
 
 	/**
-	 * Checks if all of the host macros with hostmacrosids given in $hostmacrosids are present in $db_hostmacros.
-	 * Assumes the "hostmacroid" field is valid.
+	 * Updates the macros for the children of host prototypes and propagates the inheritance to the child host
+	 * prototypes.
 	 *
-	 * @param array $hostmacroids
-	 * @param array $db_hostmacros
-	 *
-	 * @throws APIException if any of the host macros is not present in $db_hostmacros.
+	 * @param array  $tpl_hostmacros
+	 * @param string $tpl_hostmacros[]['hostmacroid']
+	 * @param string $tpl_hostmacros[]['hostid']
+	 * @param string $tpl_hostmacros[]['macro']
+	 * @param string $tpl_hostmacros[]['value']        (optional)
+	 * @param string $tpl_hostmacros[]['description']  (optional)
+	 * @param int    $tpl_hostmacros[]['type']         (optional)
+	 * @param string $tpl_hostmacros[]['macro_old']    (optional)
+	 * @param bool   $is_delete                        Whether the passed hostmacros are intended to delete.
 	 */
-	protected function checkIfHostMacrosExistIn(array $hostmacroids, array $db_hostmacros) {
-		$db_hostmacros = zbx_toHash($db_hostmacros, 'hostmacroid');
+	private function inherit(array $tpl_hostmacros, bool $is_delete = false): void {
+		$this->prepareInheritedObjects($tpl_hostmacros, $ins_hostmacros, $upd_hostmacros, $db_hostmacros);
 
-		foreach ($hostmacroids as $hostmacroid) {
-			if (!array_key_exists($hostmacroid, $db_hostmacros)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Macro with hostmacroid "%1$s" does not exist.', $hostmacroid)
-				);
+		if ($ins_hostmacros) {
+			$this->createReal($ins_hostmacros);
+		}
+
+		if ($upd_hostmacros) {
+			if ($is_delete) {
+				DB::delete('hostmacro', ['hostmacroid' => array_column($upd_hostmacros, 'hostmacroid')]);
 			}
+			else {
+				$this->updateReal($upd_hostmacros, $db_hostmacros);
+			}
+		}
+
+		if ($ins_hostmacros || $upd_hostmacros) {
+			$this->inherit(array_merge($ins_hostmacros, $upd_hostmacros), $is_delete);
 		}
 	}
 

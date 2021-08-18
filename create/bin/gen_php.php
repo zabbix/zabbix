@@ -67,6 +67,10 @@ function parse_schema($path) {
 						$type = 'DB::FIELD_TYPE_BLOB';
 						$length = 2048;
 						break;
+					case 't_cuid':
+						$type = 'DB::FIELD_TYPE_CUID';
+						$length = 25;
+						break;
 				}
 
 				$data = [

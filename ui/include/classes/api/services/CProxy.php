@@ -497,7 +497,7 @@ class CProxy extends CApiService {
 		]);
 
 		if ($db_hosts) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" is monitored with proxy "%2$s".',
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" is monitored by proxy "%2$s".',
 				$db_hosts[0]['name'], $proxies[$db_hosts[0]['proxy_hostid']]['host']
 			));
 		}

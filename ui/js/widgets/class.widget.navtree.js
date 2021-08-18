@@ -539,7 +539,7 @@ class CWidgetNavTree extends CWidget {
 
 			button_add_child.type = 'button';
 			button_add_child.title = t('Add child element');
-			button_add_child.classList.add('add-child-btn', 'js-button-add-child');
+			button_add_child.classList.add('btn-add', 'js-button-add-child');
 			button_add_child.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_child);
 
@@ -547,7 +547,7 @@ class CWidgetNavTree extends CWidget {
 
 			button_add_maps.type = 'button';
 			button_add_maps.title = t('Add multiple maps');
-			button_add_maps.classList.add('import-items-btn', 'js-button-add-maps');
+			button_add_maps.classList.add('btn-import', 'js-button-add-maps');
 			button_add_maps.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_maps);
 
@@ -556,7 +556,7 @@ class CWidgetNavTree extends CWidget {
 
 				button_edit.type = 'button';
 				button_edit.title = t('Edit');
-				button_edit.classList.add('edit-item-btn', 'js-button-edit');
+				button_edit.classList.add('btn-edit', 'js-button-edit');
 				button_edit.setAttribute('data-id', item.id);
 				tools.appendChild(button_edit);
 
@@ -564,7 +564,7 @@ class CWidgetNavTree extends CWidget {
 
 				button_remove.type = 'button';
 				button_remove.title = t('Remove');
-				button_remove.classList.add('remove-btn', 'js-button-remove');
+				button_remove.classList.add('btn-remove', 'js-button-remove');
 				button_remove.setAttribute('data-id', item.id);
 				tools.appendChild(button_remove);
 			}

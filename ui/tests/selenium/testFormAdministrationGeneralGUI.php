@@ -29,7 +29,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	public $form_selector = 'xpath://form[contains(@action, "gui.update")]';
 
 	public $default = [
-		'Default language' => 'English (en_GB)',
+		'Default language' => 'English (en_US)',
 		'Default time zone' => 'System',
 		'Default theme' => 'Blue',
 		'Limit for search and filter results' => '1000',
@@ -44,7 +44,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	];
 
 	public $db_default = [
-		'default_lang' => 'en_GB',
+		'default_lang' => 'en_US',
 		'default_timezone' => 'system',
 		'default_theme' => 'blue-theme',
 		'search_limit' => 1000,

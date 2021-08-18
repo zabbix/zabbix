@@ -62,6 +62,8 @@
 #include "preprocessor/preproc_manager.h"
 #include "preprocessor/preproc_worker.h"
 #include "availability/avail_manager.h"
+#include "service/service_manager.h"
+#include "housekeeper/problem_housekeeper.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
 #include "reporter/report_manager.h"
@@ -104,45 +106,48 @@ const char	*help_message[] = {
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
-	"      " ZBX_CONFIG_CACHE_RELOAD "        Reload configuration cache",
-	"      " ZBX_HOUSEKEEPER_EXECUTE "        Execute the housekeeper",
-	"      " ZBX_LOG_LEVEL_INCREASE "=target  Increase log level, affects all processes if",
-	"                                 target is not specified",
-	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
-	"                                 target is not specified",
-	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
-	"      " ZBX_SECRETS_RELOAD "             Reload secrets from Vault",
-	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
-	"                                 section (historycache, preprocessing, alerting,",
-	"                                 lld, valuecache, locks) or everything if section is",
-	"                                 not specified",
+	"      " ZBX_CONFIG_CACHE_RELOAD "         Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_EXECUTE "         Execute the housekeeper",
+	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE " Execute the problem housekeeper",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target   Increase log level, affects all processes if",
+	"                                  target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target   Decrease log level, affects all processes if",
+	"                                  target is not specified",
+	"      " ZBX_SNMP_CACHE_RELOAD "           Reload SNMP cache",
+	"      " ZBX_SECRETS_RELOAD "              Reload secrets from Vault",
+	"      " ZBX_DIAGINFO "=section            Log internal diagnostic information of the",
+	"                                  section (historycache, preprocessing, alerting,",
+	"                                  lld, valuecache, locks) or everything if section is",
+	"                                  not specified",
+	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
 	"",
 	"      Log level control targets:",
-	"        process-type             All processes of specified type",
-	"                                 (alerter, alert manager, configuration syncer,",
-	"                                 discoverer, escalator, history syncer,",
-	"                                 housekeeper, http poller, icmp pinger,",
-	"                                 ipmi manager, ipmi poller, java poller,",
-	"                                 poller, preprocessing manager,",
-	"                                 preprocessing worker, proxy poller,",
-	"                                 self-monitoring, snmp trapper, task manager,",
-	"                                 timer, trapper, unreachable poller,",
-	"                                 vmware collector, history poller, availability manager)",
-	"        process-type,N           Process type and number (e.g., poller,3)",
-	"        pid                      Process identifier, up to 65535. For larger",
-	"                                 values specify target as \"process-type,N\"",
+	"        process-type              All processes of specified type",
+	"                                  (alerter, alert manager, configuration syncer,",
+	"                                  discoverer, escalator, history syncer,",
+	"                                  housekeeper, http poller, icmp pinger,",
+	"                                  ipmi manager, ipmi poller, java poller,",
+	"                                  poller, preprocessing manager,",
+	"                                  preprocessing worker, proxy poller,",
+	"                                  self-monitoring, snmp trapper, task manager,",
+	"                                  timer, trapper, unreachable poller,",
+	"                                  vmware collector, history poller,",
+	"                                  availability manager, service manager)",
+	"        process-type,N            Process type and number (e.g., poller,3)",
+	"        pid                       Process identifier, up to 65535. For larger",
+	"                                  values specify target as \"process-type,N\"",
 	"",
-	"  -h --help                      Display this help message",
-	"  -V --version                   Display version number",
+	"  -h --help                       Display this help message",
+	"  -V --version                    Display version number",
 	"",
 	"Some configuration parameter default locations:",
-	"  AlertScriptsPath               \"" DEFAULT_ALERT_SCRIPTS_PATH "\"",
-	"  ExternalScripts                \"" DEFAULT_EXTERNAL_SCRIPTS_PATH "\"",
+	"  AlertScriptsPath                \"" DEFAULT_ALERT_SCRIPTS_PATH "\"",
+	"  ExternalScripts                 \"" DEFAULT_EXTERNAL_SCRIPTS_PATH "\"",
 #ifdef HAVE_LIBCURL
-	"  SSLCertLocation                \"" DEFAULT_SSL_CERT_LOCATION "\"",
-	"  SSLKeyLocation                 \"" DEFAULT_SSL_KEY_LOCATION "\"",
+	"  SSLCertLocation                 \"" DEFAULT_SSL_CERT_LOCATION "\"",
+	"  SSLKeyLocation                  \"" DEFAULT_SSL_KEY_LOCATION "\"",
 #endif
-	"  LoadModulePath                 \"" DEFAULT_LOAD_MODULE_PATH "\"",
+	"  LoadModulePath                  \"" DEFAULT_LOAD_MODULE_PATH "\"",
 	NULL	/* end of text */
 };
 
@@ -204,6 +209,8 @@ int	CONFIG_HISTORYPOLLER_FORKS	= 5;
 int	CONFIG_AVAILMAN_FORKS		= 1;
 int	CONFIG_REPORTMANAGER_FORKS	= 0;
 int	CONFIG_REPORTWRITER_FORKS	= 0;
+int	CONFIG_SERVICEMAN_FORKS		= 1;
+int	CONFIG_PROBLEMHOUSEKEEPER_FORKS = 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -217,6 +224,8 @@ int	CONFIG_HISTSYNCER_FORKS		= 4;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
+
+int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
 int	CONFIG_VMWARE_FORKS		= 0;
 int	CONFIG_VMWARE_FREQUENCY		= 60;
@@ -324,10 +333,13 @@ char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
 char	*CONFIG_WEBSERVICE_URL	= NULL;
+
+int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
 volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
@@ -341,6 +353,12 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		/* fail if the main process is queried */
 		return FAIL;
+	}
+	else if (local_server_num <= (server_count += CONFIG_SERVICEMAN_FORKS))
+	{
+		/* start service manager process and load configuration cache in parallel */
+		*local_process_type = ZBX_PROCESS_TYPE_SERVICEMAN;
+		*local_process_num = local_server_num - server_count + CONFIG_SERVICEMAN_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
@@ -493,6 +511,12 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_REPORTWRITER;
 		*local_process_num = local_server_num - server_count + CONFIG_REPORTWRITER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_PROBLEMHOUSEKEEPER_FORKS))
+	{
+		/* start service manager process and load configuration cache in parallel */
+		*local_process_type = ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER;
+		*local_process_num = local_server_num - server_count + CONFIG_PROBLEMHOUSEKEEPER_FORKS;
 	}
 	else
 		return FAIL;
@@ -907,6 +931,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			100},
 		{"WebServiceURL",		&CONFIG_WEBSERVICE_URL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"ProblemHousekeepingFrequency",	&CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY,	TYPE_INT,
+			PARM_OPT,	1,			3600},
+		{"ServiceManagerSyncFrequency",	&CONFIG_SERVICEMAN_SYNC_FREQUENCY,	TYPE_INT,
+			PARM_OPT,	1,			3600},
+		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
+			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 
@@ -1215,13 +1245,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_create_itservices_lock(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IT services lock: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
 	if (SUCCEED != zbx_history_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
@@ -1294,7 +1317,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS
 			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS
 			+ CONFIG_HISTORYPOLLER_FORKS + CONFIG_AVAILMAN_FORKS + CONFIG_REPORTMANAGER_FORKS
-			+ CONFIG_REPORTWRITER_FORKS;
+			+ CONFIG_REPORTWRITER_FORKS + CONFIG_SERVICEMAN_FORKS + CONFIG_PROBLEMHOUSEKEEPER_FORKS;
 	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
 
@@ -1328,6 +1351,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		switch (thread_args.process_type)
 		{
+			case ZBX_PROCESS_TYPE_SERVICEMAN:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				zbx_thread_start(service_manager_thread, &thread_args, &threads[i]);
+				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 				DCconfig_wait_sync();
@@ -1382,7 +1409,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
-				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ESCALATOR:
@@ -1440,7 +1467,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
-				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
@@ -1448,6 +1475,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_REPORTWRITER:
 				zbx_thread_start(report_writer_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
+				zbx_thread_start(trigger_housekeeper_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}
@@ -1517,8 +1547,6 @@ void	zbx_on_exit(int ret)
 
 	/* free history value cache */
 	zbx_vc_destroy();
-
-	zbx_destroy_itservices_lock();
 
 	/* free vmware support */
 	if (0 != CONFIG_VMWARE_FORKS)

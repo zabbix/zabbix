@@ -61,6 +61,10 @@ class CHelpItems {
 		return [
 			ITEM_TYPE_ZABBIX => [
 				[
+					'key' => 'agent.hostmetadata',
+					'description' => _('Agent host metadata. Returns string')
+				],
+				[
 					'key' => 'agent.hostname',
 					'description' => _('Agent host name. Returns string')
 				],
@@ -79,6 +83,10 @@ class CHelpItems {
 				[
 					'key' => 'kernel.maxproc',
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
+				],
+				[
+					'key' => 'kernel.openfiles',
+					'description' => _('Number of currently open file descriptors. Returns integer')
 				],
 				[
 					'key' => 'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
@@ -133,6 +141,10 @@ class CHelpItems {
 					'description' => _('Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
 				],
 				[
+					'key' => 'net.tcp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+					'description' => _('Returns number of TCP sockets that match parameters. Returns integer')
+				],
+				[
 					'key' => 'net.udp.listen[port]',
 					'description' => _('Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
 				],
@@ -143,6 +155,10 @@ class CHelpItems {
 				[
 					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
 					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
+				],
+				[
+					'key' => 'net.udp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+					'description' => _('Returns number of UDP sockets that match parameters. Returns integer')
 				],
 				[
 					'key' => 'perf_instance.discovery[object]',
@@ -162,7 +178,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
-					'description' => _('Process CPU utilisation percentage. Returns float')
+					'description' => _('Process CPU utilization percentage. Returns float')
 				],
 				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
@@ -214,7 +230,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
-					'description' => _('CPU utilisation percentage. Returns float')
+					'description' => _('CPU utilization percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',
@@ -238,7 +254,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System time. Returns integer with type as utc; string - with type as local')
+					'description' => _('System time. Returns integer with type as UTC; string - with type as local')
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
@@ -305,8 +321,8 @@ class CHelpItems {
 					'description' => _('Directory size (in bytes). Returns integer')
 				],
 				[
-					'key' => 'vfs.file.cksum[file]',
-					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer')
+					'key' => 'vfs.file.cksum[file,<mode>]',
+					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256')
 				],
 				[
 					'key' => 'vfs.file.contents[file,<encoding>]',
@@ -317,8 +333,20 @@ class CHelpItems {
 					'description' => _('Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists')
 				],
 				[
+					'key' => 'vfs.file.get[file]',
+					'description' => _('Information about a file. Returns JSON')
+				],
+				[
 					'key' => 'vfs.file.md5sum[file]',
 					'description' => _('MD5 checksum of file. Returns character string (MD5 hash of the file)')
+				],
+				[
+					'key' => 'vfs.file.owner[file,<ownertype>,<resulttype>]',
+					'description' => _('File owner information. Returns string')
+				],
+				[
+					'key' => 'vfs.file.permissions[file]',
+					'description' => _('Returns 4-digit string containing octal number with Unix permissions')
 				],
 				[
 					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
@@ -329,8 +357,8 @@ class CHelpItems {
 					'description' => _('Find string in a file. Returns 0 - match not found; 1 - found')
 				],
 				[
-					'key' => 'vfs.file.size[file]',
-					'description' => _('File size (in bytes). Returns integer')
+					'key' => 'vfs.file.size[file,<mode>]',
+					'description' => _('File size in bytes (default) or in newlines. Returns integer')
 				],
 				[
 					'key' => 'vfs.file.time[file,<mode>]',
@@ -391,6 +419,10 @@ class CHelpItems {
 			],
 			ITEM_TYPE_ZABBIX_ACTIVE => [
 				[
+					'key' => 'agent.hostmetadata',
+					'description' => _('Agent host metadata. Returns string')
+				],
+				[
 					'key' => 'agent.hostname',
 					'description' => _('Agent host name. Returns string')
 				],
@@ -413,6 +445,10 @@ class CHelpItems {
 				[
 					'key' => 'kernel.maxproc',
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
+				],
+				[
+					'key' => 'kernel.openfiles',
+					'description' => _('Number of currently open file descriptors. Returns integer')
 				],
 				[
 					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
@@ -487,6 +523,10 @@ class CHelpItems {
 					'description' => _('Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
 				],
 				[
+					'key' => 'net.tcp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+					'description' => _('Returns number of TCP sockets that match parameters. Returns integer')
+				],
+				[
 					'key' => 'net.udp.listen[port]',
 					'description' => _('Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
 				],
@@ -497,6 +537,10 @@ class CHelpItems {
 				[
 					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
 					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
+				],
+				[
+					'key' => 'net.udp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+					'description' => _('Returns number of UDP sockets that match parameters. Returns integer')
 				],
 				[
 					'key' => 'perf_instance.discovery[object]',
@@ -516,7 +560,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
-					'description' => _('Process CPU utilisation percentage. Returns float')
+					'description' => _('Process CPU utilization percentage. Returns float')
 				],
 				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
@@ -568,7 +612,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
-					'description' => _('CPU utilisation percentage. Returns float')
+					'description' => _('CPU utilization percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',
@@ -592,7 +636,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System time. Returns integer with type as utc; string - with type as local')
+					'description' => _('System time. Returns integer with type as UTC; string - with type as local')
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
@@ -659,8 +703,8 @@ class CHelpItems {
 					'description' => _('Directory size (in bytes). Returns integer')
 				],
 				[
-					'key' => 'vfs.file.cksum[file]',
-					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer')
+					'key' => 'vfs.file.cksum[file,<mode>]',
+					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256')
 				],
 				[
 					'key' => 'vfs.file.contents[file,<encoding>]',
@@ -671,8 +715,20 @@ class CHelpItems {
 					'description' => _('Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists')
 				],
 				[
+					'key' => 'vfs.file.get[file]',
+					'description' => _('Information about a file. Returns JSON')
+				],
+				[
 					'key' => 'vfs.file.md5sum[file]',
 					'description' => _('MD5 checksum of file. Returns character string (MD5 hash of the file)')
+				],
+				[
+					'key' => 'vfs.file.owner[file,<ownertype>,<resulttype>]',
+					'description' => _('File owner information. Returns string')
+				],
+				[
+					'key' => 'vfs.file.permissions[file]',
+					'description' => _('Returns 4-digit string containing octal number with Unix permissions')
 				],
 				[
 					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
@@ -683,8 +739,8 @@ class CHelpItems {
 					'description' => _('Find string in a file. Returns 0 - match not found; 1 - found')
 				],
 				[
-					'key' => 'vfs.file.size[file]',
-					'description' => _('File size (in bytes). Returns integer')
+					'key' => 'vfs.file.size[file,<mode>]',
+					'description' => _('File size in bytes (default) or in newlines. Returns integer')
 				],
 				[
 					'key' => 'vfs.file.time[file,<mode>]',
@@ -890,7 +946,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.hv.hw.uuid[<url>,<uuid>]',
-					'description' => _('VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+					'description' => _('VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
 					'key' => 'vmware.hv.hw.vendor[<url>,<uuid>]',
@@ -1070,7 +1126,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
-					'description' => _('	The average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+					'description' => _('The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
 				],
 				[
 					'key' => 'vmware.vm.storage.totalwritelatency[<url>,<uuid>,<instance>]',

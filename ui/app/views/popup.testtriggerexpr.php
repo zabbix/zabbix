@@ -26,7 +26,7 @@
 $data_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([
-		_('Expression Variable Elements'),
+		_('Expression variable elements'),
 		_('Result type'),
 		_('Value')
 	]);

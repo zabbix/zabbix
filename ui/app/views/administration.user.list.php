@@ -55,7 +55,8 @@ $widget = (new CWidget())
 				))->setAttribute('aria-label', _('Content controls'))
 		]))
 	)
-	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'user.list')))
+	->addItem((new CFilter())
+		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'user.list'))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
@@ -67,7 +68,7 @@ $widget = (new CWidget())
 			(new CFormList())->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			),
-			(new CFormList())->addRow(_('Surname'),
+			(new CFormList())->addRow(_('Last name'),
 				(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			),
 			(new CFormList())->addRow((new CLabel(_('User roles'), 'filter_roles')),
@@ -105,7 +106,7 @@ $table = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Username'), 'username', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Surname'), 'surname', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Last name'), 'surname', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('User role'), 'role_name', $data['sort'], $data['sortorder'], $url),
 		_('Groups'),
 		_('Is online?'),

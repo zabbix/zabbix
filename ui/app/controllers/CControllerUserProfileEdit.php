@@ -125,6 +125,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'refresh', 'rows_per_page', 'url', 'form_refresh'
 		]);
 
+		$data['password_requirements'] = $this->getPasswordRequirements();
+
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			if ($data['form_refresh'] != 0) {
 				$data['medias'] = $this->getInput('medias', []);

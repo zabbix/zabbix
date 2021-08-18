@@ -925,6 +925,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 {
 	const ZBX_TABLE	*config_table;
 
+	/* sync with zbx_dbsync_compare_config() */
 	const char	*selected_fields[] = {"discovery_groupid", "snmptrap_logging",
 					"severity_name_0", "severity_name_1", "severity_name_2", "severity_name_3",
 					"severity_name_4", "severity_name_5", "hk_events_mode", "hk_events_trigger",
@@ -934,7 +935,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
 					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
 					"compression_status", "compress_older", "instanceid",
-					"default_timezone"};	/* sync with zbx_dbsync_compare_config() */
+					"default_timezone", "hk_events_service", "auditlog_enabled"};
+
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, ret;
@@ -1006,7 +1008,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 			(SUCCEED != set_hk_opt(&config->config->hk.events_trigger, 1, SEC_PER_DAY, row[9]) ||
 			SUCCEED != set_hk_opt(&config->config->hk.events_internal, 1, SEC_PER_DAY, row[10]) ||
 			SUCCEED != set_hk_opt(&config->config->hk.events_discovery, 1, SEC_PER_DAY, row[11]) ||
-			SUCCEED != set_hk_opt(&config->config->hk.events_autoreg, 1, SEC_PER_DAY, row[12])))
+			SUCCEED != set_hk_opt(&config->config->hk.events_autoreg, 1, SEC_PER_DAY, row[12]) ||
+			SUCCEED != set_hk_opt(&config->config->hk.events_service, 1, SEC_PER_DAY, row[32])))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "trigger, internal, network discovery and auto-registration data"
 				" housekeeping will be disabled due to invalid settings");
@@ -1075,6 +1078,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	}
 #endif
 	DCstrpool_replace(found, &config->config->default_timezone, row[31]);
+
+	config->config->auditlog_enabled = atoi(row[32]);
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
@@ -2247,8 +2252,8 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 		if (0 != (macros & 0x01))
 		{
 			addr = zbx_strdup(NULL, interface->ip);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL,
-					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
+					NULL, &addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				DCstrpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
@@ -2257,7 +2262,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 		if (0 != (macros & 0x02))
 		{
 			addr = zbx_strdup(NULL, interface->dns);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				DCstrpool_replace(1, &interface->dns, addr);
@@ -3579,7 +3584,7 @@ static void	DCsync_template_items(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, itemid;
 	unsigned char		tag;
 	int			ret, found;
-	ZBX_DC_TEMPLATE_ITEM 	*item;
+	ZBX_DC_TEMPLATE_ITEM	*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3615,7 +3620,7 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, itemid;
 	unsigned char		tag;
 	int			ret, found;
-	ZBX_DC_PROTOTYPE_ITEM 	*item;
+	ZBX_DC_PROTOTYPE_ITEM	*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -10096,7 +10101,7 @@ void	zbx_interface_availability_free(zbx_interface_availability_t *availability)
 	zbx_free(availability);
 }
 
-ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *);
+ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_agent_availability_init                                      *
@@ -12180,6 +12185,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE))
 		cfg->default_timezone = zbx_strdup(NULL, config->config->default_timezone);
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED))
+		cfg->auditlog_enabled = config->config->auditlog_enabled;
 
 	UNLOCK_CACHE;
 

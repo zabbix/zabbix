@@ -38,9 +38,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 		// Services.
 		'id:hk_services_mode' => true,
 		'id:hk_services' => '365d',
-		// Audit.
-		'id:hk_audit_mode' => true,
-		'id:hk_audit' => '365d',
 		// User sessions.
 		'id:hk_sessions_mode' => true,
 		'id:hk_sessions' => '365d',
@@ -62,8 +59,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 		'hk_events_autoreg' => '1d',
 		'hk_services_mode' => 1,
 		'hk_services' => '365d',
-		'hk_audit_mode' => 1,
-		'hk_audit' => '365d',
 		'hk_sessions_mode' => 1,
 		'hk_sessions' => '365d',
 		'hk_history_mode' => 1,
@@ -84,9 +79,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 		// Services.
 		'id:hk_services_mode' => true,
 		'id:hk_services' => '213d',
-		// Audit.
-		'id:hk_audit_mode' => true,
-		'id:hk_audit' => '404d',
 		// User sessions.
 		'id:hk_sessions_mode' => true,
 		'id:hk_sessions' => '151d',
@@ -108,6 +100,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 		$this->page->assertTitle('Configuration of housekeeping');
 		$this->page->assertHeader('Housekeeping');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
+		$this->assertTrue($form->query('link:Audit settings')->exists());
 
 		$headers = ['Events and alerts', 'Services', 'Audit', 'User sessions', 'History', 'Trends'];
 		foreach ($headers as $header) {
@@ -117,7 +110,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 		$checkboxes = [
 			'hk_events_mode',
 			'hk_services_mode',
-			'hk_audit_mode',
 			'hk_sessions_mode',
 			'hk_history_mode',
 			'hk_history_global',
@@ -131,7 +123,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			'hk_events_discovery',
 			'hk_events_autoreg',
 			'hk_services',
-			'hk_audit',
 			'hk_sessions',
 			'hk_history',
 			'hk_trends'
@@ -185,8 +176,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'id:hk_events_mode' => false,
 						// Services.
 						'id:hk_services_mode' => false,
-						// Audit.
-						'id:hk_audit_mode' => false,
 						// User sessions.
 						'id:hk_sessions_mode' => false,
 						// History.
@@ -199,7 +188,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 					'db' => [
 						'hk_events_mode' => 0,
 						'hk_services_mode' => 0,
-						'hk_audit_mode' => 0,
 						'hk_sessions_mode' => 0,
 						'hk_history_mode' => 0,
 						'hk_history_global' => 0,
@@ -342,9 +330,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '86400',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '86400',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '86400',
@@ -365,8 +350,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => 86400,
 						'hk_services_mode' => 1,
 						'hk_services' => 86400,
-						'hk_audit_mode' => 1,
-						'hk_audit' => 86400,
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => 86400,
 						'hk_history_mode' => 1,
@@ -392,9 +375,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '86400s',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '86400s',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '86400s',
@@ -413,8 +393,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => '86400s',
 						'hk_services_mode' => 1,
 						'hk_services' => '86400s',
-						'hk_audit_mode' => 1,
-						'hk_audit' => '86400s',
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => '86400s',
 						'hk_history_global' => 1,
@@ -438,9 +416,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '1440m',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '1440m',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '1440m',
@@ -459,8 +434,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => '1440m',
 						'hk_services_mode' => 1,
 						'hk_services' => '1440m',
-						'hk_audit_mode' => 1,
-						'hk_audit' => '1440m',
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => '1440m',
 						'hk_history_global' => 1,
@@ -484,9 +457,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '24h',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '24h',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '24h',
@@ -505,8 +475,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => '24h',
 						'hk_services_mode' => 1,
 						'hk_services' => '24h',
-						'hk_audit_mode' => 1,
-						'hk_audit' => '24h',
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => '24h',
 						'hk_history_global' => 1,
@@ -530,9 +498,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '1d',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '1d',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '1d',
@@ -548,8 +513,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => '1d',
 						'hk_services_mode' => 1,
 						'hk_services' => '1d',
-						'hk_audit_mode' => 1,
-						'hk_audit' => '1d',
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => '1d',
 						'hk_trends_global' => 1,
@@ -571,9 +534,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '788400000',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '788400000',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '788400000',
@@ -592,8 +552,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => 788400000,
 						'hk_services_mode' => 1,
 						'hk_services' => 788400000,
-						'hk_audit_mode' => 1,
-						'hk_audit' => 788400000,
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => 788400000,
 						'hk_history_global' => 1,
@@ -617,9 +575,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '788400000s',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '788400000s',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '788400000s',
@@ -638,8 +593,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => '788400000s',
 						'hk_services_mode' => 1,
 						'hk_services' => '788400000s',
-						'hk_audit_mode' => 1,
-						'hk_audit' => '788400000s',
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => '788400000s',
 						'hk_history_global' => 1,
@@ -663,9 +616,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '13140000m',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '13140000m',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '13140000m',
@@ -684,8 +634,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => '13140000m',
 						'hk_services_mode' => 1,
 						'hk_services' => '13140000m',
-						'hk_audit_mode' => 1,
-						'hk_audit' => '13140000m',
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => '13140000m',
 						'hk_history_global' => 1,
@@ -709,9 +657,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '219000h',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '219000h',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '219000h',
@@ -730,8 +675,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => '219000h',
 						'hk_services_mode' => 1,
 						'hk_services' => '219000h',
-						'hk_audit_mode' => 1,
-						'hk_audit' => '219000h',
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => '219000h',
 						'hk_history_global' => 1,
@@ -755,9 +698,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '9125d',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '9125d',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '9125d',
@@ -776,8 +716,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => '9125d',
 						'hk_services_mode' => 1,
 						'hk_services' => '9125d',
-						'hk_audit_mode' => 1,
-						'hk_audit' => '9125d',
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => '9125d',
 						'hk_history_global' => 1,
@@ -801,9 +739,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '1303w',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '1303w',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '1303w',
@@ -822,8 +757,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'hk_events_autoreg' => '1303w',
 						'hk_services_mode' => 1,
 						'hk_services' => '1303w',
-						'hk_audit_mode' => 1,
-						'hk_audit' => '1303w',
 						'hk_sessions_mode' => 1,
 						'hk_sessions' => '1303w',
 						'hk_history_global' => 1,
@@ -847,16 +780,12 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '0',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '0',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -879,16 +808,12 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '0s',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '0s',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0s'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -911,16 +836,12 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '0m',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '0m',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0m'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -943,16 +864,12 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '0h',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '0h',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0h'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -975,16 +892,12 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '0d',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '0d',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0d'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1007,16 +920,12 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '0w',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '0w',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0w'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1039,9 +948,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '0M',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '0M',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0M',
@@ -1056,7 +962,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": a time unit is expected.',
 						'Incorrect value for field "hk_history": a time unit is expected.',
 						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_audit": a time unit is expected.',
 						'Incorrect value for field "hk_services": a time unit is expected.',
 						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
 						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
@@ -1079,9 +984,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '0y',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '0y',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0y',
@@ -1096,7 +998,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": a time unit is expected.',
 						'Incorrect value for field "hk_history": a time unit is expected.',
 						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_audit": a time unit is expected.',
 						'Incorrect value for field "hk_services": a time unit is expected.',
 						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
 						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
@@ -1119,9 +1020,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '86399s',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '86399s',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '86399s',
@@ -1136,7 +1034,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1159,9 +1056,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '86399',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '86399',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '86399',
@@ -1176,7 +1070,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1199,9 +1092,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '1439m',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '1439m',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '1439m',
@@ -1216,7 +1106,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1239,9 +1128,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '23h',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '23h',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '23h',
@@ -1252,7 +1138,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 					'details' => [
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1275,9 +1160,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '99999999999999999999999999999999',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '99999999999999999999999999999999',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '99999999999999999999999999999999',
@@ -1292,7 +1174,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1315,9 +1196,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '788400001s',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '788400001s',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '788400001s',
@@ -1332,7 +1210,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1355,9 +1232,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '788400001',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '788400001',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '788400001',
@@ -1372,7 +1246,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1395,9 +1268,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '13140001m',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '13140001m',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '13140001m',
@@ -1412,7 +1282,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1435,9 +1304,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '219001h',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '219001h',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '219001h',
@@ -1452,7 +1318,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1475,9 +1340,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '9126d',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '9126d',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '9126d',
@@ -1492,7 +1354,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1515,9 +1376,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '1304w',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '1304w',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '1304w',
@@ -1532,7 +1390,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
 						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
 						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
@@ -1555,9 +1412,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '301M',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '301M',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '301M',
@@ -1572,7 +1426,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": a time unit is expected.',
 						'Incorrect value for field "hk_history": a time unit is expected.',
 						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_audit": a time unit is expected.',
 						'Incorrect value for field "hk_services": a time unit is expected.',
 						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
 						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
@@ -1595,9 +1448,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '26y',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '26y',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '26y',
@@ -1612,7 +1462,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": a time unit is expected.',
 						'Incorrect value for field "hk_history": a time unit is expected.',
 						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_audit": a time unit is expected.',
 						'Incorrect value for field "hk_services": a time unit is expected.',
 						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
 						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
@@ -1635,9 +1484,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => 'text',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => 'text',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => 'text',
@@ -1652,7 +1498,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": a time unit is expected.',
 						'Incorrect value for field "hk_history": a time unit is expected.',
 						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_audit": a time unit is expected.',
 						'Incorrect value for field "hk_services": a time unit is expected.',
 						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
 						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
@@ -1675,9 +1520,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '!@#$%^&*()_+',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '!@#$%^&*()_+',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '!@#$%^&*()_+',
@@ -1692,7 +1534,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": a time unit is expected.',
 						'Incorrect value for field "hk_history": a time unit is expected.',
 						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_audit": a time unit is expected.',
 						'Incorrect value for field "hk_services": a time unit is expected.',
 						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
 						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
@@ -1715,9 +1556,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '',
@@ -1732,7 +1570,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": a time unit is expected.',
 						'Incorrect value for field "hk_history": a time unit is expected.',
 						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_audit": a time unit is expected.',
 						'Incorrect value for field "hk_services": a time unit is expected.',
 						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
 						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
@@ -1755,9 +1592,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						// Services.
 						'id:hk_services_mode' => true,
 						'id:hk_services' => '-1',
-						// Audit.
-						'id:hk_audit_mode' => true,
-						'id:hk_audit' => '-1',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '-1',
@@ -1772,7 +1606,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'Incorrect value for field "hk_trends": a time unit is expected.',
 						'Incorrect value for field "hk_history": a time unit is expected.',
 						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_audit": a time unit is expected.',
 						'Incorrect value for field "hk_services": a time unit is expected.',
 						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
 						'Incorrect value for field "hk_events_discovery": a time unit is expected.',

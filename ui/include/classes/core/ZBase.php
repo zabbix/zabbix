@@ -150,7 +150,6 @@ class ZBase {
 		require_once 'include/maintenances.inc.php';
 		require_once 'include/maps.inc.php';
 		require_once 'include/media.inc.php';
-		require_once 'include/services.inc.php';
 		require_once 'include/sounds.inc.php';
 		require_once 'include/triggers.inc.php';
 	}
@@ -217,7 +216,7 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
-				$this->initLocales('en_gb');
+				$this->initLocales('en_us');
 				break;
 
 			case self::EXEC_MODE_SETUP:
@@ -328,7 +327,6 @@ class ZBase {
 			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/include/classes/helpers/trigger',
 			$this->rootDir.'/include/classes/macros',
-			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/include/classes/html/pageheader',
 			$this->rootDir.'/include/classes/html/svg',
@@ -425,9 +423,7 @@ class ZBase {
 	public function initLocales(string $lang): void {
 		init_mbstrings();
 
-		$default_locales = [
-			'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
-		];
+		$default_locales = ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252'];
 
 		if (function_exists('bindtextdomain')) {
 			// initializing gettext translations depending on language selected by user
@@ -447,7 +443,7 @@ class ZBase {
 				}
 			}
 
-			if (!$locale_found && $lang !== 'en_GB' && $lang !== 'en_gb') {
+			if (!$locale_found && strtolower($lang) !== strtolower(ZBX_DEFAULT_LANG)) {
 				setlocale(LC_ALL, $default_locales);
 				error('Locale for language "'.$lang.'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}

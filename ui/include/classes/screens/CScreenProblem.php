@@ -1014,15 +1014,16 @@ class CScreenProblem extends CScreenBase {
 					$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
 				}
 
-				$cell_info = ($this->data['filter']['compact_view'] && $this->data['filter']['show_suppressed']
-						&& count($info_icons) > 1)
-					? (new CSpan(
-							(new CButton(null))
-								->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-								->addStyle('margin-left: -3px;')
-								->setHint((new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER))
-							))->addClass(ZBX_STYLE_REL_CONTAINER)
-					: makeInformationList($info_icons);
+				if ($this->data['filter']['compact_view'] && $this->data['filter']['show_suppressed']
+						&& count($info_icons) > 1) {
+					$cell_info = (new CButton(null))
+						->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+						->addStyle('margin-left: -3px;')
+						->setHint(makeInformationList($info_icons));
+				}
+				else {
+					$cell_info = makeInformationList($info_icons);
+				}
 
 				$description = array_key_exists($trigger['triggerid'], $dependencies)
 					? makeTriggerDependencies($dependencies[$trigger['triggerid']])

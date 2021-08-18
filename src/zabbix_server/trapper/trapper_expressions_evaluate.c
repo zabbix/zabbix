@@ -33,6 +33,8 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 	int			ret = FAIL;
 	struct zbx_json_parse	jp_data, jp_expressions;
 
+	zbx_user_init(&user);
+
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
@@ -58,6 +60,7 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 
 	ret = SUCCEED;
 out:
+	zbx_user_free(&user);
 	return ret;
 }
 

@@ -342,7 +342,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		foreach ($users as &$user) {
+		foreach ($users as $i => &$user) {
 			if (array_key_exists('alias', $user)) {
 				unset($user['alias']);
 			}
@@ -357,6 +357,10 @@ class CUser extends CApiService {
 			}
 
 			$user = $this->checkLoginOptions($user);
+
+			if (array_key_exists('passwd', $user)) {
+				$this->checkPassword($user, '/'.($i + 1).'/passwd');
+			}
 
 			/*
 			 * If user is created without a password (e.g. for GROUP_GUI_ACCESS_LDAP), store an empty string
@@ -522,7 +526,7 @@ class CUser extends CApiService {
 		$usernames = [];
 		$check_roleids = [];
 
-		foreach ($users as &$user) {
+		foreach ($users as $i => &$user) {
 			if (array_key_exists('alias', $user)) {
 				unset($user['alias']);
 			}
@@ -555,6 +559,9 @@ class CUser extends CApiService {
 			$user = $this->checkLoginOptions($user);
 
 			if (array_key_exists('passwd', $user)) {
+				$user_data = $user + array_intersect_key($db_user, array_flip(['username', 'name', 'surname']));
+				$this->checkPassword($user_data, '/'.($i + 1).'/passwd');
+
 				if ($db_user['username'] == ZBX_GUEST_USER) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set password for user "guest".'));
 				}
@@ -1380,7 +1387,7 @@ class CUser extends CApiService {
 		]);
 
 		if (!$db_sessions) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot log out.'));
 		}
 
 		DB::delete('sessions', [
@@ -1392,7 +1399,7 @@ class CUser extends CApiService {
 			'where' => ['sessionid' => $sessionid]
 		]);
 
-		$this->addAuditDetails(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER);
+		// $this->addAuditDetails(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER);
 
 		self::$userData = null;
 
@@ -1484,9 +1491,9 @@ class CUser extends CApiService {
 				'where' => ['userid' => $db_user['userid']]
 			]);
 
-			$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
-				$db_user['userip']
-			);
+			// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
+			// 	$db_user['userip']
+			// );
 
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
 					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
@@ -1503,7 +1510,7 @@ class CUser extends CApiService {
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
-		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+		// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
 
 		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
 	}
@@ -1558,7 +1565,7 @@ class CUser extends CApiService {
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
-		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+		// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
 
 		return $db_user;
 	}
@@ -1918,5 +1925,36 @@ class CUser extends CApiService {
 		}
 
 		return $db_user;
+	}
+
+	/**
+	 * Function to validate if password meets password policy requirements.
+	 *
+	 * @param array  $user
+	 * @param string $user['username']  (optional)
+	 * @param string $user['name']      (optional)
+	 * @param string $user['surname']   (optional)
+	 * @param string $user['passwd']
+	 * @param string $path              Password field path to display error message.
+	 *
+	 * @throws APIException if the input is invalid.
+	 *
+	 * @return bool
+	 */
+	private function checkPassword(array $user, string $path): bool {
+		$context_data = array_filter(array_intersect_key($user, array_flip(['username', 'name', 'surname'])));
+		$passwd_validator = new CPasswordComplexityValidator([
+			'passwd_min_length' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_MIN_LENGTH),
+			'passwd_check_rules' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_CHECK_RULES)
+		]);
+		$passwd_validator->setContextData($context_data);
+
+		if ($passwd_validator->validate($user['passwd']) === false) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', $path, $passwd_validator->getError())
+			);
+		}
+
+		return true;
 	}
 }

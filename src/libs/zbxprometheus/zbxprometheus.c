@@ -39,6 +39,8 @@ typedef enum
 	ZBX_PROMETHEUS_CONDITION_OP_EQUAL,
 	ZBX_PROMETHEUS_CONDITION_OP_REGEX,
 	ZBX_PROMETHEUS_CONDITION_OP_EQUAL_VALUE,
+	ZBX_PROMETHEUS_CONDITION_OP_NOT_EQUAL,
+	ZBX_PROMETHEUS_CONDITION_OP_REGEX_NOT_MATCHED
 }
 zbx_prometheus_condition_op_t;
 
@@ -266,17 +268,20 @@ static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *tex
  ******************************************************************************/
 static zbx_prometheus_condition_op_t	str_loc_op(const char *data, const zbx_strloc_t *loc)
 {
-	/* the operation has been already validated during parsing, */
-	/*so there are only three possibilities:                    */
-	/*   '=' - the only sinle character operation               */
-	/*   '==' - ends with '='                                   */
-	/*   '=~' - ends with '~'                                   */
-
-	if (loc->l == loc->r)
-		return ZBX_PROMETHEUS_CONDITION_OP_EQUAL;
-
-	if ('~' == data[loc->r])
-		return ZBX_PROMETHEUS_CONDITION_OP_REGEX;
+	if ('=' == data[loc->l])
+	{
+		if ('~' == data[loc->r])
+			return ZBX_PROMETHEUS_CONDITION_OP_REGEX;
+		else
+			return ZBX_PROMETHEUS_CONDITION_OP_EQUAL;
+	}
+	else if ('!' == data[loc->l])
+	{
+		if ('~' == data[loc->r])
+			return ZBX_PROMETHEUS_CONDITION_OP_REGEX_NOT_MATCHED;
+		else
+			return ZBX_PROMETHEUS_CONDITION_OP_NOT_EQUAL;
+	}
 
 	return ZBX_PROMETHEUS_CONDITION_OP_EQUAL_VALUE;
 }
@@ -405,17 +410,26 @@ static int	parse_label(const char *data, size_t pos, zbx_strloc_t *loc)
  ******************************************************************************/
 static int	parse_label_op(const char *data, size_t pos, zbx_strloc_t *loc)
 {
-	const char	*ptr = data + pos;
+	if ('=' == data[pos])
+	{
+		loc->l = pos;
 
-	if ('=' != *ptr)
-		return FAIL;
+		if ('~' == data[pos + 1])
+			loc->r = pos + 1; /* =~ */
+		else
+			loc->r = pos; /* = */
 
-	loc->l = loc->r = pos;
+		return SUCCEED;
+	}
+	else if ('!' == data[pos] && ('=' == data[pos + 1] || '~' == data[pos + 1]))
+	{
+		/* != or !~ */
+		loc->l = pos;
+		loc->r = pos + 1;
+		return SUCCEED;
+	}
 
-	if ('~' == ptr[1])
-		loc->r++;
-
-	return SUCCEED;
+	return FAIL;
 }
 
 /******************************************************************************
@@ -886,6 +900,14 @@ static int	condition_match_key_value(const zbx_prometheus_condition_t *condition
 			if (NULL == zbx_regexp_match(value, condition->pattern, NULL))
 				return FAIL;
 			break;
+		case ZBX_PROMETHEUS_CONDITION_OP_NOT_EQUAL:
+			if (0 == strcmp(value, condition->pattern))
+				return FAIL;
+			break;
+		case ZBX_PROMETHEUS_CONDITION_OP_REGEX_NOT_MATCHED:
+			if (NULL != zbx_regexp_match(value, condition->pattern, NULL))
+				return FAIL;
+			break;
 		default:
 			return FAIL;
 	}
@@ -1078,6 +1100,14 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 		}
 
 		pos = skip_spaces(data, loc.r + 1);
+	}
+	else /* no labels in row */
+	{
+		if (0 < filter->labels.values_num) /* got labels in filter */
+		{
+			match = FAIL;
+			goto out;
+		}
 	}
 
 	/* check if there was a whitespace before metric value */

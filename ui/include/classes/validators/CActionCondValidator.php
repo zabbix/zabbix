@@ -61,6 +61,7 @@ class CActionCondValidator extends CValidator {
 			case CONDITION_TYPE_HOST:
 			case CONDITION_TYPE_DRULE:
 			case CONDITION_TYPE_PROXY:
+			case CONDITION_TYPE_SERVICE:
 				if (zbx_empty($condition['value']) || $condition['value'] === '0') {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
@@ -170,6 +171,7 @@ class CActionCondValidator extends CValidator {
 			case CONDITION_TYPE_HOST_NAME:
 			case CONDITION_TYPE_HOST_METADATA:
 			case CONDITION_TYPE_EVENT_TAG:
+			case CONDITION_TYPE_SERVICE_NAME:
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}

@@ -159,7 +159,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_header']);
-		$error = $this->zbxTestGetText('//ul[@class=\'msg-details-border\']');
+		$error = $this->zbxTestGetText('//ul[@class=\'list-dashed msg-details-border\']');
 		$this->assertContains($data['error_message'], $error);
 
 		if 	(array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
@@ -662,7 +662,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation');
-		$error = $this->zbxTestGetText('//ul[@class=\'msg-details-border\']');
+		$error = $this->zbxTestGetText('//ul[@class=\'list-dashed msg-details-border\']');
 		$this->assertContains($data['error_message'], $error);
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);

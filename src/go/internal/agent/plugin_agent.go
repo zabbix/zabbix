@@ -22,7 +22,10 @@ package agent
 import (
 	"errors"
 	"fmt"
+	"time"
+	"unicode/utf8"
 
+	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/version"
 )
@@ -36,6 +39,10 @@ var impl Plugin
 var hostnames = map[uint64]string{}
 var FirstHostname string
 
+type PerformTask func(key string, timeout time.Duration, clientID uint64) (result string, err error)
+
+var performTask PerformTask
+
 func SetHostname(clientID uint64, hostname string) {
 	hostnames[clientID] = hostname
 }
@@ -44,10 +51,45 @@ func getHostname(clientID uint64) string {
 	return hostnames[clientID]
 }
 
+func SetPerformTask(f PerformTask) {
+	performTask = f
+}
+
+func processConfigItem(timeout time.Duration, name, value, item string, length int, clientID uint64) (string, error) {
+	if len(item) == 0 {
+		return value, nil
+	}
+
+	if len(value) > 0 {
+		log.Warningf("both \"%s\" and \"%sItem\" configuration parameter defined, using \"%s\".", name, name, name)
+
+		return value, nil
+	}
+
+	var err error
+	value, err = performTask(item, timeout, clientID)
+	if err != nil {
+		return "", err
+	}
+
+	if !utf8.ValidString(value) {
+		return "", fmt.Errorf("value is not an UTF-8 string.")
+	}
+
+	if len(value) > length {
+		log.Warningf("the returned value of \"%s\" item specified by \"%sItem\" configuration parameter"+
+			" is too long, using first %d characters.", item, name, length)
+
+		return CutAfterN(value, length), nil
+	}
+
+	return value, nil
+}
+
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+		return nil, errors.New("Too many parameters.")
 	}
 
 	switch key {
@@ -55,7 +97,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if ctx.ClientID() > MaxBuiltinClientID {
 			return getHostname(ctx.ClientID()), nil
 		}
+
 		return FirstHostname, nil
+	case "agent.hostmetadata":
+		if Options.HostMetadataItem == "agent.hostmetadata" {
+			return nil, errors.New("Invalid recursive HostMetadataItem value.")
+		}
+
+		return processConfigItem(time.Duration(Options.Timeout)*time.Second, "HostMetadata",
+			Options.HostMetadata, Options.HostMetadataItem, 255, LocalChecksClientID)
 	case "agent.ping":
 		return 1, nil
 	case "agent.version":
@@ -68,6 +118,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func init() {
 	plugin.RegisterMetrics(&impl, "Agent",
 		"agent.hostname", "Returns Hostname from agent configuration.",
+		"agent.hostmetadata", "Returns string with agent host metadata.",
 		"agent.ping", "Returns agent availability check result.",
 		"agent.version", "Version of Zabbix agent.")
 }
