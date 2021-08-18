@@ -30,6 +30,8 @@ class CSeverityHelper {
 	 */
 	public static function getName(int $severity): string {
 		switch ($severity) {
+			case ZBX_SEVERITY_OK:
+				return _('OK');
 			case TRIGGER_SEVERITY_NOT_CLASSIFIED:
 				return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0));
 			case TRIGGER_SEVERITY_INFORMATION:
@@ -61,6 +63,8 @@ class CSeverityHelper {
 		}
 
 		switch ($severity) {
+			case ZBX_SEVERITY_OK:
+				return ZBX_STYLE_NORMAL_BG;
 			case TRIGGER_SEVERITY_DISASTER:
 				return ZBX_STYLE_DISASTER_BG;
 			case TRIGGER_SEVERITY_HIGH:

@@ -72,14 +72,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 			$parents[] = ', ';
 		}
 
-		if (in_array($data['service']['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])) {
-			$service_status = _('OK');
-			$service_status_style_class = null;
-		}
-		else {
-			$service_status = CSeverityHelper::getName((int) $data['service']['status']);
-			$service_status_style_class = 'service-status-'.CSeverityHelper::getStyle((int) $data['service']['status']);
-		}
+		$service_status = CSeverityHelper::getName((int) $data['service']['status']);
+		$service_status_style_class = 'service-status-'.CSeverityHelper::getStyle((int) $data['service']['status']);
 
 		$filter
 			->addTab(
