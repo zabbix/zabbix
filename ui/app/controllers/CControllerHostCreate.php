@@ -25,9 +25,7 @@
 class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 	protected function checkInput(): bool {
-		$fields = ['host' => 'required|db hosts.host|not_empty'] + self::getValidationFields();
-
-		return parent::checkInputFields($fields);
+		return parent::checkInputFields(self::getValidationFields());
 	}
 
 	protected function checkPermissions(): bool {

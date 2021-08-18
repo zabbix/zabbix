@@ -26,6 +26,7 @@ abstract class CControllerHostUpdateGeneral extends CController {
 
 	protected static function getValidationFields() {
 		return [
+			'host'				=> 'required|db hosts.host|not_empty',
 			'visiblename'		=> 'db hosts.name',
 			'description'		=> 'db hosts.description',
 			'status'			=> 'required|db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
