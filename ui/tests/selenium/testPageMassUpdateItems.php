@@ -34,8 +34,6 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 	 * Add items for mass updating.
 	 */
 	public function prepareItemData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => self::HOSTID,
@@ -278,8 +276,6 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 	 * Add items with preprocessing for mass updating.
 	 */
 	public function prepareItemTagsPreprocessingData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => self::HOSTID,

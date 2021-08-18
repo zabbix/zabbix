@@ -203,8 +203,6 @@ class testFormPreprocessingClone extends CWebTest {
 	 * Add preprocessing steps to LLD.
 	 */
 	public function prepareLLDPreprocessing() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('discoveryrule.update', [
 			'itemid' => $this->lldid,
 			'preprocessing' => $this->getLLDPreprocessing()
@@ -215,8 +213,6 @@ class testFormPreprocessingClone extends CWebTest {
 	 * Add preprocessing steps to item.
 	 */
 	public function prepareItemPreprocessing() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('item.update', [
 			'itemid' => $this->itemid,
 			'preprocessing' => $this->getItemPreprocessing()
@@ -227,8 +223,6 @@ class testFormPreprocessingClone extends CWebTest {
 	 * Add preprocessing steps to item prototype.
 	 */
 	public function prepareItemPrototypePreprocessing() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('itemprototype.update', [
 			'itemid' => $this->item_prototypeid,
 			'preprocessing' => $this->getItemPreprocessing()
