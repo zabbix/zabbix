@@ -156,6 +156,23 @@ class CControllerHostEdit extends CController {
 	}
 
 	protected function doAction(): void {
+		if ($this->host['hostid'] !== null) {
+			$interface_items = API::HostInterface()->get([
+				'output' => ['interfaceid'],
+				'selectItems' => API_OUTPUT_COUNT,
+				'hostids' => [$this->host['hostid']],
+				'preservekeys' => true,
+			]);
+
+			foreach($this->host['interfaces'] as &$interface) {
+				if (!array_key_exists($interface['interfaceid'], $interface_items)) {
+					continue;
+				}
+
+				$interface['items'] = $interface_items[$interface['interfaceid']]['items'];
+			}
+		}
+
 		$this->host = (array) $this->host + $this->getInputValues() + $this->getHostDefaultValues();
 
 		$data = [
