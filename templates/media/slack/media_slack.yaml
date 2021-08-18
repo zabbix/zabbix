@@ -227,7 +227,7 @@ zabbix_export:
         
                 resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {
+                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
                     throw resp.error;
                 }
         
