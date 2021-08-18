@@ -107,7 +107,7 @@ void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid
 
 #define PREPARE_AUDIT_TEMPLATE_OP_H(funcname, op1)								\
 void	zbx_audit_##funcname##_update_json_##op1##_parent_template(zbx_uint64_t hostid,				\
-		zbx_uint64_t templateid);
+		zbx_uint64_t hosttemplateid, zbx_uint64_t templateid);
 
 PREPARE_AUDIT_TEMPLATE_OP_H(host, attach)
 PREPARE_AUDIT_TEMPLATE_OP_H(host, detach)
