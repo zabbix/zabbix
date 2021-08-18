@@ -992,7 +992,7 @@ class CUser extends CApiService {
 	 * @param array  $users
 	 * @param string $method
 	 */
-	private function updateUsersGroups(array $users, $method) {
+	private function updateUsersGroups(array &$users, $method) {
 		$users_groups = [];
 
 		foreach ($users as $user) {
@@ -1038,12 +1038,37 @@ class CUser extends CApiService {
 		}
 
 		if ($ins_users_groups) {
-			DB::insertBatch('users_groups', $ins_users_groups);
+			$ids = DB::insertBatch('users_groups', $ins_users_groups);
 		}
 
 		if ($del_ids) {
 			DB::delete('users_groups', ['id' => $del_ids]);
 		}
+
+		// Format array for auditlog.
+		foreach ($users as &$user) {
+			$groups = [];
+			foreach ($user['usrgrps'] as $usrgrp) {
+				// Check id in db_users_groups.
+				foreach ($db_users_groups as $db_user_group) {
+					if ($db_user_group['usrgrpid'] == $usrgrp['usrgrpid']) {
+						$groups[$db_user_group['id']] = ['usrgrpid' => $usrgrp['usrgrpid']];
+						continue 2;
+					}
+				}
+
+				// Check id in new inserted objects.
+				foreach ($ins_users_groups as $key => $user_group) {
+					if ($user_group['usrgrpid'] == $usrgrp['usrgrpid']) {
+						$groups[$ids[$key]] = ['usrgrpid' => $usrgrp['usrgrpid']];
+						continue 2;
+					}
+				}
+			}
+
+			$user['usrgrps'] = $groups;
+		}
+		unset($user);
 	}
 
 	/**
@@ -1071,7 +1096,7 @@ class CUser extends CApiService {
 	 * @param array  $users
 	 * @param string $method
 	 */
-	private function updateMedias(array $users, $method) {
+	private function updateMedias(array &$users, $method) {
 		$users_medias = [];
 
 		foreach ($users as $user) {
@@ -1141,7 +1166,7 @@ class CUser extends CApiService {
 		}
 
 		if ($ins_medias) {
-			DB::insert('media', $ins_medias);
+			$ids = DB::insert('media', $ins_medias);
 		}
 
 		if ($upd_medias) {
@@ -1151,6 +1176,31 @@ class CUser extends CApiService {
 		if ($del_mediaids) {
 			DB::delete('media', ['mediaid' => $del_mediaids]);
 		}
+
+		// Format array for auditlog.
+		foreach ($users as &$user) {
+			$medias = [];
+			foreach ($user['medias'] as $media) {
+				foreach ($db_medias as $db_media) {
+					$index = $this->getSimilarMedia($users_medias[$user['userid']], $db_media['mediatypeid'], $db_media['sendto']);
+					if ($index != -1) {
+						$medias[$db_media['mediaid']] = $media;
+						continue 2;
+					}
+				}
+
+				foreach ($ins_medias as $key => $user_media) {
+					$index = $this->getSimilarMedia($users_medias[$user['userid']], $user_media['mediatypeid'], $user_media['sendto']);
+					if ($index != -1) {
+						$medias[$ids[$key]] = $media;
+						continue 2;
+					}
+				}
+			}
+
+			$user['medias'] = $medias;
+		}
+		unset($user);
 	}
 
 	/**
