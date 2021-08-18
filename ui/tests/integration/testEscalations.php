@@ -23,20 +23,17 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 /**
  * Test suite for action notifications
  *
- * @required-components server, agent
+ * @required-components server
+ * @configurationDataProvider serverConfigurationProvider
  * @backup items,actions,triggers,alerts
  * @hosts test_actions
  */
 class testEscalations extends CIntegrationTest {
 
 	private static $hostid;
-	private static $trapper_itemid;
-	private static $vfs_itemid;
-	private static $maintenanceid;
 	private static $triggerid;
 	private static $maint_start_tm;
 	private static $trigger_actionid;
-	private static $internal_actionid;
 
 	const TRAPPER_ITEM_NAME = 'trap';
 	const HOST_NAME = 'test_actions';
@@ -80,7 +77,6 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('interfaces', $response['result'][0]);
 		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
-		$interfaceid = $response['result'][0]['interfaces'][0]['interfaceid'];
 
 		// Create trapper item
 		$response = $this->call('item.create', [
@@ -92,32 +88,15 @@ class testEscalations extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
-		self::$trapper_itemid = $response['result']['itemids'][0];
 
 		// Create trigger
 		$response = $this->call('trigger.create', [
 			'description' => 'Trapper received 1',
-			'expression' => '{'.self::HOST_NAME.':'.self::TRAPPER_ITEM_NAME.'.last()}=1'
+			'expression' => '{'.self::HOST_NAME.':'.self::TRAPPER_ITEM_NAME.'.last()}>0'
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertEquals(1, count($response['result']['triggerids']));
 		self::$triggerid = $response['result']['triggerids'][0];
-
-		// Create item for testing alerting on internal event
-		$this->assertTrue(@file_put_contents(self::ITEM_UNSUPP_FILENAME, 'text') !== false);
-		$response = $this->call('item.create', [
-			'name' => 'File contents of'.self::ITEM_UNSUPP_FILENAME,
-			'key_' => 'vfs.file.contents['.self::ITEM_UNSUPP_FILENAME.']',
-			'type' => ITEM_TYPE_ZABBIX,
-			'hostid' => self::$hostid,
-			'interfaceid' => $interfaceid,
-			'value_type' => ITEM_VALUE_TYPE_TEXT,
-			'delay' => '4s',
-			'status' => ITEM_STATUS_ACTIVE
-		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-		self::$vfs_itemid = $response['result']['itemids'][0];
 
 		// Create trigger action
 		$response = $this->call('action.create', [
@@ -169,69 +148,28 @@ class testEscalations extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['actionids']));
 		self::$trigger_actionid = $response['result']['actionids'][0];
 
-		// Create internal action
-		$response = $this->call('action.create', [
-			'esc_period' => '1m',
-			'eventsource' => 3,
-			'status' => 0,
-			'filter' => [
-				'conditions' => [
-					[
-						'conditiontype' => CONDITION_TYPE_HOST,
-						'formulaid' => 'B',
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => self::$hostid
-					],
-					[
-						'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
-						'formulaid' => 'A',
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => '0'
-					]
-				],
-				'evaltype' => CONDITION_EVAL_TYPE_AND
-			],
-			'name' => 'Not supported item on '.self::HOST_NAME,
-			'operations' => [
-						[
-						'esc_period' => 0,
-						'esc_step_from' => 1,
-						'esc_step_to' => 1,
-						'evaltype' => 0,
-						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => [
-							'default_msg' => 1,
-							'mediatypeid' => 0
-						],
-						'opmessage_grp' => [
-							['usrgrpid' => 7]
-						]
-			]],
-			'recovery_operations' => [
-				[
-					'evaltype' => 0,
-					'operationtype' => OPERATION_TYPE_MESSAGE,
-					'opmessage' => [
-						'default_msg' => 1,
-						'mediatypeid' => 0
-					],
-					'opmessage_grp' => [
-						['usrgrpid' => 7]
-					]
-				]
-			]
-		]);
-		$this->assertArrayHasKey('actionids', $response['result']);
-		$this->assertEquals(1, count($response['result']['actionids']));
-		self::$internal_actionid = $response['result']['actionids'];
-
 		return true;
+	}
+
+	/**
+	 * Component configuration provider for agent related tests.
+	 *
+	 * @return array
+	 */
+	public function serverConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 4,
+				'LogFileSize' => 20
+			]
+		];
 	}
 
 	/**
 	 * @backup actions,alerts,history_uint,history,problem,events
 	 */
 	public function testEscalations_disabledAction() {
+		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
 			'status' => 1
@@ -241,21 +179,23 @@ class testEscalations extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['actionids']));
 
 		$this->reloadConfigurationCache();
-		sleep(1);
+
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(2);
 
 		// Check if there are no alerts for this action
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
 		]);
 		$this->assertEmpty($response['result']);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 	}
 
 	/**
 	 * @backup alerts,triggers,history_uint,history,problem,events
 	 */
 	public function testEscalations_disabledTrigger() {
+		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('trigger.update', [
 			'triggerid' => self::$triggerid,
 			'status' => 1
@@ -265,15 +205,16 @@ class testEscalations extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['triggerids']));
 
 		$this->reloadConfigurationCache();
-		sleep(1);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(2);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 2);
 
 		// Check if there are no alerts for this action
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
 		]);
 		$this->assertEmpty($response['result']);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 	}
 
 	/**
@@ -286,8 +227,8 @@ class testEscalations extends CIntegrationTest {
 	 * @backup alerts,history,history_uint,maintenances,events,problem
 	 */
 	public function testEscalations_checkScenario1() {
+		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 		// Create maintenance period
 		self::$maint_start_tm = time();
 		$maint_end_tm = self::$maint_start_tm + 60 * 2;
@@ -317,9 +258,9 @@ class testEscalations extends CIntegrationTest {
 		$maintenance_id = $response['result']['maintenanceids'][0];
 
 		$this->reloadConfigurationCache();
-		sleep(60);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_update_maintenances()', true);
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 3);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -328,7 +269,8 @@ class testEscalations extends CIntegrationTest {
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
-		sleep(2);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -346,7 +288,7 @@ class testEscalations extends CIntegrationTest {
 	 * @backup actions,alerts,history_uint,maintenances
 	 */
 	public function testEscalations_checkScenario2() {
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
 			'pause_suppressed' => 1
@@ -381,8 +323,9 @@ class testEscalations extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(2);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 4);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -390,10 +333,12 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
-		sleep(60);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_dc_update_maintenances() started:1 stopped:0 running:1', true);
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
-		sleep(2);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -412,6 +357,7 @@ class testEscalations extends CIntegrationTest {
 	 * @backup actions,alerts,history_uint,maintenances
 	 */
 	public function testEscalations_checkScenario3() {
+		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
 			'pause_suppressed' => 1
@@ -445,10 +391,10 @@ class testEscalations extends CIntegrationTest {
 		$maintenance_id = $response['result']['maintenanceids'][0];
 
 		$this->reloadConfigurationCache();
-		sleep(60);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_dc_update_maintenances() started:1 stopped:0 running:1', true);
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(2);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 5);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -461,11 +407,10 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey('maintenanceids', $response['result']);
 		$this->assertEquals($maintenance_id, $response['result']['maintenanceids'][0]);
 		$this->reloadConfigurationCache();
-
-		sleep(60);
-
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
-		sleep(2);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In zbx_dc_update_maintenances()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_update_maintenances()', true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -473,7 +418,9 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
-		sleep(2);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -488,6 +435,7 @@ class testEscalations extends CIntegrationTest {
 	 * @backup actions,alerts,events,problem,history_uint,hosts,users
 	 */
 	public function testEscalations_checkScenario4() {
+		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
 			'operations' => [
@@ -536,7 +484,9 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey('userids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['userids']);
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 6);
 
 		$response = $this->call('trigger.update', [
 			'triggerid' => self::$triggerid,
@@ -547,7 +497,7 @@ class testEscalations extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		sleep(60);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_cancel()', true, 120);
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -556,6 +506,16 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey(1, $response['result']);
 		$this->assertEquals(0, strncmp($esc_msg, $response['result'][1]['message'], strlen($esc_msg)));
 
+		// trigger value is not update during configuration cache sync (only initialized)
+		// therefore need to restore it manually by sending OK value
+		$response = $this->call('trigger.update', [
+			'triggerid' => self::$triggerid,
+			'status' => 0
+		]);
+
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 	}
 
 	/**
@@ -564,8 +524,8 @@ class testEscalations extends CIntegrationTest {
 	 * @backup alerts,actions
 	 */
 	public function testEscalations_checkScenario5() {
+		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
@@ -606,8 +566,12 @@ class testEscalations extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(61);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 7);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
@@ -617,16 +581,18 @@ class testEscalations extends CIntegrationTest {
 		$this->assertCount(2, $response['result']);
 		$this->assertEquals(1, $response['result'][0]['esc_step']);
 		$this->assertEquals(2, $response['result'][1]['esc_step']);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 	}
 
 	/**
 	 * Test unfinished webhook
-	 *
+	 *testEscalations_checkUnfinishedAlerts
 	 * @backup actions, alerts, history_uint, media_type, users, media, events, problem
 	 */
 	public function testEscalations_checkUnfinishedAlerts() {
+		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 
 		// Create webhook mediatype
 		$script_code = <<<HEREDOC
@@ -722,19 +688,26 @@ HEREDOC;
 		$this->assertEquals(1, count($response['result']['actionids']));
 		$actionid = $response['result']['actionids'];
 
+		$response = $this->call('action.update', [
+			'actionid' => self::$trigger_actionid,
+			'status' => 1
+		]);
+
 		$this->reloadConfigurationCache();
-		sleep(1);
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 8);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		$response = $this->call('alert.get', [
 			'actionids' => $actionid
 		]);
 		$this->assertCount(1, $response['result']);
 
-		sleep(8);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
 
 		$response = $this->call('alert.get', [
 			'actionids' => $actionid
@@ -746,10 +719,11 @@ HEREDOC;
 	 * @backup actions, alerts, history_uint
 	 */
 	public function testEscalations_triggerDependency() {
+		$this->clearLog(self::COMPONENT_SERVER);
 		// Create trigger
 		$response = $this->call('trigger.create', [
 			'description' => 'Dependent trigger',
-			'expression' => '{'.self::HOST_NAME.':'.self::TRAPPER_ITEM_NAME.'.last()}=1',
+			'expression' => '{'.self::HOST_NAME.':'.self::TRAPPER_ITEM_NAME.'.last()}>0',
 			'dependencies' => [
 				['triggerid' => self::$triggerid]
 			]
@@ -776,13 +750,13 @@ HEREDOC;
 
 		$this->reloadConfigurationCache();
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 1);
-		sleep(1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 9);
 
-		// Check if there are 2 alerts for this action
 		$response = $this->call('alert.get', [
 			'actionids' => self::$trigger_actionid
 		]);
 		$this->assertEmpty($response['result']);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 	}
 }
