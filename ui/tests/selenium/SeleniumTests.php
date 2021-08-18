@@ -104,6 +104,7 @@ require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormHostLinkTemplates.php';
+require_once dirname(__FILE__).'/testFormHostMonitoring.php';
 require_once dirname(__FILE__).'/testFormHostPrototype.php';
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormItemHttpAgent.php';
@@ -275,6 +276,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormHostLinkTemplates');
+		$suite->addTestSuite('testFormHostMonitoring');
 		$suite->addTestSuite('testFormHostPrototype');
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemHttpAgent');
