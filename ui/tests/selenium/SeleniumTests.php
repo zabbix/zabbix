@@ -239,7 +239,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsAudit');
 		$suite->addTestSuite('testPageReportsNotifications');
 		$suite->addTestSuite('testPageReportsTriggerTop');
-		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageTemplates');
@@ -298,7 +297,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingItemPrototype');
 		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
 		$suite->addTestSuite('testFormPreprocessingTest');
-		$suite->addTestSuite('testFormScheduledReport');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
@@ -342,7 +340,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testTriggerDependencies');
 		$suite->addTestSuite('testTriggerExpressions');
 		$suite->addTestSuite('testSidebarMenu');
-		$suite->addTestSuite('testScheduledReportPermissions');
 		$suite->addTestSuite('testUrlParameters');
 		$suite->addTestSuite('testUrlUserPermissions');
 		$suite->addTestSuite('testZBX6648');
@@ -354,6 +351,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testFormScheduledReport');
+		$suite->addTestSuite('testPageScheduledReport');
+		$suite->addTestSuite('testScheduledReportPermissions');
 		$suite->addTestSuite('testSID');
 
 		return $suite;

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-08-05T09:20:57Z'
+  date: '2021-08-09T16:55:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -23,7 +23,7 @@ zabbix_export:
       items:
         -
           uuid: 42068372fbce4c12a4f3193fc490d4ec
-          name: 'Cert: Alternative names'
+          name: 'Cert: Subject alternative name'
           type: DEPENDENT
           key: cert.alternative_names
           delay: '0'
@@ -38,6 +38,19 @@ zabbix_export:
                 - $.x509.alternative_names
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
         -
           uuid: 946e205aaa84433a8bf1fe46b9362acd
           name: 'Cert: Issuer'
@@ -55,9 +68,22 @@ zabbix_export:
                 - $.x509.issuer
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
         -
           uuid: f124443debb447a792beb8265d2918ee
-          name: 'Cert: Last check message'
+          name: 'Cert: Last validation status'
           type: DEPENDENT
           key: cert.message
           delay: '0'
@@ -72,9 +98,22 @@ zabbix_export:
                 - $.result.message
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
         -
           uuid: e34bffac86ef41e2865fe8410c2d0aa0
-          name: 'Cert: Not after'
+          name: 'Cert: Expires on'
           type: DEPENDENT
           key: cert.not_after
           delay: '0'
@@ -88,11 +127,24 @@ zabbix_export:
                 - $.x509.not_after.timestamp
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
           triggers:
             -
               uuid: 8a0e3e73527a45618afe94707234f4c6
-              expression: '(last(/Website certificate by Zabbix agent 2/cert.not_after) - now()) / 86400 < {$CERT.NOTAFTER.MIN.WARN}'
-              name: 'Cert: SSL certificate expires soon (less than {$CERT.NOTAFTER.MIN.WARN} days)'
+              expression: '(last(/Website certificate by Zabbix agent 2/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}'
+              name: 'Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days)'
               priority: WARNING
               description: 'The SSL certificate should be updated or it will become untrusted.'
               dependencies:
@@ -101,7 +153,7 @@ zabbix_export:
                   expression: 'find(/Website certificate by Zabbix agent 2/cert.validation,,"like","invalid")=1'
         -
           uuid: c3ba835b28db4f1486ae4be87c3fe55f
-          name: 'Cert: Not before'
+          name: 'Cert: Valid from'
           type: DEPENDENT
           key: cert.not_before
           delay: '0'
@@ -115,6 +167,19 @@ zabbix_export:
                 - $.x509.not_before.timestamp
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
         -
           uuid: 08b47b376f0f4f999bd1110696465fd9
           name: 'Cert: Public key algorithm'
@@ -132,9 +197,22 @@ zabbix_export:
                 - $.x509.public_key_algorithm
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
         -
           uuid: d7d4e592cc6741fcba9c21b5195b8544
-          name: 'Cert: Serial'
+          name: 'Cert: Serial number'
           type: DEPENDENT
           key: cert.serial_number
           delay: '0'
@@ -149,6 +227,19 @@ zabbix_export:
                 - $.x509.serial_number
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
         -
           uuid: 848cd98e80764f61bbe526316c70da11
           name: 'Cert: Fingerprint'
@@ -166,6 +257,19 @@ zabbix_export:
                 - $.sha1_fingerprint
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
           triggers:
             -
               uuid: 7a4c69a5235e444cb7294e6b7189b2b6
@@ -193,6 +297,19 @@ zabbix_export:
                 - $.x509.signature_algorithm
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
         -
           uuid: b44c554d025446c6b1761a5fde250f9f
           name: 'Cert: Subject'
@@ -210,6 +327,19 @@ zabbix_export:
                 - $.x509.subject
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
         -
           uuid: 4fc3c39291ea4e3aa6ee04fcec4e1a8d
           name: 'Cert: Validation result'
@@ -227,6 +357,19 @@ zabbix_export:
                 - $.result.value
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
           triggers:
             -
               uuid: 854c791b765a4ae2982ce6436d6e78ca
@@ -251,6 +394,19 @@ zabbix_export:
                 - $.x509.version
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
+          tags:
+            -
+              tag: resource
+              value: general
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: gauge
         -
           uuid: ec072b3b1c6847b79acac9f18d14df8a
           name: 'Cert: Get'
@@ -265,9 +421,19 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          tags:
+            -
+              tag: data
+              value: raw
+            -
+              tag: target
+              value: cert
+            -
+              tag: transport
+              value: agent
       macros:
         -
-          macro: '{$CERT.NOTAFTER.MIN.WARN}'
+          macro: '{$CERT.EXPIRY.WARN}'
           value: '7'
           description: 'Number of days until the certificate expires.'
         -

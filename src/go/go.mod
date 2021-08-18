@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
+	github.com/cakturk/go-netstat v0.0.0-20200220111822-e5b49efee7a5
 	github.com/chromedp/cdproto v0.0.0-20210104223854-2cc87dae3ee3
 	github.com/chromedp/chromedp v0.6.0
 	github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143
@@ -17,7 +18,7 @@ require (
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/godror/godror v0.20.1
 	github.com/jackc/pgx/v4 v4.8.2-0.20200910143026-040df1ccef85
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible
+	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/mediocregopher/radix/v3 v3.5.0
 	github.com/memcachier/mc/v3 v3.0.1
 	github.com/natefinch/npipe v0.0.0-20160621034901-c1b8fa8bdcce
