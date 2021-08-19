@@ -344,8 +344,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->page->open('tr_events.php?triggerid=99251&eventid=93')->waitUntilReady();
 
 			foreach (['Event details', 'Event list [previous 20]'] as $table_name) {
-				$table = $this->query('xpath://h4[text()='.CXPathHelper::escapeQuotes($table_name).']/../..//table')
-						->asTable()->one();
+				$table = $this->query('xpath://h4[text()='.CXPathHelper::escapeQuotes($table_name).']/../..//table')->asTable()->one();
 				$this->assertEquals($action_status, $table->query('xpath:.//*[text()="No"]')
 						->one()->isAttributePresent('onclick'));
 			}
