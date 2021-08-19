@@ -24,8 +24,6 @@
  */
 class CItemPrototype extends CItemGeneral {
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_ITEM_PROTOTYPE;
-
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status', 'discover'];
@@ -618,7 +616,7 @@ class CItemPrototype extends CItemGeneral {
 
 		CItemPrototypeManager::delete($itemids);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_items);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM_PROTOTYPE, $db_items);
 
 		return ['prototypeids' => $itemids];
 	}

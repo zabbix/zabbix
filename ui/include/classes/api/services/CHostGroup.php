@@ -34,8 +34,6 @@ class CHostGroup extends CApiService {
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_HOST_GROUP;
-
 	protected $tableName = 'hstgrp';
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['groupid', 'name'];
@@ -550,7 +548,7 @@ class CHostGroup extends CApiService {
 		$this->inheritRights($groups);
 		$this->inheritTagFilters($groups);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $groups);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_GROUP, $groups);
 
 		return ['groupids' => $groupids];
 	}
@@ -578,7 +576,7 @@ class CHostGroup extends CApiService {
 
 		DB::update('hstgrp', $upd_groups);
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $groups, $db_groups);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $groups, $db_groups);
 
 		return ['groupids' => zbx_objectValues($groups, 'groupid')];
 	}
@@ -685,7 +683,7 @@ class CHostGroup extends CApiService {
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_groups);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_GROUP, $db_groups);
 
 		return ['groupids' => $groupids];
 	}

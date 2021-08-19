@@ -207,7 +207,8 @@ class CAudit {
 		]
 	];
 
-	public static function log(int $resource, int $action, array $objects, ?array $old_objects): void {
+	public static function log(string $userid, string $ip, string $username, int $resource, int $action, array $objects,
+			?array $old_objects): void {
 		if (!self::isAuditEnabled() && ($resource != self::RESOURCE_SETTINGS
 					|| !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
 			return;
@@ -215,9 +216,7 @@ class CAudit {
 
 		$auditlog = [];
 		$table_key = DB::getSchema(self::RESOURCES_TABLE_NAME[$resource])['key'];
-		$user_data = CApiService::$userData;
 		$clock = time();
-		$ip = substr($user_data['userip'], 0, 39);
 		$recordsetid = self::getRecordSetId();
 
 		foreach ($objects as $object) {
@@ -228,10 +227,10 @@ class CAudit {
 			$diff = self::handleObjectDiff($resource, $action, $object, $old_object);
 
 			$auditlog[] = [
-				'userid' => $user_data['userid'],
-				'username' => $user_data['username'],
+				'userid' => $userid,
+				'username' => $username,
 				'clock' => $clock,
-				'ip' => $ip,
+				'ip' => substr($ip, 0, 39),
 				'action' => $action,
 				'resourcetype' => $resource,
 				'resourceid' => $resourceid,

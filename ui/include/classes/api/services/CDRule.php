@@ -31,8 +31,6 @@ class CDRule extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_DISCOVERY_RULE;
-
 	protected $tableName = 'drules';
 	protected $tableAlias = 'dr';
 	protected $sortColumns = ['druleid', 'name'];
@@ -699,7 +697,7 @@ class CDRule extends CApiService {
 			$drule['druleid'] = $druleids[$index];
 		});
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $drules);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_DISCOVERY_RULE, $drules);
 
 		$create_dchecks = [];
 		foreach ($drules as $dnum => $drule) {
@@ -804,7 +802,7 @@ class CDRule extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $drules, $db_drules);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DISCOVERY_RULE, $drules, $db_drules);
 
 		return ['druleids' => $druleids];
 	}
@@ -870,7 +868,7 @@ class CDRule extends CApiService {
 
 		DB::delete('drules', ['druleid' => $druleids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_drules);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_DISCOVERY_RULE, $db_drules);
 
 		return ['druleids' => $druleids];
 	}

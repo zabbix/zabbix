@@ -24,8 +24,6 @@
  */
 class CGraph extends CGraphGeneral {
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_GRAPH;
-
 	protected $tableName = 'graphs';
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['graphid', 'name', 'graphtype'];
@@ -339,7 +337,7 @@ class CGraph extends CGraphGeneral {
 
 		CGraphManager::delete($graphids);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_graphs);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_GRAPH, $db_graphs);
 
 		return ['graphids' => $graphids];
 	}

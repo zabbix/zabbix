@@ -29,8 +29,6 @@ class CAutoregistration extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_AUTOREGISTRATION;
-
 	protected $tableName = 'config';
 	protected $tableAlias = 'c';
 
@@ -109,7 +107,7 @@ class CAutoregistration extends CApiService {
 			]);
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE,
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTOREGISTRATION,
 			[['configid' => $db_autoreg['configid']] + $autoreg], [$db_autoreg['configid'] => $db_autoreg]
 		);
 

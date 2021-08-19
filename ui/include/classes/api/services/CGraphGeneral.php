@@ -134,7 +134,8 @@ abstract class CGraphGeneral extends CApiService {
 		$this->updateReal($graphs);
 		$this->inherit($graphs);
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, static::AUDIT_RESOURCE, $graphs, $db_graphs);
+		$resource = ($this instanceof CGraph)	? CAudit::RESOURCE_GRAPH : CAudit::RESOURCE_GRAPH_PROTOTYPE;
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $graphs, $db_graphs);
 
 		return ['graphids' => $graphids];
 	}
@@ -168,7 +169,8 @@ abstract class CGraphGeneral extends CApiService {
 		$this->createReal($graphs);
 		$this->inherit($graphs);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, static::AUDIT_RESOURCE, $graphs);
+		$resource = ($this instanceof CGraph)	? CAudit::RESOURCE_GRAPH : CAudit::RESOURCE_GRAPH_PROTOTYPE;
+		$this->addAuditBulk(CAudit::ACTION_ADD, $resource, $graphs);
 
 		return ['graphids' => array_column($graphs, 'graphid')];
 	}

@@ -33,8 +33,6 @@ class CTrigger extends CTriggerGeneral {
 		'deletedependencies' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_TRIGGER;
-
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname'];
@@ -619,7 +617,7 @@ class CTrigger extends CTriggerGeneral {
 
 		CTriggerManager::delete($triggerids);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_triggers);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_TRIGGER, $db_triggers);
 
 		return ['triggerids' => $triggerids];
 	}

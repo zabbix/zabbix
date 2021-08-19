@@ -1187,7 +1187,8 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if (!$inherited) {
-			$this->addAuditBulk(CAudit::ACTION_ADD, static::AUDIT_RESOURCE, $triggers);
+			$resource = ($this instanceof CTrigger) ? CAudit::RESOURCE_TRIGGER : CAudit::RESOURCE_TRIGGER_PROTOTYPE;
+			$this->addAuditBulk(CAudit::ACTION_ADD, $resource, $triggers);
 		}
 	}
 
@@ -1359,7 +1360,8 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if (!$inherited) {
-			$this->addAuditBulk(CAudit::ACTION_UPDATE, static::AUDIT_RESOURCE, $save_triggers, zbx_toHash($db_triggers, 'triggerid'));
+			$resource = ($this instanceof CTrigger) ? CAudit::RESOURCE_TRIGGER : CAudit::RESOURCE_TRIGGER_PROTOTYPE;
+			$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $save_triggers, zbx_toHash($db_triggers, 'triggerid'));
 		}
 	}
 

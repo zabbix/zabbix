@@ -122,14 +122,16 @@ class CAuditOld {
 	/**
 	 * Add audit records.
 	 *
-	 * @param array $userdata      CApiService::$userData
-	 * @param int   $action        CAudit::ACTION_*
-	 * @param int   $resourcetype  CAudit::RESOURCE_*
-	 * @param array $objects
-	 * @param array $objects_old
+	 * @param string $userid
+	 * @param string $ip
+	 * @param string $username
+	 * @param int    $action        CAudit::ACTION_*
+	 * @param int    $resourcetype  CAudit::RESOURCE_*
+	 * @param array  $objects
+	 * @param array  $objects_old
 	 */
-	public static function addBulk(array $userdata, int $action, int $resourcetype, array $objects,
-			array $objects_old = null) {
+	public static function addBulk(string $userid, string $ip, string $username, int $action, int $resourcetype,
+			array $objects, array $objects_old = null) {
 		if (!array_key_exists($resourcetype, self::$supported_type)) {
 			return;
 		}
@@ -145,7 +147,7 @@ class CAuditOld {
 		[$field_name_resourceid, $field_name_resourcename, $table_name, $api_name] = self::$supported_type[$resourcetype];
 
 		$clock = time();
-		$ip = substr($userdata['userip'], 0, 39);
+		$ip = substr($ip, 0, 39);
 
 		$auditlog = [];
 
@@ -225,8 +227,8 @@ class CAuditOld {
 			}
 
 			$auditlog[] = [
-				'userid' => $userdata['userid'],
-				'username' => $userdata['username'],
+				'userid' => $userid,
+				'username' => $username,
 				'clock' => $clock,
 				'ip' => $ip,
 				'action' => $action,

@@ -31,8 +31,6 @@ class CImage extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_IMAGE;
-
 	protected $tableName = 'images';
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['imageid', 'name'];
@@ -252,7 +250,7 @@ class CImage extends CApiService {
 		}
 		unset($image);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $images);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_IMAGE, $images);
 
 		return ['imageids' => array_column($images, 'imageid')];
 	}
@@ -345,7 +343,7 @@ class CImage extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $images, $db_images);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_IMAGE, $images, $db_images);
 
 		return ['imageids' => zbx_objectValues($images, 'imageid')];
 	}
@@ -426,7 +424,7 @@ class CImage extends CApiService {
 
 		DB::delete('images', ['imageid' => $imageids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_images);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_IMAGE, $db_images);
 
 		return ['imageids' => $imageids];
 	}

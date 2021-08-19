@@ -31,8 +31,6 @@ class CMediatype extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_MEDIA_TYPE;
-
 	protected $tableName = 'media_type';
 	protected $tableAlias = 'mt';
 	protected $sortColumns = ['mediatypeid'];
@@ -881,7 +879,7 @@ class CMediatype extends CApiService {
 			DB::insert('media_type_message', $ins_media_type_message);
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $mediatypes);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}
@@ -1124,7 +1122,7 @@ class CMediatype extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $mediatypes, $db_mediatypes);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes, $db_mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}
@@ -1159,7 +1157,7 @@ class CMediatype extends CApiService {
 
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_mediatypes);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MEDIA_TYPE, $db_mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}

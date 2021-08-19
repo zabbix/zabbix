@@ -34,8 +34,6 @@ class CUser extends CApiService {
 		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
-	public const AUDIT_RESOURCE = CAudit::RESOURCE_USER;
-
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
@@ -272,7 +270,7 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__);
 		$this->updateMedias($users, __FUNCTION__);
 
-		$this->addAuditLog(CAudit::ACTION_ADD, $users);
+		$this->addAuditLog(CAudit::RESOURCE_USER, CAudit::ACTION_ADD, $users);
 
 		return ['userids' => $userids];
 	}
@@ -435,7 +433,7 @@ class CUser extends CApiService {
 			}
 		}
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, $users, $db_users);
+		$this->addAuditLog(CAudit::RESOURCE_USER, CAudit::ACTION_UPDATE, $users, $db_users);
 
 		return ['userids' => array_column($users, 'userid')];
 	}
@@ -505,14 +503,28 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$api_users = $this->get([
+		$params = [
 			'output' => [],
-			'selectMedias' => ['mediatypeid', 'sendto', 'active', 'severity', 'period'],
-			'selectUsrgrps' => ['usrgrpid'],
 			'userids' => array_column($users, 'userid'),
 			'editable' => true,
 			'preservekeys' => true
-		]);
+		];
+
+		foreach ($users as $user) {
+			if (array_key_exists('medias', $user)) {
+				$params['selectMedias'] = ['mediatypeid', 'sendto', 'active', 'severity', 'period'];
+				break;
+			}
+		}
+
+		foreach ($users as $user) {
+			if (array_key_exists('usrgrps', $user)) {
+				$params['selectUsrgrps'] = ['usrgrpid', 'gui_access', 'users_status'];
+				break;
+			}
+		}
+
+		$api_users = $this->get($params);
 
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
@@ -700,7 +712,7 @@ class CUser extends CApiService {
 
 		$usrgrpids = array_keys($usrgrpids);
 
-		$db_usrgrps = DB::select('usrgrp', [
+		$db_usrgrps = DB::select('usrgrp', [ // FIXME:
 			'output' => ['gui_access'],
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
@@ -823,7 +835,7 @@ class CUser extends CApiService {
 
 		$mediatypeids = array_keys($mediatypeids);
 
-		$db_mediatypes = DB::select('media_type', [
+		$db_mediatypes = DB::select('media_type', [ // FIXME:
 			'output' => ['mediatypeid', 'type'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
@@ -1220,7 +1232,7 @@ class CUser extends CApiService {
 		]);
 		DB::delete('users', ['userid' => $userids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, $db_users);
+		$this->addAuditLog(CAudit::RESOURCE_USER, CAudit::ACTION_DELETE, $db_users);
 
 		return ['userids' => $userids];
 	}

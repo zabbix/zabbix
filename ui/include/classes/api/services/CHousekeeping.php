@@ -29,8 +29,6 @@ class CHousekeeping extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_HOUSEKEEPING;
-
 	/**
 	 * @var string
 	 */
@@ -125,7 +123,7 @@ class CHousekeeping extends CApiService {
 			]);
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE,
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOUSEKEEPING,
 			[['configid' => $db_hk['configid']] + $hk], [$db_hk['configid'] => $db_hk]
 		);
 

@@ -32,8 +32,6 @@ class CToken extends CApiService {
 		'generate' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS]
 	];
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_AUTH_TOKEN;
-
 	protected $tableName = 'token';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['tokenid', 'name', 'lastaccess', 'status', 'expires_at', 'created_at'];
@@ -201,7 +199,7 @@ class CToken extends CApiService {
 			$token['tokenid'] = $tokenids[$index];
 		});
 
-		$this->addAuditLog(CAudit::ACTION_ADD, $tokens);
+		$this->addAuditLog(CAudit::RESOURCE_AUTH_TOKEN, CAudit::ACTION_ADD, $tokens);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -337,7 +335,7 @@ class CToken extends CApiService {
 
 		if ($upd_tokens) {
 			DB::update('token', $upd_tokens);
-			$this->addAuditLog(CAudit::ACTION_UPDATE, $tokens, $db_tokens);
+			$this->addAuditLog(CAudit::RESOURCE_AUTH_TOKEN, CAudit::ACTION_UPDATE, $tokens, $db_tokens);
 		}
 
 		return ['tokenids' => array_column($tokens, 'tokenid')];
@@ -441,7 +439,7 @@ class CToken extends CApiService {
 
 		DB::delete('token', ['tokenid' => $tokenids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, $db_tokens);
+		$this->addAuditLog(CAudit::RESOURCE_AUTH_TOKEN, CAudit::ACTION_DELETE, $db_tokens);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -491,11 +489,8 @@ class CToken extends CApiService {
 		}
 
 		DB::update('token', $upd_tokens);
-		// array_walk($db_tokens, function (&$db_token) {
-		// 	$db_token['token'] = '';
-		// });
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, $response, $db_tokens);
+		$this->addAuditLog(CAudit::RESOURCE_AUTH_TOKEN, CAudit::ACTION_UPDATE, $response, $db_tokens);
 
 		return $response;
 	}

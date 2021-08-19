@@ -24,8 +24,6 @@
  */
 class CTemplate extends CHostGeneral {
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_TEMPLATE;
-
 	protected $sortColumns = ['hostid', 'host', 'name'];
 
 	/**
@@ -409,7 +407,7 @@ class CTemplate extends CHostGeneral {
 			$this->link($link_templateids, $link_hostids);
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $templates);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE, $templates);
 
 		return ['templateids' => array_column($templates, 'templateid')];
 	}
@@ -630,7 +628,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->updateTags(array_column($templates, 'tags', 'templateid'));
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $templates, $db_templates);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
 
 		return ['templateids' => array_column($templates, 'templateid')];
 	}
@@ -890,7 +888,7 @@ class CTemplate extends CHostGeneral {
 			info(_s('Deleted: Template "%1$s".', $db_template['name']));
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_templates);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
 	}
