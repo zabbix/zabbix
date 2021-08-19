@@ -325,19 +325,19 @@ class CControllerAuditLogList extends CController {
 
 	private function makeDetailString(string $key, array $detail): string {
 		switch ($detail[0]) {
-			case CAudit::METHOD_ADD:
+			case CAudit::DETAILS_ACTION_ADD:
 				return sprintf('%s: %s', $key, array_key_exists(1, $detail) ? $detail[1] : _('Added'));
-			case CAudit::METHOD_ATTACH:
+			case CAudit::DETAILS_ACTION_ATTACH:
 				return array_key_exists(1, $detail)
 					? sprintf('%s: %s (%s)', $key, $detail[1], _('Attached'))
 					: sprintf('%s: %s', $key, _('Attached'));
-			case CAudit::METHOD_DETACH:
+			case CAudit::DETAILS_ACTION_DETACH:
 				return array_key_exists(1, $detail)
 					? sprintf('%s: %s (%s)', $key, $detail[1], _('Detached'))
 					: sprintf('%s: %s', $key, _('Detached'));
-			case CAudit::METHOD_DELETE:
+			case CAudit::DETAILS_ACTION_DELETE:
 				return sprintf('%s: %s', $key, _('Deleted'));
-			case CAudit::METHOD_UPDATE:
+			case CAudit::DETAILS_ACTION_UPDATE:
 				return array_key_exists(1, $detail)
 					? sprintf('%s: %s => %s', $key, $detail[2], $detail[1])
 					: sprintf('%s: %s', $key, _('Updated'));

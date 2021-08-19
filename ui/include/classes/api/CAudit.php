@@ -65,11 +65,11 @@ class CAudit {
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
 
-	public const METHOD_ADD = 'add';
-	public const METHOD_UPDATE = 'update';
-	public const METHOD_ATTACH = 'attach';
-	public const METHOD_DETACH = 'detach';
-	public const METHOD_DELETE = 'delete';
+	public const DETAILS_ACTION_ADD = 'add';
+	public const DETAILS_ACTION_UPDATE = 'update';
+	public const DETAILS_ACTION_ATTACH = 'attach';
+	public const DETAILS_ACTION_DETACH = 'detach';
+	public const DETAILS_ACTION_DELETE = 'delete';
 
 	private const AUDITLOG_ENABLE = 1;
 
@@ -474,10 +474,10 @@ class CAudit {
 				continue;
 			}
 
-			$result = [self::METHOD_ADD];
+			$result = [self::DETAILS_ACTION_ADD];
 
 			if ($is_relatable) {
-				$result = [self::METHOD_ATTACH];
+				$result = [self::DETAILS_ACTION_ATTACH];
 			}
 
 			if (!$is_object_marker) {
@@ -515,14 +515,14 @@ class CAudit {
 
 			if ($value === null) {
 				if ($is_updatable && $is_object_marker) {
-					$result[$key] = [self::METHOD_DELETE];
+					$result[$key] = [self::DETAILS_ACTION_DELETE];
 				}
 				elseif ($is_updatable) {
 					continue;
 				}
 
 				if ($is_relatable) {
-					$result[$key] = [self::METHOD_DETACH];
+					$result[$key] = [self::DETAILS_ACTION_DETACH];
 				}
 
 				if (!$is_object_marker) {
@@ -530,10 +530,10 @@ class CAudit {
 				}
 			}
 			elseif ($old_value === null) {
-				$result[$key] = [self::METHOD_ADD];
+				$result[$key] = [self::DETAILS_ACTION_ADD];
 
 				if ($is_relatable) {
-					$result[$key] = [self::METHOD_ATTACH];
+					$result[$key] = [self::DETAILS_ACTION_ATTACH];
 				}
 
 				if (!$is_object_marker) {
@@ -542,10 +542,10 @@ class CAudit {
 			}
 			else {
 				if ($is_object_marker && $is_updatable) {
-					$result[$key] = [self::METHOD_UPDATE];
+					$result[$key] = [self::DETAILS_ACTION_UPDATE];
 				}
 				elseif ($value != $old_value || $is_value_masked) {
-					$result[$key] = [self::METHOD_UPDATE, $value, $old_value];
+					$result[$key] = [self::DETAILS_ACTION_UPDATE, $value, $old_value];
 				}
 			}
 		}
