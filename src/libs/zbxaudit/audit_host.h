@@ -88,7 +88,8 @@ void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname);
 void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname);
 void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid, const char *name,
 		int status, int discover, int custom_interfaces);
-void	zbx_audit_host_prototype_update_json_add_templateid(zbx_uint64_t hostid, zbx_uint64_t templateid);
+void	zbx_audit_host_prototype_update_json_update_templateid(zbx_uint64_t hostid, zbx_uint64_t templateid_orig,
+		zbx_uint64_t templateid);
 
 #define PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(resource, type1)							\
 void	zbx_audit_host_prototype_update_json_update_##resource(zbx_uint64_t hostid, type1 old_##resource,	\
@@ -110,7 +111,7 @@ void	zbx_audit_##funcname##_update_json_add_parent_template(zbx_uint64_t hostid,
 		zbx_uint64_t hosttemplateid, zbx_uint64_t templateid);
 #define PREPARE_AUDIT_TEMPLATE_DELETE_H(funcname)								\
 void	zbx_audit_##funcname##_update_json_delete_parent_template(zbx_uint64_t hostid,				\
-		zbx_uint64_t hosttemplateid, zbx_uint64_t templateid);
+		zbx_uint64_t hosttemplateid);
 PREPARE_AUDIT_TEMPLATE_ADD_H(host)
 PREPARE_AUDIT_TEMPLATE_DELETE_H(host)
 PREPARE_AUDIT_TEMPLATE_ADD_H(host_prototype)

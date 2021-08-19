@@ -1888,7 +1888,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 
 		ZBX_STR2UINT64(hosttemplateid, row[0]);
 		ZBX_STR2UINT64(templateid, row[1]);
-		zbx_audit_host_update_json_delete_parent_template(hostid, hosttemplateid, templateid);
+		zbx_audit_host_update_json_delete_parent_template(hostid, hosttemplateid);
 	}
 
 	DBfree_result(result);
@@ -2137,6 +2137,7 @@ typedef struct
 	unsigned char		discover;
 	unsigned char		custom_interfaces_orig;
 	unsigned char		custom_interfaces;
+	zbx_uint64_t		templateid_orig;
 }
 zbx_host_prototype_t;
 
@@ -2306,8 +2307,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		host_prototype->name_orig = NULL;
 		host_prototype->status_orig = 0;
 		host_prototype->discover_orig = 0;
+		host_prototype->templateid_orig = 0;
 		host_prototype->custom_interfaces_orig = 0;
-
 		zbx_vector_ptr_append(host_prototypes, host_prototype);
 		zbx_vector_uint64_append(&itemids, host_prototype->itemid);
 	}
@@ -2327,6 +2328,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select i.itemid,h.hostid,h.host,h.name,h.status,h.discover,h.custom_interfaces"
+				",h.templateid"
 				" from items i,host_discovery hd,hosts h"
 				" where i.itemid=hd.parent_itemid"
 					" and hd.hostid=h.hostid"
@@ -2372,6 +2374,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES;
 						host_prototype->custom_interfaces_orig = (unsigned char)atoi(row[6]);
 					}
+
+					ZBX_DBROW2UINT64(host_prototype->templateid_orig, row[7]);
 
 					break;
 				}
@@ -2501,8 +2505,8 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
 								host_prototype->hostid, host_prototype->name);
 
-						zbx_audit_host_update_json_delete_parent_template(
-								host_prototype->hostid, hosttemplateid, templateid);
+						zbx_audit_host_prototype_update_json_delete_parent_template(
+								host_prototype->hostid, hosttemplateid);
 					}
 					else
 						zbx_vector_uint64_remove(&host_prototype->lnk_templateids, i);
@@ -3828,8 +3832,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hosts set templateid=" ZBX_FS_UI64,
 					host_prototype->templateid);
 
-			zbx_audit_host_prototype_update_json_add_templateid(host_prototype->hostid,
-					host_prototype->templateid);
+			zbx_audit_host_prototype_update_json_update_templateid(host_prototype->hostid,
+					host_prototype->templateid_orig, host_prototype->templateid);
 
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_NAME))
 			{
