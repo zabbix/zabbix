@@ -187,7 +187,6 @@ class testUserRolesPermissions extends CWebTest {
 		];
 	}
 
-
 	/**
 	 * Check creation/edit for dashboard, map, reports, maintenance.
 	 *
@@ -204,7 +203,7 @@ class testUserRolesPermissions extends CWebTest {
 				$this->assertTrue($this->query('button', $button)->one()->isEnabled($action_status));
 			}
 
-			$this->page->open((array_key_exists('report', $data)) ? 'zabbix.php?action=scheduledreport.edit&reportid='.
+			$this->page->open(array_key_exists('report', $data) ? 'zabbix.php?action=scheduledreport.edit&reportid='.
 					self::$reportid : $data['action_link'])->waitUntilReady();
 
 			foreach ($data['form_button'] as $text) {
@@ -273,10 +272,10 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag');
-			$row->getColumn('Ack')->query('link:No')->one()->waitUntilClickable()->click();
+			$row->getColumn('Ack')->query('link:No')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
-			$this->changeRoleRule([$data['action'] => ($action_status === true) ? false : true]);
+			$this->changeRoleRule([$data['action'] => !$action_status]);
 
 			// Check that problem actions works after they were turned on.
 			if ($action_status === false) {
@@ -345,7 +344,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->page->open('tr_events.php?triggerid=99251&eventid=93')->waitUntilReady();
 
 			foreach (['Event details', 'Event list [previous 20]'] as $table_name) {
-				$table = $this->query('xpath://h4[text()="'.$table_name.'"]/../..//table')->asTable()->one();
+				$table = $this->query('xpath://h4[text()='.CXPathHelper::escapeQuotes($table_name).']/../..//table')->asTable()->one();
 				$this->assertEquals($action_status, $table->query('xpath:.//*[text()="No"]')
 						->one()->isAttributePresent('onclick'));
 			}
@@ -1045,7 +1044,8 @@ class testUserRolesPermissions extends CWebTest {
 
 			if ($data['section'] !== 'Monitoring') {
 				$main_section->click();
-				$element = $this->query('xpath://a[text()="'.$data['section'].'"]/../ul[@class="submenu"]')->one();
+				$element = $this->query('xpath://a[text()='.CXPathHelper::escapeQuotes($data['section']).
+						']/../ul[@class="submenu"]')->one();
 				CElementQuery::wait()->until(function () use ($element) {
 					return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
 							' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
@@ -1056,10 +1056,10 @@ class testUserRolesPermissions extends CWebTest {
 
 			if ($action_status) {
 				if (array_key_exists('user_roles', $data)) {
-					$this->clickSignout();
+					$this->signOut();
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
-					$this->clickSignout();
+					$this->signOut();
 					$this->page->userLogin('user_for_role', 'zabbixzabbix');
 				}
 				else {
@@ -1070,14 +1070,14 @@ class testUserRolesPermissions extends CWebTest {
 			else {
 				if (array_key_exists('user_roles', $data)) {
 					$this->checkLinks($data['link']);
-					$this->clickSignout();
+					$this->signOut();
 					$this->page->userLogin('Admin', 'zabbix');
 					$this->changeRoleRule($user_roles);
-					$this->clickSignout();
+					$this->signOut();
 				}
 				else {
 					$this->checkLinks($data['link']);
-					$this->clickSignout();
+					$this->signOut();
 				}
 			}
 		}
@@ -1161,17 +1161,10 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	public function testUserRolesPermissions_ManageApiToken() {
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
-
-		foreach ([true, false] as $action_status) {
-			if ($action_status) {
-				$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
-				$this->assertEquals('API tokens', $this->page->getTitle());
-				$this->changeRoleRule(['Manage API tokens' => false]);
-			}
-			else {
-				$this->checkLinks(['zabbix.php?action=user.token.list']);
-			}
-		}
+		$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
+		$this->assertEquals('API tokens', $this->page->getTitle());
+		$this->changeRoleRule(['Manage API tokens' => false]);
+		$this->checkLinks(['zabbix.php?action=user.token.list']);
 	}
 
 	/**
@@ -1183,8 +1176,8 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=service.list')->waitUntilReady();
 			foreach (['View', 'Edit'] as $radio) {
-				$this->assertEquals($action_status, $this->query('xpath://ul[@id="list_mode"]/li/label[text()="'.$radio.'"]')
-						->asSegmentedRadio()->exists());
+				$this->assertEquals($action_status, $this->query('xpath://ul[@id="list_mode"]/li/label[text()='
+						.CXPathHelper::escapeQuotes($radio).']')->asSegmentedRadio()->exists());
 			}
 			if ($action_status) {
 				$this->query('id:list_mode')->asSegmentedRadio()->one()->select('Edit');
@@ -1223,9 +1216,7 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	private function changeRoleRule($action) {
 		$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$super_roleid)->waitUntilReady();
-		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
-		$form->fill($action);
-		$form->submit();
+		$this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one()->fill($action)->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'User role updated');
 	}
@@ -1233,9 +1224,9 @@ class testUserRolesPermissions extends CWebTest {
 	/**
 	 * Click Sign out button.
 	 */
-	private function clickSignout() {
+	private function signOut() {
 		$this->query('xpath://a[@class="icon-signout"]')->waitUntilPresent()->one()->click();
 		$this->page->waitUntilReady();
-		$this->query('button:Sign in')->waitUntilVisible()->one();
+		$this->query('button:Sign in')->waitUntilVisible();
 	}
 }
