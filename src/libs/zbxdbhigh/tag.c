@@ -22,9 +22,9 @@
 #include "log.h"
 #include "../zbxalgo/vectorimpl.h"
 
-zbx_db_tag_t		*zbx_db_tag_create(const char *tag_tag, const char *tag_value)
+zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value)
 {
-	zbx_db_tag_t		*tag;
+	zbx_db_tag_t	*tag;
 
 	tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
 	tag->flags = ZBX_FLAG_DB_TAG_UNSET;
@@ -35,7 +35,6 @@ zbx_db_tag_t		*zbx_db_tag_create(const char *tag_tag, const char *tag_value)
 
 	return tag;
 }
-
 
 void	zbx_db_tag_free(zbx_db_tag_t *tag)
 {

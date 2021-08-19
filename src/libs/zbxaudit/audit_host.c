@@ -30,25 +30,25 @@
 		audit_key_privprotocol[AUDIT_DETAILS_KEY_LEN], audit_key_contextname[AUDIT_DETAILS_KEY_LEN];	\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(audit_key_version, AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[" ZBX_FS_UI64		\
+	zbx_snprintf(audit_key_version, sizeof(audit_key_version), #auditentry".interfaces[" ZBX_FS_UI64	\
 			"].details.version", interfaceid);							\
-	zbx_snprintf(audit_key_bulk, AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[" ZBX_FS_UI64		\
+	zbx_snprintf(audit_key_bulk, sizeof(audit_key_bulk), #auditentry".interfaces[" ZBX_FS_UI64		\
 			"].details.bulk", interfaceid);								\
-	zbx_snprintf(audit_key_community, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_community, sizeof(audit_key_community),						\
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.community", interfaceid);		\
-	zbx_snprintf(audit_key_securityname, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_securityname, sizeof(audit_key_securityname),					\
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.securityname", interfaceid);		\
-	zbx_snprintf(audit_key_securitylevel, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_securitylevel, sizeof(audit_key_securitylevel),					\
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.securitylevel", interfaceid);		\
-	zbx_snprintf(audit_key_authpassphrase, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_authpassphrase, sizeof(audit_key_authpassphrase),				\
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.authpassphrase", interfaceid);		\
-	zbx_snprintf(audit_key_privpassphrase, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_privpassphrase, sizeof(audit_key_privpassphrase),				\
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.privpassphrase", interfaceid);		\
-	zbx_snprintf(audit_key_authprotocol, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_authprotocol, sizeof(audit_key_authprotocol),					\
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.authprotocol", interfaceid);		\
-	zbx_snprintf(audit_key_privprotocol, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_privprotocol, sizeof(audit_key_privprotocol),					\
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.privprotocol", interfaceid);		\
-	zbx_snprintf(audit_key_contextname, AUDIT_DETAILS_KEY_LEN,						\
+	zbx_snprintf(audit_key_contextname, sizeof(audit_key_contextname),					\
 			#auditentry".interfaces[" ZBX_FS_UI64 "].details.contextname", interfaceid);		\
 
 #define PREPARE_AUDIT_SNMP_INTERFACE(funcname, auditentry)							\
@@ -57,7 +57,10 @@ void	zbx_audit_##funcname##_update_json_add_snmp_interface(zbx_uint64_t hostid, 
 		const char *authpassphrase, const char *privpassphrase, zbx_uint64_t authprotocol,		\
 		zbx_uint64_t privprotocol, const char *contextname, zbx_uint64_t interfaceid)			\
 {														\
+	char	audit_key[AUDIT_DETAILS_KEY_LEN];								\
 PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)								\
+	zbx_snprintf(audit_key, sizeof(audit_key), #auditentry".interfaces[" ZBX_FS_UI64 "]", interfaceid);	\
+	zbx_audit_update_json_append(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key);				\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_version, version);	\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_bulk, bulk);		\
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_community, community);	\
@@ -194,29 +197,32 @@ void	zbx_audit_##funcname##_update_json_add_interfaces(zbx_uint64_t hostid, zbx_
 {														\
 	char	audit_key_main[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN],			\
 		audit_key_useip[AUDIT_DETAILS_KEY_LEN], audit_key_ip[AUDIT_DETAILS_KEY_LEN],			\
-		audit_key_dns[AUDIT_DETAILS_KEY_LEN], audit_key_port[AUDIT_DETAILS_KEY_LEN];			\
+		audit_key_dns[AUDIT_DETAILS_KEY_LEN], audit_key_port[AUDIT_DETAILS_KEY_LEN],			\
+		audit_key[AUDIT_DETAILS_KEY_LEN];								\
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(audit_key_main,  AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[" ZBX_FS_UI64		\
-			"].details.main", interfaceid);								\
-	zbx_snprintf(audit_key_type,  AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[" ZBX_FS_UI64		\
-			"].details.type", interfaceid);								\
-	zbx_snprintf(audit_key_useip, AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[" ZBX_FS_UI64		\
-			"].details.useip", interfaceid);							\
-	zbx_snprintf(audit_key_ip,    AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[" ZBX_FS_UI64		\
-			"].details.ip", interfaceid);								\
-	zbx_snprintf(audit_key_dns,   AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[" ZBX_FS_UI64		\
-			"].details.dns", interfaceid);								\
-	zbx_snprintf(audit_key_port,  AUDIT_DETAILS_KEY_LEN, #auditentry".interfaces[" ZBX_FS_UI64		\
-			"].details.port", interfaceid);								\
+	zbx_snprintf(audit_key, sizeof(audit_key), #auditentry".interfaces[" ZBX_FS_UI64 "]", interfaceid);	\
+	zbx_snprintf(audit_key_main,  sizeof(audit_key_main),  #auditentry".interfaces[" ZBX_FS_UI64		\
+			"].main", interfaceid);									\
+	zbx_snprintf(audit_key_type,  sizeof(audit_key_type),  #auditentry".interfaces[" ZBX_FS_UI64		\
+			"].type", interfaceid);									\
+	zbx_snprintf(audit_key_useip, sizeof(audit_key_useip), #auditentry".interfaces[" ZBX_FS_UI64		\
+			"].useip", interfaceid);								\
+	zbx_snprintf(audit_key_ip,    sizeof(audit_key_ip),    #auditentry".interfaces[" ZBX_FS_UI64		\
+			"].ip", interfaceid);									\
+	zbx_snprintf(audit_key_dns,   sizeof(audit_key_dns),   #auditentry".interfaces[" ZBX_FS_UI64		\
+			"].dns", interfaceid);									\
+	zbx_snprintf(audit_key_port,  sizeof(audit_key_port),  #auditentry".interfaces[" ZBX_FS_UI64		\
+			"].port", interfaceid);									\
 														\
+	zbx_audit_update_json_append(hostid,        AUDIT_DETAILS_ACTION_ADD, audit_key);			\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_main, main_);		\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_type, type);		\
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_useip, useip);		\
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_ip, ip);		\
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_dns, dns);		\
-	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_port, port);		\
+	zbx_audit_update_json_append_int(hostid,    AUDIT_DETAILS_ACTION_ADD, audit_key_port, port);		\
 }														\
 														\
 PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, useip, zbx_uint64_t, uint64)					\
@@ -333,7 +339,7 @@ void	zbx_audit_hostgroup_update_json_attach(zbx_uint64_t hostid, zbx_uint64_t ho
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(buf, sizeof(buf), "host.groups[" ZBX_FS_UI64 "]", hostgroupid);
+	zbx_snprintf(buf, sizeof(buf), "host.groups[" ZBX_FS_UI64 "].groupid", hostgroupid);
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, buf, groupid);
 }
 
@@ -359,7 +365,7 @@ void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, 
 
 	for (i = 0; i < groupids->values_num; i++)
 	{
-		zbx_snprintf(buf, sizeof(buf), "host.groups[" ZBX_FS_UI64 "]", hostgroupids->values[i]);
+		zbx_snprintf(buf, sizeof(buf), "host.groups[" ZBX_FS_UI64 "].groupid", hostgroupids->values[i]);
 		zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_DETACH, buf,
 				groupids->values[i]);
 	}
@@ -458,7 +464,7 @@ void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_u
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "hostprototype.templateid",
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.templateid",
 			templateid);
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.name", name);
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.status", status);
@@ -471,7 +477,7 @@ void	zbx_audit_host_prototype_update_json_add_templateid(zbx_uint64_t hostid, zb
 {
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, "hostprototype.templateid",
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.templateid",
 			templateid);
 }
 
@@ -490,24 +496,31 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(discover, int, int)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(custom_interfaces, int, int)
 #undef PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE
 
-void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, const char* name,
-		zbx_uint64_t groupid, zbx_uint64_t templateid)
+void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
+		const char* name, zbx_uint64_t groupid, zbx_uint64_t templateid)
 {
-	char	buf[AUDIT_DETAILS_KEY_LEN];
+	char	audit_key_name[AUDIT_DETAILS_KEY_LEN], audit_key_groupid[AUDIT_DETAILS_KEY_LEN],
+		audit_key_templateid[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
 	if (0 != strlen(name))
 	{
-		zbx_snprintf(buf, sizeof(buf), "hostprototype.groupPrototypes[%s]", name);
-		zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, buf, templateid);
+		zbx_snprintf(audit_key_name, sizeof(audit_key_name), "hostprototype.groupPrototypes[" ZBX_FS_UI64
+			"].name", group_prototypeid);
+		zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_name, name);
 	}
 	else if (0 != groupid)
 	{
-		zbx_snprintf(buf, sizeof(buf), "hostprototype.groupLinks[" ZBX_FS_UI64 "]", groupid);
-		zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, buf,
-				templateid);
+		zbx_snprintf(audit_key_groupid, sizeof(audit_key_groupid), "hostprototype.groupLinks[" ZBX_FS_UI64
+				"].groupid", group_prototypeid);
+		zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ATTACH, audit_key_groupid,
+				groupid);
 	}
+
+	zbx_snprintf(audit_key_templateid, sizeof(audit_key_templateid), "hostprototype.groupPrototypes[" ZBX_FS_UI64
+			"].templateid", group_prototypeid);
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_templateid, templateid);
 }
 
 void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid, zbx_uint64_t groupid,
@@ -517,20 +530,20 @@ void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "hostprototype.groupLinks[" ZBX_FS_UI64 "]", groupid);
+	zbx_snprintf(buf, sizeof(buf), "hostprototype.groupLinks[" ZBX_FS_UI64 "].groupid", groupid);
 
 	zbx_audit_update_json_update_uint64(hostid, buf, templateid_old, templateid_new);
 }
 
 #define PREPARE_AUDIT_TEMPLATE_OP(funcname, auditentry, op1, op2)						\
 void	zbx_audit_##funcname##_update_json_##op1##_parent_template(zbx_uint64_t hostid,				\
-		zbx_uint64_t templateid)									\
+		zbx_uint64_t hosttemplateid, zbx_uint64_t templateid)						\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(buf, sizeof(buf), #auditentry".templates[" ZBX_FS_UI64 "].templateid", templateid);	\
+	zbx_snprintf(buf, sizeof(buf), #auditentry".templates[" ZBX_FS_UI64 "].templateid", hosttemplateid);	\
 														\
 	zbx_audit_update_json_append_uint64(hostid, op2, buf, templateid);					\
 }														\
@@ -621,7 +634,7 @@ void	zbx_audit_host_prototype_update_json_update_tag_tag(zbx_uint64_t hostid, zb
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "hostprototype.tags[" ZBX_FS_UI64 "].tag", tagid);
+	zbx_snprintf(buf, sizeof(buf), "hostprototype.tags[" ZBX_FS_UI64 "].tag", tagid);
 
 	zbx_audit_update_json_update_string(hostid, buf, tag_old, tag_new);
 }
@@ -633,7 +646,7 @@ void	zbx_audit_host_prototype_update_json_update_tag_value(zbx_uint64_t hostid, 
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "hostprototype.tags[" ZBX_FS_UI64 "].value", tagid);
+	zbx_snprintf(buf, sizeof(buf), "hostprototype.tags[" ZBX_FS_UI64 "].value", tagid);
 
 	zbx_audit_update_json_update_string(hostid, buf, value_old, value_new);
 }
@@ -644,7 +657,7 @@ void	zbx_audit_host_prototype_update_json_delete_tag(zbx_uint64_t hostid, zbx_ui
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "hostprototype.tags[" ZBX_FS_UI64 "]", tagid);
+	zbx_snprintf(buf, sizeof(buf), "hostprototype.tags[" ZBX_FS_UI64 "]", tagid);
 
 	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, buf);
 }

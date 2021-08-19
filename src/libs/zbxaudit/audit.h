@@ -68,6 +68,7 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 		const char *value);
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audit_op, const char *key,
 		uint64_t value);
+void	zbx_audit_update_json_append(const zbx_uint64_t id, const char *audit_op, const char *key);
 void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value);
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
 		const char *value_new);

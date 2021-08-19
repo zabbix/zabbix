@@ -1688,7 +1688,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -1822,6 +1822,8 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 	size_t			sql_alloc = 128, sql_offset = 0;
 	zbx_vector_uint64_t	templateids;
 	int			i, res = SUCCEED;
+	DB_RESULT		result;
+	DB_ROW			row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1863,7 +1865,33 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 	/* removing items will remove discovery rules related to them */
 	DBdelete_template_items(hostid, del_templateids);
 
+	/* need to find hosttemplateids for audit */
 	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hosttemplateid,templateid from hosts_templates"
+			" where hostid=" ZBX_FS_UI64
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid",
+			del_templateids->values, del_templateids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	hosttemplateid, templateid;
+
+		ZBX_STR2UINT64(hosttemplateid, row[0]);
+		ZBX_STR2UINT64(templateid, row[1]);
+		zbx_audit_host_update_json_detach_parent_template(hostid, hosttemplateid, templateid);
+	}
+
+	DBfree_result(result);
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from hosts_templates"
@@ -1875,9 +1903,6 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 	DBexecute("%s", sql);
 
 	zbx_free(sql);
-
-	for (i = 0; i < del_templateids->values_num; i++)
-		zbx_audit_host_update_json_detach_parent_template(hostid, del_templateids->values[i]);
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 
@@ -2405,7 +2430,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 								host_prototype->hostid, host_prototype->name);
 
 						zbx_audit_host_update_json_detach_parent_template(
-								host_prototype->hostid, hosttemplateid);
+								host_prototype->hostid, hosttemplateid, templateid);
 					}
 					else
 						zbx_vector_uint64_remove(&host_prototype->lnk_templateids, i);
@@ -3770,11 +3795,13 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 		for (j = 0; j < host_prototype->lnk_templateids.values_num; j++)
 		{
-			zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid++, host_prototype->hostid,
+			zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, host_prototype->hostid,
 					host_prototype->lnk_templateids.values[j]);
 
 			zbx_audit_host_prototype_update_json_attach_parent_template(host_prototype->hostid,
-					host_prototype->lnk_templateids.values[j]);
+					hosttemplateid, host_prototype->lnk_templateids.values[j]);
+
+			hosttemplateid++;
 		}
 
 		for (j = 0; j < host_prototype->group_prototypes.values_num; j++)
@@ -3783,13 +3810,15 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 			if (0 == group_prototype->group_prototypeid)
 			{
-				zbx_db_insert_add_values(&db_insert_gproto, group_prototypeid++, host_prototype->hostid,
+				zbx_db_insert_add_values(&db_insert_gproto, group_prototypeid, host_prototype->hostid,
 						group_prototype->name, group_prototype->groupid,
 						group_prototype->templateid);
 
 				zbx_audit_host_prototype_update_json_add_group_details(host_prototype->hostid,
-						group_prototype->name, group_prototype->groupid,
+						group_prototypeid, group_prototype->name, group_prototype->groupid,
 						group_prototype->templateid);
+
+				group_prototypeid++;
 			}
 			else
 			{
@@ -4075,7 +4104,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 	if (0 != new_tags)
 	{
-		zbx_db_insert_autoincrement(&db_insert_tag, "hosttagid");
 		zbx_db_insert_execute(&db_insert_tag);
 		zbx_db_insert_clean(&db_insert_tag);
 	}
@@ -5125,8 +5153,10 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	for (i = 0; i < lnk_templateids->values_num; i++)
 	{
-		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid++, hostid, lnk_templateids->values[i]);
-		zbx_audit_host_update_json_attach_parent_template(hostid, lnk_templateids->values[i]);
+		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, hostid, lnk_templateids->values[i]);
+		zbx_audit_host_update_json_attach_parent_template(hostid, hosttemplateid, lnk_templateids->values[i]);
+
+		hosttemplateid++;
 	}
 
 	DBcopy_template_items(hostid, lnk_templateids);
