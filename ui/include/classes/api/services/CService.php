@@ -578,7 +578,7 @@ class CService extends CApiService {
 			if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
 				$output = ['service_status_ruleid', 'serviceid'];
 			}
-			elseif ($options['selectTimes'] === API_OUTPUT_EXTEND) {
+			elseif ($options['selectStatusRules'] === API_OUTPUT_EXTEND) {
 				$output = ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'];
 			}
 			else {
