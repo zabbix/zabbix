@@ -327,16 +327,10 @@ class CControllerAuditLogList extends CController {
 		switch ($detail[0]) {
 			case CAudit::DETAILS_ACTION_ADD:
 				return sprintf('%s: %s', $key, array_key_exists(1, $detail) ? $detail[1] : _('Added'));
-			case CAudit::DETAILS_ACTION_ATTACH:
-				return array_key_exists(1, $detail)
-					? sprintf('%s: %s (%s)', $key, $detail[1], _('Attached'))
-					: sprintf('%s: %s', $key, _('Attached'));
-			case CAudit::DETAILS_ACTION_DETACH:
-				return array_key_exists(1, $detail)
-					? sprintf('%s: %s (%s)', $key, $detail[1], _('Detached'))
-					: sprintf('%s: %s', $key, _('Detached'));
+
 			case CAudit::DETAILS_ACTION_DELETE:
 				return sprintf('%s: %s', $key, _('Deleted'));
+
 			case CAudit::DETAILS_ACTION_UPDATE:
 				return array_key_exists(1, $detail)
 					? sprintf('%s: %s => %s', $key, $detail[2], $detail[1])

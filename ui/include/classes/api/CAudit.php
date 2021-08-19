@@ -67,8 +67,6 @@ class CAudit {
 
 	public const DETAILS_ACTION_ADD = 'add';
 	public const DETAILS_ACTION_UPDATE = 'update';
-	public const DETAILS_ACTION_ATTACH = 'attach';
-	public const DETAILS_ACTION_DETACH = 'detach';
 	public const DETAILS_ACTION_DELETE = 'delete';
 
 	private const AUDITLOG_ENABLE = 1;
@@ -207,10 +205,6 @@ class CAudit {
 		self::RESOURCE_USER => [
 			'fields' => ['passwd' => true]
 		]
-	];
-
-	private static $relatable_object = [
-		self::RESOURCE_USER => ['user.usrgrps']
 	];
 
 	private static $updatable_object = [
@@ -384,22 +378,6 @@ class CAudit {
 		return $value == $schema_fields[$key]['default'];
 	}
 
-	private static function isObjectRelatable(int $resource, string $path): bool {
-		if (!array_key_exists($resource, self::$relatable_object)) {
-			return false;
-		}
-
-		$relatable_objects = self::$relatable_object[$resource];
-
-		foreach ($relatable_objects as $relatable_key) {
-			if (strpos($path, $relatable_key) === 0) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	private static function isObjectUpdatable(int $resource, string $path): bool {
 		if (!array_key_exists($resource, self::$updatable_object)) {
 			return false;
@@ -460,7 +438,6 @@ class CAudit {
 			$result = [];
 			$path = preg_replace('/\[[0-9]+\]/', '', $key);
 			$is_object_marker = (array_key_exists($key, $object_markers) && $object_markers[$key] > 1);
-			$is_relatable = self::isObjectRelatable($resource, $path);
 
 			if (self::isDefaultValue($resource, $path, $value)) {
 				unset($object[$key]);
@@ -468,10 +445,6 @@ class CAudit {
 			}
 
 			$result = [self::DETAILS_ACTION_ADD];
-
-			if ($is_relatable) {
-				$result = [self::DETAILS_ACTION_ATTACH];
-			}
 
 			if (!$is_object_marker) {
 				$result[] = $value;
@@ -499,10 +472,9 @@ class CAudit {
 			// Non associative arrays should not be detected as object marker.
 			$is_object_marker = (array_key_exists($key, $object_markers) && $object_markers[$key] > 1);
 			$is_value_masked = self::isPathMasked($resource, $path, $value);
-			$is_relatable = self::isObjectRelatable($resource, $path);
 			$is_updatable = self::isObjectUpdatable($resource, $path);
 
-			if (!$is_relatable && !$is_updatable && $value === null) {
+			if (!$is_updatable && $value === null) {
 				continue;
 			}
 
@@ -514,20 +486,12 @@ class CAudit {
 					continue;
 				}
 
-				if ($is_relatable) {
-					$result[$key] = [self::DETAILS_ACTION_DETACH];
-				}
-
 				if (!$is_object_marker) {
 					$result[$key][] = $old_value;
 				}
 			}
 			elseif ($old_value === null) {
 				$result[$key] = [self::DETAILS_ACTION_ADD];
-
-				if ($is_relatable) {
-					$result[$key] = [self::DETAILS_ACTION_ATTACH];
-				}
 
 				if (!$is_object_marker) {
 					$result[$key][] = $value;
