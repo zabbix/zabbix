@@ -207,10 +207,6 @@ class CAudit {
 		]
 	];
 
-	private static $updatable_object = [
-		self::RESOURCE_USER => ['user.medias']
-	];
-
 	public static function log(int $resource, int $action, array $objects, ?array $old_objects): void {
 		if (!self::isAuditEnabled() && ($resource != self::RESOURCE_SETTINGS
 					|| !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
@@ -378,22 +374,6 @@ class CAudit {
 		return $value == $schema_fields[$key]['default'];
 	}
 
-	private static function isObjectUpdatable(int $resource, string $path): bool {
-		if (!array_key_exists($resource, self::$updatable_object)) {
-			return false;
-		}
-
-		$updatable_objects = self::$updatable_object[$resource];
-
-		foreach ($updatable_objects as $updatable_key) {
-			if (strpos($path, $updatable_key) === 0) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	private static function isPathMasked(int $resource, string $path, ?string $value): bool {
 		$path = explode('.', $path);
 
@@ -462,7 +442,7 @@ class CAudit {
 		$diff_keys = array_keys(array_merge($object, $old_object));
 		$object_markers = self::getObjectMarkers($diff_keys);
 
-		$object += $old_object;
+		// $object += $old_object;
 
 		foreach ($diff_keys as $key) {
 			$value = array_key_exists($key, $object) ? $object[$key] : null;
@@ -472,22 +452,10 @@ class CAudit {
 			// Non associative arrays should not be detected as object marker.
 			$is_object_marker = (array_key_exists($key, $object_markers) && $object_markers[$key] > 1);
 			$is_value_masked = self::isPathMasked($resource, $path, $value);
-			$is_updatable = self::isObjectUpdatable($resource, $path);
-
-			if (!$is_updatable && $value === null) {
-				continue;
-			}
 
 			if ($value === null) {
-				if ($is_updatable && $is_object_marker) {
+				if ($is_object_marker) {
 					$result[$key] = [self::DETAILS_ACTION_DELETE];
-				}
-				elseif ($is_updatable) {
-					continue;
-				}
-
-				if (!$is_object_marker) {
-					$result[$key][] = $old_value;
 				}
 			}
 			elseif ($old_value === null) {
@@ -498,7 +466,7 @@ class CAudit {
 				}
 			}
 			else {
-				if ($is_object_marker && $is_updatable) {
+				if ($is_object_marker) {
 					$result[$key] = [self::DETAILS_ACTION_UPDATE];
 				}
 				elseif ($value != $old_value || $is_value_masked) {
