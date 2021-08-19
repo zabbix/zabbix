@@ -316,7 +316,7 @@ class CControllerHostEdit extends CController {
 	 */
 	protected function extendProxies(?array &$proxies): void {
 		if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$proxies = ($this->host['proxy_hostid'] !== '0')
+			$proxies = ($this->host['proxy_hostid'] != '0')
 				? API::Proxy()->get([
 					'output' => ['host', 'proxyid'],
 					'proxyids' => [$this->host['proxy_hostid']],

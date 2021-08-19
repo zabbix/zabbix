@@ -59,7 +59,7 @@ class CLegacyAction extends CAction {
 		if (in_array(getRequest('context', ''), ['host', 'template']) && in_array($action, ['items.php', 'triggers.php',
 				'graphs.php', 'host_discovery.php', 'httpconf.php', 'disc_prototypes.php', 'trigger_prototypes.php',
 				'host_prototypes.php'])) {
-			$action = (getRequest('context') === 'host') ? 'host.list' : 'templates.php';
+			$action = (getRequest('context') === 'host') ? 'hosts' : 'templates.php';
 		}
 
 		if ($user_type < USER_TYPE_ZABBIX_USER) {

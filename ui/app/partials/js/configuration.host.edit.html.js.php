@@ -24,9 +24,7 @@
  */
 
 $host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
-$linked_templates = $host_is_discovered
-	? array_column($data['host']['parentTemplates'], 'templateid')
-	: [];
+$linked_templates = $host_is_discovered ? array_column($data['host']['parentTemplates'], 'templateid') : [];
 ?>
 <?php if (!$host_is_discovered): ?>
 	<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
@@ -136,6 +134,7 @@ $linked_templates = $host_is_discovered
 
 		/**
 		 * Updates visible name placeholder.
+		 *
 		 * @param {string} placeholder Text to display as default host alias.
 		 */
 		setVisibleNamePlaceholder(placeholder) {
@@ -575,9 +574,8 @@ $linked_templates = $host_is_discovered
 			}
 		});
 
-		// radio button of inventory modes was clicked
+		// Radio button of inventory modes was clicked.
 		jQuery('input[name=inventory_mode]').click(function() {
-			// action depending on which button was clicked
 			var inventoryFields = jQuery('#inventorylist :input:gt(2)');
 
 			switch (jQuery(this).val()) {
