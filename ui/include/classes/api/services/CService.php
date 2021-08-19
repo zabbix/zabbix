@@ -649,7 +649,7 @@ class CService extends CApiService {
 
 			if (array_key_exists('propagation_rule', $service) && !array_key_exists('propagation_value', $service)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Cannot specify propagation_rule parameter without specifying propagation_value parameter for service "%1$s".',
+					'Cannot specify "propagation_rule" parameter without specifying "propagation_value" parameter for service "%1$s".',
 					$name
 				));
 			}
@@ -687,7 +687,7 @@ class CService extends CApiService {
 
 			if (!in_array($service['propagation_value'], $propagation_values)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incompatible propagation_rule and propagation_value parameters for service "%1$s".', $name)
+					_s('Incompatible "propagation_rule" and "propagation_value" parameters for service "%1$s".', $name)
 				);
 			}
 		}
