@@ -1480,7 +1480,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 	zbx_template_item_preproc_t	*preproc;
 	zbx_vector_uint64_t		deleteids;
 	zbx_db_insert_t			db_insert;
-	zbx_uint64_t			new_preprocid;
+	zbx_uint64_t			new_preprocid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1792,7 +1792,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 	int				i, j, new_param_num = 0, update_param_num = 0, delete_param_num = 0;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t			item_parameter_id;
+	zbx_uint64_t			item_parameter_id = 0;
 	zbx_template_item_t		*item;
 	zbx_template_item_param_t	*param;
 	zbx_vector_uint64_t		deleteids;
@@ -1945,7 +1945,7 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 	int				i, j, new_lld_macro_num = 0, update_lld_macro_num = 0, delete_lld_macro_num = 0;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t			new_lld_macro_pathid;
+	zbx_uint64_t			new_lld_macro_pathid = 0;
 	zbx_template_item_t		*item;
 	zbx_template_lld_macro_t	*lld_macro;
 	zbx_vector_uint64_t		deleteids;
