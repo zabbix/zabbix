@@ -209,10 +209,6 @@ class CAudit {
 		]
 	];
 
-	private static $relatable_id_mapping = [
-		'user.usrgrps' => 'usrgrpid'
-	];
-
 	private static $relatable_object = [
 		self::RESOURCE_USER => ['user.usrgrps']
 	];
@@ -296,15 +292,16 @@ class CAudit {
 
 		$object = self::maskValues($resource, $object);
 
-		$dot_object = self::dotArrayConverter($api_name, $object);
+		$object = self::convertKeysToDetailsFormat($api_name, $object);
 
 		switch ($action) {
 			case CAudit::ACTION_ADD:
-				return self::handleAdd($dot_object, $resource);
-			case CAudit::ACTION_UPDATE:
-				$dot_old_object = self::dotArrayConverter($api_name, self::maskValues($resource, $old_object));
+				return self::handleAdd($object, $resource);
 
-				return self::handleUpdate($dot_object, $dot_old_object, $resource);
+			case CAudit::ACTION_UPDATE:
+				$old_object = self::convertKeysToDetailsFormat($api_name, self::maskValues($resource, $old_object));
+
+				return self::handleUpdate($object, $old_object, $resource);
 		}
 
 		return [];
@@ -347,15 +344,11 @@ class CAudit {
 		return $object;
 	}
 
-	private static function dotArrayConverter(string $prefix, array $object): array {
+	private static function convertKeysToDetailsFormat(string $prefix, array $object): array {
 		$result = [];
 
 		foreach ($object as $key => $value) {
 			$index = is_numeric($key) ? '['.$key.']' : '.'.$key;
-
-			if (array_key_exists($prefix, self::$relatable_id_mapping)) {
-				$index = '['.$value[self::$relatable_id_mapping[$prefix]].']';
-			}
 
 			if (is_array($value)) {
 				$new_prefix = $prefix . $index;
@@ -365,7 +358,7 @@ class CAudit {
 					$result[$new_prefix] = '';
 				}
 
-				$result += self::dotArrayConverter($new_prefix, $value);
+				$result += self::convertKeysToDetailsFormat($new_prefix, $value);
 			}
 			else {
 				$result[$prefix.$index] = (string) $value;
@@ -461,12 +454,12 @@ class CAudit {
 	}
 
 	private static function handleAdd(array $object, int $resource): array {
-		$object_keys = self::getObjectMarkers(array_keys($object));
+		$object_markers = self::getObjectMarkers(array_keys($object));
 
 		foreach ($object as $key => &$value) {
 			$result = [];
 			$path = preg_replace('/\[[0-9]+\]/', '', $key);
-			$is_object_marker = (array_key_exists($key, $object_keys) && $object_keys[$key] > 1);
+			$is_object_marker = (array_key_exists($key, $object_markers) && $object_markers[$key] > 1);
 			$is_relatable = self::isObjectRelatable($resource, $path);
 
 			if (self::isDefaultValue($resource, $path, $value)) {
@@ -494,7 +487,7 @@ class CAudit {
 	private static function handleUpdate(array $object, array $old_object, int $resource): array {
 		$result = [];
 		$diff_keys = array_keys(array_merge($object, $old_object));
-		$object_keys = self::getObjectMarkers($diff_keys);
+		$object_markers = self::getObjectMarkers($diff_keys);
 
 		$object += $old_object;
 
@@ -504,7 +497,7 @@ class CAudit {
 
 			$path = preg_replace('/\[[0-9]+\]/', '', $key);
 			// Non associative arrays should not be detected as object marker.
-			$is_object_marker = (array_key_exists($key, $object_keys) && $object_keys[$key] > 1);
+			$is_object_marker = (array_key_exists($key, $object_markers) && $object_markers[$key] > 1);
 			$is_value_masked = self::isPathMasked($resource, $path, $value);
 			$is_relatable = self::isObjectRelatable($resource, $path);
 			$is_updatable = self::isObjectUpdatable($resource, $path);
