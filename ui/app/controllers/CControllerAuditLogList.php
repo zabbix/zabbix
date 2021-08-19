@@ -298,7 +298,7 @@ class CControllerAuditLogList extends CController {
 				$auditlog['short_details'] .= "\n\n";
 			}
 
-			$details = $this->formatDetails($details, $auditlog['action']);
+			$details = $this->formatDetails($details);
 
 			$auditlog['details'] = implode("\n", $details);
 			$auditlog['short_details'] .= implode("\n", array_slice($details, 0, 2));
@@ -312,16 +312,10 @@ class CControllerAuditLogList extends CController {
 		return $auditlogs;
 	}
 
-	private function formatDetails(array $details, string $action): array {
+	private function formatDetails(array $details): array {
 		$new_details = [];
 		foreach ($details as $key => $detail) {
-			switch ($action) {
-				case CAudit::ACTION_ADD:
-				case CAudit::ACTION_UPDATE:
-				case CAudit::ACTION_EXECUTE:
-					$new_details[] = $this->makeDetailString($key, $detail);
-					break;
-			}
+			$new_details[] = $this->makeDetailString($key, $detail);
 		}
 
 		sort($new_details);
