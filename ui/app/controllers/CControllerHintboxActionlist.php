@@ -38,7 +38,7 @@ class CControllerHintboxActionlist extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$this->event = API::Event()->get([
+			$events = API::Event()->get([
 				'output' => ['eventid', 'r_eventid', 'clock'],
 				'select_acknowledges' => ['userid', 'action', 'message', 'clock', 'new_severity',
 					'old_severity'
@@ -46,9 +46,13 @@ class CControllerHintboxActionlist extends CController {
 				'eventids' => (array) $this->getInput('eventid')
 			]);
 
-			$this->event = reset($this->event);
-
-			$ret = (bool) $this->event;
+			if (!$events) {
+				error(_('No permissions to referred object or it does not exist!'));
+				$ret = false;
+			}
+			else {
+				$this->event = $events[0];
+			}
 		}
 
 		if (!$ret) {

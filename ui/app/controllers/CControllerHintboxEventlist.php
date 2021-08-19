@@ -32,13 +32,13 @@ class CControllerHintboxEventlist extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'triggerid' => 'required|db triggers.triggerid',
-			'eventid_till' => 'required|db events.eventid',
-			'show_timeline' => 'required|in 0,1',
-			'show_tags' => 'required|in '.implode(',', [PROBLEMS_SHOW_TAGS_NONE, PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_3]),
-			'filter_tags' => 'array',
-			'tag_name_format' => 'required|in '.implode(',', [PROBLEMS_TAG_NAME_FULL, PROBLEMS_TAG_NAME_SHORTENED, PROBLEMS_TAG_NAME_NONE]),
-			'tag_priority' => 'required|string'
+			'triggerid' =>			'required|db triggers.triggerid',
+			'eventid_till' =>		'required|db events.eventid',
+			'show_timeline' =>		'required|in 0,1',
+			'show_tags' =>			'required|in '.implode(',', [PROBLEMS_SHOW_TAGS_NONE, PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_3]),
+			'filter_tags' =>		'array',
+			'tag_name_format' =>	'required|in '.implode(',', [PROBLEMS_TAG_NAME_FULL, PROBLEMS_TAG_NAME_SHORTENED, PROBLEMS_TAG_NAME_NONE]),
+			'tag_priority' =>		'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -53,8 +53,9 @@ class CControllerHintboxEventlist extends CController {
 				error(_('No permissions to referred object or it does not exist!'));
 				$ret = false;
 			}
-
-			$this->trigger = $triggers[0];
+			else {
+				$this->trigger = $triggers[0];
+			}
 		}
 
 		if ($ret) {
@@ -73,9 +74,9 @@ class CControllerHintboxEventlist extends CController {
 
 		foreach ($filter_tags as $filter_tag) {
 			$fields = [
-				'tag' => 'required|string',
-				'operator' => 'required|in '.implode(',', [TAG_OPERATOR_EQUAL, TAG_OPERATOR_LIKE]),
-				'value' => 'required|string'
+				'tag' =>		'required|string',
+				'operator' =>	'required|in '.implode(',', [TAG_OPERATOR_EQUAL, TAG_OPERATOR_LIKE]),
+				'value' =>		'required|string'
 			];
 
 			$validator = new CNewValidator($filter_tag, $fields);
