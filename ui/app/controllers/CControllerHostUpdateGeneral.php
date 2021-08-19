@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -24,7 +24,12 @@
  */
 abstract class CControllerHostUpdateGeneral extends CController {
 
-	protected static function getValidationFields() {
+	/**
+	 * Common host field validation rules.
+	 * 
+	 * @return array
+	 */
+	protected static function getValidationFields(): array {
 		return [
 			'host'				=> 'required|db hosts.host|not_empty',
 			'visiblename'		=> 'db hosts.name',

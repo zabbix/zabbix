@@ -25,9 +25,7 @@
 class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 
 	protected function checkInput(): bool {
-		$fields = ['hostid' => 'required|db hosts.hostid'] + self::getValidationFields();
-
-		return parent::checkInputFields($fields);
+		return parent::checkInputFields(['hostid' => 'required|db hosts.hostid'] + self::getValidationFields());
 	}
 
 	protected function checkPermissions(): bool {
