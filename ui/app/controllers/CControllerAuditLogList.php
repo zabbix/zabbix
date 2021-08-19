@@ -265,50 +265,48 @@ class CControllerAuditLogList extends CController {
 
 	private function sanitizeDetails(array $auditlogs): array {
 		foreach ($auditlogs as &$auditlog) {
-			if (in_array($auditlog['action'], [AUDIT_ACTION_UPDATE, AUDIT_ACTION_ADD, AUDIT_ACTION_EXECUTE])) {
-				$details = json_decode($auditlog['details'], true);
-				$auditlog['details'] = is_array($details) ? $this->formatDetails($details, $auditlog['action']) : '';
+			if (!in_array($auditlog['action'], [AUDIT_ACTION_UPDATE, AUDIT_ACTION_ADD, AUDIT_ACTION_EXECUTE])) {
+				continue;
 			}
+
+			$details = json_decode($auditlog['details'], true);
+
+			if (!is_array($details) || count($details) == 0) {
+				continue;
+			}
+
+			$details = $this->formatDetails($details);
+
+			$auditlog['details'] = implode("\n", $details);
 		}
 		unset($auditlog);
 
 		return $auditlogs;
 	}
 
-	private function formatDetails(array $details, string $action): string {
+	private function formatDetails(array $details): array {
 		$new_details = [];
 		foreach ($details as $key => $detail) {
-			switch ($action) {
-				case AUDIT_ACTION_ADD:
-					$new_details[] = sprintf('%s: %s', $key, (count($detail) > 1) ? $detail[1] : _('Added'));
-					break;
-				case AUDIT_ACTION_UPDATE:
-					switch ($detail[0]) {
-						case AUIDT_DETAILS_ACTION_ATTACH:
-						case AUIDT_DETAILS_ACTION_DETACH:
-							$new_details[] = sprintf('%s: %s (%s)', $key, $detail[1],
-								($detail[0] === AUIDT_DETAILS_ACTION_ATTACH) ? _('Attached') : _('Detached')
-							);
-							break;
-						case AUIDT_DETAILS_ACTION_ADD:
-							$new_details[] = sprintf('%s: %s', $key, (count($detail) > 1) ? $detail[1] : _('Added'));
-							break;
-						case AUIDT_DETAILS_ACTION_DELETE:
-							$new_details[] = sprintf('%s: %s', $key, _('Deleted'));
-							break;
-						default:
-							$new_details[] = sprintf('%s: %s => %s', $key, $detail[2], $detail[1]);
-							break;
-					}
-					break;
-				case AUDIT_ACTION_EXECUTE:
-					$new_details[] = sprintf('%s: %s', $key, $detail[1]);
-					break;
-			}
+			$new_details[] = $this->makeDetailString($key, $detail);
 		}
 
-		natsort($new_details);
+		sort($new_details);
 
-		return implode("\n", $new_details);
+		return $new_details;
+	}
+
+	private function makeDetailString(string $key, array $detail): string {
+		switch ($detail[0]) {
+			case AUDIT_DETAILS_ACTION_ADD:
+				return sprintf('%s: %s', $key, array_key_exists(1, $detail) ? $detail[1] : _('Added'));
+
+			case AUDIT_DETAILS_ACTION_DELETE:
+				return sprintf('%s: %s', $key, _('Deleted'));
+
+			case AUDIT_DETAILS_ACTION_UPDATE:
+				return array_key_exists(1, $detail)
+					? sprintf('%s: %s => %s', $key, $detail[2], $detail[1])
+					: sprintf('%s: %s', $key, _('Updated'));
+		}
 	}
 }
