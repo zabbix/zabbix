@@ -31,8 +31,6 @@ class CUserGroup extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	protected const AUDIT_RESOURCE = CAudit::RESOURCE_USER_GROUP;
-
 	protected $tableName = 'usrgrp';
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['usrgrpid', 'name'];
@@ -199,7 +197,7 @@ class CUserGroup extends CApiService {
 		$this->updateTagFilters($usrgrps, __FUNCTION__);
 		$this->updateUsersGroups($usrgrps, __FUNCTION__);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, self::AUDIT_RESOURCE, $usrgrps);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
@@ -285,7 +283,7 @@ class CUserGroup extends CApiService {
 		$this->updateTagFilters($usrgrps, __FUNCTION__);
 		$this->updateUsersGroups($usrgrps, __FUNCTION__);
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, self::AUDIT_RESOURCE, $usrgrps, $db_usrgrps);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 
 		return ['usrgrpids'=> zbx_objectValues($usrgrps, 'usrgrpid')];
 	}
@@ -850,7 +848,7 @@ class CUserGroup extends CApiService {
 		DB::delete('users_groups', ['usrgrpid' => $usrgrpids]);
 		DB::delete('usrgrp', ['usrgrpid' => $usrgrpids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, self::AUDIT_RESOURCE, $db_usrgrps);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
