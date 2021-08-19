@@ -193,11 +193,11 @@ void	zbx_audit_host_group_create_entry(int audit_action, zbx_uint64_t groupid, c
 void	zbx_audit_host_group_del(zbx_uint64_t groupid, const char *name);
 void	zbx_audit_host_group_update_json_add_details(zbx_uint64_t groupid, const char *name, int flags);
 
-#define PREPARE_AUDIT_HOST_GROUP_UPDATE_H(resource, type1, type2)						\
+#define PREPARE_AUDIT_HOST_GROUP_UPDATE_H(resource, type1)						\
 void	zbx_audit_host_group_update_json_update_##resource(zbx_uint64_t groupid, type1 old_##resource,		\
 		type1 new_##resource);										\
 
-PREPARE_AUDIT_HOST_GROUP_UPDATE_H(name, const char*, string)
+PREPARE_AUDIT_HOST_GROUP_UPDATE_H(name, const char*)
 #undef PREPARE_AUDIT_HOST_UPDATE_H
 
 #endif	/* ZABBIX_AUDIT_HOST_H */
