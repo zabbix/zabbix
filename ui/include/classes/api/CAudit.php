@@ -284,7 +284,7 @@ class CAudit {
 	}
 
 	private static function handleObjectDiff(int $resource, int $action, array $object, array $old_object): array {
-		if (in_array($action, [self::ACTION_DELETE, self::ACTION_LOGIN, self::ACTION_LOGOUT])) {
+		if (!in_array($action, [self::ACTION_CREATE, self::ACTION_UPDATE, self::ACTION_EXECUTE])) {
 			return [];
 		}
 
