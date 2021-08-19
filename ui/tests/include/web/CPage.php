@@ -233,6 +233,8 @@ class CPage {
 	 */
 	public function logout() {
 		try {
+			$this->open('setup.php');
+
 			$session = (self::$cookie === null)
 					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_session'), 'value')
 					: self::$cookie['value'];
@@ -578,12 +580,8 @@ class CPage {
 			$this->driver->get(PHPUNIT_URL);
 		}
 
+		$this->logout();
 		$this->open('index.php');
-
-		if ($this->getCurrentUrl() !== 'index.php') {
-			$this->logout();
-		}
-
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
 		$this->query('id:enter')->one()->click();
