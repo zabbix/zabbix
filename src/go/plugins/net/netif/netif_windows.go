@@ -87,7 +87,7 @@ func (p *Plugin) getIfRowByIP(ipaddr string, ifs []win32.MIB_IF_ROW2) (row *win3
 }
 
 func (p *Plugin) getGuidString(winGuid win32.GUID) string {
-	return fmt.Sprintf("{%08x-%04x-%04x-%02x-%02x}", winGuid.Data1, winGuid.Data2, winGuid.Data3, winGuid.Data4[:2], winGuid.Data4[2:])
+	return fmt.Sprintf("{%08X-%04X-%04X-%02X-%02X}", winGuid.Data1, winGuid.Data2, winGuid.Data3, winGuid.Data4[:2], winGuid.Data4[2:])
 }
 
 func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {

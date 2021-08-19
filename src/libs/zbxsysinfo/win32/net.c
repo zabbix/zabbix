@@ -329,7 +329,7 @@ static char	*zbx_ifrow_get_guid_str(const zbx_ifrow_t *pIfRow)
 		guid = &pIfRow->ifRow2->InterfaceGuid;
 
 		zbx_snprintf_alloc(&guid_cstr, &guid_alloc, &guid_offset,
-				"{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
+				"{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
 				guid->Data1, guid->Data2, guid->Data3,
 				guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3],
 				guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
