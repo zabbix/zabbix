@@ -1157,11 +1157,6 @@ jQuery(function($) {
 			// Position the menu (before hiding).
 			$menu_popup.position(options.position);
 
-			// Fix menu showing out of viewport in case of many Scripts etc.
-			if (parseInt($menu_popup.css('top'), 10) < 0) {
-				$menu_popup.css('top', 0);
-			}
-
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
 			$menu_popup.add('.menu-popup', $menu_popup).hide();
 
