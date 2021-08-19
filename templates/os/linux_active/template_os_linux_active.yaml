@@ -1283,7 +1283,7 @@ zabbix_export:
           uuid: 7cb47989debc4deba77394a5320a83e8
           name: 'Checksum of /etc/passwd'
           type: ZABBIX_ACTIVE
-          key: 'vfs.file.cksum[/etc/passwd]'
+          key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
           history: 7d
           trends: '0'
@@ -1300,7 +1300,7 @@ zabbix_export:
           triggers:
             -
               uuid: a49d7ca808c345ec8ef516fdc3b0d5ff
-              expression: 'last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#1)<>last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd],#2)'
+              expression: 'last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd,sha256],#2)'
               name: '/etc/passwd has been changed'
               priority: INFO
               manual_close: 'YES'
