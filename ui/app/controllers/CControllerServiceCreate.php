@@ -27,7 +27,7 @@ class CControllerServiceCreate extends CController {
 			'parent_serviceids' =>			'array_db services.serviceid',
 			'problem_tags' =>				'array',
 			'sortorder' =>					'required|db services.sortorder|ge 0|le 999',
-			'algorithm' =>					'required|db services.algorithm|in '.implode(',', [ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL]),
+			'algorithm' =>					'required|db services.algorithm|in '.implode(',', [ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE]),
 			'advanced_configuration' =>		'in 1',
 			'status_rules' =>				'array',
 			'propagation_rule' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusPropagationNames())),
