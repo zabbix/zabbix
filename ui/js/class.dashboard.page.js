@@ -994,7 +994,12 @@ class CDashboardPage extends CBaseComponent {
 				});
 			},
 
-			mouseLeave: (e) => {
+			mouseLeave: () => {
+				if (this._widget_placeholder_move_animation_frame !== null) {
+					cancelAnimationFrame(this._widget_placeholder_move_animation_frame);
+					this._widget_placeholder_move_animation_frame = null;
+				}
+
 				if (this._widget_placeholder_clicked_pos === null) {
 					this.resetWidgetPlaceholder();
 				}
