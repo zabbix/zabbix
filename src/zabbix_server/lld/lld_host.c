@@ -4107,6 +4107,11 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 				snmp->authprotocol = interface->data.snmp->authprotocol;
 				snmp->privprotocol = interface->data.snmp->privprotocol;
 				snmp->contextname = zbx_strdup(NULL, interface->data.snmp->contextname);
+				snmp->community_orig = NULL;
+				snmp->securityname_orig = NULL;
+				snmp->authpassphrase_orig = NULL;
+				snmp->privpassphrase_orig = NULL;
+				snmp->contextname_orig = NULL;
 				snmp->flags = 0x00;
 				new_interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 				new_interface->data.snmp = snmp;
