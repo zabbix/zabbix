@@ -1888,7 +1888,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 
 		ZBX_STR2UINT64(hosttemplateid, row[0]);
 		ZBX_STR2UINT64(templateid, row[1]);
-		zbx_audit_host_update_json_detach_parent_template(hostid, hosttemplateid, templateid);
+		zbx_audit_host_update_json_delete_parent_template(hostid, hosttemplateid, templateid);
 	}
 
 	DBfree_result(result);
@@ -2501,7 +2501,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
 								host_prototype->hostid, host_prototype->name);
 
-						zbx_audit_host_update_json_detach_parent_template(
+						zbx_audit_host_update_json_delete_parent_template(
 								host_prototype->hostid, hosttemplateid, templateid);
 					}
 					else
@@ -3661,6 +3661,9 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			{
 				zbx_vector_db_tag_ptr_append(&upd_tags, tag);
 
+				zbx_audit_host_prototype_update_json_update_tag_create_entry(host_prototype->hostid,
+						tag->tagid);
+
 				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
 				{
 					zbx_audit_host_prototype_update_json_update_tag_tag(host_prototype->hostid,
@@ -3870,7 +3873,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, host_prototype->hostid,
 					host_prototype->lnk_templateids.values[j]);
 
-			zbx_audit_host_prototype_update_json_attach_parent_template(host_prototype->hostid,
+			zbx_audit_host_prototype_update_json_add_parent_template(host_prototype->hostid,
 					hosttemplateid, host_prototype->lnk_templateids.values[j]);
 
 			hosttemplateid++;
@@ -3927,6 +3930,9 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				const char	*d = "";
 
 				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hostmacro set ");
+
+				zbx_audit_host_prototype_update_json_update_hostmacro_create_entry(
+						host_prototype->hostid, hostmacro->hostmacroid);
 
 				if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_VALUE))
 				{
@@ -5226,7 +5232,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	for (i = 0; i < lnk_templateids->values_num; i++)
 	{
 		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, hostid, lnk_templateids->values[i]);
-		zbx_audit_host_update_json_attach_parent_template(hostid, hosttemplateid, lnk_templateids->values[i]);
+		zbx_audit_host_update_json_add_parent_template(hostid, hosttemplateid, lnk_templateids->values[i]);
 
 		hosttemplateid++;
 	}

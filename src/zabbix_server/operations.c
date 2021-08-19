@@ -191,7 +191,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 		for (i = 0; i < groupids->values_num; i++)
 		{
 			zbx_db_insert_add_values(&db_insert, hostgroupid, hostid, groupids->values[i]);
-			zbx_audit_hostgroup_update_json_attach(hostid, hostgroupid, groupids->values[i]);
+			zbx_audit_hostgroup_update_json_add_group(hostid, hostgroupid, groupids->values[i]);
 			hostgroupid++;
 		}
 
