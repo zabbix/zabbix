@@ -75,9 +75,12 @@ static int	DBpatch_5000002(void)
 
 static int	DBpatch_5000003(void)
 {
-	DB_RESULT	result;
-	int		ret;
-	const char	*fields[] = {"subject", "message"};
+	DB_RESULT		result;
+	int			ret;
+	zbx_field_len_t		fields[] = {
+			{"subject", 255},
+			{"message", 65535}
+	};
 
 	result = DBselect("select om.operationid,om.subject,om.message"
 			" from opmessage om,operations o,actions a"
@@ -96,9 +99,12 @@ static int	DBpatch_5000003(void)
 
 static int	DBpatch_5000004(void)
 {
-	DB_RESULT	result;
-	int		ret;
-	const char	*fields[] = {"subject", "message"};
+	DB_RESULT		result;
+	int			ret;
+	zbx_field_len_t		fields[] = {
+			{"subject", 255},
+			{"message", 65535}
+	};
 
 	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
 

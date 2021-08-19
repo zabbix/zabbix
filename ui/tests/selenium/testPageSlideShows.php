@@ -86,7 +86,7 @@ class testPageSlideShows extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allSlideShows
-	 * @backup-once slideshows
+	 * @backupOnce slideshows
 	 */
 	public function testPageSlideShows_DeleteSelected($slideshow) {
 		$slideshowid = $slideshow['slideshowid'];
@@ -109,7 +109,7 @@ class testPageSlideShows extends CLegacyWebTest {
 	}
 
 	/**
-	 * @backup-once slideshows
+	 * @backupOnce slideshows
 	 */
 	public function testPageSlideShows_MassDeleteAll() {
 		$this->zbxTestLogin('slideconf.php');

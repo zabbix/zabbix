@@ -433,7 +433,7 @@ Template tooling version used: 0.38</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Miniumum apply latency of OSDs</description>
+               <description>Minimum apply latency of OSDs</description>
                <applications>
                   <application>
                      <name>Ceph</name>

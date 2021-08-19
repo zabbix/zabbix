@@ -75,6 +75,7 @@
 				<trycatch>
 					<try>
 						<exec executable="scan-build" failonerror="on">
+							<arg line="-plist-html"/>
 							<arg line="-o"/>
 							<arg line="./clang-scan-build-reports"/>
 							<arg line="make"/>
@@ -192,7 +193,7 @@
 						<arg line="tests_build"/>
 					</exec>
 					<mkdir dir="tests_results/@{conf-name}"/>
-					<exec executable="tests/tests_run.pl" failonerror="on" output="tests_results/@{conf-name}/output.xml">
+					<exec executable="tests/tests_run.pl" failonerror="off" output="tests_results/@{conf-name}/output.xml">
 						<arg line="-x @{conf-name}"/>
 					</exec>
 				</try>
@@ -222,7 +223,7 @@
 		<property name="cmocka-2-agent-only" value="-q --enable-agent"/>
 		<property name="cmocka-3-server-only" value="-q --enable-server --with-mysql"/>
 		<property name="cmocka-4-proxy-only" value="-q --enable-proxy --with-sqlite3"/>
-		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
 	</target>
 
 	<target name="cmocka-tests" depends="init-cmocka-test-conf-options">

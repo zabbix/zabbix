@@ -170,7 +170,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 	/**
 	 * Test for checking new Graph prototype widget creation.
 	 *
-	 * @on-after cleanupProfile
+	 * @onAfter cleanupProfile
 	 *
 	 * @dataProvider getWidgetData
 	 */
@@ -181,7 +181,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 	/**
 	 * Test for checking existing Graph prototype widget update.
 	 *
-	 * @on-after cleanupProfile
+	 * @onAfter cleanupProfile
 	 *
 	 * @dataProvider getWidgetData
 	 */

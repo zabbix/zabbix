@@ -597,7 +597,8 @@ class CControllerMenuPopup extends CController {
 						$menu_data['urls'][] = [
 							'label' => $url['name'],
 							'url' => $url['url'],
-							'target' => '_blank'
+							'target' => '_blank',
+							'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
 						];
 					}
 				}
@@ -609,7 +610,7 @@ class CControllerMenuPopup extends CController {
 						$url['url'] = 'javascript: alert(\''.
 							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
 						'\');';
-						unset($url['target']);
+						unset($url['target'], $url['rel']);
 					}
 				}
 				unset($url);

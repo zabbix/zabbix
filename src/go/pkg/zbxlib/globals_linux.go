@@ -86,6 +86,7 @@ char *CONFIG_TLS_CIPHER_CMD = NULL;
 
 int	CONFIG_PASSIVE_FORKS = 0;
 int	CONFIG_ACTIVE_FORKS = 0;
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 const char	*progname = NULL;
 const char	title_message[] = "agent";

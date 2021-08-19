@@ -1307,7 +1307,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 1,
-												'Type' => 'Flexible',
+												'type' => 'Flexible',
 												'delay' => '60s',
 												'period' => '1-5,01:01-13:05'
 											]
@@ -1374,11 +1374,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 *
 	 * @backup items
 	 */
-	// TODO: uncomment after fix ZBX-18271
-/*	public function testFormLowLevelDiscoveryOverrides_Update($data) {
+	public function testFormLowLevelDiscoveryOverrides_Update($data) {
 		$this->overridesUpdate($data);
 	}
-*/
 
 	private function overridesUpdate($data) {
 		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
@@ -1840,27 +1838,22 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			if (array_key_exists('Operations', $override)) {
 				// Write Condititons from data to array.
 				$condition_text = [];
-				foreach($override['Operations'] as $operation) {
+				foreach ($override['Operations'] as $operation) {
 					$fields = array_key_exists('fields', $operation) ? $operation['fields'] : $operation;
 
 					$condition_text[] = $fields['Object'].' '.
 							$fields['Condition']['operator'].' '.
 							$fields['Condition']['value'];
 				}
-				// TODO: remove sort after fix ZBX-18271
-				sort($condition_text);
 
 				// Compare Conditions from table with data.
 				$actual_conditions = [];
 				for ($n = 0; $n < $operation_count - 1; $n++) {
 					$actual_conditions[] = $operation_container->getRow($n)->getColumn('Condition')->getText();
 				}
-				// TODO: remove sort after fix ZBX-18271
-				sort($actual_conditions);
-
 				$this->assertEquals($condition_text, $actual_conditions);
 
-				foreach($override['Operations'] as $i => $operation) {
+				foreach ($override['Operations'] as $i => $operation) {
 					$operation_container->getRow($i)->query('button:Edit')->one()->click();
 					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asCheckboxForm()->one();
 					$operation_overlay->checkValue(

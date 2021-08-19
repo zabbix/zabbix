@@ -37,7 +37,7 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_hostids' =>				'array_id',
 			'filter_application' =>			'string',
 			'filter_select' =>				'string',
-			'filter_show_without_data' =>	'in 1',
+			'filter_show_without_data' =>	'in 0,1',
 			'filter_show_details' =>		'in 1',
 			'filter_set' =>					'in 1',
 			'filter_rst' =>					'in 1',
@@ -71,7 +71,7 @@ class CControllerLatestView extends CControllerLatest {
 				PROFILE_TYPE_STR
 			);
 			CProfile::update('web.latest.filter.select', trim($this->getInput('filter_select', '')), PROFILE_TYPE_STR);
-			CProfile::update('web.latest.filter.show_without_data', $this->getInput('filter_show_without_data', 0),
+			CProfile::update('web.latest.filter.show_without_data', $this->getInput('filter_show_without_data', 1),
 				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.latest.filter.show_details', $this->getInput('filter_show_details', 0),

@@ -1489,11 +1489,6 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
 	}
 
-	// Sort interfaces to be listed starting with one selected as 'main'.
-	CArrayHelper::sort($data['interfaces'], [
-		['field' => 'main', 'order' => ZBX_SORT_DOWN]
-	]);
-
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
 	}

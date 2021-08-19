@@ -53,12 +53,23 @@ foreach ($data['alerts'] as $alert) {
 		$info_icons = null;
 	}
 
+	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
+		? [
+			bold($alert['subject']),
+			BR(),
+			BR(),
+			zbx_nl2br($alert['message'])
+		]
+		: [
+			zbx_nl2br($alert['message'])
+		];
+
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 		array_key_exists($alert['actionid'], $data['actions']) ? $data['actions'][$alert['actionid']]['name'] : '',
 		$alert['description'],
 		makeEventDetailsTableUser($alert, $data['db_users']),
-		[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
+		$message,
 		makeActionTableStatus($alert),
 		makeInformationList($info_icons)
 	]);

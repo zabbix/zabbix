@@ -273,9 +273,10 @@ class CTemplate extends CHostGeneral {
 					$result = $template['rowscount'];
 				}
 			}
-			else{
+			else {
 				$template['templateid'] = $template['hostid'];
-				unset($template['hostid']);
+				// Templates share table with hosts and host prototypes. Therefore remove template unrelated fields.
+				unset($template['hostid'], $template['discover']);
 
 				$result[$template['templateid']] = $template;
 			}
@@ -1231,15 +1232,21 @@ class CTemplate extends CHostGeneral {
 		// Adding Templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
+				$templates = [];
 				$relationMap = $this->createRelationMap($result, 'templateid', 'hostid', 'hosts_templates');
-				$templates = API::Template()->get([
-					'output' => $options['selectTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($templates, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$templates = API::Template()->get([
+						'output' => $options['selectTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($templates, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $templates, 'templates', $options['limitSelects']);
 			}
 			else {
@@ -1260,15 +1267,21 @@ class CTemplate extends CHostGeneral {
 		// Adding Hosts
 		if ($options['selectHosts'] !== null) {
 			if ($options['selectHosts'] != API_OUTPUT_COUNT) {
+				$hosts = [];
 				$relationMap = $this->createRelationMap($result, 'templateid', 'hostid', 'hosts_templates');
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'host');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hosts = API::Host()->get([
+						'output' => $options['selectHosts'],
+						'hostids' => $related_ids,
+						'preservekeys' => true
+					]);
+					if (!is_null($options['limitSelects'])) {
+						order_result($hosts, 'host');
+					}
 				}
+
 				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
 			else {

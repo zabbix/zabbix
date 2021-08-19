@@ -714,21 +714,26 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * Each host prototype must have the "ruleid" parameter set.
 	 *
-	 * @param array     $hostPrototypes
+	 * @param array     $host_prototypes
 	 * @param array		$hostIds
 	 *
 	 * @return array 	an array of unsaved child host prototypes
 	 */
-	protected function prepareInheritedObjects(array $hostPrototypes, array $hostIds = null) {
+	protected function prepareInheritedObjects(array $host_prototypes, array $hostIds = null) {
 		// fetch the related discovery rules with their hosts
 		$discoveryRules = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'hostid'],
 			'selectHosts' => ['hostid'],
-			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid'),
+			'itemids' => array_column($host_prototypes, 'ruleid'),
 			'templated' => true,
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
+
+		// Remove host prototypes which don't belong to templates, so they cannot be inherited.
+		$host_prototypes = array_filter($host_prototypes, function ($host_prototype) use ($discoveryRules) {
+			return array_key_exists($host_prototype['ruleid'], $discoveryRules);
+		});
 
 		// fetch all child hosts to inherit to
 		// do not inherit host prototypes on discovered hosts
@@ -786,7 +791,7 @@ class CHostPrototype extends CHostBase {
 			// skip items not from parent templates of current host
 			$templateIds = zbx_toHash($host['parentTemplates'], 'templateid');
 			$parentHostPrototypes = [];
-			foreach ($hostPrototypes as $inum => $parentHostPrototype) {
+			foreach ($host_prototypes as $inum => $parentHostPrototype) {
 				$parentTemplateId = $discoveryRules[$parentHostPrototype['ruleid']]['hostid'];
 
 				if (isset($templateIds[$parentTemplateId])) {
@@ -1294,6 +1299,7 @@ class CHostPrototype extends CHostBase {
 
 		// adding host
 		if ($options['selectParentHost'] !== null && $options['selectParentHost'] != API_OUTPUT_COUNT) {
+			$hosts = [];
 			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
 				'SELECT hd.hostid,i.hostid AS parent_hostid'.
@@ -1305,25 +1311,36 @@ class CHostPrototype extends CHostBase {
 				$relationMap->addRelation($relation['hostid'], $relation['parent_hostid']);
 			}
 
-			$hosts = API::Host()->get([
-				'output' => $options['selectParentHost'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'templated_hosts' => true,
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$hosts = API::Host()->get([
+					'output' => $options['selectParentHost'],
+					'hostids' => $related_ids,
+					'templated_hosts' => true,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapOne($result, $hosts, 'parentHost');
 		}
 
 		// adding templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
+				$templates = [];
 				$relationMap = $this->createRelationMap($result, 'hostid', 'templateid', 'hosts_templates');
-				$templates = API::Template()->get([
-					'output' => $options['selectTemplates'],
-					'templateids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true
-				]);
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$templates = API::Template()->get([
+						'output' => $options['selectTemplates'],
+						'templateids' => $related_ids,
+						'preservekeys' => true
+					]);
+				}
+
 				$result = $relationMap->mapMany($result, $templates, 'templates');
 			}
 			else {

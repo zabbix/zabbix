@@ -360,6 +360,7 @@ abstract class CGraphGeneral extends CApiService {
 
 		// adding Hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
+			$hosts = [];
 			$relationMap = new CRelationMap();
 			// discovered items
 			$dbRules = DBselect(
@@ -372,18 +373,24 @@ abstract class CGraphGeneral extends CApiService {
 				$relationMap->addRelation($relation['graphid'], $relation['hostid']);
 			}
 
-			$hosts = API::Host()->get([
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'templated_hosts' => true,
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$hosts = API::Host()->get([
+					'output' => $options['selectHosts'],
+					'hostids' => $related_ids,
+					'templated_hosts' => true,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding Templates
 		if ($options['selectTemplates'] !== null && $options['selectTemplates'] !== API_OUTPUT_COUNT) {
+			$templates = [];
 			$relationMap = new CRelationMap();
 			// discovered items
 			$dbRules = DBselect(
@@ -396,12 +403,17 @@ abstract class CGraphGeneral extends CApiService {
 				$relationMap->addRelation($relation['graphid'], $relation['hostid']);
 			}
 
-			$templates = API::Template()->get([
-				'output' => $options['selectTemplates'],
-				'templateids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$templates = API::Template()->get([
+					'output' => $options['selectTemplates'],
+					'templateids' => $related_ids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			$result = $relationMap->mapMany($result, $templates, 'templates');
 		}
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-04T07:33:55Z</date>
+   <date>2021-08-17T12:26:21Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -63,6 +63,7 @@ Template tooling version used: 0.38</description>
                <key>sensor.temp.status[cpqHeThermalCondition.0]</key>
                <history>7d</history>
                <trends>0d</trends>
+               <status>ENABLED</status>
                <description>MIB: CPQHLTH-MIB&#13;
 This value specifies the overall condition of the system's thermal environment.&#13;
 This value will be one of the following:&#13;
@@ -90,8 +91,10 @@ failed(4)  The temperature sensor detects a condition that could  permanently da
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.232.2.2.4.2.0</snmp_oid>
                <key>system.hw.model</key>
+               <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: CPQSINFO-MIB&#13;
 The machine product name.The name of the machine used in this system.</description>
@@ -113,8 +116,10 @@ The machine product name.The name of the machine used in this system.</descripti
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.232.2.2.2.1.0</snmp_oid>
                <key>system.hw.serialnumber</key>
+               <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: CPQSINFO-MIB&#13;
 The serial number of the physical system unit. The string will be empty if the system does not report the serial number function.</description>
@@ -147,6 +152,7 @@ The serial number of the physical system unit. The string will be empty if the s
                <key>system.status[cpqHeMibCondition.0]</key>
                <history>7d</history>
                <trends>0d</trends>
+               <status>ENABLED</status>
                <description>MIB: CPQHLTH-MIB&#13;
 The overall condition. This object represents the overall status of the server information represented by this MIB.</description>
                <applications>
@@ -203,6 +209,7 @@ The overall condition. This object represents the overall status of the server i
                      <key>system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Cache Module Board Backup Power Status. This monitors the status of each backup power source on the board.&#13;
 The backup power source can only recharge when the system has power applied. The type of backup power source used is indicated by cpqDaAccelBackupPowerSource.&#13;
@@ -268,37 +275,26 @@ Capacitor Failed (7)  The flash backed cache module capacitor is below the suffi
                      <key>system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
-Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.&#13;
-Note that for some controller models, a cache module board that physically attaches to the controller or chipset may not be an available option.&#13;
-&#13;
-The status can be:&#13;
 Other (1)&#13;
- Indicates that the instrument agent does not recognize the status of the cache module. You may need to upgrade the instrument agent.&#13;
-&#13;
+ Indicates that the instrument agent does not recognize the status of the cache module.&#13;
 Invalid (2)&#13;
  Indicates that a cache module board has not been installed in this system or is present but not configured.&#13;
-&#13;
 Enabled (3)&#13;
  Indicates that cache operations are currently configured and enabled for at least one logical drive.&#13;
-&#13;
 Temporarily Disabled (4)&#13;
- Indicates that cache operations have been temporarily disabled. View the cache module board error code object to determine why the write cache operations have been temporarily disabled.&#13;
-&#13;
+ Indicates that cache operations have been temporarily disabled.&#13;
 Permanently Disabled (5)&#13;
- Indicates that cache operations have been permanently disabled. View the cache module board error code object to determine why the write cache operations have been disabled.&#13;
-&#13;
+ Indicates that cache operations have been permanently disabled.&#13;
 Cache Module Flash Memory Not Attached (6)&#13;
- Indicates that the flash memory component of the flash backed cache module is not attached. This status will be set when the flash memory is not attached and the Supercap is attached. This value is only used on flash backed cache modules that support removable flash memory.&#13;
-&#13;
+ Indicates that the flash memory component of the flash backed cache module is not attached.&#13;
 Cache Module Degraded Failsafe Speed (7)&#13;
- Indicates that the cache module board is currently degraded and operating at a failsafe speed. View variables cpqDaCacheMemoryDataWidth and cpqDaCacheMemoryTransferRate to obtain the cache module board`s current memory data width and memory transfer rate.&#13;
-&#13;
+ Indicates that the cache module board is currently degraded and operating at a failsafe speed.&#13;
 Cache Module Critical Failure (8)&#13;
  Indicates that the cache module board has encountered a critical failure. The controller is currently operating in Zero Memory Raid mode.&#13;
-&#13;
 Read Cache Could Not Be Mapped (9)&#13;
- Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available. This status may be caused by virtual space limitations in certain operating systems and is only applicable to B-Series controllers.</description>
+ Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available.</description>
                      <applications>
                         <application>
                            <name>Disk arrays</name>
@@ -377,6 +373,7 @@ Read Cache Could Not Be Mapped (9)&#13;
                      <key>system.hw.diskarray.model[cpqDaCntlrModel.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Array Controller Model. The type of controller card.</description>
                      <applications>
@@ -401,6 +398,7 @@ Array Controller Model. The type of controller card.</description>
                      <key>system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 This value represents the overall condition of this controller,&#13;
 and any associated logical drives,physical drives, and array accelerators.</description>
@@ -465,6 +463,7 @@ and any associated logical drives,physical drives, and array accelerators.</desc
                      <key>sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The condition of the fan.&#13;
 This value will be one of the following:&#13;
@@ -533,6 +532,7 @@ failed(4)  A non-redundant fan is not operating properly.</description>
                      <key>system.hw.physicaldisk.media_type[cpqDaPhyDrvMediaType.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Drive Array Physical Drive Media Type.The following values are defined:&#13;
 other(1)  The instrument agent is unable to determine the physical drive’s media type.&#13;
@@ -560,6 +560,7 @@ solidState(3)  The physical drive media is composed of solid state electronics.<
                      <key>system.hw.physicaldisk.model[cpqDaPhyDrvModel.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive Model.This is a text description of the physical drive.&#13;
@@ -585,6 +586,7 @@ If a model number is not present, you may not have properly initialized the driv
                      <key>system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive Serial Number.&#13;
@@ -619,6 +621,7 @@ but may have been modified due to space limitations.  This can be used for ident
                      <key>system.hw.physicaldisk.size[cpqDaPhyDrvMediaType.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive Size in MB.&#13;
@@ -651,6 +654,7 @@ or if the controller does not support SCSI drives.</description>
                      <key>system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive S.M.A.R.T Status.The following values are defined:&#13;
 other(1)  The agent is unable to determine if the status of S.M.A.R.T  predictive failure monitoring for this drive.&#13;
@@ -693,6 +697,7 @@ replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  er
                      <key>system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Physical Drive Status. This shows the status of the physical drive. The following values are valid for the physical drive status:&#13;
 other (1)  Indicates that the instrument agent does not recognize  the drive.&#13;
@@ -761,6 +766,7 @@ predictiveFailure(4)  Indicates that the drive has a predictive failure error an
                      <key>sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The condition of the power supply. This value will be one of the following:&#13;
 other(1)  The status could not be determined or not present.&#13;
@@ -837,6 +843,7 @@ failed(4)  A power supply component detects a condition that could  permanently 
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -893,6 +900,7 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <key>sensor.temp.locale[cpqHeTemperatureLocale.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 This specifies the location of the temperature sensor present in the system.</description>
                      <applications>
@@ -916,6 +924,7 @@ This specifies the location of the temperature sensor present in the system.</de
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -970,6 +979,7 @@ Temperature readings of testpoint: {#SNMPINDEX}</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1025,6 +1035,7 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1074,6 +1085,7 @@ Temperature readings of testpoint: Ambient</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1129,6 +1141,7 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1178,6 +1191,7 @@ Temperature readings of testpoint: CPU-{#SNMPINDEX}</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1233,6 +1247,7 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1282,6 +1297,7 @@ Temperature readings of testpoint: I/O-{#SNMPINDEX}</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1337,6 +1353,7 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1386,6 +1403,7 @@ Temperature readings of testpoint: Memory-{#SNMPINDEX}</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1441,6 +1459,7 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1490,6 +1509,7 @@ Temperature readings of testpoint: PSU-{#SNMPINDEX}</description>
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>MIB: CPQHLTH-MIB&#13;
 The Temperature sensor condition.&#13;
 This value will be one of the following:&#13;
@@ -1545,6 +1565,7 @@ The system will automatically shutdown if the failed(4) condition results, so it
                      <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CPQHLTH-MIB&#13;
@@ -1584,6 +1605,7 @@ Temperature readings of testpoint: System-{#SNMPINDEX}</description>
                      <snmp_oid>1.3.6.1.4.1.232.3.2.3.1.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.virtualdisk.layout[cpqDaLogDrvFaultTol.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>Logical Drive Fault Tolerance.&#13;
 This shows the fault tolerance mode of the logical drive.</description>
                      <applications>
@@ -1608,6 +1630,7 @@ This shows the fault tolerance mode of the logical drive.</description>
                      <key>system.hw.virtualdisk.size[cpqDaLogDrvSize.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Logical Drive Size.&#13;
 This is the size of the logical drive in megabytes.  This value&#13;
@@ -1637,6 +1660,7 @@ differ from the advertised size of a drive.</description>
                      <snmp_oid>1.3.6.1.4.1.232.3.2.3.1.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>Logical Drive Status.</description>
                      <applications>
                         <application>
@@ -1773,6 +1797,18 @@ differ from the advertised size of a drive.</description>
             <macro>
                <macro>{$PSU_WARN_STATUS}</macro>
                <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
             </macro>
             <macro>
                <macro>{$VDISK_CRIT_STATUS}</macro>

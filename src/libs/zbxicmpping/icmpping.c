@@ -61,7 +61,7 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 	if (NULL == (f = popen(tmp, "r")))
 		return;
 
-	while (NULL != fgets(tmp, sizeof(tmp), f))
+	while (NULL != zbx_fgets(tmp, sizeof(tmp), f))
 	{
 		for (p = tmp; isspace(*p); p++)
 			;
@@ -539,7 +539,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		goto out;
 	}
 
-	if (NULL == fgets(tmp, (int)tmp_size, f))
+	if (NULL == zbx_fgets(tmp, (int)tmp_size, f))
 	{
 		zbx_snprintf(tmp, tmp_size, "no output");
 	}
@@ -662,7 +662,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #endif
 			ret = SUCCEED;
 		}
-		while (NULL != fgets(tmp, (int)tmp_size, f));
+		while (NULL != zbx_fgets(tmp, (int)tmp_size, f));
 
 		for (i = 0; i < hosts_count; i++)
 			zbx_free(hosts[i].status);

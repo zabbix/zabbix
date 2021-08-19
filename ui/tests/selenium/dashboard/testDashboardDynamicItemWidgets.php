@@ -274,8 +274,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	}
 
 	/**
-	 * @on-before createTestFile
-	 * @on-after removeTestFile
+	 * @onBefore createTestFile
+	 * @onAfter removeTestFile
 	 *
 	 * @dataProvider getWidgetsData
 	 */
