@@ -2711,6 +2711,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			if (host->inventory_mode_orig != host->inventory_mode)
 			{
+				zbx_audit_host_update_json_add_inventory_mode(host->hostid, (int)host->inventory_mode);
 				if (HOST_INVENTORY_DISABLED == host->inventory_mode)
 					zbx_vector_uint64_append(&del_host_inventory_hostids, host->hostid);
 				else if (HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
@@ -2930,10 +2931,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					host->custom_interfaces);
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
-			{
 				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)host->inventory_mode);
-				zbx_audit_host_update_json_add_inventory_mode(host->hostid, (int)host->inventory_mode);
-			}
 		}
 		else
 		{
@@ -3109,7 +3107,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
 			{
 				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)host->inventory_mode);
-				zbx_audit_host_update_json_add_inventory_mode(host->hostid, (int)host->inventory_mode);
 			}
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
