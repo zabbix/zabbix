@@ -99,8 +99,8 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(status, int)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(discover, int)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(custom_interfaces, int)
 
-void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, const char* name,
-		zbx_uint64_t groupid, zbx_uint64_t templateid);
+void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
+		const char* name, zbx_uint64_t groupid, zbx_uint64_t templateid);
 
 void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid, zbx_uint64_t groupid,
 		zbx_uint64_t templateid_old, zbx_uint64_t templateid_new);

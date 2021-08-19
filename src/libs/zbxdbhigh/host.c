@@ -3882,13 +3882,15 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 			if (0 == group_prototype->group_prototypeid)
 			{
-				zbx_db_insert_add_values(&db_insert_gproto, group_prototypeid++, host_prototype->hostid,
+				zbx_db_insert_add_values(&db_insert_gproto, group_prototypeid, host_prototype->hostid,
 						group_prototype->name, group_prototype->groupid,
 						group_prototype->templateid);
 
 				zbx_audit_host_prototype_update_json_add_group_details(host_prototype->hostid,
-						group_prototype->name, group_prototype->groupid,
+						group_prototypeid, group_prototype->name, group_prototype->groupid,
 						group_prototype->templateid);
+
+				group_prototypeid++;
 			}
 			else
 			{
