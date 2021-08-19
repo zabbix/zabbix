@@ -3246,7 +3246,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		{
 			zbx_db_insert_add_values(&db_insert_hgroups, hostgroupid, host->hostid,
 					host->new_groupids.values[j]);
-			zbx_audit_hostgroup_update_json_attach(host->hostid, hostgroupid, host->new_groupids.values[i]);
+			zbx_audit_hostgroup_update_json_attach(host->hostid, hostgroupid, host->new_groupids.values[j]);
 			hostgroupid++;
 		}
 
