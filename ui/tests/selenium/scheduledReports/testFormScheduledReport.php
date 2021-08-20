@@ -48,7 +48,7 @@ class testFormScheduledReport extends CWebTest {
 				'LEFT JOIN report_param rp ON r.reportid=rp.reportid '.
 				'LEFT JOIN report_user ru ON r.reportid=ru.reportid '.
 				'LEFT JOIN report_usrgrp rg ON r.reportid=rg.reportid '.
-				'ORDER BY r.reportid, rp.reportparamid, ru.reportuserid, rg.reportusrgrpid'
+				'ORDER BY r.reportid, rp.reportparamid, ru.reportuserid, rg.reportusrgrpid, ru.access_userid'
 		);
 	}
 
