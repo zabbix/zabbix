@@ -23,30 +23,31 @@
  * @var CView $this
  */
 
-$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')));
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')))
+	->setAttribute('id', 'host-cancel');
 
 $data += [
 	'form_name' => 'host-form',
 	'buttons' => ($data['hostid'] == 0)
 		? [
-			new CSubmit('add', _('Add')),
+			(new CSubmit('add', _('Add')))->setAttribute('id', 'host-add'),
 			$cancel_button
 		]
 		: [
-			new CSubmit('update', _('Update')),
-			new CButton('clone', _('Clone')),
-			new CButton('full_clone', _('Full clone')),
+			(new CSubmit('update', _('Update')))->setAttribute('id', 'host-update'),
+			(new CButton('clone', _('Clone')))->setAttribute('id', 'host-clone'),
+			(new CButton('full_clone', _('Full clone')))->setAttribute('id', 'host-full_clone'),
 			(new CButton('delete', _('Delete')))
 				->onClick('return confirm('.json_encode(_('Delete selected host?')).')
 					? host_edit.deleteHost()
 					: false')
+				->setAttribute('id', 'host-delete')
 				->setAttribute('data-redirect', (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.massdelete')
 					->setArgument('ids', [$data['hostid']])
 					->setArgumentSID()
 					->getUrl()
-				)
-				->addClass(ZBX_STYLE_BTN_ALT),
+				),
 			$cancel_button
 		]
 ];

@@ -54,7 +54,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Linux by Zabbix agent');
 
 		$this->zbxTestTextPresent('Linux by Zabbix agent');
-		$this->zbxTestClick('update');
+		$this->zbxTestClick('host-update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent($this->host_for_template);
@@ -89,7 +89,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait("//button[contains(@onclick, 'unlink[".$hostid2."]') and text()='Unlink']");
 
 		$this->zbxTestTextNotPresent($template);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickWait('host-update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
@@ -117,7 +117,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Linux by Zabbix agent');
 
 		$this->zbxTestTextPresent('Linux by Zabbix agent');
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickWait('host-update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent($this->host_for_template);
@@ -152,7 +152,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait("//button[contains(@onclick, 'unlink_and_clear[".$hostid2."]') and text()='Unlink and clear']");
 
 		$this->zbxTestTextNotPresent($template);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickWait('host-update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 

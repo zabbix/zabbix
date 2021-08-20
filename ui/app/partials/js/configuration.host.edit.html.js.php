@@ -504,8 +504,8 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 				}
 			});
 
-			var clone_button = document.querySelector('.js-clone-host'),
-				full_clone_button = document.querySelector('.js-full-clone-host');
+			var clone_button = document.getElementById('host-clone'),
+				full_clone_button = document.getElementById('host-full_clone');
 
 			/**
 			* Supplies a handler for in-popup clone button click with according action.
@@ -669,8 +669,8 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 				host_edit.submit(e.target);
 			});
 
-			var clone_button = document.getElementById('clone'),
-				full_clone_button = document.getElementById('full_clone');
+			var clone_button = document.getElementById('host-clone'),
+				full_clone_button = document.getElementById('host-full_clone');
 
 			/**
 			* Supplies a handler for in-page clone button click with according action.

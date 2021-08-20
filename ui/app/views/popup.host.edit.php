@@ -29,6 +29,7 @@ $data['popup_form'] = true;
 if ($data['hostid'] == 0) {
 	$buttons = [
 		[
+			'id' => 'host-add',
 			'title' => _('Add'),
 			'class' => '',
 			'keepOpen' => true,
@@ -40,6 +41,7 @@ if ($data['hostid'] == 0) {
 else {
 	$buttons = [
 		[
+			'id' => 'host-update',
 			'title' => _('Update'),
 			'class' => '',
 			'keepOpen' => true,
@@ -47,18 +49,21 @@ else {
 			'action' => 'host_edit.submit(document.getElementById("'.$data['form_name'].'"));'
 		],
 		[
+			'id' => 'host-clone',
 			'title' => _('Clone'),
-			'class' => 'btn-alt js-clone-host',
+			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false
 		],
 		[
+			'id' => 'host-full_clone',
 			'title' => _('Full clone'),
-			'class' => 'btn-alt js-full-clone-host',
+			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false
 		],
 		[
+			'id' => 'host-delete',
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected host?'),
 			'class' => 'btn-alt',

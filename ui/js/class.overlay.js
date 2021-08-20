@@ -286,6 +286,10 @@ Overlay.prototype.makeButton = function(obj) {
 			text: obj.title
 		});
 
+	if ('id' in obj) {
+		$button.attr('id', obj.id);
+	}
+
 	$button.on('click', function(e) {
 		if (('confirmation' in obj) && !confirm(obj.confirmation)) {
 			e.preventDefault();

@@ -124,7 +124,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestClickLinkText($name);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickWait('host-update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent($name);
@@ -148,7 +148,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestClickButton('disable-hosts');
+		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -172,7 +172,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('ids_'.$hostid);
-		$this->zbxTestClickButton('disable-hosts');
+		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -195,7 +195,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('ids_'.$hostid);
-		$this->zbxTestClickButton('enable-hosts');
+		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -213,7 +213,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestClickButton('enable-hosts');
+		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
