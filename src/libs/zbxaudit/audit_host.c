@@ -360,12 +360,12 @@ void	zbx_audit_hostgroup_update_json_add_group(zbx_uint64_t hostid, zbx_uint64_t
 
 void	zbx_audit_hostgroup_update_json_delete_group(zbx_uint64_t hostid, zbx_uint64_t hostgroupid, zbx_uint64_t groupid)
 {
-	char	buf[AUDIT_DETAILS_KEY_LEN];
+	char	audit_key[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(buf, sizeof(buf), "host.groups[" ZBX_FS_UI64 "]", hostgroupid);
-	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_DELETE, buf, groupid);
+	zbx_snprintf(audit_key, sizeof(audit_key), "host.groups[" ZBX_FS_UI64 "]", hostgroupid);
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_DELETE, audit_key, groupid);
 }
 
 void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
