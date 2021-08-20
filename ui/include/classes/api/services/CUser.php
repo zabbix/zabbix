@@ -424,7 +424,7 @@ class CUser extends CApiService {
 			DB::update('users', $upd_users);
 		}
 
-		$this->updateUsersGroups($users, __FUNCTION__);
+		$this->updateUsersGroups($users, __FUNCTION__, $db_users);
 		$this->updateMedias($users, __FUNCTION__);
 
 		foreach ($users as $user) {
@@ -510,18 +510,12 @@ class CUser extends CApiService {
 			'preservekeys' => true
 		];
 
-		foreach ($users as $user) {
-			if (array_key_exists('medias', $user)) {
-				$params['selectMedias'] = ['mediatypeid', 'sendto', 'active', 'severity', 'period'];
-				break;
-			}
-		}
-
-		foreach ($users as $user) {
-			if (array_key_exists('usrgrps', $user)) {
-				$params['selectUsrgrps'] = ['usrgrpid', 'gui_access', 'users_status'];
-				break;
-			}
+		if (array_column($users, 'medias')) {
+			$db_medias = DB::select('media', [
+				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
+				'filter' => ['userid' => array_column($users, 'userid')],
+				'preservekeys' => true
+			]);
 		}
 
 		$api_users = $this->get($params);
@@ -538,17 +532,19 @@ class CUser extends CApiService {
 		// Format proper user array.
 		foreach ($api_users as $userid => $user_value) {
 			$db_users[$userid] = $db_users[$userid] + $user_value;
-
-			if (array_key_exists('medias', $db_users[$userid])) {
-				foreach ($db_users[$userid]['medias'] as &$media) {
-					if (!is_array($media['sendto'])) {
-						$media['sendto'] = [$media['sendto']];
-					}
-				}
-				unset($media);
-			}
 		}
 		unset($api_users);
+
+		foreach ($db_medias as $mediaid => $db_media) {
+			$db_users[$db_media['userid']]['medias'][$mediaid] = [
+				'mediatypeid' => $db_media['mediatypeid'],
+				'sendto' => is_array($db_media['sendto']) ? $db_media['sendto'] : [$db_media['sendto']],
+				'active' => $db_media['active'],
+				'severity' => $db_media['severity'],
+				'period' => $db_media['period']
+			];
+		}
+		unset($db_medias);
 
 		// Get readonly super admin role ID and name.
 		$db_roles = DBfetchArray(DBselect(
@@ -712,7 +708,7 @@ class CUser extends CApiService {
 
 		$usrgrpids = array_keys($usrgrpids);
 
-		$db_usrgrps = DB::select('usrgrp', [ // FIXME:
+		$db_usrgrps = DB::select('usrgrp', [
 			'output' => ['gui_access'],
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
@@ -835,7 +831,7 @@ class CUser extends CApiService {
 
 		$mediatypeids = array_keys($mediatypeids);
 
-		$db_mediatypes = DB::select('media_type', [ // FIXME:
+		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'type'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
@@ -1004,7 +1000,7 @@ class CUser extends CApiService {
 	 * @param array  $users
 	 * @param string $method
 	 */
-	private function updateUsersGroups(array &$users, $method) {
+	private function updateUsersGroups(array &$users, string $method,  ?array &$db_users = null) {
 		$users_groups = [];
 
 		foreach ($users as $user) {
@@ -1024,7 +1020,8 @@ class CUser extends CApiService {
 		$db_users_groups = ($method === 'update')
 			? DB::select('users_groups', [
 				'output' => ['id', 'usrgrpid', 'userid'],
-				'filter' => ['userid' => array_keys($users_groups)]
+				'filter' => ['userid' => array_keys($users_groups)],
+				'preservekeys' => true
 			])
 			: [];
 
@@ -1062,9 +1059,9 @@ class CUser extends CApiService {
 			$groups = [];
 			foreach ($user['usrgrps'] as $usrgrp) {
 				// Check id in db_users_groups.
-				foreach ($db_users_groups as $db_user_group) {
+				foreach ($db_users_groups as $id => $db_user_group) {
 					if ($db_user_group['usrgrpid'] == $usrgrp['usrgrpid']) {
-						$groups[$db_user_group['id']] = ['usrgrpid' => $usrgrp['usrgrpid']];
+						$groups[$id] = ['usrgrpid' => $usrgrp['usrgrpid']];
 						continue 2;
 					}
 				}
@@ -1081,6 +1078,12 @@ class CUser extends CApiService {
 			$user['usrgrps'] = $groups;
 		}
 		unset($user);
+
+		if ($method === 'update') {
+			foreach ($db_users_groups as $id => $db_user_group) {
+				$db_users[$db_user_group['userid']]['usrgrps'][$id] = ['usrgrpid' => $usrgrp['usrgrpid']];
+			}
+		}
 	}
 
 	/**
