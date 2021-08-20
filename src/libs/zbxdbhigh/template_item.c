@@ -2376,7 +2376,7 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 			{
 				zbx_uint64_t	lld_override_optemplateid;
 
-				lld_override_optemplateid = DBget_maxid_num("lld_override_optemplateid",
+				lld_override_optemplateid = DBget_maxid_num("lld_override_optemplate",
 						override_operation->templateids.values_num);
 
 				for (k = 0; k < override_operation->templateids.values_num; k++)
@@ -2741,7 +2741,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 			{
 				ppsrc = (zbx_template_item_preproc_t *)item->template_preprocs.values[j];
 
-				ppdst = zbx_item_preproc_create(0, ppsrc->step, ppsrc->type, ppsrc->params,
+				ppdst = zbx_item_preproc_create("0", ppsrc->step, ppsrc->type, ppsrc->params,
 						ppsrc->error_handler, ppsrc->error_handler_params);
 
 				zbx_vector_item_preproc_ptr_append(&item->item_preprocs, ppdst);
