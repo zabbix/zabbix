@@ -985,7 +985,7 @@ void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
 
-int	zbx_dc_maintenance_has_tags();
+int	zbx_dc_maintenance_has_tags(void);
 
 typedef struct
 {

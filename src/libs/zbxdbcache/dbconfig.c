@@ -12993,7 +12993,7 @@ char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid
 	return exp;
 }
 
-int	zbx_dc_maintenance_has_tags()
+int	zbx_dc_maintenance_has_tags(void)
 {
 	int	ret;
 
