@@ -27,9 +27,10 @@ class CControllerPopupServiceStatusRuleEdit extends CController {
 			'edit' => 			'in 1',
 			'row_index' =>		'required|int32',
 			'new_status' =>		'int32',
-			'type' =>			'int32',
+			'type' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusRuleTypeOptions())),
 			'limit_value' =>	'int32',
-			'limit_status' =>	'int32'
+			'limit_status' =>	'in '.implode(',', array_keys(CServiceHelper::getStatusNames())),
+			'new_status' =>		'in '.implode(',', array_keys(CServiceHelper::getProblemStatusNames()))
 		];
 
 		$ret = $this->validateInput($fields);

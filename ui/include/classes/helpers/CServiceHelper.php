@@ -123,7 +123,7 @@ class CServiceHelper {
 		}
 
 		return $rule !== null
-			? new CObject([new CTag('em', true, self::getStatusNames()[$new_status]), ' - ', $rule])
+			? new CObject([new CTag('em', true, self::getProblemStatusNames()[$new_status]), ' - ', $rule])
 			: null;
 	}
 
