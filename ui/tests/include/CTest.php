@@ -158,6 +158,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 			return true;
 		}
 
+		CDataHelper::setSessionId(null);
+
 		$class = new ReflectionClass($context);
 		if (!is_object($context)) {
 			$context = null;

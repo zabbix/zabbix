@@ -1361,7 +1361,8 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 											'value' =>					['type' => XML_STRING, 'default' => ''],
 											'description' =>			['type' => XML_STRING, 'default' => '']
 										]]
-									]]
+									]],
+									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE]
 								]]
 							]],
 							'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
@@ -1561,8 +1562,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 								]]
 							]]
 						]]
-					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE]
+					]]
 				]]
 			]],
 			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [

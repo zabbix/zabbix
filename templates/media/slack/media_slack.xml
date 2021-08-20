@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-07-21T14:31:20Z</date>
+    <date>2021-07-21T15:07:55Z</date>
     <media_types>
         <media_type>
             <name>Slack</name>

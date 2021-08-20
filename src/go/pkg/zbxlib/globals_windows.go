@@ -58,6 +58,8 @@ int	CONFIG_UNSAFE_USER_PARAMETERS= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS= 0;
 char *CONFIG_SOURCE_IP = NULL;
 
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
+
 const char	*progname = NULL;
 const char	title_message[] = "agent";
 const char	*usage_message[] = {};

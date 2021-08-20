@@ -1566,7 +1566,8 @@ class CImportDataAdapterTest extends TestCase {
 							],
 							'discover' => '0',
 							'templates' => [],
-							'macros' => []
+							'macros' => [],
+							'inventory_mode' => '-1'
 						]
 					],
 					'jmx_endpoint' => '',

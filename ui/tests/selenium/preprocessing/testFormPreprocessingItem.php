@@ -18,21 +18,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup items
  */
-class testFormItemPreprocessing extends testFormPreprocessing {
-	const HOST_ID = 40001;							// 'Simple form test host'
-	const INHERITANCE_TEMPLATE_ID	= 15000;		// 'Inheritance test template'
-	const INHERITANCE_HOST_ID		= 15001;		// 'Template inheritance test host'
+class testFormPreprocessingItem extends testFormPreprocessing {
 
-	public $link = 'items.php?filter_set=1&filter_hostids[0]='.self::HOST_ID;
-	public $ready_link = 'items.php?form=update&hostid='.self::HOST_ID.'&itemid=';
+	public $link = 'items.php?filter_set=1&filter_hostids[0]='.self::HOSTID;
+	public $ready_link = 'items.php?form=update&hostid='.self::HOSTID.'&itemid=';
 	public $button = 'Create item';
 	public $success_message = 'Item added';
 	public $fail_message = 'Cannot add item';
+
+	const HOSTID					= 40001;	// 'Simple form test host'
+	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
+	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
+	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
+	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
 
 	use PreprocessingTrait;
 
@@ -89,57 +93,55 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getItemPreprocessingPrometheusData
 	 * @dataProvider getCustomOnFailValidationData
 	 */
-	public function testFormItemPreprocessing_CreateAllSteps($data) {
+	public function testFormPreprocessingItem_CreateAllSteps($data) {
 		$this->checkCreate($data);
 	}
 
 	/**
 	 * @dataProvider getItemPreprocessingTrailingSpacesData
 	 */
-	public function testFormItemPreprocessing_TrailingSpaces($data) {
+	public function testFormPreprocessingItem_TrailingSpaces($data) {
 		$this->checkTrailingSpaces($data);
 	}
 
 	/**
 	 * Test copies templated item from one host to another.
 	 */
-	public function testFormItemPreprocessing_CopyItem() {
-		$preprocessing_item_key = 'test-inheritance-item-preprocessing';	// testInheritanceItemPreprocessing.
-		$preprocessing_item_name = 'testInheritanceItemPreprocessing';
-		$preprocessing_item_id = 15094;
-		$original_host_id = 15001;											// Template inheritance test host
+	public function testFormPreprocessingItem_CopyItem() {
+		$item_key = 'test-inheritance-item-preprocessing';	// testInheritanceItemPreprocessing
+		$item_name = 'testInheritanceItemPreprocessing';
+		$itemid = 15094;									// testInheritanceItemPreprocessing
+		$original_hostid = 15001;							// "Template inheritance test host"
 		$target_hostname = 'Simple form test host';
 
-		$this->page->login()->open('items.php?filter_set=1&filter_hostids[0]='.$original_host_id);
+		$this->page->login()->open('items.php?filter_set=1&filter_hostids[0]='.$original_hostid);
 		$table = $this->query('xpath://form[@name="items"]/table')->asTable()->one();
-		$table->findRow('Key', $preprocessing_item_key)->select();
+		$table->findRow('Key', $item_key)->select();
 		$this->query('button:Copy')->one()->click();
-		$form = $this->query('name:elements_form')->waitUntilPresent()->asForm()->one();
-		$form->fill([
+		$mass_update_form = $this->query('name:elements_form')->waitUntilPresent()->asForm()->one();
+		$mass_update_form->fill([
 			'Target type'	=> 'Hosts',
 			'Target' => $target_hostname
 		]);
-		$form->submit();
-
+		$mass_update_form->submit();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Item copied', $message->getTitle());
+		$this->assertMessage(TEST_GOOD, 'Item copied');
 
 		// Open original item form and get steps text.
-		$this->page->open('items.php?form=update&hostid='.$original_host_id.'&itemid='.$preprocessing_item_id);
+		$this->page->open('items.php?form=update&hostid='.$original_hostid.'&itemid='.$itemid);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Preprocessing');
 		$original_steps = $this->listPreprocessingSteps();
 		// Open copied item form, get steps text and compare to original.
-		$this->page->open('items.php?filter_set=1&filter_hostids[0]='.self::HOST_ID);
-		$this->query('link', $preprocessing_item_name)->one()->click();
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$this->assertEquals($preprocessing_item_name, $form->getField('Name')->getValue());
-		$this->assertEquals($preprocessing_item_key, $form->getField('Key')->getValue());
+		$this->page->open('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->query('link', $item_name)->one()->click();
+		$form->invalidate();
+		$this->assertEquals($item_name, $form->getField('Name')->getValue());
+		$this->assertEquals($item_key, $form->getField('Key')->getValue());
 		$form->selectTab('Preprocessing');
 		$copied_steps = $this->listPreprocessingSteps();
 		$this->assertEquals($original_steps, $copied_steps);
+
 		// Get steps inputs and check if they are not disabled.
 		foreach (array_keys($copied_steps) as $i) {
 			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
@@ -148,18 +150,43 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	}
 
 	/**
+	 * Add preprocessing steps to item for cloning.
+	 */
+	public function prepareCloneItemPreprocessing() {
+		CDataHelper::call('item.update', [
+			'itemid' => self::CLONE_ITEMID,
+			'preprocessing' => self::CLONE_PREPROCESSING
+		]);
+	}
+
+	/**
+	 * @onBefore prepareCloneItemPreprocessing
+	 *
+	 * @backup profiles
+	 */
+	public function testFormPreprocessingItem_CloneItem() {
+		$link = 'items.php?form=update&hostid='.self::HOSTID.'&itemid='.self::CLONE_ITEMID;
+		$this->checkCloneItem($link, 'Item');
+	}
+
+	public function testFormPreprocessingItem_CloneTemplatedItem() {
+		$link = 'items.php?form=update&hostid='.self::INHERITANCE_HOSTID.'&itemid='.self::INHERITED_ITEMID;
+		$this->checkCloneItem($link, 'Item', $templated = true);
+	}
+
+	/**
 	 * @dataProvider getItemCustomOnFailData
 	 */
-	public function testFormItemPreprocessing_CustomOnFail($data) {
+	public function testFormPreprocessingItem_CustomOnFail($data) {
 		$this->checkCustomOnFail($data);
 	}
 
 	/**
 	 * @dataProvider getItemInheritancePreprocessing
 	 */
-	public function testFormItemPreprocessing_PreprocessingInheritanceFromTemplate($data) {
-		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_TEMPLATE_ID;
-		$host_link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_HOST_ID;
+	public function testFormPreprocessingItem_PreprocessingInheritanceFromTemplate($data) {
+		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_TEMPLATEID;
+		$host_link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_HOSTID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}

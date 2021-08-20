@@ -12993,6 +12993,17 @@ char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid
 	return exp;
 }
 
+int	zbx_dc_maintenance_has_tags(void)
+{
+	int	ret;
+
+	RDLOCK_CACHE;
+	ret = config->maintenance_tags.num_data != 0 ? SUCCEED : FAIL;
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
 #endif

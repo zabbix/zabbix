@@ -1594,9 +1594,21 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 	return $default;
 }
 
-function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
-{
-	$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
+/**
+ * Create a message box.
+ *
+ * @param string      $class                  CSS class of the message box. Possible values:
+ *                                            ZBX_STYLE_MSG_GOOD, ZBX_STYLE_MSG_BAD, ZBX_STYLE_MSG_WARNING.
+ * @param array       $messages               An array of messages.
+ * @param string      $messages[]['message']  Message text.
+ * @param string|null $title                  (optional) Message box title.
+ * @param bool        $show_close_box         (optional) Show or hide close button in error message box.
+ * @param bool        $show_details           (optional) Show or hide message details.
+ *
+ * @return CTag
+ */
+function makeMessageBox(string $class, array $messages, string $title = null, bool $show_close_box = true,
+		bool $show_details = false): CTag {
 	$msg_details = null;
 	$link_details = null;
 
@@ -1638,11 +1650,17 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$title = new CSpan($title);
 	}
 
+	$aria_labels = [
+		ZBX_STYLE_MSG_GOOD => _('Success message'),
+		ZBX_STYLE_MSG_BAD => _('Error message'),
+		ZBX_STYLE_MSG_WARNING => _('Warning message')
+	];
+
 	// Details link should be in front of title.
 	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
 		->addClass($class)
 		->setAttribute('role', 'contentinfo')
-		->setAttribute('aria-label', $good ? _('Success message') : _('Error message'));
+		->setAttribute('aria-label', $aria_labels[$class]);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
@@ -1685,14 +1703,14 @@ function filter_messages(array $messages = []) {
 }
 
 /**
- * Returns the message box when messages are present; null otherwise
+ * Returns a message box if there are messages. Otherwise, null.
  *
  * @param  bool    $good            Parameter passed to makeMessageBox to specify message box style.
  * @param  string  $title           Message box title.
  * @param  bool    $show_close_box  Show or hide close button in error message box.
  * @global array   $ZBX_MESSAGES
  *
- * @return CDiv|null
+ * @return CTag|null
  */
 function getMessages($good = false, $title = null, $show_close_box = true) {
 	global $ZBX_MESSAGES;
@@ -1700,7 +1718,7 @@ function getMessages($good = false, $title = null, $show_close_box = true) {
 	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good, $messages, $title, $show_close_box)
+		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD, $messages, $title, $show_close_box)
 		: null;
 
 	$ZBX_MESSAGES = [];
@@ -1708,15 +1726,42 @@ function getMessages($good = false, $title = null, $show_close_box = true) {
 	return $message_box;
 }
 
-function show_messages($good = false, $okmsg = null, $errmsg = null) {
+function show_messages($good = null, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES, $ZBX_MESSAGES_PREPARED;
 
 	if (defined('ZBX_API_REQUEST')) {
 		return null;
 	}
 
-	$title = $good ? $okmsg : $errmsg;
 	$messages = isset($ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+
+	if ($good === null) {
+		$has_errors = false;
+		$has_warnings = false;
+
+		foreach ($messages as $message) {
+			$has_errors = ($has_errors || ($message['type'] === 'error'));
+			$has_warnings = ($has_warnings || ($message['type'] === 'warning'));
+		}
+
+		if ($has_errors) {
+			$class = ZBX_STYLE_MSG_BAD;
+			$good = false;
+		}
+		elseif ($has_warnings) {
+			$class = ZBX_STYLE_MSG_WARNING;
+			$good = true;
+		}
+		else {
+			$class = ZBX_STYLE_MSG_GOOD;
+			$good = true;
+		}
+	}
+	else {
+		$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
+	}
+
+	$title = $good ? $okmsg : $errmsg;
 
 	$ZBX_MESSAGES = [];
 
@@ -1740,7 +1785,7 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 			foreach ($messages as $message) {
 				$image_messages[] = [
 					'text' => $message['message'],
-					'color' => $message['type'] == 'error'
+					'color' => ($message['type'] === 'error')
 						? ['R' => 255, 'G' => 55, 'B' => 55]
 						: ['R' => 155, 'G' => 155, 'B' => 55]
 				];
@@ -1793,11 +1838,11 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 
 			// Prepare messages for inclusion within the layout engine.
 			$ZBX_MESSAGES_PREPARED[] = [
-				'is_good' => $good,
+				'class' => $class,
 				'messages' => $messages,
 				'title' => $title,
 				'show_close_box' => true,
-				'show_details' => !$good
+				'show_details' => ($class === ZBX_STYLE_MSG_BAD)
 			];
 
 			break;
@@ -1891,7 +1936,7 @@ function get_prepared_messages(array $options = []): ?string {
 
 	$html = '';
 	foreach (array_merge($messages_authentication, $messages_session, $messages_current) as $box) {
-		$html .= makeMessageBox($box['is_good'], $box['messages'], $box['title'], $box['show_close_box'],
+		$html .= makeMessageBox($box['class'], $box['messages'], $box['title'], $box['show_close_box'],
 			$box['show_details']
 		)->toString();
 	}
@@ -1921,6 +1966,25 @@ function info($msgs) {
 
 	foreach ($msgs as $msg) {
 		$ZBX_MESSAGES[] = ['type' => 'info', 'message' => $msg];
+	}
+}
+
+/**
+ * Add warning messages to the global message array.
+ *
+ * @param array|string $messages
+ */
+function warning($messages): void {
+	global $ZBX_MESSAGES;
+
+	if (!isset($ZBX_MESSAGES)) {
+		$ZBX_MESSAGES = [];
+	}
+
+	zbx_value2array($messages);
+
+	foreach ($messages as $message) {
+		$ZBX_MESSAGES[] = ['type' => 'warning', 'message' => $message];
 	}
 }
 

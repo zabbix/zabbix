@@ -198,13 +198,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 				: $value;
 		}, $macros);
 
-		$msg = [
-			'type' => 'error',
-			'message' => _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
-			'src' => ''
-		];
-
-		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
+		warning(_('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'));
 	}
 
 	if (hasRequest('clone')) {

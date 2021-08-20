@@ -33,7 +33,7 @@ class testMassUpdateItems extends CWebTest{
 	use PreprocessingTrait;
 
 	const HOSTID = 40001;	// Simple form test host.
-	const RULEID = 133700;	// testFormDiscoveryRule1 on Simple form test host.
+	const RULEID = 43700;	// testFormDiscoveryRule1 on Simple form test host.
 	const HOST_NAME = 'Simple form test host';
 	const AGENT_INTERFACE_ID = 40011;
 	const SNMP2_INTERFACE_ID = 40012;
@@ -73,8 +73,6 @@ class testMassUpdateItems extends CWebTest{
 	 * Add interface to host.
 	 */
 	public function prepareInterfaceData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('hostinterface.create', [
 			[
 				'hostid' => self::HOSTID,
@@ -1470,8 +1468,6 @@ class testMassUpdateItems extends CWebTest{
 	 * Add items with preprocessing for mass updating.
 	 */
 	public function prepareItemPreprocessingData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => self::HOSTID,
