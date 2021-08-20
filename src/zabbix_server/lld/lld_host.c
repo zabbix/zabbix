@@ -865,6 +865,8 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		host->tls_subject_orig = NULL;
 		host->tls_psk_identity_orig = NULL;
 		host->tls_psk_orig = NULL;
+		host->tls_connect_orig = 0;
+		host->tls_accept_orig = 0;
 
 		zbx_vector_uint64_create(&host->lnk_templateids);
 
@@ -3935,6 +3937,9 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		interface->dns_orig = NULL;
 		interface->port_orig = NULL;
 		interface->data.snmp = NULL;
+		interface->main_orig = main;
+		interface->type_orig = type;
+		interface->useip_orig = 0;
 		interface->flags = ZBX_FLAG_LLD_INTERFACE_REMOVE;
 
 		zbx_vector_ptr_append(interfaces, interface);
@@ -4116,6 +4121,11 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 				snmp->authpassphrase_orig = NULL;
 				snmp->privpassphrase_orig = NULL;
 				snmp->contextname_orig = NULL;
+				snmp->securitylevel_orig = snmp->securitylevel;
+				snmp->authprotocol_orig = snmp->authprotocol;
+				snmp->privprotocol_orig = snmp->privprotocol;
+				snmp->version_orig = snmp->version;
+				snmp->bulk_orig = snmp->bulk;
 				snmp->flags = 0x00;
 				new_interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 				new_interface->data.snmp = snmp;
