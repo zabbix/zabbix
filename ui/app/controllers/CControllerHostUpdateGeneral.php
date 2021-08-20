@@ -26,7 +26,7 @@ abstract class CControllerHostUpdateGeneral extends CController {
 
 	/**
 	 * Common host field validation rules.
-	 * 
+	 *
 	 * @return array
 	 */
 	protected static function getValidationFields(): array {

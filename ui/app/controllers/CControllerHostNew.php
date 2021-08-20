@@ -22,7 +22,7 @@
 /**
  * Controller for host creation.
  */
-class CControllerHostCreate extends CControllerHostUpdateGeneral {
+class CControllerHostNew extends CControllerHostUpdateGeneral {
 
 	protected function checkInput(): bool {
 		return parent::checkInputFields(self::getValidationFields());

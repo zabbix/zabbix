@@ -684,7 +684,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 					var curl = new Curl('zabbix.php', false),
 						fields = host_edit.getCloneData(form);
 
-					curl.setArgument('action', 'host.edit');
+					curl.setArgument('action', 'host.create');
 					curl.setArgument(operation_type, 1);
 
 					for (const [k, v] of Object.entries(fields)) {
