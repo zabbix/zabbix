@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -50,6 +51,7 @@ type Param struct {
 	required     bool
 	validator    Validator
 	defaultValue *string
+	sessionOnly  bool
 }
 
 func ucFirst(str string) string {
@@ -118,6 +120,12 @@ func (p *Param) WithDefault(value string) *Param {
 	}
 
 	p.defaultValue = &value
+
+	return p
+}
+
+func (p *Param) SessionOnly() *Param {
+	p.sessionOnly = true
 
 	return p
 }
@@ -361,6 +369,10 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 				val = p.defaultValue
 			}
 		} else {
+			if p.sessionOnly {
+				return nil, zbxerr.ErrorInvalidParams.Wrap(
+					fmt.Errorf("%q cannot be passed as a key parameter", p.name))
+			}
 			val = &rawParams[i]
 		}
 
@@ -393,6 +405,8 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 		if err = mergeWithSessionData(params, m.params, session); err != nil {
 			return nil, err
 		}
+
+		params["sessionName"] = rawParams[0]
 	}
 
 	return params, nil

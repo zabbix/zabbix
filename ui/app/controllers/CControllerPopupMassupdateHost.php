@@ -237,9 +237,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					}
 				}
 
-				$host_macros_add = [];
-				$host_macros_update = [];
-				$host_macros_remove = [];
 				foreach ($hosts as &$host) {
 					if (array_key_exists('groups', $visible)) {
 						if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
@@ -337,45 +334,33 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					if (array_key_exists('macros', $visible)) {
 						switch ($mass_update_macros) {
 							case ZBX_ACTION_ADD:
-								if ($macros) {
-									$update_existing = $this->getInput('macros_add', 0);
+								$update_existing = (bool) getRequest('macros_add', 0);
+								$host['macros'] = array_column($host['macros'], null, 'hostmacroid');
+								$host_macros_by_macro = array_column($host['macros'], null, 'macro');
 
-									foreach ($macros as $macro) {
-										foreach ($host['macros'] as $host_macro) {
-											if ($macro['macro'] === $host_macro['macro']) {
-												if ($update_existing) {
-													$macro['hostmacroid'] = $host_macro['hostmacroid'];
-													$host_macros_update[] = $macro;
-												}
-
-												continue 2;
-											}
-										}
-
-										$macro['hostid'] = $host['hostid'];
-										$host_macros_add[] = $macro;
+								foreach ($macros as $macro) {
+									if (!array_key_exists($macro['macro'], $host_macros_by_macro)) {
+										$host['macros'][] = $macro;
+									}
+									elseif ($update_existing) {
+										$hostmacroid = $host_macros_by_macro[$macro['macro']]['hostmacroid'];
+										$host['macros'][$hostmacroid] = ['hostmacroid' => $hostmacroid] + $macro;
 									}
 								}
 								break;
 
-							case ZBX_ACTION_REPLACE: // In Macros its update.
-								if ($macros) {
-									$add_missing = $this->getInput('macros_update', 0);
+							case ZBX_ACTION_REPLACE:
+								$add_missing = (bool) getRequest('macros_update', 0);
+								$host['macros'] = array_column($host['macros'], null, 'hostmacroid');
+								$host_macros_by_macro = array_column($host['macros'], null, 'macro');
 
-									foreach ($macros as $macro) {
-										foreach ($host['macros'] as $host_macro) {
-											if ($macro['macro'] === $host_macro['macro']) {
-												$macro['hostmacroid'] = $host_macro['hostmacroid'];
-												$host_macros_update[] = $macro;
-
-												continue 2;
-											}
-										}
-
-										if ($add_missing) {
-											$macro['hostid'] = $host['hostid'];
-											$host_macros_add[] = $macro;
-										}
+								foreach ($macros as $macro) {
+									if (array_key_exists($macro['macro'], $host_macros_by_macro)) {
+										$hostmacroid = $host_macros_by_macro[$macro['macro']]['hostmacroid'];
+										$host['macros'][$hostmacroid] = ['hostmacroid' => $hostmacroid] + $macro;
+									}
+									elseif ($add_missing) {
+										$host['macros'][] = $macro;
 									}
 								}
 								break;
@@ -383,15 +368,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 							case ZBX_ACTION_REMOVE:
 								if ($macros) {
 									$except_selected = $this->getInput('macros_remove', 0);
+									$host_macros_by_macro = array_column($host['macros'], null, 'macro');
+									$macros_by_macro = array_column($macros, null, 'macro');
 
-									$macro_names = array_column($macros, 'macro');
-
-									foreach ($host['macros'] as $host_macro) {
-										if ((!$except_selected && in_array($host_macro['macro'], $macro_names))
-												|| ($except_selected && !in_array($host_macro['macro'], $macro_names))) {
-											$host_macros_remove[] = $host_macro['hostmacroid'];
-										}
-									}
+									$host['macros'] = $except_selected
+										? array_intersect_key($host_macros_by_macro, $macros_by_macro)
+										: array_diff_key($host_macros_by_macro, $macros_by_macro);
 								}
 								break;
 
@@ -404,9 +386,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 								break;
 						}
 
-						if ($mass_update_macros != ZBX_ACTION_REMOVE_ALL) {
-							unset($host['macros']);
-						}
+						$host['macros'] = array_values($host['macros']);
 					}
 
 					unset($host['parentTemplates']);
@@ -428,28 +408,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 				if ($result === false) {
 					throw new Exception();
-				}
-
-				/**
-				 * Macros must be updated separately, since calling API::UserMacro->replaceMacros() inside
-				 * API::Host->update() results in loss of secret macro values.
-				 */
-				if ($host_macros_remove) {
-					if (!API::UserMacro()->delete($host_macros_remove)) {
-						throw new Exception();
-					}
-				}
-
-				if ($host_macros_add) {
-					if (!API::UserMacro()->create($host_macros_add)) {
-						throw new Exception();
-					}
-				}
-
-				if ($host_macros_update) {
-					if (!API::UserMacro()->update($host_macros_update)) {
-						throw new Exception();
-					}
 				}
 
 				// Value mapping.
@@ -475,7 +433,8 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 			}
 			else {
-				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
+				$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
+					->toString();
 			}
 
 			$this->setResponse(

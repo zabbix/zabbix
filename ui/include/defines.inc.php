@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.4.3rc2');
-define('ZABBIX_API_VERSION',	'5.4.3');
+define('ZABBIX_VERSION',		'5.4.4rc1');
+define('ZABBIX_API_VERSION',	'5.4.4');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
 
 define('ZABBIX_DB_VERSION',		5040000);
@@ -1382,6 +1382,7 @@ define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
 define('API_NUMERIC_RANGES',		41);
 define('API_UUID',					42);
+define('API_VAULT_SECRET',			43);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1397,6 +1398,7 @@ define('API_TIME_UNIT_WITH_YEAR',		0x0200);
 define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 define('API_PRESERVE_KEYS',				0x0800);
 define('API_ALLOW_MACRO',				0x1000);
+define('API_ALLOW_GLOBAL_REGEX',		0x2000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

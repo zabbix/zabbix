@@ -30,8 +30,6 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 	 * Function creates the given value mappings for the specified template.
 	 */
 	public static function prepareTemplateValueMappings() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('valuemap.create', [
 			[
 				'name' => self::UPDATE_VALUEMAP1,
@@ -70,20 +68,33 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 				'hostid' => self::TEMPLATEID,
 				'mappings' => [
 					[
-						'value' => 'oneoneoneoneoneoneoneoneoneoneone',
-						'newvalue' => '11111111111'
+						'type' => '0',
+						'value' => '1010101010101010101010101010101',
+						'newvalue' => 'default value1010101010101010101010101010101'
 					],
 					[
-						'value' => 'two',
-						'newvalue' => '2'
+						'type' => '4',
+						'value' => '424242424242424242424242424242424242424242424242',
+						'newvalue' => 'Answer to the Ultimate Question of Life, Universe and Everything'
 					],
 					[
-						'value' => 'threethreethreethreethreethreethreethreethreethree',
-						'newvalue' => '3333333333'
+						'type' => '3',
+						'value' => '123458945-987653341',
+						'newvalue' => 'from 123458945 to 987653341'
 					],
 					[
-						'value' => 'four',
-						'newvalue' => '4'
+						'type' => '1',
+						'value' => '12',
+						'newvalue' => 'greater or equals 12'
+					],
+					[
+						'type' => '2',
+						'value' => '11',
+						'newvalue' => 'less or equals 11'
+					],
+					[
+						'type' => '5',
+						'newvalue' => 'default value'
 					]
 				]
 			]
