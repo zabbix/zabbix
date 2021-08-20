@@ -1400,7 +1400,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length,
 		unsigned char *context_op);
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
-char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
+char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
 
 #define ZBX_SESSION_ACTIVE		0
 #define ZBX_SESSION_PASSIVE		1
