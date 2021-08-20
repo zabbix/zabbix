@@ -42,7 +42,7 @@ $form_grid = (new CFormGrid())
 				->setId('service-status-rule-new-status')
 				->setFocusableElementId('service-status-rule-new-status-focusable')
 				->setValue($data['form']['new_status'])
-				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getStatusNames()))
+				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getProblemStatusNames()))
 		)
 	])
 	->addItem([

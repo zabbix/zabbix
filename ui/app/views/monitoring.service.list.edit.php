@@ -59,66 +59,13 @@ $filter = (new CFilter())
 	->setActiveTab($data['active_tab']);
 
 if ($data['service'] !== null && !$data['is_filtered']) {
-	$parents = [];
-	while ($parent = array_shift($data['service']['parents'])) {
-		$parents[] = (new CLink($parent['name'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'service.list.edit')
-				->setArgument('serviceid', $parent['serviceid'])
-		))->setAttribute('data-serviceid', $parent['serviceid']);
-
-		$parents[] = CViewHelper::showNum($parent['children']);
-
-		if (!$data['service']['parents']) {
-			break;
-		}
-
-		$parents[] = ', ';
-	}
-
-	$service_status = CSeverityHelper::getName((int) $data['service']['status']);
-	$service_status_style_class = 'service-status-'.CSeverityHelper::getStyle((int) $data['service']['status']);
-
 	$filter
 		->addTab(
 			(new CLink(_('Info'), '#tab_info'))->addClass(ZBX_STYLE_BTN_INFO),
 			(new CDiv())
 				->setId('tab_info')
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)
-				->addItem(
-					(new CDiv())
-						->addClass(ZBX_STYLE_SERVICE_INFO)
-						->addClass($service_status_style_class)
-						->addItem([
-							(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME),
-							(new CDiv(
-								(new CButton(null))
-									->addClass(ZBX_STYLE_BTN_EDIT)
-									->addClass('js-edit-service')
-									->setAttribute('data-serviceid', $data['service']['serviceid'])
-							))->addClass(ZBX_STYLE_SERVICE_ACTIONS)
-						])
-						->addItem([
-							(new CDiv(_('Parent services')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-							(new CDiv($parents))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
-						])
-						->addItem([
-							(new CDiv(_('Status')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-							(new CDiv((new CDiv($service_status))->addClass(ZBX_STYLE_SERVICE_STATUS)))
-								->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
-						])
-						->addItem([
-							(new CDiv(_('SLA')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-							(new CDiv(($data['service']['showsla'] == SERVICE_SHOW_SLA_ON)
-								? sprintf('%.4f', $data['service']['goodsla'])
-								: ''
-							))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
-						])
-						->addItem([
-							(new CDiv(_('Tags')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-							(new CDiv($data['service']['tags']))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
-						])
-				)
+				->addItem(new CPartial('service.info', $data + ['is_editable' => true]))
 		);
 }
 

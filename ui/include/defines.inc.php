@@ -1939,6 +1939,7 @@ define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
 define('ZBX_STYLE_SERVER_NAME', 'server-name');
 define('ZBX_STYLE_SERVICE_ACTIONS', 'service-actions');
 define('ZBX_STYLE_SERVICE_INFO', 'service-info');
+define('ZBX_STYLE_SERVICE_INFO_GRID', 'service-info-grid');
 define('ZBX_STYLE_SERVICE_INFO_LABEL', 'service-info-label');
 define('ZBX_STYLE_SERVICE_INFO_VALUE', 'service-info-value');
 define('ZBX_STYLE_SERVICE_NAME', 'service-name');

@@ -128,7 +128,11 @@ class CServiceHelper {
 	}
 
 	public static function getStatusNames(): array {
-		$status_names = [ZBX_SEVERITY_OK => _('OK')];
+		return [ZBX_SEVERITY_OK => _('OK')] + self::getProblemStatusNames();
+	}
+
+	public static function getProblemStatusNames(): array {
+		$status_names = [];
 
 		foreach (CSeverityHelper::getSeverities() as $severity) {
 			$status_names[$severity['value']] = $severity['name'];

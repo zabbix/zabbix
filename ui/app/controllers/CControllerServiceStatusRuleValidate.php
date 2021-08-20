@@ -27,7 +27,7 @@ class CControllerServiceStatusRuleValidate extends CController {
 			'type' =>			'required|in '.implode(',', array_keys(CServiceHelper::getStatusRuleTypeOptions())),
 			'limit_value' =>	'required|int32|ge 1',
 			'limit_status' =>	'required|in '.implode(',', array_keys(CServiceHelper::getStatusNames())),
-			'new_status' =>		'required|in '.implode(',', array_keys(CServiceHelper::getStatusNames()))
+			'new_status' =>		'required|in '.implode(',', array_keys(CServiceHelper::getProblemStatusNames()))
 		];
 
 		$ret = $this->validateInput($fields);
