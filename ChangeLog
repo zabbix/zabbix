@@ -2189,6 +2189,7 @@ Changes for 4.0.33rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
 ........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 ..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
