@@ -274,7 +274,7 @@ class testEscalations extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
-		], 5, 3);
+		], 6, 5);
 		$this->assertArrayHasKey(1, $response['result']);
 		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
 	}
