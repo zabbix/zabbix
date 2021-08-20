@@ -563,19 +563,33 @@ void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid,
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, audit_key_templateid, templateid);
 }
 
-void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid, zbx_uint64_t groupid,
-		zbx_uint64_t templateid_old, zbx_uint64_t templateid_new)
+void	zbx_audit_host_prototype_update_json_update_group_details(zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
+		const char* name, zbx_uint64_t groupid, zbx_uint64_t templateid_old, zbx_uint64_t templateid_new)
 {
-	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_groupid[AUDIT_DETAILS_KEY_LEN];
+	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_templateid[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key, sizeof(audit_key), "hostprototype.groupLinks[" ZBX_FS_UI64 "]", groupid);
-	zbx_snprintf(audit_key_groupid, sizeof(audit_key_groupid), "hostprototype.groupLinks[" ZBX_FS_UI64 "].groupid",
-			groupid);
+	if (0 != strlen(name))
+	{
+		zbx_snprintf(audit_key, sizeof(audit_key), "hostprototype.groupPrototypes[" ZBX_FS_UI64 "]", groupid);
+		zbx_snprintf(audit_key_templateid, sizeof(audit_key_templateid), "hostprototype.groupPrototypes["
+				ZBX_FS_UI64 "].templateid", group_prototypeid);
+	}
+	else if (0 != groupid)
+	{
+		zbx_snprintf(audit_key, sizeof(audit_key), "hostprototype.groupLinks[" ZBX_FS_UI64 "]", groupid);
+		zbx_snprintf(audit_key_templateid, sizeof(audit_key_templateid), "hostprototype.groupLinks[" ZBX_FS_UI64
+				"].templateid", group_prototypeid);
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
 
+		return;
+	}
 	zbx_audit_update_json_append_no_value(hostid, AUDIT_DETAILS_ACTION_UPDATE, audit_key);
-	zbx_audit_update_json_update_uint64(hostid, audit_key_groupid, templateid_old, templateid_new);
+	zbx_audit_update_json_update_uint64(hostid, audit_key_templateid, templateid_old, templateid_new);
 }
 
 #define PREPARE_AUDIT_TEMPLATE_ADD(funcname, auditentry)							\
