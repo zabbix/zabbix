@@ -683,14 +683,14 @@ class testPageHosts extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageHosts_FilterByTags($data) {
-		$this->page->login()->open(urlencode((new CUrl('zabbix.php'))
+		$this->page->login()->open((new CUrl('zabbix.php'))
 			->setArgument('action', 'host.list')
 			->setArgument('filter_groups[]', 4)
 			->setArgument('filter_host', 'host')
 			->setArgument('filter_port', 10051)
 			->setArgument('filter_set', 1)
 			->getUrl()
-		));
+		);
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);

@@ -678,7 +678,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Go to host and change IPMI settings.
 		$this->zbxTestOpen((new CUrl('zabbix.php'))
 			->setArgument('action', 'host.edit')
-			->setArgument('hostid=', self::HOST_ID)
+			->setArgument('hostid', self::HOST_ID)
 			->getUrl()
 		);
 		$this->zbxTestTabSwitch('IPMI');

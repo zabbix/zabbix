@@ -44,7 +44,6 @@ $table = (new CTableInfo())
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$interface = reset($host['interfaces']);
-	$link = 'hostid='.$hostid;
 	$visible_name = make_decoration($host['name'], $data['search']);
 
 	$name_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
