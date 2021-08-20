@@ -127,13 +127,7 @@ class CDashboardPage extends CBaseComponent {
 	activate() {
 		this._state = DASHBOARD_PAGE_STATE_ACTIVE;
 
-		if (this._is_edit_mode) {
-			this._resizeGrid(this._getNumOccupiedRows() + this._grid_pad_rows);
-		}
-		else {
-			this._resizeGrid();
-		}
-
+		this._resizeGrid();
 		this._activateEvents();
 
 		for (const widget of this._widgets.keys()) {
@@ -225,7 +219,7 @@ class CDashboardPage extends CBaseComponent {
 		this._initWidgetResizing();
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
-			this._resizeGrid(this._getNumOccupiedRows() + this._grid_pad_rows);
+			this._resizeGrid();
 
 			this._activateWidgetDragging();
 			this._activateWidgetResizing();
@@ -706,18 +700,14 @@ class CDashboardPage extends CBaseComponent {
 	};
 
 	_resizeGrid(min_rows = null) {
-		if (min_rows === 0) {
-			this._grid_min_rows = null;
+		if (min_rows == 0) {
+			this._grid_min_rows = 0;
 		}
 		else if (min_rows !== null) {
 			this._grid_min_rows = Math.max(this._grid_min_rows, Math.min(this._max_rows, min_rows));
 		}
 
-		let num_rows = this._getNumOccupiedRows();
-
-		if (this._grid_min_rows !== null) {
-			num_rows = Math.max(num_rows, this._grid_min_rows);
-		}
+		let num_rows = Math.max(this._grid_min_rows, this._getNumOccupiedRows());
 
 		let height = this._cell_height * num_rows;
 
@@ -1004,7 +994,12 @@ class CDashboardPage extends CBaseComponent {
 				});
 			},
 
-			mouseLeave: (e) => {
+			mouseLeave: () => {
+				if (this._widget_placeholder_move_animation_frame !== null) {
+					cancelAnimationFrame(this._widget_placeholder_move_animation_frame);
+					this._widget_placeholder_move_animation_frame = null;
+				}
+
 				if (this._widget_placeholder_clicked_pos === null) {
 					this.resetWidgetPlaceholder();
 				}
@@ -1034,6 +1029,9 @@ class CDashboardPage extends CBaseComponent {
 			this._widget_placeholder
 				.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW)
 				.showAtDefaultPosition();
+		}
+		else {
+			this._widget_placeholder.hide();
 		}
 	}
 
@@ -1929,11 +1927,15 @@ class CDashboardPage extends CBaseComponent {
 			},
 
 			widgetEnter: (e) => {
+				const widget = e.detail.target;
+
 				if (this._is_edit_mode) {
+					const pos = widget.getPos();
+
+					this._resizeGrid(pos.y + pos.height + this._grid_pad_rows);
+
 					this.resetWidgetPlaceholder();
 				}
-
-				const widget = e.detail.target;
 
 				if (!widget.isEntered()) {
 					widget.enter();
