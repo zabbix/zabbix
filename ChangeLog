@@ -969,10 +969,17 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.15rc1
 
 New features:
+.........T [ZBXNEXT-6751] added Cisco Adaptive Security Virtual Appliance (ASAv) template (abakaldin)
 .........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
+........S. [ZBX-19658] added query batching when reading event data during maintenance processing (wiper)
+.........T [ZBX-19562] removed the "Oracle by ODBC" and "Asterisk by HTTP" from templates.tmpl file (abakaldin)
+.........T [ZBX-19686] changed 1-st parameter {#IFNAME} in net.if.* items to {#IFGUID} in Windows templates (mchudinov)
+.........T [ZBX-19805] added initial comment with alert content to the incident message (abiba)
+...G...... [ZBX-19482] fixed block device discovery of cd-roms and linked devices (akozlovs)
 ...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
 .........T [ZBX-19762] removed unsupported items in Zabbix server templates (abakaldin)
 .........T [ZBX-19749] changed the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
