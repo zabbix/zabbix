@@ -193,9 +193,9 @@ zabbix_export:
                 }
         
                 result.tags = {
-                    ["__message_ts_" + params.channel]: resp.ts,
-                    ["__channel_id_" + params.channel]: resp.channel,
-                    ["__message_link_" + params.channel]: getPermalink(resp.channel, resp.ts),
+                    ['__message_ts_' + params.channel]: resp.ts,
+                    ['__channel_id_' + params.channel]: resp.channel,
+                    ['__message_link_' + params.channel]: getPermalink(resp.channel, resp.ts),
                 };
         
             }
@@ -203,13 +203,14 @@ zabbix_export:
                 try {
                     var channel_event_tags = JSON.parse(params.event_tags);
                 } catch (error) {
-                    throw "Can't process event tags: " + error;
+                    throw 'Can't process event tags: ' + error;
                 }
         
                 if (Array.isArray(channel_event_tags)) {
                     for (i in channel_event_tags) {
-                        if (channel_event_tags[i].tag.includes("__message_ts_" + params.channel)) {
+                        if (channel_event_tags[i].tag.includes('__message_ts_' + params.channel)) {
                             fields.thread_ts = channel_event_tags[i].value;
+                            break;
                         }
                     }
                 }
@@ -224,9 +225,9 @@ zabbix_export:
                     )
                 ];
         
-                resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
+                resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status() != 200 || !resp.ok || resp.ok === 'false') {
+                if (req.getStatus() != 200 || !resp.ok || resp.ok === 'false') {
                     throw resp.error;
                 }
         
@@ -238,15 +239,16 @@ zabbix_export:
                 try {
                     var channel_event_tags = JSON.parse(params.event_tags);
                 } catch (error) {
-                    throw "Can't process event tags: " + error;
+                    throw 'Can't process event tags: ' + error;
                 }
         
                 if (Array.isArray(channel_event_tags)) {
                     for (i in channel_event_tags) {
-                        if (channel_event_tags[i].tag.includes("__channel_id_" + params.channel)) {
+                        if (channel_event_tags[i].tag.includes('__channel_id_' + params.channel)) {
                             fields.channel = channel_event_tags[i].value;
+                            continue;
                         }
-                        if (channel_event_tags[i].tag.includes("__message_ts_" + params.channel)) {
+                        if (channel_event_tags[i].tag.includes('__message_ts_' + params.channel)) {
                             fields.ts = channel_event_tags[i].value;
                         }
                     }
@@ -291,7 +293,7 @@ zabbix_export:
                 }
         
                 result.tags = {
-                    ["__message_link_" + params.channel]: getPermalink(resp.channel, resp.ts)
+                    ['__message_link_' + params.channel]: getPermalink(resp.channel, resp.ts)
                 }
         
             }
@@ -387,7 +389,7 @@ zabbix_export:
                 message.fields.push(
                     {
                         title: 'Event tags',
-                        value: JSON.parse(params.event_tags).filter(function (e) { return !e.tag.includes("__") }).map(function (e) { return e.tag + ": " + e.value }).join('\n') || 'None',
+                        value: JSON.parse(params.event_tags).filter(function (e) { return !e.tag.includes('__') }).map(function (e) { return e.tag + ': ' + e.value }).join('\n') || 'None',
                         short: true
                     },
                     {
