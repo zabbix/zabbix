@@ -259,11 +259,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 	int				read_tags;
 	const char			*tag_fields, *tag_join;
 
-	read_tags = zbx_dc_maintenance_has_tags();
-
-	/* get open or recently closed problems */
-
-	if (SUCCEED == read_tags)
+	if (SUCCEED == (read_tags = zbx_dc_maintenance_has_tags()))
 	{
 		tag_fields = "t.tag,t.value";
 		tag_join = " left join problem_tag t on p.eventid=t.eventid";
@@ -274,6 +270,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 		tag_join = "";
 	}
 
+	/* get open or recently closed problems */
 	result = DBselect("select p.eventid,p.objectid,p.r_eventid,%s"
 			" from problem p"
 			"%s"
@@ -323,8 +320,6 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 	if (0 != eventids.values_num)
 	{
 		int	i;
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0;
 
 		if (SUCCEED == read_tags)
 		{
@@ -336,6 +331,9 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 
 		for (i = 0; i < eventids.values_num; i += ZBX_EVENT_BATCH_SIZE)
 		{
+			char	*sql = NULL;
+			size_t	sql_alloc = 0, sql_offset = 0;
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select e.eventid,e.objectid,er.r_eventid,%s"
 					" from events e"
