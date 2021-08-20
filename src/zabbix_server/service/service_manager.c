@@ -1681,7 +1681,7 @@ int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule
 				goto out;
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
-			if (children.values_num * 100 / total_num < rule->limit_value)
+			if (0 == total_num || children.values_num * 100 / total_num < rule->limit_value)
 				goto out;
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
@@ -1689,7 +1689,7 @@ int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule
 				goto out;
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
-			if ((total_num - children.values_num) * 100 / total_num >= rule->limit_value)
+			if (0 == total_num || (total_num - children.values_num) * 100 / total_num >= rule->limit_value)
 				goto out;
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
@@ -1699,7 +1699,7 @@ int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
 			weight = services_get_weight(&children);
-			if (weight * 100 / total_weight < rule->limit_value)
+			if (0 == total_weight || weight * 100 / total_weight < rule->limit_value)
 				goto out;
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
@@ -1709,7 +1709,7 @@ int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule
 			break;
 		case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
 			weight = services_get_weight(&children);
-			if ((total_weight - weight) * 100 / total_weight >= rule->limit_value)
+			if (0 == total_weight || (total_weight - weight) * 100 / total_weight >= rule->limit_value)
 				goto out;
 			break;
 		default:
