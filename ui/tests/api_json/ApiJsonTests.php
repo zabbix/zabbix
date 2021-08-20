@@ -77,6 +77,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testItemPrototype');
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testProxy');
+		$suite->addTestSuite('testServices');
 		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testTriggers');
 		$suite->addTestSuite('testTriggerPermissions');
