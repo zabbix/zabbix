@@ -48,7 +48,7 @@ class testFormScheduledReport extends CWebTest {
 				'LEFT JOIN report_param rp ON r.reportid=rp.reportid '.
 				'LEFT JOIN report_user ru ON r.reportid=ru.reportid '.
 				'LEFT JOIN report_usrgrp rg ON r.reportid=rg.reportid '.
-				'ORDER BY r.reportid, rp.reportparamid, ru.reportuserid, rg.reportusrgrpid'
+				'ORDER BY r.reportid, rp.reportparamid, ru.reportuserid, rg.reportusrgrpid, ru.access_userid'
 		);
 	}
 
@@ -766,30 +766,10 @@ class testFormScheduledReport extends CWebTest {
 	public function testFormScheduledReport_SimpleUpdate() {
 		$old_hash = $this->getHash();
 		$name = CDBHelper::getRandom('SELECT name FROM report', 1);
-
-		// TODO: delete this debug information when test failing is fixed.
-		var_dump($name);
-		// TODO: delete this debug information when test failing is fixed.
-		echo (json_encode(CDBHelper::getAll('SELECT * FROM report r '.
-				'LEFT JOIN report_param rp ON r.reportid=rp.reportid '.
-				'LEFT JOIN report_user ru ON r.reportid=ru.reportid '.
-				'LEFT JOIN report_usrgrp rg ON r.reportid=rg.reportid '.
-				'ORDER BY r.reportid, rp.reportparamid, ru.reportuserid, rg.reportusrgrpid'
-		), JSON_PRETTY_PRINT));
-
 		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Scheduled report updated');
-
-		// TODO: delete this debug information when test failing is fixed.
-		echo (json_encode(CDBHelper::getAll('SELECT * FROM report r '.
-				'LEFT JOIN report_param rp ON r.reportid=rp.reportid '.
-				'LEFT JOIN report_user ru ON r.reportid=ru.reportid '.
-				'LEFT JOIN report_usrgrp rg ON r.reportid=rg.reportid '.
-				'ORDER BY r.reportid, rp.reportparamid, ru.reportuserid, rg.reportusrgrpid'
-		), JSON_PRETTY_PRINT));
-
 		$this->assertEquals($old_hash, $this->getHash());
 	}
 
