@@ -3058,7 +3058,7 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, cha
 {
 	int		len, quotes = 0;
 	char		*buffer, *ptr_buffer;
-	const char	*ptr_context = context;
+	const char	*ptr_context = context, *start = context;
 
 	if ('"' == *ptr_context || ' ' == *ptr_context)
 		force_quote = 1;
@@ -3090,7 +3090,7 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, cha
 
 	if ('\\' == *(ptr_buffer - 1))
 	{
-		*error = zbx_dsprintf(*error, "quoted context \"%s\" cannot end with '\\' character", context);
+		*error = zbx_dsprintf(*error, "quoted context \"%s\" cannot end with '\\' character", start);
 		zbx_free(buffer);
 		return NULL;
 	}
