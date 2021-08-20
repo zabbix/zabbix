@@ -188,10 +188,13 @@ function get_icon($type, $params = []) {
  * @param string  $current_element
  * @param int     $hostid
  * @param int     $lld_ruleid
+ * @param array   $display_options                    For now pertinent to hosts only.
+ * @param bool    $display_options['no_breadcrumbs']  Toggle breadcrumbs off (for in-popup display).
+ * @param string  $display_options['link_target']     E.g. _blank to open linked entities in a new tab.
  *
  * @return CList|null
  */
-function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
+function getHostNavigation($current_element, $hostid, $lld_ruleid = 0, $display_options = []) {
 	$options = [
 		'output' => [
 			'hostid', 'status', 'name', 'maintenance_status', 'flags'
@@ -201,6 +204,8 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 		'hostids' => [$hostid],
 		'editable' => true
 	];
+	$link_target = array_key_exists('link_target', $display_options) ? $display_options['link_target'] : null;
+
 	if ($lld_ruleid == 0) {
 		$options['selectItems'] = API_OUTPUT_COUNT;
 		$options['selectTriggers'] = API_OUTPUT_COUNT;
@@ -292,20 +297,23 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'host.edit')
-				->setArgument('hostid', $db_host['hostid'])
-		));
+		if (!array_key_exists('no_breadcrumbs', $display_options)) {
+			$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'host.edit')
+					->setArgument('hostid', $db_host['hostid'])
+				));
 
-		if ($current_element === '') {
-			$host->addClass(ZBX_STYLE_SELECTED);
+			if ($current_element === '') {
+				$host->addClass(ZBX_STYLE_SELECTED);
+			}
+
+			$list->addItem(new CBreadcrumbs([new CSpan(new CLink(_('All hosts'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
+			]));
 		}
 
 		$list
-			->addItem(new CBreadcrumbs([new CSpan(new CLink(_('All hosts'),
-				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
-			]))
 			->addItem($status)
 			->addItem(getHostAvailabilityTable($db_host['interfaces']));
 
@@ -327,12 +335,12 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	if ($lld_ruleid == 0) {
 		// items
 		$items = new CSpan([
-			new CLink(_('Items'),
+			(new CLink(_('Items'),
 				(new CUrl('items.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
-			),
+			))->setAttribute('target', $link_target),
 			CViewHelper::showNum($db_host['items'])
 		]);
 		if ($current_element == 'items') {
@@ -342,12 +350,12 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 
 		// triggers
 		$triggers = new CSpan([
-			new CLink(_('Triggers'),
+			(new CLink(_('Triggers'),
 				(new CUrl('triggers.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
-			),
+			))->setAttribute('target', $link_target),
 			CViewHelper::showNum($db_host['triggers'])
 		]);
 		if ($current_element == 'triggers') {
@@ -357,11 +365,11 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 
 		// graphs
 		$graphs = new CSpan([
-			new CLink(_('Graphs'), (new CUrl('graphs.php'))
+			(new CLink(_('Graphs'), (new CUrl('graphs.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$db_host['hostid']])
 				->setArgument('context', $context)
-			),
+			))->setAttribute('target', $link_target),
 			CViewHelper::showNum($db_host['graphs'])
 		]);
 		if ($current_element == 'graphs') {
@@ -372,11 +380,11 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 		// Dashboards
 		if ($is_template) {
 			$dashboards = new CSpan([
-				new CLink(_('Dashboards'),
+				(new CLink(_('Dashboards'),
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'template.dashboard.list')
 						->setArgument('templateid', $db_host['hostid'])
-				),
+				))->setAttribute('target', $link_target),
 				CViewHelper::showNum($db_host['dashboards'])
 			]);
 			if ($current_element == 'dashboards') {
@@ -387,11 +395,11 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 
 		// discovery rules
 		$lld_rules = new CSpan([
-			new CLink(_('Discovery rules'), (new CUrl('host_discovery.php'))
+			(new CLink(_('Discovery rules'), (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$db_host['hostid']])
 				->setArgument('context', $context)
-			),
+			))->setAttribute('target', $link_target),
 			CViewHelper::showNum($db_host['discoveries'])
 		]);
 		if ($current_element == 'discoveries') {
@@ -401,12 +409,12 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 
 		// web scenarios
 		$http_tests = new CSpan([
-			new CLink(_('Web scenarios'),
+			(new CLink(_('Web scenarios'),
 				(new CUrl('httpconf.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
-			),
+			))->setAttribute('target', $link_target),
 			CViewHelper::showNum($db_host['httpTests'])
 		]);
 		if ($current_element == 'web') {
