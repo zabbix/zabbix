@@ -69,9 +69,10 @@ while ($parent = array_shift($data['service']['parents'])) {
 		])
 		->addItem([
 			(new CDiv(_('SLA')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-			(new CDiv(($data['service']['showsla'] == SERVICE_SHOW_SLA_ON)
-				? sprintf('%.4f', $data['service']['goodsla'])
-				: ''
+			(new CDiv(
+				$data['service']['showsla'] == SERVICE_SHOW_SLA_ON
+					? sprintf('%.4f', $data['service']['goodsla'])
+					: ''
 			))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 		])
 		->addItem([
