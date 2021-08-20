@@ -1,1 +1,0 @@
-.........T [ZBX-19686] changed 1-st parameter {#IFNAME} in net.if.* items to {#IFGUID} in Windows templates (mchudinov)
