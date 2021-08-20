@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-13 19:54+0300\n"
+"POT-Creation-Date: 2021-08-20 19:54+0300\n"
 "PO-Revision-Date: 2016-05-11 02:08+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -125,7 +125,7 @@ msgstr ""
 msgid "%1$s [Line: %2$s | Column: %3$s]"
 msgstr "%1$s [线: %2$s | 列: %3$s]"
 
-#: include/actions.inc.php:1814
+#: include/actions.inc.php:1838
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s action"
@@ -159,7 +159,7 @@ msgid "%1$s item"
 msgid_plural "%1$s items"
 msgstr[0] "%1$s 项目"
 
-#: include/actions.inc.php:1653
+#: include/actions.inc.php:1676
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
@@ -202,7 +202,7 @@ msgid_plural "%1$s problems in total"
 msgstr[0] "异常问题总计 %1$s"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
-#: include/actions.inc.php:2090
+#: include/actions.inc.php:2117
 #: include/views/administration.auditacts.list.php:83
 #, c-format
 msgid "%1$s retry left"
@@ -465,11 +465,12 @@ msgstr ""
 msgid "Access to modules"
 msgstr ""
 
-#: app/views/hint.box.php:77 app/views/monitoring.widget.problems.view.php:66
-#: include/actions.inc.php:153 include/blocks.inc.php:722
-#: include/classes/screens/CScreenProblem.php:876
-#: include/classes/screens/CScreenProblem.php:901
-#: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:287
+#: app/views/hintbox.eventlist.php:76
+#: app/views/monitoring.widget.problems.view.php:66
+#: include/actions.inc.php:153 include/blocks.inc.php:717
+#: include/classes/screens/CScreenProblem.php:868
+#: include/classes/screens/CScreenProblem.php:893
+#: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:287
 msgid "Ack"
 msgstr "确认"
 
@@ -481,7 +482,7 @@ msgstr "确认"
 msgid "Acknowledge problems"
 msgstr ""
 
-#: app/views/popup.condition.common.php:652 include/actions.inc.php:1993
+#: app/views/popup.condition.common.php:652 include/actions.inc.php:2020
 #: include/events.inc.php:193
 msgid "Acknowledged"
 msgstr "已确认"
@@ -521,8 +522,8 @@ msgstr "确认已解决的事件"
 #: app/views/popup.massupdate.trigger.php:101
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:125
 #: app/views/popup.valuemap.edit.php:51 app/views/reports.auditlog.list.php:70
-#: app/views/reports.auditlog.list.php:90 include/actions.inc.php:1756
-#: include/actions.inc.php:1839
+#: app/views/reports.auditlog.list.php:90 include/actions.inc.php:1772
+#: include/actions.inc.php:1866
 #: include/views/administration.auditacts.list.php:63
 #: include/views/configuration.action.edit.php:59
 #: include/views/configuration.action.edit.php:174
@@ -625,13 +626,13 @@ msgstr "动作已更新"
 #: app/views/administration.mediatype.edit.php:282
 #: app/views/configuration.discovery.edit.php:79
 #: app/views/monitoring.dashboard.view.php:116
-#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:723
+#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:718
 #: include/classes/helpers/CMenuHelper.php:177
 #: include/classes/helpers/CRoleHelper.php:435
-#: include/classes/screens/CScreenProblem.php:877
-#: include/classes/screens/CScreenProblem.php:902
-#: include/classes/screens/CScreenProblem.php:1170
-#: include/classes/screens/CScreenProblem.php:1231 include/events.inc.php:288
+#: include/classes/screens/CScreenProblem.php:869
+#: include/classes/screens/CScreenProblem.php:894
+#: include/classes/screens/CScreenProblem.php:1162
+#: include/classes/screens/CScreenProblem.php:1223 include/events.inc.php:288
 #: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:68 jsLoader.php:146
 #: jsLoader.php:174 jsLoader.php:189 jsLoader.php:203 jsLoader.php:329
@@ -972,7 +973,7 @@ msgstr ""
 msgid "Aggregation interval"
 msgstr ""
 
-#: include/actions.inc.php:2024
+#: include/actions.inc.php:2051
 msgid "Alert message"
 msgstr "告警消息"
 
@@ -1609,11 +1610,11 @@ msgstr "按触发器模板"
 msgid "CERT"
 msgstr "CERT"
 
-#: app/views/hint.box.php:117
+#: app/views/hintbox.eventlist.php:116
 #: app/views/monitoring.widget.problems.view.php:109
 #: include/classes/graph/CSvgGraph.php:1080
-#: include/classes/screens/CScreenProblem.php:982
-#: include/classes/screens/CScreenProblem.php:1192 include/events.inc.php:378
+#: include/classes/screens/CScreenProblem.php:974
+#: include/classes/screens/CScreenProblem.php:1184 include/events.inc.php:373
 msgid "CLOSING"
 msgstr "关闭中"
 
@@ -3385,7 +3386,7 @@ msgstr "列数"
 msgid "Combined result"
 msgstr "合并的结果"
 
-#: app/views/administration.script.edit.php:174 include/actions.inc.php:1861
+#: app/views/administration.script.edit.php:174 include/actions.inc.php:1888
 #: include/views/administration.auditacts.list.php:102
 msgid "Command"
 msgstr "命令"
@@ -4449,7 +4450,7 @@ msgstr ""
 msgid "Database TLS key file"
 msgstr ""
 
-#: include/blocks.inc.php:614
+#: include/blocks.inc.php:609
 msgid "Database history tables upgraded"
 msgstr ""
 
@@ -5060,7 +5061,7 @@ msgid "Description"
 msgstr "描述"
 
 #: app/views/administration.mediatype.list.php:81
-#: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:530
+#: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:525
 #: include/func.inc.php:1601 include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:178
 #: include/views/configuration.action.edit.php:321
@@ -5467,11 +5468,11 @@ msgstr "显示问题"
 msgid "Display stacked graph"
 msgstr "显示堆叠数据图"
 
+#: app/controllers/CControllerHintboxActionlist.php:93
 #: app/views/administration.queue.details.php:85 app/views/search.php:184
 #: app/views/search.php:268 app/views/search.php:367
-#: include/actions.inc.php:1646 include/actions.inc.php:1717
-#: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:378
+#: include/actions.inc.php:1669 include/actions.inc.php:1741
+#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:378
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "显示 已自动发现的 %2$s中的%1$s"
@@ -5644,10 +5645,11 @@ msgstr "用户ID \"%1$s\" 与 \"%2$s\" 冲突"
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "用户组ID \"%1$s\" 与 \"%2$s\" 冲突"
 
-#: app/views/hint.box.php:76 app/views/monitoring.widget.problems.view.php:65
-#: include/blocks.inc.php:721 include/classes/screens/CScreenProblem.php:875
-#: include/classes/screens/CScreenProblem.php:900
-#: include/classes/screens/CScreenProblem.php:1168 include/events.inc.php:286
+#: app/views/hintbox.eventlist.php:75
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:716
+#: include/classes/screens/CScreenProblem.php:867
+#: include/classes/screens/CScreenProblem.php:892
+#: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:286
 #: include/views/configuration.action.edit.php:174
 msgid "Duration"
 msgstr "持续时间"
@@ -6249,7 +6251,7 @@ msgstr "执行在"
 msgid "Execute scripts"
 msgstr ""
 
-#: include/actions.inc.php:2045
+#: include/actions.inc.php:2072
 #: include/views/administration.auditacts.list.php:77
 msgid "Executed"
 msgstr "已执行"
@@ -6417,7 +6419,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "失败"
 
-#: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2057
+#: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2084
 #: include/views/administration.auditacts.list.php:87
 msgid "Failed"
 msgstr "已失败"
@@ -6938,8 +6940,8 @@ msgstr "梯度线"
 #: app/partials/monitoring.latest.view.html.php:154
 #: app/views/monitoring.charts.view.php:56
 #: include/classes/macros/CMacrosResolverGeneral.php:905
-#: include/classes/screens/CScreenProblem.php:1312
-#: include/classes/screens/CScreenProblem.php:1317
+#: include/classes/screens/CScreenProblem.php:1304
+#: include/classes/screens/CScreenProblem.php:1309
 #: include/classes/widgets/CWidgetConfig.php:60
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:66
@@ -7352,8 +7354,8 @@ msgstr "高亮整行"
 #: app/views/administration.housekeeping.edit.php:125
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
 #: include/classes/macros/CMacrosResolverGeneral.php:910
-#: include/classes/screens/CScreenProblem.php:1319
-#: include/classes/screens/CScreenProblem.php:1324
+#: include/classes/screens/CScreenProblem.php:1311
+#: include/classes/screens/CScreenProblem.php:1316
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
@@ -7423,11 +7425,11 @@ msgstr "横向对齐"
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:92 app/views/popup.massupdate.host.php:290
 #: app/views/search.php:30 httpconf.php:212 httpconf.php:481
-#: include/actions.inc.php:50 include/blocks.inc.php:718
+#: include/actions.inc.php:50 include/blocks.inc.php:713
 #: include/classes/screens/CScreenHttpTest.php:112
-#: include/classes/screens/CScreenProblem.php:871
-#: include/classes/screens/CScreenProblem.php:895
-#: include/classes/screens/CScreenProblem.php:1165
+#: include/classes/screens/CScreenProblem.php:863
+#: include/classes/screens/CScreenProblem.php:887
+#: include/classes/screens/CScreenProblem.php:1157
 #: include/classes/setup/CSetupWizard.php:440
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
@@ -8101,7 +8103,7 @@ msgstr ""
 msgid "In maintenance"
 msgstr "维修中"
 
-#: include/actions.inc.php:2052
+#: include/actions.inc.php:2079
 #: include/views/administration.auditacts.list.php:81
 msgid "In progress"
 msgstr "启用中"
@@ -8176,8 +8178,8 @@ msgstr "无法访问的触发器"
 #: app/controllers/CControllerScheduledReportEdit.php:235
 #: app/controllers/CControllerScheduledReportEdit.php:281
 #: app/controllers/CControllerScheduledReportList.php:136
-#: include/actions.inc.php:1927 include/actions.inc.php:1950
-#: include/actions.inc.php:1955
+#: include/actions.inc.php:1954 include/actions.inc.php:1977
+#: include/actions.inc.php:1982
 #: include/classes/helpers/CDashboardHelper.php:39 include/events.inc.php:248
 #: include/views/monitoring.sysmap.edit.php:81
 msgid "Inaccessible user"
@@ -8550,11 +8552,11 @@ msgstr "评估类型的值不正确。"
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "错误的事件对象 \"%1$s\" (%2$s)对于事件源\"%3$s\" (%4$s),只有以下对象的支持:%5$s."
 
-#: include/classes/api/services/CAlert.php:376
+#: include/classes/api/services/CAlert.php:386
 msgid "Incorrect eventobject value."
 msgstr "错误的事件对象值."
 
-#: include/classes/api/services/CAlert.php:369
+#: include/classes/api/services/CAlert.php:379
 msgid "Incorrect eventsource value."
 msgstr "错误的事件源的值."
 
@@ -9267,9 +9269,9 @@ msgstr ""
 #: app/partials/scheduledreport.table.html.php:45
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
-#: include/actions.inc.php:1756 include/actions.inc.php:1839
-#: include/blocks.inc.php:717 include/classes/screens/CScreenProblem.php:870
-#: include/classes/screens/CScreenProblem.php:894
+#: include/actions.inc.php:1772 include/actions.inc.php:1866
+#: include/blocks.inc.php:712 include/classes/screens/CScreenProblem.php:862
+#: include/classes/screens/CScreenProblem.php:886
 #: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.graph.list.php:140
 #: include/views/configuration.host.discovery.list.php:201
@@ -10900,7 +10902,7 @@ msgstr ""
 msgid "Manual host action"
 msgstr ""
 
-#: include/actions.inc.php:1988
+#: include/actions.inc.php:2015
 msgid "Manually closed"
 msgstr "手动关闭"
 
@@ -11037,7 +11039,7 @@ msgstr "掩码"
 #: app/controllers/CControllerPopupMassupdateItem.php:406
 #: app/controllers/CControllerPopupMassupdateTemplate.php:364
 #: app/controllers/CControllerPopupMassupdateTrigger.php:235
-#: include/classes/screens/CScreenProblem.php:1142
+#: include/classes/screens/CScreenProblem.php:1134
 #: include/views/configuration.host.list.php:444
 #: include/views/configuration.item.list.php:311
 #: include/views/configuration.item.prototype.list.php:196
@@ -11107,7 +11109,7 @@ msgstr "操作系统最大的文件打开数量。返回整数"
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "操作系统最大的进程数。返回整数"
 
-#: include/blocks.inc.php:635
+#: include/blocks.inc.php:630
 #, c-format
 msgid "Maximum required database version is %1$s."
 msgstr ""
@@ -11249,8 +11251,8 @@ msgstr ""
 #: app/views/monitoring.widget.actionlog.view.php:37
 #: app/views/popup.acknowledge.edit.php:35
 #: app/views/popup.mediatype.message.php:80
-#: app/views/popup.mediatypetest.edit.php:75 include/actions.inc.php:1623
-#: include/actions.inc.php:1894 include/actions.inc.php:2001
+#: app/views/popup.mediatypetest.edit.php:75 include/actions.inc.php:1645
+#: include/actions.inc.php:1921 include/actions.inc.php:2028
 #: include/views/administration.auditacts.list.php:66
 #: include/views/administration.auditacts.list.php:97
 msgid "Message"
@@ -11278,12 +11280,12 @@ msgstr "消息超时"
 msgid "Message type"
 msgstr ""
 
-#: include/actions.inc.php:1756 include/actions.inc.php:1839
+#: include/actions.inc.php:1772 include/actions.inc.php:1866
 msgid "Message/Command"
 msgstr "信息/命令"
 
 #: app/views/administration.authentication.edit.php:201
-#: include/classes/screens/CScreenProblem.php:1224
+#: include/classes/screens/CScreenProblem.php:1216
 msgid "Messages"
 msgstr "消息"
 
@@ -11326,7 +11328,7 @@ msgstr ""
 msgid "Minimum required PHP version is %1$s."
 msgstr ""
 
-#: include/blocks.inc.php:631
+#: include/blocks.inc.php:626
 #, c-format
 msgid "Minimum required database version is %1$s."
 msgstr ""
@@ -11851,7 +11853,8 @@ msgstr ""
 msgid "New triggers"
 msgstr "新触发器"
 
-#: jsLoader.php:183
+#: app/views/monitoring.dashboard.view.php:175
+#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:183
 msgid "Next page"
 msgstr ""
 
@@ -11865,8 +11868,8 @@ msgstr "下一步"
 #: app/partials/configuration.filter.items.php:202
 #: app/partials/configuration.filter.items.php:211
 #: app/views/administration.user.list.php:135
-#: app/views/administration.user.list.php:139 app/views/hint.box.php:179
-#: app/views/hint.box.php:183
+#: app/views/administration.user.list.php:139
+#: app/views/hintbox.eventlist.php:178 app/views/hintbox.eventlist.php:182
 #: app/views/monitoring.widget.problems.view.php:264
 #: app/views/monitoring.widget.problems.view.php:268
 #: app/views/popup.condition.common.php:647
@@ -11875,13 +11878,13 @@ msgstr "下一步"
 #: app/views/popup.massupdate.item.php:337
 #: app/views/popup.massupdate.item.php:379
 #: app/views/popup.massupdate.trigger.php:67 include/actions.inc.php:33
-#: include/blocks.inc.php:537 include/blocks.inc.php:615
-#: include/blocks.inc.php:844 include/blocks.inc.php:848
-#: include/classes/screens/CScreenProblem.php:1106
-#: include/classes/screens/CScreenProblem.php:1110
-#: include/classes/screens/CScreenProblem.php:1252 include/events.inc.php:195
-#: include/events.inc.php:199 include/events.inc.php:394
-#: include/events.inc.php:398 include/triggers.inc.php:1173
+#: include/blocks.inc.php:532 include/blocks.inc.php:610
+#: include/blocks.inc.php:839 include/blocks.inc.php:843
+#: include/classes/screens/CScreenProblem.php:1098
+#: include/classes/screens/CScreenProblem.php:1102
+#: include/classes/screens/CScreenProblem.php:1244 include/events.inc.php:195
+#: include/events.inc.php:199 include/events.inc.php:389
+#: include/events.inc.php:393 include/triggers.inc.php:1173
 #: include/triggers.inc.php:1178
 #: include/views/configuration.graph.list.php:205
 #: include/views/configuration.host.prototype.list.php:142
@@ -12147,7 +12150,8 @@ msgstr ""
 #: app/controllers/CControllerDashboardShareUpdate.php:93
 #: app/controllers/CControllerDashboardView.php:206
 #: app/controllers/CControllerDashboardView.php:254
-#: app/controllers/CControllerHintBox.php:153
+#: app/controllers/CControllerHintboxActionlist.php:50
+#: app/controllers/CControllerHintboxEventlist.php:53
 #: app/controllers/CControllerHostDashboardView.php:115
 #: app/controllers/CControllerMenuPopup.php:74
 #: app/controllers/CControllerMenuPopup.php:217
@@ -12509,11 +12513,11 @@ msgstr ""
 msgid "Number of enabled items on the host."
 msgstr "主机启用监控项的数量"
 
-#: include/blocks.inc.php:541
+#: include/blocks.inc.php:536
 msgid "Number of hosts (enabled/disabled)"
 msgstr ""
 
-#: include/blocks.inc.php:554
+#: include/blocks.inc.php:549
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "监控项数量（已启用/已禁用/不支持）"
 
@@ -12577,11 +12581,11 @@ msgstr "状态改变次数"
 msgid "Number of steps"
 msgstr "步骤数量"
 
-#: include/blocks.inc.php:550
+#: include/blocks.inc.php:545
 msgid "Number of templates"
 msgstr ""
 
-#: include/blocks.inc.php:565
+#: include/blocks.inc.php:560
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "触发器数量（已启用/已禁用 [问题/正常]）"
 
@@ -12597,7 +12601,7 @@ msgstr "Zabbix 数据库中不支持的监控项数量。"
 msgid "Number of unsupported items on the host."
 msgstr "主机中不迟滞的监控项数量。"
 
-#: include/blocks.inc.php:577
+#: include/blocks.inc.php:572
 msgid "Number of users (online)"
 msgstr "用户数(线上)"
 
@@ -12835,7 +12839,7 @@ msgstr "只有Zabbix代理, SNMPv1,SNMPv2 和 SNMPv3检查才是独特的."
 msgid "Only administrators can set map owner."
 msgstr "只有管理员才可以设置拓扑图的所有人。"
 
-#: include/blocks.inc.php:555
+#: include/blocks.inc.php:550
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "只计算指派给启用的主机的监控项"
 
@@ -12886,7 +12890,7 @@ msgstr "只有超级管理员才能更新关联项。"
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "只可显示最近的20%%的指示器."
 
-#: include/blocks.inc.php:566
+#: include/blocks.inc.php:561
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "只计算指派给启用的主机的和相依于启用的项目的触发器"
 
@@ -12924,9 +12928,9 @@ msgstr "操作并无群组来操作."
 msgid "Operation has no template to operate."
 msgstr "操作并无模板来操作."
 
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:720
-#: include/classes/screens/CScreenProblem.php:898
-#: include/classes/screens/CScreenProblem.php:1167 include/events.inc.php:181
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:715
+#: include/classes/screens/CScreenProblem.php:890
+#: include/classes/screens/CScreenProblem.php:1159 include/events.inc.php:181
 #: include/views/configuration.trigger.prototype.edit.php:84
 #: include/views/configuration.trigger.prototype.list.php:59
 #: include/views/configuration.triggers.edit.php:106
@@ -13306,11 +13310,11 @@ msgstr "PHP xmlwriter 扩展不支持"
 msgid "POP"
 msgstr "POP"
 
-#: app/views/hint.box.php:117
+#: app/views/hintbox.eventlist.php:116
 #: app/views/monitoring.widget.problems.view.php:109 chart5.php:199
 #: include/classes/graph/CSvgGraph.php:1075
-#: include/classes/screens/CScreenProblem.php:982
-#: include/classes/screens/CScreenProblem.php:1192 include/events.inc.php:378
+#: include/classes/screens/CScreenProblem.php:974
+#: include/classes/screens/CScreenProblem.php:1184 include/events.inc.php:373
 #: include/triggers.inc.php:250 include/views/monitoring.overview.items.php:36
 #: include/views/monitoring.overview.triggers.php:45
 msgid "PROBLEM"
@@ -13377,7 +13381,7 @@ msgctxt "page navigation"
 msgid "Pager"
 msgstr ""
 
-#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:530
+#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:525
 msgid "Parameter"
 msgstr "参数"
 
@@ -13773,9 +13777,7 @@ msgid "Previous month"
 msgstr "上一个月"
 
 #: app/views/monitoring.dashboard.view.php:157
-#: app/views/monitoring.dashboard.view.php:175
-#: app/views/monitoring.host.dashboard.view.php:94
-#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:184
+#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:184
 msgid "Previous page"
 msgstr ""
 
@@ -13855,12 +13857,12 @@ msgstr "优先权层级"
 #: app/partials/monitoring.problem.filter.php:97
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:719
+#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:714
 #: include/classes/helpers/CMediatypeHelper.php:45
-#: include/classes/screens/CScreenProblem.php:873
-#: include/classes/screens/CScreenProblem.php:896
-#: include/classes/screens/CScreenProblem.php:1073
-#: include/classes/screens/CScreenProblem.php:1166
+#: include/classes/screens/CScreenProblem.php:865
+#: include/classes/screens/CScreenProblem.php:888
+#: include/classes/screens/CScreenProblem.php:1065
+#: include/classes/screens/CScreenProblem.php:1158
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:61
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:61
 #: include/classes/widgets/forms/CWidgetFormProblems.php:76
@@ -13875,7 +13877,7 @@ msgstr "优先权层级"
 msgid "Problem"
 msgstr "问题"
 
-#: include/actions.inc.php:1977
+#: include/actions.inc.php:2004
 msgid "Problem created"
 msgstr "问题已创建"
 
@@ -13912,7 +13914,7 @@ msgstr "问题在"
 msgid "Problem recovery"
 msgstr ""
 
-#: include/actions.inc.php:1980
+#: include/actions.inc.php:2007
 msgid "Problem resolved"
 msgstr "问题已解决"
 
@@ -13991,7 +13993,8 @@ msgstr "属性"
 
 #: app/controllers/CControllerMenuPopup.php:351
 #: app/controllers/CControllerMenuPopup.php:634
-#: app/controllers/CControllerWidgetUrlView.php:64 app/views/hint.box.php:45
+#: app/controllers/CControllerWidgetUrlView.php:64
+#: app/views/hintbox.eventlist.php:44
 #: include/classes/helpers/CVaultHelper.php:107
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
@@ -14133,10 +14136,11 @@ msgstr ""
 msgid "Queue overview by proxy"
 msgstr ""
 
-#: app/views/hint.box.php:101 app/views/monitoring.widget.problems.view.php:93
+#: app/views/hintbox.eventlist.php:100
+#: app/views/monitoring.widget.problems.view.php:93
 #: include/classes/graph/CSvgGraph.php:1071
-#: include/classes/screens/CScreenProblem.php:966
-#: include/classes/screens/CScreenProblem.php:1180 include/events.inc.php:362
+#: include/classes/screens/CScreenProblem.php:958
+#: include/classes/screens/CScreenProblem.php:1172 include/events.inc.php:357
 msgid "RESOLVED"
 msgstr "已解决"
 
@@ -14225,7 +14229,7 @@ msgid "Recipients"
 msgstr ""
 
 #: app/views/administration.user.edit.php:533
-#: include/classes/screens/CScreenProblem.php:1074
+#: include/classes/screens/CScreenProblem.php:1066
 #: include/views/configuration.item.list.php:204
 #: include/views/configuration.trigger.prototype.list.php:167
 #: include/views/configuration.triggers.list.php:306
@@ -14250,10 +14254,11 @@ msgstr "恢复表达式语法错误。"
 msgid "Recovery operations"
 msgstr "恢复操作"
 
-#: app/views/hint.box.php:74 app/views/monitoring.widget.problems.view.php:55
-#: include/classes/screens/CScreenProblem.php:868
-#: include/classes/screens/CScreenProblem.php:891
-#: include/classes/screens/CScreenProblem.php:1163 include/events.inc.php:283
+#: app/views/hintbox.eventlist.php:73
+#: app/views/monitoring.widget.problems.view.php:55
+#: include/classes/screens/CScreenProblem.php:860
+#: include/classes/screens/CScreenProblem.php:883
+#: include/classes/screens/CScreenProblem.php:1155 include/events.inc.php:283
 msgid "Recovery time"
 msgstr "恢复时间"
 
@@ -14334,8 +14339,8 @@ msgstr ""
 msgid "Remember me for 30 days"
 msgstr "30天内记住我"
 
-#: include/actions.inc.php:981 include/actions.inc.php:1769
-#: include/actions.inc.php:2023
+#: include/actions.inc.php:981 include/actions.inc.php:1785
+#: include/actions.inc.php:2050
 msgid "Remote command"
 msgstr "远程命令"
 
@@ -14639,7 +14644,7 @@ msgstr "要求的性能(vps)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Zabbix服务器所需求的性能,每秒钟处理的新值数."
 
-#: include/blocks.inc.php:581
+#: include/blocks.inc.php:576
 msgid "Required server performance, new values per second"
 msgstr "要求的主机性能, 每秒新值"
 
@@ -14694,23 +14699,23 @@ msgid "Resolved by"
 msgstr "处理方法"
 
 #: app/views/monitoring.widget.problems.view.php:154
-#: include/classes/screens/CScreenProblem.php:998
+#: include/classes/screens/CScreenProblem.php:990
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "通过关联规则解析\"%1$s\"。"
 
 #: app/views/monitoring.widget.problems.view.php:157
-#: include/classes/screens/CScreenProblem.php:1001
+#: include/classes/screens/CScreenProblem.php:993
 msgid "Resolved by correlation rule."
 msgstr "通过关联规则解析。"
 
 #: app/views/monitoring.widget.problems.view.php:164
-#: include/classes/screens/CScreenProblem.php:1008
+#: include/classes/screens/CScreenProblem.php:1000
 msgid "Resolved by inaccessible user."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:163
-#: include/classes/screens/CScreenProblem.php:1007
+#: include/classes/screens/CScreenProblem.php:999
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "用户解决\"%1$s\"。"
@@ -15479,7 +15484,7 @@ msgstr ""
 msgid "Send to users"
 msgstr ""
 
-#: include/actions.inc.php:2046
+#: include/actions.inc.php:2073
 #: include/views/administration.auditacts.list.php:76
 msgid "Sent"
 msgstr "已送达"
@@ -15684,9 +15689,9 @@ msgstr ""
 #: app/views/popup.massupdate.trigger.php:53
 #: app/views/popup.triggerwizard.php:93
 #: include/classes/screens/CScreenHistory.php:274
-#: include/classes/screens/CScreenProblem.php:865
-#: include/classes/screens/CScreenProblem.php:887
-#: include/classes/screens/CScreenProblem.php:1161
+#: include/classes/screens/CScreenProblem.php:857
+#: include/classes/screens/CScreenProblem.php:879
+#: include/classes/screens/CScreenProblem.php:1153
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:70
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:70
 #: include/classes/widgets/forms/CWidgetFormProblems.php:85
@@ -15705,22 +15710,22 @@ msgstr ""
 msgid "Severity"
 msgstr "严重性"
 
-#: include/actions.inc.php:1706
+#: include/actions.inc.php:1729
 msgctxt "screen reader"
 msgid "Severity changed"
 msgstr "严重性发生改变"
 
-#: include/actions.inc.php:1676
-#: include/classes/screens/CScreenProblem.php:1228
+#: include/actions.inc.php:1699
+#: include/classes/screens/CScreenProblem.php:1220
 msgid "Severity changes"
 msgstr "严重性变化"
 
-#: include/actions.inc.php:1698
+#: include/actions.inc.php:1721
 msgctxt "screen reader"
 msgid "Severity decreased"
 msgstr "严重性下降"
 
-#: include/actions.inc.php:1702
+#: include/actions.inc.php:1725
 msgctxt "screen reader"
 msgid "Severity increased"
 msgstr "严重性提升"
@@ -16174,19 +16179,20 @@ msgstr ""
 #: app/views/configuration.correlation.list.php:52
 #: app/views/configuration.correlation.list.php:77
 #: app/views/configuration.discovery.list.php:52
-#: app/views/configuration.discovery.list.php:80 app/views/hint.box.php:75
+#: app/views/configuration.discovery.list.php:80
+#: app/views/hintbox.eventlist.php:74
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
 #: app/views/popup.massupdate.host.php:96
 #: app/views/popup.massupdate.item.php:325
 #: app/views/popup.scheduledreport.subscription.php:116
-#: app/views/reports.scheduledreport.list.php:59 include/actions.inc.php:1756
-#: include/actions.inc.php:1839 include/classes/html/CHostAvailability.php:76
+#: app/views/reports.scheduledreport.list.php:59 include/actions.inc.php:1772
+#: include/actions.inc.php:1866 include/classes/html/CHostAvailability.php:76
 #: include/classes/screens/CScreenHttpTestDetails.php:85
 #: include/classes/screens/CScreenHttpTest.php:116
-#: include/classes/screens/CScreenProblem.php:869
-#: include/classes/screens/CScreenProblem.php:893
-#: include/classes/screens/CScreenProblem.php:1164
+#: include/classes/screens/CScreenProblem.php:861
+#: include/classes/screens/CScreenProblem.php:885
+#: include/classes/screens/CScreenProblem.php:1156
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:284 include/forms.inc.php:515
@@ -16242,7 +16248,7 @@ msgstr "只有状态"
 msgid "Status problem"
 msgstr "状态 问题"
 
-#: include/actions.inc.php:1839
+#: include/actions.inc.php:1866
 #: include/classes/screens/CScreenHttpTestDetails.php:81
 msgid "Step"
 msgstr "步骤"
@@ -16558,8 +16564,8 @@ msgstr "标记值"
 #: app/partials/monitoring.host.view.html.php:32
 #: app/partials/monitoring.latest.view.html.php:58
 #: app/partials/monitoring.latest.view.html.php:71
-#: app/partials/monitoring.problem.filter.php:231 app/views/hint.box.php:78
-#: app/views/monitoring.latest.view.php:95
+#: app/partials/monitoring.problem.filter.php:231
+#: app/views/hintbox.eventlist.php:77 app/views/monitoring.latest.view.php:95
 #: app/views/monitoring.web.view.php:87
 #: app/views/monitoring.widget.problems.view.php:68
 #: app/views/popup.lldoperation.php:264
@@ -16570,11 +16576,11 @@ msgstr "标记值"
 #: app/views/popup.massupdate.template.php:131
 #: app/views/popup.massupdate.template.php:149
 #: app/views/popup.massupdate.trigger.php:78
-#: app/views/popup.massupdate.trigger.php:153 include/blocks.inc.php:724
+#: app/views/popup.massupdate.trigger.php:153 include/blocks.inc.php:719
 #: include/classes/screens/CScreenHttpTest.php:117
-#: include/classes/screens/CScreenProblem.php:847
-#: include/classes/screens/CScreenProblem.php:903
-#: include/classes/screens/CScreenProblem.php:1171
+#: include/classes/screens/CScreenProblem.php:839
+#: include/classes/screens/CScreenProblem.php:895
+#: include/classes/screens/CScreenProblem.php:1163
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:51
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:79
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:79
@@ -17027,16 +17033,16 @@ msgstr "直到"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:49
 #: app/controllers/CControllerPopupTriggerExpr.php:212
-#: app/views/hint.box.php:62 app/views/hint.box.php:68
+#: app/views/hintbox.eventlist.php:61 app/views/hintbox.eventlist.php:67
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
 #: app/views/popup.itemtestedit.view.php:269
 #: app/views/popup.triggerexpr.php:173 app/views/popup.triggerexpr.php:177
-#: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1623
-#: include/actions.inc.php:1676 include/actions.inc.php:1756
-#: include/actions.inc.php:1839 include/actions.inc.php:1894
-#: include/blocks.inc.php:699 include/classes/screens/CScreenProblem.php:824
-#: include/classes/screens/CScreenProblem.php:1162
+#: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1645
+#: include/actions.inc.php:1699 include/actions.inc.php:1772
+#: include/actions.inc.php:1866 include/actions.inc.php:1921
+#: include/blocks.inc.php:694 include/classes/screens/CScreenProblem.php:816
+#: include/classes/screens/CScreenProblem.php:1154
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
@@ -17123,7 +17129,7 @@ msgstr "到"
 msgid "To set a host interface select a single item type for all items"
 msgstr "要设定一个主机接口, 选择一个单一的监控项类型给所有的监控项"
 
-#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2548
+#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2548
 #: srv_status.php:38
 msgid "Today"
 msgstr "今天"
@@ -17686,7 +17692,7 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr "无法覆盖已经存在的配置文件。"
 
-#: include/blocks.inc.php:639
+#: include/blocks.inc.php:634
 msgid "Unable to retrieve database version."
 msgstr ""
 
@@ -17702,7 +17708,7 @@ msgstr "不能上传文件因为 \"文件上传\"被禁止."
 msgid "Unacknowledge"
 msgstr ""
 
-#: include/actions.inc.php:1997
+#: include/actions.inc.php:2024
 msgid "Unacknowledged"
 msgstr ""
 
@@ -18038,8 +18044,8 @@ msgstr "用于动作中"
 #: app/views/administration.token.view.php:37
 #: app/views/administration.user.edit.php:244
 #: app/views/reports.auditlog.list.php:87 httpconf.php:67
-#: include/actions.inc.php:1623 include/actions.inc.php:1676
-#: include/actions.inc.php:1894 include/classes/setup/CSetupWizard.php:358
+#: include/actions.inc.php:1645 include/actions.inc.php:1699
+#: include/actions.inc.php:1921 include/classes/setup/CSetupWizard.php:358
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18080,7 +18086,7 @@ msgstr "用户 \"%1$s\" 用于 \"%2$s\" 操作。"
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr ""
 
-#: include/actions.inc.php:1894
+#: include/actions.inc.php:1921
 msgid "User action"
 msgstr "用户动作"
 
@@ -18302,7 +18308,7 @@ msgstr "ID为 \"%1$s\" 的用户不可用。"
 msgid "User with username \"%1$s\" already exists."
 msgstr ""
 
-#: include/actions.inc.php:1756 include/actions.inc.php:1839
+#: include/actions.inc.php:1772 include/actions.inc.php:1866
 msgid "User/Recipient"
 msgstr "用户/接受者"
 
@@ -18625,7 +18631,7 @@ msgstr ""
 #: app/views/popup.massupdate.template.php:140
 #: app/views/popup.massupdate.trigger.php:87
 #: app/views/popup.testtriggerexpr.php:31 app/views/popup.valuemap.edit.php:51
-#: include/blocks.inc.php:530 include/classes/graphdraw/CPieGraphDraw.php:309
+#: include/blocks.inc.php:525 include/classes/graphdraw/CPieGraphDraw.php:309
 #: include/classes/screens/CScreenHistory.php:279
 #: include/classes/screens/CScreenHistory.php:393
 #: include/views/configuration.host.discovery.edit.php:125
@@ -19258,8 +19264,8 @@ msgstr "每年"
 #: app/partials/configuration.filter.items.php:194
 #: app/partials/configuration.filter.items.php:201
 #: app/partials/configuration.filter.items.php:210
-#: app/views/administration.user.list.php:133 app/views/hint.box.php:179
-#: app/views/hint.box.php:183
+#: app/views/administration.user.list.php:133
+#: app/views/hintbox.eventlist.php:178 app/views/hintbox.eventlist.php:182
 #: app/views/monitoring.widget.problems.view.php:264
 #: app/views/monitoring.widget.problems.view.php:268
 #: app/views/popup.condition.common.php:648
@@ -19268,12 +19274,12 @@ msgstr "每年"
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:68 include/actions.inc.php:32
-#: include/blocks.inc.php:537 include/blocks.inc.php:844
-#: include/blocks.inc.php:848 include/classes/screens/CScreenProblem.php:1106
-#: include/classes/screens/CScreenProblem.php:1110
-#: include/classes/screens/CScreenProblem.php:1252 include/events.inc.php:195
-#: include/events.inc.php:199 include/events.inc.php:394
-#: include/events.inc.php:398 include/triggers.inc.php:1172
+#: include/blocks.inc.php:532 include/blocks.inc.php:839
+#: include/blocks.inc.php:843 include/classes/screens/CScreenProblem.php:1098
+#: include/classes/screens/CScreenProblem.php:1102
+#: include/classes/screens/CScreenProblem.php:1244 include/events.inc.php:195
+#: include/events.inc.php:199 include/events.inc.php:389
+#: include/events.inc.php:393 include/triggers.inc.php:1172
 #: include/triggers.inc.php:1177
 #: include/views/configuration.graph.list.php:205
 #: include/views/configuration.host.prototype.list.php:142
@@ -19290,7 +19296,7 @@ msgstr "每年"
 msgid "Yes"
 msgstr "是"
 
-#: include/classes/screens/CScreenProblem.php:717 include/func.inc.php:2542
+#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2542
 msgid "Yesterday"
 msgstr "昨天"
 
@@ -19436,7 +19442,7 @@ msgstr "zabbix 服务器 详细信息"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix server is not running: the information displayed may not be current."
 
-#: include/blocks.inc.php:536
+#: include/blocks.inc.php:531
 msgid "Zabbix server is running"
 msgstr "Zabbix服务器端运行中"
 
@@ -20712,7 +20718,7 @@ msgid "number"
 msgstr "数字"
 
 #: app/views/monitoring.widget.problemhosts.view.php:126
-#: include/blocks.inc.php:509
+#: include/blocks.inc.php:504
 msgid "of"
 msgstr "其"
 
