@@ -151,22 +151,30 @@ $additional_rules->addItem(
 
 $service_tab
 	->addItem([
-		(new CLabel(_('Additional rules')))->setId('additional_rules_label'),
+		(new CLabel(_('Additional rules')))
+			->setId('additional_rules_label')
+			->addStyle('display: none;'),
 		(new CFormField(
 			(new CDiv($additional_rules))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		))->setId('additional_rules_field')
+		))
+			->setId('additional_rules_field')
+			->addStyle('display: none;')
 	])
 	->addItem([
-		(new CLabel(_('Status propagation rule')))->setId('status_propagation_rules_label'),
+		(new CLabel(_('Status propagation rule')))
+			->setId('status_propagation_rules_label')
+			->addStyle('display: none;'),
 		(new CFormField(
 			(new CSelect('propagation_rule'))
 				->setId('propagation_rule')
 				->setFocusableElementId('propagation_rule_focusable')
 				->setValue($data['form']['propagation_rule'])
 				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getStatusPropagationNames()))
-		))->setId('status_propagation_rules_field')
+		))
+			->setId('status_propagation_rules_field')
+			->addStyle('display: none;')
 	]);
 
 $propagation_value_number = (new CRadioButtonList('propagation_value_number',
@@ -188,13 +196,19 @@ $service_tab
 		(new CFormField([
 			$propagation_value_number,
 			$propagation_value_status
-		]))->setId('status_propagation_value_field')
+		]))
+			->setId('status_propagation_value_field')
+			->addStyle('display: none;')
 	])
 	->addItem([
-		(new CLabel(_('Weight')))->setId('weight_label'),
+		(new CLabel(_('Weight')))
+			->setId('weight_label')
+			->addStyle('display: none;'),
 		(new CFormField(
 			(new CTextBox('weight', $data['form']['weight'], false, 7))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-		))->setId('weight_field')
+		))
+			->setId('weight_field')
+			->addStyle('display: none;')
 	]);
 
 // SLA tab.
