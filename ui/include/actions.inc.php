@@ -1302,23 +1302,21 @@ function eventType($type = null) {
  *
  * @param array $events    Array with event objects with acknowledges.
  * @param array $triggers  Array of triggers.
- * @param array $r_events  Array with related recovery event data (optional).
  *
  * @return array
  */
-function getEventsActionsIconsData(array $events, array $triggers, array $r_events = []) {
+function getEventsActionsIconsData(array $events, array $triggers): array {
 	$messages = getEventsMessages($events);
 	$severities = getEventsSeverityChanges($events, $triggers);
-	$actions = getEventsActions($events, $r_events);
+	$actions = getEventsAlertsOverview($events);
 
 	return [
 		'data' => [
 			'messages' => $messages['data'],
 			'severities' => $severities['data'],
-			'actions' => $actions['data']
+			'actions' => $actions
 		],
-		'mediatypeids' => $actions['mediatypeids'],
-		'userids' => $messages['userids'] + $severities['userids'] + $actions['userids']
+		'userids' => $messages['userids'] + $severities['userids']
 	];
 }
 
@@ -1426,21 +1424,18 @@ function getEventsSeverityChanges(array $events, array $triggers) {
 }
 
 /**
- * Get data, required to create actions icon with popup with event actions.
+ * Get data, required to create actions icon.
  *
  * @param array  $events                 Array with event objects with acknowledges.
  * @param string $events[]['eventid']    Problem event ID.
  * @param string $events[]['r_eventid']  OK event ID.
- * @param array  $r_events               Array with related recovery event data (optional).
  *
- * @return array
+ * @return array  List indexed by eventid containing overview on event alerts.
  */
-function getEventsActions(array $events, array $r_events = []) {
+function getEventsAlertsOverview(array $events): array {
 	$alert_eventids = [];
-	$r_eventids = [];
-	$userids = [];
-	$mediatypeids = [];
 	$actions = [];
+	$event_alert_state = [];
 
 	foreach ($events as $event) {
 		// Get alerts for event.
@@ -1449,43 +1444,67 @@ function getEventsActions(array $events, array $r_events = []) {
 		// Get alerts for related recovery events.
 		if ($event['r_eventid'] != 0) {
 			$alert_eventids[$event['r_eventid']] = true;
-			$r_eventids[$event['r_eventid']] = true;
 		}
 	}
 
-	if ($r_eventids && !$r_events) {
-		$r_events = API::Event()->get([
-			'output' => ['clock'],
-			'eventids' => array_keys($r_eventids),
-			'preservekeys' => true
-		]);
-	}
+	if ($alert_eventids) {
+		$event_alert_state = array_combine(array_keys($alert_eventids), array_fill(0, count($alert_eventids), [
+			'failed_cnt' => 0,
+			'in_progress_cnt' => 0,
+			'total_cnt' => 0
+		]));
 
-	$alerts = $alert_eventids
-		? API::Alert()->get([
-			'output' => ['alerttype', 'clock', 'error', 'eventid', 'mediatypeid', 'retries', 'status', 'userid'],
+		$alerts = API::Alert()->get([
+			'groupCount' => true,
+			'countOutput' => true,
+			'filter' => ['status' => ALERT_STATUS_FAILED],
 			'eventids' => array_keys($alert_eventids)
-		])
-		: [];
+		]);
+
+		foreach ($alerts as $alert) {
+			$event_alert_state[$alert['eventid']]['failed_cnt'] = (int) $alert['rowscount'];
+		}
+
+		$alerts = API::Alert()->get([
+			'groupCount' => true,
+			'countOutput' => true,
+			'filter' => ['status' => [ALERT_STATUS_NEW, ALERT_STATUS_NOT_SENT]],
+			'eventids' => array_keys($alert_eventids)
+		]);
+
+		foreach ($alerts as $alert) {
+			$event_alert_state[$alert['eventid']]['in_progress_cnt'] = (int) $alert['rowscount'];
+		}
+
+		$alerts = API::Alert()->get([
+			'groupCount' => true,
+			'countOutput' => true,
+			'eventids' => array_keys($alert_eventids)
+		]);
+
+		foreach ($alerts as $alert) {
+			$event_alert_state[$alert['eventid']]['total_cnt'] = (int) $alert['rowscount'];
+		}
+	}
 
 	// Create array of actions for each event.
 	foreach ($events as $event) {
-		$event_actions = getSingleEventActions($event, $r_events, $alerts);
+		$event_actions = $event_alert_state[$event['eventid']];
+		if ($event['r_eventid']) {
+			$r_event_actions = $event_alert_state[$event['r_eventid']];
+			$event_actions['failed_cnt'] += $r_event_actions['failed_cnt'];
+			$event_actions['total_cnt'] += $r_event_actions['total_cnt'];
+			$event_actions['in_progress_cnt'] += $r_event_actions['in_progress_cnt'];
+		}
+
 		$actions[$event['eventid']] = [
-			'actions' => $event_actions['actions'],
-			'count' => $event_actions['count'],
-			'has_uncomplete_action' => $event_actions['has_uncomplete_action'],
-			'has_failed_action' => $event_actions['has_failed_action']
+			'count' => $event_actions['total_cnt'] + count($event['acknowledges']),
+			'has_uncomplete_action' => (bool) $event_actions['in_progress_cnt'],
+			'has_failed_action' => (bool) $event_actions['failed_cnt']
 		];
-		$mediatypeids += $event_actions['mediatypeids'];
-		$userids += $event_actions['userids'];
 	}
 
-	return [
-		'data' => $actions,
-		'mediatypeids' => $mediatypeids,
-		'userids' => $userids
-	];
+	return $actions;
 }
 
 /**
@@ -1513,12 +1532,15 @@ function getEventDetailsActions(array $event) {
 		]);
 	}
 
+	$config = select_config();
+
 	// Get automatic actions (alerts).
 	$alerts = API::Alert()->get([
 		'output' => ['alerttype', 'clock', 'error', 'eventid', 'esc_step', 'mediatypeid', 'message', 'retries',
 			'sendto', 'status', 'subject', 'userid', 'p_eventid', 'acknowledgeid'
 		],
-		'eventids' => $alert_eventids
+		'eventids' => $alert_eventids,
+		'config' => $config['search_limit']
 	]);
 
 	$actions = getSingleEventActions($event, $r_events, $alerts);
@@ -1526,7 +1548,8 @@ function getEventDetailsActions(array $event) {
 	return [
 		'actions' => $actions['actions'],
 		'mediatypeids' => $actions['mediatypeids'],
-		'userids' => $actions['userids']
+		'userids' => $actions['userids'],
+		'count' => $actions['count']
 	];
 }
 
@@ -1661,16 +1684,15 @@ function getEventUpdates(array $event) {
  * @param array  $actions['messages']    Messages icon data.
  * @param array  $actions['severities']  Severity change icon data.
  * @param array  $actions['actions']     Actions icon data.
- * @param array  $mediatypes             Mediatypes with maxattempts value and name.
  * @param array  $users                  User name, surname and alias.
  * @param array  $config                 Zabbix config.
  *
  * @return CCol|string
  */
-function makeEventActionsIcons($eventid, $actions, $mediatypes, $users, $config) {
+function makeEventActionsIcons($eventid, $actions, $users, $config) {
 	$messages_icon = makeEventMessagesIcon($actions['messages'][$eventid], $users);
 	$severities_icon = makeEventSeverityChangesIcon($actions['severities'][$eventid], $users, $config);
-	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $users, $mediatypes, $config);
+	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $eventid);
 
 	$action_icons = [];
 	if ($messages_icon !== null) {
@@ -1718,6 +1740,7 @@ function makeEventMessagesIcon(array $data, array $users) {
 	return $total
 		? makeActionIcon([
 			'icon' => ZBX_STYLE_ACTION_ICON_MSGS,
+			'button' => true,
 			'hint' => [
 				$table,
 				($total > ZBX_WIDGET_ROWS)
@@ -1789,6 +1812,7 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 
 	return $total
 		? makeActionIcon([
+			'button' => true,
 			'icon' => $icon_style,
 			'hint' => [
 				$table,
@@ -1807,39 +1831,31 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 }
 
 /**
- * Create icon with hintbox for event actions.
+ * @param array  $actions                      Array with all actions sorted by clock.
+ * @param int    $actions[]['action_type']     Type of action table entry (ZBX_EVENT_HISTORY_*).
+ * @param string $actions[]['clock']           Time, when action was performed.
+ * @param string $actions[]['message']         Message sent by alert, or written by manual update, or remote command text.
+ * @param string $actions[]['action']          Flag with problem update operation performed (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE).
+ * @param string $actions[]['alerttype']       Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
+ * @param string $actions[]['mediatypeid']     Id for mediatype, where alert message was sent (only for ZBX_EVENT_HISTORY_ALERT).
+ * @param string $actions[]['error']           Error message in case of failed alert (only for ZBX_EVENT_HISTORY_ALERT).
+ * @param array  $users                        User name, surname and alias.
+ * @param array  $mediatypes                   Mediatypes with maxattempts value and description.
+ * @param string $mediatypes[]['name']         Mediatype name.
+ * @param string $mediatypes[]['maxattempts']  Maximum attempts for this mediatype.
+ * @param array  $config                       Zabbix config.
  *
- * @param array  $data
- * @param array  $data['actions']                   Array with all actions sorted by clock.
- * @param int    $data['actions'][]['action_type']  Type of action table entry (ZBX_EVENT_HISTORY_*).
- * @param string $data['actions'][]['clock']        Time, when action was performed.
- * @param string $data['actions'][]['message']      Message sent by alert, or written by manual update, or remote command text.
- * @param string $data['actions'][]['action']       Flag with problem update operation performed (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE).
- * @param string $data['actions'][]['alerttype']    Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
- * @param string $data['actions'][]['mediatypeid']  Id for mediatype, where alert message was sent (only for ZBX_EVENT_HISTORY_ALERT).
- * @param string $data['actions'][]['error']        Error message in case of failed alert (only for ZBX_EVENT_HISTORY_ALERT).
- * @param int    $data['count']                     Number of actions.
- * @param bool   $data['has_uncomplete_action']     Does the event have at least one uncompleted alert action.
- * @param bool   $data['has_failed_action']         Does the event have at least one failed alert action.
- * @param array  $users                             User name, surname and alias.
- * @param array  $mediatypes                        Mediatypes with maxattempts value and name.
- * @param string $mediatypes[]['name']              Mediatype name.
- * @param array  $config                            Zabbix config.
- *
- * @return CSpan|null
+ * @return CTableInfo
  */
-function makeEventActionsIcon(array $data, array $users, array $mediatypes, array $config) {
-	// Number of meaningful actions.
-	$total = $data['count'];
-	// Number of all action entries.
-	$action_count = count($data['actions']);
+function makeEventActionsTable(array $actions, array $users, array $mediatypes, array $config): CTableInfo {
+	$action_count = count($actions);
 
 	$table = (new CTableInfo())->setHeader([
 		_('Time'), _('User/Recipient'), _('Action'), _('Message/Command'), _('Status'), _('Info')
 	]);
 
 	for ($i = 0; $i < $action_count && $i < ZBX_WIDGET_ROWS; $i++) {
-		$action = $data['actions'][$i];
+		$action = $actions[$i];
 
 		$message = '';
 		if ($action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE
@@ -1867,6 +1883,24 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
 		]);
 	}
 
+	return $table;
+}
+
+/**
+ * Create icon with hintbox for event actions.
+ *
+ * @param array  $data
+ * @param int    $data['count']                     Number of actions.
+ * @param bool   $data['has_uncomplete_action']     Does the event have at least one uncompleted alert action.
+ * @param bool   $data['has_failed_action']         Does the event have at least one failed alert action.
+ * @param string $eventid
+ *
+ * @return CButton|null
+ */
+function makeEventActionsIcon(array $data, $eventid): ?CButton {
+	// Number of meaningful actions.
+	$total = $data['count'];
+
 	// select icon
 	if ($data['has_failed_action']) {
 		$icon_style = ZBX_STYLE_ACTIONS_NUM_RED;
@@ -1881,19 +1915,12 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
 	return $total
 		? makeActionIcon([
 			'icon' => $icon_style,
-			'hint' => [
-				$table,
-				($total > ZBX_WIDGET_ROWS)
-					? (new CDiv(
-						(new CDiv(
-							(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
-								->addClass(ZBX_STYLE_TABLE_STATS)
-						))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-					))->addClass(ZBX_STYLE_TABLE_PAGING)
-					: null
-			],
+			'button' => true,
 			'num' => $total,
 			'aria-label' => _xn('%1$s action', '%1$s actions', $total, 'screen reader', $total)
+		])->setAjaxHint([
+			'type' => 'eventactions',
+			'data' => ['eventid' => $eventid]
 		])
 		: null;
 }
@@ -2091,7 +2118,7 @@ function makeActionTableIcon(array $action, array $config) {
 				$new_severity_name = getSeverityName($action['new_severity'], $config);
 				$hint = $old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name;
 
-				$action_icons[] = makeActionIcon(['icon' => $action_type, 'hint' => $hint]);
+				$action_icons[] = makeActionIcon(['button' => true, 'icon' => $action_type, 'hint' => $hint]);
 			}
 
 			return (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP);

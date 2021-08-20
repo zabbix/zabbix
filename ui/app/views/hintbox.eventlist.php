@@ -19,14 +19,13 @@
 **/
 
 
-/**
- * Create a table with trigger events and, if defined, trigger description and a clickable URL.
- *
- * @param array $data
- *
- * @return CDiv
- */
-function makeEventList(array $data): CDiv {
+$output = [];
+
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
+}
+
+if (array_key_exists('problems', $data)) {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -43,8 +42,8 @@ function makeEventList(array $data): CDiv {
 		$trigger_url = CHtmlUrlValidator::validate($data['trigger']['url'], ['allow_user_macro' => false])
 			? $data['trigger']['url']
 			: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
-					zbx_jsvalue($data['trigger']['url'], false, false)).
-				'\');';
+				json_encode($data['trigger']['url'])).
+			'\');';
 
 		$div->addItem(
 			(new CDiv())
@@ -180,17 +179,7 @@ function makeEventList(array $data): CDiv {
 
 	$div->addItem($table);
 
-	return $div;
-}
-
-$output = [];
-
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
-}
-
-if (array_key_exists('data', $data)) {
-	$output['data'] = makeEventList($data['data'])->toString();
+	$output['data'] = $div->toString();
 }
 
 echo json_encode($output);
