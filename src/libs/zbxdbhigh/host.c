@@ -3906,8 +3906,9 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 						" where group_prototypeid=" ZBX_FS_UI64 ";\n",
 						group_prototype->templateid, group_prototype->group_prototypeid);
 
-				zbx_audit_host_prototype_update_json_update_group_links(host_prototype->hostid,
-						group_prototype->group_prototypeid, group_prototype->templateid_orig,
+				zbx_audit_host_prototype_update_json_update_group_details(host_prototype->hostid,
+						group_prototype->group_prototypeid, group_prototype->name,
+						group_prototype->groupid, group_prototype->templateid_orig,
 						group_prototype->templateid);
 			}
 		}

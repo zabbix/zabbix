@@ -105,8 +105,8 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(custom_interfaces, int)
 void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
 		const char* name, zbx_uint64_t groupid, zbx_uint64_t templateid);
 
-void	zbx_audit_host_prototype_update_json_update_group_links(zbx_uint64_t hostid, zbx_uint64_t groupid,
-		zbx_uint64_t templateid_old, zbx_uint64_t templateid_new);
+void	zbx_audit_host_prototype_update_json_update_group_details(zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
+		const char* name, zbx_uint64_t groupid, zbx_uint64_t templateid_old, zbx_uint64_t templateid_new);
 
 #define PREPARE_AUDIT_TEMPLATE_ADD_H(funcname)									\
 void	zbx_audit_##funcname##_update_json_add_parent_template(zbx_uint64_t hostid,				\
