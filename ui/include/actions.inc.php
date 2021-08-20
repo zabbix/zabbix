@@ -1605,7 +1605,7 @@ function getEventUpdates(array $event) {
  * @param array  $actions['messages']    Messages icon data.
  * @param array  $actions['severities']  Severity change icon data.
  * @param array  $actions['actions']     Actions icon data.
- * @param array  $users                  User name, surname and alias.
+ * @param array  $users                  User name, surname and username.
  *
  * @return CCol|string
  */
@@ -1758,8 +1758,8 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButton {
  * @param string $actions[]['alerttype']       Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
  * @param string $actions[]['mediatypeid']     Id for mediatype, where alert message was sent (only for ZBX_EVENT_HISTORY_ALERT).
  * @param string $actions[]['error']           Error message in case of failed alert (only for ZBX_EVENT_HISTORY_ALERT).
- * @param array  $users                        User name, surname and alias.
- * @param array  $mediatypes                   Mediatypes with maxattempts value and description.
+ * @param array  $users                        User name, surname and username.
+ * @param array  $mediatypes                   Mediatypes with maxattempts value and name.
  * @param string $mediatypes[]['name']         Mediatype name.
  * @param string $mediatypes[]['maxattempts']  Maximum attempts for this mediatype.
  *
