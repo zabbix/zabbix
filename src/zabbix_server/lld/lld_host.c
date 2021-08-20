@@ -2941,7 +2941,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hosts set ");
 
-								if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
+				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 				{
 					value_esc = DBdyn_escape_string(host->host);
 
@@ -3268,6 +3268,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				const char	*d = "";
 
 				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hostmacro set ");
+
+				zbx_audit_host_update_json_update_hostmacro_create_entry(host->hostid,
+						hostmacro->hostmacroid);
+
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_VALUE))
 				{
 					value_esc = DBdyn_escape_string(hostmacro->value);
@@ -3328,6 +3332,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				char	delim = ' ';
 
 				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update host_tag set");
+
+				zbx_audit_host_update_json_update_tag_create_entry(host->hostid, tag->tagid);
 
 				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
 				{
