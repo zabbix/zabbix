@@ -26,8 +26,7 @@
 #include "../zbxdbhigh/template.h"
 
 void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name);
-void	zbx_audit_item_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item, zbx_uint64_t hostid);
-
+void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item, zbx_uint64_t hostid);
 
 #define PREPARE_AUDIT_ITEM_UPDATE_H(resource, type1, type2)				\
 void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,	\
@@ -86,8 +85,11 @@ PREPARE_AUDIT_ITEM_UPDATE_H(discover, int, int)
 void	zbx_audit_discovery_rule_update_json_add_overrides_conditions(zbx_uint64_t itemid,
 		zbx_uint64_t item_conditionid, zbx_uint64_t op, const char *macro, const char *value);
 
+void	zbx_audit_discovery_rule_update_json_update_filter_conditions_create_entry(zbx_uint64_t itemid,
+		zbx_uint64_t item_conditionid);
+
 #define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_H(resource, type1, type2)						\
-void	zbx_audit_discovery_rule_update_json_update_##resource(zbx_uint64_t itemid,				\
+void	zbx_audit_discovery_rule_update_json_update_filter_conditions_##resource(zbx_uint64_t itemid,		\
 		zbx_uint64_t item_conditionind, type1 resource##_old, type1 resource##_new);
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_H(operator, int, int)
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_H(macro, const char*, string)
@@ -99,6 +101,9 @@ void	zbx_audit_discovery_rule_update_json_delete_overrides_conditions(zbx_uint64
 void	zbx_audit_discovery_rule_update_json_add_discovery_rule_preproc(zbx_uint64_t itemid,
 		zbx_uint64_t item_preprocid, int step, int type, const char *params, int error_handler,
 		const char *error_handler_params);
+
+void	zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_create_entry(zbx_uint64_t itemid,
+		zbx_uint64_t preprocid);
 
 #define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC_H(resource, type1, type2)					\
 void	zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_##resource(zbx_uint64_t itemid,	\

@@ -868,7 +868,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
 		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name);
-		zbx_audit_item_add_data(*itemid, item, hostid);
+		zbx_audit_item_update_json_add_data(*itemid, item, hostid);
 
 		item->itemid = (*itemid)++;
 	}
@@ -1071,13 +1071,16 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			if (0 == condition->upd_flags)
 				continue;
 
+			zbx_audit_discovery_rule_update_json_update_filter_conditions_create_entry(rule->itemid,
+					rule->conditionids.values[j]);
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_condition set ");
 			if (0 != (condition->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_OPERATOR))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%soperator=%d", d,
 						(int)condition->op);
 				d = ",";
-				zbx_audit_discovery_rule_update_json_update_operator(rule->itemid,
+				zbx_audit_discovery_rule_update_json_update_filter_conditions_operator(rule->itemid,
 						rule->conditionids.values[j], (int)condition->op_orig,
 						(int)condition->op);
 			}
@@ -1088,7 +1091,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 				d = ",";
 				zbx_free(macro_esc);
 
-				zbx_audit_discovery_rule_update_json_update_macro(rule->itemid,
+				zbx_audit_discovery_rule_update_json_update_filter_conditions_macro(rule->itemid,
 						rule->conditionids.values[j], condition->macro_orig,
 						condition->macro);
 			}
@@ -1098,7 +1101,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
 				zbx_free(value_esc);
 
-				zbx_audit_discovery_rule_update_json_update_value(rule->itemid,
+				zbx_audit_discovery_rule_update_json_update_filter_conditions_value(rule->itemid,
 						rule->conditionids.values[j], condition->value_orig,
 						condition->value);
 			}
@@ -1551,6 +1554,9 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 			if (0 == (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE))
 				continue;
 
+			zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_create_entry(item->itemid,
+					preproc->item_preprocid);
+
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_preproc set ");
 
 			if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_TYPE))
@@ -1598,8 +1604,8 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 				zbx_free(params_esc);
 
 				zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_error_handler_params(
-						item->itemid, preproc->item_preprocid, preproc->error_handler_params_orig,
-						preproc->error_handler_params);
+						item->itemid, preproc->item_preprocid,
+						preproc->error_handler_params_orig, preproc->error_handler_params);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where item_preprocid=" ZBX_FS_UI64 ";\n",
