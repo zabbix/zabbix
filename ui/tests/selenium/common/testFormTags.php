@@ -553,7 +553,7 @@ class testFormTags extends CWebTest {
 
 			case 'host':
 			case 'host prototype':
-				$form_name = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:hostsForm';
+				$form_name = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:host-form';
 				$form = $this->query($form_name)->asForm()->waitUntilPresent()->one();
 				$form->fill(['Host name' => $new_name]);
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
