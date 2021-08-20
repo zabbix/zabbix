@@ -427,12 +427,6 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__, $db_users);
 		$this->updateMedias($users, __FUNCTION__);
 
-		foreach ($users as $user) {
-			if (!array_key_exists('passwd', $user)) {
-				unset($db_users[$user['userid']]['passwd']);
-			}
-		}
-
 		$this->addAuditLog(CAudit::RESOURCE_USER, CAudit::ACTION_UPDATE, $users, $db_users);
 
 		return ['userids' => array_column($users, 'userid')];
@@ -503,48 +497,42 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$params = [
+		$db_users = $this->get([
 			'output' => [],
 			'userids' => array_column($users, 'userid'),
 			'editable' => true,
 			'preservekeys' => true
-		];
-
-		if (array_column($users, 'medias')) {
-			$db_medias = DB::select('media', [
-				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
-				'filter' => ['userid' => array_column($users, 'userid')],
-				'preservekeys' => true
-			]);
-		}
-
-		$api_users = $this->get($params);
+		]);
 
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'username', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
 				'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid'
 			],
-			'userids' => array_keys($api_users),
+			'userids' => array_keys($db_users),
 			'preservekeys' => true
 		]);
 
-		// Format proper user array.
-		foreach ($api_users as $userid => $user_value) {
-			$db_users[$userid] = $db_users[$userid] + $user_value;
-		}
-		unset($api_users);
-
-		foreach ($db_medias as $mediaid => $db_media) {
-			$db_users[$db_media['userid']]['medias'][$mediaid] = [
-				'mediatypeid' => $db_media['mediatypeid'],
-				'sendto' => is_array($db_media['sendto']) ? $db_media['sendto'] : [$db_media['sendto']],
-				'active' => $db_media['active'],
-				'severity' => $db_media['severity'],
-				'period' => $db_media['period']
+		// Add medias to db_users object.
+		if (array_column($users, 'medias')) {
+			$media_params = [
+				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
+				'filter' => ['userid' => array_column($users, 'userid')],
+				'preservekeys' => true
 			];
+			$db_medias = DBselect(DB::makeSql('media', $media_params));
+
+			while ($db_media = DBfetch($db_medias)) {
+				$db_media['sendto'] = explode("\n", $db_media['sendto']);
+				$db_users[$db_media['userid']]['medias'][$db_media['mediaid']] = [
+					'mediatypeid' => $db_media['mediatypeid'],
+					'sendto' => $db_media['sendto'],
+					'active' => $db_media['active'],
+					'severity' => $db_media['severity'],
+					'period' => $db_media['period']
+				];
+			}
 		}
-		unset($db_medias);
 
 		// Get readonly super admin role ID and name.
 		$db_roles = DBfetchArray(DBselect(
@@ -997,10 +985,11 @@ class CUser extends CApiService {
 	/**
 	 * Update table "users_groups".
 	 *
-	 * @param array  $users
-	 * @param string $method
+	 * @param array       $users
+	 * @param string      $method
+	 * @param null|string $db_users
 	 */
-	private function updateUsersGroups(array &$users, string $method,  ?array &$db_users = null) {
+	private function updateUsersGroups(array &$users, string $method, array &$db_users = null) {
 		$users_groups = [];
 
 		foreach ($users as $user) {
@@ -1057,31 +1046,36 @@ class CUser extends CApiService {
 		// Format array for auditlog.
 		foreach ($users as &$user) {
 			$groups = [];
-			foreach ($user['usrgrps'] as $usrgrp) {
-				// Check id in db_users_groups.
-				foreach ($db_users_groups as $id => $db_user_group) {
-					if ($db_user_group['usrgrpid'] == $usrgrp['usrgrpid']) {
-						$groups[$id] = ['usrgrpid' => $usrgrp['usrgrpid']];
-						continue 2;
+			if (array_key_exists('usrgrps', $user)) {
+				foreach ($user['usrgrps'] as $usrgrp) {
+					// Check id in db_users_groups.
+					foreach ($db_users_groups as $id => $db_user_group) {
+						if ($db_user_group['usrgrpid'] == $usrgrp['usrgrpid']) {
+							$groups[$id] = ['usrgrpid' => $usrgrp['usrgrpid'], 'userid' => $user['userid']];
+							continue 2;
+						}
+					}
+
+					// Check id in new inserted objects.
+					foreach ($ins_users_groups as $key => $user_group) {
+						if ($user_group['usrgrpid'] == $usrgrp['usrgrpid']) {
+							$groups[$ids[$key]] = ['usrgrpid' => $usrgrp['usrgrpid'], 'userid' => $user['userid']];
+							continue 2;
+						}
 					}
 				}
 
-				// Check id in new inserted objects.
-				foreach ($ins_users_groups as $key => $user_group) {
-					if ($user_group['usrgrpid'] == $usrgrp['usrgrpid']) {
-						$groups[$ids[$key]] = ['usrgrpid' => $usrgrp['usrgrpid']];
-						continue 2;
-					}
-				}
+				$user['usrgrps'] = $groups;
 			}
-
-			$user['usrgrps'] = $groups;
 		}
 		unset($user);
 
 		if ($method === 'update') {
 			foreach ($db_users_groups as $id => $db_user_group) {
-				$db_users[$db_user_group['userid']]['usrgrps'][$id] = ['usrgrpid' => $usrgrp['usrgrpid']];
+				$db_users[$db_user_group['userid']]['usrgrps'][$id] = [
+					'usrgrpid' => $usrgrp['usrgrpid'],
+					'userid' => $db_user_group['userid']
+				];
 			}
 		}
 	}
@@ -1195,25 +1189,30 @@ class CUser extends CApiService {
 		// Format array for auditlog.
 		foreach ($users as &$user) {
 			$medias = [];
-			foreach ($user['medias'] as $media) {
-				foreach ($db_medias as $db_media) {
-					$index = $this->getSimilarMedia($users_medias[$user['userid']], $db_media['mediatypeid'], $db_media['sendto']);
-					if ($index != -1) {
-						$medias[$db_media['mediaid']] = $media;
-						continue 2;
+			if (array_key_exists('medias', $user)) {
+				foreach ($user['medias'] as $media) {
+					foreach ($db_medias as $db_media) {
+						$index = $this->getSimilarMedia($users_medias[$user['userid']], $db_media['mediatypeid'],
+							$db_media['sendto']
+						);
+						if ($index != -1) {
+							$medias[$db_media['mediaid']] = $media;
+							continue 2;
+						}
+					}
+
+					foreach ($ins_medias as $key => $user_media) {
+						$user_media['sendto'] = explode("\n", $user_media['sendto']);
+						$index = $this->getSimilarMedia([$media], $user_media['mediatypeid'], $user_media['sendto']);
+						if ($index != -1) {
+							$medias[$ids[$key]] = $media;
+							continue 2;
+						}
 					}
 				}
 
-				foreach ($ins_medias as $key => $user_media) {
-					$index = $this->getSimilarMedia($users_medias[$user['userid']], $user_media['mediatypeid'], $user_media['sendto']);
-					if ($index != -1) {
-						$medias[$ids[$key]] = $media;
-						continue 2;
-					}
-				}
+				$user['medias'] = $medias;
 			}
-
-			$user['medias'] = $medias;
 		}
 		unset($user);
 	}
