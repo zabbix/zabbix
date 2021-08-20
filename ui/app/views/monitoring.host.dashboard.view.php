@@ -109,7 +109,7 @@ $widget = (new CWidget())
 				->addItem(
 					(new CSimpleButton(null))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
-						->setTitle(_('Previous page'))
+						->setTitle(_('Next page'))
 				)
 			: null
 	)

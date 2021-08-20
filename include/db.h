@@ -890,6 +890,7 @@ typedef struct
 	char		*tag;
 	char		*value_orig;
 	char		*value;
+#define ZBX_FLAG_DB_TAG_UNSET			__UINT64_C(0x00000000)
 #define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000001)
 #define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000002)
 #define ZBX_FLAG_DB_TAG_REMOVE			__UINT64_C(0x80000000)
@@ -898,8 +899,9 @@ typedef struct
 }
 zbx_db_tag_t;
 
-void	zbx_db_tag_free(zbx_db_tag_t *tag);
-int	zbx_db_tag_compare_func(const void *d1, const void *d2);
+zbx_db_tag_t	*zbx_db_tag_create(const char *tag, const char *value);
+void		zbx_db_tag_free(zbx_db_tag_t *tag);
+int		zbx_db_tag_compare_func(const void *d1, const void *d2);
 
 ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
 

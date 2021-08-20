@@ -27,6 +27,7 @@ typedef struct
 {
 	char		*fsname;
 	char		*fstype;
+	char		*fslabel;
 	char		*fsdrivetype;
 	zbx_uint64_t	total;
 	zbx_uint64_t	not_used;
@@ -173,9 +174,9 @@ static const char	*get_drive_type_string(UINT type)
 	}
 }
 
-static void	get_fs_data(const wchar_t* path, char **fsname, char **fstype, char **fsdrivetype)
+static void	get_fs_data(const wchar_t* path, char **fsname, char **fstype, char **fslabel, char **fsdrivetype)
 {
-	wchar_t	fs_name[MAX_PATH + 1], *long_path = NULL;
+	wchar_t	fs_name[MAX_PATH + 1], vol_name[MAX_PATH + 1], *long_path = NULL;
 	size_t	sz;
 
 	*fsname = zbx_unicode_to_utf8(path);
@@ -197,10 +198,17 @@ static void	get_fs_data(const wchar_t* path, char **fsname, char **fstype, char 
 		path = long_path;
 	}
 
-	if (FALSE != GetVolumeInformation(path, NULL, 0, NULL, NULL, NULL, fs_name, ARRSIZE(fs_name)))
+	if (FALSE != GetVolumeInformation(path, vol_name, ARRSIZE(vol_name), NULL, NULL, NULL, fs_name,
+			ARRSIZE(fs_name)))
+	{
 		*fstype = zbx_unicode_to_utf8(fs_name);
+		*fslabel = zbx_unicode_to_utf8(vol_name);
+	}
 	else
+	{
 		*fstype = zbx_strdup(NULL, "UNKNOWN");
+		*fslabel = zbx_strdup(NULL, "");
+	}
 
 	*fsdrivetype = zbx_strdup(NULL, get_drive_type_string(GetDriveType(path)));
 
@@ -212,9 +220,9 @@ static int	add_fs_to_vector(zbx_vector_ptr_t *mntpoints, wchar_t *path, char **e
 	zbx_wmpoint_t	*mntpoint;
 	zbx_uint64_t	total, not_used, used;
 	double		pfree, pused;
-	char 		*fsname = NULL, *fstype = NULL, *fsdrivetype = NULL;
+	char 		*fsname = NULL, *fstype = NULL, *fslabel = NULL, *fsdrivetype = NULL;
 
-	get_fs_data(path, &fsname, &fstype, &fsdrivetype);
+	get_fs_data(path, &fsname, &fstype, &fslabel, &fsdrivetype);
 
 	if (SYSINFO_RET_OK != get_fs_size_stat(fsname, &total, &not_used, &used, &pfree, &pused, error))
 	{
@@ -227,6 +235,7 @@ static int	add_fs_to_vector(zbx_vector_ptr_t *mntpoints, wchar_t *path, char **e
 	mntpoint = (zbx_wmpoint_t *)zbx_malloc(NULL, sizeof(zbx_wmpoint_t));
 	mntpoint->fsname = fsname;
 	mntpoint->fstype = fstype;
+	mntpoint->fslabel = fslabel;
 	mntpoint->fsdrivetype = fsdrivetype;
 	mntpoint->total = total;
 	mntpoint->not_used = not_used;
@@ -242,6 +251,7 @@ static void	zbx_wmpoints_free(zbx_wmpoint_t *mpoint)
 {
 	zbx_free(mpoint->fsname);
 	zbx_free(mpoint->fstype);
+	zbx_free(mpoint->fslabel);
 	zbx_free(mpoint->fsdrivetype);
 	zbx_free(mpoint);
 }
@@ -325,7 +335,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct zbx_json		j;
 	int 			i, ret = SYSINFO_RET_FAIL;
 	zbx_vector_ptr_t	mount_paths;
-	char			*error = NULL, *fsname, *fstype, *fsdrivetype;
+	char			*error = NULL, *fsname, *fstype, *fslabel, *fsdrivetype;
 
 	zbx_vector_ptr_create(&mount_paths);
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
@@ -339,11 +349,12 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	for (i = 0; i < mount_paths.values_num; i++)
 	{
-		get_fs_data(mount_paths.values[i], &fsname, &fstype, &fsdrivetype);
+		get_fs_data(mount_paths.values[i], &fsname, &fstype, &fslabel, &fsdrivetype);
 
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, fsname, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, fstype, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSLABEL, fslabel, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSDRIVETYPE, fsdrivetype, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 
@@ -421,6 +432,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result,  HANDLE time
 			zbx_json_addobject(&j, NULL);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mpoint->fsname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mpoint->fstype, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSLABEL, mpoint->fslabel, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSDRIVETYPE, mpoint->fsdrivetype, ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&j, ZBX_SYSINFO_TAG_BYTES);
 			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mpoint->total);

@@ -133,7 +133,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
+                        name: '{#FSLABEL}({#FSNAME}): Disk space usage'
                         host: 'Windows by Zabbix agent active'
                 -
                   type: GRAPH_PROTOTYPE
@@ -443,7 +443,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 6d3c76d7f4644e07a351aacc0c2b0651
-              name: '{#FSNAME}: Space utilization'
+              name: '{#FSLABEL}({#FSNAME}): Space utilization'
               type: ZABBIX_ACTIVE
               key: 'vfs.fs.size[{#FSNAME},pused]'
               history: 7d
@@ -456,7 +456,7 @@ zabbix_export:
                   value: 'Filesystem {#FSNAME}'
             -
               uuid: 4ca1e75a143f4b1c9cb1b1e9d0d02286
-              name: '{#FSNAME}: Total space'
+              name: '{#FSLABEL}({#FSNAME}): Total space'
               type: ZABBIX_ACTIVE
               key: 'vfs.fs.size[{#FSNAME},total]'
               history: 7d
@@ -468,7 +468,7 @@ zabbix_export:
                   value: 'Filesystem {#FSNAME}'
             -
               uuid: c221010d5aef4bb182681092d0df3586
-              name: '{#FSNAME}: Used space'
+              name: '{#FSLABEL}({#FSNAME}): Used space'
               type: ZABBIX_ACTIVE
               key: 'vfs.fs.size[{#FSNAME},used]'
               history: 7d
@@ -484,7 +484,7 @@ zabbix_export:
               expression: |
                 last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                 ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+              name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
@@ -498,7 +498,7 @@ zabbix_export:
               expression: |
                 last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
                 ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<10G or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+              name: '{#FSLABEL}({#FSNAME}): Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
@@ -509,14 +509,14 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
                   expression: |
                     last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
           graph_prototypes:
             -
               uuid: 112006f664834dcf932373b57900425c
-              name: '{#FSNAME}: Disk space usage'
+              name: '{#FSLABEL}({#FSNAME}): Disk space usage'
               width: '600'
               height: '340'
               type: PIE

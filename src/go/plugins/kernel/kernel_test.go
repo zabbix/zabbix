@@ -34,6 +34,7 @@ var testSets = []testSet{
 		[]testCase{
 			{1, "test_name", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
 			{2, "test_name", "kernel.maxproc", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+			{3, "test_name", "kernel.openfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
 		},
 		"",
 		"",
@@ -83,6 +84,30 @@ var testSets = []testSet{
 			{1, "test_name", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
 		},
 		"/proc/sys/fs/file-max",
+		"",
+	}, {
+		"testKernel08",
+		[]testCase{
+			{1, "test_name", "kernel.openfiles", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
+			{2, "test_name", "kernel.openfiles", []string{""}, true, uint64(18446744073709551615), reflect.Uint64},
+			{3, "test_name", "kernel.openfiles", []string{"param"}, true, uint64(18446744073709551615), reflect.Uint64},
+			{4, "test_name", "wrong.key", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+		},
+		"/proc/sys/fs/file-nr",
+		"18446744073709551615\n",
+	}, {
+		"testKernel09",
+		[]testCase{
+			{1, "test_name", "kernel.openfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+		},
+		"/proc/sys/fs/file-nr",
+		"18446744073709551616",
+	}, {
+		"testKernel10",
+		[]testCase{
+			{1, "test_name", "kernel.openfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+		},
+		"/proc/sys/fs/file-nr",
 		"",
 	},
 }

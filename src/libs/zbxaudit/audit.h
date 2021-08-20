@@ -28,9 +28,8 @@
 #define AUDIT_ACTION_EXECUTE		7
 
 #define AUDIT_DETAILS_ACTION_ADD	"add"
+#define AUDIT_DETAILS_ACTION_UPDATE	"update"
 #define AUDIT_DETAILS_ACTION_DELETE	"delete"
-#define AUDIT_DETAILS_ACTION_ATTACH	"attach"
-#define AUDIT_DETAILS_ACTION_DETACH	"detach"
 
 #define AUDIT_SECRET_MASK		"******"
 
@@ -70,6 +69,7 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 		const char *value);
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audit_op, const char *key,
 		uint64_t value);
+void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const char *audit_op, const char *key);
 void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value);
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
 		const char *value_new);

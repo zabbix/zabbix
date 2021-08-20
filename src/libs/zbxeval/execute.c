@@ -2588,7 +2588,7 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 				ctx->expression + token->loc.l);
 	}
 
-	zbx_variant_set_ui64(&ret_value, arg->data.dbl_vector->values_num);
+	zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)arg->data.dbl_vector->values_num);
 
 	eval_function_return(token->opt, &ret_value, output);
 
