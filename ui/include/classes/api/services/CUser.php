@@ -1133,6 +1133,7 @@ class CUser extends CApiService {
 		$ins_medias = [];
 		$upd_medias = [];
 		$del_mediaids = [];
+		$upd_indexes = [];
 
 		foreach ($db_medias as $db_media) {
 			$index = $this->getSimilarMedia($users_medias[$db_media['userid']], $db_media['mediatypeid'],
@@ -1161,7 +1162,7 @@ class CUser extends CApiService {
 					];
 				}
 
-				unset($users_medias[$db_media['userid']][$index]);
+				$upd_indexes[$db_media['userid']][] = $index;
 			}
 			else {
 				$del_mediaids[] = $db_media['mediaid'];
@@ -1169,8 +1170,10 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users_medias as $userid => $medias) {
-			foreach ($medias as $media) {
-				$ins_medias[] = ['userid' => $userid] + $media;
+			foreach ($medias as $index => $media) {
+				if (!in_array($index, $upd_indexes[$userid])) {
+					$ins_medias[] = ['userid' => $userid] + $media;
+				}
 			}
 		}
 
