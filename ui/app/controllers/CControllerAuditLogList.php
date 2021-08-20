@@ -313,12 +313,12 @@ class CControllerAuditLogList extends CController {
 	}
 
 	private function formatDetails(array $details): array {
+		ksort($details);
+
 		$new_details = [];
 		foreach ($details as $key => $detail) {
 			$new_details[] = $this->makeDetailString($key, $detail);
 		}
-
-		sort($new_details);
 
 		return $new_details;
 	}
