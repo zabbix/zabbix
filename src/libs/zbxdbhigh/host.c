@@ -1889,7 +1889,6 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 
 	DBfree_result(result);
 
-	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	sql_offset = 0;
 
@@ -4047,6 +4046,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				}
 				else if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE))
 				{
+					zbx_audit_host_prototype_update_json_update_interface_details_create_entry(
+							host_prototype->hostid, interface->interfaceid);
 					DBhost_prototypes_interface_snmp_prepare_sql(host_prototype->hostid,
 							interface->interfaceid, interface->data.snmp, &sql1,
 							&sql1_alloc, &sql1_offset);

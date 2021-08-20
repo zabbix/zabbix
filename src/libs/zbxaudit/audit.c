@@ -60,7 +60,7 @@ static void	append_int_json(struct zbx_json *json, const char *audit_op, const c
 	zbx_json_close(json);
 }
 
-static void	append_json(struct zbx_json *json, const char *audit_op, const char *key)
+static void	append_json_no_value(struct zbx_json *json, const char *audit_op, const char *key)
 {
 	zbx_json_addarray(json, key);
 	zbx_json_addstring(json, NULL, audit_op, ZBX_JSON_TYPE_STRING);
@@ -324,10 +324,10 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 		exit(EXIT_FAILURE);						\
 	}									\
 
-void	zbx_audit_update_json_append(const zbx_uint64_t id, const char *audit_op, const char *key)
+void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const char *audit_op, const char *key)
 {
 	PREPARE_UPDATE_JSON_APPEND_OP();
-	append_json(&((*found_audit_entry)->details_json), audit_op, key);
+	append_json_no_value(&((*found_audit_entry)->details_json), audit_op, key);
 }
 
 void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value)
