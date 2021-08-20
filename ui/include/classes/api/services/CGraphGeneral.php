@@ -169,7 +169,7 @@ abstract class CGraphGeneral extends CApiService {
 		$this->createReal($graphs);
 		$this->inherit($graphs);
 
-		$resource = ($this instanceof CGraph)	? CAudit::RESOURCE_GRAPH : CAudit::RESOURCE_GRAPH_PROTOTYPE;
+		$resource = ($this instanceof CGraph) ? CAudit::RESOURCE_GRAPH : CAudit::RESOURCE_GRAPH_PROTOTYPE;
 		$this->addAuditBulk(CAudit::ACTION_ADD, $resource, $graphs);
 
 		return ['graphids' => array_column($graphs, 'graphid')];
