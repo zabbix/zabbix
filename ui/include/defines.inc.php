@@ -266,11 +266,9 @@ define('AUDIT_RESOURCE_USER_ROLE',			44);
 define('AUDIT_RESOURCE_AUTH_TOKEN',			45);
 define('AUDIT_RESOURCE_SCHEDULED_REPORT',	46);
 
-define('AUIDT_DETAILS_ACTION_ADD',		'add');
-define('AUIDT_DETAILS_ACTION_UPDATE',	'update');
-define('AUIDT_DETAILS_ACTION_DELETE',	'delete');
-define('AUIDT_DETAILS_ACTION_ATTACH',	'attach');
-define('AUIDT_DETAILS_ACTION_DETACH',	'detach');
+define('AUDIT_DETAILS_ACTION_ADD',		'add');
+define('AUDIT_DETAILS_ACTION_UPDATE',	'update');
+define('AUDIT_DETAILS_ACTION_DELETE',	'delete');
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
