@@ -272,9 +272,9 @@ class testEscalations extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
-		]);
+		], 5, 3);
 		$this->assertArrayHasKey(1, $response['result']);
 		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
 	}
