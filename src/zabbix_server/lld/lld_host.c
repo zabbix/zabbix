@@ -1085,7 +1085,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 				ZBX_STR2UINT64(hostgroupid, row[2]);
 				zbx_vector_uint64_append(del_hostgroupids, hostgroupid);
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, host->name);
-				zbx_audit_hostgroup_update_json_detach(hostid, hostgroupid, groupid);
+				zbx_audit_hostgroup_update_json_delete_group(hostid, hostgroupid, groupid);
 			}
 			else
 			{
@@ -3243,7 +3243,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		{
 			zbx_db_insert_add_values(&db_insert_hgroups, hostgroupid, host->hostid,
 					host->new_groupids.values[j]);
-			zbx_audit_hostgroup_update_json_attach(host->hostid, hostgroupid, host->new_groupids.values[j]);
+			zbx_audit_hostgroup_update_json_add_group(host->hostid, hostgroupid,
+					host->new_groupids.values[j]);
 			hostgroupid++;
 		}
 

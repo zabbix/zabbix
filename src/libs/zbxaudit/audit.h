@@ -28,9 +28,8 @@
 #define AUDIT_ACTION_EXECUTE		7
 
 #define AUDIT_DETAILS_ACTION_ADD	"add"
+#define AUDIT_DETAILS_ACTION_UPDATE	"update"
 #define AUDIT_DETAILS_ACTION_DELETE	"delete"
-#define AUDIT_DETAILS_ACTION_ATTACH	"attach"
-#define AUDIT_DETAILS_ACTION_DETACH	"detach"
 
 #define AUDIT_SECRET_MASK		"******"
 
