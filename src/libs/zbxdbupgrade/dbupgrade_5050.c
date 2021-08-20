@@ -487,6 +487,31 @@ static int	DBpatch_5050034(void)
 
 	return DBset_default("config", &field);
 }
+
+static int	DBpatch_5050035(void)
+{
+	const ZBX_FIELD	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("item_preproc", &field, &old_field);
+}
+
+static int	DBpatch_5050036(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field, &old_field);
+}
+
+static int	DBpatch_5050037(void)
+{
+	const ZBX_FIELD	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media_type_message", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -528,5 +553,8 @@ DBPATCH_ADD(5050031, 0, 1)
 DBPATCH_ADD(5050032, 0, 1)
 DBPATCH_ADD(5050033, 0, 1)
 DBPATCH_ADD(5050034, 0, 1)
+DBPATCH_ADD(5050035, 0, 1)
+DBPATCH_ADD(5050036, 0, 1)
+DBPATCH_ADD(5050037, 0, 1)
 
 DBPATCH_END()
