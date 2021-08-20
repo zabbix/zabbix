@@ -3994,8 +3994,8 @@ z-select[disabled] button,
   padding: 3px 0 7px; }
 
 .overlay-descr {
-  background: linear-gradient(#000000 30%, rgba(0, 0, 0, 0)), linear-gradient(rgba(0, 0, 0, 0), #000000 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
-  background: linear-gradient(#000000 30%, rgba(0, 0, 0, 0)), linear-gradient(rgba(0, 0, 0, 0), #000000 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
+  background: linear-gradient(#000000 30%, transparent), linear-gradient(transparent, #000000 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), transparent), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), transparent) 0 100%;
+  background: linear-gradient(#000000 30%, transparent), linear-gradient(transparent, #000000 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), transparent), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), transparent) 0 100%;
   background-repeat: no-repeat;
   background-color: #000000;
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
@@ -4803,8 +4803,8 @@ svg {
   .columns-wrapper.columns-3 > div,
   .columns-wrapper.columns-3 > li {
     display: block;
-    flex: 0 0 33.3333333333%;
-    max-width: 33.3333333333%; }
+    flex: 0 0 33.33333%;
+    max-width: 33.33333%; }
   .columns-wrapper .column-5 {
     flex: 0 0 5%;
     max-width: 5%; }
@@ -5355,8 +5355,8 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     border-radius: 50%;
     background: #f8f8f8; }
   .range-control.range-control-focus .range-control-thumb {
-    margin-top: -6.6666666667px;
-    margin-left: -6.6666666667px;
+    margin-top: -6.66667px;
+    margin-left: -6.66667px;
     background: #f8f8f8;
     border: 2px solid #fafafa; }
   .range-control.range-control-focus .range-control-progress {
@@ -6061,7 +6061,7 @@ z-select button.focusable:focus,
 .log-warning-bg,
 .log-high-bg,
 .log-disaster-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
   .na-bg::before,
   .normal-bg::before,
   .info-bg::before,
@@ -6206,7 +6206,7 @@ td.inactive-bg {
   color: #ffffff; }
 
 .inactive-bg, td.inactive-bg {
-  background-color: rgba(0, 0, 0, 0) !important;
+  background-color: transparent !important;
   padding-left: 42px; }
   .inactive-bg::before {
     content: '';
