@@ -24,6 +24,7 @@
  */
 
 $parents = [];
+
 while ($parent = array_shift($data['service']['parents'])) {
 	$parents[] = (new CLink($parent['name'],
 		(new CUrl('zabbix.php'))
@@ -48,9 +49,9 @@ while ($parent = array_shift($data['service']['parents'])) {
 			(new CDiv(
 				$data['is_editable']
 					? (new CButton(null))
-					->addClass(ZBX_STYLE_BTN_EDIT)
-					->addClass('js-edit-service')
-					->setAttribute('data-serviceid', $data['service']['serviceid'])
+						->addClass(ZBX_STYLE_BTN_EDIT)
+						->addClass('js-edit-service')
+						->setAttribute('data-serviceid', $data['service']['serviceid'])
 					: null
 			))->addClass(ZBX_STYLE_SERVICE_ACTIONS)
 		]),
