@@ -45,7 +45,7 @@ class CAudit {
 	public const RESOURCE_SCRIPT = 25;
 	public const RESOURCE_PROXY = 26;
 	public const RESOURCE_MAINTENANCE = 27;
-	public const RESOURCE_REGEXP = 28; // FIXME: add to resource name consts
+	public const RESOURCE_REGEXP = 28;
 	public const RESOURCE_MACRO = 29;
 	public const RESOURCE_TEMPLATE = 30;
 	public const RESOURCE_TRIGGER_PROTOTYPE = 31;
@@ -61,7 +61,7 @@ class CAudit {
 	public const RESOURCE_HOUSEKEEPING = 41;
 	public const RESOURCE_AUTHENTICATION = 42;
 	public const RESOURCE_TEMPLATE_DASHBOARD = 43;
-	public const RESOURCE_USER_ROLE = 44; // FIXME: add to resource name consts
+	public const RESOURCE_USER_ROLE = 44;
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
 
@@ -71,134 +71,22 @@ class CAudit {
 
 	private const AUDITLOG_ENABLE = 1;
 
-	private const RESOURCES_TABLE_NAME = [ // FIXME: convert from const to static array
-		self::RESOURCE_ACTION => 'actions',
-		self::RESOURCE_AUTHENTICATION => 'config',
+	private const RESOURCES_TABLE_NAME = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
-		self::RESOURCE_AUTOREGISTRATION => 'config',
-		self::RESOURCE_CORRELATION => 'correlation',
-		self::RESOURCE_DASHBOARD => 'dashboard',
-		self::RESOURCE_DISCOVERY_RULE => 'drules',
-		self::RESOURCE_GRAPH => 'graphs',
-		self::RESOURCE_GRAPH_PROTOTYPE => 'graphs',
-		self::RESOURCE_HOST => 'hosts',
-		self::RESOURCE_HOST_GROUP => 'groups',
-		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
-		self::RESOURCE_HOUSEKEEPING => 'config',
-		self::RESOURCE_ICON_MAP => 'icon_map',
-		self::RESOURCE_IMAGE => 'images',
-		self::RESOURCE_IT_SERVICE => 'services',
-		self::RESOURCE_ITEM => 'items',
-		self::RESOURCE_ITEM_PROTOTYPE => 'items',
-		self::RESOURCE_MACRO => 'globalmacro',
-		self::RESOURCE_MAINTENANCE => 'maintenances',
-		self::RESOURCE_MAP => 'sysmaps',
-		self::RESOURCE_MEDIA_TYPE => 'media_type',
-		self::RESOURCE_MODULE => 'module',
-		self::RESOURCE_PROXY => 'hosts',
-		self::RESOURCE_SCENARIO => 'httptest',
-		self::RESOURCE_SCHEDULED_REPORT => 'report',
-		self::RESOURCE_SCRIPT => 'scripts',
-		self::RESOURCE_SETTINGS => 'config',
-		self::RESOURCE_TEMPLATE => 'hosts',
-		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
-		self::RESOURCE_TRIGGER => 'triggers',
-		self::RESOURCE_TRIGGER_PROTOTYPE => 'triggers',
-		self::RESOURCE_USER => 'users',
-		self::RESOURCE_USER_GROUP => 'usrgrp',
-		self::RESOURCE_VALUE_MAP => 'valuemaps'
+		self::RESOURCE_USER => 'users'
 	];
 
 	private const RESOURCES_FIELD_NAME = [
-		self::RESOURCE_ACTION => 'name',
-		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
-		self::RESOURCE_AUTOREGISTRATION => null,
-		self::RESOURCE_CORRELATION => 'name',
-		self::RESOURCE_DASHBOARD => 'name',
-		self::RESOURCE_DISCOVERY_RULE => 'name',
-		self::RESOURCE_GRAPH => 'name',
-		self::RESOURCE_GRAPH_PROTOTYPE => 'name',
-		self::RESOURCE_HOST => 'name',
-		self::RESOURCE_HOST_GROUP => 'name',
-		self::RESOURCE_HOST_PROTOTYPE => 'host',
-		self::RESOURCE_HOUSEKEEPING => null,
-		self::RESOURCE_ICON_MAP => 'name',
-		self::RESOURCE_IMAGE => 'name',
-		self::RESOURCE_IT_SERVICE => 'name',
-		self::RESOURCE_ITEM => 'name',
-		self::RESOURCE_ITEM_PROTOTYPE => 'name',
-		self::RESOURCE_MACRO => 'macro',
-		self::RESOURCE_MAINTENANCE => 'name',
-		self::RESOURCE_MAP => 'name',
-		self::RESOURCE_MEDIA_TYPE => 'name',
-		self::RESOURCE_MODULE => 'id',
-		self::RESOURCE_PROXY => 'host',
-		self::RESOURCE_SCENARIO => 'name',
-		self::RESOURCE_SCHEDULED_REPORT => 'name',
-		self::RESOURCE_SCRIPT => 'name',
-		self::RESOURCE_SETTINGS => null,
-		self::RESOURCE_TEMPLATE => 'name',
-		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
-		self::RESOURCE_TRIGGER => 'description',
-		self::RESOURCE_TRIGGER_PROTOTYPE => 'description',
-		self::RESOURCE_USER => 'username',
-		self::RESOURCE_USER_GROUP => 'name',
-		self::RESOURCE_VALUE_MAP => 'name'
+		self::RESOURCE_USER => 'username'
 	];
 
 	private const RESOURCES_API_NAME = [
-		self::RESOURCE_ACTION => 'action',
-		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
-		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
-		self::RESOURCE_CORRELATION => 'correlation',
-		self::RESOURCE_DASHBOARD => 'dashboard',
-		self::RESOURCE_DISCOVERY_RULE => 'drule',
-		self::RESOURCE_GRAPH => 'graph',
-		self::RESOURCE_GRAPH_PROTOTYPE => 'graphprototype',
-		self::RESOURCE_HOST => 'host',
-		self::RESOURCE_HOST_GROUP => 'hostgroup',
-		self::RESOURCE_HOST_PROTOTYPE => 'hostprototype',
-		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
-		self::RESOURCE_ICON_MAP => 'iconmap',
-		self::RESOURCE_IMAGE => 'image',
-		self::RESOURCE_IT_SERVICE => 'service',
-		self::RESOURCE_ITEM => 'item',
-		self::RESOURCE_ITEM_PROTOTYPE => 'itemprototype',
-		self::RESOURCE_MACRO => 'usermacro',
-		self::RESOURCE_MAINTENANCE => 'maintenance',
-		self::RESOURCE_MAP => 'map',
-		self::RESOURCE_MEDIA_TYPE => 'mediatype',
-		self::RESOURCE_MODULE => 'module',
-		self::RESOURCE_PROXY => 'proxy',
-		self::RESOURCE_SCENARIO => 'httptest',
-		self::RESOURCE_SCHEDULED_REPORT => 'report',
-		self::RESOURCE_SCRIPT => 'script',
-		self::RESOURCE_SETTINGS => 'settings',
-		self::RESOURCE_TEMPLATE => 'template',
-		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
-		self::RESOURCE_TRIGGER => 'trigger',
-		self::RESOURCE_TRIGGER_PROTOTYPE => 'triggerprototype',
-		self::RESOURCE_USER => 'user',
-		self::RESOURCE_USER_GROUP => 'usergroup',
-		self::RESOURCE_VALUE_MAP => 'valuemap'
+		self::RESOURCE_USER => 'user'
 	];
 
 	private static $masked_fields = [
-		self::RESOURCE_MACRO => [
-			'fields' => ['value' => true],
-			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
-		],
-		self::RESOURCE_HOST => [
-			'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
-		],
-		self::RESOURCE_TEMPLATE => [
-			'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
-		],
-		self::RESOURCE_MEDIA_TYPE => [
-			'fields' => ['passwd' => true]
-		],
 		self::RESOURCE_AUTH_TOKEN => [
 			'fields' => ['token' => true]
 		],
@@ -284,10 +172,10 @@ class CAudit {
 		$object = self::convertKeysToDetailsFormat($api_name, $object);
 
 		switch ($action) {
-			case CAudit::ACTION_ADD:
+			case self::ACTION_ADD:
 				return self::handleAdd($object, $resource);
 
-			case CAudit::ACTION_UPDATE:
+			case self::ACTION_UPDATE:
 				$old_object = self::convertKeysToDetailsFormat($api_name, self::maskValues($resource, $old_object));
 
 				return self::handleUpdate($object, $old_object, $resource);
