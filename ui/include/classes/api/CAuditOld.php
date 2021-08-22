@@ -63,6 +63,7 @@ class CAuditOld {
 		CAudit::RESOURCE_TRIGGER_PROTOTYPE =>	['triggerid', 'description', 'triggers', 'triggerprototype'],
 		CAudit::RESOURCE_USER =>				['userid', 'username', 'users', 'user'],
 		CAudit::RESOURCE_USER_GROUP =>			['usrgrpid', 'name', 'usrgrp', 'usergroup'],
+		CAudit::RESOURCE_USER_ROLE =>			['roleid', 'name', 'role', 'role'],
 		CAudit::RESOURCE_VALUE_MAP =>			['valuemapid', 'name', 'valuemaps', 'valuemap'],
 		CAudit::RESOURCE_TEMPLATE_DASHBOARD =>	['dashboardid', 'name', 'dashboard', 'templatedashboard']
 	];
