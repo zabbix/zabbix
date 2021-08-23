@@ -233,7 +233,7 @@ class CPage {
 	 */
 	public function logout() {
 		try {
-			// Before logout open page without any sripts, otherwise session might be restored and logout won't work.
+			// Before logout open page without any scripts, otherwise session might be restored and logout won't work.
 			$this->open('setup.php');
 
 			$session = (self::$cookie === null)

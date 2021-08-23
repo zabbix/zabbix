@@ -28,6 +28,10 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  */
 class testPasswordComplexity extends CWebTest {
 
+	const ACTION_UPDATE = true;
+	const OWN_PASSWORD  = true;
+	const ADMIN_USERID  = 1;
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -62,7 +66,6 @@ class testPasswordComplexity extends CWebTest {
 	 * Add user for updating.
 	 */
 	public function prepareUserData() {
-		CDataHelper::setSessionId(null);
 
 		$response = CDataHelper::call('user.create', [
 			[
@@ -982,10 +985,9 @@ class testPasswordComplexity extends CWebTest {
 	 * @dataProvider getUserPasswordData
 	 */
 	public function testPasswordComplexity_ChangeOwnUserPassword($data) {
-		$own = true;
-		$update = true;
-		$userid = self::$userid;
-		$this->checkPasswordComplexity($data, self::$admin_password, $userid, $update, $own, self::$user_password,);
+		$this->checkPasswordComplexity($data, self::$admin_password, self::$userid, self::ACTION_UPDATE,
+				self::OWN_PASSWORD, self::$user_password
+		);
 	}
 
 	/**
@@ -995,10 +997,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @dataProvider getAdminPasswordData
 	 */
 	public function testPasswordComplexity_ChangeOwnAdminPassword($data) {
-		$own = true;
-		$update = true;
-		$userid = 1;
-		$this->checkPasswordComplexity($data, self::$admin_password, $userid, $update, $own);
+		$this->checkPasswordComplexity($data, self::$admin_password, self::ADMIN_USERID, self::ACTION_UPDATE, self::OWN_PASSWORD);
 	}
 
 	/**
@@ -1008,9 +1007,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @dataProvider getUserPasswordData
 	 */
 	public function testPasswordComplexity_UpdateUserPassword($data) {
-		$update = true;
-		$userid = self::$userid;
-		$this->checkPasswordComplexity($data, self::$admin_password, $userid, $update);
+		$this->checkPasswordComplexity($data, self::$admin_password, self::$userid, self::ACTION_UPDATE);
 	}
 
 	/**
@@ -1020,9 +1017,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @dataProvider getAdminPasswordData
 	 */
 	public function testPasswordComplexity_UpdateAdminPassword($data) {
-		$userid = 1;
-		$update = true;
-		$this->checkPasswordComplexity($data, self::$admin_password, $userid, $update);
+		$this->checkPasswordComplexity($data, self::$admin_password, self::ADMIN_USERID, self::ACTION_UPDATE);
 	}
 
 	/**
@@ -1050,15 +1045,12 @@ class testPasswordComplexity extends CWebTest {
 
 		if ($update) {
 			if ($own) {
-				if ($userid === 1) {
-					$this->page->open('zabbix.php?action=userprofile.edit');
-					$this->clickChangePassword();
-				}
-				else {
+				if ($userid !== 1) {
 					$this->page->userLogin('update-user', $user_password);
-					$this->page->open('zabbix.php?action=userprofile.edit');
-					$this->clickChangePassword();
 				}
+
+				$this->page->open('zabbix.php?action=userprofile.edit');
+				$this->clickChangePassword();
 			}
 			else {
 				$this->page->login()->open('zabbix.php?action=user.edit&userid='.$userid);
