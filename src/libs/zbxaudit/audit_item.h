@@ -131,7 +131,11 @@ void	zbx_audit_item_delete_params(zbx_uint64_t itemid, int item_flags, zbx_uint6
 
 void	zbx_audit_discovery_rule_update_json_add_lld_macro_path(zbx_uint64_t itemid,
 		zbx_uint64_t lld_macro_pathid, const char *lld_macro, const char *path);
-#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(resource)						\
+
+void	zbx_audit_discovery_rule_update_json_lld_macro_path_create_update_entry(zbx_uint64_t itemid,
+		zbx_uint64_t lld_macro_pathid);
+
+#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(resource)	\
 void	zbx_audit_discovery_rule_update_json_update_lld_macro_path_##resource(zbx_uint64_t itemid,		\
 		zbx_uint64_t lld_macro_pathid, const char *resource##_old, const char *resource##_new);
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(lld_macro)
@@ -146,6 +150,9 @@ void zbx_audit_discovery_rule_update_json_add_lld_override_filter(zbx_uint64_t i
 
 void zbx_audit_discovery_rule_update_json_add_lld_override_condition(zbx_uint64_t itemid, zbx_uint64_t overrideid,
 		zbx_uint64_t override_conditionid, int operator, const char *macro, const char *value);
+
+void	zbx_audit_discovery_rule_update_json_add_lld_override_operation(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+		zbx_uint64_t override_operationid,  int operator, const char *value);
 
 #define PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD_H(resource, type)						\
 void	zbx_audit_discovery_rule_update_json_add_lld_override_##resource(zbx_uint64_t itemid,			\

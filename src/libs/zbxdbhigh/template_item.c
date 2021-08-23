@@ -2035,6 +2035,9 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 			if (0 == (lld_macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE))
 				continue;
 
+			zbx_audit_discovery_rule_update_json_lld_macro_path_create_update_entry(item->itemid,
+					lld_macro->lld_macro_pathid);
+
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update lld_macro_path set ");
 
 			if (0 != (lld_macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_LLD_MACRO))
@@ -2300,6 +2303,10 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 
 			zbx_db_insert_add_values(&db_insert_ooperations, override_operationid, overrideid,
 					(int)override_operation->operationtype, (int)override_operation->operator,
+					override_operation->value);
+
+			zbx_audit_discovery_rule_update_json_add_lld_override_operation((*pitem)->itemid,
+					overrideid, override_operationid, (int)override_operation->operator,
 					override_operation->value);
 
 			if (ZBX_PROTOTYPE_STATUS_COUNT != override_operation->status)

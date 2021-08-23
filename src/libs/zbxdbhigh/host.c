@@ -1407,22 +1407,21 @@ static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
 	/* httpstepitem, httptestitem */
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hsi.itemid"
-			" from httpstepitem hsi,httpstep hs"
-			" where hsi.httpstepid=hs.httpstepid"
+			"select hsi.itemid,i.name,i.flags"
+			" from httpstepitem hsi,httpstep hs,items i"
+			" where hsi.httpstepid=hs.httpstepid and i.itemid=hsi.itemid"
 				" and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hs.httptestid",
 			httptestids->values, httptestids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			" union all "
-			"select itemid"
-			" from httptestitem"
-			" where");
+			"select i.itemid,i.name,i.flags"
+			" from httptestitem ht,items i"
+			" where ht.itemid=i.itemid and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
 			httptestids->values, httptestids->values_num);
 
-	DBselect_uint64(sql, &itemids);
-
+	DBselect_delete_for_item(sql, &itemids);
 	DBdelete_items(&itemids);
 
 	sql_offset = 0;
