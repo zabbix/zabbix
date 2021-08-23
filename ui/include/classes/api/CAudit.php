@@ -86,13 +86,6 @@ class CAudit {
 		self::RESOURCE_USER => 'user'
 	];
 
-	private const NESTED_OBJECTS_TABLE_NAMES = [
-		self::RESOURCE_USER => [
-			'user.medias' => 'media',
-			'user.usrgrps' => 'users_groups',
-		]
-	];
-
 	private const MASKED_PATHS = [
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
 		// self::RESOURCE_MACRO => [
@@ -100,6 +93,16 @@ class CAudit {
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		// ],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
+	];
+
+	private const RELATABLE_TABLE_NAME_MAPPING = [
+		'user.medias' => 'media',
+		'user.usrgrps' => 'users_groups'
+	];
+
+	private const RELATABLE_ID_MAPPING = [
+		'user.medias' => 'mediaid',
+		'user.usrgrps' => 'id'
 	];
 
 	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,
@@ -173,14 +176,14 @@ class CAudit {
 		}
 
 		$api_name = self::API_NAMES[$resource];
-		$object = self::convertKeysToPaths($api_name, $object);
+		$object = self::convertKeysToPaths($resource, $api_name, $object);
 
 		switch ($action) {
 			case self::ACTION_ADD:
 				return self::handleAdd($resource, $object);
 
 			case self::ACTION_UPDATE:
-				$old_object = self::convertKeysToPaths($api_name, $old_object);
+				$old_object = self::convertKeysToPaths($resource, $api_name, $old_object);
 				return self::handleUpdate($resource, $object, $old_object);
 			default:
 				return [];
@@ -216,15 +219,20 @@ class CAudit {
 		return false;
 	}
 
-	private static function convertKeysToPaths(string $prefix, array $object): array {
+	private static function convertKeysToPaths(int $resource, string $prefix, array $object): array {
 		$result = [];
 
 		foreach ($object as $key => $value) {
 			$index = is_numeric($key) ? '['.$key.']' : '.'.$key;
 
+			if (array_key_exists($prefix, self::RELATABLE_ID_MAPPING)) {
+				$index = '['.$value[self::RELATABLE_ID_MAPPING[$prefix]].']';
+				unset($value[self::RELATABLE_ID_MAPPING[$prefix]]);
+			}
+
 			if (is_array($value)) {
 				$new_prefix = $prefix . $index;
-				$result += self::convertKeysToPaths($new_prefix, $value);
+				$result += self::convertKeysToPaths($resource, $new_prefix, $value);
 			}
 			else {
 				$result[$prefix.$index] = (string) $value;
@@ -243,7 +251,9 @@ class CAudit {
 				$object_path = preg_replace('/\[[0-9]+\]/', '', $object_path);
 			}
 
-			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[$resource][$object_path];
+			if (array_key_exists($object_path, self::RELATABLE_TABLE_NAME_MAPPING)) {
+				$table_name = self::RELATABLE_TABLE_NAME_MAPPING[$object_path];
+			}
 		}
 
 		$schema_fields = DB::getSchema($table_name)['fields'];
@@ -307,6 +317,10 @@ class CAudit {
 			else if ($old_value === null) {
 				if (self::isNestedObjectProperty($path)) {
 					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_ADD];
+				}
+
+				if (self::isDefaultValue($resource, $path, $value)) {
+					continue;
 				}
 
 				if (self::isValueToMask($resource, $path, $object)) {
