@@ -176,14 +176,14 @@ class CAudit {
 		}
 
 		$api_name = self::API_NAMES[$resource];
-		$object = self::convertKeysToPaths($resource, $api_name, $object);
+		$object = self::convertKeysToPaths($api_name, $object);
 
 		switch ($action) {
 			case self::ACTION_ADD:
 				return self::handleAdd($resource, $object);
 
 			case self::ACTION_UPDATE:
-				$old_object = self::convertKeysToPaths($resource, $api_name, $old_object);
+				$old_object = self::convertKeysToPaths($api_name, $old_object);
 				return self::handleUpdate($resource, $object, $old_object);
 			default:
 				return [];
@@ -219,7 +219,7 @@ class CAudit {
 		return false;
 	}
 
-	private static function convertKeysToPaths(int $resource, string $prefix, array $object): array {
+	private static function convertKeysToPaths(string $prefix, array $object): array {
 		$result = [];
 
 		foreach ($object as $key => $value) {
@@ -232,7 +232,7 @@ class CAudit {
 
 			if (is_array($value)) {
 				$new_prefix = $prefix . $index;
-				$result += self::convertKeysToPaths($resource, $new_prefix, $value);
+				$result += self::convertKeysToPaths($new_prefix, $value);
 			}
 			else {
 				$result[$prefix.$index] = (string) $value;
