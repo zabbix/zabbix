@@ -24,19 +24,37 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for alerting for services.
  *
  * @required-components server
+ * @configurationDataProvider serverConfigurationProvider
  * @hosts test_services_alerting
- * @backup history
+ * @backup history,items,triggers,alerts,services
  */
 class testAlertingForServices extends CIntegrationTest {
 	const HOSTNAME = 'test_services_alerting';
 	const TRAPPER_KEY = 'test_trapper';
 	const SERVICENAME = 'Service 1';
+	const TRIGGER_DESC = 'Sample trigger';
 
 	private static $hostid;
 	private static $serviceid;
 	private static $actionid;
-	private static $itemid;
 	private static $triggerid;
+	private static $itemid;
+	private static $problem_tags;
+
+	private function createServiceWithProblemTags($name, $problem_tags) {
+		$response = $this->call('service.create', [
+			'name' => $name,
+			'algorithm' => 1,
+			'showsla' => 1,
+			'goodsla' => 99.0,
+			'sortorder' => 1,
+			'problem_tags' => $problem_tags
+		]);
+		$this->assertArrayHasKey('serviceids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['serviceids']);
+
+		return $response['result']['serviceids'][0];
+	}
 
 	/**
 	 * @inheritdoc
@@ -78,9 +96,8 @@ class testAlertingForServices extends CIntegrationTest {
 		self::$itemid = $response['result']['itemids'][0];
 
 		// Create trigger
-		$trigger_desc = 'Sample trigger';
 		$response = $this->call('trigger.create', [
-			'description' => $trigger_desc,
+			'description' => self::TRIGGER_DESC,
 			'priority' => TRIGGER_SEVERITY_HIGH,
 			'status' => TRIGGER_STATUS_ENABLED,
 			'type' => 0,
@@ -97,29 +114,20 @@ class testAlertingForServices extends CIntegrationTest {
 			'tags' => [
 				[
 					'tag' => 'ServiceLink',
-					'value' => self::$triggerid . ':' . $trigger_desc
+					'value' => self::$triggerid . ':' . self::TRIGGER_DESC
 				]
 			]
 		]);
+		self::$problem_tags = 'ServiceLink:' . self::$triggerid . ':' . self::TRIGGER_DESC;
 
 		// Create service
-		$response = $this->call('service.create', [
-			'name' => self::SERVICENAME,
-			'algorithm' => 1,
-			'showsla' => 1,
-			'goodsla' => 99.0,
-			'sortorder' => 1,
-			'problem_tags' => [
-				[
-					'tag' => 'ServiceLink',
-					'operator' => 0,
-					'value' => self::$triggerid . ':' . $trigger_desc
-				]
+		self::$serviceid = $this->createServiceWithProblemTags(self::SERVICENAME, [
+			[
+				'tag' => 'ServiceLink',
+				'operator' => 0,
+				'value' => self::$triggerid . ':' . self::TRIGGER_DESC
 			]
 		]);
-		$this->assertArrayHasKey('serviceids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['serviceids']);
-		self::$serviceid = $response['result']['serviceids'][0];
 
 		// Create action
 		$response = $this->call('action.create', [
@@ -190,14 +198,29 @@ class testAlertingForServices extends CIntegrationTest {
 	}
 
 	/**
+	 * Component configuration provider for agent related tests.
+	 *
+	 * @return array
+	 */
+	public function serverConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 4,
+				'LogFileSize' => 20
+			]
+		];
+	}
+
+	/**
 	 * Test suite for alerting for services.
 	 *
-	 * @backup actions,alerts,history,events,problem,escalations,event_recovery
+	 * @backup actions,alerts,history,events,problem,service_problem,triggers,escalations
 	 */
 	public function testAlertingForServices_checkServiceStatusChange() {
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
 
-		sleep(1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
@@ -212,7 +235,6 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
 		// Alert will not be created when severity is updated
-
 		$response = $this->call('event.get', [
 			'objectids' => self::$triggerid,
 		]
@@ -230,7 +252,7 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->assertArrayHasKey('eventids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['eventids']);
 
-		sleep(1);
+		sleep(3);
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
@@ -240,7 +262,6 @@ class testAlertingForServices extends CIntegrationTest {
 		]
 		);
 		$this->assertCount(1, $response['result']);
-		sleep(1);
 
 		// Check if new problem event was added
 		$response = $this->call('problem.get', [
@@ -256,13 +277,15 @@ class testAlertingForServices extends CIntegrationTest {
 
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 0);
 
-		sleep(1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
 			'actionsids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
-			'eventobject' => EVENT_OBJECT_SERVICE
+			'eventobject' => EVENT_OBJECT_SERVICE,
+			'sortfield' => 'alertid'
 			]
 		);
 		$this->assertCount(2, $response['result']);
@@ -270,10 +293,10 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->assertEquals('Recovery', $response['result'][1]['subject']);
 		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
 
-		sleep(1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In zbx_process_events()', true, 20);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_process_events()', true);
 
 		// Check recovery event
-
 		$response = $this->call('event.get', [
 			'output' => 'extend',
 			'source' => EVENT_SOURCE_SERVICE,
@@ -292,7 +315,72 @@ class testAlertingForServices extends CIntegrationTest {
 	/**
 	 * Test suite for alerting for services.
 	 *
-	 * @backup actions,alerts,history,events,problem
+	 * @backup alerts,history,events,triggers,services
+	 */
+	public function testAlertingForServices_checkMacros() {
+		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 0);
+		$this->reloadConfigurationCache();
+
+		$response = $this->call('action.update', [
+			'actionid' => self::$actionid,
+			'esc_period' => '1m',
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'evaltype' => 0,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => 0,
+						'message' => '{SERVICE.NAME}|{SERVICE.TAGS}|{SERVICE.TAGSJSON}|{SERVICE.ROOTCAUSE}',
+						'subject' => 'Problem'
+					],
+					'opmessage_grp' => [['usrgrpid' => 7]]
+				]
+			],
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+
+		$response = $this->call('alert.get', [
+			'output' => 'extend',
+			'actionsids' => self::$actionid,
+			'eventsource' => EVENT_SOURCE_SERVICE,
+			'eventobject' => EVENT_OBJECT_SERVICE
+		]);
+
+		$this->reloadConfigurationCache();
+		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
+
+		$response = $this->call('alert.get', [
+			'output' => 'extend',
+			'actionsids' => self::$actionid,
+			'eventsource' => EVENT_SOURCE_SERVICE,
+			'eventobject' => EVENT_OBJECT_SERVICE
+		]);
+		$this->assertArrayHasKey(0, $response['result']);
+
+		$service_macros = explode('|', $response['result'][0]['message']);
+
+		$rootcause = '/Host: "' . self::HOSTNAME . '" Problem name: "' . self::TRIGGER_DESC .'" Severity: "' .
+				'High" Age: [0-9]+s Problem tags: "' . self::$problem_tags . '"/ ';
+
+		$this->assertEquals(self::SERVICENAME, $service_macros[0]);
+		$this->assertEmpty($service_macros[1]);
+		$this->assertEquals('[]', $service_macros[2]);
+
+		$this->assertEquals(1, preg_match($rootcause, $service_macros[3], $matches));
+	}
+
+	/**
+	 * Test suite for alerting for services.
+	 *
+	 * @backup alerts,history,events,triggers,services
 	 */
 	public function testAlertingForServices_checkEscalationSteps() {
 		$response = $this->call('action.update', [
@@ -335,18 +423,98 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
-		sleep(60);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		$response = $this->call('alert.get', [
-			'output' => 'extend',
-			'actionsids' => self::$actionid,
-			'eventsource' => EVENT_SOURCE_SERVICE,
-			'eventobject' => EVENT_OBJECT_SERVICE
+				'output' => 'extend',
+				'actionsids' => self::$actionid,
+				'eventsource' => EVENT_SOURCE_SERVICE,
+				'eventobject' => EVENT_OBJECT_SERVICE,
+				'sortfield' => 'alertid'
 			]
 		);
 		$this->assertCount(2, $response['result']);
 		$this->assertEquals(1, $response['result'][0]['esc_step']);
 		$this->assertEquals(2, $response['result'][1]['esc_step']);
+
+		return true;
 	}
 
+	/**
+	 * Test suite for alerting for services.
+	 *
+	 * @backup alerts,history,events,triggers,services
+	 */
+	public function testAlertingForServices_checkTwoTriggers() {
+		$this->reloadConfigurationCache();
+		// Create trigger
+		$trigger_desc_2 = self::TRIGGER_DESC . '2';
+		$response = $this->call('trigger.create', [
+			'description' => $trigger_desc_2,
+			'priority' => TRIGGER_SEVERITY_DISASTER,
+			'status' => TRIGGER_STATUS_ENABLED,
+			'type' => 0,
+			'recovery_mode' => 0,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+			'expression' => 'last(/' . self::HOSTNAME . '/' . self::TRAPPER_KEY . ')=1',
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['triggerids']);
+		$trigger_id_2 = $response['result']['triggerids'][0];
+
+		$response = $this->call('trigger.update', [
+			'triggerid' => $trigger_id_2,
+			'tags' => [
+				[
+					'tag' => 'ServiceLink',
+					'value' => $trigger_id_2 . ':' . $trigger_desc_2
+				]
+			]
+		]);
+
+		$serviceid_child1 = $this->createServiceWithProblemTags('Child service (disaster)', [[
+			'tag' => 'ServiceLink',
+			'operator' => 0,
+			'value' => $trigger_id_2 . ':' . $trigger_desc_2
+		]]);
+
+		$serviceid_child2 = $this->createServiceWithProblemTags('Child service (high)', [[
+			'tag' => 'ServiceLink',
+			'operator' => 0,
+			'value' => self::$triggerid . ':' . self::TRIGGER_DESC
+		]]);
+
+		// Update service
+		$response = $this->call('service.update', [
+			'serviceid' => self::$serviceid,
+			'children' => [
+				['serviceid' => $serviceid_child1],
+				['serviceid' => $serviceid_child2]
+			],
+			'problem_tags' => []
+		]);
+		$this->assertArrayHasKey('serviceids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['serviceids']);
+
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In db_update_services()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_update_services()', true);
+
+		$response = $this->call('service.get', [
+			'output' => 'extend',
+			'serviceids' => self::$serviceid
+		]);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertArrayHasKey('status', $response['result'][0]);
+		$this->assertEquals(TRIGGER_SEVERITY_DISASTER, $response['result'][0]['status']);
+
+		return true;
+	}
 }
