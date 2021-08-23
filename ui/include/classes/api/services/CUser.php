@@ -1073,7 +1073,7 @@ class CUser extends CApiService {
 		if ($method === 'update') {
 			foreach ($db_users_groups as $id => $db_user_group) {
 				$db_users[$db_user_group['userid']]['usrgrps'][$id] = [
-					'usrgrpid' => $usrgrp['usrgrpid'],
+					'usrgrpid' => $db_user_group['usrgrpid'],
 					'userid' => $db_user_group['userid']
 				];
 			}
@@ -1171,7 +1171,7 @@ class CUser extends CApiService {
 
 		foreach ($users_medias as $userid => $medias) {
 			foreach ($medias as $index => $media) {
-				if (!in_array($index, $upd_indexes[$userid])) {
+				if (!$upd_indexes || !in_array($index, $upd_indexes[$userid])) {
 					$ins_medias[] = ['userid' => $userid] + $media;
 				}
 			}

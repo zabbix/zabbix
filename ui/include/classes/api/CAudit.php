@@ -86,13 +86,20 @@ class CAudit {
 		self::RESOURCE_USER => 'user'
 	];
 
-	private static $masked_fields = [
-		self::RESOURCE_AUTH_TOKEN => [
-			'fields' => ['token' => true]
-		],
-		self::RESOURCE_USER => [
-			'fields' => ['passwd' => true]
-		]
+	private const PATHS_TABLE_NAME = [
+		self::RESOURCES_API_NAME[self::RESOURCE_AUTH_TOKEN] => 'token',
+		self::RESOURCES_API_NAME[self::RESOURCE_USER] => 'users',
+		self::RESOURCES_API_NAME[self::RESOURCE_USER].'.medias' => 'media',
+		self::RESOURCES_API_NAME[self::RESOURCE_USER].'.usrgrps' => 'users_groups',
+	];
+
+	private const MASKED_PATHS = [
+		['path' => self::RESOURCES_API_NAME[self::RESOURCE_AUTH_TOKEN].'.token'],
+		// [
+		// 	'path' => self::RESOURCES_API_NAME[self::RESOURCE_MACRO].'.value',
+		// 	'conditions' => [self::RESOURCES_API_NAME[self::RESOURCE_MACRO].'.type' => ZBX_MACRO_TYPE_SECRET]
+		// ],
+		['path' => self::RESOURCES_API_NAME[self::RESOURCE_USER].'.passwd']
 	];
 
 	public static function log(string $userid, string $ip, string $username, int $resource, int $action, array $objects,
@@ -161,67 +168,49 @@ class CAudit {
 	}
 
 	private static function handleObjectDiff(int $resource, int $action, array $object, array $old_object): array {
-		if (!in_array($action, [self::ACTION_ADD, self::ACTION_UPDATE, self::ACTION_EXECUTE])) {
+		if (!in_array($action, [self::ACTION_ADD, self::ACTION_UPDATE])) {
 			return [];
 		}
 
 		$api_name = self::RESOURCES_API_NAME[$resource];
-
-		$object = self::maskValues($resource, $object);
-
-		$object = self::convertKeysToDetailsFormat($api_name, $object);
+		$object = self::convertKeysToPaths($api_name, $object);
 
 		switch ($action) {
 			case self::ACTION_ADD:
-				return self::handleAdd($object, $resource);
+				return self::handleAdd($object);
 
 			case self::ACTION_UPDATE:
-				$old_object = self::convertKeysToDetailsFormat($api_name, self::maskValues($resource, $old_object));
-
-				return self::handleUpdate($object, $old_object, $resource);
+				$old_object = self::convertKeysToPaths($api_name, $old_object);
+				return self::handleUpdate($object, $old_object);
+			default:
+				return [];
 		}
-
-		return [];
 	}
 
-	private static function isMaskField(int $resource, array $object, string $key): bool {
-		$table_masked_fields = [];
+	private static function isValueToMask(string $path, array $object): bool {
+		$index = array_search($path, array_column(self::MASKED_PATHS, 'path'));
 
-		if (!array_key_exists($resource, self::$masked_fields)) {
+		if ($index === false) {
 			return false;
 		}
 
-		$table_masked_fields = self::$masked_fields[$resource]['fields'];
-
-		if (!array_key_exists('conditions', self::$masked_fields[$resource])) {
-			return array_key_exists($key, $table_masked_fields);
+		if (!array_key_exists('conditions', self::MASKED_PATHS[$index])) {
+			return true;
 		}
 
-		if (array_key_exists($key, $table_masked_fields)) {
-			if (!array_key_exists('conditions', self::$masked_fields[$resource])) {
-				return true;
-			}
+		$all_counditions = count(self::MASKED_PATHS[$index]['conditions']);
+		$true_conditions = 0;
 
-			foreach (self::$masked_fields[$resource]['conditions'] as $field_name => $value) {
-				if (array_key_exists($field_name, $object) && $object[$field_name] == $value) {
-					return true;
-				}
+		foreach (self::MASKED_PATHS[$index]['conditions'] as $condition_path => $value) {
+			if (array_key_exists($condition_path, $object) && $object[$condition_path] == $value) {
+				$true_conditions++;
 			}
 		}
 
-		return false;
+		return ($true_conditions == $all_counditions);
 	}
 
-	private static function maskValues(int $resource, array $object): array {
-		foreach ($object as $key => &$value) {
-			$value = self::isMaskField($resource, $object, $key) ? ZBX_SECRET_MASK : $value;
-		}
-		unset($value);
-
-		return $object;
-	}
-
-	private static function convertKeysToDetailsFormat(string $prefix, array $object): array {
+	private static function convertKeysToPaths(string $prefix, array $object): array {
 		$result = [];
 
 		foreach ($object as $key => $value) {
@@ -229,13 +218,7 @@ class CAudit {
 
 			if (is_array($value)) {
 				$new_prefix = $prefix . $index;
-
-				if (is_numeric($key)) {
-					// Add object marker key.
-					$result[$new_prefix] = '';
-				}
-
-				$result += self::convertKeysToDetailsFormat($new_prefix, $value);
+				$result += self::convertKeysToPaths($new_prefix, $value);
 			}
 			else {
 				$result[$prefix.$index] = (string) $value;
@@ -245,120 +228,115 @@ class CAudit {
 		return $result;
 	}
 
-	private static function isDefaultValue(int $resource, string $path, string $value): bool {
-		$schema_fields = DB::getSchema(self::RESOURCES_TABLE_NAME[$resource])['fields'];
-		$keys = explode('.', $path);
-		$key = end($keys);
+	private static function isDefaultValue(string $path, string $value): bool {
+		$object_path = self::getLastObjectPath($path);
 
-		if (!array_key_exists($key, $schema_fields)) {
+		if (substr($object_path, -1) === ']') {
+			$pos = strrpos($object_path, '[');
+			$object_path = substr($object_path, 0, $pos);
+		}
+
+		$schema_fields = DB::getSchema(self::PATHS_TABLE_NAME[$object_path])['fields'];
+		$field_name = substr($path, strrpos($path, '.') + 1);
+
+		if (!array_key_exists($field_name, $schema_fields)) {
 			return false;
 		}
 
-		if (!array_key_exists('default', $schema_fields[$key])) {
+		if (!array_key_exists('default', $schema_fields[$field_name])) {
 			return false;
 		}
 
-		return $value == $schema_fields[$key]['default'];
+		return $value == $schema_fields[$field_name]['default'];
 	}
 
-	private static function isPathMasked(int $resource, string $path, ?string $value): bool {
-		$path = explode('.', $path);
-
-		if (!array_key_exists($resource, self::$masked_fields)) {
-			return false;
-		}
-
-		if (!array_key_exists($path[1], self::$masked_fields[$resource]['fields'])) {
-			return false;
-		}
-
-		return $value === ZBX_SECRET_MASK;
+	private static function isNestedObjectProperty(string $path): bool {
+		return (count(explode('.', $path)) > 2);
 	}
 
-	private static function getObjectMarkers(array $keys): array {
-		$object_keys = [];
+	private static function getLastObjectPath(string $path): string {
+		return substr($path, 0, strrpos($path, '.'));
+	}
 
-		foreach ($keys as $key) {
-			$pos = strrpos($key, ']');
+	private static function handleAdd(array $object): array {
+		$nested_objects = [];
 
-			if ($pos === false) {
+		foreach ($object as $path => &$value) {
+			if (self::isNestedObjectProperty($path)) {
+				$nested_objects[self::getLastObjectPath($path)] = true;
+			}
+
+			if (self::isDefaultValue($path, $value)) {
+				unset($object[$path]);
 				continue;
 			}
 
-			$key = substr($key, 0, $pos + 1);
-
-			if(array_key_exists($key, $object_keys)) {
-				$object_keys[substr($key, 0, $pos + 1)]++;
+			if (self::isValueToMask($path, $object)) {
+				$value = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
 			}
 			else {
-				$object_keys[$key] = 1;
+				$value = [self::DETAILS_ACTION_ADD, $value];
 			}
-		}
-
-		return $object_keys;
-	}
-
-	private static function handleAdd(array $object, int $resource): array {
-		$object_markers = self::getObjectMarkers(array_keys($object));
-
-		foreach ($object as $key => &$value) {
-			$result = [];
-			$path = preg_replace('/\[[0-9]+\]/', '', $key);
-			$is_object_marker = (array_key_exists($key, $object_markers) && $object_markers[$key] > 1);
-
-			if (self::isDefaultValue($resource, $path, $value)) {
-				unset($object[$key]);
-				continue;
-			}
-
-			$result = [self::DETAILS_ACTION_ADD];
-
-			if (!$is_object_marker) {
-				$result[] = $value;
-			}
-
-			$value = $result;
 		}
 		unset($value);
+
+		foreach (array_keys($nested_objects) as $path) {
+			$object[$path] = [self::DETAILS_ACTION_ADD];
+		}
 
 		return $object;
 	}
 
-	private static function handleUpdate(array $object, array $old_object, int $resource): array {
+	private static function handleUpdate(array $object, array $old_object): array {
 		$result = [];
-		$diff_keys = array_keys(array_merge($object, $old_object));
-		$object_markers = self::getObjectMarkers($diff_keys);
+		$nested_objects_actions = [];
 
-		// $object += $old_object;
+		$full_object = $object + $old_object;
 
-		foreach ($diff_keys as $key) {
-			$value = array_key_exists($key, $object) ? $object[$key] : null;
-			$old_value = array_key_exists($key, $old_object) ? $old_object[$key] : null;
-
-			$path = preg_replace('/\[[0-9]+\]/', '', $key);
-			// Non associative arrays should not be detected as object marker.
-			$is_object_marker = (array_key_exists($key, $object_markers) && $object_markers[$key] > 1);
-			$is_value_masked = self::isPathMasked($resource, $path, $value);
+		foreach (array_keys($full_object) as $path) {
+			$value = array_key_exists($path, $object) ? $object[$path] : null;
+			$old_value = array_key_exists($path, $old_object) ? $old_object[$path] : null;
 
 			if ($value === null) {
-				if ($is_object_marker) {
-					$result[$key] = [self::DETAILS_ACTION_DELETE];
+				if (self::isNestedObjectProperty($path)) {
+					$nested_objects_actions[self::getLastObjectPath($path)] = self::DETAILS_ACTION_DELETE;
 				}
 			}
-			elseif ($old_value === null) {
-				$result[$key] = [self::DETAILS_ACTION_ADD];
+			else if ($old_value === null) {
+				if (self::isNestedObjectProperty($path)) {
+					$nested_objects_actions[self::getLastObjectPath($path)] = self::DETAILS_ACTION_ADD;
+				}
 
-				if (!$is_object_marker) {
-					$result[$key][] = $value;
+				if (self::isValueToMask($path, $object)) {
+					$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
+				}
+				else {
+					$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 				}
 			}
 			else {
-				if ($is_object_marker) {
-					$result[$key] = [self::DETAILS_ACTION_UPDATE];
+				if (self::isNestedObjectProperty($path)) {
+					$nested_objects_actions[self::getLastObjectPath($path)] = self::DETAILS_ACTION_UPDATE;
 				}
-				elseif ($value != $old_value || $is_value_masked) {
-					$result[$key] = [self::DETAILS_ACTION_UPDATE, $value, $old_value];
+
+				if (self::isValueToMask($path, $full_object)) {
+					$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
+				} elseif ($value != $old_value) {
+					$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $old_value];
 				}
+			}
+		}
+
+		$result_paths = array_keys($result);
+
+		foreach ($nested_objects_actions as $path => $action) {
+			if ($action === self::DETAILS_ACTION_UPDATE) {
+				if (preg_grep('/'.preg_quote($path).'/', $result_paths)) {
+					$result[$path] = [$action];
+				}
+			}
+			else {
+				$result[$path] = [$action];
 			}
 		}
 
