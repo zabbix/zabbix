@@ -697,8 +697,6 @@ static void	sync_service_rules(zbx_service_manager_t *service_manager, int *upda
 
 		if (NULL == (rule = zbx_hashset_search(&service_manager->service_rules, &rule_local)))
 		{
-			rule_local.revision = revision;
-
 			rule = zbx_hashset_insert(&service_manager->service_rules, &rule_local, sizeof(rule_local));
 
 			update = 1;
@@ -735,7 +733,6 @@ static void	sync_service_rules(zbx_service_manager_t *service_manager, int *upda
 
 		if (0 != update)
 			(*updated)++;
-
 	}
 	DBfree_result(result);
 
