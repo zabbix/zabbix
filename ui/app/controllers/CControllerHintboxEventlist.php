@@ -108,7 +108,7 @@ class CControllerHintboxEventlist extends CController {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventid_till' => $this->getInput('eventid_till'),
-			'objectids' => $this->getInput('triggerid'),
+			'objectids' => $trigger['triggerid'],
 			'value' => TRIGGER_VALUE_TRUE,
 			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
