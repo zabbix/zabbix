@@ -75,7 +75,7 @@
                 Jira.params.url += '/';&#13;
             }&#13;
 &#13;
-            Jira.params.url += 'rest/servicedeskapi/latest/';&#13;
+            Jira.params.url += 'rest/servicedeskapi/';&#13;
         }&#13;
     },&#13;
 &#13;
