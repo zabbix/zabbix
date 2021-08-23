@@ -6,6 +6,7 @@ New features:
 .........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
 A.F....... [ZBXNEXT-6528,ZBXNEXT-6569] improved performance of graphs and graphs prototypes configuration process (rlataria, Sasha, vmaksimovs)
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6708] added TLS/SSL website certificates validation plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 
 Bug fixes:
@@ -984,6 +985,7 @@ New features:
 .........T [ZBXNEXT-6751] added Cisco Adaptive Security Virtual Appliance (ASAv) template (abakaldin)
 .........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6708] added TLS/SSL website certificates validation plugin to Zabbix agent 2 (esneiders)
 
 Bug fixes:
 .......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
