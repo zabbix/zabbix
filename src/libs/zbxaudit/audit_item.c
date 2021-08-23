@@ -88,12 +88,14 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 
 #define ONLY_ITEM_AND_ITEM_PROTOTYPE (AUDIT_RESOURCE_ITEM == resource_type || \
 		AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)
-#define IT_OR_ITP(s) ONLY_ITEM ? "item."#s : (ONLY_ITEM_PROTOTYPE ? "itemprototype."#s : "discoveryrule."#s)
-#define ADD_JSON_S(x)	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP(x), item->x)
-#define ADD_JSON_UI(x)	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP(x), item->x)
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP(itemid), itemid);
+#define IT_OR_ITP_OR_DR(s) ONLY_ITEM ? "item."#s : (ONLY_ITEM_PROTOTYPE ? "itemprototype."#s : "discoveryrule."#s)
+#define ADD_JSON_S(x)	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(x),\
+		item->x)
+#define ADD_JSON_UI(x)	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(x),\
+		item->x)
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(itemid), itemid);
 	ADD_JSON_S(delay);
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP(hostid), hostid);
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(hostid), hostid);
 	/* ruleid is REQUIRED for item prototype */
 	ADD_JSON_UI(interfaceid);
 	ADD_JSON_S(key); // API HAS 'key_' , but SQL 'key'
@@ -147,17 +149,19 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 	if ONLY_ITEM_AND_ITEM_PROTOTYPE ADD_JSON_UI(valuemapid);
 	ADD_JSON_UI(verify_host);
 	ADD_JSON_UI(verify_peer);
-	/* discover - only for item */
 	/* ITEM API FINISHED */
 
 	/* application - handled later
 	preprocessing - handled later */
 
+	if ONLY_ITEM_PROTOTYPE ADD_JSON_UI(discover);
+
 	if ONLY_LLD_RULE
 	{
-		ADD_JSON_S(formula);
-		ADD_JSON_UI(evaltype);
-		ADD_JSON_UI(discover);
+		zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD,
+				IT_OR_ITP_OR_DR("filter.formula"), item->formula);
+		zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD,
+				IT_OR_ITP_OR_DR("filter.evaltype"), item->evaltype);
 	}
 #undef ADD_JSON_UI
 #undef ADD_JSON_S
