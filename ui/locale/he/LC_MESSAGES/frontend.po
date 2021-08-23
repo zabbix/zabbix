@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-20 19:55+0300\n"
-"PO-Revision-Date: 2021-08-08 11:29+0300\n"
+"PO-Revision-Date: 2021-08-23 08:21+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1628414942.000000\n"
+"X-POOTLE-MTIME: 1629699698.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -980,7 +980,7 @@ msgstr "הצפנת סוכן"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:423
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "נתונים על סוכן המארח. מחזירה מחרוזת"
 
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:427
@@ -1713,7 +1713,7 @@ msgstr "CSV ל־JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2420
 msgid "CUID is expected"
-msgstr ""
+msgstr "אמור להיות CUID"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:176
 #: include/views/configuration.graph.edit.php:263
@@ -5736,7 +5736,7 @@ msgstr "ערך „name” (שם) כפול „%1$s” עבור מפה."
 #: include/classes/api/services/CMap.php:1285
 #, c-format
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "„usrgrpid” (מזהה קבוצת משתמשים) כפול „%1$s” בקבוצות משתמשים למפה „%2$s”."
 
 #: include/classes/api/services/CCorrelation.php:1191
 #, c-format
@@ -6684,7 +6684,7 @@ msgstr "השדה „host” (מארח) הוא בגדר חובה."
 #: include/classes/items/CHelpItems.php:325
 #: include/classes/items/CHelpItems.php:707
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
-msgstr ""
+msgstr "מחרוזת אימות קובץ, מחושבת על ידי האלגוריתם cksum מבית יוניקס. מחזירה מספר שלם וחיובי עבור crc32 (בררת מחדל) ומחרוזת עבור md5,‏ sha256"
 
 #: include/classes/api/services/CImage.php:570
 msgid "File format is unsupported."
@@ -6702,12 +6702,12 @@ msgstr "הקובץ גדול מדי, גודל ההעלאה המרבי הוא %1$s
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:727
 msgid "File owner information. Returns string"
-msgstr ""
+msgstr "פרטי בעלות על קובץ. מחזירה מחרוזת"
 
 #: include/classes/items/CHelpItems.php:361
 #: include/classes/items/CHelpItems.php:743
 msgid "File size in bytes (default) or in newlines. Returns integer"
-msgstr ""
+msgstr "גודל קובץ בבתים (בררת מחדל) או בשורות חדשות. מחזירה מספר שלם וחיובי"
 
 #: include/classes/items/CHelpItems.php:365
 #: include/classes/items/CHelpItems.php:747
@@ -7095,7 +7095,7 @@ msgstr "התרשים „%1$s” כבר קיים תחת „%2$s” (הפריטי�
 #: include/classes/api/services/CGraphGeneral.php:1135
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" as a graph created from graph prototype."
-msgstr ""
+msgstr "התרשים „%1$s” כבר קיים תחת „%2$s” כתרשים שנוצר מאב־טיפוס של תרשימים."
 
 #: include/classes/api/services/CGraphGeneral.php:1038
 #: include/classes/api/services/CGraphGeneral.php:1246
@@ -15032,12 +15032,12 @@ msgstr "מחזירה מידע הקשור בשער הגישה ל־Zabbix ב־Java
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:527
 msgid "Returns number of TCP sockets that match parameters. Returns integer"
-msgstr ""
+msgstr "מחזירה את מספר שקעי ה־TCP שתואמים למשתנים. מחזירה מספר שלם וחיובי"
 
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:543
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
-msgstr ""
+msgstr "מחזירה את מספר שקעי ה־UDP שתואמים למשתנים. מחזירה מספר שלם וחיובי"
 
 #: include/classes/items/CHelpItems.php:805
 msgid "Returns percentage of lost ICMP ping packets."
@@ -15764,12 +15764,12 @@ msgstr "שירות"
 #: include/classes/api/services/CService.php:683
 #, c-format
 msgid "Service \"%1$s\" cannot have problem tags and children at the same time."
-msgstr ""
+msgstr "לשירות „%1$s” לא יכולות להיות תגיות תקלה וצאצאים בו־זמנית."
 
 #: include/classes/api/services/CService.php:625
 #, c-format
 msgid "Service \"%1$s\" cannot have problem tags with the selected status calculation algorithm."
-msgstr ""
+msgstr "לשירות „%1$s” לא יכולות להיות תגיות תקלה עם אלגוריתם חישוב המצב הנבחר."
 
 #: include/classes/api/services/CService.php:619
 #, c-format
@@ -15779,7 +15779,7 @@ msgstr "השירות „%1$s” לא יכול להציג SLA לאלגוריתם 
 #: include/classes/api/services/CService.php:580
 #, c-format
 msgid "Service \"%1$s\" must have no more than 4 digits after the decimal point."
-msgstr ""
+msgstr "לשירות „%1$s” לא יכולות להיות למעלה מ־4 ספרות אחרי הנקודה העשרונית."
 
 #: include/classes/helpers/CMenuHelper.php:184
 #: include/views/configuration.action.list.php:28
@@ -16718,7 +16718,7 @@ msgstr "סטטיסטיקת מערכת. מחזירה מספר שלם וחיובי
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:639
 msgid "System time. Returns integer with type as UTC; string - with type as local"
-msgstr ""
+msgstr "שעת המערכת. מחזירה מספר שלם וחיובי עם סוג UTC, מחרוזת - כשהסוג הוא מקומי"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:679
@@ -17196,7 +17196,7 @@ msgstr "המשתנה „%1$s” חסר ממאפייני המשתמש."
 
 #: include/classes/core/CJsonRpc.php:177
 msgid "The received JSON is not a valid JSON-RPC request."
-msgstr ""
+msgstr "ה־JSON שהתקבל אינו בקשת JSON-RPC תקנית."
 
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
@@ -18280,7 +18280,7 @@ msgstr "שימוש בבקשות קבוצתיות"
 
 #: app/views/administration.trigdisplay.edit.php:35
 msgid "Use custom event status colors"
-msgstr ""
+msgstr "להשתמש בצבעי אירועים מותאמים אישית"
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -19359,7 +19359,7 @@ msgstr "שדות שגויים עבור קישור המפה."
 #: include/classes/api/services/CMap.php:977
 #: include/classes/api/services/CMap.php:1452
 msgid "Wrong value for \"url\" field."
-msgstr ""
+msgstr "ערך שגוי לשדה „url” (כתובת)."
 
 #: include/views/js/monitoring.sysmaps.js.php:303
 #: include/views/js/monitoring.sysmaps.js.php:436
@@ -19569,7 +19569,7 @@ msgstr "לא נכנסת"
 
 #: app/views/popup.generic.php:90
 msgid "You cannot switch hosts for current selection."
-msgstr ""
+msgstr "לא ניתן להחליף מארחים בבחירה הנוכחית."
 
 #: include/classes/api/services/CAction.php:1808
 #, c-format
@@ -19680,6 +19680,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"לא ניתן להגיע לשרת ה־Zabbix‏ „%1$s”. סיבות אפשריות:\n"
+"1. כתובת IP או DNS שגויות בקובץ „zabbix.conf.php”;\n"
+"2. הגדרות רשת שגויות.\n"
 
 #: app/views/administration.script.edit.php:125
 msgid "Zabbix server (proxy)"
@@ -20263,7 +20266,7 @@ msgstr "cosh()‎ - קוסינוס היפרבולי של ערך"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:514
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
-msgstr ""
+msgstr "cot()‎ - קוטנגנס של ערך, כאשר הערך היא זווית שמבוטאת ברדיאנים"
 
 #: include/graphs.inc.php:82
 msgid "count"
