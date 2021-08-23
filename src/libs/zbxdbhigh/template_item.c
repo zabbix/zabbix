@@ -1500,6 +1500,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 			if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, preproc->item_preprocid);
+				zbx_audit_item_delete_preproc(item->itemid, item->flags, preproc->item_preprocid);
 				continue;
 			}
 
@@ -1542,8 +1543,8 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 						preproc->type, preproc->params, preproc->error_handler,
 						preproc->error_handler_params);
 
-				zbx_audit_discovery_rule_update_json_add_discovery_rule_preproc(item->itemid,
-						new_preprocid, preproc->step, preproc->type, preproc->params,
+				zbx_audit_item_update_json_add_item_preproc(item->itemid, new_preprocid, item->flags,
+						preproc->step, preproc->type, preproc->params,
 						preproc->error_handler, preproc->error_handler_params);
 
 				new_preprocid++;
@@ -1554,7 +1555,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 			if (0 == (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE))
 				continue;
 
-			zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_create_entry(item->itemid,
+			zbx_audit_item_update_json_update_item_preproc_create_entry(item->itemid, item->flags,
 					preproc->item_preprocid);
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_preproc set ");
@@ -1564,7 +1565,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stype=%d", d, preproc->type);
 				d = ",";
 
-				zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_type(item->itemid,
+				zbx_audit_item_update_json_update_item_preproc_type(item->itemid, item->flags,
 						preproc->item_preprocid, preproc->type_orig, preproc->type);
 			}
 
@@ -1578,7 +1579,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 				zbx_free(params_esc);
 				d = ",";
 
-				zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_params(item->itemid,
+				zbx_audit_item_update_json_update_item_preproc_params(item->itemid, item->flags,
 						preproc->item_preprocid, preproc->params_orig, preproc->params);
 			}
 
@@ -1588,8 +1589,8 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 						preproc->error_handler);
 				d = ",";
 
-				zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_error_handler(
-						item->itemid, preproc->item_preprocid, preproc->error_handler_orig,
+				zbx_audit_item_update_json_update_item_preproc_error_handler(item->itemid, item->flags,
+						preproc->item_preprocid, preproc->error_handler_orig,
 						preproc->error_handler);
 			}
 
@@ -1603,8 +1604,8 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 
 				zbx_free(params_esc);
 
-				zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_error_handler_params(
-						item->itemid, preproc->item_preprocid,
+				zbx_audit_item_update_json_update_item_preproc_error_handler_params(item->itemid,
+						item->flags, preproc->item_preprocid,
 						preproc->error_handler_params_orig, preproc->error_handler_params);
 			}
 
@@ -1625,7 +1626,6 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 
 	if (0 != new_preproc_num)
 	{
-		zbx_db_insert_autoincrement(&db_insert, "item_preprocid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}

@@ -359,29 +359,45 @@ void	zbx_audit_discovery_rule_update_json_delete_overrides_conditions(zbx_uint64
 	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
 
-void	zbx_audit_discovery_rule_update_json_add_discovery_rule_preproc(zbx_uint64_t itemid,
-		zbx_uint64_t item_preprocid, int step, int type, const char *params, int error_handler,
-		const char *error_handler_params)
+#define ITEM_RESOURCE_KEY_RESOLVE_PREPROC(resource, nested)							\
+	if (AUDIT_RESOURCE_ITEM == resource_type)								\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "item.preprocessing[" ZBX_FS_UI64 \
+				"]"#nested#resource, preprocid);						\
+	}													\
+	else if (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)						\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "itemprototype.preprocessing["	\
+				ZBX_FS_UI64 "]"#nested#resource, preprocid);				\
+	}													\
+	else if (AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)						\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.preprocessing["	\
+				ZBX_FS_UI64 "]"#resource, preprocid);					\
+	}													\
+	else													\
+		THIS_SHOULD_NEVER_HAPPEN;
+
+void	zbx_audit_item_update_json_add_item_preproc(zbx_uint64_t itemid, zbx_uint64_t preprocid, int item_flags,
+		int step, int type, const char *params, int error_handler, const char *error_handler_params)
 {
-	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_step[AUDIT_DETAILS_KEY_LEN],
+	int	resource_type;
+	char	audit_key_[AUDIT_DETAILS_KEY_LEN], audit_key_step[AUDIT_DETAILS_KEY_LEN],
 		audit_key_type[AUDIT_DETAILS_KEY_LEN], audit_key_params[AUDIT_DETAILS_KEY_LEN],
 		audit_key_error_handler[AUDIT_DETAILS_KEY_LEN], audit_key_error_handler_params[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key, sizeof(audit_key), "discoveryrule.preprocessing[" ZBX_FS_UI64 "]", item_preprocid);
-	zbx_snprintf(audit_key_step, sizeof(audit_key_step),
-			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].step", item_preprocid);
-	zbx_snprintf(audit_key_type, sizeof(audit_key_type),
-			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].type", item_preprocid);
-	zbx_snprintf(audit_key_params, sizeof(audit_key_params),
-			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].params", item_preprocid);
-	zbx_snprintf(audit_key_error_handler, sizeof(audit_key_error_handler),
-			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].error_handler", item_preprocid);
-	zbx_snprintf(audit_key_error_handler_params, sizeof(audit_key_error_handler_params),
-			"discoveryrule.preprocessing[" ZBX_FS_UI64 "].error_handler_params", item_preprocid);
+	resource_type = item_flag_to_resource_type(item_flags);
 
-	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key);
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(,)
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(step, .)
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(type, .)
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(params, .)
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(error_handler, .)
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(error_handler_params, .)
+
+	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_);
 	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, step);
 	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_type, type);
 	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_params, params);
@@ -389,35 +405,54 @@ void	zbx_audit_discovery_rule_update_json_add_discovery_rule_preproc(zbx_uint64_
 	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, error_handler_params);
 }
 
-void	zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_create_entry(zbx_uint64_t itemid,
+void	zbx_audit_item_update_json_update_item_preproc_create_entry(zbx_uint64_t itemid, int item_flags,
 		zbx_uint64_t preprocid)
 {
-	char	audit_key[AUDIT_DETAILS_KEY_LEN];
+	int	resource_type;
+	char	audit_key_[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key, sizeof(audit_key), "discoveryrule.preprocessing[" ZBX_FS_UI64 "]", preprocid);
-	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_UPDATE, audit_key);
+	resource_type = item_flag_to_resource_type(item_flags);
+
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(,)
+
+	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_UPDATE, audit_key_);
 }
 
-#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(resource, type1, type2)					\
-void	zbx_audit_discovery_rule_update_json_update_discovery_rule_preproc_##resource(zbx_uint64_t itemid,	\
+#define PREPARE_AUDIT_ITEM_UPDATE_PREPROC(resource, type1, type2)						\
+void	zbx_audit_item_update_json_update_item_preproc_##resource(zbx_uint64_t itemid, int item_flags,		\
 		zbx_uint64_t preprocid, type1 resource##_old, type1 resource##_new)				\
 {														\
+	int	resource_type;											\
 	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
 														\
 	RETURN_IF_AUDIT_OFF();											\
+	resource_type = item_flag_to_resource_type(item_flags);							\
 														\
-	zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource),					\
-			"discoveryrule.preprocessing[" ZBX_FS_UI64 "]."#resource, preprocid);			\
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(resource,.)							\
 														\
 	zbx_audit_update_json_update_##type2(itemid, audit_key_##resource, resource##_old, resource##_new);	\
 }
-PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(type, int, int)
-PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(params, const char*, string)
-PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(error_handler, int, int)
-PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC(error_handler_params, const char*, string)
-#undef PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_PREPROC
+PREPARE_AUDIT_ITEM_UPDATE_PREPROC(type, int, int)
+PREPARE_AUDIT_ITEM_UPDATE_PREPROC(params, const char*, string)
+PREPARE_AUDIT_ITEM_UPDATE_PREPROC(error_handler, int, int)
+PREPARE_AUDIT_ITEM_UPDATE_PREPROC(error_handler_params, const char*, string)
+#undef PREPARE_AUDIT_ITEM_UPDATE_PREPROC
+
+void	zbx_audit_item_delete_preproc(zbx_uint64_t itemid, int item_flags, zbx_uint64_t preprocid)
+{
+	int	resource_type;
+	char	audit_key_[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = item_flag_to_resource_type(item_flags);
+
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(,)
+
+	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, audit_key_);
+}
 
 #define ITEM_RESOURCE_KEY_RESOLVE(resource, nested)								\
 	if (AUDIT_RESOURCE_ITEM == resource_type)								\
@@ -447,8 +482,8 @@ void	zbx_audit_item_update_json_add_params(zbx_uint64_t itemid, int item_flags, 
 	RETURN_IF_AUDIT_OFF();
 	resource_type = item_flag_to_resource_type(item_flags);
 
-	ITEM_RESOURCE_KEY_RESOLVE(name, ".")
-	ITEM_RESOURCE_KEY_RESOLVE(value, ".")
+	ITEM_RESOURCE_KEY_RESOLVE(name, .)
+	ITEM_RESOURCE_KEY_RESOLVE(value, .)
 
 	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_name, name);
 	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
@@ -464,7 +499,7 @@ void	zbx_audit_item_update_json_update_params_##resource(zbx_uint64_t itemid, in
 	RETURN_IF_AUDIT_OFF();											\
 														\
 	resource_type = item_flag_to_resource_type(item_flags);							\
-	ITEM_RESOURCE_KEY_RESOLVE(resource, ".")								\
+	ITEM_RESOURCE_KEY_RESOLVE(resource, .)								\
 														\
 	zbx_audit_update_json_update_string(itemid, audit_key_##resource, resource##_orig, resource);		\
 }
