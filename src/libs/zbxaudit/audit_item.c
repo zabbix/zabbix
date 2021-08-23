@@ -276,7 +276,7 @@ void	DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	id, flags;
+	zbx_uint64_t	id;
 
 	result = DBselect("%s", sql);
 
@@ -284,8 +284,7 @@ void	DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids)
 	{
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
-		ZBX_STR2UINT64(flags, row[2]);
-		zbx_audit_item_create_entry_for_delete(id, row[1], item_flag_to_resource_type(flags));
+		zbx_audit_item_create_entry_for_delete(id, row[1], item_flag_to_resource_type(atoi(row[2])));
 	}
 	DBfree_result(result);
 
