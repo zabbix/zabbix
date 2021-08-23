@@ -1915,7 +1915,6 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 
 	if (0 != new_param_num)
 	{
-		zbx_db_insert_autoincrement(&db_insert, "item_parameterid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
