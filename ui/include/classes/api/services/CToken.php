@@ -450,7 +450,7 @@ class CToken extends CApiService {
 		}
 
 		$db_tokens = $this->get([
-			'output' => ['tokenid', 'name'],
+			'output' => [],
 			'tokenids' => $tokenids,
 			'preservekeys' => true
 		]);
@@ -458,6 +458,12 @@ class CToken extends CApiService {
 		if (count($db_tokens) != count($tokenids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
+		$db_tokens = DB::select('token', [
+			'output' => ['tokenid', 'name', 'token'],
+			'tokenids' => array_keys($db_tokens),
+			'preservekeys' => true
+		]);
 
 		$response = [];
 		$upd_tokens = [];
