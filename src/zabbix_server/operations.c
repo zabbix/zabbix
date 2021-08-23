@@ -431,6 +431,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				zbx_free(sql);
 
 				make_hostname(host_visible);	/* replace not-allowed symbols */
+				zbx_free(hostname);
 				hostname = DBget_unique_hostname_by_sample(host_visible, "name");
 				zbx_free(host_visible);
 
@@ -559,7 +560,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 			if (NULL == (row2 = DBfetch(result2)))
 			{
 				hostid = DBget_maxid("hosts");
-				hostname = zbx_strdup(NULL, row[1]);
+				hostname = zbx_strdup(hostname, row[1]);
 				*status = HOST_STATUS_MONITORED;
 
 				if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
@@ -607,7 +608,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 			{
 				ZBX_STR2UINT64(hostid, row2[0]);
 				ZBX_DBROW2UINT64(host_proxy_hostid, row2[1]);
-				hostname = zbx_strdup(NULL, row2[2]);
+				hostname = zbx_strdup(hostname, row2[2]);
 				*status = atoi(row2[3]);
 
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, hostname);
