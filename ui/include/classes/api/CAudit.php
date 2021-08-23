@@ -197,7 +197,7 @@ class CAudit {
 		}
 
 		if (!array_key_exists('conditions', self::MASKED_PATHS[$resource])) {
-			return in_array($path, self::MASKED_PATHS[$resource]);
+			return in_array($path, self::MASKED_PATHS[$resource]['paths']);
 		}
 
 		if (in_array($path, self::MASKED_PATHS[$resource])) {
@@ -243,7 +243,7 @@ class CAudit {
 				$object_path = preg_replace('/\[[0-9]+\]/', '', $object_path);
 			}
 
-			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[$object_path];
+			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[$resource][$object_path];
 		}
 
 		$schema_fields = DB::getSchema($table_name)['fields'];
@@ -281,14 +281,14 @@ class CAudit {
 			}
 
 			if (self::isValueToMask($resource, $path, $object)) {
-				$result = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
+				$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
 			}
 			else {
-				$result = [self::DETAILS_ACTION_ADD, $value];
+				$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 			}
 		}
 
-		return $object;
+		return $result;
 	}
 
 	private static function handleUpdate(int $resource, array $object, array $old_object): array {
@@ -323,7 +323,7 @@ class CAudit {
 						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
 					}
 
-					if ($is_value_to_mask || $value != $old_value) {
+					if ($is_value_to_mask) {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
 					} elseif ($value != $old_value) {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $old_value];
