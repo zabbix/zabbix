@@ -25,6 +25,7 @@
 #include "zbxserver.h"
 #include "template.h"
 #include "../../libs/zbxaudit/audit_host.h"
+#include "../../libs/zbxaudit/audit_item.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "../zbxalgo/vectorimpl.h"
