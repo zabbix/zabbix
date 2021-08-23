@@ -1665,6 +1665,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 	zbx_template_item_tag_t		*tag;
 	zbx_vector_uint64_t		deleteids;
 	zbx_db_insert_t			db_insert;
+	zbx_uint64_t			new_tagid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1681,6 +1682,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 			if (0 != (tag->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_TAG_DELETE))
 			{
 				zbx_vector_uint64_append(&deleteids, tag->itemtagid);
+				zbx_audit_item_delete_tag(item->itemid, item->flags, tag->itemtagid);
 				continue;
 			}
 
@@ -1701,7 +1703,10 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_tag_num)
+	{
+		new_tagid = DBget_maxid_num("item_tag", new_tag_num);
 		zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+	}
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -1714,13 +1719,19 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 			tag = (zbx_template_item_tag_t *)item->item_tags.values[j];
 			if (0 == tag->itemtagid)
 			{
-				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), item->itemid, tag->tag, tag->value);
+				zbx_db_insert_add_values(&db_insert, new_tagid, item->itemid, tag->tag, tag->value);
+				zbx_audit_item_update_json_add_item_tag(item->itemid, new_tagid, item->flags, tag->tag,
+						tag->value);
+				new_tagid++;
+
 				continue;
 			}
 
 			if (0 == (tag->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE))
 				continue;
 
+			zbx_audit_item_update_json_update_item_tag_create_entry(item->itemid, item->flags,
+								tag->itemtagid);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_tag set ");
 
 			if (0 != (tag->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_TAG))
@@ -1730,8 +1741,11 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 				tag_esc = DBdyn_escape_string(tag->tag);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stag='%s'", d, tag_esc);
 
-				zbx_free(tag_esc);
 				d = ",";
+				zbx_audit_item_update_json_update_item_tag_tag(item->itemid, item->flags,
+						tag->itemtagid, "", tag_esc);
+				zbx_free(tag_esc);
+
 			}
 
 			if (0 != (tag->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_VALUE))
@@ -1740,6 +1754,8 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 				value_esc = DBdyn_escape_string(tag->value);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
+				zbx_audit_item_update_json_update_item_tag_value(item->itemid, item->flags,
+						tag->itemtagid, "", value_esc);
 
 				zbx_free(value_esc);
 			}
@@ -1762,7 +1778,6 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 	if (0 != new_tag_num)
 	{
-		zbx_db_insert_autoincrement(&db_insert, "itemtagid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}

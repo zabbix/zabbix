@@ -453,6 +453,92 @@ void	zbx_audit_item_delete_preproc(zbx_uint64_t itemid, int item_flags, zbx_uint
 	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, audit_key_);
 }
 
+#define ITEM_RESOURCE_KEY_RESOLVE_TAG(resource, nested)								\
+	if (AUDIT_RESOURCE_ITEM == resource_type)								\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "item.tag[" ZBX_FS_UI64	 \
+				"]"#nested#resource, tagid);						\
+	}													\
+	else if (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)						\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "itemprototype.tag["		\
+				ZBX_FS_UI64 "]"#nested#resource, tagid);					\
+	}													\
+	else if (AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)						\
+	{													\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.tag["		\
+				ZBX_FS_UI64 "]"#resource, tagid);						\
+	}													\
+	else													\
+		THIS_SHOULD_NEVER_HAPPEN;
+
+void	zbx_audit_item_update_json_add_item_tag(zbx_uint64_t itemid, zbx_uint64_t tagid, int item_flags,
+		const char *tag, const char *value)
+{
+	int	resource_type;
+	char	audit_key_[AUDIT_DETAILS_KEY_LEN], audit_key_tag[AUDIT_DETAILS_KEY_LEN],
+		audit_key_value[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = item_flag_to_resource_type(item_flags);
+
+	ITEM_RESOURCE_KEY_RESOLVE_TAG(,)
+	ITEM_RESOURCE_KEY_RESOLVE_TAG(tag, .)
+	ITEM_RESOURCE_KEY_RESOLVE_TAG(value, .)
+
+	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_tag, tag);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+}
+
+void	zbx_audit_item_update_json_update_item_tag_create_entry(zbx_uint64_t itemid, int item_flags,
+		zbx_uint64_t tagid)
+{
+	int	resource_type;
+	char	audit_key_[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = item_flag_to_resource_type(item_flags);
+
+	ITEM_RESOURCE_KEY_RESOLVE_TAG(,)
+
+	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_UPDATE, audit_key_);
+}
+
+#define PREPARE_AUDIT_ITEM_UPDATE_TAG(resource, type1, type2)							\
+void	zbx_audit_item_update_json_update_item_tag_##resource(zbx_uint64_t itemid, int item_flags,		\
+		zbx_uint64_t tagid, type1 resource##_old, type1 resource##_new)					\
+{														\
+	int	resource_type;											\
+	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
+														\
+	RETURN_IF_AUDIT_OFF();											\
+	resource_type = item_flag_to_resource_type(item_flags);							\
+														\
+	ITEM_RESOURCE_KEY_RESOLVE_TAG(resource,.)								\
+														\
+	zbx_audit_update_json_update_##type2(itemid, audit_key_##resource, resource##_old, resource##_new);	\
+}
+PREPARE_AUDIT_ITEM_UPDATE_TAG(tag, const char*, string)
+PREPARE_AUDIT_ITEM_UPDATE_TAG(value, const char*, string)
+#undef PREPARE_AUDIT_ITEM_UPDATE_TAG
+
+void	zbx_audit_item_delete_tag(zbx_uint64_t itemid, int item_flags, zbx_uint64_t tagid)
+{
+	int	resource_type;
+	char	audit_key_[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = item_flag_to_resource_type(item_flags);
+
+	ITEM_RESOURCE_KEY_RESOLVE_TAG(,)
+
+	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, audit_key_);
+}
+
 #define ITEM_RESOURCE_KEY_RESOLVE(resource, nested)								\
 	if (AUDIT_RESOURCE_ITEM == resource_type)								\
 	{													\
