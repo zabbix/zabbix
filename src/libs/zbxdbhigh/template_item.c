@@ -1843,7 +1843,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 	{
 		zbx_db_insert_prepare(&db_insert, "item_parameter", "item_parameterid", "itemid", "name", "value",
 				NULL);
-		item_parameter_id = DBget_maxid_num("item_paramter", new_param_num);
+		item_parameter_id = DBget_maxid_num("item_parameter", new_param_num);
 	}
 
 	for (i = 0; i < items->values_num; i++)
