@@ -425,7 +425,7 @@ class CUser extends CApiService {
 		}
 
 		$this->updateUsersGroups($users, __FUNCTION__, $db_users);
-		$this->updateMedias($users, __FUNCTION__);
+		$this->updateMedias($users, __FUNCTION__, $db_users);
 
 		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
 
@@ -512,27 +512,6 @@ class CUser extends CApiService {
 			'userids' => array_keys($db_users),
 			'preservekeys' => true
 		]);
-
-		// Add medias to db_users object.
-		if (array_column($users, 'medias')) {
-			$media_params = [
-				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
-				'filter' => ['userid' => array_column($users, 'userid')],
-				'preservekeys' => true
-			];
-			$db_medias = DBselect(DB::makeSql('media', $media_params));
-
-			while ($db_media = DBfetch($db_medias)) {
-				$db_media['sendto'] = explode("\n", $db_media['sendto']);
-				$db_users[$db_media['userid']]['medias'][$db_media['mediaid']] = [
-					'mediatypeid' => $db_media['mediatypeid'],
-					'sendto' => $db_media['sendto'],
-					'active' => $db_media['active'],
-					'severity' => $db_media['severity'],
-					'period' => $db_media['period']
-				];
-			}
-		}
 
 		// Get readonly super admin role ID and name.
 		$db_roles = DBfetchArray(DBselect(
@@ -634,6 +613,8 @@ class CUser extends CApiService {
 			}
 		}
 
+		$this->addAffectedObjects($users, $db_users);
+
 		if ($usernames) {
 			$this->checkDuplicates($usernames);
 		}
@@ -645,6 +626,62 @@ class CUser extends CApiService {
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
 		$this->checkHimself($users);
+	}
+
+	/**
+	 * Add the existing medias and user groups to $db_users whether these are affected by the update.
+	 *
+	 * @param array $users
+	 * @param array $db_users
+	 */
+	private function addAffectedObjects(array $users, array &$db_users): void {
+		$userids = ['usrgrps' => [], 'medias' => []];
+
+		foreach ($users as $user) {
+			if (array_key_exists('usrgrps', $user)) {
+				$userids['usrgrps'][] = $user['userid'];
+				$db_users[$user['userid']]['usrgrps'] = [];
+			}
+
+			if (array_key_exists('medias', $user)) {
+				$userids['medias'][] = $user['userid'];
+				$db_users[$user['userid']]['medias'] = [];
+			}
+		}
+
+		if ($userids['usrgrps']) {
+			$options = [
+				'output' => ['id', 'usrgrpid', 'userid'],
+				'filter' => ['userid' => $userids['usrgrps']]
+			];
+			$db_usrgrps = DBselect(DB::makeSql('users_groups', $options));
+
+			while ($db_usrgrp = DBfetch($db_usrgrps)) {
+				$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] = [
+					'id' => $db_usrgrp['id'],
+					'usrgrpid' => $db_usrgrp['usrgrpid']
+				];
+			}
+		}
+
+		if ($userids['medias']) {
+			$options = [
+				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
+				'filter' => ['userid' => $userids['medias']]
+			];
+			$db_medias = DBselect(DB::makeSql('media', $options));
+
+			while ($db_media = DBfetch($db_medias)) {
+				$db_users[$db_media['userid']]['medias'][$db_media['mediaid']] = [
+					'mediaid' => $db_media['mediaid'],
+					'mediatypeid' => $db_media['mediatypeid'],
+					'sendto' => $db_media['sendto'],
+					'active' => $db_media['active'],
+					'severity' => $db_media['severity'],
+					'period' => $db_media['period']
+				];
+			}
+		}
 	}
 
 	/**
@@ -983,101 +1020,64 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update table "users_groups".
+	 * Update table "users_groups" and populate users.usrgrps by "id" property.
 	 *
-	 * @param array       $users
-	 * @param string      $method
-	 * @param null|string $db_users
+	 * @param array      $users
+	 * @param string     $method
+	 * @param null|array $db_users
 	 */
-	private function updateUsersGroups(array &$users, string $method, array &$db_users = null) {
-		$users_groups = [];
-
-		foreach ($users as $user) {
-			if (array_key_exists('usrgrps', $user)) {
-				$users_groups[$user['userid']] = [];
-
-				foreach ($user['usrgrps'] as $usrgrp) {
-					$users_groups[$user['userid']][$usrgrp['usrgrpid']] = true;
-				}
-			}
-		}
-
-		if (!$users_groups) {
-			return;
-		}
-
-		$db_users_groups = ($method === 'update')
-			? DB::select('users_groups', [
-				'output' => ['id', 'usrgrpid', 'userid'],
-				'filter' => ['userid' => array_keys($users_groups)],
-				'preservekeys' => true
-			])
-			: [];
-
+	private function updateUsersGroups(array &$users, string $method, array $db_users = null): void {
 		$ins_users_groups = [];
 		$del_ids = [];
 
-		foreach ($db_users_groups as $db_user_group) {
-			if (array_key_exists($db_user_group['usrgrpid'], $users_groups[$db_user_group['userid']])) {
-				unset($users_groups[$db_user_group['userid']][$db_user_group['usrgrpid']]);
+		foreach ($users as &$user) {
+			if (!array_key_exists('usrgrps', $user)) {
+				continue;
 			}
-			else {
-				$del_ids[] = $db_user_group['id'];
-			}
-		}
 
-		foreach ($users_groups as $userid => $usrgrpids) {
-			foreach (array_keys($usrgrpids) as $usrgrpid) {
-				$ins_users_groups[] = [
-					'userid' => $userid,
-					'usrgrpid' => $usrgrpid
-				];
+			$db_usrgrps = $method === 'update'
+				? array_column($db_users[$user['userid']]['usrgrps'], null, 'usrgrpid')
+				: [];
+
+			foreach ($user['usrgrps'] as &$usrgrp) {
+				if (array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)) {
+					$usrgrp['id'] = $db_usrgrps[$usrgrp['usrgrpid']]['id'];
+					unset($db_usrgrps[$usrgrp['usrgrpid']]);
+				}
+				else {
+					$ins_users_groups[] = [
+						'userid' => $user['userid'],
+						'usrgrpid' => $usrgrp['usrgrpid']
+					];
+				}
 			}
+			unset($usrgrp);
+
+			$del_ids = array_merge($del_ids, array_column($db_usrgrps, 'id'));
+		}
+		unset($user);
+
+		if ($del_ids) {
+			DB::delete('users_groups', ['id' => $del_ids]);
 		}
 
 		if ($ins_users_groups) {
 			$ids = DB::insertBatch('users_groups', $ins_users_groups);
 		}
 
-		if ($del_ids) {
-			DB::delete('users_groups', ['id' => $del_ids]);
-		}
-
-		// Format array for auditlog.
 		foreach ($users as &$user) {
-			$groups = [];
-			if (array_key_exists('usrgrps', $user)) {
-				foreach ($user['usrgrps'] as $usrgrp) {
-					// Check id in db_users_groups.
-					foreach ($db_users_groups as $id => $db_user_group) {
-						if ($db_user_group['usrgrpid'] == $usrgrp['usrgrpid']) {
-							$groups[$id] = ['usrgrpid' => $usrgrp['usrgrpid'], 'userid' => $user['userid']];
-							continue 2;
-						}
-					}
-
-					// Check id in new inserted objects.
-					foreach ($ins_users_groups as $key => $user_group) {
-						if ($user_group['usrgrpid'] == $usrgrp['usrgrpid']) {
-							$groups[$ids[$key]] = ['usrgrpid' => $usrgrp['usrgrpid'], 'userid' => $user['userid']];
-							continue 2;
-						}
-					}
-				}
-
-				$user['usrgrps'] = $groups;
+			if (!array_key_exists('usrgrps', $user)) {
+				continue;
 			}
+
+			foreach ($user['usrgrps'] as &$usrgrp) {
+				if (!array_key_exists('id', $usrgrp)) {
+					$usrgrp['id'] = array_shift($ids);
+				}
+			}
+			unset($usrgrp);
 		}
 		unset($user);
-
-		if ($method === 'update') {
-			foreach ($db_users_groups as $id => $db_user_group) {
-				$db_users[$db_user_group['userid']]['usrgrps'][$id] = [
-					'usrgrpid' => $db_user_group['usrgrpid'],
-					'userid' => $db_user_group['userid']
-				];
-			}
-		}
 	}
 
 	/**
@@ -1100,122 +1100,78 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update table "media".
+	 * Update table "media" and populate users.medias by "mediaid" property. Also this function converts "sendto" to the
+	 * string.
 	 *
-	 * @param array  $users
-	 * @param string $method
+	 * @param array      $users
+	 * @param string     $method
+	 * @param null|array $db_users
 	 */
-	private function updateMedias(array &$users, $method) {
-		$users_medias = [];
-
-		foreach ($users as $user) {
-			if (array_key_exists('medias', $user)) {
-				$users_medias[$user['userid']] = [];
-
-				foreach ($user['medias'] as $media) {
-					$media['sendto'] = implode("\n", $media['sendto']);
-					$users_medias[$user['userid']][] = $media;
-				}
-			}
-		}
-
-		if (!$users_medias) {
-			return;
-		}
-
-		$db_medias = ($method === 'update')
-			? DB::select('media', [
-				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
-				'filter' => ['userid' => array_keys($users_medias)]
-			])
-			: [];
-
+	private function updateMedias(array &$users, string $method, array $db_users = null) {
 		$ins_medias = [];
 		$upd_medias = [];
 		$del_mediaids = [];
-		$upd_indexes = [];
 
-		foreach ($db_medias as $db_media) {
-			$index = $this->getSimilarMedia($users_medias[$db_media['userid']], $db_media['mediatypeid'],
-				$db_media['sendto']
-			);
-
-			if ($index != -1) {
-				$media = $users_medias[$db_media['userid']][$index];
-
-				$upd_media = [];
-
-				if (array_key_exists('active', $media) && $media['active'] != $db_media['active']) {
-					$upd_media['active'] = $media['active'];
-				}
-				if (array_key_exists('severity', $media) && $media['severity'] != $db_media['severity']) {
-					$upd_media['severity'] = $media['severity'];
-				}
-				if (array_key_exists('period', $media) && $media['period'] !== $db_media['period']) {
-					$upd_media['period'] = $media['period'];
-				}
-
-				if ($upd_media) {
-					$upd_medias[] = [
-						'values' => $upd_media,
-						'where' => ['mediaid' => $db_media['mediaid']]
-					];
-				}
-
-				$upd_indexes[$db_media['userid']][] = $index;
+		foreach ($users as &$user) {
+			if (!array_key_exists('medias', $user)) {
+				continue;
 			}
-			else {
-				$del_mediaids[] = $db_media['mediaid'];
+
+			$db_medias = $method === 'update' ? $db_users[$user['userid']]['medias'] : [];
+
+			foreach ($user['medias'] as &$media) {
+				$media['sendto'] = implode("\n", $media['sendto']);
+
+				$index = $this->getSimilarMedia($db_medias, $media['mediatypeid'], $media['sendto']);
+
+				if ($index != -1) {
+					$db_media = $db_medias[$index];
+
+					$upd_media = DB::getUpdatedValues('media', $media, $db_media);
+
+					if ($upd_media) {
+						$upd_medias[] = [
+							'values' => $upd_media,
+							'where' => ['mediaid' => $db_media['mediaid']]
+						];
+					}
+
+					$media['mediaid'] = $db_media['mediaid'];
+					unset($db_medias[$index]);
+				}
+				else {
+					$ins_medias[] = ['userid' => $user['userid']] + $media;
+				}
 			}
+			unset($media);
+
+			$del_mediaids = array_merge($del_mediaids, array_column($db_medias, 'mediaid'));
 		}
+		unset($user);
 
-		foreach ($users_medias as $userid => $medias) {
-			foreach ($medias as $index => $media) {
-				if (!$upd_indexes || !in_array($index, $upd_indexes[$userid])) {
-					$ins_medias[] = ['userid' => $userid] + $media;
-				}
-			}
-		}
-
-		if ($ins_medias) {
-			$ids = DB::insert('media', $ins_medias);
+		if ($del_mediaids) {
+			DB::delete('media', ['mediaid' => $del_mediaids]);
 		}
 
 		if ($upd_medias) {
 			DB::update('media', $upd_medias);
 		}
 
-		if ($del_mediaids) {
-			DB::delete('media', ['mediaid' => $del_mediaids]);
+		if ($ins_medias) {
+			$mediaids = DB::insert('media', $ins_medias);
 		}
 
-		// Format array for auditlog.
 		foreach ($users as &$user) {
-			$medias = [];
-			if (array_key_exists('medias', $user)) {
-				foreach ($user['medias'] as $media) {
-					foreach ($db_medias as $db_media) {
-						$index = $this->getSimilarMedia($users_medias[$user['userid']], $db_media['mediatypeid'],
-							$db_media['sendto']
-						);
-						if ($index != -1) {
-							$medias[$db_media['mediaid']] = $media;
-							continue 2;
-						}
-					}
-
-					foreach ($ins_medias as $key => $user_media) {
-						$user_media['sendto'] = explode("\n", $user_media['sendto']);
-						$index = $this->getSimilarMedia([$media], $user_media['mediatypeid'], $user_media['sendto']);
-						if ($index != -1) {
-							$medias[$ids[$key]] = $media;
-							continue 2;
-						}
-					}
-				}
-
-				$user['medias'] = $medias;
+			if (!array_key_exists('medias', $user)) {
+				continue;
 			}
+
+			foreach ($user['medias'] as &$media) {
+				if (!array_key_exists('mediaid', $media)) {
+					$media['mediaid'] = array_shift($mediaids);
+				}
+			}
+			unset($media);
 		}
 		unset($user);
 	}
