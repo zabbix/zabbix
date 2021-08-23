@@ -615,6 +615,12 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 				service->propagation_value = service_local.propagation_value;
 				update = 1;
 			}
+
+			if (service->weight != service_local.weight)
+			{
+				service->weight = service_local.weight;
+				update = 1;
+			}
 		}
 
 		service->revision = revision;
