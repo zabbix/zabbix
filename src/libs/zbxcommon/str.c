@@ -3058,17 +3058,17 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
  * Parameters:                                                                *
  *     context     - [IN] the macro context                                   *
  *     force_quote - [IN] if non zero then context quoting is enforced        *
+ *     error       - [OUT] the error message                                  *
  *                                                                            *
  * Return value:                                                              *
- *     A string containing quoted macro context. This string must be freed by *
- *     the caller.                                                            *
+ *     A string containing quoted macro context on success, NULL on error.    *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
+char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error)
 {
 	int		len, quotes = 0;
 	char		*buffer, *ptr_buffer;
-	const char	*ptr_context = context;
+	const char	*ptr_context = context, *start = context;
 
 	if ('"' == *ptr_context || ' ' == *ptr_context)
 		force_quote = 1;
@@ -3096,6 +3096,13 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 			*ptr_buffer++ = '\\';
 
 		*ptr_buffer++ = *context++;
+	}
+
+	if ('\\' == *(ptr_buffer - 1))
+	{
+		*error = zbx_dsprintf(*error, "quoted context \"%s\" cannot end with '\\' character", start);
+		zbx_free(buffer);
+		return NULL;
 	}
 
 	*ptr_buffer++ = '"';
