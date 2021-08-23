@@ -197,5 +197,6 @@
 
 		window.host_page = new hostPage();
 		window.host_page.start();
+		host_popup.init();
 	});
 </script>
