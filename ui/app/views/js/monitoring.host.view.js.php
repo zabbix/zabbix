@@ -190,8 +190,6 @@
 				}
 			},
 			start: function() {
-				host_popup.init();
-
 				this.running = true;
 				this.refresh();
 			}

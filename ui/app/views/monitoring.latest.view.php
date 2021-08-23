@@ -115,9 +115,6 @@ $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key
 $widget->show();
 
 // Initialize page refresh.
-(new CScriptTag('
-	latest_page.start();
-	host_popup.init();
-'))
+(new CScriptTag('latest_page.start();'))
 	->setOnDocumentReady()
 	->show();

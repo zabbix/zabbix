@@ -41,7 +41,7 @@ const host_popup = {
 			element.addEventListener('click', (e) => {
 				const node = e.target,
 					host_data = (typeof node.dataset.hostgroups !== 'undefined')
-						? { groupids: JSON.parse(node.dataset.hostgroups) }
+						? {groupids: JSON.parse(node.dataset.hostgroups)}
 						: {},
 					url = new Curl('zabbix.php', false);
 
@@ -51,25 +51,14 @@ const host_popup = {
 			});
 		});
 
-		document.addEventListener('click', (e) => {
-			let node = e.target,
-				hostid = null;
-
-			if (!node.classList.contains(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)) {
-				return;
-			}
-
-			if (typeof node.hostid !== 'undefined' && typeof node.dataset.hostid !== 'undefined') {
-				hostid = node.dataset.hostid;
-			}
-			else {
-				hostid = new Curl(node.href).getArgument('hostid')
-			}
-
-			e.preventDefault();
-			this.edit({hostid});
-			history.pushState({}, '', node.getAttribute('href'));
-		}, {capture: true});
+		document.querySelectorAll('.' + ZBX_STYLE_ZABBIX_HOST_POPUPEDIT).forEach((element) => {
+			element.addEventListener('click', (e) => {
+				const url = new Curl(e.target.href, false);
+				this.edit({hostid: url.getArgument('hostid')});
+				history.pushState({}, '', url.getUrl());
+				e.preventDefault();
+			});
+		});
 	},
 
 	/**

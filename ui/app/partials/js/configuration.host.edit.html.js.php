@@ -131,11 +131,10 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 			this.setVisibleNamePlaceholder(host_field.value);
 		},
 
-
 		/**
 		 * Updates visible name placeholder.
 		 *
-		 * @param {string} placeholder Text to display as default host alias.
+		 * @param {string} placeholder  Text to display as default host alias.
 		 */
 		setVisibleNamePlaceholder(placeholder) {
 			document.getElementById('visiblename').placeholder = placeholder;

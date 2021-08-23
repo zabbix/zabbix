@@ -122,7 +122,7 @@ class CControllerHostEdit extends CController {
 			else {
 				$data['tableTitles'] = getHostInventories();
 				$data['tableTitles'] = zbx_toHash($data['tableTitles'], 'db_field');
-				$inventoryFields = array_keys($data['tableTitles']);
+				$inventory_fields = array_keys($data['tableTitles']);
 
 				$this->host = API::Host()->get([
 					'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
@@ -135,7 +135,7 @@ class CControllerHostEdit extends CController {
 					'selectInterfaces' => ['interfaceid', 'type', 'available', 'error', 'details', 'ip', 'dns', 'port',
 						'useip'
 					],
-					'selectInventory' => $inventoryFields,
+					'selectInventory' => $inventory_fields,
 					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
 					'selectParentTemplates' => ['templateid', 'name'],
 					'selectTags' => ['tag', 'value'],
