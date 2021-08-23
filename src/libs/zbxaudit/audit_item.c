@@ -233,6 +233,61 @@ PREPARE_AUDIT_ITEM_UPDATE(discover,		int,		int)
 #undef ONLY_LLD_RULE
 #undef IT_OR_ITP
 
+static void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, char *name, int resource_type)
+{
+	zbx_audit_entry_t	local_audit_item_entry, **found_audit_item_entry;
+	zbx_audit_entry_t	*local_audit_item_entry_x = &local_audit_item_entry;
+
+	RETURN_IF_AUDIT_OFF();
+
+	local_audit_item_entry.id = id;
+
+	found_audit_item_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
+			&(local_audit_item_entry_x));
+	if (NULL == found_audit_item_entry)
+	{
+		zbx_audit_entry_t	*local_audit_item_entry_insert;
+
+		local_audit_item_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
+		local_audit_item_entry_insert->id = id;
+		local_audit_item_entry_insert->name = zbx_strdup(NULL, name);
+		local_audit_item_entry_insert->audit_action = AUDIT_ACTION_DELETE;
+		local_audit_item_entry_insert->resource_type = resource_type;
+
+		zbx_json_init(&(local_audit_item_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_item_entry_insert,
+				sizeof(local_audit_item_entry_insert));
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBselect_for_item                                                *
+ *                                                                            *
+ * Parameters: sql - [IN] sql statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ ******************************************************************************/
+void	DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id, flags;
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+		zbx_vector_uint64_append(ids, id);
+		ZBX_STR2UINT64(flags, row[2]);
+		zbx_audit_item_create_entry_for_delete(id, row[1], item_flag_to_resource_type(flags));
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
 void	zbx_audit_discovery_rule_update_json_add_overrides_conditions(zbx_uint64_t itemid,
 		zbx_uint64_t item_conditionid, zbx_uint64_t op, const char *macro, const char *value)
 {

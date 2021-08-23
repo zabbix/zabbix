@@ -82,6 +82,8 @@ PREPARE_AUDIT_ITEM_UPDATE_H(verify_host, int, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(allow_traps, int, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(discover, int, int)
 
+void	DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids);
+
 void	zbx_audit_discovery_rule_update_json_add_overrides_conditions(zbx_uint64_t itemid,
 		zbx_uint64_t item_conditionid, zbx_uint64_t op, const char *macro, const char *value);
 
