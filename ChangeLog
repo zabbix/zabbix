@@ -3354,8 +3354,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.33rc1
 
-New features:
-
 Bug fixes:
 A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
