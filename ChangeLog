@@ -42,6 +42,7 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+.......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
 A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ........S. [ZBX-19745] fixed Zabbix server exiting when quoted user macro context ends with backslash (vso)
 ........S. [ZBX-19797] fixed action command operation execution with oracle backend (wiper)
