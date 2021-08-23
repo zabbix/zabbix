@@ -151,7 +151,6 @@
 				{
 					title: <?= json_encode(_('Ok')) ?>,
 					cancel: true,
-					class: '<?= ZBX_STYLE_BTN_ALT ?>',
 					action: () => true
 				}
 			]
