@@ -307,23 +307,8 @@ class CToken extends CApiService {
 		$upd_tokens = [];
 		foreach ($tokens as $token) {
 			$db_token = $db_tokens[$token['tokenid']];
-			$upd_token = [];
 
-			if (array_key_exists('name', $token) && $token['name'] !== $db_token['name']) {
-				$upd_token['name'] = $token['name'];
-			}
-
-			if (array_key_exists('description', $token) && $token['description'] !== $db_token['description']) {
-				$upd_token['description'] = $token['description'];
-			}
-
-			if (array_key_exists('status', $token) && $token['status'] != $db_token['status']) {
-				$upd_token['status'] = $token['status'];
-			}
-
-			if (array_key_exists('expires_at', $token) && $token['expires_at'] != $db_token['expires_at']) {
-				$upd_token['expires_at'] = $token['expires_at'];
-			}
+			$upd_token = DB::getUpdatedValues('token', $token, $db_token);
 
 			if ($upd_token) {
 				$upd_tokens[] = [
