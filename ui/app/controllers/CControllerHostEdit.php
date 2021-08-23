@@ -412,7 +412,7 @@ class CControllerHostEdit extends CController {
 
 			if ($secrets_reset) {
 				CMessageHelper::addError(
-					_('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
+					_('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.')
 				);
 			}
 
