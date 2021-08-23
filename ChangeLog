@@ -42,6 +42,7 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+.......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
 A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ........S. [ZBX-19745] fixed Zabbix server exiting when quoted user macro context ends with backslash (vso)
 ........S. [ZBX-19797] fixed action command operation execution with oracle backend (wiper)
@@ -188,6 +189,7 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6569] improved performance of graphs and graphs
 A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 
 Bug fixes:
+.......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
 A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ........S. [ZBX-19745] fixed Zabbix server exiting when quoted user macro context ends with backslash (vso)
 ........S. [ZBX-19797] fixed action command operation execution with oracle backend (wiper)
@@ -1164,6 +1166,7 @@ New features:
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
 A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ........S. [ZBX-19658] added query batching when reading event data during maintenance processing (wiper)
 .........T [ZBX-19562] removed the "Oracle by ODBC" and "Asterisk by HTTP" from templates.tmpl file (abakaldin)
@@ -3350,8 +3353,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 
 --------------------------------------------------------------------------------
 Changes for 4.0.33rc1
-
-New features:
 
 Bug fixes:
 A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
