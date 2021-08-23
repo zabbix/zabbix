@@ -199,7 +199,7 @@ class CToken extends CApiService {
 			$token['tokenid'] = $tokenids[$index];
 		});
 
-		$this->addAuditLog(CAudit::RESOURCE_AUTH_TOKEN, CAudit::ACTION_ADD, $tokens);
+		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_AUTH_TOKEN, $tokens);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -335,7 +335,7 @@ class CToken extends CApiService {
 
 		if ($upd_tokens) {
 			DB::update('token', $upd_tokens);
-			$this->addAuditLog(CAudit::RESOURCE_AUTH_TOKEN, CAudit::ACTION_UPDATE, $tokens, $db_tokens);
+			$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $tokens, $db_tokens);
 		}
 
 		return ['tokenids' => array_column($tokens, 'tokenid')];
@@ -439,7 +439,7 @@ class CToken extends CApiService {
 
 		DB::delete('token', ['tokenid' => $tokenids]);
 
-		$this->addAuditLog(CAudit::RESOURCE_AUTH_TOKEN, CAudit::ACTION_DELETE, $db_tokens);
+		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_AUTH_TOKEN, $db_tokens);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -490,7 +490,7 @@ class CToken extends CApiService {
 
 		DB::update('token', $upd_tokens);
 
-		$this->addAuditLog(CAudit::RESOURCE_AUTH_TOKEN, CAudit::ACTION_UPDATE, $response, $db_tokens);
+		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $response, $db_tokens);
 
 		return $response;
 	}

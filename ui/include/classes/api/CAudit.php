@@ -102,7 +102,7 @@ class CAudit {
 		['path' => self::RESOURCES_API_NAME[self::RESOURCE_USER].'.passwd']
 	];
 
-	public static function log(string $userid, string $ip, string $username, int $resource, int $action, array $objects,
+	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,
 			?array $old_objects): void {
 		if (!self::isAuditEnabled() && ($resource != self::RESOURCE_SETTINGS
 					|| !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {

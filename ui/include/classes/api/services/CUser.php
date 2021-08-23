@@ -270,7 +270,7 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__);
 		$this->updateMedias($users, __FUNCTION__);
 
-		$this->addAuditLog(CAudit::RESOURCE_USER, CAudit::ACTION_ADD, $users);
+		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
 
 		return ['userids' => $userids];
 	}
@@ -427,7 +427,7 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__, $db_users);
 		$this->updateMedias($users, __FUNCTION__);
 
-		$this->addAuditLog(CAudit::RESOURCE_USER, CAudit::ACTION_UPDATE, $users, $db_users);
+		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
 
 		return ['userids' => array_column($users, 'userid')];
 	}
@@ -1237,7 +1237,7 @@ class CUser extends CApiService {
 		]);
 		DB::delete('users', ['userid' => $userids]);
 
-		$this->addAuditLog(CAudit::RESOURCE_USER, CAudit::ACTION_DELETE, $db_users);
+		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
 
 		return ['userids' => $userids];
 	}
