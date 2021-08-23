@@ -300,11 +300,21 @@ class CControllerAuditLogList extends CController {
 			}
 
 			$details = $this->formatDetails($details);
+			$short_details =  array_slice($details, 0, 2);
+
+			// We cut string and show "Details" button if audit detail string more than 255 symbols.
+			foreach ($short_details as &$detail) {
+				if (mb_strlen($detail) > 255) {
+					$detail = mb_substr($detail, 0, 252).'...';
+					$auditlog['details_button'] = 1;
+				}
+			}
+			unset($detail);
 
 			$auditlog['details'] = implode("\n", $details);
-			$auditlog['short_details'] .= implode("\n", array_slice($details, 0, 2));
+			$auditlog['short_details'] .= implode("\n", $short_details);
 
-			if (count($details) > 2) {
+			if (!$auditlog['details_button'] && count($details) > 2) {
 				$auditlog['details_button'] = 1;
 			}
 		}
