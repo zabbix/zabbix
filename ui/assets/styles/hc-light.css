@@ -6441,7 +6441,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .audit-details-wrapper {
   display: flex;
   justify-content: space-between; }
-  .audit-details-wrapper .audit-show-details-bttn-wrapper {
+  .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
 
 .sidebar .logo:focus .sidebar-logo {
