@@ -280,25 +280,22 @@ class CAudit {
 		return substr($path, 0, strrpos($path, '.'));
 	}
 
-	private static function getNestedObjects(array $keys): array {
-		$object_keys = [];
+	private static function getNestedObjectsPaths(array $object): array {
+		$paths = [];
 
-		foreach ($keys as $key) {
-			if (strrpos($key, ']') === false) {
+		foreach ($object as $path => $foo) {
+			if (!self::isNestedObjectProperty($path)) {
 				continue;
 			}
 
-			$key = self::getLastObjectPath($key);
+			$object_path = self::getLastObjectPath($path);
 
-			if (array_key_exists($key, $object_keys)) {
-				$object_keys[$key]++;
-			}
-			else {
-				$object_keys[$key] = 1;
+			if (!in_array($object_path, $paths)) {
+				$paths[] = $object_path;
 			}
 		}
 
-		return $object_keys;
+		return $paths;
 	}
 
 	private static function handleAdd(int $resource, array $object): array {
@@ -327,22 +324,22 @@ class CAudit {
 	private static function handleUpdate(int $resource, array $object, array $db_object): array {
 		$result = [];
 		$full_object = $object + $db_object;
-		$nested_objects = self::getNestedObjects(array_keys($object));
-		$db_nested_objects = self::getNestedObjects(array_keys($db_object));
+		$nested_objects_paths = self::getNestedObjectsPaths($object);
+		$db_nested_objects_paths = self::getNestedObjectsPaths($db_object);
 
-		foreach (array_keys($db_nested_objects) as $path) {
-			if (!array_key_exists($path, $nested_objects)) {
+		foreach ($db_nested_objects_paths as $path) {
+			if (!in_array($path, $nested_objects_paths)) {
 				$result[$path] = [self::DETAILS_ACTION_DELETE];
 			}
 		}
 
-		foreach (array_keys($nested_objects) as $path) {
-			if (!array_key_exists($path, $db_nested_objects)) {
+		foreach ($nested_objects_paths as $path) {
+			if (!in_array($path, $db_nested_objects_paths)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD];
 			}
 		}
 
-		foreach (array_keys($object) as $path) {
+		foreach ($object as $path => $foo) {
 			$value = array_key_exists($path, $object) ? $object[$path] : null;
 			$db_value = array_key_exists($path, $db_object) ? $db_object[$path] : null;
 
