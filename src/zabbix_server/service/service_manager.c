@@ -1673,6 +1673,9 @@ int	service_get_rule_status(const zbx_service_t *service, const zbx_service_rule
 		case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
 			status_limit = rule->limit_status + 1;
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
 	}
 
 	service_get_children_by_status(service, status_limit, &children, &total_weight, &total_num);
