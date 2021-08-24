@@ -189,10 +189,10 @@ class CService extends CApiService {
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_problem_tag', 'value'), 'default' => DB::getDefault('service_problem_tag', 'value')]
 			]],
 			'parents' =>			['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
-				'serviceid' =>			['type' => API_ID]
+				'serviceid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'children' =>			['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
-				'serviceid' =>			['type' => API_ID]
+				'serviceid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'times' =>				['type' => API_OBJECTS, 'uniq' => [['type', 'ts_from', 'ts_to']], 'fields' => [
 				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_TIME_TYPE_UPTIME, SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_ONETIME_DOWNTIME])],
@@ -298,10 +298,10 @@ class CService extends CApiService {
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('service_problem_tag', 'value'), 'default' => DB::getDefault('service_problem_tag', 'value')]
 			]],
 			'parents' =>			['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
-				'serviceid' =>			['type' => API_ID]
+				'serviceid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'children' =>			['type' => API_OBJECTS, 'uniq' => [['serviceid']], 'fields' => [
-				'serviceid' =>			['type' => API_ID]
+				'serviceid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'times' =>				['type' => API_OBJECTS, 'uniq' => [['type', 'ts_from', 'ts_to']], 'fields' => [
 				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_TIME_TYPE_UPTIME, SERVICE_TIME_TYPE_DOWNTIME, SERVICE_TIME_TYPE_ONETIME_DOWNTIME])],
