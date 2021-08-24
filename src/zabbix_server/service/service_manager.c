@@ -1554,7 +1554,7 @@ int	service_get_main_status(const zbx_service_t *service)
 				}
 
 				if (status < child_status)
-					status = child->status;
+					status = child_status;
 			}
 			break;
 		case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE:
