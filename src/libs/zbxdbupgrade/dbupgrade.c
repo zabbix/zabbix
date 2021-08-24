@@ -169,6 +169,7 @@ static zbx_oracle_column_type_t	zbx_oracle_column_type(unsigned char field_type)
 		case ZBX_TYPE_UINT:
 			return ZBX_ORACLE_COLUMN_TYPE_NUMERIC;
 		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_TEXT:
 			return ZBX_ORACLE_COLUMN_TYPE_CHARACTER;
@@ -194,6 +195,7 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 		{
 			case ZBX_TYPE_BLOB:
 			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 				/* MySQL: BLOB and TEXT columns cannot be assigned a default value */
