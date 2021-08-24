@@ -136,100 +136,86 @@ $form_grid
 		)
 	)
 	->addItem([
-		new CLabel(_('Read-write access to services'), 'service-rw-access'),
+		new CLabel(_('Read-write access to services'), 'service-write-access'),
 		new CFormField(
-			(new CRadioButtonList('service_rw_access', (int) $data['rules']['service_rw_access']))
-				->setId('service-rw-access')
-				->addClass('js-service-rw-access')
-				->addValue(_('None'), 0)
-				->addValue(_('All'), 1)
-				->addValue(_('Services list'), 2)
+			(new CRadioButtonList('service_write_access', (int) $data['service_write_access']))
+				->setId('service-write-access')
+				->addValue(_('None'), CRoleHelper::SERVICES_ACCESS_NONE)
+				->addValue(_('All'), CRoleHelper::SERVICES_ACCESS_ALL)
+				->addValue(_('Service list'), CRoleHelper::SERVICES_ACCESS_LIST)
 				->setModern(true)
 				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
 		)
 	])
 	->addItem(
-		new CFormField(
+		(new CFormField(
 			(new CMultiSelect([
-				'name' => 'rw_access_services[]',
+				'name' => 'service_write_list[]',
 				'object_name' => 'services',
-				'data' => $data['rules'][CRoleHelper::SECTION_API],
-				'disabled' => $data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'services',
-						'srcfld1' => 'name',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => zbx_formatDomId('services'.'[]'),
-						'user_type' => $data['type'],
-						'disable_selected' => true
-					]
-				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->addClass('js-rw-access-services-ms')
-		)
+				'data' => CArrayHelper::renameObjectsKeys($data['service_write_list'], ['serviceid' => 'id']),
+				'custom_select' => true
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))
+			->addClass('js-service-write-access')
+			->addStyle('display: none;')
 	)
 	->addItem([
-		new CLabel(_('Read-write access to services with tag'), 'service-rw-tag-name'),
-		new CFormField(
+		(new CLabel(_('Read-write access to services with tag'), 'service-write-tag-tag'))
+			->addClass('js-service-write-access')
+			->addStyle('display: none;'),
+		(new CFormField(
 			new CHorList([
-				(new CTextBox('service_rw_tag_name'))
-					->setId('service-rw-tag-name')
+				(new CTextBox('service_write_tag_tag'))
+					->setId('service-write-tag-tag')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_rw_tag_value'))
+				(new CTextBox('service_write_tag_value'))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			]))
+			])))
+				->addClass('js-service-write-access')
+				->addStyle('display: none;')
 	])
 	->addItem([
-		new CLabel(_('Read-write access to services'), 'service-r-access'),
+		new CLabel(_('Read-only access to services'), 'service-read-access'),
 		new CFormField(
-			(new CRadioButtonList('service_r_access', (int) $data['rules']['service_r_access']))
-				->setId('service-r-access')
-				->addClass('js-service-r-access')
-				->addValue(_('None'), 0)
-				->addValue(_('All'), 1)
-				->addValue(_('Services list'), 2)
+			(new CRadioButtonList('service_read_access', (int) $data['service_read_access']))
+				->setId('service-read-access')
+				->addValue(_('None'), CRoleHelper::SERVICES_ACCESS_NONE)
+				->addValue(_('All'), CRoleHelper::SERVICES_ACCESS_ALL)
+				->addValue(_('Service list'), CRoleHelper::SERVICES_ACCESS_LIST)
 				->setModern(true)
 				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
 		)
 	])
 	->addItem(
-		new CFormField(
+		(new CFormField(
 			(new CMultiSelect([
-				'name' => 'r_access_services[]',
+				'name' => 'service_read_list[]',
 				'object_name' => 'services',
-				'data' => $data['rules'][CRoleHelper::SECTION_API],
-				'disabled' => $data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'services',
-						'srcfld1' => 'name',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => zbx_formatDomId('services'.'[]'),
-						'user_type' => $data['type'],
-						'disable_selected' => true
-					]
-				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->addClass('js-r-access-services-ms')
-		)
+				'data' => CArrayHelper::renameObjectsKeys($data['service_read_list'], ['serviceid' => 'id']),
+				'custom_select' => true
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))
+			->addClass('js-service-read-access')
+			->addStyle('display: none;')
 	)
 	->addItem([
-		new CLabel(_('Read-only access to services with tag'), 'service-r-tag-name'),
-		new CFormField(
+		(new CLabel(_('Read-only access to services with tag'), 'service-read-tag-tag'))
+			->addClass('js-service-read-access')
+			->addStyle('display: none;'),
+		(new CFormField(
 			new CHorList([
-				(new CTextBox('service_r_tag_name'))
-					->setId('service-r-tag-name')
+				(new CTextBox('service_read_tag_tag'))
+					->setId('service-read-tag-tag')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_r_tag_value'))
+				(new CTextBox('service_read_tag_value'))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			]))
+			])))
+			->addClass('js-service-read-access')
+			->addStyle('display: none;')
 	]);
 
 $form_grid->addItem(

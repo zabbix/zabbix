@@ -224,7 +224,7 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-			title: <?= json_encode(_('Add child services')); ?>,
+			title: <?= json_encode(_('Add child services')) ?>,
 			exclude_serviceids
 		}, 'services', document.activeElement);
 
@@ -247,7 +247,7 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-			title: <?= json_encode(_('Add parent services')); ?>,
+			title: <?= json_encode(_('Add parent services')) ?>,
 			exclude_serviceids
 		}, 'services', document.activeElement);
 

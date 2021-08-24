@@ -85,7 +85,15 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'modules' => 'array',
 			'api_access' => 'in 0,1',
 			'api_mode' => 'in 0,1',
-			'api_methods' => 'array'
+			'api_methods' => 'array',
+			'service_read_access' => 'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
+			'service_read_list' => 'array_db services.serviceid',
+			'service_read_tag_tag' => 'string',
+			'service_read_tag_value' => 'string',
+			'service_write_access' => 'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
+			'service_write_list' => 'array_db services.serviceid',
+			'service_write_tag_tag' => 'string',
+			'service_write_tag_value' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -127,6 +135,22 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		$actions_labels = CRoleHelper::getActionsLabels(USER_TYPE_SUPER_ADMIN);
 		$module_labels = $this->getModulesLabels();
 
+		// TODO get values from API
+		$db_services = [
+			'services.read.mode' => 1 ,// ZBX_ROLE_RULE_SERVICES_ACCESS_ALL,
+			'services.read.list' => [],
+			'services.read.tag' => [
+				'tag' => '',
+				'value' => '',
+			],
+			'services.write.mode' => 0, // ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM,
+			'services.write.list' => [],
+			'services.write.tag' => [
+				'tag' => '',
+				'value' => '',
+			]
+		];
+
 		$data = [
 			'roleid' => 0,
 			'name' => $db_defaults['name'],
@@ -145,10 +169,34 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$data['name'] = $this->role['name'];
 			$data['type'] = $this->role['type'];
 			$data['readonly'] = (bool) $this->role['readonly'];
+
+			$data['service_read_access'] = self::getServiceAccessByAccessParams($db_services['services.read.mode'],
+				$db_services['services.read.list'], $db_services['services.read.tag']
+			);
+			$data['service_read_list'] = $db_services['services.read.list'];
+			$data['service_read_tag'] = $db_services['services.read.tag'];
+
+			$data['service_write_access'] = self::getServiceAccessByAccessParams($db_services['services.write.mode'],
+				$db_services['services.write.list'], $db_services['services.write.tag']
+			);
+			$data['service_write_list'] = $db_services['services.write.list'];
+			$data['service_write_tag'] = $db_services['services.write.tag'];
 		}
 		else {
 			// The input value will be set in case of read-only role cloning.
 			$data['type'] = $this->getInput('type', $data['type']);
+			$data['service_read_access'] = CRoleHelper::SERVICES_ACCESS_ALL;
+			$data['service_read_list'] = [];
+			$data['service_read_tag'] = [
+				'tag' => '',
+				'value' => ''
+			];
+			$data['service_write_access'] = CRoleHelper::SERVICES_ACCESS_NONE;
+			$data['service_write_list'] = [];
+			$data['service_write_tag'] = [
+				'tag' => '',
+				'value' => ''
+			];
 		}
 
 		$data['rules'] = [

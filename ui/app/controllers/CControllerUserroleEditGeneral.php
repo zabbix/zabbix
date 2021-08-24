@@ -62,8 +62,8 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	}
 
 	protected function getModuleSectionRules(): array {
-		$moduelids = $this->getModuleIds();
-		if (!$moduelids) {
+		$moduleids = $this->getModuleIds();
+		if (!$moduleids) {
 			return [];
 		}
 
@@ -74,7 +74,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 					'moduleid' => $moduleid,
 					'status' => $modules[$moduleid]
 				];
-			}, $moduelids)
+			}, $moduleids)
 		];
 	}
 
@@ -217,6 +217,37 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			}
 		}
 
+		// Overwrite Services section.
+		if ($this->hasInput('service_read_access')) {
+			$data['service_read_access'] = $this->getInput('service_read_access');
+		}
+
+		if ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
+			if ($this->hasInput('service_read_list')) {
+				$data['service_read_list'] = $this->getInput('service_read_list');
+			}
+
+			if ($this->hasInput('service_read_tag_tag')) {
+				$data['service_read_tag_tag'] = $this->getInput('service_read_tag_tag');
+				$data['service_read_tag_value'] = $this->getInput('service_read_tag_value');
+			}
+		}
+
+		if ($this->hasInput('service_write_access')) {
+			$data['service_write_access'] = $this->getInput('service_write_access');
+		}
+
+		if ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
+			if ($this->hasInput('service_write_list')) {
+				$data['service_write_list'] = $this->getInput('service_write_list');
+			}
+
+			if ($this->hasInput('service_write_tag_tag')) {
+				$data['service_write_tag_tag'] = $this->getInput('service_write_tag_tag');
+				$data['service_write_tag_value'] = $this->getInput('service_write_tag_value');
+			}
+		}
+
 		// Overwrite modules section.
 		if ($this->hasInput(CRoleHelper::SECTION_MODULES)) {
 			$data['rules'][CRoleHelper::SECTION_MODULES] = $this->getInput('modules');
@@ -236,5 +267,17 @@ abstract class CControllerUserroleEditGeneral extends CController {
 		}
 
 		return $data;
+	}
+
+	protected static function getServiceAccessByAccessParams(int $mode, array $list, array $tag): int {
+		if ($mode == 1) {
+			return CRoleHelper::SERVICES_ACCESS_ALL;
+		}
+		elseif ($list || $tag['tag'] !== '') {
+			return CRoleHelper::SERVICES_ACCESS_LIST;
+		}
+		else {
+			return CRoleHelper::SERVICES_ACCESS_NONE;
+		}
 	}
 }

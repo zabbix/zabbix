@@ -47,10 +47,6 @@ echo get_prepared_messages(['with_current_messages' => true]);
 if ($page['type'] == PAGE_TYPE_HTML) {
 	makeServerStatusOutput()->show();
 
-	insertPagePostJs();
-
-	require_once 'include/views/js/common.init.js.php';
-
 	if (in_array($page['type'], [PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML])) {
 		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
 				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
@@ -66,6 +62,10 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	if (!defined('ZBX_PAGE_NO_MENU')) {
 		makePageFooter()->show();
 	}
+
+	require_once 'include/views/js/common.init.js.php';
+
+	insertPagePostJs(true);
 
 	echo '</div></body></html>';
 }

@@ -81,7 +81,15 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			'modules' => 'array',
 			'api_access' => 'in 0,1',
 			'api_mode' => 'in 0,1',
-			'api_methods' => 'array'
+			'api_methods' => 'array',
+			'service_read_access' => 'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
+			'service_read_list' => 'array_db services.serviceid',
+			'service_read_tag_tag' => 'string',
+			'service_read_tag_value' => 'string',
+			'service_write_access' => 'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
+			'service_write_list' => 'array_db services.serviceid',
+			'service_write_tag_tag' => 'string',
+			'service_write_tag_value' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);

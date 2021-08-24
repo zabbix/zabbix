@@ -35,12 +35,36 @@
 			if (usertype_select !== null) {
 				usertype_select.addEventListener('change', this.events.usertypeChange);
 
-				this.updateCheckboxes(usertype_select.value);
+				this.updateAccessUiElementsFieldsGroup(usertype_select.value);
 			}
 
 			document
 				.getElementById('api-access')
 				.addEventListener('change', this.events.apiaccessChange);
+
+			document
+				.getElementById('service-write-access')
+				.addEventListener('change', this.events.serviceWriteAccessChange);
+
+			this.updateServicesWriteAccessFields();
+
+			jQuery('#service_write_list_')
+				.multiSelect('getSelectButton')
+				.addEventListener('click', () => {
+					this.selectServiceAccessList(jQuery('#service_write_list_'));
+				});
+
+			document
+				.getElementById('service-read-access')
+				.addEventListener('change', this.events.serviceReadAccessChange);
+
+			this.updateServicesReadAccessFields();
+
+			jQuery('#service_read_list_')
+				.multiSelect('getSelectButton')
+				.addEventListener('click', () => {
+					this.selectServiceAccessList(jQuery('#service_read_list_'));
+				});
 
 			const clone_button = document.getElementById('clone');
 			if (clone_button !== null) {
@@ -48,7 +72,7 @@
 			}
 		},
 
-		updateCheckboxes(user_type) {
+		updateAccessUiElementsFieldsGroup(user_type) {
 			if (this.readonly) {
 				return;
 			}
@@ -137,7 +161,31 @@
 			});
 		},
 
-		updateApiAccess(is_apiaccess_checked) {
+		updateServicesWriteAccessFields() {
+			const service_write_access = document.querySelector('input[name="service_write_access"]:checked').value;
+
+			document
+				.querySelectorAll('.js-service-write-access')
+				.forEach((element) => {
+					element.style.display = service_write_access == <?= CRoleHelper::SERVICES_ACCESS_LIST ?>
+						? ''
+						: 'none';
+				});
+		},
+
+		updateServicesReadAccessFields() {
+			const service_read_access = document.querySelector('input[name="service_read_access"]:checked').value;
+
+			document
+				.querySelectorAll('.js-service-read-access')
+				.forEach((element) => {
+					element.style.display = service_read_access == <?= CRoleHelper::SERVICES_ACCESS_LIST ?>
+						? ''
+						: 'none';
+				});
+		},
+
+		updateApiAccessFieldsGroup(is_apiaccess_checked) {
 			if (this.readonly) {
 				return;
 			}
@@ -149,18 +197,53 @@
 			$('#api_methods_').multiSelect(is_apiaccess_checked ? 'enable' : 'disable');
 		},
 
+		selectServiceAccessList($multiselect) {
+			const exclude_serviceids = [];
+
+			for (const service of $multiselect.multiSelect('getData')) {
+				exclude_serviceids.push(service.id);
+			}
+
+			const overlay = PopUp('popup.services', {
+				title: <?= json_encode(_('Add services')) ?>,
+				exclude_serviceids
+			}, 'services', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				const data = [];
+
+				for (const service of e.detail) {
+					data.push({id: service.serviceid, name: service.name});
+				}
+
+				$multiselect.multiSelect('addData', data);
+			});
+		},
+
 		events: {
 			usertypeChange(e) {
-				view.updateCheckboxes(e.target.value);
+				view.updateAccessUiElementsFieldsGroup(e.target.value);
 				view.updateApiMethodsMultiselect(e.target.value);
 			},
 
 			apiaccessChange(e) {
-				view.updateApiAccess(e.target.checked);
+				view.updateApiAccessFieldsGroup(e.target.checked);
+			},
+
+			serviceWriteAccessChange() {
+				if (!view.readonly) {
+					view.updateServicesWriteAccessFields();
+				}
+			},
+
+			serviceReadAccessChange() {
+				if (!view.readonly) {
+					view.updateServicesReadAccessFields();
+				}
 			},
 
 			cloneClick() {
-				if (this.readonly) {
+				if (view.readonly) {
 					const url = new Curl('zabbix.php');
 					url.setArgument('action', 'userrole.edit');
 
