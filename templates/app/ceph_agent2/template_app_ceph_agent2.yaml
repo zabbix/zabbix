@@ -931,6 +931,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.rd_ops
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
