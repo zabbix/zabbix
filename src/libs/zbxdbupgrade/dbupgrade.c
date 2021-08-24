@@ -54,40 +54,31 @@ zbx_db_version_t;
 
 /* NOTE: Do not forget to sync changes in ZBX_TYPE_*_STR defines for Oracle with zbx_oracle_column_type()! */
 
-#if defined(HAVE_POSTGRESQL)
-#	define ZBX_TYPE_ID_STR		"bigint"
-#elif defined(HAVE_MYSQL)
-#	define ZBX_TYPE_ID_STR		"bigint unsigned"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_TYPE_ID_STR		"number(20)"
-#endif
-
-#ifdef HAVE_ORACLE
-#	define ZBX_TYPE_INT_STR		"number(10)"
-#	define ZBX_TYPE_CHAR_STR	"nvarchar2"
-#else
-#	define ZBX_TYPE_INT_STR		"integer"
-#	define ZBX_TYPE_CHAR_STR	"varchar"
-#endif
-
 #if defined(HAVE_MYSQL)
+#	define ZBX_TYPE_ID_STR		"bigint unsigned"
 #	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"bigint unsigned"
 #	define ZBX_TYPE_LONGTEXT_STR	"longtext"
 #elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_ID_STR		"number(20)"
 #	define ZBX_TYPE_FLOAT_STR	"binary_double"
 #	define ZBX_TYPE_UINT_STR	"number(20)"
 #	define ZBX_TYPE_LONGTEXT_STR	"nclob"
 #elif defined(HAVE_POSTGRESQL)
+#	define ZBX_TYPE_ID_STR		"bigint"
 #	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"numeric(20)"
 #	define ZBX_TYPE_LONGTEXT_STR	"text"
 #endif
 
 #if defined(HAVE_ORACLE)
+#	define ZBX_TYPE_INT_STR		"number(10)"
+#	define ZBX_TYPE_CHAR_STR	"nvarchar2"
 #	define ZBX_TYPE_SHORTTEXT_STR	"nvarchar2(2048)"
 #	define ZBX_TYPE_TEXT_STR	"nclob"
 #else
+#	define ZBX_TYPE_INT_STR		"integer"
+#	define ZBX_TYPE_CHAR_STR	"varchar"
 #	define ZBX_TYPE_SHORTTEXT_STR	"text"
 #	define ZBX_TYPE_TEXT_STR	"text"
 #endif
