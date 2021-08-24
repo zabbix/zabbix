@@ -339,5 +339,19 @@
 		<ant antfile="../build-backend.xml" dir="sources" target="build-dist" inheritAll="true" inheritRefs="true"/>
 	</target>
 
+    <target name="agent2-tests">
+            <!-- Create, build & test agent2 -->
+            <exec executable="./bootstrap.sh" failonerror="on"/>
+            <exec executable="./configure" failonerror="on">
+                    <arg line="--quiet"/>
+        <arg line="--enable-agent2"/>
+            </exec>
+            <exec executable="make" failonerror="on">
+                    <arg line="-s"/>
+                    <arg line="-j5"/>
+                    <arg line="check"/>
+            </exec>
+    </target>
+	
 	<target name="build" depends="make-dist"/>
 </project>
