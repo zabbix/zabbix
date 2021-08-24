@@ -191,7 +191,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 		for (i = 0; i < groupids->values_num; i++)
 		{
 			zbx_db_insert_add_values(&db_insert, hostgroupid, hostid, groupids->values[i]);
-			zbx_audit_hostgroup_update_json_attach(hostid, hostgroupid, groupids->values[i]);
+			zbx_audit_hostgroup_update_json_add_group(hostid, hostgroupid, groupids->values[i]);
 			hostgroupid++;
 		}
 
@@ -431,6 +431,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				zbx_free(sql);
 
 				make_hostname(host_visible);	/* replace not-allowed symbols */
+				zbx_free(hostname);
 				hostname = DBget_unique_hostname_by_sample(host_visible, "name");
 				zbx_free(host_visible);
 
@@ -559,7 +560,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 			if (NULL == (row2 = DBfetch(result2)))
 			{
 				hostid = DBget_maxid("hosts");
-				hostname = zbx_strdup(NULL, row[1]);
+				hostname = zbx_strdup(hostname, row[1]);
 				*status = HOST_STATUS_MONITORED;
 
 				if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
@@ -607,7 +608,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 			{
 				ZBX_STR2UINT64(hostid, row2[0]);
 				ZBX_DBROW2UINT64(host_proxy_hostid, row2[1]);
-				hostname = zbx_strdup(NULL, row2[2]);
+				hostname = zbx_strdup(hostname, row2[2]);
 				*status = atoi(row2[3]);
 
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, hostname);
@@ -717,7 +718,7 @@ void	op_host_del(const DB_EVENT *event)
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_append(&hostids, hostid);
 	zbx_vector_str_create(&hostnames);
-	zbx_vector_str_append(&hostnames, hostname);
+	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
 	DBdelete_hosts_with_prototypes(&hostids, &hostnames);
 
@@ -892,7 +893,7 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
-	/* make sure host belongs to at least one hostgroup */
+	/* make sure the host belongs to at least one hostgroup after removing it from specified host groups */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select groupid"
 			" from hosts_groups"
@@ -905,39 +906,65 @@ void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	if (NULL == DBfetch(result))
 	{
+		DBfree_result(result);
+
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove host \"%s\" from all host groups:"
 				" it must belong to at least one", zbx_host_string(hostid));
 	}
 	else
 	{
-		zbx_vector_uint64_t	hostgroupids;
+		zbx_vector_uint64_t	hostgroupids, found_groupids;
+		DB_RESULT		result2;
+		DB_ROW			row;
+
+		DBfree_result(result);
 
 		zbx_vector_uint64_create(&hostgroupids);
+		zbx_vector_uint64_create(&found_groupids);
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hostgroupid"
+				"select hostgroupid,groupid"
 				" from hosts_groups"
 				" where hostid=" ZBX_FS_UI64
 					" and",
 				hostid);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
-		DBselect_uint64(sql, &hostgroupids);
 
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"delete from hosts_groups"
-				" where hostid=" ZBX_FS_UI64
-					" and",
-				hostid);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+		result2 = DBselect("%s", sql);
 
-		DBexecute("%s", sql);
+		while (NULL != (row = DBfetch(result2)))
+		{
+			zbx_uint64_t	hostgroupid, groupid;
 
-		zbx_audit_host_hostgroup_delete(hostid, hostname, &hostgroupids, groupids);
+			ZBX_STR2UINT64(hostgroupid, row[0]);
+			ZBX_STR2UINT64(groupid, row[1]);
+
+			zbx_vector_uint64_append(&hostgroupids, hostgroupid);
+			zbx_vector_uint64_append(&found_groupids, groupid);
+		}
+
+		DBfree_result(result2);
+
+		if (0 != hostgroupids.values_num)
+		{
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"delete from hosts_groups"
+					" where hostid=" ZBX_FS_UI64
+						" and",
+					hostid);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values,
+					groupids->values_num);
+
+			DBexecute("%s", sql);
+
+			zbx_audit_host_hostgroup_delete(hostid, hostname, &hostgroupids, &found_groupids);
+		}
+
+		zbx_vector_uint64_destroy(&found_groupids);
 		zbx_vector_uint64_destroy(&hostgroupids);
 	}
-	DBfree_result(result);
 
 	zbx_free(sql);
 out:

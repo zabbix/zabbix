@@ -2738,8 +2738,6 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
-		char	*description_esc, *expression_esc, *comments_esc, *url_esc, *value_esc, *opdata_esc,
-			*event_name_esc;
 		int	index;
 
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
@@ -2779,9 +2777,9 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				/* further updates will fail, so there is unnecessary overhead, */
 				/* but lld_expression_create() can fail only because of bugs,   */
 				/* so better to leave unoptimized handling of 'impossible'      */
-				/* errors than unnecessary complicate cod                       */
-				DBrollback();
+				/* errors than unnecessary complicate code                      */
 				ret = FAIL;
+				goto cleanup;
 			}
 		}
 
@@ -2789,8 +2787,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		{
 			if (FAIL == lld_expression_create(trigger, &trigger->recovery_expression, &trigger->functions))
 			{
-				DBrollback();
 				ret = FAIL;
+				goto cleanup;
 			}
 		}
 
@@ -2812,6 +2810,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		else if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE))
 		{
 			const char	*d = "";
+			char		*description_esc, *expression_esc, *comments_esc, *url_esc, *value_esc,
+					*opdata_esc, *event_name_esc;
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set ");
 
@@ -3078,39 +3078,47 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
-		zbx_free(sql);
 	}
+cleanup:
+	zbx_free(sql);
 
 	if (0 != new_triggers)
 	{
-		zbx_db_insert_execute(&db_insert);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 
-		zbx_db_insert_execute(&db_insert_tdiscovery);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert_tdiscovery);
 		zbx_db_insert_clean(&db_insert_tdiscovery);
 	}
 
 	if (0 != new_functions)
 	{
-		zbx_db_insert_execute(&db_insert_tfunctions);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert_tfunctions);
 		zbx_db_insert_clean(&db_insert_tfunctions);
 	}
 
 	if (0 != new_dependencies)
 	{
-		zbx_db_insert_execute(&db_insert_tdepends);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert_tdepends);
 		zbx_db_insert_clean(&db_insert_tdepends);
 	}
 
 	if (0 != new_tags)
 	{
-		zbx_db_insert_execute(&db_insert_ttags);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert_ttags);
 		zbx_db_insert_clean(&db_insert_ttags);
 	}
 
-	DBcommit();
+	if (ret == SUCCEED)
+		DBcommit();
+	else
+		DBrollback();
 out:
-
 	zbx_vector_uint64_destroy(&trigger_protoids);
 	zbx_vector_uint64_destroy(&del_triggertagids);
 	zbx_vector_uint64_destroy(&del_triggerdepids);

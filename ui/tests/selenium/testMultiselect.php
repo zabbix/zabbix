@@ -26,13 +26,13 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testMultiselect extends CWebTest {
 
 	public function testMultiselect_SuggestExisting() {
-		$this->checkSuggest('zabbix.php?action=problem.view', 'zbx_filter',
+		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
 			'Host groups', 'z', 'multiselect-suggest'
 		);
 	}
 
 	public function testMultiselect_SuggestNoMatches() {
-		$this->checkSuggest('zabbix.php?action=problem.view','zbx_filter',
+		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1','zbx_filter',
 			'Host groups', 'QQQ', 'multiselect-matches'
 		);
 	}
@@ -58,7 +58,7 @@ class testMultiselect extends CWebTest {
 	}
 
 	public function testMultiselect_NotSuggestAlreadySelected() {
-		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->updateViewport();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$field = $form->getField('Host groups');
