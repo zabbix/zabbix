@@ -311,3 +311,59 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 		}
 	}
 }
+
+void	zbx_service_serialize_parentids(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
+		const zbx_vector_uint64_t *ids)
+{
+	zbx_uint32_t	data_len = 0;
+	int		i;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, ids->values_num);
+
+	for (i = 0; i < ids->values_num; i++)
+		zbx_serialize_prepare_value(data_len, ids->values[i]);
+
+	if (NULL != *data)
+	{
+		while (data_len > *data_alloc - *data_offset)
+		{
+			*data_alloc *= 2;
+			*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
+		}
+	}
+	else
+		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+
+	ptr = *data + *data_offset;
+	*data_offset += data_len;
+
+	ptr += zbx_serialize_value(ptr, ids->values_num);
+
+	for (i = 0; i < ids->values_num; i++)
+		ptr += zbx_serialize_value(ptr, ids->values[i]);
+}
+
+void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *ids)
+{
+	const unsigned char	*end = data + size;
+
+	while (data < end)
+	{
+		int		values_num, i;
+
+		data += zbx_deserialize_value(data, &values_num);
+
+		if (0 == values_num)
+			continue;
+
+		for (i = 0; i < values_num; i++)
+		{
+			zbx_uint64_t	id;
+
+			data += zbx_deserialize_value(data, &id);
+
+			zbx_vector_uint64_append(ids, id);
+		}
+	}
+}

@@ -2338,8 +2338,7 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 	zbx_vector_uint64_destroy(&serviceids);
 }
 
-static void	get_parent_serviceids(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		zbx_service_t *service)
+static void	get_parent_serviceids(zbx_service_t *service, zbx_vector_uint64_t *parentids)
 {
 	zbx_uint64_t	i;
 
@@ -2348,9 +2347,10 @@ static void	get_parent_serviceids(unsigned char **data, size_t *data_alloc, size
 		zbx_service_t	*parent;
 
 		parent = (zbx_service_t*)(service->parents.values[i]);
-		zbx_service_serialize_id(data, data_alloc, data_offset, parent->serviceid);
 
-		get_parent_serviceids(data, data_alloc, data_offset, parent);
+		zbx_vector_uint64_append(parentids, parent->serviceid);
+
+		get_parent_serviceids(parent, parentids);
 	}
 }
 
@@ -2358,19 +2358,30 @@ static void	process_parentlist(const zbx_ipc_message_t *message, zbx_service_man
 		zbx_ipc_client_t *client)
 {
 	unsigned char		*data = NULL;
-	size_t			data_alloc = 0, data_offset = 0;
+	zbx_uint32_t		data_alloc = 0, data_offset = 0;
 	zbx_uint64_t		child_serviceid = 0;
 	zbx_service_t		*service, service_local;
+	zbx_vector_uint64_t	parentids;
 
 	zbx_deserialize_uint64(message->data, &child_serviceid);
 
 	service_local.serviceid = child_serviceid;
 
+	zbx_vector_uint64_create(&parentids);
+
 	if (NULL != (service = zbx_hashset_search(&service_manager->services, &service_local)))
-		get_parent_serviceids(&data, &data_alloc, &data_offset, service);
+	{
+		get_parent_serviceids(service, &parentids);
+
+		zbx_vector_uint64_sort(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_service_serialize_parentids(&data, &data_alloc, &data_offset, &parentids);
+	}
 
 	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset);
 
+	zbx_vector_uint64_destroy(&parentids);
 	zbx_free(data);
 }
 

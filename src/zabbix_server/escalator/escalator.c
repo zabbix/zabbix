@@ -86,29 +86,22 @@ zbx_tag_filter_t;
 
 typedef struct
 {
-	char	*read_tag;
-	char	*read_value;
-	char 	*write_tag;
-	char	*write_value;
-}
-zbx_service_tag_rule_t;
+	/* the role identifier */
+	zbx_uint64_t		roleid;
 
-typedef struct
-{
-	zbx_uint64_t	roleid;
-	char		*name;
-	int		type;
-	zbx_uint64_t	value_serviceid;
-	char		*value_str;
-	zbx_uint64_t	value_int;
+	/* 0 if services.read is set to 0 and services.write is either 0 or absent. 1 otherwise. */
+	unsigned char		default_read;
+
+	/* the service identifiers listed by services.read.id.* and services.write.id.* */
+	zbx_vector_uint64_t	serviceids;
+
+	/* the service.read.tag.* and service.write.tag.* rules */
+	zbx_vector_tags_t	tags;
 }
-zbx_service_role_rule_t;
+zbx_service_role_t;
 
 ZBX_VECTOR_DECL(service_alarm, zbx_service_alarm_t)
 ZBX_VECTOR_IMPL(service_alarm, zbx_service_alarm_t)
-
-ZBX_PTR_VECTOR_DECL(service_role_rule, zbx_service_role_rule_t*)
-ZBX_PTR_VECTOR_IMPL(service_role_rule, zbx_service_role_rule_t*)
 
 typedef enum
 {
@@ -402,156 +395,214 @@ out:
 	return perm;
 }
 
-static int	get_service_global_rights_enabled(zbx_uint64_t roleid, zbx_vector_service_role_rule_t *rolerules)
-{
-	int	i;
-
-	for (i = 0; i < rolerules->values_num; i++)
-	{
-		zbx_service_role_rule_t	*rule;
-
-		rule = rolerules->values[i];
-
-		if (ZBX_ROLE_RULE_TYPE_INT == rule->type && roleid == rule->roleid)
-		{
-			if (0 == strcmp(rule->name, "services.read") && 1 == rule->value_int)
-				return SUCCEED;
-		}
-	}
-
-	return FAIL;
-}
-
-static void	check_cached_rule_serviceids(zbx_uint64_t roleid, zbx_uint64_t serviceid,
-		zbx_vector_service_role_rule_t *rolerules, int *perm)
-{
-	int	i;
-
-	for (i = 0; i < rolerules->values_num; i++)
-	{
-		zbx_service_role_rule_t	*rule;
-
-		rule = rolerules->values[i];
-
-		if (ZBX_ROLE_RULE_TYPE_SERVICEID != rule->type)
-			continue;
-
-		if (roleid == rule->roleid && serviceid == rule->value_serviceid)
-		{
-			if (0 == strncmp("services.read.", rule->name, ZBX_CONST_STRLEN("services.read.")))
-				*perm |= PERM_READ;
-			else if (0 == strncmp("services.write.", rule->name, ZBX_CONST_STRLEN("services.write.")))
-				*perm |= PERM_READ_WRITE;
-		}
-	}
-}
-
-static void	check_service_tags_rule_match(zbx_uint64_t roleid, int *perm, const zbx_vector_ptr_t *service_tags,
-		zbx_vector_service_role_rule_t *rolerules, zbx_service_tag_rule_t *tag_rules)
-{
-	int		i;
-
-	for (i = 0; i < rolerules->values_num; i++)
-	{
-		zbx_service_role_rule_t *rule;
-
-		rule = rolerules->values[i];
-
-		if (ZBX_ROLE_RULE_TYPE_STR != rule->type || rule->roleid != roleid)
-			continue;
-
-		if (0 == strcmp(rule->name, "services.read.tag.name"))
-			tag_rules->read_tag = rule->value_str;
-		else if (0 == strcmp(rule->name, "services.read.tag.value"))
-			tag_rules->read_value = rule->value_str;
-		else if (0 == strcmp(rule->name, "services.write.tag.name"))
-			tag_rules->write_tag = rule->value_str;
-		else if (0 == strcmp(rule->name, "services.write.tag.value"))
-			tag_rules->write_value = rule->value_str;
-	}
-
-	for (i = 0; i < service_tags->values_num; i++)
-	{
-		zbx_tag_t	*tag;
-
-		tag = (zbx_tag_t*)service_tags->values[i];
-
-		if (NULL != tag_rules->read_tag)
-		{
-			if (0 == strcmp(tag_rules->read_tag, tag->tag))
-			{
-				if (NULL == tag_rules->read_value || 0 == strcmp(tag_rules->read_value, tag->value))
-					*perm |= PERM_READ;
-			}
-		}
-
-		if (NULL != tag_rules->write_tag)
-		{
-			if (0 == strcmp(tag_rules->write_tag, tag->tag))
-			{
-				if (NULL == tag_rules->write_value || 0 == strcmp(tag_rules->write_value, tag->value))
-				{
-					*perm |= PERM_READ_WRITE;
-				}
-			}
-		}
-	}
-}
-
-static void	check_parent_service_intersection(zbx_vector_uint64_t *parent_ids, zbx_uint64_t roleid,
-		zbx_vector_service_role_rule_t *rolerules, int *perm)
+static int	check_parent_service_intersection(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *role_ids)
 {
 	int	i;
 
 	for (i = 0; i < parent_ids->values_num; i++)
 	{
-		zbx_uint64_t	parent_id;
-
-		parent_id = parent_ids->values[i];
-		check_cached_rule_serviceids(roleid, parent_id, rolerules, perm);
+		if (SUCCEED == zbx_vector_uint64_bsearch(role_ids, parent_ids->values[i], ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			return PERM_READ;
 	}
+
+	return PERM_DENY;
 }
 
-static void	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
-		zbx_service_tag_rule_t *tag_rules, int *perm)
+static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
+		zbx_vector_tags_t *tags)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*serviceid_sql = NULL, *sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0, serviceid_sql_alloc = 0, serviceid_sql_offset = 0;
+	char		*sql = NULL, *read_tag = NULL, *read_value = NULL, *write_tag = NULL, *write_value = NULL;
+	int		i, perm = PERM_DENY;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
-	if (0 == parent_ids->values_num || NULL == tag_rules->read_tag && NULL == tag_rules->write_tag)
-		return;
+	if (0 == parent_ids->values_num || 0 == tags->values_num)
+		return PERM_DENY;
 
-	DBadd_condition_alloc(&serviceid_sql, &serviceid_sql_alloc, &serviceid_sql_offset, "serviceid", parent_ids->values,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select null from service_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "serviceid", parent_ids->values,
 			parent_ids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and (");
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select null from service_tag where%s and (", serviceid_sql);
-
-	if (NULL != tag_rules->read_tag)
+	for (i = 0; i < tags->values_num; i++)
 	{
-		if (NULL != tag_rules->read_value)
-			zbx_strdcatf(sql, "(tag='%s' and value='%s') ", tag_rules->read_tag, tag_rules->read_value);
-		else
-			zbx_strdcatf(sql, "tag='%s' ", tag_rules->read_tag);
-	}
+		zbx_tag_t *tag = tags->values[i];
 
-	if (NULL != tag_rules->write_tag)
-	{
-		if (NULL != tag_rules->write_value)
-			zbx_strdcatf(sql, "or (tag='%s' and value='%s') ", tag_rules->write_tag, tag_rules->write_value);
+		if (NULL == tag->value)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(tag='%s')", tag->tag);
+		}
 		else
-			zbx_strdcatf(sql, "or tag='%s' ", tag_rules->write_tag);
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(tag='%s' and value='%s')", tag->tag,
+					tag->value);
+		}
+
+		if (i + 1 < tags->values_num)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or");
+		}
 	}
 
 	result = DBselect("%s) limit 1", sql);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		*perm |= PERM_READ;
+		perm = PERM_READ;
 	}
 
 	DBfree_result(result);
+	zbx_free(sql);
+
+	return perm;
+}
+
+static int	check_service_tags_rule_match(const zbx_vector_ptr_t *service_tags, const zbx_vector_tags_t *role_tags)
+{
+	int	i, perm = PERM_DENY;
+	char	*read_tag = NULL, *read_value = NULL, *write_tag = NULL, *write_value = NULL;
+
+	for (i = 0; i < role_tags->values_num; i++)
+	{
+		zbx_tag_t	*role_tag = role_tags->values[i];
+
+		if (0 == strncmp(role_tag->tag, "services.read.tag.name", ZBX_CONST_STRLEN("services.read.tag.name")))
+		{
+			read_tag = role_tag->value;
+		}
+		else if (0 == strncmp(role_tag->tag, "services.read.tag.value",
+				ZBX_CONST_STRLEN("services.read.tag.value")))
+		{
+			read_value = role_tag->value;
+		}
+		else if (0 == strncmp(role_tag->tag, "services.write.tag.name",
+				ZBX_CONST_STRLEN("services.write.tag.name")))
+		{
+			write_tag = role_tag->value;
+		}
+		else if (0 == strncmp(role_tag->tag, "services.write.tag.value",
+				ZBX_CONST_STRLEN("services.write.tag.value")))
+		{
+			write_value = role_tag->value;
+		}
+	}
+
+	if (NULL == read_tag)
+		return perm;
+
+	for (i = 0; i < service_tags->values_num; i++)
+	{
+		zbx_tag_t *tag = (zbx_tag_t*)service_tags->values[i];
+
+		if (0 == strcmp(read_tag, tag->tag))
+		{
+			if (NULL == read_value || 0 == strcmp(read_value, tag->value))
+				perm |= PERM_READ;
+		}
+		else if (NULL != write_tag && 0 == strcmp(write_tag, tag->tag))
+		{
+			if (NULL == write_value || 0 == strcmp(write_value, tag->value))
+				perm |= PERM_READ_WRITE;
+		}
+	}
+
+	return perm;
+}
+
+static int	zbx_db_cache_service_role(zbx_service_role_t *role)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	unsigned char	services_read = 1, services_write = -1;
+	int		ret = FAIL;
+
+	result = DBselect("select name,roleid,value_int,value_str,value_serviceid,type from role_rule where roleid="
+			ZBX_FS_UI64 " order by name", role->roleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	type;
+		char		*name = row[0];
+
+		ZBX_STR2UINT64(type, row[5]);
+
+		ret = SUCCEED;
+
+		if (ZBX_ROLE_RULE_TYPE_INT == type) /* services.read or services.write */
+		{
+			char	*value_int = row[2];
+
+			if (0 == strcmp("services.read", name))
+				ZBX_STR2UCHAR(services_read, value_int);
+			else if (0 == strcmp("services.write", name))
+				ZBX_STR2UCHAR(services_write, value_int);
+		}
+		else if (ZBX_ROLE_RULE_TYPE_STR == type) /* services.read.tag.* / services.write.tag.* */
+		{
+			char		*value_str = row[3];
+			zbx_tag_t	*tag;
+			size_t		name_len;
+
+			if (NULL == row[3])
+				continue;
+
+			name_len = strlen(name);
+
+			if (name_len < ZBX_CONST_STRLEN("tag.value"))
+				continue;
+
+			if (0 == strcmp("tag.name", name + name_len - ZBX_CONST_STRLEN("tag.name")))
+			{
+				tag = (zbx_tag_t*)zbx_malloc(NULL, sizeof(zbx_tag_t));
+				tag->tag = zbx_strdup(NULL, value_str);
+				tag->value = NULL;
+				zbx_vector_tags_append(&role->tags, tag);
+			}
+			else if (0 == strcmp("tag.value", name + name_len - ZBX_CONST_STRLEN("tag.value")))
+			{
+				if (role->tags.values_num == 0)
+					continue;
+
+				tag = role->tags.values[role->tags.values_num - 1];
+				tag->value = zbx_strdup(NULL, value_str);
+			}
+
+		}
+		else if (ZBX_ROLE_RULE_TYPE_SERVICEID == type) /* services.read.id.<idx> / services.write.id.<idx>*/
+		{
+			char		*value_serviceid = row[4];
+			zbx_uint64_t	serviceid;
+
+			if (NULL == value_serviceid)
+				continue;
+
+			if (0 != strncmp(name, "services.read.id", ZBX_CONST_STRLEN("service.read.id")) &&
+					0 != strncmp(name, "services.write.id", ZBX_CONST_STRLEN("service.write.id")))
+			{
+				continue;
+			}
+
+			ZBX_STR2UINT64(serviceid, value_serviceid);
+
+			zbx_vector_uint64_append(&role->serviceids, serviceid);
+		}
+	}
+
+	if (0 == services_read && services_write < 1)
+		role->default_read = 0;
+	else
+		role->default_read = 1;
+
+	if (role->serviceids.values_num > 0)
+	{
+		zbx_vector_uint64_sort(&role->serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&role->serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+
+	DBfree_result(result);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -565,7 +616,7 @@ static void	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
  *                                                                            *
  ******************************************************************************/
 static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, const DB_SERVICE *service,
-		zbx_vector_service_role_rule_t *rolerules)
+		zbx_hashset_t *roles)
 {
 	int			perm = PERM_DENY;
 	unsigned char		*data = NULL;
@@ -573,23 +624,45 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	zbx_user_t	user = {.userid = userid};
 	zbx_ipc_message_t	response;
 	zbx_vector_uint64_t	parent_ids;
-	zbx_service_tag_rule_t	tag_rules = { 0 };
+	zbx_service_role_t	role_local, *role;
 
 	user.type = get_user_info(userid, &user.roleid, user_timezone);
 
+	role_local.roleid = user.roleid;
+
+	if (NULL == (role = zbx_hashset_search(roles, &role_local)))
+	{
+		zbx_vector_uint64_create(&role_local.serviceids);
+		zbx_vector_tags_create(&role_local.tags);
+		zbx_db_cache_service_role(&role_local);
+		zbx_hashset_insert(roles, &role, sizeof(zbx_service_role_t));
+		role = &role_local;
+	}
+
 	// check if global read rights are not disabled (services.read:0). In this case individual role rules can be skipped.
-	if (SUCCEED == get_service_global_rights_enabled(user.roleid, rolerules))
-		return perm;
+	if (1 == role->default_read)
+		return PERM_READ;
 
 	// read read/write rule rights
-	check_cached_rule_serviceids(user.roleid, service->serviceid, rolerules, &perm);
-	if (perm > PERM_DENY)
-		return perm;
+	if (SUCCEED == zbx_vector_uint64_bsearch(&role->serviceids, service->serviceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		return PERM_READ;
 
 	// check if service tags does not match tag rules
-	check_service_tags_rule_match(user.roleid, &perm, &service->service_tags, rolerules, &tag_rules);
-	if (perm > PERM_DENY)
+	if (PERM_DENY < (perm = check_service_tags_rule_match(&service->service_tags, &role->tags)))
+	{
+		zabbix_log(3, "check 3 - ok");
 		return perm;
+	}
+	else
+	{
+		zabbix_log(3, "check 3 - fail");
+	}
+
+	zabbix_log(3, "tag count = %lu", role->tags.values_num);
+	for (int u = 0; u < role->tags.values_num; u++)
+	{
+		zabbix_log(3, "tag '%s' -> '%s'", role->tags.values[u]->tag, role->tags.values[u]->value);
+	}
 
 	// get service parent ids from service manager
 	zbx_service_serialize_id(&data, &data_alloc, &data_offset, service->serviceid);
@@ -600,15 +673,17 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	zbx_ipc_message_init(&response);
 	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset, &response);
 	zbx_vector_uint64_create(&parent_ids);
-	zbx_service_deserialize_ids(response.data, response.size, &parent_ids);
+	zbx_service_deserialize_parentids(response.data, response.size, &parent_ids);
 	zbx_ipc_message_clean(&response);
 
 	// check if the returned vector doesn't intersect rule serviceids vector
-	check_parent_service_intersection(&parent_ids, user.roleid, rolerules, &perm);
-	if (perm > PERM_DENY)
+	if (PERM_DENY < (perm = check_parent_service_intersection(&parent_ids, &role->serviceids)))
 		return perm;
 
-	check_db_parent_rule_tag_match(&parent_ids, &tag_rules, &perm);
+
+	if (PERM_DENY < (perm = check_db_parent_rule_tag_match(&parent_ids, &role->tags)))
+		return perm;
+
 out:
 	zbx_vector_uint64_destroy(&parent_ids);
 	zbx_free(data);
@@ -790,7 +865,7 @@ out:
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_USER_MSG **user_msg,
 		const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service, int macro_type,
-		unsigned char evt_src, unsigned char op_mode, const char *default_timezone, zbx_vector_service_role_rule_t *rolerules)
+		unsigned char evt_src, unsigned char op_mode, const char *default_timezone, zbx_hashset_t *roles)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -834,7 +909,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 					goto clean;
 				break;
 			case EVENT_OBJECT_SERVICE:
-				if (PERM_READ > get_service_permission(userid, &user_timezone, service, rolerules))
+				if (PERM_READ > get_service_permission(userid, &user_timezone, service, roles))
 					goto clean;
 				break;
 			default:
@@ -873,7 +948,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 		const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service, unsigned char evt_src,
 		unsigned char op_mode,
-		const char *default_timezone, zbx_vector_service_role_rule_t *rolerules)
+		const char *default_timezone, zbx_hashset_t *roles)
 {
 	char		*sql = NULL;
 	DB_RESULT	result;
@@ -936,7 +1011,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 					goto clean;
 				break;
 			case EVENT_OBJECT_SERVICE:
-				if (PERM_READ > get_service_permission(userid, &user_timezone, service, rolerules))
+				if (PERM_READ > get_service_permission(userid, &user_timezone, service, roles))
 					goto clean;
 				break;
 			default:
@@ -972,7 +1047,7 @@ clean:
  *                                                                            *
  ******************************************************************************/
 static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event,
-		const char *error, const char *default_timezone, const DB_SERVICE *service, zbx_vector_service_role_rule_t *rolerules)
+		const char *error, const char *default_timezone, const DB_SERVICE *service, zbx_hashset_t *roles)
 {
 	char		*message_dyn, *sql = NULL;
 	DB_RESULT	result;
@@ -1027,7 +1102,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 					goto clean;
 				break;
 			case EVENT_OBJECT_SERVICE:
-				if (PERM_READ > get_service_permission(userid, &user_timezone, service, rolerules))
+				if (PERM_READ > get_service_permission(userid, &user_timezone, service, roles))
 					goto clean;
 				break;
 			default:
@@ -1836,7 +1911,7 @@ succeed:
 }
 
 static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EVENT *event, const DB_ACTION *action,
-		const DB_SERVICE *service, const char *default_timezone, zbx_vector_service_role_rule_t *rolerules)
+		const DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1895,7 +1970,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 				case OPERATION_TYPE_MESSAGE:
 					add_object_msg(action->actionid, operationid, &user_msg, event, NULL, NULL,
 							NULL, service, MACRO_TYPE_MESSAGE_NORMAL, action->eventsource,
-							ZBX_OPERATION_MODE_NORMAL, default_timezone, rolerules);
+							ZBX_OPERATION_MODE_NORMAL, default_timezone, roles);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, NULL, NULL, NULL, service, action->actionid, operationid,
@@ -1964,7 +2039,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
  ******************************************************************************/
 static void	escalation_execute_recovery_operations(const DB_EVENT *event, const DB_EVENT *r_event,
 		const DB_ACTION *action, const DB_SERVICE *service, const char *default_timezone,
-		zbx_vector_service_role_rule_t *rolerules)
+		zbx_hashset_t *roles)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1994,12 +2069,12 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 			case OPERATION_TYPE_MESSAGE:
 				add_object_msg(action->actionid, operationid, &user_msg, event, r_event, NULL, NULL,
 						service, MACRO_TYPE_MESSAGE_RECOVERY, action->eventsource,
-						ZBX_OPERATION_MODE_RECOVERY, default_timezone, rolerules);
+						ZBX_OPERATION_MODE_RECOVERY, default_timezone, roles);
 				break;
 			case OPERATION_TYPE_RECOVERY_MESSAGE:
 				add_sentusers_msg(&user_msg, action->actionid, operationid, event, r_event, NULL, NULL,
 						service, action->eventsource, ZBX_OPERATION_MODE_RECOVERY,
-						default_timezone, rolerules);
+						default_timezone, roles);
 				break;
 			case OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, NULL, NULL, service, action->actionid, operationid, 1,
@@ -2031,7 +2106,7 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
  ******************************************************************************/
 static void	escalation_execute_update_operations(const DB_EVENT *event, const DB_EVENT *r_event,
 		const DB_ACTION *action, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, const char *default_timezone, zbx_vector_service_role_rule_t *rolerules)
+		const DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2061,12 +2136,12 @@ static void	escalation_execute_update_operations(const DB_EVENT *event, const DB
 			case OPERATION_TYPE_MESSAGE:
 				add_object_msg(action->actionid, operationid, &user_msg, event, r_event, ack,
 						service_alarm, service, MACRO_TYPE_MESSAGE_UPDATE, action->eventsource,
-						ZBX_OPERATION_MODE_UPDATE, default_timezone, rolerules);
+						ZBX_OPERATION_MODE_UPDATE, default_timezone, roles);
 				break;
 			case OPERATION_TYPE_UPDATE_MESSAGE:
 				add_sentusers_msg(&user_msg, action->actionid, operationid, event, r_event, ack,
 						service_alarm, service, action->eventsource, ZBX_OPERATION_MODE_UPDATE,
-						default_timezone, rolerules);
+						default_timezone, roles);
 				if (NULL != ack)
 				{
 					add_sentusers_ack_msg(&user_msg, action->actionid, operationid, event, r_event,
@@ -2402,7 +2477,7 @@ static void	escalation_log_cancel_warning(const DB_ESCALATION *escalation, const
  *                                                                            *
  ******************************************************************************/
 static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
-		const char *error, const char *default_timezone, const DB_SERVICE *service, zbx_vector_service_role_rule_t *rolerules)
+		const char *error, const char *default_timezone, const DB_SERVICE *service, zbx_hashset_t *roles)
 {
 	ZBX_USER_MSG	*user_msg = NULL;
 
@@ -2413,7 +2488,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step)
 	{
 		add_sentusers_msg_esc_cancel(&user_msg, action->actionid, event, ZBX_NULL2EMPTY_STR(error),
-				default_timezone, service, rolerules);
+				default_timezone, service, roles);
 		flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid, NULL, NULL, NULL);
 	}
 
@@ -2435,12 +2510,12 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
-		const DB_SERVICE *service, const char *default_timezone, zbx_vector_service_role_rule_t *rolerules)
+		const DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	escalation_execute_operations(escalation, event, action, service, default_timezone, rolerules);
+	escalation_execute_operations(escalation, event, action, service, default_timezone, roles);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2459,12 +2534,12 @@ static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *actio
  ******************************************************************************/
 static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
 		const DB_EVENT *r_event, const DB_SERVICE *service, const char *default_timezone,
-		zbx_vector_service_role_rule_t *rolerules)
+		zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	escalation_execute_recovery_operations(event, r_event, action, service, default_timezone, rolerules);
+	escalation_execute_recovery_operations(event, r_event, action, service, default_timezone, roles);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2484,7 +2559,7 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
  *                                                                            *
  ******************************************************************************/
 static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
-		const DB_EVENT *r_event, const char *default_timezone, zbx_vector_service_role_rule_t *rolerules)
+		const DB_EVENT *r_event, const char *default_timezone, zbx_hashset_t *roles)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -2510,7 +2585,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 		ack.old_severity = atoi(row[4]);
 		ack.new_severity = atoi(row[5]);
 
-		escalation_execute_update_operations(event, r_event, action, &ack, NULL, NULL, default_timezone, rolerules);
+		escalation_execute_update_operations(event, r_event, action, &ack, NULL, NULL, default_timezone, roles);
 	}
 
 	DBfree_result(result);
@@ -2536,13 +2611,13 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
  ******************************************************************************/
 static void	escalation_update(DB_ESCALATION *escalation, const DB_ACTION *action,
 		const DB_EVENT *event, const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service,
-		const char *default_timezone, zbx_vector_service_role_rule_t *rolerules)
+		const char *default_timezone, zbx_hashset_t *roles)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " servicealarmid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->servicealarmid,
 			zbx_escalation_status_string(escalation->status));
 
-	escalation_execute_update_operations(event, NULL, action, NULL, service_alarm, service, default_timezone, rolerules);
+	escalation_execute_update_operations(event, NULL, action, NULL, service_alarm, service, default_timezone, roles);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2864,43 +2939,20 @@ static void	service_clean(DB_SERVICE *service)
 	zbx_free(service);
 }
 
-static void	service_rolerule_clean(zbx_service_role_rule_t *rule)
+static zbx_hash_t	service_role_hash_func(const void *d)
 {
-	zbx_free(rule->name);
+	const zbx_service_role_t	*role = (const zbx_service_role_t *)d;
 
-	if (ZBX_ROLE_RULE_TYPE_STR == rule->type)
-		zbx_free(rule->value_str);
-
-	zbx_free(rule);
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(&role->roleid);
 }
 
-static void	zbx_db_load_service_rules(zbx_vector_service_role_rule_t *rolerules)
+static int	service_role_compare_func(const void *d1, const void *d2)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	const zbx_service_role_t	*role1 = (const zbx_service_role_t *)d1;
+	const zbx_service_role_t	*role2 = (const zbx_service_role_t *)d2;
 
-	result = DBselect("select name,roleid,value_int,value_str,value_serviceid,type from role_rule where name like "
-			"'services.%%'");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		zbx_service_role_rule_t	*rule = (zbx_service_role_rule_t*)malloc(sizeof(zbx_service_role_rule_t));
-
-		rule->name = zbx_strdup(NULL, row[0]);
-		ZBX_STR2UINT64(rule->roleid, row[1]);
-		ZBX_STR2UINT64(rule->type, row[5]);
-
-		if (ZBX_ROLE_RULE_TYPE_INT == rule->type)
-			ZBX_STR2UINT64(rule->value_int, row[2]);
-		else if (ZBX_ROLE_RULE_TYPE_STR == rule->type)
-			rule->value_str = zbx_strdup(NULL, row[3]);
-		else if (ZBX_ROLE_RULE_TYPE_SERVICEID == rule->type)
-			ZBX_STR2UINT64(rule->value_serviceid, row[4]);
-
-		zbx_vector_service_role_rule_append(rolerules, rule);
-	}
-
-	DBfree_result(result);
+	ZBX_RETURN_IF_NOT_EQUAL(role1->roleid, role2->roleid);
+	return 0;
 }
 
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *escalations,
@@ -2914,7 +2966,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	zbx_vector_service_alarm_t	service_alarms;
 	zbx_service_alarm_t		*service_alarm, service_alarm_local;
 	zbx_vector_service_t		services;
-	zbx_vector_service_role_rule_t	rolerules;
+	zbx_hashset_t			service_roles;
 	DB_SERVICE			service_local;
 
 	zbx_vector_uint64_create(&escalationids);
@@ -2924,13 +2976,13 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	zbx_vector_uint64_pair_create(&event_pairs);
 	zbx_vector_service_alarm_create(&service_alarms);
 	zbx_vector_service_create(&services);
-	zbx_vector_service_role_rule_create(&rolerules);
+
+	zbx_hashset_create(&service_roles, 100, service_role_hash_func, service_role_compare_func);
 
 	add_ack_escalation_r_eventids(escalations, eventids, &event_pairs);
 
 	get_db_actions_info(actionids, &actions);
 	zbx_db_get_events_by_eventids(eventids, &events);
-	zbx_db_load_service_rules(&rolerules);
 
 	if (0 != ((DB_ESCALATION *)escalations->values[0])->serviceid)
 	{
@@ -3050,7 +3102,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		switch (state)
 		{
 			case ZBX_ESCALATION_CANCEL:
-				escalation_cancel(escalation, action, event, error, default_timezone, service, &rolerules);
+				escalation_cancel(escalation, action, event, error, default_timezone, service, &service_roles);
 				zbx_free(error);
 				zbx_vector_uint64_append(&escalationids, escalation->escalationid);
 				continue;
@@ -3077,7 +3129,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 		if (0 != escalation->servicealarmid)
 		{
-			escalation_update(escalation, action, event, service_alarm, service, default_timezone, &rolerules);
+			escalation_update(escalation, action, event, service_alarm, service, default_timezone, &service_roles);
 		}
 		else if (0 != escalation->acknowledgeid)
 		{
@@ -3100,20 +3152,20 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 			}
 
-			escalation_acknowledge(escalation, action, event, r_event, default_timezone, &rolerules);
+			escalation_acknowledge(escalation, action, event, r_event, default_timezone, &service_roles);
 		}
 		else if (NULL != r_event)
 		{
 			if (0 == escalation->esc_step)
-				escalation_execute(escalation, action, event, service, default_timezone, &rolerules);
+				escalation_execute(escalation, action, event, service, default_timezone, &service_roles);
 			else
-				escalation_recover(escalation, action, event, r_event, service, default_timezone, &rolerules);
+				escalation_recover(escalation, action, event, r_event, service, default_timezone, &service_roles);
 		}
 		else if (escalation->nextcheck <= now)
 		{
 			if (ESCALATION_STATUS_ACTIVE == escalation->status)
 			{
-				escalation_execute(escalation, action, event, service, default_timezone, &rolerules);
+				escalation_execute(escalation, action, event, service, default_timezone, &service_roles);
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation->status)
 			{
@@ -3232,8 +3284,8 @@ out:
 	zbx_vector_service_clear_ext(&services, service_clean);
 	zbx_vector_service_destroy(&services);
 
-	zbx_vector_service_role_rule_clear_ext(&rolerules, service_rolerule_clean);
-	zbx_vector_service_role_rule_destroy(&rolerules);
+	zbx_hashset_clear(&service_roles);
+	zbx_hashset_destroy(&service_roles);
 
 	ret = escalationids.values_num; /* performance metric */
 

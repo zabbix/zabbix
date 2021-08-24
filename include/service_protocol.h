@@ -45,5 +45,8 @@ void	zbx_service_serialize_parent_service(unsigned char **data, size_t *data_all
 		zbx_uint64_t serviceid, zbx_vector_tags_t *tags);
 void	zbx_service_deserialize_parent_services(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_ptr_t *parent_services);
+void	zbx_service_serialize_parentids(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
+		const zbx_vector_uint64_t *ids);
+void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *ids);
 
 #endif
