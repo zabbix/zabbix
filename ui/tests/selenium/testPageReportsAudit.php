@@ -75,7 +75,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentId('config');
 
 		$this->zbxTestCheckHeader('Audit log');
-		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Details']);
+		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'Recordset ID', 'ID', 'Details']);
 		$this->zbxTestExpandFilterTab();
 		$this->zbxTestAssertElementPresentId('filter_userids__ms');
 		$this->zbxTestAssertElementPresentId('filter_resourceid');
@@ -247,7 +247,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 			'Resource' => 'Macro',
 			'Action' => 'Update',
 			'ID' => 11,
-			'Details' => "Description: {"."$"."1}\n\nusermacro.description: Test description 1 => New Updated Description"
+			'Details' => "Description: {\$1}\n\nusermacro.description: Test description 1 => New Updated Description"
 		];
 
 		foreach ($audit as $column => $value) {

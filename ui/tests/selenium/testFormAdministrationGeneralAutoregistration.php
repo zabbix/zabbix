@@ -177,10 +177,8 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 		if (array_key_exists('detail_button', $data)) {
 			$row->getColumn('Details')->query('link:Details')->one()->click();
 			$details = COverlayDialogElement::find()->waitUntilVisible()->one();
-			$details_text = $details->query('xpath://textarea')->one()->getText();
-			$details_text = explode("\n", $details_text);
+			$details_text = explode("\n", $details->query('xpath://textarea')->one()->getText());
 			sort($details_text);
-			sort($data['detail_button']);
 			$this->assertEquals($details_text, $data['detail_button']);
 		}
 	}
