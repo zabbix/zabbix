@@ -357,6 +357,8 @@ void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_uint32_t s
 		if (0 == values_num)
 			continue;
 
+		zbx_vector_uint64_reserve(ids, values_num);
+
 		for (i = 0; i < values_num; i++)
 		{
 			zbx_uint64_t	id;

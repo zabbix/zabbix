@@ -413,7 +413,7 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*sql = NULL, *read_tag = NULL, *read_value = NULL, *write_tag = NULL, *write_value = NULL;
+	char		*sql = NULL;
 	int		i, perm = PERM_DENY;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
@@ -426,12 +426,14 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and (");
 
 	for (i = 0; i < tags->values_num; i++)
-	while (1)
 	{
 		zbx_tag_t	*tag = tags->values[i];
 		char		*tag_esc;
 
 		tag_esc = DBdyn_escape_string(tag->tag);
+
+		if (i > 0)
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or");
 
 		if (NULL == tag->value)
 		{
@@ -439,21 +441,15 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
 		}
 		else
 		{
-			char	*value_esc = DBdyn_escape_string(tag->value);
+			char	*value_esc;
 
+			value_esc = DBdyn_escape_string(tag->value);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(tag='%s' and value='%s')", tag_esc,
 					value_esc);
+			zbx_free(value_esc);
 		}
 
 		zbx_free(tag_esc);
-
-		if (i + 1 < tags->values_num)
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or");
-			i++;
-		}
-		else
-			break;
 	}
 
 	result = DBselect("%s) limit 1", sql);
@@ -525,7 +521,7 @@ static int	zbx_db_cache_service_role(zbx_service_role_t *role)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	services_read = 1, services_write = -1;
+	unsigned char	services_read = 1, services_write = 0;
 	int		ret = FAIL;
 
 	result = DBselect("select name,roleid,value_int,value_str,value_serviceid,type from role_rule where roleid="
@@ -563,6 +559,8 @@ static int	zbx_db_cache_service_role(zbx_service_role_t *role)
 			if (name_len < ZBX_CONST_STRLEN("tag.value"))
 				continue;
 
+			/* As the field 'name' is sorted, its 'tag.value' record always follows its corresponding */
+			/* 'tag.name' record */
 			if (0 == strcmp("tag.name", name + name_len - ZBX_CONST_STRLEN("tag.name")))
 			{
 				tag = (zbx_tag_t*)zbx_malloc(NULL, sizeof(zbx_tag_t));
@@ -682,8 +680,8 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	if (PERM_DENY < (perm = check_db_parent_rule_tag_match(&parent_ids, &role->tags)))
 		return perm;
 
-out:
 	zbx_vector_uint64_destroy(&parent_ids);
+out:
 	zbx_free(data);
 
 	return perm;
