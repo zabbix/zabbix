@@ -95,12 +95,12 @@ class CAudit {
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
-	private const RELATABLE_TABLE_NAME_MAPPING = [
+	private const NESTED_OBJECTS_TABLE_NAMES = [
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups'
 	];
 
-	private const RELATABLE_ID_MAPPING = [
+	private const NESTED_OBJECTS_IDS = [
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id'
 	];
@@ -189,8 +189,6 @@ class CAudit {
 			case self::ACTION_UPDATE:
 				$db_object = self::convertKeysToPaths($api_name, $db_object);
 				return self::handleUpdate($resource, $object, $db_object);
-			default:
-				return [];
 		}
 	}
 
@@ -229,9 +227,9 @@ class CAudit {
 		foreach ($object as $key => $value) {
 			$index = '.'.$key;
 
-			if (array_key_exists($prefix, self::RELATABLE_ID_MAPPING)) {
-				$index = '['.$value[self::RELATABLE_ID_MAPPING[$prefix]].']';
-				unset($value[self::RELATABLE_ID_MAPPING[$prefix]]);
+			if (array_key_exists($prefix, self::NESTED_OBJECTS_IDS)) {
+				$index = '['.$value[self::NESTED_OBJECTS_IDS[$prefix]].']';
+				unset($value[self::NESTED_OBJECTS_IDS[$prefix]]);
 			}
 
 			if (is_array($value)) {
@@ -255,7 +253,7 @@ class CAudit {
 				$object_path = preg_replace('/\[[0-9]+\]/', '', $object_path);
 			}
 
-			$table_name = self::RELATABLE_TABLE_NAME_MAPPING[$object_path];
+			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[$object_path];
 		}
 
 		$schema_fields = DB::getSchema($table_name)['fields'];
