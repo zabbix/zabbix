@@ -284,9 +284,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				))
 		))->addClass(ZBX_STYLE_NOWRAP),
 		$problem_update_link,
-		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
-			$data['data']['users']
-		),
+		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['users']),
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));
 }

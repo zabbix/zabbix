@@ -1,6 +1,10 @@
 Changes for 6.0.0alpha1
 
 New features:
+........S. [ZBXNEXT-6810] implemented audit on server (processing of LLD rules and discovered hosts) (akozlovs)
+..F.....S. [ZBXNEXT-6802] implemented audit for server (linking templates - host, host prototypes) (arimdjonoks, vmaksimovs)
+.........T [ZBXNEXT-6702] added {#FSLABEL} macro in item names of the "Windows filesystems by Zabbix agent/agent active" templates, changed vfs.file.cksum[/etc/passwd] key to vfs.file.cksum[/etc/passwd,sha256] in Unix templates (mchudinov)
+.........T [ZBXNEXT-6751] added Cisco Adaptive Security Virtual Appliance (ASAv) template (abakaldin)
 A.F.I...S. [ZBXNEXT-6813] changed UI language from en_GB to en_US (rlataria)
 .........T [ZBXNEXT-6765] added template Cloudflare by HTTP (mchudinov)
 ...G...... [ZBXNEXT-6688] added new items for Agent and Agent2 (asestakovs, MVekslers)
@@ -13,6 +17,7 @@ A.F.I...S. [ZBXNEXT-6470,ZBXNEXT-6715] made auditlog workable with new auditlog 
 A.F.I..... [ZBXNEXT-4029] implemented password policy support (Ivo, miks, vmurzins)
 ..F.....S. [ZBXNEXT-6773] added new aggregation functions count, exists_foreach and item_count (averza, dgoloscapov)
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6708] added TLS/SSL website certificates validation plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 A.F.I...S. [ZBXNEXT-6755] added support of alerting in services (agriscenko, ashubin, averza, vso, wiper)
 A.F.I...S. [ZBXNEXT-3022] improved scalability of services (ashubin, averza, vso, wiper)
@@ -38,6 +43,19 @@ A......... [ZBXNEXT-6582] increased "Attempts" to 100 and "Attempt interval" to 
 ..F....... [ZBXNEXT-6657] implemented DB version support check in System Information widget (Ivo)
 
 Bug fixes:
+.......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
+A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
+........S. [ZBX-19745] fixed Zabbix server exiting when quoted user macro context ends with backslash (vso)
+........S. [ZBX-19797] fixed action command operation execution with oracle backend (wiper)
+........S. [ZBX-19658] added query batching when reading event data during maintenance processing (wiper)
+.........T [ZBX-19686] changed 1-st parameter {#IFNAME} in net.if.* items to {#IFGUID} in Windows templates (mchudinov)
+..F....... [ZBX-19688] fixed minor visual issues with the dashboards (averza)
+........S. [ZBX-19648] fixed e-mail encoding declaration (dgoloscapov)
+..F....... [ZBX-19770] fixed context menu appearing out of viewport (ashubin, averza, vmurzins)
+........S. [ZBX-19823] fixed crash when action removes host from host group the host is not attached to (Andris)
+.........T [ZBX-19805] added initial comment with alert content to the incident message (abiba)
+...G...... [ZBX-19482] fixed block device discovery of cd-roms and linked devices (akozlovs)
+A......... [ZBX-19341] fixed template export missing inventory mode for Host prototype (jfreibergs)
 ...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
 .........T [ZBX-19749] changed tags, the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
 ..F....... [ZBX-18135] fixed warning message close button (agriscenko)
@@ -164,13 +182,26 @@ A......... [ZBX-8999] fixed exporting of images separately from other objects (I
 Changes for 5.4.4rc1
 
 New features:
+.........T [ZBXNEXT-6751] added Cisco Adaptive Security Virtual Appliance (ASAv) template (abakaldin)
 .........T [ZBXNEXT-6765] added template Cloudflare by HTTP (mchudinov)
 .........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
 A.F....... [ZBXNEXT-6528,ZBXNEXT-6569] improved performance of graphs and graphs prototypes configuration process (rlataria, Sasha, vmaksimovs)
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6708] added TLS/SSL website certificates validation plugin to Zabbix agent 2 (esneiders)
 A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 
 Bug fixes:
+.......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
+A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
+........S. [ZBX-19745] fixed Zabbix server exiting when quoted user macro context ends with backslash (vso)
+........S. [ZBX-19797] fixed action command operation execution with oracle backend (wiper)
+........S. [ZBX-19658] added query batching when reading event data during maintenance processing (wiper)
+.........T [ZBX-19686] changed 1-st parameter {#IFNAME} in net.if.* items to {#IFGUID} in Windows templates (mchudinov)
+..F....... [ZBX-19688] fixed minor visual issues with the dashboards (averza)
+........S. [ZBX-19648] fixed e-mail encoding declaration (dgoloscapov)
+..F....... [ZBX-19770] fixed context menu appearing out of viewport (ashubin, averza, vmurzins)
+.........T [ZBX-19805] added initial comment with alert content to the incident message (abiba)
+...G...... [ZBX-19482] fixed block device discovery of cd-roms and linked devices (akozlovs)
 ...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
 A......... [ZBX-19341] fixed template export missing inventory mode for Host prototype (jfreibergs)
 .........T [ZBX-19749] changed tags, the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
@@ -1132,10 +1163,19 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.15rc1
 
 New features:
+.........T [ZBXNEXT-6751] added Cisco Adaptive Security Virtual Appliance (ASAv) template (abakaldin)
 .........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6708] added TLS/SSL website certificates validation plugin to Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
+A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
+........S. [ZBX-19658] added query batching when reading event data during maintenance processing (wiper)
+.........T [ZBX-19562] removed the "Oracle by ODBC" and "Asterisk by HTTP" from templates.tmpl file (abakaldin)
+.........T [ZBX-19686] changed 1-st parameter {#IFNAME} in net.if.* items to {#IFGUID} in Windows templates (mchudinov)
+.........T [ZBX-19805] added initial comment with alert content to the incident message (abiba)
+...G...... [ZBX-19482] fixed block device discovery of cd-roms and linked devices (akozlovs)
 ...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
 .........T [ZBX-19762] removed unsupported items in Zabbix server templates (abakaldin)
 .........T [ZBX-19749] changed the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
@@ -3317,9 +3357,8 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.33rc1
 
-New features:
-
 Bug fixes:
+A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
 ........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 ..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)

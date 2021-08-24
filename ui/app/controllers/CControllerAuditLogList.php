@@ -317,6 +317,16 @@ class CControllerAuditLogList extends CController {
 			if (!$auditlog['details_button'] && count($details) > 2) {
 				$auditlog['details_button'] = 1;
 			}
+
+			$details = json_decode($auditlog['details'], true);
+
+			if (!is_array($details) || count($details) == 0) {
+				continue;
+			}
+
+			$details = $this->formatDetails($details);
+
+			$auditlog['details'] = implode("\n", $details);
 		}
 		unset($auditlog);
 

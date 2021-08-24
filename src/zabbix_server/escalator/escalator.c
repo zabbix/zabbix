@@ -1015,7 +1015,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 	{
 		zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				/* the 1st 'select' works if remote command target is "Host group" */
-				"select distinct h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
+				"select h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
 					",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
 					",s.scope,s.timeout,s.name,h.tls_connect"
 #ifdef HAVE_OPENIPMI
@@ -1039,14 +1039,14 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		DBadd_condition_alloc(&buffer, &buffer_alloc, &buffer_offset, "hg.groupid", groupids.values,
 				groupids.values_num);
 
-		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, " union ");
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, " union all ");
 	}
 
 	zbx_vector_uint64_destroy(&groupids);
 
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			/* the 2nd 'select' works if remote command target is "Host" */
-			"select distinct h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
+			"select h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
 				",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
 				",s.scope,s.timeout,s.name,h.tls_connect"
 #ifdef HAVE_OPENIPMI
@@ -1063,9 +1063,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				" and oh.hostid=h.hostid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
-			" union "
+			" union all "
 			/* the 3rd 'select' works if remote command target is "Current host" */
-			"select distinct 0,0,null,s.type,s.scriptid,s.execute_on,s.port"
+			"select 0,0,null,s.type,s.scriptid,s.execute_on,s.port"
 				",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
 				",s.scope,s.timeout,s.name,%d",
 			operationid, HOST_STATUS_MONITORED, ZBX_TCP_SEC_UNENCRYPTED);
@@ -1172,6 +1172,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			goto skip;
 
+		zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+
 		if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
 		{
 			zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
@@ -1204,8 +1206,6 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 		}
-
-		zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 
 		/* substitute macros in script body and webhook parameters */
 
