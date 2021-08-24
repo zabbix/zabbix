@@ -1074,6 +1074,10 @@ Template tooling version used: 0.38</description>
                      <type>JSONPATH</type>
                      <params>$.rd_ops</params>
                   </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]</key>
