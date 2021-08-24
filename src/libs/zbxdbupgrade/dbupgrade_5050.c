@@ -29,11 +29,6 @@ extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 
-static int	DBpatch_5050000(void)
-{
-	return SUCCEED;
-}
-
 static int	DBpatch_5050001(void)
 {
 	const ZBX_TABLE	table =
@@ -487,13 +482,21 @@ static int	DBpatch_5050034(void)
 
 	return DBset_default("config", &field);
 }
+
+static int	DBpatch_5050035(void)
+{
+	const ZBX_FIELD	old_field = {"details", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"details", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("auditlog", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(5050)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(5050000, 0, 1)
 DBPATCH_ADD(5050001, 0, 1)
 DBPATCH_ADD(5050002, 0, 1)
 DBPATCH_ADD(5050003, 0, 1)
@@ -528,5 +531,6 @@ DBPATCH_ADD(5050031, 0, 1)
 DBPATCH_ADD(5050032, 0, 1)
 DBPATCH_ADD(5050033, 0, 1)
 DBPATCH_ADD(5050034, 0, 1)
+DBPATCH_ADD(5050035, 0, 1)
 
 DBPATCH_END()

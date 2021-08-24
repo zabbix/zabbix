@@ -73,23 +73,22 @@ zbx_db_version_t;
 #if defined(HAVE_MYSQL)
 #	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"bigint unsigned"
+#	define ZBX_TYPE_LONGTEXT_STR	"longtext"
 #elif defined(HAVE_ORACLE)
 #	define ZBX_TYPE_FLOAT_STR	"binary_double"
 #	define ZBX_TYPE_UINT_STR	"number(20)"
+#	define ZBX_TYPE_LONGTEXT_STR	"nclob"
 #elif defined(HAVE_POSTGRESQL)
 #	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"numeric(20)"
+#	define ZBX_TYPE_LONGTEXT_STR	"text"
 #endif
 
 #if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_SHORTTEXT_STR	"nvarchar2(2048)"
-#else
-#	define ZBX_TYPE_SHORTTEXT_STR	"text"
-#endif
-
-#if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_TEXT_STR	"nclob"
 #else
+#	define ZBX_TYPE_SHORTTEXT_STR	"text"
 #	define ZBX_TYPE_TEXT_STR	"text"
 #endif
 
@@ -117,6 +116,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			break;
 		case ZBX_TYPE_UINT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_UINT_STR);
+			break;
+		case ZBX_TYPE_LONGTEXT:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_LONGTEXT_STR);
 			break;
 		case ZBX_TYPE_SHORTTEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_SHORTTEXT_STR);
@@ -547,8 +549,8 @@ int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZB
 
 	if (NULL != old_field && (zbx_oracle_column_type(old_field->type) != zbx_oracle_column_type(field->type) ||
 			ZBX_ORACLE_COLUMN_TYPE_DOUBLE == zbx_oracle_column_type(field->type) ||
-			(ZBX_TYPE_TEXT == field->type && (ZBX_TYPE_SHORTTEXT == old_field->type ||
-				ZBX_TYPE_CHAR == old_field->type))))
+			((ZBX_TYPE_TEXT == field->type || ZBX_TYPE_LONGTEXT == field->type) &&
+				(ZBX_TYPE_SHORTTEXT == old_field->type || ZBX_TYPE_CHAR == old_field->type))))
 	{
 		return DBmodify_field_type_with_copy(table_name, field);
 	}
