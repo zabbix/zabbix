@@ -426,23 +426,34 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and (");
 
 	for (i = 0; i < tags->values_num; i++)
+	while (1)
 	{
-		zbx_tag_t *tag = tags->values[i];
+		zbx_tag_t	*tag = tags->values[i];
+		char		*tag_esc;
+
+		tag_esc = DBdyn_escape_string(tag->tag);
 
 		if (NULL == tag->value)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(tag='%s')", tag->tag);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(tag='%s')", tag_esc);
 		}
 		else
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(tag='%s' and value='%s')", tag->tag,
-					tag->value);
+			char	*value_esc = DBdyn_escape_string(tag->value);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(tag='%s' and value='%s')", tag_esc,
+					value_esc);
 		}
+
+		zbx_free(tag_esc);
 
 		if (i + 1 < tags->values_num)
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or");
+			i++;
 		}
+		else
+			break;
 	}
 
 	result = DBselect("%s) limit 1", sql);
@@ -649,20 +660,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 
 	// check if service tags does not match tag rules
 	if (PERM_DENY < (perm = check_service_tags_rule_match(&service->service_tags, &role->tags)))
-	{
-		zabbix_log(3, "check 3 - ok");
 		return perm;
-	}
-	else
-	{
-		zabbix_log(3, "check 3 - fail");
-	}
-
-	zabbix_log(3, "tag count = %lu", role->tags.values_num);
-	for (int u = 0; u < role->tags.values_num; u++)
-	{
-		zabbix_log(3, "tag '%s' -> '%s'", role->tags.values[u]->tag, role->tags.values[u]->value);
-	}
 
 	// get service parent ids from service manager
 	zbx_service_serialize_id(&data, &data_alloc, &data_offset, service->serviceid);
