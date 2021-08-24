@@ -759,6 +759,17 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			zbx_audit_item_update_json_update_##field(item->itemid, item->flags,			\
 					item->field##_orig, item->field);					\
 		}
+#define PREPARE_UPDATE_STR_SECRET(FLAG_POSTFIX, field)								\
+		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
+		{												\
+			str_esc = DBdyn_escape_string(item->field);						\
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s"#field"='%s'", d, str_esc);		\
+			d = ",";										\
+			zbx_free(str_esc);									\
+														\
+			zbx_audit_item_update_json_update_##field(item->itemid, item->flags,			\
+					ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);				\
+		}
 #define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)									\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
 		{												\
@@ -799,7 +810,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		PREPARE_UPDATE_STR(SNMP_OID, snmp_oid)
 		PREPARE_UPDATE_UC(AUTHTYPE, authtype)
 		PREPARE_UPDATE_STR(USERNAME, username)
-		PREPARE_UPDATE_STR(PASSWORD, password)
+		PREPARE_UPDATE_STR_SECRET(PASSWORD, password)
 		PREPARE_UPDATE_STR(PUBLICKEY, publickey)
 		PREPARE_UPDATE_STR(PRIVATEKEY, privatekey)
 		PREPARE_UPDATE_UC(FLAGS, flags)
@@ -823,7 +834,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		PREPARE_UPDATE_UC(OUTPUT_FORMAT, output_format)
 		PREPARE_UPDATE_STR(SSL_CERT_FILE, ssl_cert_file)
 		PREPARE_UPDATE_STR(SSL_KEY_FILE, ssl_key_file)
-		PREPARE_UPDATE_STR(SSL_KEY_PASSWORD, ssl_key_password)
+		PREPARE_UPDATE_STR_SECRET(SSL_KEY_PASSWORD, ssl_key_password)
 		PREPARE_UPDATE_UC(VERIFY_PEER, verify_peer)
 		PREPARE_UPDATE_UC(VERIFY_HOST, verify_host)
 		PREPARE_UPDATE_UC(ALLOW_TRAPS, allow_traps)
