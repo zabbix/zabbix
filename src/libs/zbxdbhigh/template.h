@@ -26,8 +26,7 @@
 typedef struct _zbx_template_item_preproc_t zbx_template_item_preproc_t;
 ZBX_PTR_VECTOR_DECL(item_preproc_ptr, zbx_template_item_preproc_t *)
 
-typedef struct _zbx_template_item_tag_t zbx_template_item_tag_t;
-ZBX_PTR_VECTOR_DECL(item_tag_ptr, zbx_template_item_tag_t *)
+ZBX_PTR_VECTOR_DECL(item_tag_ptr, zbx_db_tag_t *)
 
 typedef struct _zbx_template_item_param_t zbx_template_item_param_t;
 ZBX_PTR_VECTOR_DECL(item_param_ptr, zbx_template_item_param_t *)
