@@ -3031,9 +3031,8 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		const zbx_lld_item_prototype_t	*item_prototype;
 
 		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
-		item->itemid = (*itemid)++;
 
-		zbx_db_insert_add_values(db_insert_items, item->itemid, item->name, item->key, hostid,
+		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key, hostid,
 				(int)item_prototype->type, (int)item_prototype->value_type,
 				item->delay, item->history, item->trends,
 				(int)item->status, item_prototype->trapper_hosts, item->units,
@@ -3049,13 +3048,14 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				item->ssl_key_password, item_prototype->verify_peer, item_prototype->verify_host,
 				item_prototype->allow_traps);
 
-		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, item->itemid,
+		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
 				item->parent_itemid, item_prototype->key);
 
-		zbx_db_insert_add_values(db_insert_irtdata, item->itemid);
+		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
 		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name);
 		zbx_audit_item_update_json_add_lld_data(*itemid, item, item_prototype, hostid);
+		item->itemid = (*itemid)++;
 	}
 
 	for (index = 0; index < item->dependent_items.values_num; index++)
@@ -3092,7 +3092,6 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	const char			*d = "";
 
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update items set ");
-	zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name);
 
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_NAME))
 	{
@@ -3540,7 +3539,11 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		{
 			new_items++;
 		}
-		else if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
+		else
+			zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name);
+
+
+		if (0 != item->itemid && 0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
 		{
 			upd_items++;
 			if(0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
@@ -3810,6 +3813,7 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 						(int)ZBX_FLAG_DISCOVERY_CREATED, preproc_op->step, preproc_op->type,
 						preproc_op->params, preproc_op->error_handler,
 						preproc_op->error_handler_params);
+				new_preprocid++;
 				continue;
 			}
 
@@ -4464,9 +4468,13 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		preproc_op = (zbx_lld_item_preproc_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_preproc_t));
 		preproc_op->step = atoi(row[1]);
 		preproc_op->type = atoi(row[2]);
+		preproc_op->type_orig = preproc_op->type;
 		preproc_op->params = zbx_strdup(NULL, row[3]);
+		preproc_op->params_orig = NULL;
 		preproc_op->error_handler = atoi(row[4]);
+		preproc_op->error_handler_orig = preproc_op->error_handler;
 		preproc_op->error_handler_params = zbx_strdup(NULL, row[5]);
+		preproc_op->error_handler_params_orig = NULL;
 		zbx_vector_ptr_append(&item_prototype->preproc_ops, preproc_op);
 	}
 	DBfree_result(result);
@@ -4501,7 +4509,9 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 
 		item_param = (zbx_lld_item_param_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_param_t));
 		item_param->name = zbx_strdup(NULL, row[1]);
+		item_param->name_orig = NULL;
 		item_param->value = zbx_strdup(NULL, row[2]);
+		item_param->value_orig = NULL;
 		zbx_vector_ptr_append(&item_prototype->item_params, item_param);
 	}
 	DBfree_result(result);
@@ -4536,7 +4546,9 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 
 		item_tag = (zbx_lld_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_tag_t));
 		item_tag->tag = zbx_strdup(NULL, row[1]);
+		item_tag->tag_orig = NULL;
 		item_tag->value = zbx_strdup(NULL, row[2]);
+		item_tag->value_orig = NULL;
 		zbx_vector_ptr_append(&item_prototype->item_tags, item_tag);
 	}
 	DBfree_result(result);
