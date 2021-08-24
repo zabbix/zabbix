@@ -205,7 +205,7 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 	ADD_JSON_S(snmp_oid);
 	ADD_JSON_P_UI(authtype);
 	ADD_JSON_S(username);
-	ADD_JSON_S(password);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT(password), ZBX_MACRO_SECRET_MASK);
 	ADD_JSON_P_S(publickey);
 	ADD_JSON_P_S(privatekey);
 	ADD_JSON_S(description);
@@ -227,7 +227,8 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 	ADD_JSON_P_UI(output_format);
 	ADD_JSON_S(ssl_cert_file);
 	ADD_JSON_S(ssl_key_file);
-	ADD_JSON_S(ssl_key_password);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT(ssl_key_password),
+			ZBX_MACRO_SECRET_MASK);
 	ADD_JSON_P_UI(verify_peer);
 	ADD_JSON_P_UI(verify_host);
 	ADD_JSON_P_UI(allow_traps);
