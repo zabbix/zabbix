@@ -96,7 +96,7 @@ void	zbx_audit_discovery_rule_update_json_update_filter_conditions_create_entry(
 
 #define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_H(resource, type1, type2)						\
 void	zbx_audit_discovery_rule_update_json_update_filter_conditions_##resource(zbx_uint64_t itemid,		\
-		zbx_uint64_t item_conditionind, type1 resource##_old, type1 resource##_new);
+		zbx_uint64_t item_conditionid, type1 resource##_old, type1 resource##_new);
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_H(operator, int, int)
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_H(macro, const char*, string)
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_H(value, const char*, string)
@@ -150,7 +150,11 @@ void	zbx_audit_item_delete_params(zbx_uint64_t itemid, int item_flags, zbx_uint6
 
 void	zbx_audit_discovery_rule_update_json_add_lld_macro_path(zbx_uint64_t itemid,
 		zbx_uint64_t lld_macro_pathid, const char *lld_macro, const char *path);
-#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(resource)						\
+
+void	zbx_audit_discovery_rule_update_json_lld_macro_path_create_update_entry(zbx_uint64_t itemid,
+		zbx_uint64_t lld_macro_pathid);
+
+#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(resource)	\
 void	zbx_audit_discovery_rule_update_json_update_lld_macro_path_##resource(zbx_uint64_t itemid,		\
 		zbx_uint64_t lld_macro_pathid, const char *resource##_old, const char *resource##_new);
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(lld_macro)

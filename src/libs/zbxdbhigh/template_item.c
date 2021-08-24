@@ -59,25 +59,7 @@ struct _zbx_template_item_preproc_t
 
 ZBX_PTR_VECTOR_IMPL(item_preproc_ptr, zbx_template_item_preproc_t *)
 
-struct _zbx_template_item_tag_t
-{
-	zbx_uint64_t	itemtagid;
-#define ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_RESET_FLAG	__UINT64_C(0x000000000000)
-#define ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_TAG		__UINT64_C(0x000000000001)
-#define ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_VALUE		__UINT64_C(0x000000000002)
-#define ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE			\
-		(ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_TAG |	\
-		ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_VALUE		\
-		)
-
-#define ZBX_FLAG_TEMPLATE_ITEM_TAG_DELETE		__UINT64_C(0x000000010000)
-
-	zbx_uint64_t	upd_flags;
-	char		*tag;
-	char		*value;
-};
-
-ZBX_PTR_VECTOR_IMPL(item_tag_ptr, zbx_template_item_tag_t *)
+ZBX_PTR_VECTOR_IMPL(item_tag_ptr, zbx_db_tag_t *)
 
 struct _zbx_template_item_param_t
 {
@@ -1286,13 +1268,6 @@ static void	zbx_item_preproc_free(zbx_template_item_preproc_t *preproc)
 	zbx_free(preproc);
 }
 
-static void	zbx_item_tags_free(zbx_template_item_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
-}
-
 static void	zbx_item_params_free(zbx_template_item_param_t *param)
 {
 	if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME))
@@ -1357,8 +1332,8 @@ static void	free_template_item(zbx_template_item_t *item)
 	zbx_vector_ptr_destroy(&item->dependent_items);
 	zbx_vector_item_preproc_ptr_clear_ext(&item->item_preprocs, zbx_item_preproc_free);
 	zbx_vector_item_preproc_ptr_clear_ext(&item->template_preprocs, zbx_item_preproc_free);
-	zbx_vector_item_tag_ptr_clear_ext(&item->item_tags, zbx_item_tags_free);
-	zbx_vector_item_tag_ptr_clear_ext(&item->template_tags, zbx_item_tags_free);
+	zbx_vector_item_tag_ptr_clear_ext(&item->item_tags, zbx_db_tag_free);
+	zbx_vector_item_tag_ptr_clear_ext(&item->template_tags, zbx_db_tag_free);
 	zbx_vector_item_param_ptr_clear_ext(&item->item_params, zbx_item_params_free);
 	zbx_vector_item_param_ptr_clear_ext(&item->template_params, zbx_item_params_free);
 	zbx_vector_lld_macro_ptr_clear_ext(&item->item_lld_macros, zbx_lld_macros_free);
@@ -1662,7 +1637,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_template_item_t		*item;
-	zbx_template_item_tag_t		*tag;
+	zbx_db_tag_t			*tag;
 	zbx_vector_uint64_t		deleteids;
 	zbx_db_insert_t			db_insert;
 	zbx_uint64_t			new_tagid = 0;
@@ -1677,22 +1652,22 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 		for (j = 0; j < item->item_tags.values_num; j++)
 		{
-			tag = (zbx_template_item_tag_t *)item->item_tags.values[j];
+			tag = (zbx_db_tag_t *)item->item_tags.values[j];
 
-			if (0 != (tag->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_TAG_DELETE))
+			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
 			{
-				zbx_vector_uint64_append(&deleteids, tag->itemtagid);
-				zbx_audit_item_delete_tag(item->itemid, item->flags, tag->itemtagid);
+				zbx_vector_uint64_append(&deleteids, tag->tagid);
+				zbx_audit_item_delete_tag(item->itemid, item->flags, tag->tagid);
 				continue;
 			}
 
-			if (0 == tag->itemtagid)
+			if (0 == tag->tagid)
 			{
 				new_tag_num++;
 				continue;
 			}
 
-			if (0 == (tag->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE))
+			if (0 == (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 				continue;
 
 			update_tag_num++;
@@ -1716,8 +1691,8 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 		{
 			const char	*d = "";
 
-			tag = (zbx_template_item_tag_t *)item->item_tags.values[j];
-			if (0 == tag->itemtagid)
+			tag = (zbx_db_tag_t *)item->item_tags.values[j];
+			if (0 == tag->tagid)
 			{
 				zbx_db_insert_add_values(&db_insert, new_tagid, item->itemid, tag->tag, tag->value);
 				zbx_audit_item_update_json_add_item_tag(item->itemid, new_tagid, item->flags, tag->tag,
@@ -1727,14 +1702,14 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 				continue;
 			}
 
-			if (0 == (tag->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE))
+			if (0 == (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 				continue;
 
 			zbx_audit_item_update_json_update_item_tag_create_entry(item->itemid, item->flags,
-								tag->itemtagid);
+					tag->tagid);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_tag set ");
 
-			if (0 != (tag->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_TAG))
+			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
 			{
 				char	*tag_esc;
 
@@ -1743,25 +1718,25 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 				d = ",";
 				zbx_audit_item_update_json_update_item_tag_tag(item->itemid, item->flags,
-						tag->itemtagid, "", tag_esc);
+						tag->tagid, tag->tag_orig, tag->tag);
 				zbx_free(tag_esc);
 
 			}
 
-			if (0 != (tag->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_VALUE))
+			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
 			{
 				char	*value_esc;
 
 				value_esc = DBdyn_escape_string(tag->value);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
 				zbx_audit_item_update_json_update_item_tag_value(item->itemid, item->flags,
-						tag->itemtagid, "", value_esc);
+						tag->tagid, tag->value_orig, tag->value);
 
 				zbx_free(value_esc);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemtagid=" ZBX_FS_UI64 ";\n",
-					tag->itemtagid);
+					tag->tagid);
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
@@ -2620,16 +2595,6 @@ static int	template_item_preproc_sort_by_step(const void *d1, const void *d2)
 	return 0;
 }
 
-static int	template_item_tag_sort_by_tag(const void *d1, const void *d2)
-{
-	zbx_template_item_tag_t	*it1 = *(zbx_template_item_tag_t * const *)d1;
-	zbx_template_item_tag_t	*it2 = *(zbx_template_item_tag_t * const *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(it1->tag, it2->tag);
-
-	return 0;
-}
-
 static int	template_item_param_sort_by_name(const void *d1, const void *d2)
 {
 	zbx_template_item_param_t	*ip1 = *(zbx_template_item_param_t * const *)d1;
@@ -2845,7 +2810,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid;
-	zbx_template_item_tag_t		*ptsrc, *ptdst;
+	zbx_db_tag_t			*ptsrc, *ptdst;
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
@@ -2890,10 +2855,10 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 
 			item = (zbx_template_item_t *)items->values[index];
 
-			ptdst = (zbx_template_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_template_item_tag_t));
+			ptdst = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
 
-			ptdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_RESET_FLAG;
-			ZBX_STR2UINT64(ptdst->itemtagid, row[0]);
+			ptdst->flags = ZBX_FLAG_DB_TAG_UNSET;
+			ZBX_STR2UINT64(ptdst->tagid, row[0]);
 			ptdst->tag = zbx_strdup(NULL, row[2]);
 			ptdst->value = zbx_strdup(NULL, row[3]);
 
@@ -2924,10 +2889,10 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
-		ptdst = (zbx_template_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_template_item_tag_t));
+		ptdst = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
 
-		ptdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_RESET_FLAG;
-		ZBX_STR2UINT64(ptdst->itemtagid, row[0]);
+		ptdst->flags = ZBX_FLAG_DB_TAG_UNSET;
+		ZBX_STR2UINT64(ptdst->tagid, row[0]);
 		ptdst->tag = zbx_strdup(NULL, row[2]);
 		ptdst->value = zbx_strdup(NULL, row[3]);
 
@@ -2943,8 +2908,8 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 
 		item = (zbx_template_item_t *)items->values[i];
 
-		zbx_vector_item_tag_ptr_sort(&item->item_tags, template_item_tag_sort_by_tag);
-		zbx_vector_item_tag_ptr_sort(&item->template_tags, template_item_tag_sort_by_tag);
+		zbx_vector_item_tag_ptr_sort(&item->item_tags, zbx_db_tag_compare_func_template);
+		zbx_vector_item_tag_ptr_sort(&item->template_tags, zbx_db_tag_compare_func_template);
 
 		tag_num = MAX(item->item_tags.values_num, item->template_tags.values_num);
 
@@ -2952,44 +2917,46 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 		{
 			if (j >= item->item_tags.values_num)
 			{
-				ptsrc = (zbx_template_item_tag_t *)item->template_tags.values[j];
-				ptdst = (zbx_template_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_template_item_tag_t));
-				ptdst->itemtagid = 0;
-				ptdst->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_RESET_FLAG;
+				ptsrc = (zbx_db_tag_t *)item->template_tags.values[j];
+				ptdst = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+				ptdst->tagid = 0;
+				ptdst->flags = ZBX_FLAG_DB_TAG_UNSET;
 				ptdst->tag = zbx_strdup(NULL, ptsrc->tag);
 				ptdst->value = zbx_strdup(NULL, ptsrc->value);
 				zbx_vector_item_tag_ptr_append(&item->item_tags, ptdst);
 				continue;
 			}
 
-			ptdst = (zbx_template_item_tag_t *)item->item_tags.values[j];
+			ptdst = (zbx_db_tag_t *)item->item_tags.values[j];
 
 			if (j >= item->template_tags.values_num)
 			{
-				ptdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_TAG_DELETE;
+				ptdst->flags |= ZBX_FLAG_DB_TAG_REMOVE;
 				continue;
 			}
 
-			ptsrc = (zbx_template_item_tag_t *)item->template_tags.values[j];
+			ptsrc = (zbx_db_tag_t *)item->template_tags.values[j];
 
 			buffer = zbx_strdup(buffer, ptsrc->tag);
 
 			if (0 != strcmp(ptdst->tag, buffer))
 			{
+				ptdst->tag_orig = zbx_strdup(NULL, ptdst->tag);
 				zbx_free(ptdst->tag);
 				ptdst->tag = buffer;
 				buffer = NULL;
-				ptdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_TAG;
+				ptdst->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG;
 			}
 
 			buffer = zbx_strdup(buffer, ptsrc->value);
 
 			if (0 != strcmp(ptdst->value, buffer))
 			{
+				ptdst->value_orig = zbx_strdup(NULL, ptdst->value);
 				zbx_free(ptdst->value);
 				ptdst->value = buffer;
 				buffer = NULL;
-				ptdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_TAG_UPDATE_VALUE;
+				ptdst->flags |= ZBX_FLAG_DB_TAG_UPDATE_VALUE;
 			}
 			else
 				zbx_free(buffer);
