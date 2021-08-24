@@ -93,12 +93,7 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 
 	if (0 == sysinfo(&info))
 	{
-		if (0 == (zbx_uint64_t)info.totalswap)
-			return SYSINFO_RET_FAIL;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		if (0 == (zbx_uint64_t)info.mem_unit)
-			return SYSINFO_RET_FAIL;
-
 		SET_UI64_RESULT(result, ((zbx_uint64_t)info.totalswap - (zbx_uint64_t)info.freeswap) *
 				(zbx_uint64_t)info.mem_unit);
 #else
@@ -115,11 +110,7 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 
 	get_swapinfo(&swaptotal, &swapfree);
 
-	if (0 == swaptotal)
-		return SYSINFO_RET_FAIL;
-
 	SET_UI64_RESULT(result, swaptotal - swapfree);
-
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
@@ -134,12 +125,7 @@ static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 
 	if (0 == sysinfo(&info))
 	{
-		if (0 == (zbx_uint64_t)info.freeswap)
-			return SYSINFO_RET_FAIL;
-
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		if (0 == (zbx_uint64_t)info.mem_unit)
-			return SYSINFO_RET_FAIL;
 		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeswap * (zbx_uint64_t)info.mem_unit);
 #else
 		SET_UI64_RESULT(result, info.freeswap);
@@ -154,9 +140,6 @@ static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 	double swaptotal,swapfree;
 
 	get_swapinfo(&swaptotal,&swapfree);
-
-	if (0 == swapfree)
-		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, swapfree);
 	return SYSINFO_RET_OK;
