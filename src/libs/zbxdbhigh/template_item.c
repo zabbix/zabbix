@@ -1718,7 +1718,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 				d = ",";
 				zbx_audit_item_update_json_update_item_tag_tag(item->itemid, item->flags,
-						tag->tagid, "", tag_esc);
+						tag->tagid, tag->tag_orig, tag->tag);
 				zbx_free(tag_esc);
 
 			}
@@ -1730,7 +1730,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 				value_esc = DBdyn_escape_string(tag->value);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
 				zbx_audit_item_update_json_update_item_tag_value(item->itemid, item->flags,
-						tag->tagid, "", value_esc);
+						tag->tagid, tag->value_orig, tag->value);
 
 				zbx_free(value_esc);
 			}
@@ -2941,6 +2941,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 
 			if (0 != strcmp(ptdst->tag, buffer))
 			{
+				ptdst->tag_orig = zbx_strdup(NULL, ptdst->tag);
 				zbx_free(ptdst->tag);
 				ptdst->tag = buffer;
 				buffer = NULL;
@@ -2951,6 +2952,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 
 			if (0 != strcmp(ptdst->value, buffer))
 			{
+				ptdst->value_orig = zbx_strdup(NULL, ptdst->value);
 				zbx_free(ptdst->value);
 				ptdst->value = buffer;
 				buffer = NULL;
