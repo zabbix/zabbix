@@ -24,29 +24,43 @@
  */
 
 ?>
-<script type="text/javascript">
-	jQuery(function($) {
-		function hostPage() {
-			let filter_options = <?= json_encode($data['filter_options']) ?>;
+<script>
+	const view = {
+		host_view_form: null,
+		filter: null,
+		refresh_url: null,
+		refresh_interval: null,
+		refresh_counters: null,
+		running: false,
+		timeout: null,
+		deferred: null,
 
-			this.refresh_url = '<?= $data['refresh_url'] ?>';
-			this.refresh_interval = <?= $data['refresh_interval'] ?>;
-			this.running = false;
-			this.timeout = null;
-			this.deferred = null;
+		init({filter_options, refresh_url, refresh_interval}) {
+			this.refresh_url = refresh_url;
+			this.refresh_interval = refresh_interval;
 
+			this.initTabFilter(filter_options);
+
+			this.host_view_form = $('form[name=host_view]');
+			this.running = true;
+			this.refresh();
+
+			host_popup.init();
+		},
+
+		initTabFilter(filter_options) {
 			if (filter_options) {
 				this.refresh_counters = this.createCountersRefresh(1);
 				this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
-				this.filter.on(TABFILTER_EVENT_URLSET, (ev) => {
-					let url = new Curl('', false);
-
+				this.filter.on(TABFILTER_EVENT_URLSET, () => {
+					const url = new Curl('', false);
 					url.setArgument('action', 'host.view.refresh');
 					this.refresh_url = url.getUrl();
+
 					this.unscheduleRefresh();
 					this.refresh();
 
-					var filter_item = this.filter._active_item;
+					const filter_item = this.filter._active_item;
 
 					if (this.filter._active_item.hasCounter()) {
 						$.post('zabbix.php', {
@@ -61,142 +75,139 @@
 					}
 				});
 			}
-		}
+		},
 
-		hostPage.prototype = {
-			createCountersRefresh: function(timeout) {
-				if (this.refresh_counters) {
-					clearTimeout(this.refresh_counters);
-					this.refresh_counters = null;
-				}
-
-				return setTimeout(() => this.getFiltersCounters(), timeout);
-			},
-			getFiltersCounters: function() {
-				return $.post('zabbix.php', {
-						action: 'host.view.refresh',
-						filter_counters: 1
-					}).done((json) => {
-						if (json.filter_counters) {
-							this.filter.updateCounters(json.filter_counters);
-						}
-					}).always(() => {
-						if (this.refresh_interval > 0) {
-							this.refresh_counters = this.createCountersRefresh(this.refresh_interval);
-						}
-					});
-			},
-			getCurrentForm: function() {
-				return $('form[name=host_view]');
-			},
-			addMessages: function(messages) {
-				$('.wrapper main').before(messages);
-			},
-			removeMessages: function() {
-				$('.wrapper .msg-bad').remove();
-			},
-			refresh: function() {
-				this.setLoading();
-
-				this.deferred = $.getJSON(this.refresh_url);
-
-				return this.bindDataEvents(this.deferred);
-			},
-			setLoading: function() {
-				this.getCurrentForm().addClass('is-loading is-loading-fadein delayed-15s');
-			},
-			clearLoading: function() {
-				this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
-			},
-			doRefresh: function(body) {
-				this.getCurrentForm().replaceWith(body);
-			},
-			/**
-			* Popuplates data-attribute used to prefill new host.
-			*
-			* @param {array} groupids Filtered host group IDs.
-			*/
-			updateCreateHostButton: function(groupids) {
-				$('.' + ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).attr('data-hostgroups', JSON.stringify(groupids));
-			},
-			bindDataEvents: function(deferred) {
-				var that = this;
-
-				deferred
-					.done(function(response) {
-						that.onDataDone.call(that, response);
-					})
-					.fail(function(jqXHR) {
-						that.onDataFail.call(that, jqXHR);
-					})
-					.always(this.onDataAlways.bind(this));
-
-				return deferred;
-			},
-			onDataDone: function(response) {
-				this.clearLoading();
-				this.removeMessages();
-				this.doRefresh(response.body);
-
-				if ('groupids' in response) {
-					this.updateCreateHostButton(response.groupids);
-				}
-
-				if ('messages' in response) {
-					this.addMessages(response.messages);
-				}
-			},
-			onDataFail: function(jqXHR) {
-				// Ignore failures caused by page unload.
-				if (jqXHR.status == 0) {
-					return;
-				}
-
-				this.clearLoading();
-
-				var messages = $(jqXHR.responseText).find('.msg-global');
-
-				if (messages.length) {
-					this.getCurrentForm().html(messages);
-				}
-				else {
-					this.getCurrentForm().html(jqXHR.responseText);
-				}
-			},
-			onDataAlways: function() {
-				if (this.running) {
-					this.deferred = null;
-					this.scheduleRefresh();
-				}
-			},
-			scheduleRefresh: function() {
-				this.unscheduleRefresh();
-
-				if (this.refresh_interval > 0) {
-					this.timeout = setTimeout((function() {
-						this.timeout = null;
-						this.refresh();
-					}).bind(this), this.refresh_interval);
-				}
-			},
-			unscheduleRefresh: function() {
-				if (this.timeout !== null) {
-					clearTimeout(this.timeout);
-					this.timeout = null;
-				}
-
-				if (this.deferred) {
-					this.deferred.abort();
-				}
-			},
-			start: function() {
-				this.running = true;
-				this.refresh();
+		createCountersRefresh(timeout) {
+			if (this.refresh_counters) {
+				clearTimeout(this.refresh_counters);
+				this.refresh_counters = null;
 			}
-		};
 
-		window.host_page = new hostPage();
-		window.host_page.start();
-		host_popup.init();
-	});
+			return setTimeout(() => this.getFiltersCounters(), timeout);
+		},
+
+		getFiltersCounters() {
+			return $.post('zabbix.php', {
+				action: 'host.view.refresh',
+				filter_counters: 1
+			}).done((json) => {
+				if (json.filter_counters) {
+					this.filter.updateCounters(json.filter_counters);
+				}
+			}).always(() => {
+				if (this.refresh_interval > 0) {
+					this.refresh_counters = this.createCountersRefresh(this.refresh_interval);
+				}
+			});
+		},
+
+		addMessages(messages) {
+			$('.wrapper main').before(messages);
+		},
+
+		removeMessages() {
+			$('.wrapper .msg-bad').remove();
+		},
+
+		refresh() {
+			this.setLoading();
+
+			this.deferred = $.getJSON(this.refresh_url);
+
+			return this.bindDataEvents(this.deferred);
+		},
+
+		setLoading() {
+			this.host_view_form.addClass('is-loading is-loading-fadein delayed-15s');
+		},
+
+		clearLoading() {
+			this.host_view_form.removeClass('is-loading is-loading-fadein delayed-15s');
+		},
+
+		/**
+		 * Popuplates data-attribute used to prefill new host.
+		 *
+		 * @param {array} groupids Filtered host group IDs.
+		 */
+		updateCreateHostButton(groupids) {
+			$('.'+host_popup.ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).attr('data-hostgroups', JSON.stringify(groupids));
+		},
+
+		bindDataEvents(deferred) {
+			const that = this;
+
+			deferred
+				.done(function (response) {
+					that.onDataDone.call(that, response);
+				})
+				.fail(function (jqXHR) {
+					that.onDataFail.call(that, jqXHR);
+				})
+				.always(this.onDataAlways.bind(this));
+
+			return deferred;
+		},
+
+		onDataDone(response) {
+			this.clearLoading();
+			this.removeMessages();
+			this.host_view_form.replaceWith(response.body);
+			this.host_view_form = $('form[name=host_view]');
+
+			if ('groupids' in response) {
+				this.updateCreateHostButton(response.groupids);
+			}
+
+			if ('messages' in response) {
+				this.addMessages(response.messages);
+			}
+		},
+
+		onDataFail(jqXHR) {
+			// Ignore failures caused by page unload.
+			if (jqXHR.status == 0) {
+				return;
+			}
+
+			this.clearLoading();
+
+			const messages = $(jqXHR.responseText).find('.msg-global');
+
+			if (messages.length) {
+				this.host_view_form.html(messages);
+			} else {
+				this.host_view_form.html(jqXHR.responseText);
+			}
+		},
+
+		onDataAlways() {
+			if (this.running) {
+				this.deferred = null;
+				this.scheduleRefresh();
+			}
+		},
+
+		scheduleRefresh() {
+			this.unscheduleRefresh();
+
+			if (this.refresh_interval > 0) {
+				this.timeout = setTimeout((function () {
+					this.timeout = null;
+					this.refresh();
+				}).bind(this), this.refresh_interval);
+			}
+		},
+
+		unscheduleRefresh() {
+			if (this.timeout !== null) {
+				clearTimeout(this.timeout);
+				this.timeout = null;
+			}
+
+			if (this.deferred) {
+				this.deferred.abort();
+			}
+		}
+	}
 </script>

@@ -18,12 +18,13 @@
 **/
 
 
-const ZBX_STYLE_ZABBIX_HOST_POPUPEDIT = 'js-edit-host';
-const ZBX_STYLE_ZABBIX_HOST_POPUPCREATE = 'js-create-host';
 const PAGE_TYPE_JS = 'ajax';
 const MESSAGE_TYPE_SUCCESS = 'success';
 
 const host_popup = {
+	ZBX_STYLE_ZABBIX_HOST_POPUPEDIT: 'js-edit-host',
+	ZBX_STYLE_ZABBIX_HOST_POPUPCREATE: 'js-create-host',
+
 	/**
 	 * General entry point to be called on pages that need host popup functionality.
 	 */
@@ -37,7 +38,7 @@ const host_popup = {
 	 * Sets up listeners for elements marked to start host edit/create popup.
 	 */
 	initActionButtons() {
-		document.querySelectorAll('.' + ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).forEach((element) => {
+		document.querySelectorAll('.'+this.ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).forEach((element) => {
 			element.addEventListener('click', (e) => {
 				const node = e.target,
 					host_data = (typeof node.dataset.hostgroups !== 'undefined')
@@ -51,7 +52,7 @@ const host_popup = {
 			});
 		});
 
-		document.querySelectorAll('.' + ZBX_STYLE_ZABBIX_HOST_POPUPEDIT).forEach((element) => {
+		document.querySelectorAll('.'+this.ZBX_STYLE_ZABBIX_HOST_POPUPEDIT).forEach((element) => {
 			element.addEventListener('click', (e) => {
 				const url = new Curl(e.target.href, false);
 				this.edit({hostid: url.getArgument('hostid')});

@@ -30,6 +30,8 @@ $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
 $this->addJsFile('class.tagfilteritem.js');
 
+$this->includeJsFile('monitoring.host.view.js.php');
+
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 $nav_items = new CList();
@@ -76,10 +78,12 @@ $widget->addItem((new CForm())
 
 $widget->show();
 
-$this->includeJsFile('monitoring.host.view.js.php', $data);
-
 (new CScriptTag('
-	host_page.start();
+	view.init('.json_encode([
+		'filter_options' => $data['filter_options'],
+		'refresh_url' => $data['refresh_url'],
+		'refresh_interval' => $data['refresh_interval']
+	]).');
 '))
 	->setOnDocumentReady()
 	->show();
