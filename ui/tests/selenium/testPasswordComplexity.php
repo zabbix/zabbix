@@ -121,7 +121,7 @@ class testPasswordComplexity extends CWebTest {
 
 		foreach ($hintboxes as $hintbox) {
 			// Summon the hint-box.
-			$form->query('xpath://label[text()='. zbx_dbstr($hintbox['field']).']//span')->one()->click();
+			$form->query('xpath://label[text()='.zbx_dbstr($hintbox['field']).']//span')->one()->click();
 			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
 
 			// Assert text.
@@ -227,7 +227,7 @@ class testPasswordComplexity extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot update authentication',
-				'Invalid parameter "/passwd_min_length": value must be one of 1-70.'
+					'Invalid parameter "/passwd_min_length": value must be one of 1-70.'
 			);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
 		}
@@ -1026,8 +1026,11 @@ class testPasswordComplexity extends CWebTest {
 	/**
 	 * Check password complexity rules for user creation or update.
 	 *
-	 * @param array      $data       data provider
-	 * @param boolean    $update     false if create, true if update
+	 * @param array     $data       data provider
+	 * @param string    $admin_password    password used for Admin user login
+	 * @param int       $userid            id of the user whose password is changed
+	 * @param boolean   $update            false if create, true if update
+	 * @param $own      $own               true if user changes his password himself
 	 */
 	private function checkPasswordComplexity($data, $admin_password, $userid = null, $update = false, $own = false,
 			$user_password = null) {
