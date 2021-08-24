@@ -172,14 +172,6 @@ class CControllerAuditLogList extends CController {
 		$data['actions'] = [-1 => _('All')] + $data['actions'];
 		$data['resources'] = [-1 => _('All')] + $data['resources'];
 
-		// (new CUser)->update([
-		// 	"userid" => "39",
-		// 	"medias" =>  [[
-		// 		"mediatypeid" => "29",
-		// 		"sendto" => "brevis"
-		// 	]]
-		// ]);
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Audit log'));
 		$this->setResponse($response);
