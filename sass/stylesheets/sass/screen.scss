@@ -6330,18 +6330,26 @@ z-select,
 
 // Report -> Audit details styles.
 
-.audit-show-details-wrapper {
-	position: absolute;
-	text-align: right;
-	top: 5px;
-	right: 10px;
-}
-
 .audit-details-popup-wrapper {
 	margin: 5px 10px;
 
 	.audit-details-popup-textarea {
 		width: 100%;
 		height: 135px;
+	}
+}
+
+.audit-details-wrapper {
+	display: flex;
+	// align-items: start;
+	// align-content: start;
+	justify-content: space-between;
+
+	.audit-show-details-bttn-wrapper {
+		// position: absolute;
+		// text-align: right;
+		// top: 5px;
+		// right: 10px;
+		margin: 0 5px 0 5px;
 	}
 }

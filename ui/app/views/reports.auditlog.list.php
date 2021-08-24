@@ -123,13 +123,14 @@ foreach ($data['auditlogs'] as $auditlog) {
 				->setArgument('filter_recordsetid', $auditlog['recordsetid'])
 				->setArgument('filter_set', 1)
 		),
-		[zbx_nl2br($auditlog['short_details']),
+		(new CDiv([new CDiv(zbx_nl2br($auditlog['short_details'])),
 			($auditlog['details_button'] == 1)
 				? (new CDiv (
 					(new CLinkAction(_('Details')))->onClick('openAuditDetails('.json_encode($auditlog['details']).')')
-				))->addClass('audit-show-details-wrapper')
+				))->addClass('audit-show-details-bttn-wrapper')
 				: ''
-		]
+		]))->addClass('audit-details-wrapper')
+
 	]);
 }
 

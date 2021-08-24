@@ -172,6 +172,14 @@ class CControllerAuditLogList extends CController {
 		$data['actions'] = [-1 => _('All')] + $data['actions'];
 		$data['resources'] = [-1 => _('All')] + $data['resources'];
 
+		// (new CUser)->update([
+		// 	"userid" => "39",
+		// 	"medias" =>  [[
+		// 		"mediatypeid" => "29",
+		// 		"sendto" => "brevis"
+		// 	]]
+		// ]);
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Audit log'));
 		$this->setResponse($response);
@@ -337,15 +345,17 @@ class CControllerAuditLogList extends CController {
 	private function makeDetailString(string $key, array $detail): string {
 		switch ($detail[0]) {
 			case CAudit::DETAILS_ACTION_ADD:
-				return sprintf('%s: %s', $key, array_key_exists(1, $detail) ? $detail[1] : _('Added'));
+				return array_key_exists(1, $detail)
+					? $key.': '.$detail[1]
+					: $key.': '._('Added');
 
 			case CAudit::DETAILS_ACTION_DELETE:
-				return sprintf('%s: %s', $key, _('Deleted'));
+				return $key.': '._('Deleted');
 
 			case CAudit::DETAILS_ACTION_UPDATE:
 				return array_key_exists(1, $detail)
 					? sprintf('%s: %s => %s', $key, $detail[2], $detail[1])
-					: sprintf('%s: %s', $key, _('Updated'));
+					: $key.': '._('Updated');
 		}
 	}
 }
