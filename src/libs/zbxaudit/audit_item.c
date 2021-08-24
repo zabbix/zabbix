@@ -124,7 +124,10 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 	ADD_JSON_UI(output_format);
 	ADD_JSON_S(params);
 	/* parameters , handled later - for both item and item prototype and LLD RULE */
-	ADD_JSON_S(password);
+
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(password),
+			ZBX_MACRO_SECRET_MASK);
+
 	ADD_JSON_UI(post_type);
 	ADD_JSON_S(posts);
 	/* prevvalue - only for item */
@@ -136,7 +139,10 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 	ADD_JSON_S(snmp_oid);
 	ADD_JSON_S(ssl_cert_file);
 	ADD_JSON_S(ssl_key_file);
-	ADD_JSON_S(ssl_key_password);
+
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(ssl_key_password),
+			ZBX_MACRO_SECRET_MASK);
+
 	/* state - only for item and LLD RULE */
 	ADD_JSON_UI(status);
 	ADD_JSON_S(status_codes);
