@@ -223,7 +223,7 @@ class CAudit {
 		$result = [];
 
 		foreach ($object as $key => $value) {
-			$index = is_numeric($key) ? '['.$key.']' : '.'.$key;
+			$index = '.'.$key;
 
 			if (array_key_exists($prefix, self::RELATABLE_ID_MAPPING)) {
 				$index = '['.$value[self::RELATABLE_ID_MAPPING[$prefix]].']';
@@ -251,9 +251,7 @@ class CAudit {
 				$object_path = preg_replace('/\[[0-9]+\]/', '', $object_path);
 			}
 
-			if (array_key_exists($object_path, self::RELATABLE_TABLE_NAME_MAPPING)) {
-				$table_name = self::RELATABLE_TABLE_NAME_MAPPING[$object_path];
-			}
+			$table_name = self::RELATABLE_TABLE_NAME_MAPPING[$object_path];
 		}
 
 		$schema_fields = DB::getSchema($table_name)['fields'];
@@ -339,7 +337,8 @@ class CAudit {
 
 					if ($is_value_to_mask) {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
-					} elseif ($value != $old_value) {
+					}
+					else {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $old_value];
 					}
 				}
