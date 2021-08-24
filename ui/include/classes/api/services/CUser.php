@@ -1035,7 +1035,7 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			$db_usrgrps = $method === 'update'
+			$db_usrgrps = ($method === 'update')
 				? array_column($db_users[$user['userid']]['usrgrps'], null, 'usrgrpid')
 				: [];
 
@@ -1117,7 +1117,7 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			$db_medias = $method === 'update' ? $db_users[$user['userid']]['medias'] : [];
+			$db_medias = ($method === 'update') ? $db_users[$user['userid']]['medias'] : [];
 
 			foreach ($user['medias'] as &$media) {
 				$media['sendto'] = implode("\n", $media['sendto']);

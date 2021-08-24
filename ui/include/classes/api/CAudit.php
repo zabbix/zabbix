@@ -106,7 +106,7 @@ class CAudit {
 	];
 
 	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,
-			?array $old_objects): void {
+			?array $db_objects): void {
 		if (!self::isAuditEnabled() && ($resource != self::RESOURCE_SETTINGS
 					|| !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
 			return;
@@ -119,10 +119,14 @@ class CAudit {
 
 		foreach ($objects as $object) {
 			$resourceid = $object[$table_key];
-			$old_object = ($action == self::ACTION_UPDATE) ? $old_objects[$resourceid] : [];
-			$resource_name = self::getResourceName($resource, $action, $object, $old_object);
+			$db_object = ($action == self::ACTION_UPDATE) ? $db_objects[$resourceid] : [];
+			$resource_name = self::getResourceName($resource, $action, $object, $db_object);
 
-			$diff = self::handleObjectDiff($resource, $action, $object, $old_object);
+			$diff = self::handleObjectDiff($resource, $action, $object, $db_object);
+
+			if ($action == self::ACTION_UPDATE && count($diff) === 0) {
+				continue;
+			}
 
 			$auditlog[] = [
 				'userid' => $userid,
@@ -155,11 +159,11 @@ class CAudit {
 		return CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
 	}
 
-	private static function getResourceName(int $resource, int $action, array $object, array $old_object): string {
+	private static function getResourceName(int $resource, int $action, array $object, array $db_object): string {
 		$field_name = self::FIELD_NAMES[$resource];
 		$resource_name = ($field_name !== null)
 			? (($action == self::ACTION_UPDATE)
-				? $old_object[$field_name]
+				? $db_object[$field_name]
 				: $object[$field_name])
 			: '';
 
@@ -170,7 +174,7 @@ class CAudit {
 		return $resource_name;
 	}
 
-	private static function handleObjectDiff(int $resource, int $action, array $object, array $old_object): array {
+	private static function handleObjectDiff(int $resource, int $action, array $object, array $db_object): array {
 		if (!in_array($action, [self::ACTION_ADD, self::ACTION_UPDATE])) {
 			return [];
 		}
@@ -183,8 +187,8 @@ class CAudit {
 				return self::handleAdd($resource, $object);
 
 			case self::ACTION_UPDATE:
-				$old_object = self::convertKeysToPaths($api_name, $old_object);
-				return self::handleUpdate($resource, $object, $old_object);
+				$db_object = self::convertKeysToPaths($api_name, $db_object);
+				return self::handleUpdate($resource, $object, $db_object);
 			default:
 				return [];
 		}
@@ -276,6 +280,27 @@ class CAudit {
 		return substr($path, 0, strrpos($path, '.'));
 	}
 
+	private static function getNestedObjects(array $keys): array {
+		$object_keys = [];
+
+		foreach ($keys as $key) {
+			if (strrpos($key, ']') === false) {
+				continue;
+			}
+
+			$key = self::getLastObjectPath($key);
+
+			if (array_key_exists($key, $object_keys)) {
+				$object_keys[$key]++;
+			}
+			else {
+				$object_keys[$key] = 1;
+			}
+		}
+
+		return $object_keys;
+	}
+
 	private static function handleAdd(int $resource, array $object): array {
 		$result = [];
 
@@ -299,24 +324,29 @@ class CAudit {
 		return $result;
 	}
 
-	private static function handleUpdate(int $resource, array $object, array $old_object): array {
+	private static function handleUpdate(int $resource, array $object, array $db_object): array {
 		$result = [];
-		$full_object = $object + $old_object;
+		$full_object = $object + $db_object;
+		$nested_objects = self::getNestedObjects(array_keys($object));
+		$db_nested_objects = self::getNestedObjects(array_keys($db_object));
 
-		foreach (array_keys($full_object) as $path) {
-			$value = array_key_exists($path, $object) ? $object[$path] : null;
-			$old_value = array_key_exists($path, $old_object) ? $old_object[$path] : null;
-
-			if ($value === null) {
-				if (self::isNestedObjectProperty($path)) {
-					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_DELETE];
-				}
+		foreach (array_keys($db_nested_objects) as $path) {
+			if (!array_key_exists($path, $nested_objects)) {
+				$result[$path] = [self::DETAILS_ACTION_DELETE];
 			}
-			else if ($old_value === null) {
-				if (self::isNestedObjectProperty($path)) {
-					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_ADD];
-				}
+		}
 
+		foreach (array_keys($nested_objects) as $path) {
+			if (!array_key_exists($path, $db_nested_objects)) {
+				$result[$path] = [self::DETAILS_ACTION_ADD];
+			}
+		}
+
+		foreach (array_keys($object) as $path) {
+			$value = array_key_exists($path, $object) ? $object[$path] : null;
+			$db_value = array_key_exists($path, $db_object) ? $db_object[$path] : null;
+
+			if ($db_value === null) {
 				if (self::isDefaultValue($resource, $path, $value)) {
 					continue;
 				}
@@ -330,7 +360,7 @@ class CAudit {
 			}
 			else {
 				$is_value_to_mask = self::isValueToMask($resource, $path, $full_object);
-				if ($is_value_to_mask || $value != $old_value) {
+				if ($is_value_to_mask || $value != $db_value) {
 					if (self::isNestedObjectProperty($path)) {
 						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
 					}
@@ -339,7 +369,7 @@ class CAudit {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
 					}
 					else {
-						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $old_value];
+						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
 					}
 				}
 			}
