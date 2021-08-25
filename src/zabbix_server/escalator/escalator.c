@@ -495,7 +495,7 @@ static int	check_service_tags_rule_match(const zbx_vector_tags_t *service_tags, 
 	return PERM_DENY;
 }
 
-static int	zbx_db_cache_service_role(zbx_service_role_t *role)
+static void	zbx_db_cache_service_role(zbx_service_role_t *role)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
