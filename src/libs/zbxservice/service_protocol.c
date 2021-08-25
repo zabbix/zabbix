@@ -326,9 +326,9 @@ void	zbx_service_serialize_parentids(unsigned char **data, zbx_uint32_t *data_al
 
 	if (NULL != *data)
 	{
-		while (data_len > *data_alloc - *data_offset)
+		if (*data_alloc - *data_offset < data_len)
 		{
-			*data_alloc *= 2;
+			*data_alloc = *data_offset + data_len;
 			*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
 		}
 	}
@@ -346,26 +346,21 @@ void	zbx_service_serialize_parentids(unsigned char **data, zbx_uint32_t *data_al
 
 void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *ids)
 {
-	const unsigned char	*end = data + size;
+	int		values_num, i;
 
-	while (data < end)
+	data += zbx_deserialize_value(data, &values_num);
+
+	if (0 == values_num)
+		return;
+
+	zbx_vector_uint64_reserve(ids, values_num);
+
+	for (i = 0; i < values_num; i++)
 	{
-		int		values_num, i;
+		zbx_uint64_t	id;
 
-		data += zbx_deserialize_value(data, &values_num);
+		data += zbx_deserialize_value(data, &id);
 
-		if (0 == values_num)
-			continue;
-
-		zbx_vector_uint64_reserve(ids, values_num);
-
-		for (i = 0; i < values_num; i++)
-		{
-			zbx_uint64_t	id;
-
-			data += zbx_deserialize_value(data, &id);
-
-			zbx_vector_uint64_append(ids, id);
-		}
+		zbx_vector_uint64_append(ids, id);
 	}
 }
