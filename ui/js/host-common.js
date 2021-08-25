@@ -40,14 +40,15 @@ const host_popup = {
 	initActionButtons() {
 		document.querySelectorAll('.'+this.ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).forEach((element) => {
 			element.addEventListener('click', (e) => {
-				const node = e.target,
-					host_data = (typeof node.dataset.hostgroups !== 'undefined')
-						? {groupids: JSON.parse(node.dataset.hostgroups)}
-						: {},
-					url = new Curl('zabbix.php', false);
+				const host_data = (typeof e.target.dataset.hostgroups !== 'undefined')
+					? {groupids: JSON.parse(e.target.dataset.hostgroups)}
+					: {};
 
 				this.edit(host_data);
+
+				const url = new Curl('zabbix.php', false);
 				url.setArgument('action', 'host.edit');
+				host_data.groupids.forEach((g) => url.setArgument('groupids['+g+']', g));
 				history.pushState({}, '', url.getUrl());
 			});
 		});
@@ -65,22 +66,16 @@ const host_popup = {
 	/**
 	 * Sets up and opens host edit popup.
 	 *
-	 * @param {object} host_data                 Host data used to initialize host form.
-	 * @param {object} host_data{hostid}         ID of host to edit.
-	 * @param {object} host_data{groupids}       Host groups to pre-fill when creating new host.
+	 * @param {object} host_data              Host data used to initialize host form.
+	 * @param {string} host_data['hostid']    ID of host to edit.
+	 * @param {array}  host_data['groupids']  Host groups to pre-fill when creating new host.
 	 */
 	edit(host_data = {}) {
 		host_data.output = PAGE_TYPE_JS;
 
 		const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
-		overlay.$dialogue.addClass('sticked-to-top')[0].addEventListener('dialogue.submit', (e) => {
-			postMessageOk(e.detail.title);
-
-			if (e.detail.messages !== null) {
-				postMessageDetails('success', e.detail.messages);
-			}
-		});
+		overlay.$dialogue.addClass('sticked-to-top');
 
 		overlay.$dialogue[0].addEventListener('overlay.close', () => {
 			history.replaceState({}, '', this.original_url);
