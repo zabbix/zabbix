@@ -485,7 +485,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'try'
+						'Name' => 'empty try'
 					],
 					'expected' => []
 				]
