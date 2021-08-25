@@ -33,6 +33,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 
 		$rules += $this->getUiSectionRules($user_type);
 		$rules += $this->getActionSectionRules($user_type);
+		$rules += $this->getServiceSectionRules();
 		$rules += $this->getModuleSectionRules();
 		$rules += $this->getApiSectionRules();
 
@@ -58,6 +59,46 @@ abstract class CControllerUserroleEditGeneral extends CController {
 					'status' => $this->getInput(str_replace('.', '_', $rule))
 				];
 			}, CRoleHelper::getAllActions($user_type))
+		];
+	}
+
+	protected function getServiceSectionRules(): array {
+		$read_access = $this->getInput('service_read_access', CRoleHelper::SERVICES_ACCESS_NONE);
+		$write_access = $this->getInput('service_write_access', CRoleHelper::SERVICES_ACCESS_NONE);
+
+		return [
+			'services.read.mode' => $read_access == CRoleHelper::SERVICES_ACCESS_ALL
+				? ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+				: ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM,
+			'services.read.list' => $read_access == CRoleHelper::SERVICES_ACCESS_LIST
+				? array_map(
+					function (string $serviceid): array {
+						return ['serviceid' => $serviceid];
+					},
+					$this->getInput('service_read_list', []))
+				: [],
+			'services.read.tag' => $read_access == CRoleHelper::SERVICES_ACCESS_LIST
+				? [
+					'tag' => $this->getInput('service_read_tag_tag', ''),
+					'value' => $this->getInput('service_read_tag_value', '')
+				]
+				: ['tag' => '', 'value' => ''],
+			'services.write.mode' => $write_access == CRoleHelper::SERVICES_ACCESS_ALL
+				? ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+				: ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM,
+			'services.write.list' => $write_access == CRoleHelper::SERVICES_ACCESS_LIST
+				? array_map(
+					function (string $serviceid): array {
+						return ['serviceid' => $serviceid];
+					},
+					$this->getInput('service_write_list', []))
+				: [],
+			'services.write.tag' => $write_access == CRoleHelper::SERVICES_ACCESS_LIST
+				? [
+					'tag' => $this->getInput('service_write_tag_tag', ''),
+					'value' => $this->getInput('service_write_tag_value', '')
+				]
+				: ['tag' => '', 'value' => '']
 		];
 	}
 
