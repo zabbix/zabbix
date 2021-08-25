@@ -3099,7 +3099,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "name='%s'", value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_name(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED, item->name_proto,
-				value_esc);
+				item->name);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
@@ -3108,7 +3108,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%skey_='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_key(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED, item->key_orig,
-				value_esc);
+				item->key);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE))
@@ -3131,7 +3131,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sdelay='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_delay(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED, item->delay_orig,
-				value_esc);
+				item->delay);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY))
@@ -3140,7 +3140,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%shistory='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_history(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->history_orig, value_esc);
+				item->history_orig, item->history);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS))
@@ -3149,7 +3149,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%strends='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_trends(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->trends_orig, value_esc);
+				item->trends_orig, item->trends);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS))
@@ -3158,7 +3158,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%strapper_hosts='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_trapper_hosts(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->trapper_hosts_orig, value_esc);
+				item->trapper_hosts_orig, item_prototype->trapper_hosts);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_UNITS))
@@ -3166,7 +3166,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		value_esc = DBdyn_escape_string(item->units);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sunits='%s'", d, value_esc);
 		zbx_audit_item_update_json_update_units(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED, item->units_orig,
-				value_esc);
+				item->units);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA))
@@ -3175,7 +3175,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sformula='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_formula(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->formula_orig, value_esc);
+				item->formula_orig, item_prototype->formula);
 		zbx_free(value_esc);
 
 	}
@@ -3185,7 +3185,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%slogtimefmt='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_logtimefmt(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->logtimefmt_orig, value_esc);
+				item->logtimefmt_orig, item_prototype->logtimefmt);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID))
@@ -3202,7 +3202,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sparams='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_params(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->params_orig, value_esc);
+				item->params_orig, item->params);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR))
@@ -3211,7 +3211,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sipmi_sensor='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_ipmi_sensor(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->ipmi_sensor_orig, value_esc);
+				item->ipmi_sensor_orig, item->ipmi_sensor);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID))
@@ -3220,7 +3220,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmp_oid='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_snmp_oid(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->snmp_oid_orig, value_esc);
+				item->snmp_oid_orig, item->snmp_oid);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE))
@@ -3236,7 +3236,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%susername='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_username(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->username_orig, value_esc);
+				item->username_orig, item->username);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD))
@@ -3254,7 +3254,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%spublickey='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_publickey(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->publickey_orig, value_esc);
+				item->publickey_orig, item_prototype->publickey);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY))
@@ -3263,7 +3263,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sprivatekey='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_privatekey(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->privatekey_orig, value_esc);
+				item->privatekey_orig, item_prototype->privatekey);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION))
@@ -3272,7 +3272,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sdescription='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_description(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->description_orig, value_esc);
+				item->description_orig, item->description);
 		zbx_free(value_esc);
 
 	}
@@ -3290,7 +3290,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sjmx_endpoint='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_jmx_endpoint(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->jmx_endpoint_orig, value_esc);
+				item->jmx_endpoint_orig, item->jmx_endpoint);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM))
@@ -3307,7 +3307,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%stimeout='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_timeout(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->timeout_orig, value_esc);
+				item->timeout_orig, item->timeout);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_URL))
@@ -3316,7 +3316,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%surl='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_url(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED, item->url_orig,
-				value_esc);
+				item->url);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS))
@@ -3325,7 +3325,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%squery_fields='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_query_fields(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->query_fields_orig, value_esc);
+				item->query_fields_orig, item->query_fields);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_POSTS))
@@ -3334,7 +3334,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sposts='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_posts(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED, item->posts_orig,
-				value_esc);
+				item->posts);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_STATUS_CODES))
@@ -3343,7 +3343,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sstatus_codes='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_status_codes(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->status_codes_orig, value_esc);
+				item->status_codes_orig, item->status_codes);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_FOLLOW_REDIRECTS))
@@ -3367,7 +3367,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%shttp_proxy='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_http_proxy(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->http_proxy_orig, value_esc);
+				item->http_proxy_orig, item->http_proxy);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_HEADERS))
@@ -3376,7 +3376,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sheaders='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_headers(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->headers_orig, value_esc);
+				item->headers_orig, item->headers);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_RETRIEVE_MODE))
@@ -3409,7 +3409,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sssl_cert_file='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_ssl_cert_file(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->ssl_cert_file_orig, value_esc);
+				item->ssl_cert_file_orig, item->ssl_cert_file);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_FILE))
@@ -3418,7 +3418,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sssl_key_file='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_ssl_key_file(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item->ssl_key_file_orig, value_esc);
+				item->ssl_key_file_orig, item->ssl_key_file);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD))
@@ -3850,7 +3850,7 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 				delim = ',';
 				zbx_audit_item_update_json_update_item_preproc_params(item->itemid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, preproc_op->item_preprocid,
-						preproc_op->params_orig, params_esc);
+						preproc_op->params_orig, preproc_op->params);
 				zbx_free(params_esc);
 			}
 
@@ -3875,7 +3875,8 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 
 				zbx_audit_item_update_json_update_item_preproc_error_handler_params(item->itemid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, preproc_op->item_preprocid,
-						preproc_op->error_handler_params_orig, params_esc);
+						preproc_op->error_handler_params_orig,
+						preproc_op->error_handler_params);
 
 				zbx_free(params_esc);
 			}
@@ -4043,7 +4044,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 				delim = ',';
 				zbx_audit_item_update_json_update_params_name(item->itemid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, item_param->item_parameterid,
-						item_param->name_orig, name_esc);
+						item_param->name_orig, item_param->name);
 				zbx_free(name_esc);
 			}
 
@@ -4056,7 +4057,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 				zbx_audit_item_update_json_update_params_value(item->itemid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, item_param->item_parameterid,
-						item_param->value_orig, value_esc);
+						item_param->value_orig, item_param->value);
 
 				zbx_free(value_esc);
 			}
@@ -4142,7 +4143,8 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED))
 			{
 				zbx_vector_uint64_append(&deleteids, item_tag->item_tagid);
-				zbx_audit_item_delete_tag(item->itemid, item->flags, item_tag->item_tagid);
+				zbx_audit_item_delete_tag(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
+						item_tag->item_tagid);
 				continue;
 			}
 
@@ -4222,7 +4224,7 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 
 				zbx_audit_item_update_json_update_item_tag_tag(item->itemid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, item_tag->item_tagid,
-						item_tag->tag_orig, tag_esc);
+						item_tag->tag_orig, item_tag->tag);
 				zbx_free(tag_esc);
 				delim = ',';
 			}
@@ -4236,7 +4238,7 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 
 				zbx_audit_item_update_json_update_item_tag_value(item->itemid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, item_tag->item_tagid,
-						item_tag->value_orig, value_esc);
+						item_tag->value_orig, item_tag->value);
 
 				zbx_free(value_esc);
 			}

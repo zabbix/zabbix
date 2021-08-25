@@ -21,6 +21,8 @@
 #include "log.h"
 #include "db.h"
 
+#include "../../libs/zbxaudit/audit_item.h"
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_field_str_rollback                                           *
@@ -184,8 +186,29 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 	/* remove 'lost' objects */
 	if (0 != del_ids.values_num)
 	{
+		zbx_vector_uint64_t	itemids;
+
+
 		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		if(0 == strncmp(table, "item_discovery", ZBX_CONST_STRLEN("item_discovery")))
+		{
+			zbx_vector_uint64_create(&itemids);
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"select distinct i.itemid,i.name,i.flags"
+						" from items i"
+						" where ");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", del_ids.values,
+					del_ids.values_num);
+
+			DBselect_delete_for_item(sql, &itemids);
+			zbx_vector_uint64_destroy(&itemids);
+		}
+
 		cb(&del_ids);
+
+		zbx_free(sql);
 	}
 
 	DBcommit();
