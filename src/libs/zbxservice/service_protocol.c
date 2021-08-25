@@ -333,7 +333,7 @@ void	zbx_service_serialize_parentids(unsigned char **data, zbx_uint32_t *data_al
 		}
 	}
 	else
-		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = MAX(1024, data_len)));
+		*data = (unsigned char *)zbx_malloc(NULL, (*data_alloc = data_len));
 
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
