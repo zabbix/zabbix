@@ -1,6 +1,7 @@
 Changes for 6.0.0alpha1
 
 New features:
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6775] implemented new audit log; added new auditlog to user and token API (rlataria, Sasha, vmaksimovs)
 ........S. [ZBXNEXT-6810] implemented audit on server (processing of LLD rules and discovered hosts) (akozlovs)
 ..F.....S. [ZBXNEXT-6802] implemented audit for server (linking templates - host, host prototypes) (arimdjonoks, vmaksimovs)
 .........T [ZBXNEXT-6702] added {#FSLABEL} macro in item names of the "Windows filesystems by Zabbix agent/agent active" templates, changed vfs.file.cksum[/etc/passwd] key to vfs.file.cksum[/etc/passwd,sha256] in Unix templates (mchudinov)
