@@ -165,9 +165,9 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 	if ONLY_LLD_RULE
 	{
 		zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD,
-				IT_OR_ITP_OR_DR("filter.formula"), item->formula);
+				IT_OR_ITP_OR_DR(filter.formula), item->formula);
 		zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD,
-				IT_OR_ITP_OR_DR("filter.evaltype"), item->evaltype);
+				IT_OR_ITP_OR_DR(filter.evaltype), item->evaltype);
 	}
 #undef ADD_JSON_UI
 #undef ADD_JSON_S
