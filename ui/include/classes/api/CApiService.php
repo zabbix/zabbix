@@ -1173,9 +1173,10 @@ class CApiService {
 	 * @param array $objects
 	 * @param array $objects_old
 	 */
-	protected function addAuditLog(int $action, int $resource, array $objects, array $objects_old = null): void {
+	public function addAuditLog(int $action, int $resource, array $objects, array $objects_old = null,
+			bool $parent = true): void {
 		CAudit::log(self::$userData['userid'], self::$userData['userip'], self::$userData['username'], $action,
-			$resource, $objects, $objects_old
+			$resource, $objects, $objects_old, $parent
 		);
 	}
 

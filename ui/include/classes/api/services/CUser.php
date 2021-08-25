@@ -1191,6 +1191,16 @@ class CUser extends CApiService {
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
 		]);
+
+		$token_options = [
+			'output' => ['tokenid'],
+			'filter' => ['userid' => $userids]
+		];
+		$tokenids = DBfetchColumn(DBselect(DB::makeSql('token', $token_options)), 'tokenid');
+		if ($tokenids) {
+			CTokenManager::delete($tokenids, false, $this);
+		}
+
 		DB::delete('users', ['userid' => $userids]);
 
 		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);

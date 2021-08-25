@@ -305,7 +305,7 @@ class CToken extends CApiService {
 		$this->validateUpdate($tokens, $db_tokens);
 
 		$upd_tokens = [];
-		foreach ($tokens as $token) {
+		foreach ($tokens as &$token) {
 			$db_token = $db_tokens[$token['tokenid']];
 
 			$upd_token = DB::getUpdatedValues('token', $token, $db_token);
@@ -316,7 +316,10 @@ class CToken extends CApiService {
 					'where' => ['tokenid' => $token['tokenid']]
 				];
 			}
+
+			$token['userid'] = $db_token['userid'];
 		}
+		unset($token);
 
 		if ($upd_tokens) {
 			DB::update('token', $upd_tokens);
@@ -413,7 +416,7 @@ class CToken extends CApiService {
 		}
 
 		$db_tokens = DB::select('token', [
-			'output' => ['tokenid', 'userid', 'name'],
+			'output' => ['tokenid'],
 			'tokenids' => $tokenids,
 			'filter' => ['userid' => $filter_userids]
 		]);
@@ -422,9 +425,7 @@ class CToken extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		DB::delete('token', ['tokenid' => $tokenids]);
-
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_AUTH_TOKEN, $db_tokens);
+		CTokenManager::delete($tokenids, true, $this);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -460,7 +461,7 @@ class CToken extends CApiService {
 		}
 
 		$db_tokens = DB::select('token', [
-			'output' => ['tokenid', 'name', 'token'],
+			'output' => ['tokenid', 'name', 'token', 'userid'],
 			'tokenids' => array_keys($db_tokens),
 			'preservekeys' => true
 		]);
@@ -471,7 +472,8 @@ class CToken extends CApiService {
 			$token = bin2hex(random_bytes(32));
 			$response[] = [
 				'tokenid' => $tokenid,
-				'token' => $token
+				'token' => $token,
+				'userid' => $db_tokens[$tokenid]['userid']
 			];
 			$upd_tokens[] = [
 				'values' => ['token' => hash('sha512', $token), 'creator_userid' => self::$userData['userid']],
