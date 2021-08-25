@@ -1760,7 +1760,7 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 		{
 			zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
 
-			if (SUCCEED != service_get_status(child, &child_status))
+			if (SUCCEED != service_get_status(child, &child_status) || ZBX_SERVICE_STATUS_OK == child_status)
 				continue;
 
 			if ((ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE == service->algorithm && child_status >= severity) ||
