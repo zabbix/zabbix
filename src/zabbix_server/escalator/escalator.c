@@ -670,7 +670,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 		zabbix_log(3, "DBG Check 4 OK");
 		return perm;
 	}
-	else 
+	else
 	{
 		zabbix_log(3, "DBG Check 4 FAIL");
 	}
@@ -681,7 +681,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 		zabbix_log(3, "DBG Check 5 OK");
 		return perm;
 	}
-	else 
+	else
 	{
 		zabbix_log(3, "DBG Check 5 FAIL");
 	}
