@@ -37,6 +37,7 @@
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
 #include "service_protocol.h"
+#include "dbcache.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
@@ -467,7 +468,7 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
 	return perm;
 }
 
-static int	check_service_tags_rule_match(const zbx_vector_ptr_t *service_tags, const zbx_vector_tags_t *role_tags)
+static int	check_service_tags_rule_match(const zbx_vector_tags_t *service_tags, const zbx_vector_tags_t *role_tags)
 {
 	int	i, j;
 
@@ -477,12 +478,15 @@ static int	check_service_tags_rule_match(const zbx_vector_ptr_t *service_tags, c
 
 		for (j = 0; j < service_tags->values_num; j++)
 		{
-			zbx_tag_t *service_tag = (zbx_tag_t*)service_tags->values[j];
+			zbx_tag_t *service_tag = service_tags->values[j];
 
 			if (0 == strcmp(service_tag->tag, role_tag->tag))
 			{
-				if (0 == strcmp(service_tag->value, role_tag->value))
+				if (NULL != role_tag->value && 0 == strcmp(service_tag->value, role_tag->value))
+				{
 					return PERM_READ_WRITE;
+				}
+
 				return PERM_READ;
 			}
 		}
@@ -515,8 +519,6 @@ static int	zbx_db_cache_service_role(zbx_service_role_t *role)
 		{
 			char	*value_int = row[2];
 
-			zabbix_log(3, "type 0, name = '%s'", name);
-
 			if (0 == strcmp("read", name))
 				ZBX_STR2UCHAR(services_read, value_int);
 			else if (0 == strcmp("write", name))
@@ -526,8 +528,6 @@ static int	zbx_db_cache_service_role(zbx_service_role_t *role)
 		{
 			char		*value_str = row[3];
 			zbx_tag_t	*tag;
-
-			zabbix_log(3, "type 1, name = '%s'", name);
 
 			/* As the field 'name' is sorted, its 'tag.value' record always follows its corresponding */
 			/* 'tag.name' record */
@@ -555,8 +555,6 @@ static int	zbx_db_cache_service_role(zbx_service_role_t *role)
 
 			if (SUCCEED == DBis_null(value_serviceid))
 				continue;
-
-			zabbix_log(3, "type 3, name = '%s'", name);
 
 			if (0 != strncmp(name, "read.id", ZBX_CONST_STRLEN("read.id")) &&
 					0 != strncmp(name, "write.id", ZBX_CONST_STRLEN("write.id")))
@@ -621,42 +619,22 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 
 	// check if global read rights are not disabled (services.read:0). In this case individual role rules can be skipped.
 	if (1 == role->default_read)
-	{
-		zabbix_log(3, "DBG Check 1 OK");
 		return PERM_READ;
-	}
-	else
-	{
-		zabbix_log(3, "DBG Check 1 FAIL");
-	}
 
 	// read read/write rule rights
 	if (SUCCEED == zbx_vector_uint64_bsearch(&role->serviceids, service->serviceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-	{
-		zabbix_log(3, "DBG Check 2 OK");
 		return PERM_READ;
-	}
-	else
-	{
-		zabbix_log(3, "DBG Check 2 FAIL");
-	}
 
 	// check if service tags does not match tag rules
 	if (PERM_DENY < (perm = check_service_tags_rule_match(&service->service_tags, &role->tags)))
-	{
-		zabbix_log(3, "DBG Check 3 OK");
 		return perm;
-	}
-	else
-	{
-		zabbix_log(3, "DBG Check 3 FAIL");
-	}
+
 
 	// get service parent ids from service manager
 	zbx_service_serialize_id(&data, &data_alloc, &data_offset, service->serviceid);
 
 	if (NULL == data)
-		goto out;
+		goto out2;
 
 	zbx_ipc_message_init(&response);
 	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset, &response);
@@ -666,28 +644,14 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 
 	// check if the returned vector doesn't intersect rule serviceids vector
 	if (PERM_DENY < (perm = check_parent_service_intersection(&parent_ids, &role->serviceids)))
-	{
-		zabbix_log(3, "DBG Check 4 OK");
-		return perm;
-	}
-	else
-	{
-		zabbix_log(3, "DBG Check 4 FAIL");
-	}
-
+		goto out;
 
 	if (PERM_DENY < (perm = check_db_parent_rule_tag_match(&parent_ids, &role->tags)))
-	{
-		zabbix_log(3, "DBG Check 5 OK");
-		return perm;
-	}
-	else
-	{
-		zabbix_log(3, "DBG Check 5 FAIL");
-	}
+		goto out;
 
-	zbx_vector_uint64_destroy(&parent_ids);
 out:
+	zbx_vector_uint64_destroy(&parent_ids);
+out2:
 	zbx_free(data);
 
 	return perm;
@@ -2804,7 +2768,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 			tag->tag = zbx_strdup(NULL, row[2]);
 			tag->value = zbx_strdup(NULL, row[3]);
 
-			zbx_vector_ptr_append(&last_service->service_tags, tag);
+			zbx_vector_tags_append(&last_service->service_tags, tag);
 			continue;
 		}
 
@@ -2813,20 +2777,16 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 		service->name = zbx_strdup(NULL, row[1]);
 		zbx_vector_uint64_create(&service->eventids);
 		zbx_vector_ptr_create(&service->events);
+		zbx_vector_tags_create(&service->service_tags);
 
 		if (FAIL == DBis_null(row[2]))
 		{
 			zbx_tag_t	*tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
-			zbx_vector_ptr_create(&service->service_tags);
 
 			tag->tag = zbx_strdup(NULL, row[2]);
+			tag->value = zbx_strdup(NULL, row[3]);
 
-			if (FAIL == DBis_null(row[3]))
-				tag->value = zbx_strdup(NULL, row[3]);
-			else
-				tag->value = '\0';
-
-			zbx_vector_ptr_append(&service->service_tags, tag);
+			zbx_vector_tags_append(&service->service_tags, tag);
 		}
 
 		zbx_vector_service_append(services, service);
@@ -2933,33 +2893,19 @@ static void	get_db_service_alarms(zbx_vector_ptr_t *escalations, zbx_vector_serv
 	zbx_vector_uint64_destroy(&service_alarmids);
 }
 
-static void	service_tag_clean(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
-}
-
-static void	tag_clean(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
-}
-
 static void	service_clean(DB_SERVICE *service)
 {
 	zbx_free(service->name);
 	zbx_vector_ptr_destroy(&service->events);
 	zbx_vector_uint64_destroy(&service->eventids);
-	zbx_vector_ptr_clear_ext(&service->service_tags, service_tag_clean);
-	zbx_vector_ptr_destroy(&service->service_tags);
+	zbx_vector_tags_clear_ext(&service->service_tags, zbx_free_tag);
+	zbx_vector_tags_destroy(&service->service_tags);
 	zbx_free(service);
 }
 
 static void	service_role_clean(zbx_service_role_t *role)
 {
-	zbx_vector_tags_clear_ext(&role->tags, tag_clean);
+	zbx_vector_tags_clear_ext(&role->tags, zbx_free_tag);
 	zbx_vector_tags_destroy(&role->tags);
 	zbx_vector_uint64_destroy(&role->serviceids);
 }

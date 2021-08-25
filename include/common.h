@@ -1735,4 +1735,14 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 /* UTF-8 trimming */
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
+
+typedef struct
+{
+	char	*tag;
+	char	*value;
+}
+zbx_tag_t;
+
+void	zbx_free_tag(zbx_tag_t *tag);
+
 #endif

@@ -208,15 +208,6 @@ DC_FUNCTION;
 
 typedef struct
 {
-	char	*tag;
-	char	*value;
-}
-zbx_tag_t;
-
-ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
-
-typedef struct
-{
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	itemid;
 	zbx_tag_t	tag;
@@ -877,7 +868,6 @@ typedef struct
 }
 zbx_hc_item_t;
 
-void	zbx_free_tag(zbx_tag_t *tag);
 void	zbx_free_item_tag(zbx_item_tag_t *item_tag);
 
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);

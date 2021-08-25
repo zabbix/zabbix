@@ -2305,7 +2305,7 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 	zbx_vector_uint64_t	serviceids, eventids;
 	int			i;
 	unsigned char		*data = NULL;
-	zbx_uint32_t		data_alloc = 0, data_offset = 0;
+	size_t			data_alloc = 0, data_offset = 0;
 
 	zbx_vector_uint64_create(&serviceids);
 	zbx_vector_uint64_create(&eventids);

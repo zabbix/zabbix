@@ -8056,13 +8056,6 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	}
 }
 
-void	zbx_free_tag(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
-}
-
 void	zbx_free_item_tag(zbx_item_tag_t *item_tag)
 {
 	zbx_free(item_tag->tag.tag);
