@@ -22,31 +22,43 @@
 /**
  * Controller for host creation.
  */
-class CControllerHostNew extends CControllerHostUpdateGeneral {
+class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 	protected function checkInput(): bool {
-		return parent::checkInputFields(self::getValidationFields());
+		$ret = $this->validateInput(self::getValidationFields());
+
+		if (!$ret) {
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
-		$ret = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+			return false;
+		}
 
-		if ($ret && $this->hasInput('clone_hostid') && $this->hasInput('full_clone')) {
+		if ($this->hasInput('clone_hostid') && $this->hasInput('full_clone')) {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'hostids' => $this->getInput('clone_hostid')
 			]);
 
 			if (!$hosts) {
-				access_deny(ACCESS_DENY_OBJECT);
+				return false;
 			}
 		}
 
-		return $ret;
+		return true;
 	}
 
 	protected function doAction(): void {
-		$output = [];
 		$host = array_filter([
 			'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
 			'proxy_hostid' => $this->getInput('proxy_hostid', 0),
@@ -81,51 +93,31 @@ class CControllerHostNew extends CControllerHostUpdateGeneral {
 
 		$host = CArrayHelper::renameKeys($host, ['visiblename' => 'name']);
 
-		$full_clone = $this->hasInput('full_clone');
 		$src_hostid = $this->getInput('clone_hostid', '');
 
 		if ($src_hostid) {
 			$host = $this->extendHostCloneEncryption($host, $src_hostid);
 		}
 
-		$hostids = API::Host()->create($host);
+		$result = API::Host()->create($host);
 
-		if ($hostids !== false && $this->createValueMaps($hostids['hostids'][0], $this->getInput('valuemaps', []),
-					$this->hasInput('full_clone') || $this->hasInput('clone')
-				) && (!$full_clone || $this->copyFromCloneSourceHost($src_hostid, $hostids['hostids'][0]))) {
-			$messages = get_and_clear_messages();
-			$details = [];
+		$hostid = $result ? $result['hostids'][0] : null;
 
-			foreach ($messages as $message) {
-				$details[] = $message['message'];
+		if ($hostid && $this->createValueMaps($hostid)
+				&& (!$this->hasInput('full_clone') || $this->copyFromCloneSourceHost($src_hostid, $hostid))) {
+			$output = ['title' => _('Host added')];
+
+			if ($messages = CMessageHelper::getMessages()) {
+				$output['messages'] = array_column($messages, 'message');
 			}
-
-			ob_start();
-			uncheckTableRows('hosts');
-
+		}
+		else {
 			$output = [
-				'message' => makeMessageBox(ZBX_STYLE_MSG_GOOD, $messages, _('Host added'), true, false)->toString(),
-				'title' => _('Host added'),
-				'details' => $details,
-				'script_inline' => ob_get_clean()
+				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())->toString()
 			];
 		}
 
-		if (!$output) {
-			if (($messages = getMessages()) !== null) {
-				$output = ['errors' => $messages->toString()];
-			}
-
-			if ($hostids !== false) {
-				API::Host()->delete([$hostids['hostids'][0]]);
-			}
-		}
-
-		$response = $output
-			? (new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			: new CControllerResponseFatal();
-
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
 	/**
@@ -160,12 +152,13 @@ class CControllerHostNew extends CControllerHostUpdateGeneral {
 	 * Create valuemaps.
 	 *
 	 * @param string $hostid      Target hostid.
-	 * @param array  $valuemaps   Submitted value maps.
-	 * @param bool   $clone_mode  Whether to cleanup existing ids.
 	 *
 	 * @return bool
 	 */
-	private function createValueMaps(string $hostid, array $valuemaps, $clone_mode = false): bool {
+	private function createValueMaps(string $hostid): bool {
+		$valuemaps = $this->getInput('valuemaps', []);
+		$clone_mode = ($this->hasInput('full_clone') || $this->hasInput('clone'));
+
 		foreach($valuemaps as $key => $valuemap) {
 			if ($clone_mode) {
 				unset($valuemap['valuemapid']);

@@ -25,7 +25,19 @@
 class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 
 	protected function checkInput(): bool {
-		return parent::checkInputFields(['hostid' => 'required|db hosts.hostid'] + self::getValidationFields());
+		$ret = $this->validateInput(['hostid' => 'required|db hosts.hostid'] + self::getValidationFields());
+
+		if (!$ret) {
+			$output = [];
+
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
@@ -43,7 +55,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 		]);
 
 		if (!$this->host) {
-			access_deny(ACCESS_DENY_OBJECT);
+			return false;
 		}
 
 		$this->host = $this->host[0];
@@ -100,36 +112,22 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 			$host = array_intersect_key($host, array_flip(['hostid', 'status', 'inventory', 'description']));
 		}
 
-		$hostids = API::Host()->update($host);
+		$result = API::Host()->update($host);
 
-		if ($hostids !== false && $this->processValueMaps($this->getInput('valuemaps', []))) {
-			$messages = get_and_clear_messages();
-			$details = [];
+		if ($result !== false && $this->processValueMaps($this->getInput('valuemaps', []))) {
+			$output = ['title' => _('Host updated')];
 
-			foreach ($messages as $message) {
-				$details[] = $message['message'];
+			if ($messages = CMessageHelper::getMessages()) {
+				$output['messages'] = array_column($messages, 'message');
 			}
-
-			ob_start();
-			uncheckTableRows('hosts');
-
+		}
+		else {
 			$output = [
-				'message' => makeMessageBox(ZBX_STYLE_MSG_GOOD, $messages, _('Host updated'), true, false)->toString(),
-				'title' => _('Host updated'),
-				'details' => $details,
-				'script_inline' => ob_get_clean()
+				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())->toString()
 			];
 		}
 
-		if (!$output && ($messages = getMessages()) !== null) {
-			$output = ['errors' => $messages->toString()];
-		}
-
-		$response = $output
-			? (new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			: new CControllerResponseFatal();
-
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
 	/**

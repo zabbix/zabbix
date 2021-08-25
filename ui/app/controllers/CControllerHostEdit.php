@@ -176,7 +176,7 @@ class CControllerHostEdit extends CController {
 		$this->host = (array) $this->host + $this->getInputValues() + $this->getHostDefaultValues();
 
 		$data = [
-			'form_action' => $this->host['hostid'] ? 'host.update' : 'host.new',
+			'form_action' => $this->host['hostid'] ? 'host.update' : 'host.create',
 			'hostid' => $this->host['hostid'],
 			'full_clone' => $this->hasInput('full_clone') ? 1 : null,
 			'clone_hostid' => $this->clone_hostid,

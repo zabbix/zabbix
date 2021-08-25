@@ -47,7 +47,7 @@ const host_popup = {
 					url = new Curl('zabbix.php', false);
 
 				this.edit(host_data);
-				url.setArgument('action', 'host.create');
+				url.setArgument('action', 'host.edit');
 				history.pushState({}, '', url.getUrl());
 			});
 		});
@@ -148,15 +148,12 @@ async function handle_hostaction_response(response, host_form = null) {
 		jQuery('head').append(response.script_inline);
 	}
 
-	clearMessages();
-	$('main').find('> .msg-good, > .msg-bad, > .msg-warning').not('.msg-global-footer').remove();
-
 	if (typeof overlay !== 'undefined') {
 		overlay.unsetLoading();
 		overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 	}
 
-	parent = (host_form !== null) ? host_form : document.querySelector('main');
+	var parent = (host_form !== null) ? host_form : document.querySelector('main');
 
 	if ('error' in response) {
 		alert(response.error);
@@ -180,18 +177,23 @@ async function handle_hostaction_response(response, host_form = null) {
 			history.replaceState({}, '', host_popup.original_url);
 		}
 
+		chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+		chkbxRange.clearSelectedOnFilterChange();
+
 		const filter_btn = document.querySelector('[name=filter_apply]');
 
 		if (filter_btn !== null) {
+			clearMessages();
+			addMessage(makeMessageBox('good', response.messages, response.title, true, false));
+
 			filter_btn.click();
-			addMessage(response.message);
 		}
 		else {
-			if ('details' in response) {
-				postMessageDetails(MESSAGE_TYPE_SUCCESS, response.details);
+			postMessageOk(response.title);
+			if ('messages' in response) {
+				postMessageDetails('success', response.messages);
 			}
 
-			postMessageOk(response.title);
 			location.replace(host_popup.original_url);
 		}
 	}

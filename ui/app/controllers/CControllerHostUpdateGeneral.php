@@ -76,29 +76,6 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	}
 
 	/**
-	 * Validate input parameters.
-	 *
-	 * @param array $fields Input validation rules.
-	 *
-	 * @return bool Validation successful.
-	 */
-	protected function checkInputFields(array $fields): bool {
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$output = [];
-
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
-		}
-
-		return $ret;
-	}
-
-	/**
 	 * Prepare host interfaces.
 	 *
 	 * @param array $interfaces Submitted interfaces.
