@@ -64,57 +64,74 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 	}
 
 	protected function doAction(): void {
-		$output = [];
-		$host = [
-			'hostid' => $this->host['hostid'],
-			'host' => $this->getInput('host', $this->host['host']),
-			'name' => $this->getInput('visiblename', $this->host['name']),
-			'status' => $this->getInput('status', $this->host['status']),
-			'proxy_hostid' => $this->getInput('proxy_hostid', $this->host['proxy_hostid']),
-			'groups' => $this->processHostGroups($this->getInput('groups', [])),
-			'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
-			'tags' => $this->processTags($this->getInput('tags', [])),
-			'templates' => $this->processTemplates([
-				$this->getInput('add_templates', []), $this->getInput('templates', [])
-			]),
-			'clear_templates' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
-			'macros' => $this->processUserMacros($this->getInput('macros', [])),
-			'inventory' => ($this->getInput('inventory_mode', $this->host['inventory_mode']) != HOST_INVENTORY_DISABLED)
-				? $this->getInput('host_inventory', [])
-				: [],
-			'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
-			'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])
-		];
+		$result = false;
 
-		$host_properties = [
-			'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_subject',
-			'tls_issuer', 'inventory_mode'
-		];
+		try {
+			DBstart();
 
-		foreach ($host_properties as $prop) {
-			if (!array_key_exists($prop, $this->host) || $this->getInput($prop, '') !== $this->host[$prop]) {
-				$host[$prop] = $this->getInput($prop, '');
+			$inventory_enabled = false;
+			if ($this->getInput('inventory_mode', $this->host['inventory_mode']) != HOST_INVENTORY_DISABLED) {
+				$inventory_enabled = true;
 			}
+
+			$host = [
+				'hostid' => $this->host['hostid'],
+				'host' => $this->getInput('host', $this->host['host']),
+				'name' => $this->getInput('visiblename', $this->host['name']),
+				'status' => $this->getInput('status', $this->host['status']),
+				'proxy_hostid' => $this->getInput('proxy_hostid', $this->host['proxy_hostid']),
+				'groups' => $this->processHostGroups($this->getInput('groups', [])),
+				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
+				'tags' => $this->processTags($this->getInput('tags', [])),
+				'templates' => $this->processTemplates([
+					$this->getInput('add_templates', []), $this->getInput('templates', [])
+				]),
+				'clear_templates' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
+				'macros' => $this->processUserMacros($this->getInput('macros', [])),
+				'inventory' => $inventory_enabled ? $this->getInput('host_inventory', []) : [],
+				'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
+				'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])
+			];
+
+			$host_properties = [
+				'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_subject',
+				'tls_issuer', 'inventory_mode'
+			];
+
+			foreach ($host_properties as $prop) {
+				if (!array_key_exists($prop, $this->host) || $this->getInput($prop, '') !== $this->host[$prop]) {
+					$host[$prop] = $this->getInput($prop, '');
+				}
+			}
+
+			$this->getInputs($host, ['tls_psk_identity', 'tls_psk']);
+
+			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+				unset($host['tls_psk'], $host['tls_psk_identity']);
+			}
+
+			if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
+					&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
+				unset($host['tls_issuer'], $host['tls_subject']);
+			}
+
+			if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$host = array_intersect_key($host, array_flip(['hostid', 'status', 'inventory', 'description']));
+			}
+
+			$hostids = API::Host()->update($host);
+
+			if ($hostids === false || !$this->processValueMaps($this->getInput('valuemaps', []))) {
+				throw new Exception();
+			}
+
+			$result = DBend(true);
+		}
+		catch (Exception $e) {
+			DBend(false);
 		}
 
-		$this->getInputs($host, ['tls_psk_identity', 'tls_psk']);
-
-		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-			unset($host['tls_psk'], $host['tls_psk_identity']);
-		}
-
-		if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
-				&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
-			unset($host['tls_issuer'], $host['tls_subject']);
-		}
-
-		if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$host = array_intersect_key($host, array_flip(['hostid', 'status', 'inventory', 'description']));
-		}
-
-		$result = API::Host()->update($host);
-
-		if ($result !== false && $this->processValueMaps($this->getInput('valuemaps', []))) {
+		if ($result) {
 			$output = ['title' => _('Host updated')];
 
 			if ($messages = CMessageHelper::getMessages()) {
