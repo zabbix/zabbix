@@ -224,6 +224,9 @@ class CPage {
 	 */
 	public function logout() {
 		try {
+			// Before logout open page without any scripts, otherwise session might be restored and logout won't work.
+			$this->open('setup.php');
+
 			$session = (self::$cookie === null)
 					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_sessionid'), 'value')
 					: self::$cookie['value'];
