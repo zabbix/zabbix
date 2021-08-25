@@ -261,7 +261,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function validateUpdate(array &$services, array &$db_services = null): void {
+	private function validateUpdate(array &$services, &$db_services = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['serviceid']], 'fields' => [
 			'serviceid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],

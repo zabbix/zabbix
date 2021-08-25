@@ -61,8 +61,6 @@ class CRoleHelper {
 	public const MODULES_MODULE = 'modules.module.';
 	public const MODULES_DEFAULT_ACCESS = 'modules.default_access';
 	public const API_ACCESS = 'api.access';
-	public const API_ACCESS_DISABLED = 0;
-	public const API_ACCESS_ENABLED = 1;
 	public const API_MODE = 'api.mode';
 	public const API_MODE_DENY = 0;
 	public const API_MODE_ALLOW = 1;
@@ -79,8 +77,6 @@ class CRoleHelper {
 	public const ACTIONS_MANAGE_SCHEDULED_REPORTS = 'actions.manage_scheduled_reports';
 	public const ACTIONS_MANAGE_SERVICES = 'actions.manage_services';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
-	public const DEFAULT_ACCESS_DISABLED = 0;
-	public const DEFAULT_ACCESS_ENABLED = 1;
 
 	public const SECTION_UI = 'ui';
 	public const SECTION_MODULES = 'modules';
@@ -93,8 +89,6 @@ class CRoleHelper {
 	public const UI_SECTION_CONFIGURATION = 'ui.configuration';
 	public const UI_SECTION_ADMINISTRATION = 'ui.administration';
 
-	public const API_WILDCARD = '*';
-	public const API_WILDCARD_ALIAS = '*.*';
 	public const API_ANY_METHOD = '.*';
 	public const API_ANY_SERVICE = '*.';
 
@@ -556,7 +550,7 @@ class CRoleHelper {
 	 */
 	public static function getApiMaskMethods(int $user_type): array {
 		$api_methods = self::getApiMethods($user_type);
-		$result = [self::API_WILDCARD => $api_methods, self::API_WILDCARD_ALIAS => $api_methods];
+		$result = [ZBX_ROLE_RULE_API_WILDCARD => $api_methods, ZBX_ROLE_RULE_API_WILDCARD_ALIAS => $api_methods];
 
 		foreach ($api_methods as &$api_method) {
 			[$service, $method] = explode('.', $api_method, 2);
@@ -609,7 +603,7 @@ class CRoleHelper {
 		}
 
 		foreach ($api_method_masks as $user_type => $masks) {
-			$api_method_masks[$user_type] = array_merge([self::API_WILDCARD, self::API_WILDCARD_ALIAS],
+			$api_method_masks[$user_type] = array_merge([ZBX_ROLE_RULE_API_WILDCARD, ZBX_ROLE_RULE_API_WILDCARD_ALIAS],
 				array_keys($masks)
 			);
 		}

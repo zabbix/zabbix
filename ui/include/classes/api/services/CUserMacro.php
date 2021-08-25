@@ -1097,7 +1097,7 @@ class CUserMacro extends CApiService {
 		return $result;
 	}
 
-	protected function unsetExtraFields(array $objects, array $fields, $output) {
+	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		foreach ($objects as &$object) {
 			if ($object['type'] == ZBX_MACRO_TYPE_SECRET) {
 				unset($object['value']);

@@ -322,15 +322,15 @@ class CLocalApiClient extends CApiClient {
 
 		$api_access_mode = (bool) CRoleHelper::API_MODE_DENY;
 		$api_methods = [];
-		$actions_default_access = (bool) CRoleHelper::DEFAULT_ACCESS_ENABLED;
+		$actions_default_access = true;
 		$is_action_allowed = null;
 
 		while ($db_rule = DBfetch($db_rules)) {
-			$rule_value = $db_rule[CRole::RULE_VALUE_TYPES[$db_rule['type']]];
+			$rule_value = $db_rule[CRole::RULE_TYPE_FIELDS[$db_rule['type']]];
 
 			switch ($db_rule['name']) {
 				case CRoleHelper::API_ACCESS:
-					if ($rule_value == CRoleHelper::API_ACCESS_DISABLED) {
+					if ($rule_value == 0) {
 						return false;
 					}
 					break;
@@ -366,7 +366,7 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		$api_method_masks = [
-			CRoleHelper::API_WILDCARD, CRoleHelper::API_WILDCARD_ALIAS, CRoleHelper::API_ANY_SERVICE.$method,
+			ZBX_ROLE_RULE_API_WILDCARD, ZBX_ROLE_RULE_API_WILDCARD_ALIAS, CRoleHelper::API_ANY_SERVICE.$method,
 			$api.CRoleHelper::API_ANY_METHOD
 		];
 		foreach ($api_methods as $api_method) {

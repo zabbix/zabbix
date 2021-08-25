@@ -2078,18 +2078,6 @@ define('ZBX_PROPERTY_INHERITED',	0x01);
 define('ZBX_PROPERTY_OWN',			0x02);
 define('ZBX_PROPERTY_BOTH',			0x03);	// ZBX_PROPERTY_INHERITED | ZBX_PROPERTY_OWN
 
-// init $_REQUEST
-ini_set('variables_order', 'GP');
-$_REQUEST = $_POST + $_GET;
-
-// init precision
-ini_set('precision', 14);
-
-// BC Math scale. bcscale() can be undefined prior requirement check in setup.
-if (function_exists('bcscale')) {
-	bcscale(7);
-}
-
 // Number of tags to display in Problems widget and Monitoring > Problems.
 define('PROBLEMS_SHOW_TAGS_NONE', 0);
 define('PROBLEMS_SHOW_TAGS_1', 1);
@@ -2105,5 +2093,24 @@ define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
 define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
 
+define('ZBX_ROLE_RULE_SERVICES_ACCESS_ALL',		0);
+define('ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM',	1);
+define('ZBX_ROLE_RULE_API_MODE_DENY',   		0);
+define('ZBX_ROLE_RULE_API_MODE_ALLOW',  		1);
+define('ZBX_ROLE_RULE_API_WILDCARD',    		'*');
+define('ZBX_ROLE_RULE_API_WILDCARD_ALIAS',		'*.*');
+
 // Allows to set "rel" tag value "noreferer" when setting target="_blank".
 define('ZBX_NOREFERER', true);
+
+// init $_REQUEST
+ini_set('variables_order', 'GP');
+$_REQUEST = $_POST + $_GET;
+
+// init precision
+ini_set('precision', 14);
+
+// BC Math scale. bcscale() can be undefined prior requirement check in setup.
+if (function_exists('bcscale')) {
+	bcscale(7);
+}

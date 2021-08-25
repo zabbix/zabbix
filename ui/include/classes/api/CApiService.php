@@ -279,7 +279,7 @@ class CApiService {
 	 *
 	 * @return array
 	 */
-	protected function unsetExtraFields(array $objects, array $fields, $output) {
+	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		// find the fields that have not been requested
 		$extraFields = [];
 		foreach ($fields as $field) {
