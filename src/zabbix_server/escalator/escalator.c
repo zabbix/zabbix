@@ -625,7 +625,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 		zabbix_log(3, "DBG Check 1 OK");
 		return PERM_READ;
 	}
-	else 
+	else
 	{
 		zabbix_log(3, "DBG Check 1 FAIL");
 	}
@@ -636,7 +636,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 		zabbix_log(3, "DBG Check 2 OK");
 		return PERM_READ;
 	}
-	else 
+	else
 	{
 		zabbix_log(3, "DBG Check 2 FAIL");
 	}
@@ -647,7 +647,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 		zabbix_log(3, "DBG Check 3 OK");
 		return perm;
 	}
-	else 
+	else
 	{
 		zabbix_log(3, "DBG Check 3 FAIL");
 	}
@@ -2808,20 +2808,20 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 			continue;
 		}
 
-		service = zbx_malloc(NULL, sizeof(DB_SERVICE));
+		service = (DB_SERVICE*)zbx_malloc(NULL, sizeof(DB_SERVICE));
 		service->serviceid = serviceid;
 		service->name = zbx_strdup(NULL, row[1]);
 		zbx_vector_uint64_create(&service->eventids);
 		zbx_vector_ptr_create(&service->events);
 
-		if (NULL != row[2])
+		if (FAIL == DBis_null(row[2]))
 		{
 			zbx_tag_t	*tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
 			zbx_vector_ptr_create(&service->service_tags);
 
 			tag->tag = zbx_strdup(NULL, row[2]);
 
-			if (NULL == row[3])
+			if (FAIL == DBis_null(row[3]))
 				tag->value = zbx_strdup(NULL, row[3]);
 			else
 				tag->value = '\0';
@@ -2933,6 +2933,13 @@ static void	get_db_service_alarms(zbx_vector_ptr_t *escalations, zbx_vector_serv
 	zbx_vector_uint64_destroy(&service_alarmids);
 }
 
+static void	service_tag_clean(zbx_tag_t *tag)
+{
+	zbx_free(tag->tag);
+	zbx_free(tag->value);
+	zbx_free(tag);
+}
+
 static void	tag_clean(zbx_tag_t *tag)
 {
 	zbx_free(tag->tag);
@@ -2945,7 +2952,7 @@ static void	service_clean(DB_SERVICE *service)
 	zbx_free(service->name);
 	zbx_vector_ptr_destroy(&service->events);
 	zbx_vector_uint64_destroy(&service->eventids);
-	zbx_vector_ptr_clear_ext(&service->service_tags, tag_clean);
+	zbx_vector_ptr_clear_ext(&service->service_tags, service_tag_clean);
 	zbx_vector_ptr_destroy(&service->service_tags);
 	zbx_free(service);
 }
