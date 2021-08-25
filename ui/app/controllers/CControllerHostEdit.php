@@ -156,21 +156,22 @@ class CControllerHostEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		if ($this->host['hostid'] !== null) {
+		if (array_key_exists('interfaces', $this->host) && $this->host['interfaces']) {
 			$interface_items = API::HostInterface()->get([
-				'output' => ['interfaceid'],
+				'output' => [],
 				'selectItems' => API_OUTPUT_COUNT,
 				'hostids' => [$this->host['hostid']],
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 
-			foreach($this->host['interfaces'] as &$interface) {
+			foreach ($this->host['interfaces'] as &$interface) {
 				if (!array_key_exists($interface['interfaceid'], $interface_items)) {
 					continue;
 				}
 
 				$interface['items'] = $interface_items[$interface['interfaceid']]['items'];
 			}
+			unset($interface);
 		}
 
 		$this->host = (array) $this->host + $this->getInputValues() + $this->getHostDefaultValues();
@@ -423,7 +424,7 @@ class CControllerHostEdit extends CController {
 			}, $this->getInput('valuemaps', []));
 
 			$inputs['interfaces'] = array_map(function ($interface) {
-				unset($interface['interfaceid']);
+				unset($interface['interfaceid'], $interface['items']);
 
 				return $interface;
 			}, $this->getInput('interfaces', []));
