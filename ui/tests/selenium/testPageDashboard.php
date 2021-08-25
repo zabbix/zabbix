@@ -122,6 +122,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//div[@class="dashboard-grid"]/div[8]//a[@href="zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D='.$this->graphMemoryId.'&filter_set=1"]', 'ЗАББИКС Сервер: '.$this->graphMemory);
 		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids').' AND value_id='.$this->graphCpuId));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids').' AND value_id='.$this->graphMemoryId));
+		$this->page->logout();
 	}
 
 	public function testPageDashboard_RemoveFavouriteGraphs() {
