@@ -373,12 +373,12 @@ void	zbx_audit_discovery_rule_update_json_delete_overrides_conditions(zbx_uint64
 	else if (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)						\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "itemprototype.preprocessing["	\
-				ZBX_FS_UI64 "]"#nested#resource, preprocid);				\
+				ZBX_FS_UI64 "]"#nested#resource, preprocid);					\
 	}													\
 	else if (AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)						\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.preprocessing["	\
-				ZBX_FS_UI64 "]"#resource, preprocid);					\
+				ZBX_FS_UI64 "]"#resource, preprocid);						\
 	}													\
 	else													\
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -435,7 +435,7 @@ void	zbx_audit_item_update_json_update_item_preproc_##resource(zbx_uint64_t item
 	RETURN_IF_AUDIT_OFF();											\
 	resource_type = item_flag_to_resource_type(item_flags);							\
 														\
-	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(resource,.)							\
+	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(resource,.)								\
 														\
 	zbx_audit_update_json_update_##type2(itemid, audit_key_##resource, resource##_old, resource##_new);	\
 }
@@ -462,8 +462,8 @@ void	zbx_audit_item_delete_preproc(zbx_uint64_t itemid, int item_flags, zbx_uint
 #define ITEM_RESOURCE_KEY_RESOLVE_TAG(resource, nested)								\
 	if (AUDIT_RESOURCE_ITEM == resource_type)								\
 	{													\
-		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "item.tag[" ZBX_FS_UI64	 \
-				"]"#nested#resource, tagid);						\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "item.tag[" ZBX_FS_UI64	\
+				"]"#nested#resource, tagid);							\
 	}													\
 	else if (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)						\
 	{													\
@@ -590,7 +590,7 @@ void	zbx_audit_item_update_json_update_params_##resource(zbx_uint64_t itemid, in
 	RETURN_IF_AUDIT_OFF();											\
 														\
 	resource_type = item_flag_to_resource_type(item_flags);							\
-	ITEM_RESOURCE_KEY_RESOLVE(resource, .)								\
+	ITEM_RESOURCE_KEY_RESOLVE(resource, .)									\
 														\
 	zbx_audit_update_json_update_string(itemid, audit_key_##resource, resource##_orig, resource);		\
 }
