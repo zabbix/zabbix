@@ -138,9 +138,6 @@ static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_
 	int			i, j;
 	zbx_vector_ptr_t	candidates;
 
-	if (ZBX_SERVICE_STATUS_OK == event->severity)
-		return;
-
 	zbx_vector_ptr_create(&candidates);
 
 	for (i = 0; i < event->tags.values_num; i++)
