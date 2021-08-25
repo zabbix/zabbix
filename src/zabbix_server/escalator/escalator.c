@@ -482,12 +482,8 @@ static int	check_service_tags_rule_match(const zbx_vector_tags_t *service_tags, 
 
 			if (0 == strcmp(service_tag->tag, role_tag->tag))
 			{
-				if (NULL != role_tag->value && 0 == strcmp(service_tag->value, role_tag->value))
-				{
-					return PERM_READ_WRITE;
-				}
-
-				return PERM_READ;
+				if (NULL != role_tag->value || 0 == strcmp(service_tag->value, role_tag->value))
+					return PERM_READ;
 			}
 		}
 	}
@@ -628,7 +624,6 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	// check if service tags does not match tag rules
 	if (PERM_DENY < (perm = check_service_tags_rule_match(&service->service_tags, &role->tags)))
 		return perm;
-
 
 	// get service parent ids from service manager
 	zbx_service_serialize_id(&data, &data_alloc, &data_offset, service->serviceid);
