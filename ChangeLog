@@ -31,6 +31,7 @@ A......... [ZBX-19752] fixed multiple types of media type creation having messag
 ..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
 A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
 ...G...... [ZBX-19732] fixed Zabbix agent2 not starting when ListenIP is set to 0.0.0.0 (vso)
+...G...PS. [ZBX-7933] added configurable parameter for TCP queue maximum size (dgoloscapov)
 .........T [ZBX-19692] fixed issues with Zyxel templates (abakaldin)
 A......... [ZBX-19124] fixed PHP runtime errors when passed incorrect value for "output" option (Sasha)
 A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
