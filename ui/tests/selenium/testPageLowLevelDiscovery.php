@@ -256,6 +256,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			$this->query('button:Execute now')->one()->click();
 			$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
 		}
+		$this->page->logout();
 	}
 
 	/**
@@ -278,10 +279,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Server hardware'
+						'Host groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 40
+					'rows' => 84
 				]
 			],
 			[
@@ -393,13 +394,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Key' => 'array.cache.discovery'
+						'Key' => 'array.cache.discovery',
+						'Type' => 'HTTP agent'
 					],
 					'context' => 'template',
 					'expected' => [
-						'Array Controller Cache Discovery',
-						'Array Controller Cache Discovery',
-						'Array Controller Cache Discovery'
+						'Array controller cache discovery',
+						'Array controller cache discovery',
+						'Array controller cache discovery',
+						'Array controller cache discovery'
 					]
 				]
 			],
