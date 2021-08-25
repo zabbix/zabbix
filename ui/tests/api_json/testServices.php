@@ -679,6 +679,24 @@ class testServices extends CAPITest {
 				'expected_error' => 'Incompatible "propagation_rule" and "propagation_value" parameters for service "foo".'
 			],
 
+			// Read-only fields.
+			[
+				'service' => [
+					'serviceid' => 1
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "serviceid".'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status' => ZBX_SEVERITY_OK
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "status".'
+			],
+
 			// Child services.
 			[
 				'service' => [
@@ -689,6 +707,195 @@ class testServices extends CAPITest {
 					'children' => null
 				],
 				'expected_error' => 'Invalid parameter "/1/children": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => true
+				],
+				'expected_error' => 'Invalid parameter "/1/children": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/children": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/children": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => 999
+				],
+				'expected_error' => 'Invalid parameter "/1/children": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [null]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [true]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [0]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => ['']
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						[]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1": the parameter "serviceid" is missing.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => null]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => true]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => []]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => '']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => '1.0']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => -1]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => 999] // Non-existing service.
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => 2],
+						['serviceid' => 2]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/2": value (serviceid)=(2) already exists.'
 			],
 
 			// Parent services.
@@ -701,6 +908,210 @@ class testServices extends CAPITest {
 					'parents' => null
 				],
 				'expected_error' => 'Invalid parameter "/1/parents": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => true
+				],
+				'expected_error' => 'Invalid parameter "/1/parents": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/parents": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => -1
+				],
+				'expected_error' => 'Invalid parameter "/1/parents": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => 999
+				],
+				'expected_error' => 'Invalid parameter "/1/parents": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [null]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [true]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [0]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => ['']
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [
+						[]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1": the parameter "serviceid" is missing.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => null]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/children/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [
+						['serviceid' => true]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [
+						['serviceid' => []]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [
+						['serviceid' => '']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [
+						['serviceid' => '1.0']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [
+						['serviceid' => -1]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/1/serviceid": a number is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [
+						['serviceid' => 999] // Non-existing service.
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'parents' => [
+						['serviceid' => 2],
+						['serviceid' => 2]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parents/2": value (serviceid)=(2) already exists.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'children' => [
+						['serviceid' => 2]
+					],
+					'parents' => [
+						['serviceid' => 2]
+					]
+				],
+				'expected_error' => 'Services form a circular dependency.'
 			],
 
 			// Tags.
@@ -1021,7 +1432,7 @@ class testServices extends CAPITest {
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
 					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
-					'times' => [1]
+					'times' => [0]
 				],
 				'expected_error' => 'Invalid parameter "/1/times/1": an array is expected.'
 			],
@@ -1596,6 +2007,29 @@ class testServices extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/times/1/note": value is too long.'
 			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'times' => [
+						[
+							'type' => SERVICE_TIME_TYPE_UPTIME,
+							'ts_from' => 0,
+							'ts_to' => 0,
+							'note' => ''
+						],
+						[
+							'type' => SERVICE_TIME_TYPE_UPTIME,
+							'ts_from' => 0,
+							'ts_to' => 0,
+							'note' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/times/2": value (type, ts_from, ts_to)=(0, 0, 0) already exists.'
+			],
 
 			// Problem tags.
 			[
@@ -1664,7 +2098,7 @@ class testServices extends CAPITest {
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
 					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
-					'problem_tags' => [1]
+					'problem_tags' => [0]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/1": an array is expected.'
 			],
@@ -1982,6 +2416,815 @@ class testServices extends CAPITest {
 					'status_rules' => null
 				],
 				'expected_error' => 'Invalid parameter "/1/status_rules": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => true
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [null]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [true]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [0]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => ['']
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1": an array is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1": the parameter "type" is missing.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						['type' => null]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/type": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						['type' => true]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/type": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						['type' => []]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/type": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						['type' => '']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/type": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						['type' => '1.0']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/type": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						['type' => -1]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/type": value must be one of '.
+					implode(', ', [
+						ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+						ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE,
+						ZBX_SERVICE_STATUS_RULE_TYPE_N_L,
+						ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
+						ZBX_SERVICE_STATUS_RULE_TYPE_W_GE,
+						ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE,
+						ZBX_SERVICE_STATUS_RULE_TYPE_W_L,
+						ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+					]).'.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						['type' => 999]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/type": value must be one of '.
+					implode(', ', [
+						ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+						ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE,
+						ZBX_SERVICE_STATUS_RULE_TYPE_N_L,
+						ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
+						ZBX_SERVICE_STATUS_RULE_TYPE_W_GE,
+						ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE,
+						ZBX_SERVICE_STATUS_RULE_TYPE_W_L,
+						ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+					]).'.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						['type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1": the parameter "limit_value" is missing.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => null
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => true
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => []
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => '1.0'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-1000000.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1000001
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-1000000.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_L,
+							'limit_value' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-1000000.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_L,
+							'limit_value' => 1000001
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-1000000.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_W_GE,
+							'limit_value' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-1000000.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_W_GE,
+							'limit_value' => 1000001
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-1000000.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_W_L,
+							'limit_value' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-1000000.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_W_L,
+							'limit_value' => 1000001
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-1000000.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE,
+							'limit_value' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-100.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE,
+							'limit_value' => 101
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-100.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
+							'limit_value' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-100.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
+							'limit_value' => 101
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-100.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE,
+							'limit_value' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-100.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE,
+							'limit_value' => 101
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-100.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_WP_L,
+							'limit_value' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-100.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_WP_L,
+							'limit_value' => 101
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_value": value must be one of 1-100.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1": the parameter "limit_status" is missing.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => null
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => true
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => []
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => '1.0'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => -2
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_status": value must be one of '.
+					implode(', ', array_merge(
+						[ZBX_SEVERITY_OK],
+						range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+					)).'.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => TRIGGER_SEVERITY_COUNT
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/limit_status": value must be one of '.
+					implode(', ', array_merge(
+						[ZBX_SEVERITY_OK],
+						range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+					)).'.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1": the parameter "new_status" is missing.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK,
+							'new_status' => null
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/new_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK,
+							'new_status' => true
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/new_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK,
+							'new_status' => []
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/new_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK,
+							'new_status' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/new_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK,
+							'new_status' => '1.0'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/new_status": an integer is expected.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK,
+							'new_status' => ZBX_SEVERITY_OK
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/new_status": value must be one of '.
+					implode(', ', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)).'.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK,
+							'new_status' => TRIGGER_SEVERITY_COUNT
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/1/new_status": value must be one of '.
+					implode(', ', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)).'.'
+			],
+			[
+				'service' => [
+					'name' => 'foo',
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+					'showsla' => SERVICE_SHOW_SLA_OFF,
+					'sortorder' => 0,
+					'status_rules' => [
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK,
+							'new_status' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+						],
+						[
+							'type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE,
+							'limit_value' => 1,
+							'limit_status' => ZBX_SEVERITY_OK,
+							'new_status' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/status_rules/2": value (type, limit_value, limit_status)=('.
+					ZBX_SERVICE_STATUS_RULE_TYPE_N_GE.', 1, '.ZBX_SEVERITY_OK.') already exists.'
 			]
 		];
 	}
@@ -2059,11 +3302,31 @@ class testServices extends CAPITest {
 	public static function service_delete_data_invalid(): array {
 		return [
 			[
+				'service' => [null],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'service' => [true],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'service' => [[]],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
 				'service' => [''],
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
-				'service' => ['12345'],
+				'service' => ['1.0'],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'service' => [-1],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'service' => [999], // Non-existing service.
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			]
 		];
@@ -2169,6 +3432,558 @@ class testServices extends CAPITest {
 					'result' => []
 				]
 			],
+			[
+				'request' => [
+					'output' => [],
+					'parentids' => [-1]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/parentids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'parentids' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/parentids": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'parentids' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/parentids": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'parentids' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/parentids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'parentids' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/parentids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'parentids' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/parentids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'parentids' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/parentids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'parentids' => ['1.0']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/parentids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'parentids' => [-1]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/parentids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'childids' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/childids": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'childids' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/childids": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'childids' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/childids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'childids' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/childids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'childids' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/childids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'childids' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/childids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'childids' => ['1.0']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/childids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'childids' => [-1]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/childids/1": a number is expected.',
+					'result' => []
+				]
+			],
+
+			[
+				'request' => [
+					'output' => [],
+					'evaltype' => null
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/evaltype": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'evaltype' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/evaltype": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'evaltype' => []
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/evaltype": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'evaltype' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/evaltype": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'evaltype' => '1.0'
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/evaltype": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'evaltype' => 1
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/evaltype": value must be one of '.
+						implode(', ', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'evaltype' => 999
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/evaltype": value must be one of '.
+						implode(', ', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => null
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => 0
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [0]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => ['tag' => 'foo']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1": the parameter "tag" is missing.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1": unexpected parameter "0".',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => null]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/tag": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/tag": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => []]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/tag": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => 0]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/tag": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'value' => null]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/value": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'value' => true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/value": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'value' => []]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/value": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'value' => 0]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/value": a character string is expected.',
+					'result' => []
+				]
+			],
+//			[
+//				'request' => [
+//					'output' => [],
+//					'tags' => [
+//						['tag' => '', 'operator' => null]
+//					]
+//				],
+//				'expected' => [
+//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+//					'result' => []
+//				]
+//			],
+//			[
+//				'request' => [
+//					'output' => [],
+//					'tags' => [
+//						['tag' => '', 'operator' => true]
+//					]
+//				],
+//				'expected' => [
+//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+//					'result' => []
+//				]
+//			],
+//			[
+//				'request' => [
+//					'output' => [],
+//					'tags' => [
+//						['tag' => '', 'operator' => []]
+//					]
+//				],
+//				'expected' => [
+//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+//					'result' => []
+//				]
+//			],
+//			[
+//				'request' => [
+//					'output' => [],
+//					'tags' => [
+//						['tag' => '', 'operator' => '']
+//					]
+//				],
+//				'expected' => [
+//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+//					'result' => []
+//				]
+//			],
+//			[
+//				'request' => [
+//					'output' => [],
+//					'tags' => [
+//						['tag' => '', 'operator' => '1.0']
+//					]
+//				],
+//				'expected' => [
+//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+//					'result' => []
+//				]
+//			],
+//			[
+//				'request' => [
+//					'output' => [],
+//					'tags' => [
+//						['tag' => '', 'operator' => -1]
+//					]
+//				],
+//				'expected' => [
+//					'error' => 'Invalid parameter "/tags/1/operator": value must be one of '.
+//						implode(', ', [
+//							TAG_OPERATOR_LIKE,
+//							TAG_OPERATOR_EQUAL,
+//							TAG_OPERATOR_NOT_LIKE,
+//							TAG_OPERATOR_NOT_EQUAL,
+//							TAG_OPERATOR_EXISTS,
+//							TAG_OPERATOR_NOT_EXISTS
+//						]).'.',
+//					'result' => []
+//				]
+//			],
+//			[
+//				'request' => [
+//					'output' => [],
+//					'tags' => [
+//						['tag' => '', 'operator' => 999]
+//					]
+//				],
+//				'expected' => [
+//					'error' => 'Invalid parameter "/tags/1/operator": value must be one of '.
+//						implode(', ', [
+//							TAG_OPERATOR_LIKE,
+//							TAG_OPERATOR_EQUAL,
+//							TAG_OPERATOR_NOT_LIKE,
+//							TAG_OPERATOR_NOT_EQUAL,
+//							TAG_OPERATOR_EXISTS,
+//							TAG_OPERATOR_NOT_EXISTS
+//						]).'.',
+//					'result' => []
+//				]
+//			],
+			// problem tags
 
 			// Input validation, filter object.
 			[
@@ -2199,7 +4014,7 @@ class testServices extends CAPITest {
 				'request' => [
 					'output' => [],
 					'filter' => [
-						'serviceid' => [false]
+						'serviceid' => [true]
 					]
 				],
 				'expected' => [
@@ -2255,6 +4070,1043 @@ class testServices extends CAPITest {
 					'result' => []
 				]
 			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'name' => true
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/name": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'name' => 0
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/name": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'name' => [null]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/name/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'name' => [true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/name/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'name' => [[]]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/name/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'name' => [0]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/name/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => true
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => ''
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => '1.0'
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => -2
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status/1": value must be one of '.
+						implode(', ', array_merge(
+							[ZBX_SEVERITY_OK],
+							range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+						)).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => TRIGGER_SEVERITY_COUNT
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status/1": value must be one of '.
+						implode(', ', array_merge(
+							[ZBX_SEVERITY_OK],
+							range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+						)).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => [true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => ['']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => ['1.0']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => [-2]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status/1": value must be one of '.
+						implode(', ', array_merge(
+							[ZBX_SEVERITY_OK],
+							range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+						)).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => [TRIGGER_SEVERITY_COUNT]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status/1": value must be one of '.
+						implode(', ', array_merge(
+							[ZBX_SEVERITY_OK],
+							range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+						)).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => true
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => ''
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => '1.0'
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => -1
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm/1": value must be one of '.
+						implode(', ', [
+							ZBX_SERVICE_STATUS_CALC_SET_OK,
+							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
+						]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => [null]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => [true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => ['']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => ['1.0']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => [-1]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm/1": value must be one of '.
+						implode(', ', [
+							ZBX_SERVICE_STATUS_CALC_SET_OK,
+							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
+						]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'algorithm' => [999]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/algorithm/1": value must be one of '.
+						implode(', ', [
+							ZBX_SERVICE_STATUS_CALC_SET_OK,
+							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
+						]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => true
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => ''
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => '1.0'
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => -1
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla/1": value must be one of '.
+						implode(', ', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => [null]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => [true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => ['']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => ['1.0']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => [-1]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla/1": value must be one of '.
+						implode(', ', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'showsla' => [999]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/showsla/1": value must be one of '.
+						implode(', ', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]).'.',
+					'result' => []
+				]
+			],
+
+			// Related objects.
+			[
+				'request' => [
+					'output' => [],
+					'selectAlarms' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectAlarms": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectAlarms' => 0
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectAlarms": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectAlarms' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectAlarms": value must be one of '.
+						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectAlarms' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectAlarms/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectAlarms' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectAlarms/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectAlarms' => [0]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectAlarms/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectAlarms' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectAlarms/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectAlarms' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectAlarms/1": value must be one of clock, value.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectChildren' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectChildren": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectChildren' => 0
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectChildren": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectChildren' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectChildren": value must be one of '.
+						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectChildren' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectChildren/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectChildren' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectChildren/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectChildren' => [0]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectChildren/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectChildren' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectChildren/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectChildren' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectChildren/1": value must be one of '.
+						implode(', ', array_keys(DB::getSchema('services')['fields'])).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectParents' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectParents": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectParents' => 0
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectParents": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectParents' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectParents": value must be one of '.
+						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectParents' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectParents/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectParents' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectParents/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectParents' => [0]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectParents/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectParents' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectParents/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectParents' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectParents/1": value must be one of '.
+						implode(', ', array_keys(DB::getSchema('services')['fields'])).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectProblemTags' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectProblemTags": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectProblemTags' => 0
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectProblemTags": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectProblemTags' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectProblemTags": value must be one of '.
+						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectProblemTags' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectProblemTags/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectProblemTags' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectProblemTags/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectProblemTags' => [0]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectProblemTags/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectProblemTags' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectProblemTags/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectProblemTags' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectProblemTags/1": value must be one of tag, operator, value.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusRules' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusRules": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusRules' => 0
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusRules": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusRules' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusRules": value must be one of '.
+						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusRules' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusRules/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusRules' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusRules/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusRules' => [0]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusRules/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusRules' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusRules/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusRules' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusRules/1": value must be one of type, limit_value, limit_status, new_status.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTags' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTags": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTags' => 0
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTags": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTags' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTags": value must be one of '.
+						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTags' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTags/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTags' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTags/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTags' => [0]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTags/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTags' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTags/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTags' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTags/1": value must be one of tag, value.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTimes' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTimes": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTimes' => 0
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTimes": an array or a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTimes' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTimes": value must be one of '.
+						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTimes' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTimes/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTimes' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTimes/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTimes' => [0]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTimes/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTimes' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTimes/1": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectTimes' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectTimes/1": value must be one of type, ts_from, ts_to, note.',
+					'result' => []
+				]
+			]
 		];
 	}
 
@@ -2276,7 +5128,97 @@ class testServices extends CAPITest {
 			[
 				'request' => [
 					'output' => [],
+					'serviceids' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'serviceids' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'serviceids' => '1.0'
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'serviceids' => -1
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
 					'serviceids' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'serviceids' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'serviceids' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'serviceids' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'serviceids' => ['1.0']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'serviceids' => [-1]
 				],
 				'expected' => [
 					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
