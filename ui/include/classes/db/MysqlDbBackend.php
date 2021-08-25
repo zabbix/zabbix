@@ -89,8 +89,8 @@ class MysqlDbBackend extends DbBackend {
 				' AND '.dbConditionString('table_name', array_keys(DB::getSchema())).
 				' AND '.dbConditionString('data_type', ['text', 'varchar', 'longtext']).
 				' AND ('.
-					dbConditionString('UPPER(character_set_name)', ZBX_DB_MYSQL_ALLOWED_CHARSETS).
-					' OR collation_name!='.zbx_dbstr(ZBX_DB_MYSQL_ALLOWED_COLLATION).
+					dbConditionString('UPPER(character_set_name)', ZBX_DB_MYSQL_ALLOWED_CHARSETS, true).
+					' OR '.dbConditionString('collation_name', ZBX_DB_MYSQL_ALLOWED_COLLATIONS, true).
 				')'
 		), 'table_name');
 
