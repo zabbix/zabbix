@@ -2321,7 +2321,7 @@ static char	*db_strlist_quote(const char *strlist, char delimiter)
 
 	while (NULL != (delim = strchr(strlist, delimiter)))
 	{
-		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%.*s',", delim - strlist, strlist);
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%.*s',", (int)(delim - strlist), strlist);
 		strlist = delim + 1;
 	}
 
