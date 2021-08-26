@@ -159,15 +159,15 @@ class CAudit {
 		}
 
 		if ($parentids) {
-			$auditlog = array_merge($auditlog, self::parentLog($userid, $username, $ip, $resource,
-				array_keys($parentids)
-			));
+			$auditlog = array_merge($auditlog,
+				self::parentLog($userid, $ip, $username, $resource, array_keys($parentids))
+			);
 		}
 
 		DB::insertBatch('auditlog', $auditlog);
 	}
 
-	private static function parentLog(string $userid, string $username, string $ip, int $resource, array $ids): array {
+	private static function parentLog(string $userid, string $ip, string $username, int $resource, array $ids): array {
 		$auditlog = [];
 
 		$parent_resource = self::PARENT_RESOURCES[$resource];
