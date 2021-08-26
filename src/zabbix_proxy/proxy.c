@@ -149,11 +149,11 @@ int		threads_num = 0;
 pid_t		*threads = NULL;
 static int	*threads_flags;
 
-unsigned char	program_type		= ZBX_PROGRAM_TYPE_PROXY_ACTIVE;
+unsigned char			program_type	= ZBX_PROGRAM_TYPE_PROXY_ACTIVE;
 
-unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
-int		process_num		= 0;
-int		server_num		= 0;
+ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
+ZBX_THREAD_LOCAL int		process_num	= 0;
+ZBX_THREAD_LOCAL int		server_num	= 0;
 
 static int	CONFIG_PROXYMODE	= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;

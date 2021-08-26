@@ -49,8 +49,10 @@
 #define ZBX_REPORT_STATE_ERROR		2
 #define ZBX_REPORT_STATE_SUCCESS_INFO	3
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num, CONFIG_REPORTWRITER_FORKS;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
+extern int				CONFIG_REPORTWRITER_FORKS;
 
 /* report manager data */
 typedef struct

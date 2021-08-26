@@ -30,9 +30,10 @@
 #include "service_protocol.h"
 #include "service_actions.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
-extern int		CONFIG_SERVICEMAN_SYNC_FREQUENCY;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
+extern int				CONFIG_SERVICEMAN_SYNC_FREQUENCY;
 
 /* keep deleted problem eventids up to 2 hours in case problem deletion arrived before problem or before recovery */
 #define ZBX_PROBLEM_CLEANUP_AGE		(SEC_PER_HOUR * 2)
