@@ -425,7 +425,7 @@ class CToken extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		CTokenManager::delete($tokenids, true, $this);
+		CTokenManager::delete($tokenids, $this);
 
 		return ['tokenids' => $tokenids];
 	}

@@ -1198,7 +1198,7 @@ class CUser extends CApiService {
 		];
 		$tokenids = DBfetchColumn(DBselect(DB::makeSql('token', $token_options)), 'tokenid');
 		if ($tokenids) {
-			CTokenManager::delete($tokenids, false, $this);
+			CTokenManager::delete($tokenids, $this, false);
 		}
 
 		DB::delete('users', ['userid' => $userids]);

@@ -21,8 +21,7 @@
 
 class CTokenManager {
 
-	public static function delete(array $tokenids, bool $parent, CApiService $apiService) {
-
+	public static function delete(array $tokenids, CApiService $apiService, bool $log_parents = true): void {
 		$db_tokens = DB::select('token', [
 			'output' => ['tokenid', 'userid', 'name'],
 			'tokenids' => $tokenids
@@ -30,6 +29,6 @@ class CTokenManager {
 
 		DB::delete('token', ['tokenid' => $tokenids]);
 
-		$apiService->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_AUTH_TOKEN, $db_tokens, null, $parent);
+		$apiService->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_AUTH_TOKEN, $db_tokens, null, $log_parents);
 	}
 }
