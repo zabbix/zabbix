@@ -725,7 +725,7 @@ class CAction extends CApiService {
 		// Add operations.
 		$this->addOperations($operations_to_create);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ACTION, $audit);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_ACTION, $audit);
 
 		return ['actionids' => array_keys($actions)];
 	}
@@ -938,7 +938,7 @@ class CAction extends CApiService {
 
 		if ($actions_update_data) {
 			DB::update('actions', $actions_update_data);
-			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $actions, $db_actions);
+			$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ACTION, $actions, $db_actions);
 		}
 
 		// add, update and delete operations
@@ -1586,7 +1586,7 @@ class CAction extends CApiService {
 
 		DB::delete('actions', ['actionid' => $actionids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, $db_actions);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_ACTION, $db_actions);
 
 		return ['actionids' => $actionids];
 	}

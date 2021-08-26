@@ -879,7 +879,7 @@ class CMediatype extends CApiService {
 			DB::insert('media_type_message', $ins_media_type_message);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MEDIA_TYPE, $mediatypes);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}
@@ -1122,7 +1122,7 @@ class CMediatype extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MEDIA_TYPE, $mediatypes, $db_mediatypes);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes, $db_mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}
@@ -1157,7 +1157,7 @@ class CMediatype extends CApiService {
 
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MEDIA_TYPE, $db_mediatypes);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MEDIA_TYPE, $db_mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}

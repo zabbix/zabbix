@@ -32,8 +32,6 @@ class CToken extends CApiService {
 		'generate' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS]
 	];
 
-	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_AUTH_TOKEN;
-
 	protected $tableName = 'token';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['tokenid', 'name', 'lastaccess', 'status', 'expires_at', 'created_at'];
@@ -201,7 +199,7 @@ class CToken extends CApiService {
 			$token['tokenid'] = $tokenids[$index];
 		});
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, static::AUDIT_RESOURCE, $tokens);
+		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_AUTH_TOKEN, $tokens);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -309,23 +307,8 @@ class CToken extends CApiService {
 		$upd_tokens = [];
 		foreach ($tokens as $token) {
 			$db_token = $db_tokens[$token['tokenid']];
-			$upd_token = [];
 
-			if (array_key_exists('name', $token) && $token['name'] !== $db_token['name']) {
-				$upd_token['name'] = $token['name'];
-			}
-
-			if (array_key_exists('description', $token) && $token['description'] !== $db_token['description']) {
-				$upd_token['description'] = $token['description'];
-			}
-
-			if (array_key_exists('status', $token) && $token['status'] != $db_token['status']) {
-				$upd_token['status'] = $token['status'];
-			}
-
-			if (array_key_exists('expires_at', $token) && $token['expires_at'] != $db_token['expires_at']) {
-				$upd_token['expires_at'] = $token['expires_at'];
-			}
+			$upd_token = DB::getUpdatedValues('token', $token, $db_token);
 
 			if ($upd_token) {
 				$upd_tokens[] = [
@@ -337,7 +320,7 @@ class CToken extends CApiService {
 
 		if ($upd_tokens) {
 			DB::update('token', $upd_tokens);
-			$this->addAuditBulk(AUDIT_ACTION_UPDATE, static::AUDIT_RESOURCE, $tokens, $db_tokens);
+			$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $tokens, $db_tokens);
 		}
 
 		return ['tokenids' => array_column($tokens, 'tokenid')];
@@ -363,7 +346,7 @@ class CToken extends CApiService {
 		}
 
 		$db_tokens = $this->get([
-			'output' => ['userid', 'name', 'description', 'status', 'expires_at'],
+			'output' => ['tokenid', 'userid', 'name', 'description', 'status', 'expires_at'],
 			'tokenids' => array_column($tokens, 'tokenid', 'tokenid'),
 			'preservekeys' => true
 		]);
@@ -441,7 +424,7 @@ class CToken extends CApiService {
 
 		DB::delete('token', ['tokenid' => $tokenids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, static::AUDIT_RESOURCE, $db_tokens);
+		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_AUTH_TOKEN, $db_tokens);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -467,7 +450,7 @@ class CToken extends CApiService {
 		}
 
 		$db_tokens = $this->get([
-			'output' => ['tokenid', 'name'],
+			'output' => [],
 			'tokenids' => $tokenids,
 			'preservekeys' => true
 		]);
@@ -475,6 +458,12 @@ class CToken extends CApiService {
 		if (count($db_tokens) != count($tokenids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
+		$db_tokens = DB::select('token', [
+			'output' => ['tokenid', 'name', 'token'],
+			'tokenids' => array_keys($db_tokens),
+			'preservekeys' => true
+		]);
 
 		$response = [];
 		$upd_tokens = [];
@@ -491,11 +480,8 @@ class CToken extends CApiService {
 		}
 
 		DB::update('token', $upd_tokens);
-		array_walk($db_tokens, function (&$db_token) {
-			$db_token['token'] = '';
-		});
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, static::AUDIT_RESOURCE, $response, $db_tokens);
+		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $response, $db_tokens);
 
 		return $response;
 	}
