@@ -2603,7 +2603,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	get_expression_macro_result(const DB_EVENT *event, char **data, zbx_strloc_t *loc,
+static int	get_expression_macro_result(const DB_EVENT *event, char *data, zbx_strloc_t *loc,
 		char **replace_to, char **error)
 {
 	int				ret = FAIL;
@@ -2615,9 +2615,10 @@ static int	get_expression_macro_result(const DB_EVENT *event, char **data, zbx_s
 	char				*expression = NULL;
 	size_t				exp_alloc = 0, exp_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, expression);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_strncpy_alloc(&expression, &exp_alloc, &exp_offset, *data + loc->l, loc->r - loc->l + 1);
+	zbx_strncpy_alloc(&expression, &exp_alloc, &exp_offset, data + loc->l, loc->r - loc->l + 1);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression: '%s'", __func__, expression);
 
 	if (SUCCEED != zbx_eval_parse_expression(&ctx, expression, ZBX_EVAL_PARSE_EXPRESSION_MACRO, error))
 		goto out;
@@ -2976,7 +2977,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					char		*errmsg = NULL;
 
-					if (SUCCEED != (ret = get_expression_macro_result(event, data,
+					if (SUCCEED != (ret = get_expression_macro_result(event, *data,
 							&inner_token.data.expression_macro.expression, &replace_to,
 							&errmsg)))
 					{
@@ -4188,7 +4189,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					{
 						char		*errmsg = NULL;
 
-						if (SUCCEED != (ret = get_expression_macro_result(event, data,
+						if (SUCCEED != (ret = get_expression_macro_result(event, *data,
 								&inner_token.data.expression_macro.expression,
 								&replace_to, &errmsg)))
 						{
