@@ -119,6 +119,7 @@ class CAudit {
 		$auditlog = [];
 		$table_key = DB::getPk(self::TABLE_NAMES[$resource]);
 		$clock = time();
+		$ip = substr($ip, 0, DB::getFieldLength('auditlog', 'ip'));
 		$recordsetid = self::getRecordSetId();
 
 		$parentids = [];
@@ -148,7 +149,7 @@ class CAudit {
 				'userid' => $userid,
 				'username' => $username,
 				'clock' => $clock,
-				'ip' => substr($ip, 0, 39),
+				'ip' => $ip,
 				'action' => $action,
 				'resourcetype' => $resource,
 				'resourceid' => $resourceid,
@@ -160,7 +161,7 @@ class CAudit {
 
 		if ($log_parents && $parentids) {
 			$auditlog = array_merge($auditlog,
-				self::parentLog($userid, $ip, $username, $parent_resource, array_keys($parentids))
+				self::parentLog($userid, $ip, $username, $parent_resource, array_keys($parentids), $clock)
 			);
 		}
 
@@ -168,13 +169,12 @@ class CAudit {
 	}
 
 	private static function parentLog(string $userid, string $ip, string $username, int $resource,
-			array $resourceids): array {
+			array $resourceids, int $clock): array {
 		$auditlog = [];
 
 		$table_name = self::TABLE_NAMES[$resource];
 		$table_key = DB::getPk($table_name);
 		$field_name = self::FIELD_NAMES[$resource];
-		$clock = time();
 		$recordsetid = self::getRecordSetId();
 
 		$db_options = [
@@ -188,7 +188,7 @@ class CAudit {
 				'userid' => $userid,
 				'username' => $username,
 				'clock' => $clock,
-				'ip' => substr($ip, 0, 39),
+				'ip' => $ip,
 				'action' => self::ACTION_UPDATE,
 				'resourcetype' => $resource,
 				'resourceid' => $row[$table_key],
