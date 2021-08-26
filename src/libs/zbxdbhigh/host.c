@@ -2363,6 +2363,7 @@ typedef struct
 	char		*value;
 	char		*description;
 	unsigned char	type;
+#define ZBX_FLAG_HPMACRO_RESET_FLAG		__UINT64_C(0x00000000)
 #define ZBX_FLAG_HPMACRO_UPDATE_VALUE		__UINT64_C(0x00000001)
 #define ZBX_FLAG_HPMACRO_UPDATE_DESCRIPTION	__UINT64_C(0x00000002)
 #define ZBX_FLAG_HPMACRO_UPDATE_TYPE		__UINT64_C(0x00000004)
@@ -2387,6 +2388,7 @@ typedef struct
 	unsigned char	privprotocol;
 	unsigned char	version;
 	unsigned char	bulk;
+#define ZBX_FLAG_HPINTERFACE_SNMP_RESET_FLAG		__UINT64_C(0x00000000)
 #define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE		__UINT64_C(0x00000001)
 #define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK		__UINT64_C(0x00000002)
 #define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY	__UINT64_C(0x00000004)
@@ -2417,6 +2419,7 @@ typedef struct
 	char		*ip;
 	char		*dns;
 	char		*port;
+#define ZBX_FLAG_HPINTERFACE_RESET_FLAG		__UINT64_C(0x00000000)
 #define ZBX_FLAG_HPINTERFACE_UPDATE_MAIN	__UINT64_C(0x00000001)
 #define ZBX_FLAG_HPINTERFACE_UPDATE_TYPE	__UINT64_C(0x00000002)
 #define ZBX_FLAG_HPINTERFACE_UPDATE_USEIP	__UINT64_C(0x00000004)
@@ -2452,6 +2455,7 @@ typedef struct
 	char			*host;
 	char			*name;
 	unsigned char		status;
+#define ZBX_FLAG_HPLINK_RESET_FLAG			0x00
 #define ZBX_FLAG_HPLINK_UPDATE_NAME			0x01
 #define ZBX_FLAG_HPLINK_UPDATE_STATUS			0x02
 #define ZBX_FLAG_HPLINK_UPDATE_DISCOVER			0x04
@@ -2587,7 +2591,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		host_prototype->host = zbx_strdup(NULL, row[2]);
 		host_prototype->name = zbx_strdup(NULL, row[3]);
 		ZBX_STR2UCHAR(host_prototype->status, row[4]);
-		host_prototype->flags = 0;
+		host_prototype->flags = ZBX_FLAG_HPLINK_RESET_FLAG;
 		ZBX_STR2UCHAR(host_prototype->discover, row[5]);
 		ZBX_STR2UCHAR(host_prototype->custom_interfaces, row[6]);
 
@@ -2977,6 +2981,7 @@ static int	DBhost_prototypes_macro_make(zbx_vector_macros_t *hostmacros, zbx_uin
  *                                                                            *
  * Parameters: interfaces     - [IN/OUT] list of host interfaces              *
  *             interfaceid    - [IN] interface id                             *
+ *             del_snmp_ids   - [IN/OUT] list of SNMP interfaces to delete    *
  *             ifmain         - [IN] interface main                           *
  *             type           - [IN] interface type                           *
  *             useip          - [IN] interface useip                          *
@@ -2998,11 +3003,11 @@ static int	DBhost_prototypes_macro_make(zbx_vector_macros_t *hostmacros, zbx_uin
  *               FAIL    - in the other case                                  *
  ******************************************************************************/
 static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces, zbx_uint64_t interfaceid,
-		unsigned char ifmain, unsigned char type, unsigned char useip, const char *ip, const char *dns,
-		const char *port, unsigned char snmp_type, unsigned char bulk, const char *community,
-		const char *securityname, unsigned char securitylevel, const char *authpassphrase,
-		const char *privpassphrase, unsigned char authprotocol, unsigned char privprotocol,
-		const char *contextname)
+		zbx_vector_uint64_t *del_snmp_ids, unsigned char ifmain, unsigned char type, unsigned char useip,
+		const char *ip, const char *dns, const char *port, unsigned char snmp_type, unsigned char bulk,
+		const char *community, const char *securityname, unsigned char securitylevel,
+		const char *authpassphrase, const char *privpassphrase, unsigned char authprotocol,
+		unsigned char privprotocol, const char *contextname)
 {
 	zbx_interfaces_prototype_t	*interface;
 	int				i;
@@ -3037,26 +3042,35 @@ static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces,
 			{
 				zbx_interface_prototype_snmp_t *snmp = interface->data.snmp;
 
-				if (snmp->version != snmp_type)
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE;
-				if (snmp->bulk != bulk)
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK;
-				if (0 != strcmp(snmp->community, community))
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY;
-				if (0 != strcmp(snmp->securityname, securityname))
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME;
-				if (snmp->securitylevel != securitylevel)
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECLEVEL;
-				if (0 != strcmp(snmp->authpassphrase, authpassphrase))
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS;
-				if (0 != strcmp(snmp->privpassphrase, privpassphrase))
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS;
-				if (snmp->authprotocol != authprotocol)
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPROTOCOL;
-				if (snmp->privprotocol != privprotocol)
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPROTOCOL;
-				if (0 != strcmp(snmp->contextname, contextname))
-					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT;
+				if (INTERFACE_TYPE_SNMP == type)
+				{
+					if (snmp->version != snmp_type)
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE;
+					if (snmp->bulk != bulk)
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK;
+					if (0 != strcmp(snmp->community, community))
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY;
+					if (0 != strcmp(snmp->securityname, securityname))
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME;
+					if (snmp->securitylevel != securitylevel)
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECLEVEL;
+					if (0 != strcmp(snmp->authpassphrase, authpassphrase))
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS;
+					if (0 != strcmp(snmp->privpassphrase, privpassphrase))
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS;
+					if (snmp->authprotocol != authprotocol)
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPROTOCOL;
+					if (snmp->privprotocol != privprotocol)
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPROTOCOL;
+					if (0 != strcmp(snmp->contextname, contextname))
+						snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT;
+				}
+				else
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_CREATE;
+			}
+			else if (INTERFACE_TYPE_SNMP == type)
+			{
+				zbx_vector_uint64_append(del_snmp_ids, interfaceid);
 			}
 
 			return SUCCEED;
@@ -3133,7 +3147,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 		hostmacro->value = zbx_strdup(NULL, row[2]);
 		hostmacro->description = zbx_strdup(NULL, row[3]);
 		ZBX_STR2UCHAR(hostmacro->type, row[4]);
-		hostmacro->flags = 0;
+		hostmacro->flags = ZBX_FLAG_HPMACRO_RESET_FLAG;
 
 		zbx_vector_macros_append(&host_prototype->hostmacros, hostmacro);
 	}
@@ -3427,6 +3441,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 		interface->ip = zbx_strdup(NULL, row[4]);
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
+		interface->flags = ZBX_FLAG_HPINTERFACE_RESET_FLAG;
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
@@ -3444,6 +3459,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 			ZBX_STR2UCHAR(snmp->authprotocol, row[14]);
 			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
 			snmp->contextname = zbx_strdup(NULL, row[16]);
+			snmp->flags = ZBX_FLAG_HPINTERFACE_SNMP_RESET_FLAG;
 			interface->data.snmp = snmp;
 		}
 		else
@@ -3500,12 +3516,13 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 					uint64_t	interfaceid;
 
 					ZBX_STR2UINT64(interfaceid, row[0]);
-					ZBX_STR2UINT64(type, row[3]);
+					ZBX_STR2UCHAR(type, row[3]);
 
 					if (INTERFACE_TYPE_SNMP == type)
 					{
 						if (FAIL == DBhost_prototypes_interface_make(
 								&host_prototype->interfaces, interfaceid,
+								del_snmp_interfaceids,
 								(unsigned char)atoi(row[2]),	/* main */
 								type,
 								(unsigned char)atoi(row[4]),	/* useip */
@@ -3523,13 +3540,14 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 								(unsigned char)atoi(row[16]),	/* privprotocol */
 								row[17]))			/* contextname */
 						{
-							zbx_vector_uint64_append(del_snmp_interfaceids, interfaceid);
+							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 						}
 					}
 					else
 					{
 						if (FAIL == DBhost_prototypes_interface_make(
 								&host_prototype->interfaces, interfaceid,
+								del_snmp_interfaceids,
 								(unsigned char)atoi(row[2]),	/* main */
 								type,
 								(unsigned char)atoi(row[4]),	/* useip */

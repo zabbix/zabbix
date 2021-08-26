@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 19:53+0300\n"
+"POT-Creation-Date: 2021-08-20 19:54+0300\n"
 "PO-Revision-Date: 2016-02-11 15:12+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: \n"
@@ -69,7 +69,7 @@ msgstr "\"%1$s\" value must be less than or equal to \"%2$s\" value"
 msgid "\"host:key\" pair is expected"
 msgstr "\"host:key\" pair is expected"
 
-#: include/forms.inc.php:1288
+#: include/forms.inc.php:1293
 #: include/views/configuration.host.discovery.edit.php:815
 #: include/views/js/configuration.host.discovery.edit.js.php:98
 #: include/views/js/item.preprocessing.js.php:148
@@ -122,7 +122,7 @@ msgstr ""
 msgid "%1$s [Line: %2$s | Column: %3$s]"
 msgstr "%1$s [Line: %2$s | Column: %3$s]"
 
-#: include/actions.inc.php:1814
+#: include/actions.inc.php:1838
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s action"
@@ -145,7 +145,7 @@ msgid_plural "%1$s hosts in maintenance"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2566
+#: include/func.inc.php:2625
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
@@ -161,7 +161,7 @@ msgid_plural "%1$s items"
 msgstr[0] "%1$s item"
 msgstr[1] "%1$s items"
 
-#: include/actions.inc.php:1653
+#: include/actions.inc.php:1676
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
@@ -172,7 +172,7 @@ msgstr[1] "%1$s messages"
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
-#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2572
+#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
 #: jsLoader.php:170 jsLoader.php:171 jsLoader.php:172 jsLoader.php:173
 #, c-format
 msgid "%1$s minute"
@@ -209,7 +209,7 @@ msgstr[0] "%1$s problem in total"
 msgstr[1] "%1$s problems in total"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
-#: include/actions.inc.php:2090
+#: include/actions.inc.php:2117
 #: include/views/administration.auditacts.list.php:83
 #, c-format
 msgid "%1$s retry left"
@@ -219,7 +219,7 @@ msgstr[1] "%1$s retries left"
 
 #: app/views/administration.user.edit.php:522
 #: include/classes/widgets/CWidgetConfig.php:283
-#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2579
+#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
 #: jsLoader.php:168 jsLoader.php:169
 #, c-format
 msgid "%1$s second"
@@ -259,7 +259,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, selected"
 
-#: include/func.inc.php:1834
+#: include/func.inc.php:1880
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -348,7 +348,7 @@ msgstr "500 latest values"
 msgid "<empty string>"
 msgstr "<empty string>"
 
-#: include/forms.inc.php:1336 include/views/js/item.preprocessing.js.php:197
+#: include/forms.inc.php:1341 include/views/js/item.preprocessing.js.php:197
 msgid "<label name>"
 msgstr "<label name>"
 
@@ -356,7 +356,7 @@ msgstr "<label name>"
 msgid "<manual>"
 msgstr "<manual>"
 
-#: include/forms.inc.php:1334 include/forms.inc.php:1342
+#: include/forms.inc.php:1339 include/forms.inc.php:1347
 #: include/views/js/item.preprocessing.js.php:195
 #: include/views/js/item.preprocessing.js.php:204
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
@@ -478,11 +478,12 @@ msgstr ""
 msgid "Access to modules"
 msgstr ""
 
-#: app/views/hint.box.php:77 app/views/monitoring.widget.problems.view.php:66
-#: include/actions.inc.php:153 include/blocks.inc.php:722
-#: include/classes/screens/CScreenProblem.php:876
-#: include/classes/screens/CScreenProblem.php:901
-#: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:287
+#: app/views/hintbox.eventlist.php:76
+#: app/views/monitoring.widget.problems.view.php:66
+#: include/actions.inc.php:153 include/blocks.inc.php:717
+#: include/classes/screens/CScreenProblem.php:868
+#: include/classes/screens/CScreenProblem.php:893
+#: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:287
 msgid "Ack"
 msgstr "Ack"
 
@@ -494,7 +495,7 @@ msgstr "Acknowledge"
 msgid "Acknowledge problems"
 msgstr ""
 
-#: app/views/popup.condition.common.php:652 include/actions.inc.php:1993
+#: app/views/popup.condition.common.php:652 include/actions.inc.php:2020
 #: include/events.inc.php:193
 msgid "Acknowledged"
 msgstr "Acknowledged"
@@ -534,8 +535,8 @@ msgstr "Acknowledged RESOLVED events"
 #: app/views/popup.massupdate.trigger.php:101
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:125
 #: app/views/popup.valuemap.edit.php:51 app/views/reports.auditlog.list.php:70
-#: app/views/reports.auditlog.list.php:90 include/actions.inc.php:1756
-#: include/actions.inc.php:1839
+#: app/views/reports.auditlog.list.php:90 include/actions.inc.php:1772
+#: include/actions.inc.php:1866
 #: include/views/administration.auditacts.list.php:63
 #: include/views/configuration.action.edit.php:59
 #: include/views/configuration.action.edit.php:174
@@ -640,14 +641,14 @@ msgstr "Action updated"
 #: app/views/administration.mediatype.edit.php:282
 #: app/views/configuration.discovery.edit.php:79
 #: app/views/monitoring.dashboard.view.php:116
-#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:723
+#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:718
 #: include/classes/helpers/CMenuHelper.php:177
 #: include/classes/helpers/CRoleHelper.php:435
-#: include/classes/screens/CScreenProblem.php:877
-#: include/classes/screens/CScreenProblem.php:902
-#: include/classes/screens/CScreenProblem.php:1170
-#: include/classes/screens/CScreenProblem.php:1231 include/events.inc.php:288
-#: include/forms.inc.php:1217 include/views/configuration.action.edit.php:28
+#: include/classes/screens/CScreenProblem.php:869
+#: include/classes/screens/CScreenProblem.php:894
+#: include/classes/screens/CScreenProblem.php:1162
+#: include/classes/screens/CScreenProblem.php:1223 include/events.inc.php:288
+#: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:68 jsLoader.php:146
 #: jsLoader.php:174 jsLoader.php:189 jsLoader.php:203 jsLoader.php:329
 #: tr_events.php:182
@@ -751,8 +752,8 @@ msgstr "Active till"
 #: app/views/popup.triggerwizard.php:116 app/views/popup.triggerwizard.php:150
 #: app/views/popup.valuemap.edit.php:60 app/views/popup.valuemap.edit.php:128
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
-#: include/classes/widgets/CWidgetHelper.php:530 include/forms.inc.php:1476
-#: include/forms.inc.php:2040 include/views/configuration.action.edit.php:133
+#: include/classes/widgets/CWidgetHelper.php:530 include/forms.inc.php:1481
+#: include/forms.inc.php:2045 include/views/configuration.action.edit.php:133
 #: include/views/configuration.action.edit.php:304
 #: include/views/configuration.action.edit.php:386
 #: include/views/configuration.action.edit.php:462
@@ -910,7 +911,7 @@ msgstr ""
 msgid "Add widget"
 msgstr "Add widget"
 
-#: app/controllers/CControllerPopupImportCompare.php:160
+#: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
 msgstr ""
 
@@ -987,7 +988,7 @@ msgstr ""
 msgid "Aggregation interval"
 msgstr ""
 
-#: include/actions.inc.php:2024
+#: include/actions.inc.php:2051
 msgid "Alert message"
 msgstr "Alert message"
 
@@ -1075,7 +1076,7 @@ msgstr "Allowed hosts"
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:679
+#: include/classes/setup/CSetupWizard.php:682
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternatively, you can install it manually:"
 
@@ -1109,7 +1110,7 @@ msgstr "And"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:80
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:80
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:370
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:68
 #: include/classes/widgets/forms/CWidgetFormWeb.php:62
 #: include/views/configuration.action.edit.php:122
@@ -1396,9 +1397,9 @@ msgstr ""
 msgid "Authorization"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:157
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:229
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:150
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:222
 msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Auto"
@@ -1486,7 +1487,7 @@ msgid "Axes"
 msgstr "Axes"
 
 #: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:567
 msgid "Back"
 msgstr "Back"
 
@@ -1626,11 +1627,11 @@ msgstr "By trigger template"
 msgid "CERT"
 msgstr "CERT"
 
-#: app/views/hint.box.php:117
+#: app/views/hintbox.eventlist.php:116
 #: app/views/monitoring.widget.problems.view.php:109
 #: include/classes/graph/CSvgGraph.php:1080
-#: include/classes/screens/CScreenProblem.php:982
-#: include/classes/screens/CScreenProblem.php:1192 include/events.inc.php:378
+#: include/classes/screens/CScreenProblem.php:974
+#: include/classes/screens/CScreenProblem.php:1184 include/events.inc.php:373
 msgid "CLOSING"
 msgstr "CLOSING"
 
@@ -1771,7 +1772,7 @@ msgstr "Cannot add dependency from a host to a template."
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 msgstr "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
 
-#: host_discovery.php:702
+#: host_discovery.php:717
 msgid "Cannot add discovery rule"
 msgstr "Cannot add discovery rule"
 
@@ -1787,11 +1788,11 @@ msgstr "Cannot add graph prototype"
 msgid "Cannot add group"
 msgstr "Cannot add group"
 
-#: hosts.php:363
+#: hosts.php:357
 msgid "Cannot add host"
 msgstr "Cannot add host"
 
-#: host_prototypes.php:296
+#: host_prototypes.php:290
 msgid "Cannot add host prototype"
 msgstr "Cannot add host prototype"
 
@@ -1871,7 +1872,7 @@ msgstr "Cannot add service"
 msgid "Cannot add submaps. Max depth reached."
 msgstr "Cannot add submaps. Max depth reached."
 
-#: templates.php:213
+#: templates.php:207
 msgid "Cannot add template"
 msgstr "Cannot add template"
 
@@ -1909,9 +1910,9 @@ msgstr "Cannot bind anonymously to LDAP server."
 msgid "Cannot bind to LDAP server."
 msgstr "Cannot bind to LDAP server."
 
-#: include/forms.inc.php:1861 include/forms.inc.php:1868
-#: include/forms.inc.php:1878 include/forms.inc.php:1912
-#: include/forms.inc.php:1919 include/forms.inc.php:1929
+#: include/forms.inc.php:1866 include/forms.inc.php:1873
+#: include/forms.inc.php:1883 include/forms.inc.php:1917
+#: include/forms.inc.php:1924 include/forms.inc.php:1934
 #, c-format
 msgid "Cannot build expression tree: %1$s."
 msgstr ""
@@ -1951,7 +1952,7 @@ msgstr "Cannot close problem: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "Cannot connect to LDAP server."
 
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:420
 msgid "Cannot connect to the database."
 msgstr "Cannot connect to the database."
 
@@ -2017,7 +2018,7 @@ msgstr "Cannot create icon map"
 msgid "Cannot create scheduled report"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:677
+#: include/classes/setup/CSetupWizard.php:678
 msgid "Cannot create the configuration file."
 msgstr "Cannot create the configuration file."
 
@@ -2060,14 +2061,14 @@ msgstr[1] "Cannot delete dashboards"
 msgid "Cannot delete dependency"
 msgstr "Cannot delete dependency"
 
-#: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:397
+#: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:412
 #, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Cannot delete discovery rule"
 msgstr[1] "Cannot delete discovery rule"
 
-#: host_discovery.php:745
+#: host_discovery.php:760
 msgid "Cannot delete discovery rules"
 msgstr "Cannot delete discovery rules"
 
@@ -2093,7 +2094,7 @@ msgid_plural "Cannot delete groups"
 msgstr[0] "Cannot delete group"
 msgstr[1] "Cannot delete groups"
 
-#: hosts.php:650 hosts.php:671
+#: hosts.php:644 hosts.php:665
 msgid "Cannot delete host"
 msgstr "Cannot delete host"
 
@@ -2111,7 +2112,7 @@ msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" mu
 msgstr[0] "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgstr[1] "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
 
-#: host_prototypes.php:149 host_prototypes.php:348
+#: host_prototypes.php:149 host_prototypes.php:342
 msgid "Cannot delete host prototypes"
 msgstr "Cannot delete host prototypes"
 
@@ -2211,7 +2212,7 @@ msgstr "Cannot delete selected actions"
 msgid "Cannot delete service"
 msgstr "Cannot delete service"
 
-#: templates.php:436 templates.php:450 templates.php:483
+#: templates.php:430 templates.php:444 templates.php:477
 msgid "Cannot delete template"
 msgstr "Cannot delete template"
 
@@ -2310,14 +2311,14 @@ msgid_plural "Cannot disable correlations"
 msgstr[0] "Cannot disable correlation"
 msgstr[1] "Cannot disable correlations"
 
-#: app/controllers/CControllerDiscoveryDisable.php:74 host_discovery.php:735
+#: app/controllers/CControllerDiscoveryDisable.php:74 host_discovery.php:750
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Cannot disable discovery rule"
 msgstr[1] "Cannot disable discovery rules"
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
-#: hosts.php:703
+#: hosts.php:697
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Cannot disable host"
@@ -2388,14 +2389,14 @@ msgid_plural "Cannot enable correlations"
 msgstr[0] "Cannot enable correlation"
 msgstr[1] "Cannot enable correlations"
 
-#: app/controllers/CControllerDiscoveryEnable.php:75 host_discovery.php:734
+#: app/controllers/CControllerDiscoveryEnable.php:75 host_discovery.php:749
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Cannot enable discovery rule"
 msgstr[1] "Cannot enable discovery rules"
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
-#: hosts.php:702
+#: hosts.php:696
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Cannot enable host"
@@ -2645,17 +2646,17 @@ msgstr "Cannot mass update visible template name."
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
 msgstr ""
 
-#: include/classes/db/DB.php:911
+#: include/classes/db/DB.php:899
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "Cannot perform delete statement on table \"%1$s\" without where condition."
 
-#: include/classes/db/DB.php:624
+#: include/classes/db/DB.php:612
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Cannot perform update statement on table \"%1$s\" without values."
 
-#: include/classes/db/DB.php:637
+#: include/classes/db/DB.php:625
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Cannot perform update statement on table \"%1$s\" without where condition."
@@ -2701,7 +2702,7 @@ msgstr "Cannot save widget \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Cannot send command, check connection with Zabbix server \"%1$s\"."
 
-#: host_discovery.php:409 host_discovery.php:765 items.php:952 items.php:1146
+#: host_discovery.php:424 host_discovery.php:780 items.php:952 items.php:1146
 msgid "Cannot send request"
 msgstr "Cannot send request"
 
@@ -2877,7 +2878,7 @@ msgid "Cannot update correlation"
 msgstr "Cannot update correlation"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
-#: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:705
+#: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:720
 msgid "Cannot update discovery rule"
 msgstr "Cannot update discovery rule"
 
@@ -2906,7 +2907,7 @@ msgstr "Cannot update group"
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Cannot update groups for discovered host \"%1$s\"."
 
-#: hosts.php:347
+#: hosts.php:341
 msgid "Cannot update host"
 msgstr "Cannot update host"
 
@@ -2914,7 +2915,7 @@ msgstr "Cannot update host"
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Cannot update host encryption settings. Connection settings for both directions should be specified."
 
-#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:333
+#: host_prototypes.php:276 host_prototypes.php:306 host_prototypes.php:327
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Cannot update host prototype"
@@ -3027,7 +3028,7 @@ msgstr "Cannot update service"
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 msgstr "Cannot update step for a templated web scenario \"%1$s\": %2$s."
 
-#: templates.php:217
+#: templates.php:211
 msgid "Cannot update template"
 msgstr "Cannot update template"
 
@@ -3381,7 +3382,7 @@ msgstr "Clone"
 
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
-#: app/views/popup.import.compare.php:162 include/func.inc.php:1637
+#: app/views/popup.import.compare.php:162 include/func.inc.php:1656
 #: include/views/js/monitoring.sysmaps.js.php:334
 #: include/views/js/monitoring.sysmaps.js.php:487
 #: include/views/js/monitoring.sysmaps.js.php:611
@@ -3452,7 +3453,7 @@ msgstr "Columns"
 msgid "Combined result"
 msgstr "Combined result"
 
-#: app/views/administration.script.edit.php:174 include/actions.inc.php:1861
+#: app/views/administration.script.edit.php:174 include/actions.inc.php:1888
 #: include/views/administration.auditacts.list.php:102
 msgid "Command"
 msgstr "Command"
@@ -3570,7 +3571,7 @@ msgstr "Configuration"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:697
+#: include/classes/setup/CSetupWizard.php:700
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Configuration file \"%1$s\" created."
@@ -3670,7 +3671,7 @@ msgstr "Configuration of proxies"
 msgid "Configuration of regular expressions"
 msgstr "Configuration of regular expressions"
 
-#: app/controllers/CControllerScriptEdit.php:204
+#: app/controllers/CControllerScriptEdit.php:208
 #: app/controllers/CControllerScriptList.php:197
 msgid "Configuration of scripts"
 msgstr "Configuration of scripts"
@@ -3723,7 +3724,7 @@ msgid "Configuration updated"
 msgstr "Configuration updated"
 
 #: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:427
+#: include/classes/setup/CSetupWizard.php:428
 msgid "Configure DB connection"
 msgstr "Configure DB connection"
 
@@ -3731,7 +3732,7 @@ msgstr "Configure DB connection"
 msgid "Confirmation text"
 msgstr "Confirmation text"
 
-#: include/classes/setup/CSetupWizard.php:695
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Congratulations! You have successfully installed Zabbix frontend."
 
@@ -4323,8 +4324,8 @@ msgstr ""
 msgid "Custom multiplier"
 msgstr "Custom multiplier"
 
-#: app/views/js/popup.itemtestedit.view.js.php:381 include/forms.inc.php:1216
-#: include/forms.inc.php:1431 include/views/js/item.preprocessing.js.php:64
+#: app/views/js/popup.itemtestedit.view.js.php:381 include/forms.inc.php:1221
+#: include/forms.inc.php:1436 include/views/js/item.preprocessing.js.php:64
 msgid "Custom on fail"
 msgstr "Custom on fail"
 
@@ -4435,7 +4436,7 @@ msgstr ""
 #: app/controllers/CControllerDashboardList.php:120
 #: app/controllers/CControllerHostDashboardView.php:122
 #: app/controllers/CControllerPopupGeneric.php:384
-#: app/controllers/CControllerPopupImportCompare.php:169
+#: app/controllers/CControllerPopupImportCompare.php:170
 #: app/partials/monitoring.host.view.html.php:38
 #: app/partials/monitoring.host.view.html.php:138
 #: app/partials/monitoring.host.view.html.php:145
@@ -4474,7 +4475,7 @@ msgid "Data overview"
 msgstr "Data overview"
 
 #: include/classes/widgets/CWidgetHelper.php:1154
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:34
 #: include/classes/widgets/views/widget.svggraph.form.view.php:290
 msgid "Data set"
 msgstr "Data set"
@@ -4488,15 +4489,15 @@ msgid "Data storage period"
 msgstr "Data storage period"
 
 #: include/classes/setup/CSetupWizard.php:388
-#: include/classes/setup/CSetupWizard.php:533
-#: include/classes/setup/CSetupWizard.php:737
+#: include/classes/setup/CSetupWizard.php:534
+#: include/classes/setup/CSetupWizard.php:740
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
-#: include/classes/setup/CSetupWizard.php:539
-#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:540
+#: include/classes/setup/CSetupWizard.php:748
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4505,22 +4506,22 @@ msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:412
-#: include/classes/setup/CSetupWizard.php:547
+#: include/classes/setup/CSetupWizard.php:548
 msgid "Database TLS cipher list"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:370
-#: include/classes/setup/CSetupWizard.php:529
+#: include/classes/setup/CSetupWizard.php:530
 msgid "Database TLS encryption"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:536
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:537
+#: include/classes/setup/CSetupWizard.php:744
 msgid "Database TLS key file"
 msgstr ""
 
-#: include/blocks.inc.php:614
+#: include/blocks.inc.php:609
 msgid "Database history tables upgraded"
 msgstr ""
 
@@ -4529,7 +4530,7 @@ msgid "Database host"
 msgstr "Database host"
 
 #: include/classes/setup/CSetupWizard.php:406
-#: include/classes/setup/CSetupWizard.php:542
+#: include/classes/setup/CSetupWizard.php:543
 msgid "Database host verification"
 msgstr ""
 
@@ -4538,34 +4539,34 @@ msgid "Database monitor"
 msgstr "Database monitor"
 
 #: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:509 setup.php:45
+#: include/classes/setup/CSetupWizard.php:510 setup.php:45
 msgid "Database name"
 msgstr "Database name"
 
-#: include/classes/setup/CSetupWizard.php:511
+#: include/classes/setup/CSetupWizard.php:512
 msgid "Database password"
 msgstr "Database password"
 
 #: include/classes/setup/CSetupWizard.php:307
-#: include/classes/setup/CSetupWizard.php:508 setup.php:44
+#: include/classes/setup/CSetupWizard.php:509 setup.php:44
 msgid "Database port"
 msgstr "Database port"
 
 #: include/classes/setup/CSetupWizard.php:319
-#: include/classes/setup/CSetupWizard.php:513
+#: include/classes/setup/CSetupWizard.php:514
 msgid "Database schema"
 msgstr "Database schema"
 
-#: include/classes/setup/CSetupWizard.php:507
+#: include/classes/setup/CSetupWizard.php:508
 msgid "Database server"
 msgstr "Database server"
 
 #: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:494
+#: include/classes/setup/CSetupWizard.php:495
 msgid "Database type"
 msgstr "Database type"
 
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:511
 msgid "Database user"
 msgstr "Database user"
 
@@ -4598,7 +4599,7 @@ msgstr ""
 msgid "Day"
 msgstr "Day"
 
-#: include/func.inc.php:2484
+#: include/func.inc.php:2543
 msgid "Day before yesterday"
 msgstr "Day before yesterday"
 
@@ -4697,12 +4698,12 @@ msgid "Default page display period"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:83
-#: include/classes/setup/CSetupWizard.php:475
+#: include/classes/setup/CSetupWizard.php:476
 msgid "Default theme"
 msgstr "Default theme"
 
 #: app/views/administration.gui.edit.php:76
-#: include/classes/setup/CSetupWizard.php:468
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Default time zone"
 msgstr ""
 
@@ -5131,8 +5132,8 @@ msgid "Description"
 msgstr "Description"
 
 #: app/views/administration.mediatype.list.php:81
-#: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:530
-#: include/func.inc.php:1588 include/views/configuration.action.edit.php:174
+#: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:525
+#: include/func.inc.php:1601 include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:178
 #: include/views/configuration.action.edit.php:321
 #: include/views/configuration.action.edit.php:407
@@ -5322,7 +5323,7 @@ msgstr "Discard unchanged"
 msgid "Discard unchanged with heartbeat"
 msgstr "Discard unchanged with heartbeat"
 
-#: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1410
+#: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1415
 #: include/views/js/item.preprocessing.js.php:66
 msgid "Discard value"
 msgstr "Discard value"
@@ -5463,35 +5464,35 @@ msgstr "Discovery rule \"%1$s\" cannot be copied without its master item."
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 
-#: app/controllers/CControllerDiscoveryCreate.php:85 host_discovery.php:702
+#: app/controllers/CControllerDiscoveryCreate.php:85 host_discovery.php:717
 msgid "Discovery rule created"
 msgstr "Discovery rule created"
 
-#: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:397
+#: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:412
 #, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Discovery rule deleted"
 msgstr[1] "Discovery rule deleted"
 
-#: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:732
+#: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:747
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] "Discovery rule disabled"
 msgstr[1] "Discovery rules disabled"
 
-#: app/controllers/CControllerDiscoveryEnable.php:72 host_discovery.php:731
+#: app/controllers/CControllerDiscoveryEnable.php:72 host_discovery.php:746
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] "Discovery rule enabled"
 msgstr[1] "Discovery rules enabled"
 
-#: app/controllers/CControllerDiscoveryUpdate.php:95 host_discovery.php:705
+#: app/controllers/CControllerDiscoveryUpdate.php:95 host_discovery.php:720
 msgid "Discovery rule updated"
 msgstr "Discovery rule updated"
 
 #: app/controllers/CControllerPopupGeneric.php:315
-#: app/controllers/CControllerPopupImportCompare.php:168
+#: app/controllers/CControllerPopupImportCompare.php:169
 #: app/views/configuration.discovery.edit.php:29
 #: app/views/configuration.discovery.list.php:31
 #: app/views/popup.condition.common.php:463 app/views/popup.import.php:36
@@ -5501,7 +5502,7 @@ msgstr "Discovery rule updated"
 msgid "Discovery rules"
 msgstr "Discovery rules"
 
-#: host_discovery.php:745
+#: host_discovery.php:760
 msgid "Discovery rules deleted"
 msgstr "Discovery rules deleted"
 
@@ -5541,11 +5542,11 @@ msgstr "Display problems"
 msgid "Display stacked graph"
 msgstr "Display stacked graph"
 
+#: app/controllers/CControllerHintboxActionlist.php:93
 #: app/views/administration.queue.details.php:85 app/views/search.php:184
 #: app/views/search.php:268 app/views/search.php:367
-#: include/actions.inc.php:1646 include/actions.inc.php:1717
-#: include/actions.inc.php:1807 include/classes/helpers/CPagerHelper.php:147
-#: jsLoader.php:378
+#: include/actions.inc.php:1669 include/actions.inc.php:1741
+#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:378
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Displaying %1$s of %2$s found"
@@ -5641,7 +5642,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:681
+#: include/classes/setup/CSetupWizard.php:684
 msgid "Download the configuration file"
 msgstr "Download the configuration file"
 
@@ -5718,10 +5719,11 @@ msgstr "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 
-#: app/views/hint.box.php:76 app/views/monitoring.widget.problems.view.php:65
-#: include/blocks.inc.php:721 include/classes/screens/CScreenProblem.php:875
-#: include/classes/screens/CScreenProblem.php:900
-#: include/classes/screens/CScreenProblem.php:1168 include/events.inc.php:286
+#: app/views/hintbox.eventlist.php:75
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:716
+#: include/classes/screens/CScreenProblem.php:867
+#: include/classes/screens/CScreenProblem.php:892
+#: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:286
 #: include/views/configuration.action.edit.php:174
 msgid "Duration"
 msgstr "Duration"
@@ -6176,7 +6178,7 @@ msgstr "Error"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Error in search request for table \"%1$s\"."
 
-#: include/func.inc.php:1631 jsLoader.php:218
+#: include/func.inc.php:1642 jsLoader.php:218
 msgid "Error message"
 msgstr "Error message"
 
@@ -6324,7 +6326,7 @@ msgstr "Execute on"
 msgid "Execute scripts"
 msgstr ""
 
-#: include/actions.inc.php:2045
+#: include/actions.inc.php:2072
 #: include/views/administration.auditacts.list.php:77
 msgid "Executed"
 msgstr "Executed"
@@ -6454,8 +6456,8 @@ msgstr "Expression cannot be empty"
 msgid "Expression constructor"
 msgstr "Expression constructor"
 
-#: include/forms.inc.php:1862 include/forms.inc.php:1869
-#: include/forms.inc.php:1879
+#: include/forms.inc.php:1867 include/forms.inc.php:1874
+#: include/forms.inc.php:1884
 msgid "Expression syntax error."
 msgstr "Expression syntax error."
 
@@ -6492,7 +6494,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Fail"
 
-#: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2057
+#: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2084
 #: include/views/administration.auditacts.list.php:87
 msgid "Failed"
 msgstr "Failed"
@@ -6843,7 +6845,7 @@ msgstr "Friday"
 #: app/partials/timeselector.filter.php:88
 #: app/views/popup.tabfilter.edit.php:44 app/views/report.services.php:82
 #: include/classes/html/CFilter.php:282
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:79
 #: include/views/configuration.services.edit.php:259
 #: include/views/configuration.services.edit.php:307
 #: include/views/js/monitoring.sysmaps.js.php:748 report4.php:191
@@ -6898,7 +6900,7 @@ msgid "GUI access disabled."
 msgstr "GUI access disabled."
 
 #: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:484
+#: include/classes/setup/CSetupWizard.php:485
 msgid "GUI settings"
 msgstr ""
 
@@ -6935,7 +6937,7 @@ msgid "Get value"
 msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:505
-#: app/views/popup.itemtestedit.view.php:434
+#: app/views/popup.itemtestedit.view.php:431
 msgid "Get value and test"
 msgstr ""
 
@@ -7012,8 +7014,8 @@ msgstr "Gradient line"
 #: app/partials/monitoring.latest.view.html.php:154
 #: app/views/monitoring.charts.view.php:56
 #: include/classes/macros/CMacrosResolverGeneral.php:905
-#: include/classes/screens/CScreenProblem.php:1312
-#: include/classes/screens/CScreenProblem.php:1317
+#: include/classes/screens/CScreenProblem.php:1304
+#: include/classes/screens/CScreenProblem.php:1309
 #: include/classes/widgets/CWidgetConfig.php:60
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:66
@@ -7116,7 +7118,7 @@ msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "Graph prototype with ID \"%1$s\" is not available."
 
 #: app/controllers/CControllerPopupGeneric.php:275
-#: app/controllers/CControllerPopupImportCompare.php:174
+#: app/controllers/CControllerPopupImportCompare.php:175
 #: include/html.inc.php:468 include/views/configuration.graph.edit.php:35
 #: include/views/configuration.graph.list.php:28
 #: include/views/configuration.host.discovery.list.php:297
@@ -7156,7 +7158,7 @@ msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 msgstr "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
 
 #: app/controllers/CControllerPopupGeneric.php:262
-#: app/controllers/CControllerPopupImportCompare.php:166
+#: app/controllers/CControllerPopupImportCompare.php:167
 #: app/partials/monitoring.host.view.html.php:37
 #: app/partials/monitoring.host.view.html.php:127
 #: app/partials/monitoring.host.view.html.php:135
@@ -7253,7 +7255,7 @@ msgstr "Group updated"
 msgid "Grouping by"
 msgstr "Grouping by"
 
-#: app/controllers/CControllerPopupImportCompare.php:163
+#: app/controllers/CControllerPopupImportCompare.php:164
 #: app/views/administration.user.edit.php:86
 #: app/views/administration.user.list.php:110 app/views/popup.import.php:29
 #: include/views/configuration.host.edit.php:86
@@ -7426,10 +7428,10 @@ msgstr "Highlight whole row"
 #: app/views/administration.housekeeping.edit.php:125
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
 #: include/classes/macros/CMacrosResolverGeneral.php:910
-#: include/classes/screens/CScreenProblem.php:1319
-#: include/classes/screens/CScreenProblem.php:1324
+#: include/classes/screens/CScreenProblem.php:1311
+#: include/classes/screens/CScreenProblem.php:1316
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
 #: jsLoader.php:348
@@ -7454,7 +7456,7 @@ msgstr "History cleared"
 msgid "History clearing can take a long time. Continue?"
 msgstr "History clearing can take a long time. Continue?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:54
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:47
 msgid "History data selection"
 msgstr "History data selection"
 
@@ -7497,12 +7499,12 @@ msgstr "Horizontal align"
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:92 app/views/popup.massupdate.host.php:290
 #: app/views/search.php:30 httpconf.php:212 httpconf.php:481
-#: include/actions.inc.php:50 include/blocks.inc.php:718
+#: include/actions.inc.php:50 include/blocks.inc.php:713
 #: include/classes/screens/CScreenHttpTest.php:112
-#: include/classes/screens/CScreenProblem.php:871
-#: include/classes/screens/CScreenProblem.php:895
-#: include/classes/screens/CScreenProblem.php:1165
-#: include/classes/setup/CSetupWizard.php:439
+#: include/classes/screens/CScreenProblem.php:863
+#: include/classes/screens/CScreenProblem.php:887
+#: include/classes/screens/CScreenProblem.php:1157
+#: include/classes/setup/CSetupWizard.php:440
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
@@ -7554,7 +7556,7 @@ msgstr "Host IP"
 msgid "Host access"
 msgstr "Host access"
 
-#: hosts.php:362
+#: hosts.php:356
 msgid "Host added"
 msgstr "Host added"
 
@@ -7575,19 +7577,19 @@ msgstr "Host cannot have more than one default interface of the same type."
 msgid "Host count"
 msgstr "Host count"
 
-#: hosts.php:650 hosts.php:671
+#: hosts.php:644 hosts.php:665
 msgid "Host deleted"
 msgstr "Host deleted"
 
 #: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:194
-#: hosts.php:700
+#: hosts.php:694
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Host disabled"
 msgstr[1] "Hosts disabled"
 
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
-#: hosts.php:699
+#: hosts.php:693
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Host enabled"
@@ -7745,7 +7747,7 @@ msgstr "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from anoth
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Host prototype \"%1$s\" already exists on \"%2$s\"."
 
-#: host_prototypes.php:296
+#: host_prototypes.php:290
 msgid "Host prototype added"
 msgstr "Host prototype added"
 
@@ -7761,7 +7763,7 @@ msgstr "Host prototype deleted"
 msgid "Host prototype macros"
 msgstr ""
 
-#: host_prototypes.php:282 host_prototypes.php:312 host_prototypes.php:332
+#: host_prototypes.php:276 host_prototypes.php:306 host_prototypes.php:326
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Host prototype updated"
@@ -7777,7 +7779,7 @@ msgstr "Host prototype with host name \"%1$s\" already exists in discovery rule 
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 
-#: app/controllers/CControllerPopupImportCompare.php:175
+#: app/controllers/CControllerPopupImportCompare.php:176
 #: include/html.inc.php:483
 #: include/views/configuration.host.discovery.list.php:306
 #: include/views/configuration.host.prototype.edit.php:35
@@ -7785,7 +7787,7 @@ msgstr "Host prototype with visible name \"%1$s\" already exists in discovery ru
 msgid "Host prototypes"
 msgstr "Host prototypes"
 
-#: host_prototypes.php:348
+#: host_prototypes.php:342
 msgid "Host prototypes deleted"
 msgstr "Host prototypes deleted"
 
@@ -7805,7 +7807,7 @@ msgstr "Host time"
 msgid "Host update failed."
 msgstr "Host update failed."
 
-#: hosts.php:346
+#: hosts.php:340
 msgid "Host updated"
 msgstr "Host updated"
 
@@ -8148,7 +8150,7 @@ msgstr "Images for all maps will be updated!"
 msgid "Immediately"
 msgstr "Immediately"
 
-#: app/controllers/CControllerPopupImport.php:164
+#: app/controllers/CControllerPopupImport.php:165
 #: app/views/administration.mediatype.list.php:36
 #: app/views/popup.import.compare.php:152 app/views/popup.import.php:156
 #: include/views/configuration.host.list.php:37
@@ -8179,7 +8181,7 @@ msgstr ""
 msgid "In maintenance"
 msgstr "In maintenance"
 
-#: include/actions.inc.php:2052
+#: include/actions.inc.php:2079
 #: include/views/administration.auditacts.list.php:81
 msgid "In progress"
 msgstr "In progress"
@@ -8207,7 +8209,7 @@ msgid "Inaccessible graph prototype"
 msgstr ""
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:317
-#: host_prototypes.php:467
+#: host_prototypes.php:461
 msgid "Inaccessible group"
 msgstr "Inaccessible group"
 
@@ -8254,8 +8256,8 @@ msgstr "Inaccessible trigger"
 #: app/controllers/CControllerScheduledReportEdit.php:235
 #: app/controllers/CControllerScheduledReportEdit.php:281
 #: app/controllers/CControllerScheduledReportList.php:136
-#: include/actions.inc.php:1927 include/actions.inc.php:1950
-#: include/actions.inc.php:1955
+#: include/actions.inc.php:1954 include/actions.inc.php:1977
+#: include/actions.inc.php:1982
 #: include/classes/helpers/CDashboardHelper.php:39 include/events.inc.php:248
 #: include/views/monitoring.sysmap.edit.php:81
 msgid "Inaccessible user"
@@ -8628,15 +8630,15 @@ msgstr "Incorrect evaltype value."
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 
-#: include/classes/api/services/CAlert.php:376
+#: include/classes/api/services/CAlert.php:386
 msgid "Incorrect eventobject value."
 msgstr "Incorrect eventobject value."
 
-#: include/classes/api/services/CAlert.php:369
+#: include/classes/api/services/CAlert.php:379
 msgid "Incorrect eventsource value."
 msgstr "Incorrect eventsource value."
 
-#: include/classes/db/DB.php:644 include/classes/db/DB.php:918
+#: include/classes/db/DB.php:632 include/classes/db/DB.php:906
 #, c-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
@@ -8645,9 +8647,9 @@ msgstr "Incorrect field \"%1$s\" name or value in where statement for table \"%2
 msgid "Incorrect fields for sysmap."
 msgstr "Incorrect fields for sysmap."
 
-#: include/classes/setup/CSetupWizard.php:737
-#: include/classes/setup/CSetupWizard.php:741
-#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:748
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -8766,7 +8768,7 @@ msgstr "Incorrect item value type"
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 
-#: include/forms.inc.php:1511
+#: include/forms.inc.php:1516
 msgid "Incorrect list of items."
 msgstr "Incorrect list of items."
 
@@ -9345,9 +9347,9 @@ msgstr ""
 #: app/partials/scheduledreport.table.html.php:45
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
-#: include/actions.inc.php:1756 include/actions.inc.php:1839
-#: include/blocks.inc.php:717 include/classes/screens/CScreenProblem.php:870
-#: include/classes/screens/CScreenProblem.php:894
+#: include/actions.inc.php:1772 include/actions.inc.php:1866
+#: include/blocks.inc.php:712 include/classes/screens/CScreenProblem.php:862
+#: include/classes/screens/CScreenProblem.php:886
 #: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.graph.list.php:140
 #: include/views/configuration.host.discovery.list.php:201
@@ -9419,7 +9421,7 @@ msgid "Insert expression"
 msgstr "Insert expression"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:702
+#: include/classes/setup/CSetupWizard.php:705
 msgid "Install"
 msgstr "Install"
 
@@ -9588,7 +9590,7 @@ msgstr "Invalid email address for media type with ID \"%1$s\"."
 #: app/controllers/CControllerPopupMassupdateItem.php:210
 #: app/controllers/CControllerPopupMassupdateItem.php:222
 #: disc_prototypes.php:352 disc_prototypes.php:357 disc_prototypes.php:370
-#: host_discovery.php:437 host_discovery.php:443 host_discovery.php:456
+#: host_discovery.php:452 host_discovery.php:458 host_discovery.php:471
 #: items.php:560 items.php:565 items.php:578
 #, c-format
 msgid "Invalid interval \"%1$s\"."
@@ -9786,8 +9788,8 @@ msgstr "Invalid method parameters."
 #: include/classes/validators/CApiInputValidator.php:2335
 #: include/classes/validators/CApiInputValidator.php:2342
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:130
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
 #, c-format
 msgid "Invalid parameter \"%1$s\": %2$s."
 msgstr "Invalid parameter \"%1$s\": %2$s."
@@ -9954,7 +9956,7 @@ msgstr "Item \"%1$s\" does not exist or you have no access to this item"
 msgid "Item added"
 msgstr "Item added"
 
-#: app/views/popup.itemtestedit.view.php:419
+#: app/views/popup.itemtestedit.view.php:420
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
 
@@ -10041,7 +10043,7 @@ msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "Item prototype with ID \"%1$s\" is not available."
 
 #: app/controllers/CControllerPopupGeneric.php:288
-#: app/controllers/CControllerPopupImportCompare.php:172
+#: app/controllers/CControllerPopupImportCompare.php:173
 #: include/html.inc.php:440
 #: include/views/configuration.host.discovery.list.php:281
 #: include/views/configuration.item.prototype.edit.php:26
@@ -10130,7 +10132,7 @@ msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\"."
 
 #: app/controllers/CControllerPopupGeneric.php:237
-#: app/controllers/CControllerPopupImportCompare.php:167
+#: app/controllers/CControllerPopupImportCompare.php:168
 #: app/partials/dataoverview.table.top.php:29
 #: app/views/administration.queue.overview.php:45
 #: app/views/popup.import.php:35 app/views/search.php:117
@@ -10145,7 +10147,7 @@ msgstr "Item with key \"%1$s\" already exists on \"%2$s\"."
 #: include/views/configuration.template.list.php:118
 #: include/views/configuration.template.list.php:206
 #: include/views/inventory.host.view.php:182
-#: include/views/inventory.host.view.php:215 items.php:1297
+#: include/views/inventory.host.view.php:215 items.php:1292
 msgid "Items"
 msgstr "Items"
 
@@ -10231,7 +10233,7 @@ msgid "Japanese (ja_JP)"
 msgstr "Japanese (ja_JP)"
 
 #: app/views/administration.mediatype.edit.php:220
-#: app/views/administration.script.edit.php:188 include/forms.inc.php:1319
+#: app/views/administration.script.edit.php:188 include/forms.inc.php:1324
 #: include/items.inc.php:1863
 #: include/views/configuration.host.discovery.edit.php:231
 #: include/views/configuration.item.edit.php:267
@@ -10366,42 +10368,42 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Last"
 
-#: include/func.inc.php:2537
+#: include/func.inc.php:2596
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "Last %1$d day"
 msgstr[1] "Last %1$d days"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2590
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "Last %1$d hour"
 msgstr[1] "Last %1$d hours"
 
-#: include/func.inc.php:2524
+#: include/func.inc.php:2583
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "Last %1$d minute"
 msgstr[1] "Last %1$d minutes"
 
-#: include/func.inc.php:2540
+#: include/func.inc.php:2599
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "Last %1$d month"
 msgstr[1] "Last %1$d months"
 
-#: include/func.inc.php:2517
+#: include/func.inc.php:2576
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "Last %1$d second"
 msgstr[1] "Last %1$d seconds"
 
-#: include/func.inc.php:2543
+#: include/func.inc.php:2602
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10516,10 +10518,10 @@ msgstr ""
 msgid "Left"
 msgstr "Left"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:143
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
 msgid "Left Y"
 msgstr "Left Y"
 
@@ -10987,7 +10989,7 @@ msgstr ""
 msgid "Manual host action"
 msgstr ""
 
-#: include/actions.inc.php:1988
+#: include/actions.inc.php:2015
 msgid "Manually closed"
 msgstr "Manually closed"
 
@@ -11120,11 +11122,11 @@ msgstr "Mark selected"
 msgid "Mask"
 msgstr "Mask"
 
-#: app/controllers/CControllerPopupMassupdateHost.php:445
-#: app/controllers/CControllerPopupMassupdateItem.php:405
-#: app/controllers/CControllerPopupMassupdateTemplate.php:363
-#: app/controllers/CControllerPopupMassupdateTrigger.php:234
-#: include/classes/screens/CScreenProblem.php:1142
+#: app/controllers/CControllerPopupMassupdateHost.php:446
+#: app/controllers/CControllerPopupMassupdateItem.php:406
+#: app/controllers/CControllerPopupMassupdateTemplate.php:364
+#: app/controllers/CControllerPopupMassupdateTrigger.php:235
+#: include/classes/screens/CScreenProblem.php:1134
 #: include/views/configuration.host.list.php:444
 #: include/views/configuration.item.list.php:311
 #: include/views/configuration.item.prototype.list.php:196
@@ -11159,12 +11161,12 @@ msgid "Mathematical functions"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:344
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:143
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:213
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:215
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:134
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:206
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
 msgid "Max"
 msgstr "Max"
 
@@ -11194,14 +11196,14 @@ msgstr "Maximum number of opened files supported by OS. Returns integer"
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Maximum number of processes supported by OS. Returns integer"
 
-#: include/blocks.inc.php:635
+#: include/blocks.inc.php:630
 #, c-format
 msgid "Maximum required database version is %1$s."
 msgstr ""
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:259
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:451
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:444
 #: include/validate.inc.php:477
 #, c-format
 msgid "Maximum time period to display is %1$s day."
@@ -11340,8 +11342,8 @@ msgstr ""
 #: app/views/monitoring.widget.actionlog.view.php:37
 #: app/views/popup.acknowledge.edit.php:35
 #: app/views/popup.mediatype.message.php:80
-#: app/views/popup.mediatypetest.edit.php:75 include/actions.inc.php:1623
-#: include/actions.inc.php:1894 include/actions.inc.php:2001
+#: app/views/popup.mediatypetest.edit.php:75 include/actions.inc.php:1645
+#: include/actions.inc.php:1921 include/actions.inc.php:2028
 #: include/views/administration.auditacts.list.php:66
 #: include/views/administration.auditacts.list.php:97
 msgid "Message"
@@ -11369,12 +11371,12 @@ msgstr "Message timeout"
 msgid "Message type"
 msgstr ""
 
-#: include/actions.inc.php:1756 include/actions.inc.php:1839
+#: include/actions.inc.php:1772 include/actions.inc.php:1866
 msgid "Message/Command"
 msgstr "Message/Command"
 
 #: app/views/administration.authentication.edit.php:201
-#: include/classes/screens/CScreenProblem.php:1224
+#: include/classes/screens/CScreenProblem.php:1216
 msgid "Messages"
 msgstr "Messages"
 
@@ -11395,10 +11397,10 @@ msgid "Middle"
 msgstr "Middle"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:339
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:126
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:198
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:119
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:191
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:193
 msgid "Min"
 msgstr "Min"
 
@@ -11417,7 +11419,7 @@ msgstr ""
 msgid "Minimum required PHP version is %1$s."
 msgstr ""
 
-#: include/blocks.inc.php:631
+#: include/blocks.inc.php:626
 #, c-format
 msgid "Minimum required database version is %1$s."
 msgstr ""
@@ -11445,7 +11447,7 @@ msgstr "Minimum severity"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:244
 #: include/classes/mvc/CController.php:252
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:446
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:439
 #: include/validate.inc.php:470
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
@@ -11759,7 +11761,7 @@ msgstr "NTLM"
 #: app/views/reports.scheduledreport.list.php:48 disc_prototypes.php:44
 #: graphs.php:43 host_discovery.php:50 httpconf.php:42
 #: include/classes/screens/CScreenHttpTest.php:113
-#: include/classes/widgets/CWidgetHelper.php:67 include/forms.inc.php:1214
+#: include/classes/widgets/CWidgetHelper.php:67 include/forms.inc.php:1219
 #: include/hosts.inc.php:109 include/views/configuration.action.edit.php:48
 #: include/views/configuration.action.edit.php:59
 #: include/views/configuration.action.list.php:66
@@ -11947,13 +11949,14 @@ msgstr ""
 msgid "New triggers"
 msgstr "New triggers"
 
-#: jsLoader.php:183
+#: app/views/monitoring.dashboard.view.php:175
+#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:183
 msgid "Next page"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:142
-#: include/classes/setup/CSetupWizard.php:429
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:430
+#: include/classes/setup/CSetupWizard.php:567
 msgid "Next step"
 msgstr "Next step"
 
@@ -11961,8 +11964,8 @@ msgstr "Next step"
 #: app/partials/configuration.filter.items.php:202
 #: app/partials/configuration.filter.items.php:211
 #: app/views/administration.user.list.php:135
-#: app/views/administration.user.list.php:139 app/views/hint.box.php:179
-#: app/views/hint.box.php:183
+#: app/views/administration.user.list.php:139
+#: app/views/hintbox.eventlist.php:178 app/views/hintbox.eventlist.php:182
 #: app/views/monitoring.widget.problems.view.php:264
 #: app/views/monitoring.widget.problems.view.php:268
 #: app/views/popup.condition.common.php:647
@@ -11971,13 +11974,13 @@ msgstr "Next step"
 #: app/views/popup.massupdate.item.php:337
 #: app/views/popup.massupdate.item.php:379
 #: app/views/popup.massupdate.trigger.php:67 include/actions.inc.php:33
-#: include/blocks.inc.php:537 include/blocks.inc.php:615
-#: include/blocks.inc.php:844 include/blocks.inc.php:848
-#: include/classes/screens/CScreenProblem.php:1106
-#: include/classes/screens/CScreenProblem.php:1110
-#: include/classes/screens/CScreenProblem.php:1252 include/events.inc.php:195
-#: include/events.inc.php:199 include/events.inc.php:394
-#: include/events.inc.php:398 include/triggers.inc.php:1173
+#: include/blocks.inc.php:532 include/blocks.inc.php:610
+#: include/blocks.inc.php:839 include/blocks.inc.php:843
+#: include/classes/screens/CScreenProblem.php:1098
+#: include/classes/screens/CScreenProblem.php:1102
+#: include/classes/screens/CScreenProblem.php:1244 include/events.inc.php:195
+#: include/events.inc.php:199 include/events.inc.php:389
+#: include/events.inc.php:393 include/triggers.inc.php:1173
 #: include/triggers.inc.php:1178
 #: include/views/configuration.graph.list.php:205
 #: include/views/configuration.host.prototype.list.php:142
@@ -12243,7 +12246,8 @@ msgstr ""
 #: app/controllers/CControllerDashboardShareUpdate.php:93
 #: app/controllers/CControllerDashboardView.php:206
 #: app/controllers/CControllerDashboardView.php:254
-#: app/controllers/CControllerHintBox.php:153
+#: app/controllers/CControllerHintboxActionlist.php:50
+#: app/controllers/CControllerHintboxEventlist.php:53
 #: app/controllers/CControllerHostDashboardView.php:115
 #: app/controllers/CControllerMenuPopup.php:74
 #: app/controllers/CControllerMenuPopup.php:217
@@ -12261,7 +12265,7 @@ msgstr ""
 #: app/controllers/CControllerWidgetMapView.php:70
 #: app/controllers/CControllerWidgetPlainTextView.php:88
 #: app/views/monitoring.widget.graph.view.php:42 disc_prototypes.php:750
-#: host_discovery.php:795 hostinventoriesoverview.php:74
+#: host_discovery.php:810 hostinventoriesoverview.php:74
 #: include/classes/api/services/CAction.php:1571
 #: include/classes/api/services/CAction.php:1843
 #: include/classes/api/services/CAction.php:2855
@@ -12605,11 +12609,11 @@ msgstr ""
 msgid "Number of enabled items on the host."
 msgstr "Number of enabled items on the host."
 
-#: include/blocks.inc.php:541
+#: include/blocks.inc.php:536
 msgid "Number of hosts (enabled/disabled)"
 msgstr ""
 
-#: include/blocks.inc.php:554
+#: include/blocks.inc.php:549
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Number of items (enabled/disabled/not supported)"
 
@@ -12660,7 +12664,7 @@ msgstr "Number of processor threads on VMware hypervisor, <url> - VMware service
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:286
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
 msgstr "Number of rows"
 
@@ -12673,11 +12677,11 @@ msgstr "Number of status changes"
 msgid "Number of steps"
 msgstr "Number of steps"
 
-#: include/blocks.inc.php:550
+#: include/blocks.inc.php:545
 msgid "Number of templates"
 msgstr ""
 
-#: include/blocks.inc.php:565
+#: include/blocks.inc.php:560
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Number of triggers (enabled/disabled [problem/ok])"
 
@@ -12693,7 +12697,7 @@ msgstr "Number of unsupported items in Zabbix database."
 msgid "Number of unsupported items on the host."
 msgstr "Number of unsupported items on the host."
 
-#: include/blocks.inc.php:577
+#: include/blocks.inc.php:572
 msgid "Number of users (online)"
 msgstr "Number of users (online)"
 
@@ -12931,7 +12935,7 @@ msgstr "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgid "Only administrators can set map owner."
 msgstr "Only administrators can set map owner."
 
-#: include/blocks.inc.php:555
+#: include/blocks.inc.php:550
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Only items assigned to enabled hosts are counted"
 
@@ -12983,7 +12987,7 @@ msgstr "Only super admins can update correlations."
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "Only the last 20%% of the indicator is displayed."
 
-#: include/blocks.inc.php:566
+#: include/blocks.inc.php:561
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 
@@ -13021,9 +13025,9 @@ msgstr "Operation has no group to operate."
 msgid "Operation has no template to operate."
 msgstr "Operation has no template to operate."
 
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:720
-#: include/classes/screens/CScreenProblem.php:898
-#: include/classes/screens/CScreenProblem.php:1167 include/events.inc.php:181
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:715
+#: include/classes/screens/CScreenProblem.php:890
+#: include/classes/screens/CScreenProblem.php:1159 include/events.inc.php:181
 #: include/views/configuration.trigger.prototype.edit.php:84
 #: include/views/configuration.trigger.prototype.list.php:59
 #: include/views/configuration.triggers.edit.php:106
@@ -13087,7 +13091,7 @@ msgstr "Options"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:81
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:81
 #: include/classes/widgets/forms/CWidgetFormProblems.php:96
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:371
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:69
 #: include/classes/widgets/forms/CWidgetFormWeb.php:63
 #: include/triggers.inc.php:1241
@@ -13215,7 +13219,7 @@ msgstr "Override item trend period"
 msgid "Override with name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:409
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:402
 #: include/classes/widgets/views/widget.svggraph.form.view.php:296
 #: include/views/configuration.host.discovery.edit.php:867
 #: include/views/configuration.host.discovery.edit.php:884
@@ -13403,11 +13407,11 @@ msgstr "PHP xmlwriter extension missing."
 msgid "POP"
 msgstr "POP"
 
-#: app/views/hint.box.php:117
+#: app/views/hintbox.eventlist.php:116
 #: app/views/monitoring.widget.problems.view.php:109 chart5.php:199
 #: include/classes/graph/CSvgGraph.php:1075
-#: include/classes/screens/CScreenProblem.php:982
-#: include/classes/screens/CScreenProblem.php:1192 include/events.inc.php:378
+#: include/classes/screens/CScreenProblem.php:974
+#: include/classes/screens/CScreenProblem.php:1184 include/events.inc.php:373
 #: include/triggers.inc.php:250 include/views/monitoring.overview.items.php:36
 #: include/views/monitoring.overview.triggers.php:45
 msgid "PROBLEM"
@@ -13474,7 +13478,7 @@ msgctxt "page navigation"
 msgid "Pager"
 msgstr ""
 
-#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:530
+#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:525
 msgid "Parameter"
 msgstr "Parameter"
 
@@ -13492,7 +13496,7 @@ msgstr "Parameter \"%1$s\" is deprecated."
 
 #: app/views/administration.mediatype.edit.php:212
 #: app/views/administration.script.edit.php:180
-#: include/classes/debug/CProfiler.php:182 include/forms.inc.php:1215
+#: include/classes/debug/CProfiler.php:182 include/forms.inc.php:1220
 #: include/views/configuration.host.discovery.edit.php:223
 #: include/views/configuration.item.edit.php:259
 #: include/views/configuration.item.prototype.edit.php:240
@@ -13714,7 +13718,7 @@ msgstr "Play"
 msgid "Play sound"
 msgstr "Play sound"
 
-#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:567
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
@@ -13727,16 +13731,16 @@ msgstr ""
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:429
+#: include/classes/setup/CSetupWizard.php:430
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 
-#: include/classes/setup/CSetupWizard.php:885
+#: include/classes/setup/CSetupWizard.php:888
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:457
+#: include/classes/setup/CSetupWizard.php:458
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 
@@ -13780,7 +13784,7 @@ msgstr "Populates host inventory field"
 #: app/views/administration.proxy.edit.php:54
 #: app/views/administration.script.edit.php:163
 #: app/views/popup.itemtestedit.view.php:111
-#: include/classes/setup/CSetupWizard.php:444 include/hosts.inc.php:1307
+#: include/classes/setup/CSetupWizard.php:445 include/hosts.inc.php:1307
 #: include/views/configuration.host.list.php:106
 #: include/views/inventory.host.view.php:79 setup.php:62
 msgid "Port"
@@ -13819,7 +13823,7 @@ msgid "Power value"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:564
+#: include/classes/setup/CSetupWizard.php:565
 msgid "Pre-installation summary"
 msgstr "Pre-installation summary"
 
@@ -13864,14 +13868,12 @@ msgid "Previous day"
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:92
-#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2487
+#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2546
 msgid "Previous month"
 msgstr "Previous month"
 
 #: app/views/monitoring.dashboard.view.php:157
-#: app/views/monitoring.dashboard.view.php:175
-#: app/views/monitoring.host.dashboard.view.php:94
-#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:184
+#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:184
 msgid "Previous page"
 msgstr ""
 
@@ -13880,12 +13882,12 @@ msgid "Previous value"
 msgstr "Previous value"
 
 #: app/partials/scheduledreport.formgrid.html.php:91
-#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2486
+#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2545
 msgid "Previous week"
 msgstr "Previous week"
 
 #: app/partials/scheduledreport.formgrid.html.php:93
-#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2488
+#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2547
 msgid "Previous year"
 msgstr "Previous year"
 
@@ -13951,18 +13953,18 @@ msgstr "Privilege level"
 #: app/partials/monitoring.problem.filter.php:97
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:719
+#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:714
 #: include/classes/helpers/CMediatypeHelper.php:45
-#: include/classes/screens/CScreenProblem.php:873
-#: include/classes/screens/CScreenProblem.php:896
-#: include/classes/screens/CScreenProblem.php:1073
-#: include/classes/screens/CScreenProblem.php:1166
+#: include/classes/screens/CScreenProblem.php:865
+#: include/classes/screens/CScreenProblem.php:888
+#: include/classes/screens/CScreenProblem.php:1065
+#: include/classes/screens/CScreenProblem.php:1158
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:61
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:61
 #: include/classes/widgets/forms/CWidgetFormProblems.php:76
 #: include/classes/widgets/forms/CWidgetFormProblems.php:204
 #: include/classes/widgets/forms/CWidgetFormProblems.php:205
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:356
 #: include/views/configuration.item.list.php:203
 #: include/views/configuration.trigger.prototype.list.php:166
 #: include/views/configuration.triggers.list.php:95
@@ -13971,7 +13973,7 @@ msgstr "Privilege level"
 msgid "Problem"
 msgstr "Problem"
 
-#: include/actions.inc.php:1977
+#: include/actions.inc.php:2004
 msgid "Problem created"
 msgstr "Problem created"
 
@@ -13987,7 +13989,7 @@ msgid "Problem expression"
 msgstr "Problem expression"
 
 #: include/classes/widgets/CWidgetConfig.php:57
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:331
 msgid "Problem hosts"
 msgstr "Problem hosts"
 
@@ -14008,7 +14010,7 @@ msgstr "Problem on"
 msgid "Problem recovery"
 msgstr ""
 
-#: include/actions.inc.php:1980
+#: include/actions.inc.php:2007
 msgid "Problem resolved"
 msgstr "Problem resolved"
 
@@ -14087,7 +14089,8 @@ msgstr "Properties"
 
 #: app/controllers/CControllerMenuPopup.php:351
 #: app/controllers/CControllerMenuPopup.php:634
-#: app/controllers/CControllerWidgetUrlView.php:64 app/views/hint.box.php:45
+#: app/controllers/CControllerWidgetUrlView.php:64
+#: app/views/hintbox.eventlist.php:44
 #: include/classes/helpers/CVaultHelper.php:107
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
@@ -14230,10 +14233,11 @@ msgstr ""
 msgid "Queue overview by proxy"
 msgstr ""
 
-#: app/views/hint.box.php:101 app/views/monitoring.widget.problems.view.php:93
+#: app/views/hintbox.eventlist.php:100
+#: app/views/monitoring.widget.problems.view.php:93
 #: include/classes/graph/CSvgGraph.php:1071
-#: include/classes/screens/CScreenProblem.php:966
-#: include/classes/screens/CScreenProblem.php:1180 include/events.inc.php:362
+#: include/classes/screens/CScreenProblem.php:958
+#: include/classes/screens/CScreenProblem.php:1172 include/events.inc.php:357
 msgid "RESOLVED"
 msgstr "RESOLVED"
 
@@ -14322,7 +14326,7 @@ msgid "Recipients"
 msgstr ""
 
 #: app/views/administration.user.edit.php:533
-#: include/classes/screens/CScreenProblem.php:1074
+#: include/classes/screens/CScreenProblem.php:1066
 #: include/views/configuration.item.list.php:204
 #: include/views/configuration.trigger.prototype.list.php:167
 #: include/views/configuration.triggers.list.php:306
@@ -14338,8 +14342,8 @@ msgstr "Recovery"
 msgid "Recovery expression"
 msgstr "Recovery expression"
 
-#: include/forms.inc.php:1913 include/forms.inc.php:1920
-#: include/forms.inc.php:1930
+#: include/forms.inc.php:1918 include/forms.inc.php:1925
+#: include/forms.inc.php:1935
 msgid "Recovery expression syntax error."
 msgstr "Recovery expression syntax error."
 
@@ -14347,10 +14351,11 @@ msgstr "Recovery expression syntax error."
 msgid "Recovery operations"
 msgstr "Recovery operations"
 
-#: app/views/hint.box.php:74 app/views/monitoring.widget.problems.view.php:55
-#: include/classes/screens/CScreenProblem.php:868
-#: include/classes/screens/CScreenProblem.php:891
-#: include/classes/screens/CScreenProblem.php:1163 include/events.inc.php:283
+#: app/views/hintbox.eventlist.php:73
+#: app/views/monitoring.widget.problems.view.php:55
+#: include/classes/screens/CScreenProblem.php:860
+#: include/classes/screens/CScreenProblem.php:883
+#: include/classes/screens/CScreenProblem.php:1155 include/events.inc.php:283
 msgid "Recovery time"
 msgstr "Recovery time"
 
@@ -14432,8 +14437,8 @@ msgstr ""
 msgid "Remember me for 30 days"
 msgstr "Remember me for 30 days"
 
-#: include/actions.inc.php:981 include/actions.inc.php:1769
-#: include/actions.inc.php:2023
+#: include/actions.inc.php:981 include/actions.inc.php:1785
+#: include/actions.inc.php:2050
 msgid "Remote command"
 msgstr "Remote command"
 
@@ -14491,8 +14496,8 @@ msgstr "Remote command"
 #: include/classes/helpers/CTagFilterFieldHelper.php:82
 #: include/classes/helpers/CTagFilterFieldHelper.php:135
 #: include/classes/widgets/CWidgetHelper.php:518
-#: include/classes/widgets/CWidgetHelper.php:571 include/forms.inc.php:1456
-#: include/forms.inc.php:2004 include/views/configuration.action.edit.php:97
+#: include/classes/widgets/CWidgetHelper.php:571 include/forms.inc.php:1461
+#: include/forms.inc.php:2009 include/views/configuration.action.edit.php:97
 #: include/views/configuration.action.edit.php:258
 #: include/views/configuration.action.edit.php:286
 #: include/views/configuration.action.edit.php:368
@@ -14603,7 +14608,7 @@ msgctxt "screen reader"
 msgid "Remove, %1$s"
 msgstr "Remove, %1$s"
 
-#: app/controllers/CControllerPopupImportCompare.php:158
+#: app/controllers/CControllerPopupImportCompare.php:159
 msgid "Removed"
 msgstr ""
 
@@ -14708,7 +14713,7 @@ msgstr "Request body"
 msgid "Request body type"
 msgstr "Request body type"
 
-#: host_discovery.php:409 host_discovery.php:765 items.php:952 items.php:1146
+#: host_discovery.php:424 host_discovery.php:780 items.php:952 items.php:1146
 msgid "Request sent successfully"
 msgstr "Request sent successfully"
 
@@ -14735,7 +14740,7 @@ msgstr "Required performance (vps)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Required performance of the Zabbix server, in new values per second expected."
 
-#: include/blocks.inc.php:581
+#: include/blocks.inc.php:576
 msgid "Required server performance, new values per second"
 msgstr "Required server performance, new values per second"
 
@@ -14790,23 +14795,23 @@ msgid "Resolved by"
 msgstr "Resolved by"
 
 #: app/views/monitoring.widget.problems.view.php:154
-#: include/classes/screens/CScreenProblem.php:998
+#: include/classes/screens/CScreenProblem.php:990
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "Resolved by correlation rule \"%1$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:157
-#: include/classes/screens/CScreenProblem.php:1001
+#: include/classes/screens/CScreenProblem.php:993
 msgid "Resolved by correlation rule."
 msgstr "Resolved by correlation rule."
 
 #: app/views/monitoring.widget.problems.view.php:164
-#: include/classes/screens/CScreenProblem.php:1008
+#: include/classes/screens/CScreenProblem.php:1000
 msgid "Resolved by inaccessible user."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:163
-#: include/classes/screens/CScreenProblem.php:1007
+#: include/classes/screens/CScreenProblem.php:999
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "Resolved by user \"%1$s\"."
@@ -14951,10 +14956,10 @@ msgstr ""
 msgid "Right"
 msgstr "Right"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:187
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:215
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:506
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:193
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
 msgid "Right Y"
 msgstr "Right Y"
 
@@ -15160,12 +15165,12 @@ msgstr "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgid "SQL query"
 msgstr "SQL query"
 
-#: include/classes/db/DB.php:928
+#: include/classes/db/DB.php:916
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "SQL statement execution has failed \"%1$s\""
 
-#: include/classes/db/DB.php:596 include/classes/db/DB.php:655
+#: include/classes/db/DB.php:584 include/classes/db/DB.php:643
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "SQL statement execution has failed \"%1$s\"."
@@ -15257,7 +15262,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "Save changes"
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:685
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Save it as \"%1$s\""
@@ -15525,7 +15530,7 @@ msgstr "Selected and all other problems of related triggers"
 msgid "Selected elements"
 msgstr "Selected elements"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:325
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:318
 msgid "Selected items only"
 msgstr "Selected items only"
 
@@ -15578,7 +15583,7 @@ msgstr ""
 msgid "Send to users"
 msgstr ""
 
-#: include/actions.inc.php:2046
+#: include/actions.inc.php:2073
 #: include/views/administration.auditacts.list.php:76
 msgid "Sent"
 msgstr "Sent"
@@ -15729,12 +15734,12 @@ msgid "Session terminated, re-login, please."
 msgstr "Session terminated, re-login, please."
 
 #: app/views/popup.tabfilter.edit.php:40
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:74
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:67
 msgid "Set custom time period"
 msgstr "Set custom time period"
 
 #: app/controllers/CControllerPopupItemTestSend.php:433
-#: app/views/js/popup.itemtestedit.view.js.php:371 include/forms.inc.php:1412
+#: app/views/js/popup.itemtestedit.view.js.php:371 include/forms.inc.php:1417
 #: include/views/js/item.preprocessing.js.php:68
 msgid "Set error to"
 msgstr "Set error to"
@@ -15752,7 +15757,7 @@ msgstr "Set host inventory mode"
 msgid "Set new value"
 msgstr ""
 
-#: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1411
+#: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1416
 #: include/views/js/item.preprocessing.js.php:67
 msgid "Set value to"
 msgstr "Set value to"
@@ -15783,15 +15788,15 @@ msgstr ""
 #: app/views/popup.massupdate.trigger.php:53
 #: app/views/popup.triggerwizard.php:93
 #: include/classes/screens/CScreenHistory.php:274
-#: include/classes/screens/CScreenProblem.php:865
-#: include/classes/screens/CScreenProblem.php:887
-#: include/classes/screens/CScreenProblem.php:1161
+#: include/classes/screens/CScreenProblem.php:857
+#: include/classes/screens/CScreenProblem.php:879
+#: include/classes/screens/CScreenProblem.php:1153
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:70
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:70
 #: include/classes/widgets/forms/CWidgetFormProblems.php:85
 #: include/classes/widgets/forms/CWidgetFormProblems.php:202
 #: include/classes/widgets/forms/CWidgetFormProblems.php:203
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:344
 #: include/events.inc.php:185 include/triggers.inc.php:1144
 #: include/views/configuration.item.list.php:171
 #: include/views/configuration.trigger.prototype.edit.php:88
@@ -15804,22 +15809,22 @@ msgstr ""
 msgid "Severity"
 msgstr "Severity"
 
-#: include/actions.inc.php:1706
+#: include/actions.inc.php:1729
 msgctxt "screen reader"
 msgid "Severity changed"
 msgstr "Severity changed"
 
-#: include/actions.inc.php:1676
-#: include/classes/screens/CScreenProblem.php:1228
+#: include/actions.inc.php:1699
+#: include/classes/screens/CScreenProblem.php:1220
 msgid "Severity changes"
 msgstr "Severity changes"
 
-#: include/actions.inc.php:1698
+#: include/actions.inc.php:1721
 msgctxt "screen reader"
 msgid "Severity decreased"
 msgstr "Severity decreased"
 
-#: include/actions.inc.php:1702
+#: include/actions.inc.php:1725
 msgctxt "screen reader"
 msgid "Severity increased"
 msgstr "Severity increased"
@@ -15860,9 +15865,9 @@ msgstr "Shortened"
 #: app/views/reports.scheduledreport.list.php:53
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:102
 #: include/classes/widgets/forms/CWidgetFormProblems.php:33
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:187
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:259
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/views/js/monitoring.sysmaps.js.php:100 report2.php:545
 msgid "Show"
@@ -15889,7 +15894,7 @@ msgstr "Show items without data"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:273
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:266
 #: include/views/configuration.graph.edit.php:114
 msgid "Show legend"
 msgstr "Show legend"
@@ -15910,7 +15915,7 @@ msgstr ""
 msgid "Show operational data"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:306
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:299
 msgid "Show problems"
 msgstr "Show problems"
 
@@ -16241,8 +16246,8 @@ msgstr "Startup time of Zabbix server, Unix timestamp."
 msgid "State"
 msgstr "State"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:158
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:230
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:151
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:223
 msgctxt "history source selection method"
 msgid "Static"
 msgstr "Static"
@@ -16273,19 +16278,20 @@ msgstr ""
 #: app/views/configuration.correlation.list.php:52
 #: app/views/configuration.correlation.list.php:77
 #: app/views/configuration.discovery.list.php:52
-#: app/views/configuration.discovery.list.php:80 app/views/hint.box.php:75
+#: app/views/configuration.discovery.list.php:80
+#: app/views/hintbox.eventlist.php:74
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
 #: app/views/popup.massupdate.host.php:96
 #: app/views/popup.massupdate.item.php:325
 #: app/views/popup.scheduledreport.subscription.php:116
-#: app/views/reports.scheduledreport.list.php:59 include/actions.inc.php:1756
-#: include/actions.inc.php:1839 include/classes/html/CHostAvailability.php:76
+#: app/views/reports.scheduledreport.list.php:59 include/actions.inc.php:1772
+#: include/actions.inc.php:1866 include/classes/html/CHostAvailability.php:76
 #: include/classes/screens/CScreenHttpTestDetails.php:85
 #: include/classes/screens/CScreenHttpTest.php:116
-#: include/classes/screens/CScreenProblem.php:869
-#: include/classes/screens/CScreenProblem.php:893
-#: include/classes/screens/CScreenProblem.php:1164
+#: include/classes/screens/CScreenProblem.php:861
+#: include/classes/screens/CScreenProblem.php:885
+#: include/classes/screens/CScreenProblem.php:1156
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:284 include/forms.inc.php:515
@@ -16341,7 +16347,7 @@ msgstr "Status only"
 msgid "Status problem"
 msgstr "Status problem"
 
-#: include/actions.inc.php:1839
+#: include/actions.inc.php:1866
 #: include/classes/screens/CScreenHttpTestDetails.php:81
 msgid "Step"
 msgstr "Step"
@@ -16403,8 +16409,8 @@ msgstr ""
 msgid "Store credentials in"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:499
 #: include/classes/setup/CSetupWizard.php:500
+#: include/classes/setup/CSetupWizard.php:501
 msgid "Stored in HashiCorp Vault secret"
 msgstr ""
 
@@ -16466,7 +16472,7 @@ msgstr ""
 msgid "Success Audit"
 msgstr "Success Audit"
 
-#: include/func.inc.php:1631 jsLoader.php:217
+#: include/func.inc.php:1641 jsLoader.php:217
 msgid "Success message"
 msgstr "Success message"
 
@@ -16543,7 +16549,7 @@ msgstr "System boot time. Returns integer (Unix timestamp)"
 msgid "System default"
 msgstr "System default"
 
-#: include/func.inc.php:1659
+#: include/func.inc.php:1678
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "System error occurred. Please contact Zabbix administrator."
 
@@ -16657,8 +16663,8 @@ msgstr "Tag value"
 #: app/partials/monitoring.host.view.html.php:32
 #: app/partials/monitoring.latest.view.html.php:58
 #: app/partials/monitoring.latest.view.html.php:71
-#: app/partials/monitoring.problem.filter.php:231 app/views/hint.box.php:78
-#: app/views/monitoring.latest.view.php:95
+#: app/partials/monitoring.problem.filter.php:231
+#: app/views/hintbox.eventlist.php:77 app/views/monitoring.latest.view.php:95
 #: app/views/monitoring.web.view.php:87
 #: app/views/monitoring.widget.problems.view.php:68
 #: app/views/popup.lldoperation.php:264
@@ -16669,16 +16675,16 @@ msgstr "Tag value"
 #: app/views/popup.massupdate.template.php:131
 #: app/views/popup.massupdate.template.php:149
 #: app/views/popup.massupdate.trigger.php:78
-#: app/views/popup.massupdate.trigger.php:153 include/blocks.inc.php:724
+#: app/views/popup.massupdate.trigger.php:153 include/blocks.inc.php:719
 #: include/classes/screens/CScreenHttpTest.php:117
-#: include/classes/screens/CScreenProblem.php:847
-#: include/classes/screens/CScreenProblem.php:903
-#: include/classes/screens/CScreenProblem.php:1171
+#: include/classes/screens/CScreenProblem.php:839
+#: include/classes/screens/CScreenProblem.php:895
+#: include/classes/screens/CScreenProblem.php:1163
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:51
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:79
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:79
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:369
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:67
 #: include/classes/widgets/forms/CWidgetFormWeb.php:61
 #: include/events.inc.php:260 include/forms.inc.php:89
@@ -16762,7 +16768,7 @@ msgstr "Template \"%1$s\" cannot be without host group."
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Template \"%1$s\" for host \"%2$s\" does not exist."
 
-#: templates.php:212
+#: templates.php:206
 msgid "Template added"
 msgstr "Template added"
 
@@ -16782,7 +16788,7 @@ msgstr ""
 msgid "Template dashboards"
 msgstr ""
 
-#: templates.php:436 templates.php:450 templates.php:483
+#: templates.php:430 templates.php:444 templates.php:477
 msgid "Template deleted"
 msgstr "Template deleted"
 
@@ -16806,7 +16812,7 @@ msgstr "Template name"
 msgid "Template trigger"
 msgstr "Template trigger"
 
-#: templates.php:216
+#: templates.php:210
 msgid "Template updated"
 msgstr "Template updated"
 
@@ -16831,7 +16837,7 @@ msgstr "Template with the same visible name \"%1$s\" already exists."
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/controllers/CControllerPopupImportCompare.php:132
-#: app/controllers/CControllerPopupImportCompare.php:164
+#: app/controllers/CControllerPopupImportCompare.php:165
 #: app/partials/configuration.filter.items.php:72
 #: app/partials/popup.operations.php:212
 #: app/views/popup.condition.common.php:352 app/views/popup.import.php:31
@@ -16872,9 +16878,9 @@ msgstr "Templates updated"
 #: app/views/administration.mediatype.list.php:139
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:573
-#: app/views/popup.itemtestedit.view.php:434
+#: app/views/popup.itemtestedit.view.php:431
 #: app/views/popup.mediatypetest.edit.php:99
-#: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1452
+#: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
 #: include/views/configuration.host.discovery.edit.php:902
 #: include/views/configuration.host.discovery.edit.php:914
 #: include/views/configuration.item.edit.php:937
@@ -16889,7 +16895,7 @@ msgstr "Templates updated"
 msgid "Test"
 msgstr "Test"
 
-#: include/forms.inc.php:1482
+#: include/forms.inc.php:1487
 msgid "Test all steps"
 msgstr "Test all steps"
 
@@ -16963,15 +16969,15 @@ msgstr ""
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
-#: hosts.php:324
+#: hosts.php:322
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
-#: host_prototypes.php:172
+#: host_prototypes.php:170
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
-#: templates.php:184
+#: templates.php:182
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
@@ -17066,7 +17072,7 @@ msgstr ""
 msgid "Theme"
 msgstr "Theme"
 
-#: include/func.inc.php:2485
+#: include/func.inc.php:2544
 msgid "This day last week"
 msgstr "This day last week"
 
@@ -17079,27 +17085,27 @@ msgstr ""
 msgid "This is the test message from Zabbix"
 msgstr "This is the test message from Zabbix"
 
-#: include/func.inc.php:2493 srv_status.php:40
+#: include/func.inc.php:2552 srv_status.php:40
 msgid "This month"
 msgstr "This month"
 
-#: include/func.inc.php:2494
+#: include/func.inc.php:2553
 msgid "This month so far"
 msgstr "This month so far"
 
-#: include/func.inc.php:2491 srv_status.php:39
+#: include/func.inc.php:2550 srv_status.php:39
 msgid "This week"
 msgstr "This week"
 
-#: include/func.inc.php:2492
+#: include/func.inc.php:2551
 msgid "This week so far"
 msgstr "This week so far"
 
-#: include/func.inc.php:2495 srv_status.php:41
+#: include/func.inc.php:2554 srv_status.php:41
 msgid "This year"
 msgstr "This year"
 
-#: include/func.inc.php:2496
+#: include/func.inc.php:2555
 msgid "This year so far"
 msgstr "This year so far"
 
@@ -17128,16 +17134,16 @@ msgstr "Till"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:49
 #: app/controllers/CControllerPopupTriggerExpr.php:212
-#: app/views/hint.box.php:62 app/views/hint.box.php:68
+#: app/views/hintbox.eventlist.php:61 app/views/hintbox.eventlist.php:67
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
 #: app/views/popup.itemtestedit.view.php:269
 #: app/views/popup.triggerexpr.php:173 app/views/popup.triggerexpr.php:177
-#: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1623
-#: include/actions.inc.php:1676 include/actions.inc.php:1756
-#: include/actions.inc.php:1839 include/actions.inc.php:1894
-#: include/blocks.inc.php:699 include/classes/screens/CScreenProblem.php:824
-#: include/classes/screens/CScreenProblem.php:1162
+#: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1645
+#: include/actions.inc.php:1699 include/actions.inc.php:1772
+#: include/actions.inc.php:1866 include/actions.inc.php:1921
+#: include/blocks.inc.php:694 include/classes/screens/CScreenProblem.php:816
+#: include/classes/screens/CScreenProblem.php:1154
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
@@ -17214,7 +17220,7 @@ msgstr "Timestamp"
 #: app/partials/massupdate.valuemaps.tab.php:46
 #: app/partials/timeselector.filter.php:96
 #: app/views/popup.tabfilter.edit.php:49 include/classes/html/CFilter.php:290
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:98
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:91
 #: include/views/js/monitoring.sysmaps.js.php:748
 msgid "To"
 msgstr "To"
@@ -17223,12 +17229,12 @@ msgstr "To"
 msgid "To set a host interface select a single item type for all items"
 msgstr "To set a host interface select a single item type for all items"
 
-#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2489
+#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2548
 #: srv_status.php:38
 msgid "Today"
 msgstr "Today"
 
-#: include/func.inc.php:2490
+#: include/func.inc.php:2549
 msgid "Today so far"
 msgstr "Today so far"
 
@@ -17333,7 +17339,7 @@ msgstr "Trend storage period"
 #: app/partials/configuration.filter.items.php:156
 #: app/partials/monitoring.latest.view.html.php:53
 #: app/views/administration.housekeeping.edit.php:142
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:50
 #: include/forms.inc.php:557 include/views/configuration.item.list.php:90
 #: include/views/configuration.item.prototype.list.php:63 items.php:262
 msgid "Trends"
@@ -17506,7 +17512,7 @@ msgstr[0] "Trigger prototype updated"
 msgstr[1] "Trigger prototypes updated"
 
 #: app/controllers/CControllerPopupGeneric.php:197
-#: app/controllers/CControllerPopupImportCompare.php:173
+#: app/controllers/CControllerPopupImportCompare.php:174
 #: include/html.inc.php:454
 #: include/views/configuration.host.discovery.list.php:289
 #: include/views/configuration.trigger.prototype.edit.php:29
@@ -17543,7 +17549,7 @@ msgid "Trigger updated"
 msgstr "Trigger updated"
 
 #: app/controllers/CControllerPopupGeneric.php:183
-#: app/controllers/CControllerPopupImportCompare.php:165
+#: app/controllers/CControllerPopupImportCompare.php:166
 #: app/partials/configuration.filter.items.php:191
 #: app/partials/monitoring.problem.filter.php:74
 #: app/partials/trigoverview.table.top.php:29
@@ -17790,7 +17796,7 @@ msgstr ""
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Unable to overwrite the existing configuration file."
 
-#: include/blocks.inc.php:639
+#: include/blocks.inc.php:634
 msgid "Unable to retrieve database version."
 msgstr ""
 
@@ -17806,7 +17812,7 @@ msgstr "Unable to upload file because \"file_uploads\" is disabled."
 msgid "Unacknowledge"
 msgstr ""
 
-#: include/actions.inc.php:1997
+#: include/actions.inc.php:2024
 msgid "Unacknowledged"
 msgstr ""
 
@@ -17838,8 +17844,8 @@ msgid "Unexpected response for action %1$s."
 msgstr ""
 
 #: app/views/popup.massupdate.item.php:165
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:228
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:149
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:221
 #: include/views/configuration.item.edit.php:661
 #: include/views/configuration.item.prototype.edit.php:640
 msgid "Units"
@@ -18083,7 +18089,7 @@ msgstr "Update operations"
 msgid "Update problem"
 msgstr "Update problem"
 
-#: app/controllers/CControllerPopupImportCompare.php:159
+#: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
 msgstr ""
 
@@ -18143,8 +18149,8 @@ msgstr "Used in actions"
 #: app/views/administration.token.view.php:37
 #: app/views/administration.user.edit.php:244
 #: app/views/reports.auditlog.list.php:87 httpconf.php:67
-#: include/actions.inc.php:1623 include/actions.inc.php:1676
-#: include/actions.inc.php:1894 include/classes/setup/CSetupWizard.php:358
+#: include/actions.inc.php:1645 include/actions.inc.php:1699
+#: include/actions.inc.php:1921 include/classes/setup/CSetupWizard.php:358
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18185,7 +18191,7 @@ msgstr "User \"%1$s\" is used in \"%2$s\" action."
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr ""
 
-#: include/actions.inc.php:1894
+#: include/actions.inc.php:1921
 msgid "User action"
 msgstr "User action"
 
@@ -18412,7 +18418,7 @@ msgstr "User with ID \"%1$s\" is not available."
 msgid "User with username \"%1$s\" already exists."
 msgstr ""
 
-#: include/actions.inc.php:1756 include/actions.inc.php:1839
+#: include/actions.inc.php:1772 include/actions.inc.php:1866
 msgid "User/Recipient"
 msgstr "User/Recipient"
 
@@ -18433,8 +18439,8 @@ msgstr "Username"
 msgid "Username and password"
 msgstr "Username and password"
 
-#: include/classes/setup/CSetupWizard.php:599
-#: include/classes/setup/CSetupWizard.php:903
+#: include/classes/setup/CSetupWizard.php:600
+#: include/classes/setup/CSetupWizard.php:906
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -18735,7 +18741,7 @@ msgstr "Validation"
 #: app/views/popup.massupdate.template.php:140
 #: app/views/popup.massupdate.trigger.php:87
 #: app/views/popup.testtriggerexpr.php:31 app/views/popup.valuemap.edit.php:51
-#: include/blocks.inc.php:530 include/classes/graphdraw/CPieGraphDraw.php:309
+#: include/blocks.inc.php:525 include/classes/graphdraw/CPieGraphDraw.php:309
 #: include/classes/screens/CScreenHistory.php:279
 #: include/classes/screens/CScreenHistory.php:393
 #: include/views/configuration.host.discovery.edit.php:125
@@ -18816,7 +18822,7 @@ msgstr "Value map \"%1$s\" already exists."
 msgid "Value mapping"
 msgstr "Value mapping"
 
-#: app/controllers/CControllerPopupImportCompare.php:171
+#: app/controllers/CControllerPopupImportCompare.php:172
 #: app/views/popup.import.php:32
 msgid "Value mappings"
 msgstr "Value mappings"
@@ -18877,17 +18883,17 @@ msgid "Various information about specific process(es). Returns float"
 msgstr "Various information about specific process(es). Returns float"
 
 #: include/classes/setup/CSetupWizard.php:335
-#: include/classes/setup/CSetupWizard.php:518
+#: include/classes/setup/CSetupWizard.php:519
 msgid "Vault API endpoint"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:350
-#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:525
 msgid "Vault authentication token"
 msgstr ""
 
 #: include/classes/core/ZBase.php:235
-#: include/classes/setup/CSetupWizard.php:899 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 
@@ -18896,7 +18902,7 @@ msgid "Vault secret"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:521
+#: include/classes/setup/CSetupWizard.php:522
 msgid "Vault secret path"
 msgstr ""
 
@@ -18983,7 +18989,7 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Warning"
 
-#: jsLoader.php:219
+#: include/func.inc.php:1643 jsLoader.php:219
 msgid "Warning message"
 msgstr ""
 
@@ -19055,7 +19061,7 @@ msgstr[1] "Web scenarios enabled"
 msgid "Web scenario updated"
 msgstr "Web scenario updated"
 
-#: app/controllers/CControllerPopupImportCompare.php:170
+#: app/controllers/CControllerPopupImportCompare.php:171
 #: app/views/popup.import.php:39 include/html.inc.php:400
 msgid "Web scenarios"
 msgstr "Web scenarios"
@@ -19137,7 +19143,7 @@ msgstr "With data collection"
 msgid "With dependencies"
 msgstr "With dependencies"
 
-#: include/forms.inc.php:1362 include/views/js/item.preprocessing.js.php:215
+#: include/forms.inc.php:1367 include/views/js/item.preprocessing.js.php:215
 msgid "With header row"
 msgstr ""
 
@@ -19219,7 +19225,7 @@ msgstr "Wrong value for url field."
 msgid "X"
 msgstr "X"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:259
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
 msgid "X-Axis"
 msgstr "X-Axis"
 
@@ -19262,7 +19268,7 @@ msgstr ""
 msgid "XML to JSON"
 msgstr ""
 
-#: include/forms.inc.php:1283 include/views/js/item.preprocessing.js.php:141
+#: include/forms.inc.php:1288 include/views/js/item.preprocessing.js.php:141
 msgid "XPath"
 msgstr "XPath"
 
@@ -19275,8 +19281,8 @@ msgstr "Y"
 msgid "Y axis MAX value"
 msgstr "Y axis MAX value"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:507
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:484
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:500
 msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr "Y axis MAX value must be greater than Y axis MIN value"
 
@@ -19370,8 +19376,8 @@ msgstr "Yearly"
 #: app/partials/configuration.filter.items.php:194
 #: app/partials/configuration.filter.items.php:201
 #: app/partials/configuration.filter.items.php:210
-#: app/views/administration.user.list.php:133 app/views/hint.box.php:179
-#: app/views/hint.box.php:183
+#: app/views/administration.user.list.php:133
+#: app/views/hintbox.eventlist.php:178 app/views/hintbox.eventlist.php:182
 #: app/views/monitoring.widget.problems.view.php:264
 #: app/views/monitoring.widget.problems.view.php:268
 #: app/views/popup.condition.common.php:648
@@ -19380,12 +19386,12 @@ msgstr "Yearly"
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:68 include/actions.inc.php:32
-#: include/blocks.inc.php:537 include/blocks.inc.php:844
-#: include/blocks.inc.php:848 include/classes/screens/CScreenProblem.php:1106
-#: include/classes/screens/CScreenProblem.php:1110
-#: include/classes/screens/CScreenProblem.php:1252 include/events.inc.php:195
-#: include/events.inc.php:199 include/events.inc.php:394
-#: include/events.inc.php:398 include/triggers.inc.php:1172
+#: include/blocks.inc.php:532 include/blocks.inc.php:839
+#: include/blocks.inc.php:843 include/classes/screens/CScreenProblem.php:1098
+#: include/classes/screens/CScreenProblem.php:1102
+#: include/classes/screens/CScreenProblem.php:1244 include/events.inc.php:195
+#: include/events.inc.php:199 include/events.inc.php:389
+#: include/events.inc.php:393 include/triggers.inc.php:1172
 #: include/triggers.inc.php:1177
 #: include/views/configuration.graph.list.php:205
 #: include/views/configuration.host.prototype.list.php:142
@@ -19402,7 +19408,7 @@ msgstr "Yearly"
 msgid "Yes"
 msgstr "Yes"
 
-#: include/classes/screens/CScreenProblem.php:717 include/func.inc.php:2483
+#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2542
 msgid "Yesterday"
 msgstr "Yesterday"
 
@@ -19523,7 +19529,7 @@ msgid "Zabbix login form"
 msgstr "Zabbix login form"
 
 #: app/views/administration.script.edit.php:126
-#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:556
 msgid "Zabbix server"
 msgstr "Zabbix server"
 
@@ -19540,7 +19546,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Zabbix server (proxy)"
 
 #: include/classes/setup/CSetupWizard.php:57
-#: include/classes/setup/CSetupWizard.php:455
+#: include/classes/setup/CSetupWizard.php:456
 msgid "Zabbix server details"
 msgstr "Zabbix server details"
 
@@ -19548,15 +19554,15 @@ msgstr "Zabbix server details"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix server is not running: the information displayed may not be current."
 
-#: include/blocks.inc.php:536
+#: include/blocks.inc.php:531
 msgid "Zabbix server is running"
 msgstr "Zabbix server is running"
 
-#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:560
 msgid "Zabbix server name"
 msgstr "Zabbix server name"
 
-#: include/classes/setup/CSetupWizard.php:556
+#: include/classes/setup/CSetupWizard.php:557
 msgid "Zabbix server port"
 msgstr "Zabbix server port"
 
@@ -19901,10 +19907,10 @@ msgstr "both username and password should be either present or empty"
 msgid "bytelength() - Returns the length in bytes"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:142
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:214
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:120
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:135
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:192
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:207
 msgid "calculated"
 msgstr "calculated"
 
@@ -20145,7 +20151,7 @@ msgstr "days"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:614 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:497
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "default"
@@ -20340,7 +20346,7 @@ msgstr "host group"
 
 #: include/classes/widgets/CWidgetHelper.php:628
 #: include/classes/widgets/CWidgetHelper.php:988
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:332
 msgid "host pattern"
 msgstr "host pattern"
 
@@ -20564,7 +20570,7 @@ msgstr ""
 msgid "length() - Length of last (most recent) T value in characters"
 msgstr ""
 
-#: include/forms.inc.php:1277 include/views/js/item.preprocessing.js.php:134
+#: include/forms.inc.php:1282 include/views/js/item.preprocessing.js.php:134
 msgid "list of characters"
 msgstr "list of characters"
 
@@ -20650,7 +20656,7 @@ msgstr "matches"
 #: include/classes/api/services/CItemGeneral.php:1399
 #: include/classes/graphdraw/CLineGraphDraw.php:1380
 #: include/classes/graphdraw/CLineGraphDraw.php:1394
-#: include/classes/graphdraw/CPieGraphDraw.php:292 include/forms.inc.php:1302
+#: include/classes/graphdraw/CPieGraphDraw.php:292 include/forms.inc.php:1307
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:68
 #: include/views/js/configuration.graph.edit.js.php:139
@@ -20685,7 +20691,7 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1399
 #: include/classes/graphdraw/CLineGraphDraw.php:1378
 #: include/classes/graphdraw/CLineGraphDraw.php:1391
-#: include/classes/graphdraw/CPieGraphDraw.php:288 include/forms.inc.php:1301
+#: include/classes/graphdraw/CPieGraphDraw.php:288 include/forms.inc.php:1306
 #: include/graphs.inc.php:76
 #: include/views/js/configuration.graph.edit.js.php:66
 #: include/views/js/configuration.graph.edit.js.php:137
@@ -20760,7 +20766,7 @@ msgstr "name"
 msgid "new"
 msgstr "new"
 
-#: hosts.php:993 templates.php:637
+#: hosts.php:987 templates.php:631
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "new"
@@ -20819,12 +20825,12 @@ msgstr "not selected"
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Number of seconds since the Epoch"
 
-#: include/forms.inc.php:1269 include/views/js/item.preprocessing.js.php:126
+#: include/forms.inc.php:1274 include/views/js/item.preprocessing.js.php:126
 msgid "number"
 msgstr "number"
 
 #: app/views/monitoring.widget.problemhosts.view.php:126
-#: include/blocks.inc.php:509
+#: include/blocks.inc.php:504
 msgid "of"
 msgstr "of"
 
@@ -20883,7 +20889,7 @@ msgstr ""
 msgid "other"
 msgstr "other"
 
-#: include/forms.inc.php:1295 include/views/js/item.preprocessing.js.php:156
+#: include/forms.inc.php:1300 include/views/js/item.preprocessing.js.php:156
 msgid "output"
 msgstr "output"
 
@@ -20896,7 +20902,7 @@ msgid "path/to/secret:key"
 msgstr ""
 
 #: app/views/popup.httpstep.php:173 app/views/popup.lldoperation.php:76
-#: include/forms.inc.php:1294 include/forms.inc.php:1308
+#: include/forms.inc.php:1299 include/forms.inc.php:1313
 #: include/views/js/item.preprocessing.js.php:155
 #: include/views/js/item.preprocessing.js.php:170
 msgid "pattern"
@@ -20914,7 +20920,7 @@ msgstr ""
 msgid "power() - The power of a base value to a power value"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:357
 msgid "problem pattern"
 msgstr "problem pattern"
 
@@ -20958,7 +20964,7 @@ msgstr ""
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
 msgstr ""
 
-#: include/forms.inc.php:1371 include/views/js/item.preprocessing.js.php:224
+#: include/forms.inc.php:1376 include/views/js/item.preprocessing.js.php:224
 msgid "replacement"
 msgstr ""
 
@@ -20995,7 +21001,7 @@ msgid "s"
 msgstr "s"
 
 #: app/views/administration.mediatype.edit.php:221
-#: app/views/administration.script.edit.php:189 include/forms.inc.php:1320
+#: app/views/administration.script.edit.php:189 include/forms.inc.php:1325
 #: include/views/configuration.host.discovery.edit.php:232
 #: include/views/configuration.item.edit.php:268
 #: include/views/configuration.item.prototype.edit.php:249
@@ -21003,7 +21009,7 @@ msgstr "s"
 msgid "script"
 msgstr "script"
 
-#: include/forms.inc.php:1370 include/views/js/item.preprocessing.js.php:223
+#: include/forms.inc.php:1375 include/views/js/item.preprocessing.js.php:223
 msgid "search string"
 msgstr ""
 
@@ -21017,7 +21023,7 @@ msgstr "second"
 msgid "second parameter is expected"
 msgstr "second parameter is expected"
 
-#: include/forms.inc.php:1313 include/views/js/item.preprocessing.js.php:176
+#: include/forms.inc.php:1318 include/views/js/item.preprocessing.js.php:176
 msgid "seconds"
 msgstr "seconds"
 
@@ -21124,7 +21130,7 @@ msgstr "supplied credentials are not unique"
 #: include/classes/helpers/CTagFilterFieldHelper.php:63
 #: include/classes/helpers/CTagFilterFieldHelper.php:117
 #: include/classes/widgets/CWidgetHelper.php:506
-#: include/classes/widgets/CWidgetHelper.php:550 include/forms.inc.php:1996
+#: include/classes/widgets/CWidgetHelper.php:550 include/forms.inc.php:2001
 #: include/views/configuration.maintenance.edit.php:174
 #: include/views/js/configuration.maintenance.edit.js.php:30
 #: include/views/js/configuration.maintenance.edit.js.php:60
@@ -21389,9 +21395,9 @@ msgstr "unsupported version number"
 #: include/classes/html/CMacroValue.php:148
 #: include/classes/widgets/CWidgetHelper.php:512
 #: include/classes/widgets/CWidgetHelper.php:566
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
-#: include/forms.inc.php:2001
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:166
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:238
+#: include/forms.inc.php:2006
 #: include/views/configuration.host.discovery.edit.php:186
 #: include/views/configuration.host.discovery.edit.php:324
 #: include/views/configuration.item.edit.php:222
