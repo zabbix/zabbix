@@ -2771,7 +2771,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 			if (0 != strcmp(ppdst->params, buffer))
 			{
-				ppdst->params_orig = zbx_strdup(NULL, buffer);
+				ppdst->params_orig = zbx_strdup(NULL, ppdst->params);
 				zbx_free(ppdst->params);
 				ppdst->params = buffer;
 				buffer = NULL;
