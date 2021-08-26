@@ -61,9 +61,9 @@ PREPARE_AUDIT_TRIGGER(trigger_prototype, triggerprototype, AUDIT_RESOURCE_TRIGGE
 #undef PREPARE_AUDIT_TRIGGER
 
 #define TR_OR_TRP(s) (ZBX_FLAG_DISCOVERY_NORMAL == flags) ? "trigger."#s : "triggerprototype:"#s
-void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t templateid, unsigned char recovery_mode,
-		unsigned char status, unsigned char type, zbx_uint64_t value, zbx_uint64_t state,
-		unsigned char priority, const char *comments, const char *url, unsigned char flags,
+void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t templateid,
+		unsigned char recovery_mode, unsigned char status, unsigned char type, zbx_uint64_t value,
+		zbx_uint64_t state, unsigned char priority, const char *comments, const char *url, unsigned char flags,
 		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close,
 		const char *opdata, unsigned char discover, const char *event_name)
 {
@@ -78,7 +78,7 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 		audit_key_manual_close[AUDIT_DETAILS_KEY_LEN], audit_key_discover[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
-	
+
 #define AUDIT_KEY_SNPRINTF(r) zbx_snprintf(audit_key_##r, sizeof(audit_key_##r), TR_OR_TRP(r));
 
 	AUDIT_KEY_SNPPRINTF(event_name)
@@ -95,7 +95,7 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 	AUDIT_KEY_SNPPRINTF(recovery_mode)
 	AUDIT_KEY_SNPPRINTF(correlation_mode)
 	AUDIT_KEY_SNPPRINTF(correlation_tag)
-	AUDIT_KEY_SNPPRINTF(manual_close)	  
+	AUDIT_KEY_SNPPRINTF(manual_close)
 	if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
 		AUDIT_KEY_SNPPRINTF(discover)
 #undef AUDIT_KEY_SNPRINTF
@@ -122,24 +122,25 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 	ADD_UINT64(discover)
 #undef ADD_STR
 #undef ADD_UINT64
-	  }
+#undef ADD_INT
+}
 
 void	zbx_audit_trigger_update_json_add_expr(zbx_uint64_t triggerid, unsigned char flags, const char *expression)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 
-	RETURN_IF_AUDIT_OFF();	
+	RETURN_IF_AUDIT_OFF();
 
 	zbx_snprintf(buf, sizeof(buf), TR_OR_TRP(expression));
 	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, buf, expression);
 }
 
-
-void	zbx_audit_trigger_update_json_add_rexpr(zbx_uint64_t triggerid, unsigned char flags, const char recovery_expression)
+void	zbx_audit_trigger_update_json_add_rexpr(zbx_uint64_t triggerid, unsigned char flags,
+		const char recovery_expression)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 
-	RETURN_IF_AUDIT_OFF();	
+	RETURN_IF_AUDIT_OFF();
 
 	zbx_snprintf(buf, sizeof(buf), TR_OR_TRP(recovery_expression));
 	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, buf, recovery_expression);
