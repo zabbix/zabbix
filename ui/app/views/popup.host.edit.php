@@ -74,6 +74,10 @@ else {
 	];
 }
 
+if ($data['warning']) {
+	$data['warning'] = makeMessageBox(ZBX_STYLE_MSG_WARNING, [['message' => $data['warning']]]);
+}
+
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
 	'body' => (new CPartial('configuration.host.edit.html', $data))->getOutput(),

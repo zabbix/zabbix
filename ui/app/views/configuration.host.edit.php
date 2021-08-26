@@ -52,6 +52,13 @@ $data += [
 		]
 ];
 
+if ($data['warning']) {
+	CMessageHelper::addWarning($data['warning']);
+	show_messages();
+
+	$data['warning'] = null;
+}
+
 (new CWidget())
 	->setTitle(_('Host'))
 	->addItem(new CPartial('configuration.host.edit.html', $data))

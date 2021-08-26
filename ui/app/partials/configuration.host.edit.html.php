@@ -569,6 +569,7 @@ if (array_key_exists('buttons', $data)) {
 }
 
 $host_form
+	->addItem($data['warning'])
 	->addItem($tabs)
 	->show();
 

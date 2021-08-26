@@ -549,10 +549,6 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 	jQuery(document).ready(function() {
 		'use strict';
 
-		<?php if (array_key_exists('warnings', $data)): ?>
-			jQuery(<?= json_encode($data['warnings']) ?>).insertBefore(overlays_stack.end().$dialogue.find('form'));
-		<?php endif; ?>
-
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
 			// If certificate is selected or checked.
 			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>

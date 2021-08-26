@@ -183,16 +183,11 @@ class CControllerHostEdit extends CController {
 			'clone_hostid' => $this->clone_hostid,
 			'host' => $this->host,
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			'warning' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
-
-		if ($this->getAction() === 'popup.host.edit' && ($messages = getMessages()) !== null) {
-			$data['warnings'] = $messages
-				->addClass(ZBX_STYLE_MSG_WARNING)
-				->toString();
-		}
 
 		// Rename fields according names of host edit form.
 		$data['host'] = CArrayHelper::renameKeys($data['host'], [
@@ -217,6 +212,21 @@ class CControllerHostEdit extends CController {
 			unset($tag);
 
 			CArrayHelper::sort($data['host']['tags'], ['tag', 'value']);
+		}
+
+		// Reset Secret text macros and set warning for cloned host.
+		if ($data['host']['hostid'] === null && $data['host']['macros']) {
+			foreach ($data['host']['macros'] as &$macro) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$macro = [
+						'type' => ZBX_MACRO_TYPE_TEXT,
+						'value' => ''
+					] + $macro;
+
+					$data['warning'] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+				}
+			}
+			unset($macro);
 		}
 
 		// Extend data for view.
@@ -397,25 +407,11 @@ class CControllerHostEdit extends CController {
 				'preservekeys' => true
 			]);
 
-			$secrets_reset = false;
-			$inputs['macros'] = array_map(function ($macro) use (&$secrets_reset) {
+			$inputs['macros'] = array_map(function ($macro) {
 				unset($macro['hostmacroid']);
 
-				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
-					$secrets_reset = true;
-					$macro = ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $macro;
-				}
-
-				$macro = $macro + ['description' => ''];
-
-				return $macro;
+				return $macro + ['description' => ''];
 			}, $this->getInput('macros', []));
-
-			if ($secrets_reset) {
-				CMessageHelper::addError(
-					_('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.')
-				);
-			}
 
 			$inputs['valuemaps'] = array_map(function ($valuemap) {
 				unset($valuemap['valuemapid']);
