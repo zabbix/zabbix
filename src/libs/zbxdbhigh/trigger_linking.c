@@ -1100,13 +1100,13 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 					&sql_update_triggers_expr_offset,
 					"update triggers set expression='%s'", esc);
 
-			/* technically this is an update SQL operation, but logically it is add, so we audit it as such */
+			/* technically this is an update SQL operation, but logically it is add, so we audit it */
+			/* as such */
 			zbx_audit_trigger_update_json_add_expr(triggerid, trigger_copy_template->flags, new_expression);
 
 			zbx_free(esc);
 			zbx_free(new_expression);
 
-			
 			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == (int)trigger_copy_template->recovery_mode)
 			{
 				zbx_eval_compose_expression(&ctx_r, &new_expression);
@@ -1115,7 +1115,8 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 						&sql_update_triggers_expr_alloc, &sql_update_triggers_expr_offset,
 						",recovery_expression='%s'", esc);
 
-				zbx_audit_trigger_update_json_add_rexpr(triggerid, trigger_copy_template->flags, new_expression);
+				zbx_audit_trigger_update_json_add_rexpr(triggerid, trigger_copy_template->flags,
+						new_expression);
 
 				zbx_free(esc);
 				zbx_free(new_expression);
