@@ -293,6 +293,9 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
 }
 
+/* SCSI device type CD/DVD-ROM. http://en.wikipedia.org/wiki/SCSI_Peripheral_Device_Type */
+#define SCSI_TYPE_ROM			0x05
+
 int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define DEVTYPE_STR	"DEVTYPE="
@@ -301,9 +304,9 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DIR		*dir;
 	struct dirent	*entries;
 	char		tmp[MAX_STRING_LEN];
-	zbx_stat_t	stat_buf;
+	zbx_stat_t	stat_buf, lstat_buf;
 	struct zbx_json	j;
-	int		devtype_found, sysfs_found;
+	int		devtype_found, sysfs_found, dev_bypass;
 
 	ZBX_UNUSED(request);
 
@@ -323,41 +326,72 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (0 == zbx_stat(tmp, &stat_buf) && 0 != S_ISBLK(stat_buf.st_mode))
 			{
+				int	offset = 0;
+
 				devtype_found = 0;
-				zbx_json_addobject(&j, NULL);
-				zbx_json_addstring(&j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
+				dev_bypass = 0;
 
 				if (1 == sysfs_found)
 				{
+					int	type;
 					FILE	*f;
 
-					zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/uevent",
-							major(stat_buf.st_rdev), minor(stat_buf.st_rdev));
-
-					if (NULL != (f = fopen(tmp, "r")))
+					if (0 == lstat(tmp, &lstat_buf))
 					{
-						while (NULL != fgets(tmp, sizeof(tmp), f))
+						zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/device/type",
+								major(stat_buf.st_rdev), minor(stat_buf.st_rdev));
+
+						if (NULL != (f = fopen(tmp, "r")) && 1 == fscanf(f, "%d", &type) &&
+								SCSI_TYPE_ROM == type)
 						{
-							if (0 == strncmp(tmp, DEVTYPE_STR, DEVTYPE_STR_LEN))
-							{
-								char	*p;
+							devtype_found = 1;
 
-								/* dismiss trailing \n */
-								p = tmp + strlen(tmp) - 1;
-								if ('\n' == *p)
-									*p = '\0';
-
-								devtype_found = 1;
-								break;
-							}
+							if (0 != S_ISLNK(lstat_buf.st_mode))
+								dev_bypass = 1;
+							else
+								zbx_snprintf(tmp, sizeof(tmp), "rom");
 						}
+
 						zbx_fclose(f);
+					}
+
+
+					if (0 == devtype_found)
+					{
+						zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/uevent",
+								major(stat_buf.st_rdev), minor(stat_buf.st_rdev));
+
+						if (NULL != (f = fopen(tmp, "r")))
+						{
+							while (NULL != fgets(tmp, sizeof(tmp), f))
+							{
+								if (0 == strncmp(tmp, DEVTYPE_STR, DEVTYPE_STR_LEN))
+								{
+									char	*p;
+
+									/* dismiss trailing \n */
+									p = tmp + strlen(tmp) - 1;
+									if ('\n' == *p)
+										*p = '\0';
+
+									devtype_found = 1;
+									offset = DEVTYPE_STR_LEN;
+									break;
+								}
+							}
+							zbx_fclose(f);
+						}
 					}
 				}
 
-				zbx_json_addstring(&j, "{#DEVTYPE}", 1 == devtype_found ? tmp + DEVTYPE_STR_LEN : "",
-						ZBX_JSON_TYPE_STRING);
-				zbx_json_close(&j);
+				if (0 == dev_bypass)
+				{
+					zbx_json_addobject(&j, NULL);
+					zbx_json_addstring(&j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
+					zbx_json_addstring(&j, "{#DEVTYPE}", 1 == devtype_found ? tmp + offset : "",
+							ZBX_JSON_TYPE_STRING);
+					zbx_json_close(&j);
+				}
 			}
 		}
 		closedir(dir);

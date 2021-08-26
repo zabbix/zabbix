@@ -1491,7 +1491,8 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 											]]
 										]]
-									]]
+									]],
+									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE]
 								]]
 							]],
 							'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
@@ -1692,8 +1693,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 								]]
 							]]
 						]]
-					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE]
+					]]
 				]]
 			]],
 			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [

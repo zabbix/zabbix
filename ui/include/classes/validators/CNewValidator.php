@@ -330,6 +330,18 @@ class CNewValidator {
 					break;
 
 				/*
+				 * 'string' => true
+				 */
+				case 'cuid':
+					if (array_key_exists($field, $this->input) && !self::isCuid($this->input[$field])) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('CUID is expected'))
+						);
+						return false;
+					}
+					break;
+
+				/*
 				 * 'flags' => <value1> | <value2> | ... | <valueN>
 				 */
 				case 'flags':
@@ -367,6 +379,22 @@ class CNewValidator {
 		}
 
 		return ($value >= 0 && bccomp($value, ZBX_MAX_UINT64) <= 0);
+	}
+
+	public static function isCuid($value): bool {
+		if (!is_string($value)) {
+			return false;
+		}
+
+		if (!CCuid::checkLength($value)) {
+			return false;
+		}
+
+		if (!CCuid::isCuid($value)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

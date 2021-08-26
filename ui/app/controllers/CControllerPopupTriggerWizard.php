@@ -193,7 +193,6 @@ class CControllerPopupTriggerWizard extends CController {
 					// Save if no errors found.
 					if (array_key_exists('triggerid', $page_options)) {
 						$result = API::Trigger()->update($trigger);
-						$audit_action = AUDIT_ACTION_UPDATE;
 
 						if (!$result['triggerids']) {
 							error(_('Cannot update trigger'));
@@ -210,7 +209,6 @@ class CControllerPopupTriggerWizard extends CController {
 							$triggerid = $db_triggers[0]['triggerid'];
 						}
 
-						$audit_action = AUDIT_ACTION_ADD;
 						if (!$result['triggerids']) {
 							error(_('Cannot add trigger'));
 						}

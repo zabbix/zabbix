@@ -183,7 +183,7 @@ class CSettings extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SETTINGS,
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SETTINGS,
 			[['configid' => $db_settings['configid']] + $settings], [$db_settings['configid'] => $db_settings]
 		);
 

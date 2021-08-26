@@ -29,11 +29,6 @@ class CWidgetFormTrigOver extends CWidgetForm {
 
 		$this->data = self::convertDottedKeys($this->data);
 
-		if (array_key_exists('tags', $this->data) && $this->data['tags']) {
-			// API doesn't guarantee fields to be retrieved in same order as stored.
-			ksort($this->data['tags'], SORT_NUMERIC);
-		}
-
 		// Output information option.
 		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), [
 			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problems'),

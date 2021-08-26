@@ -207,6 +207,19 @@ class CValidationRuleTest extends TestCase {
 					'required' => true
 				]
 			],
+			['cuid', '',
+				[
+					'cuid' => true
+				]
+			],
+			['fatal|required|json|cuid', '',
+				[
+					'fatal' => true,
+					'required' => true,
+					'json' => true,
+					'cuid' => true
+				]
+			],
 			['in', 'Cannot parse validation rules "in" at position 0.', false],
 			['in 1, 2', 'Cannot parse validation rules "in 1, 2" at position 0.', false],
 			['in 1,|fatal', 'Cannot parse validation rules "in 1,|fatal" at position 0.', false],

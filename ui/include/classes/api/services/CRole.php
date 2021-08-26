@@ -31,8 +31,6 @@ class CRole extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	private const AUDIT_RESOURCE = AUDIT_RESOURCE_USER_ROLE;
-
 	protected $tableName = 'role';
 	protected $tableAlias = 'r';
 	protected $sortColumns = ['roleid', 'name'];
@@ -152,7 +150,7 @@ class CRole extends CApiService {
 		}
 		unset($role);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $roles);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_ROLE, $roles);
 
 		return ['roleids' => $roleids];
 	}
@@ -242,7 +240,7 @@ class CRole extends CApiService {
 
 		$this->updateRules($roles, $db_roles);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $roles, $db_roles);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_ROLE, $roles, $db_roles);
 
 		return ['roleids' => array_column($roles, 'roleid')];
 	}
@@ -1128,7 +1126,7 @@ class CRole extends CApiService {
 
 		DB::delete('role', ['roleid' => $roleids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, self::AUDIT_RESOURCE, $db_roles);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_ROLE, $db_roles);
 
 		return ['roleids' => $roleids];
 	}

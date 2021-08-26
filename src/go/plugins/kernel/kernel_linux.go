@@ -23,15 +23,19 @@ import (
 	"bufio"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
-func getMax(proc bool) (max uint64, err error) {
-	var fileName string
-
-	if proc {
-		fileName = "/proc/sys/kernel/pid_max"
-	} else {
-		fileName = "/proc/sys/fs/file-max"
+// getFirstNum  - get first number from file
+func getFirstNum(key string) (max uint64, err error) {
+	fileName := "/proc"
+	switch key {
+	case "kernel.maxproc":
+		fileName += "/sys/kernel/pid_max"
+	case "kernel.maxfiles":
+		fileName += "/sys/fs/file-max"
+	case "kernel.openfiles":
+		fileName += "/sys/fs/file-nr"
 	}
 
 	file, err := stdOs.Open(fileName)
@@ -42,7 +46,11 @@ func getMax(proc bool) (max uint64, err error) {
 		reader := bufio.NewReader(file)
 
 		if line, long, err = reader.ReadLine(); err == nil && !long {
-			max, err = strconv.ParseUint(string(line), 10, 64)
+			if key == "kernel.openfiles" {
+				max, err = strconv.ParseUint(strings.Split(string(line), "\t")[0], 10, 64)
+			} else {
+				max, err = strconv.ParseUint(string(line), 10, 64)
+			}
 		}
 
 		file.Close()
