@@ -1238,7 +1238,7 @@ class CRole extends CApiService {
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($users, 'roleid', 'userid');
-			$users = $this->unsetExtraFields($users, ['userid', 'roleid']);
+			$users = $this->unsetExtraFields($users, ['userid', 'roleid'], $options['selectUsers']);
 			$result = $relation_map->mapMany($result, $users, 'users');
 
 			if ($options['selectUsers'] === API_OUTPUT_COUNT) {
