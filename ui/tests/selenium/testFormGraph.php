@@ -197,14 +197,14 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
-			$this->zbxTestClickLinkTextWait($data['template']);
+			$this->filterEntriesAndOpenGraph($data['template']);
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->query('button:Reset')->one()->click();
-			$this->zbxTestClickLinkTextWait($data['host']);
+			$this->filterEntriesAndOpenGraph($data['host']);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
 			}
@@ -212,8 +212,6 @@ class testFormGraph extends CLegacyWebTest {
 				$hostid = 40001;
 			}
 		}
-
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Graphs"]');
 
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
@@ -1006,5 +1004,18 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestAssertElementValue('width', $width);
 			$this->zbxTestAssertElementValue('height', $height);
 		}
+	}
+
+	/**
+	 * Function for filtering necessary hosts or templates and opening their Graphs.
+	 *
+	 * @param string    name of a host or template
+	 */
+	private function filterEntriesAndOpenGraph($name) {
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Graphs')->query('link:Graphs')->one()->click();
 	}
 }
