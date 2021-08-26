@@ -1192,13 +1192,13 @@ class CUser extends CApiService {
 			'where' => ['creator_userid' => $userids]
 		]);
 
-		$token_options = [
-			'output' => ['tokenid'],
-			'filter' => ['userid' => $userids]
-		];
-		$tokenids = DBfetchColumn(DBselect(DB::makeSql('token', $token_options)), 'tokenid');
+		$tokenids = DB::select('token', [
+			'output' => [],
+			'filter' => ['userid' => $userids],
+			'preservekeys' => true
+		]);
 		if ($tokenids) {
-			CTokenManager::delete($tokenids, $this, false);
+			CTokenManager::delete(array_keys($tokenids), $this, false);
 		}
 
 		DB::delete('users', ['userid' => $userids]);
