@@ -71,7 +71,6 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & flags))
 		{
 			value_esc = DBdyn_escape_field("item_rtdata", "error", diff->error);
-			zbx_replace_invalid_utf8(value_esc);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerror='%s'", delim, value_esc);
 			zbx_free(value_esc);
 		}
