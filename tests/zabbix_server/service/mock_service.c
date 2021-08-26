@@ -22,10 +22,13 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 #include "zbxalgo.h"
+#include "zbxself.h"
 
 #include "mock_service.h"
 
 /* stubs to satisfy hard link dependenceies */
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY = 0;
 
@@ -289,7 +292,7 @@ void	mock_init_service_cache(const char *path)
 	}
 }
 
-void	mock_destroy_service_cache()
+void	mock_destroy_service_cache(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_service_t		*service;

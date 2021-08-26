@@ -1738,7 +1738,7 @@ out:
  *          specified severity state                                          *
  *                                                                            *
  * Parameters: service   - [IN] the service                                   *
- *             serverity - [IN] the required severity                         *
+ *             severity  - [IN] the required severity                         *
  *             eventids  - [OUT] the services                                 *
  *                                                                            *
  * Comments: The returned list includes children, grandchildren etc           *

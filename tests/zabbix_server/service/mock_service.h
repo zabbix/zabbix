@@ -23,7 +23,7 @@
 #include "service_manager_impl.h"
 
 void	mock_init_service_cache(const char *path);
-void	mock_destroy_service_cache();
+void	mock_destroy_service_cache(void);
 
 zbx_service_t	*mock_get_service(const char *name);
 
