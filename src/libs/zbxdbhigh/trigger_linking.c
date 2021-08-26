@@ -479,7 +479,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.triggerid,tt.tag,tt.value"
+			"select t.triggerid,tt.tag,tt.value,t.flags,tt.triggertagid"
 			" from trigger_tag tt,triggers t"
 			" where tt.triggerid=t.templateid"
 			" and");
@@ -492,10 +492,16 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid, row[0]);
+		zbx_uint64_t	triggertagid;
 
+		ZBX_STR2UINT64(triggerid, row[0]);
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), triggerid, row[1], row[2]);
+
+		ZBX_STR2UINT64(triggertagid, row[4]);
+		zbx_audit_trigger_update_json_add_tags_and_values(triggerid, atoi(row[3]), triggertagid, row[1],
+				row[2]);
 	}
+
 	DBfree_result(result);
 
 	zbx_free(sql);
@@ -829,6 +835,8 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 	{
 		d = "";
 
+		zbx_audit_trigger_create_entry(AUDIT_ACTION_UPDATE, found->triggerid, found->description);
+
 		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set ");
@@ -1128,7 +1136,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 
 			/* technically this is an update SQL operation, but logically it is add, so we audit it */
 			/* as such */
-			zbx_audit_trigger_update_json_add_expr(triggerid, trigger_copy_template->flags, new_expression);
+			zbx_audit_trigger_update_json_add_expr(triggerid2, trigger_copy_template->flags, new_expression);
 
 			zbx_free(esc);
 			zbx_free(new_expression);
@@ -1141,7 +1149,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 						&sql_update_triggers_expr_alloc, &sql_update_triggers_expr_offset,
 						",recovery_expression='%s'", esc);
 
-				zbx_audit_trigger_update_json_add_rexpr(triggerid, trigger_copy_template->flags,
+				zbx_audit_trigger_update_json_add_rexpr(triggerid2, trigger_copy_template->flags,
 						new_expression);
 
 				zbx_free(esc);
