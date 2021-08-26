@@ -1788,8 +1788,8 @@ static const char	*ex_macros[] =
 	NULL
 };
 
-/* macros that are supported as simple macro host and item key */
-static const char	*simple_host_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, NULL};
+/* macros that are supported as host macro */
+static const char	*host_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, NULL};
 
 typedef struct
 {
@@ -6844,7 +6844,7 @@ int	zbx_host_macro_index(const char *macro)
 	loc.l = 0;
 	loc.r = strlen(macro) - 1;
 
-	if (NULL != macro_in_list(macro, loc, simple_host_macros, &func_num))
+	if (NULL != macro_in_list(macro, loc, host_macros, &func_num))
 		return func_num;
 
 	return -1;
