@@ -1155,7 +1155,7 @@ class testUserRolesPermissions extends CWebTest {
 	public function testUserRolesPermissions_ManageApiToken() {
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=user.token.list')->waitUntilReady();
-		$this->assertEquals('API tokens', $this->page->getTitle());
+		$this->assertEquals('TEST_SERVER_NAME: API tokens', $this->page->getTitle());
 		$this->changeRoleRule(['Manage API tokens' => false]);
 		$this->checkLinks(['zabbix.php?action=user.token.list']);
 	}
