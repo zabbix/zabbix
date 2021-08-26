@@ -280,7 +280,7 @@ class testUserRolesPermissions extends CWebTest {
 			// Check that problem actions works after they were turned on.
 			if ($action_status === false) {
 				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-				$row->getColumn('Ack')->query('link:No')->one()->waitUntilCLickable()->click();
+				$row->getColumn('Ack')->query('link:No')->waitUntilCLickable()->one()->click();
 
 				if ($data['activityid'] === 'message') {
 					$dialog->query('id:message')->one()->fill('test_text');
@@ -1063,19 +1063,12 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->userLogin('user_for_role', 'zabbix');
 
 		foreach ([true, false] as $action_status) {
-			$main_section = $this->query('link', $data['section'])->waitUntilVisible()->one();
-
+			$menu = CMainMenuElement::find()->one();
 			if ($data['section'] !== 'Monitoring') {
-				$main_section->click();
-				$element = $this->query('xpath://a[text()='.CXPathHelper::escapeQuotes($data['section']).
-						']/../ul[@class="submenu"]')->one();
-				CElementQuery::wait()->until(function () use ($element) {
-					return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
-							' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
-				});
+				$menu->select($data['section']);
 			}
 
-			$this->assertEquals($action_status, $main_section->parents('tag:li')->query('link', $data['page'])->exists());
+			$this->assertEquals($action_status, $menu->exists($data['page']));
 
 			if ($action_status) {
 				if (array_key_exists('user_roles', $data)) {
