@@ -156,7 +156,7 @@ class CControllerHostEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		if (array_key_exists('interfaces', $this->host) && $this->host['interfaces']) {
+		if (array_key_exists('interfaces', (array) $this->host) && $this->host['interfaces']) {
 			$interface_items = API::HostInterface()->get([
 				'output' => [],
 				'selectItems' => API_OUTPUT_COUNT,
