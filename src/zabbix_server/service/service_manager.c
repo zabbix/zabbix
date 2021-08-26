@@ -1752,18 +1752,20 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 	zbx_vector_ptr_create(&children);
 	zbx_vector_ptr_create(&causes);
 
-	status = service_get_main_status(service);
-
-	if (status >= severity)
+	if ((status = service_get_main_status(service)) >= severity)
 	{
 		for (i = 0; i < service->children.values_num; i++)
 		{
 			zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
 
-			if (SUCCEED != service_get_status(child, &child_status) || ZBX_SERVICE_STATUS_OK == child_status)
+			if (SUCCEED != service_get_status(child, &child_status) ||
+					ZBX_SERVICE_STATUS_OK == child_status)
+			{
 				continue;
+			}
 
-			if ((ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE == service->algorithm && child_status >= severity) ||
+			if ((ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE == service->algorithm &&
+					child_status >= severity) ||
 					ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL == service->algorithm)
 			{
 				zbx_vector_ptr_append(&causes, child);
@@ -1872,7 +1874,6 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 			service_get_causes(child, w_rule->limit_status, services);
 		}
 	}
-
 out:
 	zbx_vector_ptr_destroy(&causes);
 	zbx_vector_ptr_destroy(&children);
