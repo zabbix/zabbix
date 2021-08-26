@@ -60,6 +60,6 @@ if ($data['warning']) {
 }
 
 (new CWidget())
-	->setTitle(_('Host'))
+	->setTitle(($data['hostid'] == 0) ? _('New host') : _('Host'))
 	->addItem(new CPartial('configuration.host.edit.html', $data))
 	->show();
