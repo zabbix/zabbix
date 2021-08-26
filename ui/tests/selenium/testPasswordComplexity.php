@@ -932,8 +932,6 @@ class testPasswordComplexity extends CWebTest {
 	 * Add user for updating.
 	 */
 	public function prepareUserData() {
-		CDataHelper::setSessionId(null);
-
 		$response = CDataHelper::call('user.create', [
 			[
 				'username' => 'update-user',

@@ -127,7 +127,7 @@ class CAuthentication extends CApiService {
 			]);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTHENTICATION,
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION,
 			[['configid' => $db_auth['configid']] + $auth], [$db_auth['configid'] => $db_auth]
 		);
 
