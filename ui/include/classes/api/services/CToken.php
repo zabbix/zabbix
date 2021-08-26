@@ -398,15 +398,9 @@ class CToken extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$filter_userids = null;
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$filter_userids = [self::$userData['userid']];
-		}
-
-		$db_count = DB::select('token', [
+		$db_count = $this->get([
 			'countOutput' => true,
-			'tokenids' => $tokenids,
-			'filter' => ['userid' => $filter_userids]
+			'tokenids' => $tokenids
 		]);
 
 		if ($db_count != count($tokenids)) {
@@ -438,19 +432,18 @@ class CToken extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_tokens = $this->get([
-			'output' => [],
-			'tokenids' => $tokenids,
-			'preservekeys' => true
+		$db_count = $this->get([
+			'countOutput' => true,
+			'tokenids' => $tokenids
 		]);
 
-		if (count($db_tokens) != count($tokenids)) {
+		if ($db_count != count($tokenids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$db_tokens = DB::select('token', [
-			'output' => ['tokenid', 'name', 'token', 'userid'],
-			'tokenids' => array_keys($db_tokens),
+			'output' => ['tokenid', 'userid', 'name', 'token'],
+			'tokenids' => $tokenids,
 			'preservekeys' => true
 		]);
 
