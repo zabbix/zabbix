@@ -45,11 +45,13 @@ const char	*zbx_json_strerror(void)
 
 void	zbx_set_json_strerror(const char *fmt, ...)
 {
+	char	buffer[MAX_STRING_LEN];
 	va_list	args;
 
 	va_start(args, fmt);
 
-	zbx_vsnprintf(zbx_json_strerror_message, sizeof(zbx_json_strerror_message), fmt, args);
+	zbx_vsnprintf(buffer, sizeof(buffer), fmt, args);
+	zbx_strlcpy_utf8(zbx_json_strerror_message, buffer, sizeof(ZBX_JSON_MAX_STRERROR));
 
 	va_end(args);
 }
