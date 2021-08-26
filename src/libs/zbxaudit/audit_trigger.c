@@ -167,4 +167,44 @@ PREPARE_AUDIT_TRIGGER_UPDATE(event_name, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
 
 #undef PREPARE_AUDIT_ITEM_UPDATE
+
+void	DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id, flags;
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+		zbx_vector_uint64_append(ids, id);
+		ZBX_STR2UINT64(flags, row[2]);
+
+		if (ZBX_FLAG_DISCOVERY_NORMAL == flags)
+			zbx_audit_trigger_create_entry(AUDIT_ACTION_DELETE, id, row[1]);
+		else if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
+			zbx_audit_trigger_prototype_create_entry(AUDIT_ACTION_DELETE, id, row[1]);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+void	zbx_audit_trigger_update_json_add_dependency(unsigned char flags, zbx_uint64_t triggerdepid,
+		zbx_uint64_t triggerid, zbx_uint64_t triggerid_up)
+{
+	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_triggerid_up[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(audit_key, sizeof(audit_key), TR_OR_TRP(flags)".dependencies[" ZBX_FS_UI64 "]", triggerdepid);
+	zbx_snprintf(audit_key_triggerid_up, sizeof(audit_key_triggerid_up), TR_OR_TRP(flags)".dependencies["
+			ZBX_FS_UI64 "]", triggerdepid);
+
+	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key);
+	zbx_audit_update_json_append_uint64(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_triggerid_up, triggerid_up);
+}
+
 #undef TR_OR_TRP
