@@ -199,7 +199,7 @@ class CToken extends CApiService {
 			$token['tokenid'] = $tokenids[$index];
 		});
 
-		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_AUTH_TOKEN, $tokens);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_AUTH_TOKEN, $tokens);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -331,7 +331,7 @@ class CToken extends CApiService {
 
 		if ($upd_tokens) {
 			DB::update('token', $upd_tokens);
-			$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $tokens, $db_tokens);
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $tokens, $db_tokens);
 		}
 
 		return ['tokenids' => array_column($tokens, 'tokenid')];
@@ -383,6 +383,29 @@ class CToken extends CApiService {
 	/**
 	 * @param array $tokenids
 	 *
+	 * @static
+	 *
+	 * @param array $tokenids
+	 * @param bool  $log_parents  Create audit log records for updated users.
+	 */
+	public static function deleteForce(array $tokenids, bool $log_parents = true): void {
+		if (!$tokenids) {
+			return;
+		}
+
+		$db_tokens = DB::select('token', [
+			'output' => ['tokenid', 'userid', 'name'],
+			'tokenids' => $tokenids
+		]);
+
+		DB::delete('token', ['tokenid' => $tokenids]);
+
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_AUTH_TOKEN, $db_tokens, null, $log_parents);
+	}
+
+	/**
+	 * @param array $tokenids
+	 *
 	 * @throws APIException if the input is invalid
 	 *
 	 * @return array
@@ -407,7 +430,7 @@ class CToken extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		CTokenManager::delete($tokenids, $this);
+		self::deleteForce($tokenids);
 
 		return ['tokenids' => $tokenids];
 	}
@@ -464,7 +487,7 @@ class CToken extends CApiService {
 
 		DB::update('token', $upd_tokens);
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $response, $db_tokens);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $response, $db_tokens);
 
 		return $response;
 	}
