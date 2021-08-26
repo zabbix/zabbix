@@ -268,7 +268,7 @@ static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const z
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct td.triggerid_down,td.triggerid_up"
+			"select distinct td.triggerid_down,td.triggerid_up,t.triggerid,t.flags,td.triggerdepid"
 			" from triggers t,trigger_depends td"
 			" where t.templateid in (td.triggerid_up,td.triggerid_down) and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids, trids_num);
@@ -277,11 +277,30 @@ static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const z
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(dep_list_id.first, row[0]);
-		ZBX_STR2UINT64(dep_list_id.second, row[1]);
-		zbx_vector_uint64_pair_append(&dep_list_ids, dep_list_id);
-		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.first);
-		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.second);
+
+		int iii;
+
+		zbx_uint64_t	triggerid, triggerdepip;
+
+		for (iii = 0; iii < dep_list_ids.values_num; iii++)
+		{
+			zbx_uint64_pair_t	p = (zbx_uint64_pair_t)dep_list_ids.values[iii];
+
+			if (!(p.first == dep_list_id.first && p.second == dep_list_id.second))
+			{
+				ZBX_STR2UINT64(dep_list_id.first, row[0]);
+				ZBX_STR2UINT64(dep_list_id.second, row[1]);
+				zbx_vector_uint64_pair_append(&dep_list_ids, dep_list_id);
+				zbx_vector_uint64_append(&all_templ_ids, dep_list_id.first);
+				zbx_vector_uint64_append(&all_templ_ids, dep_list_id.second);
+			}
+		}
+
+		ZBX_STR2UINT64(triggerid_up, row[1]);
+		ZBX_STR2UINT64(triggerid, row[2]);
+		ZBX_STR2UINT64(triggerdepip, row[4]);
+
+		zbx_audit_trigger_update_json_add_dependency(atoi(row[3]), triggerdepip, triggerid, triggerid_up);
 	}
 
 	DBfree_result(result);
