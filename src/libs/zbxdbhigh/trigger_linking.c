@@ -18,6 +18,7 @@
 **/
 
 #include "db.h"
+#include "../../libs/zbxaudit/audit_trigger.h"
 #include "trigger_linking.h"
 
 typedef struct
@@ -59,6 +60,7 @@ typedef struct
 	char		*expression;
 	char		*recovery_expression;
 
+	zbx_uint64_t	templateid_orig;
 	zbx_uint64_t	templateid;
 	zbx_uint64_t	flags_orig;
 	unsigned char	flags;
@@ -623,6 +625,7 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
 			",t.flags,t.recovery_mode,t.correlation_mode,t.manual_close,t.opdata,t.discover,t.event_name"
+			",t.templateid"
 		" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -642,9 +645,10 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		zbx_trigger_descriptions_entry_t	*found, temp_t;
 
 		target_host_trigger_entry.update_flags = ZBX_FLAG_LINK_TRIGGER_UNSET;
+
+		ZBX_DBROW2UINT64(target_host_trigger_entry.templateid_orig, row[11]);
 		ZBX_STR2UINT64(target_host_trigger_entry.triggerid, row[0]);
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
-
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);
 		ZBX_STR2UINT64(target_host_trigger_entry.flags_orig, row[4]);
@@ -880,12 +884,15 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				d = ",";
 				zbx_free(event_name_esc);
 
-				zbx_audit_trigger_update_json_update_discover(found->event_name,
+				zbx_audit_trigger_update_json_update_event_name(found->triggerid,
 						found->update_flags, found->event_name_orig, found->event_name);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
 					found->templateid);
+
+			zbx_audit_trigger_update_json_update_templateid(found->triggerid, found->update_flags,
+					found->templateid_orig, found->templateid);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64 ";\n",
 					found->triggerid);
