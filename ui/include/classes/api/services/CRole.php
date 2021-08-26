@@ -20,7 +20,7 @@
 
 
 /**
- * Class containing methods for operations with user roles.
+ * User roles API implementation.
  */
 class CRole extends CApiService {
 
@@ -97,71 +97,33 @@ class CRole extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$sql_parts = [
-			'select'	=> ['role' => 'r.roleid'],
-			'from'		=> ['role' => 'role r'],
-			'where'		=> [],
-			'order'		=> [],
-			'limit'		=> null
-		];
-
-		// permission check + editable
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if ($options['editable']) {
-				return $options['countOutput'] ? 0 : [];
-			}
-
-			$sql_parts['from']['users'] = 'users u';
-			$sql_parts['where']['u'] = 'r.roleid=u.roleid';
-			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
+		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			return $options['countOutput'] ? '0' : [];
 		}
 
-		$output = $options['output'];
+		$db_roles = [];
 
-		if ($options['selectRules'] !== null && is_array($options['output']) && !in_array('type', $options['output'])) {
-			$options['output'][] = 'type';
-		}
+		$sql = $this->createSelectQuery('role', $options);
+		$resource = DBselect($sql, $options['limit']);
 
-		// roleids
-		if ($options['roleids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('r.roleid', $options['roleids']);
-		}
-
-		// filter
-		if ($options['filter'] !== null) {
-			$this->dbFilter('role r', $options, $sql_parts);
-		}
-
-		// search
-		if ($options['search'] !== null) {
-			zbx_db_search('role r', $options, $sql_parts);
-		}
-
-		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-
-		$result = [];
-
-		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
-
-		while ($db_role = DBfetch($res)) {
+		while ($row = DBfetch($resource)) {
 			if ($options['countOutput']) {
-				return $db_role['rowscount'];
+				return $row['rowscount'];
 			}
 
-			$result[$db_role['roleid']] = $db_role;
+			$db_roles[$row['roleid']] = $row;
 		}
 
-		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['roleid', 'type'], $output);
+		if ($db_roles) {
+			$db_roles = $this->addRelatedObjects($options, $db_roles);
+			$db_roles = $this->unsetExtraFields($db_roles, ['roleid', 'type'], $options['output']);
 
 			if (!$options['preservekeys']) {
-				$result = array_values($result);
+				$db_roles = array_values($db_roles);
 			}
 		}
 
-		return $result;
+		return $db_roles;
 	}
 
 	/**
@@ -210,7 +172,7 @@ class CRole extends CApiService {
 					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'ui.default_access' =>		['type' => API_INT32, 'in' => '0,1'],
-				'services.read.mode' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_ALL.','.ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM],
+				'services.read.mode' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
 				'services.read.list' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
@@ -218,7 +180,7 @@ class CRole extends CApiService {
 					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
 				]],
-				'services.write.mode' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_ALL.','.ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM],
+				'services.write.mode' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
 				'services.write.list' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
@@ -302,7 +264,7 @@ class CRole extends CApiService {
 					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'ui.default_access' =>		['type' => API_INT32, 'in' => '0,1'],
-				'services.read.mode' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_ALL.','.ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM],
+				'services.read.mode' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
 				'services.read.list' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
@@ -310,7 +272,7 @@ class CRole extends CApiService {
 					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
 				]],
-				'services.write.mode' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_ALL.','.ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM],
+				'services.write.mode' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
 				'services.write.list' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
@@ -1169,6 +1131,46 @@ class CRole extends CApiService {
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, self::AUDIT_RESOURCE, $db_roles);
 
 		return ['roleids' => $roleids];
+	}
+
+	/**
+	 * @param string $table_name
+	 * @param string $table_alias
+	 * @param array  $options
+	 * @param array  $sql_parts
+	 *
+	 * @return array
+	 */
+	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sqlParts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$sql_parts['from']['users'] = 'users u';
+			$sql_parts['where']['u'] = 'r.roleid=u.roleid';
+			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
+		}
+
+		return $sqlParts;
+	}
+
+	/**
+	 * @param string $table_name
+	 * @param string $table_alias
+	 * @param array  $options
+	 * @param array  $sql_parts
+	 *
+	 * @return array
+	 */
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (!$options['countOutput']) {
+			if ($options['selectRules'] !== null) {
+				$sql_parts = $this->addQuerySelect('r.type', $sql_parts);
+			}
+		}
+
+		return $sql_parts;
 	}
 
 	/**
