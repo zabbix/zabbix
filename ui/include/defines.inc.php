@@ -2042,11 +2042,13 @@ define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
 define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
 
+define('ZBX_ROLE_RULE_DISABLED',				0);
+define('ZBX_ROLE_RULE_ENABLED',					1);
 define('ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM',	0);
 define('ZBX_ROLE_RULE_SERVICES_ACCESS_ALL',		1);
-define('ZBX_ROLE_RULE_API_MODE_DENY',   		0);
-define('ZBX_ROLE_RULE_API_MODE_ALLOW',  		1);
-define('ZBX_ROLE_RULE_API_WILDCARD',    		'*');
+define('ZBX_ROLE_RULE_API_MODE_DENY',			0);
+define('ZBX_ROLE_RULE_API_MODE_ALLOW',			1);
+define('ZBX_ROLE_RULE_API_WILDCARD',			'*');
 define('ZBX_ROLE_RULE_API_WILDCARD_ALIAS',		'*.*');
 
 // Allows to set "rel" tag value "noreferer" when setting target="_blank".
