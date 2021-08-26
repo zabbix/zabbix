@@ -224,7 +224,6 @@ foreach ($data['hosts'] as $host) {
 			(new CUrl('zabbix.php', false))
 				->setArgument('action', 'host.list')
 				->setArgument('page', CPagerHelper::loadPage('host.list', null))
-				->setArgument('uncheck', 1)
 				->getUrl()
 		);
 
@@ -462,7 +461,6 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 		(new CUrl('zabbix.php', false))
 			->setArgument('action', 'host.list')
 			->setArgument('page', CPagerHelper::loadPage('host.list', null))
-			->setArgument('uncheck', 1)
 			->getUrl()
 	);
 

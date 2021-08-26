@@ -426,9 +426,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 			if ($this->hasInput('backurl')) {
 				$upd_status = ($this->getInput('status', HOST_STATUS_NOT_MONITORED) == HOST_STATUS_MONITORED);
+				$backurl = new CUrl($this->getInput('backurl'));
 				$cnt = count($hostids);
 
 				if ($result) {
+					$backurl->setArgument('uncheck', 1);
+
 					CMessageHelper::setSuccessTitle($upd_status
 						? _n('Host enabled', 'Hosts enabled', $cnt)
 						: _n('Host disabled', 'Hosts disabled', $cnt)
@@ -441,7 +444,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					);
 				}
 
-				$this->setResponse(new CControllerResponseRedirect($this->getInput('backurl')));
+				$this->setResponse(new CControllerResponseRedirect($backurl->getUrl()));
 			}
 			else {
 				if ($result) {
