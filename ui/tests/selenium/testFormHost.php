@@ -193,12 +193,12 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_Layout() {
-		$this->page->login()->open((new Curl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', self::$hostids['testFormHost with items'])
-			->getUrl()
-		);
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$hostname = 'testFormHost with items';
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name')
+				->query('link', $hostname)->waitUntilClickable()->one()->click();
+		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+
 		// Check tabs available in the form
 		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
 		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
@@ -228,7 +228,8 @@ class testFormHost extends CWebTest {
 
 		// Click the "expand" icon (in the 0th column) for the SNMP interface (1th row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
-		$snmp_form = $interfaces_form->getRow(1)->query('xpath://ul[@class="table-forms"]')->asForm(['normalized' => true])->one();
+		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//ul[@class="table-forms"]')->one()->parents()
+				->asForm(['normalized' => true])->one();
 		$data = [
 			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use bulk requests'],
 			'SNMPv2' => ['SNMP version', 'SNMP community', 'Use bulk requests'],
@@ -241,6 +242,7 @@ class testFormHost extends CWebTest {
 		// The SNMP interface has specific fields depending on the SNMP version and protocol.
 		foreach ($data as $field => $labels) {
 			$select = ($field === 'authNoPriv') ? 'Security level' : 'SNMP version';
+			$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 			$form->fill([$select => $field]);
 			$this->assertEquals($labels, array_values($snmp_form->getLabels()
 					->filter(new CElementFilter(CElementFilter::VISIBLE))->asText()));
