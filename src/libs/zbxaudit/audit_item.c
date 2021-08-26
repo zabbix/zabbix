@@ -310,12 +310,24 @@ PREPARE_AUDIT_ITEM_UPDATE(key,			const char*,	string)
 #undef ONLY_LLD_RULE
 #undef IT_OR_ITP
 
-static void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, char *name, int resource_type)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_audit_item_create_entry_for_delete                           *
+ *                                                                            *
+ * Parameters: id   - [IN] resource id                                        *
+ *             name - [IN] resource name                                      *
+ *             flag - [IN] resource flag                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, char *name, int flag)
 {
+	int			resource_type;
 	zbx_audit_entry_t	local_audit_item_entry, **found_audit_item_entry;
 	zbx_audit_entry_t	*local_audit_item_entry_x = &local_audit_item_entry;
 
 	RETURN_IF_AUDIT_OFF();
+
+	resource_type = item_flag_to_resource_type(flag);
 
 	local_audit_item_entry.id = id;
 
@@ -357,7 +369,7 @@ void	DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids)
 	{
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
-		zbx_audit_item_create_entry_for_delete(id, row[1], item_flag_to_resource_type(atoi(row[2])));
+		zbx_audit_item_create_entry_for_delete(id, row[1], atoi(row[2]));
 	}
 	DBfree_result(result);
 

@@ -258,7 +258,7 @@ int	lld_end_of_life(int lastcheck, int lifetime);
 
 typedef void	(*delete_ids_f)(zbx_vector_uint64_t *ids);
 typedef void	(*get_object_info_f)(const void *object, zbx_uint64_t *id, int *discovered, int *lastcheck,
-		int *ts_delete);
+		int *ts_delete, char **name);
 void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_vector_ptr_t *objects,
 		int lifetime, int lastcheck, delete_ids_f cb, get_object_info_f cb_info);
 

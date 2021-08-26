@@ -80,7 +80,7 @@ int	lld_end_of_life(int lastcheck, int lifetime)
 void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_vector_ptr_t *objects,
 		int lifetime, int lastcheck, delete_ids_f cb, get_object_info_f cb_info)
 {
-	char				*sql = NULL;
+	char				*sql = NULL, *name;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t		del_ids, lc_ids, ts_ids;
 	zbx_vector_uint64_pair_t	discovery_ts;
@@ -101,7 +101,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 		zbx_uint64_t	id;
 		int		discovery_flag, object_lastcheck, object_ts_delete;
 
-		cb_info(objects->values[i], &id, &discovery_flag, &object_lastcheck, &object_ts_delete);
+		cb_info(objects->values[i], &id, &discovery_flag, &object_lastcheck, &object_ts_delete, &name);
 
 		if (0 == id)
 			continue;
@@ -113,6 +113,11 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 			if (lastcheck > ts_delete)
 			{
 				zbx_vector_uint64_append(&del_ids, id);
+				if(0 == strncmp(table, "item_discovery", ZBX_CONST_STRLEN("item_discovery")))
+				{
+					zbx_audit_item_create_entry_for_delete(id, name,
+							(int)ZBX_FLAG_DISCOVERY_CREATED);
+				}
 			}
 			else if (object_ts_delete != ts_delete)
 			{
@@ -186,25 +191,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 	/* remove 'lost' objects */
 	if (0 != del_ids.values_num)
 	{
-		zbx_vector_uint64_t	itemids;
-
-
 		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		if(0 == strncmp(table, "item_discovery", ZBX_CONST_STRLEN("item_discovery")))
-		{
-			zbx_vector_uint64_create(&itemids);
-			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"select distinct i.itemid,i.name,i.flags"
-						" from items i"
-						" where ");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", del_ids.values,
-					del_ids.values_num);
-
-			DBselect_delete_for_item(sql, &itemids);
-			zbx_vector_uint64_destroy(&itemids);
-		}
 
 		cb(&del_ids);
 

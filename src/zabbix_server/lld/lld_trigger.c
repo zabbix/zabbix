@@ -3729,7 +3729,7 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
 }
 
 static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		int *ts_delete)
+		int *ts_delete, char **name)
 {
 	zbx_lld_trigger_t	*trigger;
 
@@ -3739,6 +3739,7 @@ static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discover
 	*discovery_flag = trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
 	*lastcheck = trigger->lastcheck;
 	*ts_delete = trigger->ts_delete;
+	*name = trigger->description;
 }
 
 /******************************************************************************

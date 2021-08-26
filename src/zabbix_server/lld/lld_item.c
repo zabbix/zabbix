@@ -4285,7 +4285,7 @@ out:
 }
 
 static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		int *ts_delete)
+		int *ts_delete, char **name)
 {
 	zbx_lld_item_t	*item;
 
@@ -4295,6 +4295,7 @@ static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_f
 	*discovery_flag = item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	*lastcheck = item->lastcheck;
 	*ts_delete = item->ts_delete;
+	*name = item->name;
 }
 
 static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
