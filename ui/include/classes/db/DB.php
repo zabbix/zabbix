@@ -228,9 +228,9 @@ class DB {
 	 *
 	 * @param string $tableName
 	 *
-	 * @return string|array
+	 * @return string
 	 */
-	protected static function getPk($tableName) {
+	public static function getPk($tableName): string {
 		$schema = self::getSchema($tableName);
 
 		return $schema['key'];

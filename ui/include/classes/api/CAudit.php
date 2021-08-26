@@ -117,7 +117,7 @@ class CAudit {
 		}
 
 		$auditlog = [];
-		$table_key = DB::getSchema(self::TABLE_NAMES[$resource])['key'];
+		$table_key = DB::getPk(self::TABLE_NAMES[$resource]);
 		$clock = time();
 		$recordsetid = self::getRecordSetId();
 
@@ -126,7 +126,7 @@ class CAudit {
 
 		if ($log_parents) {
 			$parent_resource = self::PARENT_RESOURCES[$resource];
-			$parent_key = DB::getSchema(self::TABLE_NAMES[$parent_resource])['key'];
+			$parent_key = DB::getPk(self::TABLE_NAMES[$parent_resource]);
 		}
 
 		foreach ($objects as $object) {
@@ -158,30 +158,30 @@ class CAudit {
 			];
 		}
 
-		if ($parentids) {
+		if ($log_parents && $parentids) {
 			$auditlog = array_merge($auditlog,
-				self::parentLog($userid, $ip, $username, $resource, array_keys($parentids))
+				self::parentLog($userid, $ip, $username, $parent_resource, array_keys($parentids))
 			);
 		}
 
 		DB::insertBatch('auditlog', $auditlog);
 	}
 
-	private static function parentLog(string $userid, string $ip, string $username, int $resource, array $ids): array {
+	private static function parentLog(string $userid, string $ip, string $username, int $resource,
+			array $resourceids): array {
 		$auditlog = [];
 
-		$parent_resource = self::PARENT_RESOURCES[$resource];
-		$parent_table = self::TABLE_NAMES[$parent_resource];
-		$parent_key = DB::getSchema($parent_table)['key'];
-		$parent_field = self::FIELD_NAMES[$parent_resource];
+		$table_name = self::TABLE_NAMES[$resource];
+		$table_key = DB::getPk($table_name);
+		$field_name = self::FIELD_NAMES[$resource];
 		$clock = time();
 		$recordsetid = self::getRecordSetId();
 
 		$db_options = [
-			'output' => [$parent_key, $parent_field],
-			'filter' => [$parent_key => $ids]
+			'output' => [$table_key, $field_name],
+			'filter' => [$table_key => $resourceids]
 		];
-		$db_result = DBSelect(DB::makeSql($parent_table, $db_options));
+		$db_result = DBSelect(DB::makeSql($table_name, $db_options));
 
 		while ($row = DBfetch($db_result)) {
 			$auditlog[] = [
@@ -190,9 +190,9 @@ class CAudit {
 				'clock' => $clock,
 				'ip' => substr($ip, 0, 39),
 				'action' => self::ACTION_UPDATE,
-				'resourcetype' => $parent_resource,
-				'resourceid' => $row[$parent_key],
-				'resourcename' => $row[$parent_field],
+				'resourcetype' => $resource,
+				'resourceid' => $row[$table_key],
+				'resourcename' => $row[$field_name],
 				'recordsetid' => $recordsetid,
 				'details' => ''
 			];
