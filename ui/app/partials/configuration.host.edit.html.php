@@ -562,16 +562,10 @@ if (!$host_is_discovered) {
 // Add footer buttons.
 if (array_key_exists('buttons', $data)) {
 	$primary_btn = array_shift($data['buttons']);
-	$tabs->setFooter(makeFormFooter($primary_btn, $data['buttons']));
-}
-
-if ($data['hostid'] != 0) {
-	(new CDiv(getHostNavigation('', $data['hostid'], 0, array_key_exists('popup_form', $data)
-		? ['no_breadcrumbs' => true, 'link_target' => '_blank']
-		: ['link_target' => '_blank']
-	)))
-		->addClass('header-navigation')
-		->show();
+	$tabs->setFooter(makeFormFooter(
+		$primary_btn,
+		$data['buttons']
+	));
 }
 
 $host_form
