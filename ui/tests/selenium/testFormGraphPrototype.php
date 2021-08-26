@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -27,8 +26,6 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
  * @backup graphs
  */
 class testFormGraphPrototype extends CLegacyWebTest {
-
-	use TableTrait;
 
 	/**
 	 * The name of the test template created in the test data set.
