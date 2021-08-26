@@ -65,7 +65,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			'tls_accept' => 'ge 0|le '.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
 			'ipmi_authtype' => 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2, IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM, IPMI_AUTHTYPE_RMCP_PLUS]),
 			'ipmi_privilege' => 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER, IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM]),
-			'return_to' => 'in hosts'
+			'backurl' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -421,57 +421,47 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			catch (Exception $e) {
 				DBend(false);
 
-				CMessageHelper::setErrorTitle(_('Cannot update hosts'));
-
 				$result = false;
 			}
 
-			if ($this->getInput('return_to', '') === 'hosts') {
-				$requested_host_enable = ($this->getInput('status', HOST_STATUS_NOT_MONITORED)
-						== HOST_STATUS_MONITORED);
-				$hosts_count = is_array($result) ? count($result['hostids']) : count($hosts);
-				$host_list_curl = (new CUrl('zabbix.php'))
-					->setArgument('action', 'host.list')
-					->setArgument('page', CPagerHelper::loadPage('host.list', null));
+			if ($this->hasInput('backurl')) {
+				$upd_status = ($this->getInput('status', HOST_STATUS_NOT_MONITORED) == HOST_STATUS_MONITORED);
+				$cnt = count($hostids);
 
 				if ($result) {
-					$messageSuccess = $requested_host_enable
-						? _n('Host enabled', 'Hosts enabled', $hosts_count)
-						: _n('Host disabled', 'Hosts disabled', $hosts_count);
-
-					$host_list_curl->setArgument('uncheck', 1);
-					CMessageHelper::setSuccessTitle($messageSuccess);
+					CMessageHelper::setSuccessTitle($upd_status
+						? _n('Host enabled', 'Hosts enabled', $cnt)
+						: _n('Host disabled', 'Hosts disabled', $cnt)
+					);
 				}
 				else {
-					$messageFailed = $requested_host_enable
-						? _n('Cannot enable host', 'Cannot enable hosts', $hosts_count)
-						: _n('Cannot disable host', 'Cannot disable hosts', $hosts_count);
-
-					CMessageHelper::setErrorTitle($messageFailed);
+					CMessageHelper::setErrorTitle($upd_status
+						? _n('Cannot enable host', 'Cannot enable hosts', $cnt)
+						: _n('Cannot disable host', 'Cannot disable hosts', $cnt)
+					);
 				}
 
-				$response = new CControllerResponseRedirect($host_list_curl);
-				$this->setResponse($response);
-
-				return;
-			}
-
-			if ($result) {
-				ob_start();
-				uncheckTableRows('hosts');
-
-				$output = ['title' => _('Hosts updated'), 'script_inline' => ob_get_clean()];
-
-				if ($messages = CMessageHelper::getMessages()) {
-					$output['messages'] = array_column($messages, 'message');
-				}
+				$this->setResponse(new CControllerResponseRedirect($this->getInput('backurl')));
 			}
 			else {
-				$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-					->toString();
-			}
+				if ($result) {
+					ob_start();
+					uncheckTableRows('hosts');
 
-			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+					$output = ['title' => _('Hosts updated'), 'script_inline' => ob_get_clean()];
+
+					if ($messages = CMessageHelper::getMessages()) {
+						$output['messages'] = array_column($messages, 'message');
+					}
+				}
+				else {
+					$output = ['errors' => getMessages(false, _('Cannot update hosts'))->toString()];
+				}
+
+				$this->setResponse(
+					(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				);
+			}
 		}
 		else {
 			$data = [

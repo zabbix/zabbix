@@ -220,7 +220,13 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('ids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
-		->setArgument('return_to', 'hosts');
+		->setArgument('backurl',
+			(new CUrl('zabbix.php', false))
+				->setArgument('action', 'host.list')
+				->setArgument('page', CPagerHelper::loadPage('host.list', null))
+				->setArgument('uncheck', 1)
+				->getUrl()
+		);
 
 	if ($host['status'] == HOST_STATUS_MONITORED) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -452,7 +458,13 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('action', 'popup.massupdate.host')
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
-	->setArgument('return_to', 'hosts');
+	->setArgument('backurl',
+		(new CUrl('zabbix.php', false))
+			->setArgument('action', 'host.list')
+			->setArgument('page', CPagerHelper::loadPage('host.list', null))
+			->setArgument('uncheck', 1)
+			->getUrl()
+	);
 
 $form->addItem([
 	$table,
