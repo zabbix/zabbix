@@ -1147,21 +1147,6 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected function createReal(array &$triggers, $inherited = false) {
-		$class = get_class($this);
-
-		switch ($class) {
-			case 'CTrigger':
-				$resource = AUDIT_RESOURCE_TRIGGER;
-				break;
-
-			case 'CTriggerPrototype':
-				$resource = AUDIT_RESOURCE_TRIGGER_PROTOTYPE;
-				break;
-
-			default:
-				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
-		}
-
 		$new_triggers = $triggers;
 		$new_functions = [];
 		$triggers_functions = [];
@@ -1179,7 +1164,7 @@ abstract class CTriggerGeneral extends CApiService {
 				$new_functions[] = $trigger_function;
 			}
 
-			if ($class === 'CTriggerPrototype') {
+			if ($this instanceof CTriggerPrototype) {
 				$new_trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			}
 
@@ -1202,7 +1187,8 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if (!$inherited) {
-			$this->addAuditBulk(AUDIT_ACTION_ADD, $resource, $triggers);
+			$resource = ($this instanceof CTrigger) ? CAudit::RESOURCE_TRIGGER : CAudit::RESOURCE_TRIGGER_PROTOTYPE;
+			$this->addAuditBulk(CAudit::ACTION_ADD, $resource, $triggers);
 		}
 	}
 
@@ -1252,21 +1238,6 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected function updateReal(array $triggers, array $db_triggers, $inherited = false) {
-		$class = get_class($this);
-
-		switch ($class) {
-			case 'CTrigger':
-				$resource = AUDIT_RESOURCE_TRIGGER;
-				break;
-
-			case 'CTriggerPrototype':
-				$resource = AUDIT_RESOURCE_TRIGGER_PROTOTYPE;
-				break;
-
-			default:
-				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
-		}
-
 		$upd_triggers = [];
 		$new_functions = [];
 		$del_functions_triggerids = [];
@@ -1313,7 +1284,7 @@ abstract class CTriggerGeneral extends CApiService {
 			if (array_key_exists('status', $trigger) && $trigger['status'] != $db_trigger['status']) {
 				$upd_trigger['values']['status'] = $trigger['status'];
 			}
-			if ($class === 'CTriggerPrototype'
+			if ($this instanceof CTriggerPrototype
 					&& array_key_exists('discover', $trigger) && $trigger['discover'] != $db_trigger['discover']) {
 				$upd_trigger['values']['discover'] = $trigger['discover'];
 			}
@@ -1389,7 +1360,8 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if (!$inherited) {
-			$this->addAuditBulk(AUDIT_ACTION_UPDATE, $resource, $save_triggers, zbx_toHash($db_triggers, 'triggerid'));
+			$resource = ($this instanceof CTrigger) ? CAudit::RESOURCE_TRIGGER : CAudit::RESOURCE_TRIGGER_PROTOTYPE;
+			$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $save_triggers, zbx_toHash($db_triggers, 'triggerid'));
 		}
 	}
 

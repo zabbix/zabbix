@@ -95,21 +95,21 @@ INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (4, 32, 
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (6, 'API map', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 14, 0);
 
 -- valuemap
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (399,50009,'API value map for update');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (400,50009,'API value map for update with mappings');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (401,50009,'API value map delete');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (402,50009,'API value map delete2');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (403,50009,'API value map delete3');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (404,50009,'API value map delete4');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (405,50009,'API value duplicate');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9904,399,'1','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9905,400,'One','Online');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9906,400,'Two','Offline');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9907,401,'1','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9908,402,'Three','Other');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9909,403,'Four','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9910,404,'1','Unknown');
-INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9911,405,'1','Unknown');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1399,50009,'API value map for update');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1400,50009,'API value map for update with mappings');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1401,50009,'API value map delete');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1402,50009,'API value map delete2');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1403,50009,'API value map delete3');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1404,50009,'API value map delete4');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1405,50009,'API value duplicate');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9904,1399,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9905,1400,'One','Online');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9906,1400,'Two','Offline');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9907,1401,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9908,1402,'Three','Other');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9909,1403,'Four','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9910,1404,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9911,1405,'1','Unknown');
 
 -- scripts
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, 'API disabled host', 'API disabled host', 1, '');
