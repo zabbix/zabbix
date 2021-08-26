@@ -35,7 +35,7 @@ class CMainMenuElement extends CElement {
 	}
 
 	/**
-	 * Click on page.
+	 * Select main menu section.
 	 *
 	 * @param string $section		first level menu
 	 */
@@ -43,6 +43,8 @@ class CMainMenuElement extends CElement {
 		$this->query('link', $section)->waitUntilVisible()->one()->click();
 		$element = $this->query('xpath://a[text()='.CXPathHelper::escapeQuotes($section).
 				']/../ul[@class="submenu"]')->one();
+
+		// Waits until menu section is expanded.
 		CElementQuery::wait()->until(function () use ($element) {
 			return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
 					' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
