@@ -403,13 +403,13 @@ class CToken extends CApiService {
 			$filter_userids = [self::$userData['userid']];
 		}
 
-		$db_tokens = DB::select('token', [
-			'output' => ['tokenid'],
+		$db_count = DB::select('token', [
+			'countOutput' => true,
 			'tokenids' => $tokenids,
 			'filter' => ['userid' => $filter_userids]
 		]);
 
-		if (count($db_tokens) != count($tokenids)) {
+		if ($db_count != count($tokenids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
