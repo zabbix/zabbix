@@ -6086,11 +6086,6 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
  *                            without validation of the value type            *
  *                           ZBX_MACRO_NUMERIC - values for LLD macros should *
  *                            be numeric                                      *
- *                           ZBX_MACRO_SIMPLE - LLD macros, located in the    *
- *                            item key parameters in simple macros will be    *
- *                            resolved considering quotes.                    *
- *                            Flag ZBX_MACRO_NUMERIC doesn't affect these     *
- *                            macros.                                         *
  *                           ZBX_MACRO_FUNC - function macros will be         *
  *                            skipped (lld macros inside function macros will *
  *                            be ignored) for macros specified in func_macros *
