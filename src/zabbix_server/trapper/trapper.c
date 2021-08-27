@@ -1159,7 +1159,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 		}
 		else
 		{
-			if (0 != (ZBX_TCP_LARGE & sock->protocol))
+			if (0 != (ZBX_TCP_LARGE & sock->protocol))	/* ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "large message is not supported for request received from"
 						" \"%s\": [%s]", sock->peer, value);
@@ -1256,7 +1256,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 		DC_ITEM			item;
 		int			errcode;
 
-		if (0 != (ZBX_TCP_LARGE & sock->protocol))
+		if (0 != (ZBX_TCP_LARGE & sock->protocol))	/* ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "large message is not supported for XML protocol received from"
 					" \"%s\"", sock->peer);
