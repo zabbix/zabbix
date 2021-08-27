@@ -137,7 +137,7 @@ int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error)
 		goto exit;
 	}
 
-	if (SUCCEED != zbx_tcp_recv(sock))
+	if (SUCCEED != zbx_tcp_recv_large(sock))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto exit;

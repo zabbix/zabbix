@@ -1156,76 +1156,90 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 					active_passive_misconfig(sock);
 				}
 			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
-			{
-				recv_agenthistory(sock, &jp, ts);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
-			{
-				recv_senderhistory(sock, &jp, ts);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					zbx_send_task_data(sock, ts);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					zbx_recv_proxy_data(sock, &jp, ts);
-				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-					zbx_send_proxy_data(sock, ts);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					recv_proxy_heartbeat(sock, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
-			{
-				ret = send_list_of_active_checks_json(sock, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					ret = node_process_command(sock, s, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					ret = recv_getqueue(sock, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_STATUS))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					ret = recv_getstatus(sock, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
-			{
-				ret = send_internal_stats_json(sock, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					recv_alert_send(sock, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					ret = zbx_trapper_preproc_test(sock, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					ret = zbx_trapper_expressions_evaluate(sock, &jp);
-			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
-			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-					zbx_trapper_item_test(sock, &jp);
-			}
 			else
-				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer, value);
+			{
+				if (0 != (ZBX_TCP_LARGE & sock->protocol))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "cannot process [%s] request received from \"%s\""
+							": large message is only supported for [%s] request",
+							value, sock->peer, ZBX_PROTO_VALUE_PROXY_CONFIG);
+					return FAIL;
+				}
+
+				if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
+				{
+					recv_agenthistory(sock, &jp, ts);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+				{
+					recv_senderhistory(sock, &jp, ts);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+						zbx_send_task_data(sock, ts);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+						zbx_recv_proxy_data(sock, &jp, ts);
+					else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+						zbx_send_proxy_data(sock, ts);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+						recv_proxy_heartbeat(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
+				{
+					ret = send_list_of_active_checks_json(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+						ret = node_process_command(sock, s, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+						ret = recv_getqueue(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_STATUS))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+						ret = recv_getstatus(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
+				{
+					ret = send_internal_stats_json(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+						recv_alert_send(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+						ret = zbx_trapper_preproc_test(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+						ret = zbx_trapper_expressions_evaluate(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
+				{
+					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+						zbx_trapper_item_test(sock, &jp);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]",
+							sock->peer, value);
+				}
+			}
 		}
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
@@ -1242,6 +1256,12 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 		zbx_host_key_t		hk = {host, key};
 		DC_ITEM			item;
 		int			errcode;
+
+		if (0 != (ZBX_TCP_LARGE & sock->protocol))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "request with invalid protocol received from \"%s\"", sock->peer);
+			return FAIL;
+		}
 
 		memset(&av, 0, sizeof(zbx_agent_value_t));
 
@@ -1302,8 +1322,16 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
-	if (SUCCEED != zbx_tcp_recv_to(sock, CONFIG_TRAPPER_TIMEOUT))
-		return;
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+	{
+		if (SUCCEED != zbx_tcp_recv_to_large(sock, CONFIG_TRAPPER_TIMEOUT))
+			return;
+	}
+	else
+	{
+		if (SUCCEED != zbx_tcp_recv_to(sock, CONFIG_TRAPPER_TIMEOUT))
+			return;
+	}
 
 	process_trap(sock, sock->buffer, ts);
 }
