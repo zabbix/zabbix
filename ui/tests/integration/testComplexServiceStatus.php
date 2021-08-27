@@ -86,8 +86,6 @@ class testComplexServiceStatus extends CIntegrationTest {
 			'showsla' => 0,
 			'weight' => 0,
 			'sortorder' => 0,
-			'propagation_rule' => 0,
-			'propagation_value' => 0,
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['serviceids']);
@@ -118,13 +116,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 				'type' => 0,
 				'recovery_mode' => 0,
 				'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
-				'expression' => $expr,
-				'tags' => [
-					[
-						'tag' => 'ServiceLink',
-						'value' => self::$triggerid . ':' . $trigger_desc
-					]
-				]
+				'expression' => $expr
 			]);
 
 			$this->assertArrayHasKey('triggerids', $response['result']);
@@ -146,10 +138,8 @@ class testComplexServiceStatus extends CIntegrationTest {
 				'algorithm' => 1,
 				'goodsla' => 99.99,
 				'showsla' => 0,
-				'weight' => 0,
+				'weight' => 100,
 				'sortorder' => 0,
-				'propagation_rule' => 0,
-				'propagation_value' => 0,
 				'parents' => [
 					['serviceid' => self::$parent_serviceid]
 				],
@@ -184,9 +174,9 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		$response = $this->call('service.get', [
+		$response = $this->callUntilDataIsPresent('service.get', [
 			'serviceids' => self::$parent_serviceid
-		]);
+		], 5, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(TRIGGER_SEVERITY_HIGH, $response['result'][0]['status']);
 
@@ -217,9 +207,9 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		$response = $this->call('service.get', [
+		$response = $this->callUntilDataIsPresent('service.get', [
 			'serviceids' => self::$parent_serviceid
-		]);
+		], 5, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(TRIGGER_SEVERITY_DISASTER, $response['result'][0]['status']);
 
@@ -228,13 +218,8 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 	/**
 	 * Most critical if all children have problems
-	 *
-	 * @backup services,service_status_rule
-	 *
 	 */
 	public function testComplexServiceStatus_case3() {
-		$this->reloadConfigurationCache();
-
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
 			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL
@@ -244,9 +229,9 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		$response = $this->call('service.get', [
+		$response = $this->callUntilDataIsPresent('service.get', [
 			'serviceids' => self::$parent_serviceid
-		]);
+		], 5, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals($response['result'][0]['status'], -1);
 
@@ -257,8 +242,6 @@ class testComplexServiceStatus extends CIntegrationTest {
 	 * Set status to ok
 	 */
 	public function testComplexServiceStatus_case4() {
-		$this->reloadConfigurationCache();
-
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
 			'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
@@ -268,15 +251,14 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		$response = $this->call('service.get', [
+		$response = $this->callUntilDataIsPresent('service.get', [
 			'serviceids' => self::$parent_serviceid
-		]);
+		], 5, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals($response['result'][0]['status'], -1);
 
 		return true;
 	}
-
 
 	/**
 	 * Set status of a parent service to OK, unless additional rules are met
@@ -285,8 +267,6 @@ class testComplexServiceStatus extends CIntegrationTest {
 	 *
 	 */
 	public function testComplexServiceStatus_case5() {
-		$this->reloadConfigurationCache();
-
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
 			'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
@@ -316,11 +296,81 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		$response = $this->call('service.get', [
+		$response = $this->callUntilDataIsPresent('service.get', [
 			'serviceids' => self::$parent_serviceid
-		]);
+		], 5, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals($response['result'][0]['status'], TRIGGER_SEVERITY_DISASTER);
+
+		return true;
+	}
+
+	/**
+	 * Test propagations
+	 *
+	 * @backup services
+	 *
+	 */
+	public function testComplexServiceStatus_case6() {
+		$response = $this->callUntilDataIsPresent('service.get', [
+			'search' => [
+				'name' => ['service_warning1']
+			]
+		], 5, 2);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertArrayHasKey('serviceid', $response['result'][0]);
+		$propagated_serviceid = $response['result'][0]['serviceid'];
+
+		$response = $this->call('service.update', [
+			'serviceid' => self::$parent_serviceid,
+			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
+		]);
+
+		$response = $this->call('service.update', [
+			'serviceid' => $propagated_serviceid,
+			'propagation_rule' => 1,
+			'propagation_value' => TRIGGER_SEVERITY_DISASTER
+		]);
+		$this->reloadConfigurationCache();
+
+		$response = $this->callUntilDataIsPresent('service.get', [
+			'serviceids' => self::$parent_serviceid
+		], 5, 2);
+
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals($response['result'][0]['status'], TRIGGER_SEVERITY_DISASTER);
+
+		return true;
+	}
+
+	/**
+	 * Test weights
+	 *
+	 * @backup service_status_rule
+	 *
+	 */
+	public function testComplexServiceStatus_case7() {
+		$response = $this->call('service.update', [
+			'serviceid' => self::$parent_serviceid,
+			'status_rules' => [
+				[
+					'type' => 4,
+					'limit_value' => 200,
+					'limit_status' => -1,
+					'new_status' => TRIGGER_SEVERITY_INFORMATION
+				]
+			]
+		]);
+		$this->assertArrayHasKey('serviceids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['serviceids']);
+
+		$this->reloadConfigurationCache();
+
+		$response = $this->callUntilDataIsPresent('service.get', [
+			'serviceids' => self::$parent_serviceid
+		], 5, 2);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals($response['result'][0]['status'], TRIGGER_SEVERITY_INFORMATION);
 
 		return true;
 	}
