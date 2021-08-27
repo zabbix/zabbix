@@ -1107,7 +1107,7 @@ class CUser extends CApiService {
 	 * @param string     $method
 	 * @param null|array $db_users
 	 */
-	private function updateMedias(array &$users, string $method, array $db_users = null) {
+	private function updateMedias(array &$users, string $method, array $db_users = null): void {
 		$ins_medias = [];
 		$upd_medias = [];
 		$del_mediaids = [];
