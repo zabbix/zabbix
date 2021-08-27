@@ -914,8 +914,11 @@ static void	dbpatch_replace_functionids(char **expression, const zbx_vector_ptr_
 void	dbpatch_convert_simple_macro(const char *expression, const zbx_token_simple_macro_t *data, int more,
 		char **function)
 {
-#define HOSTHOST_IDX_POS	10
-#define HOSTNAME_IDX_POS	9
+#define HOSTHOST_STR		"{HOST.HOST"
+#define HOSTNAME_STR		"{HOSTNAME"
+#define HOSTHOST_IDX_POS	ZBX_CONST_STRLEN(HOSTHOST_STR)
+#define HOSTNAME_IDX_POS	ZBX_CONST_STRLEN(HOSTNAME_STR)
+
 	zbx_dbpatch_function_t	*func;
 	zbx_vector_ptr_t	functions;
 	char			*name, *host, *key;
@@ -946,9 +949,9 @@ void	dbpatch_convert_simple_macro(const char *expression, const zbx_token_simple
 	host = zbx_substr(expression, data->host.l, data->host.r);
 	key = zbx_substr(expression, data->key.l, data->key.r);
 
-	if (0 == strncmp(host, "{HOST.HOST", HOSTHOST_IDX_POS))
+	if (0 == strncmp(host, HOSTHOST_STR, HOSTHOST_IDX_POS))
 		pos = HOSTHOST_IDX_POS;
-	else if (0 != more && 0 == strncmp(host, "{HOSTNAME", HOSTNAME_IDX_POS))
+	else if (0 != more && 0 == strncmp(host, HOSTNAME_STR, HOSTNAME_IDX_POS))
 		pos = HOSTNAME_IDX_POS;
 	else
 		pos = 0;
@@ -976,6 +979,9 @@ void	dbpatch_convert_simple_macro(const char *expression, const zbx_token_simple
 	zbx_free(host);
 	zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
 	zbx_vector_ptr_destroy(&functions);
+
 #undef HOSTHOST_IDX_POS
 #undef HOSTNAME_IDX_POS
+#undef HOSTHOST_STR
+#undef HOSTNAME_STR
 }
