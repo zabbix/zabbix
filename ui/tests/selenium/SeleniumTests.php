@@ -181,6 +181,8 @@ require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
+require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
 require_once dirname(__FILE__).'/scheduledReports/testFormScheduledReport.php';
 require_once dirname(__FILE__).'/scheduledReports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/scheduledReports/testScheduledReportPermissions.php';
@@ -353,6 +355,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testFormTemplateDashboards');
+		$suite->addTestSuite('testPageTemplateDashboards');
 		$suite->addTestSuite('testFormScheduledReport');
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
