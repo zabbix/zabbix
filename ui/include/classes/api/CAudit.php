@@ -105,6 +105,8 @@ class CAudit {
 		'user.usrgrps' => 'id'
 	];
 
+	private const SKIP_FIELDS = ['token.creator_userid'];
+
 	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,
 			?array $db_objects): void {
 		if (!self::isAuditEnabled() && ($resource != self::RESOURCE_SETTINGS
@@ -233,12 +235,17 @@ class CAudit {
 				unset($value[self::NESTED_OBJECTS_IDS[$prefix]]);
 			}
 
+			$new_prefix = $prefix.$index;
+
+			if (in_array($new_prefix, self::SKIP_FIELDS)) {
+				continue;
+			}
+
 			if (is_array($value)) {
-				$new_prefix = $prefix . $index;
 				$result += self::convertKeysToPaths($new_prefix, $value);
 			}
 			else {
-				$result[$prefix.$index] = (string) $value;
+				$result[$new_prefix] = (string) $value;
 			}
 		}
 
