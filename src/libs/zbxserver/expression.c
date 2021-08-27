@@ -4624,6 +4624,15 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
 			zbx_json_escape(&replace_to);
 
+		if (0 != (macro_type & MACRO_TYPE_HTTP_XML) && NULL != replace_to)
+		{
+			char	*replace_to_esc;
+
+			replace_to_esc = xml_escape_dyn(replace_to);
+			zbx_free(replace_to);
+			replace_to = replace_to_esc;
+		}
+
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
 			if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token.data.func_macro, &replace_to)))
