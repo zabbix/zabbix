@@ -14173,6 +14173,17 @@ void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx)
 	zbx_vector_uint64_destroy(&hostids);
 }
 
+int	zbx_dc_maintenance_has_tags(void)
+{
+	int	ret;
+
+	RDLOCK_CACHE;
+	ret = config->maintenance_tags.num_data != 0 ? SUCCEED : FAIL;
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
 #	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
