@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-20 19:54+0300\n"
-"PO-Revision-Date: 2021-06-14 04:53+0300\n"
+"PO-Revision-Date: 2021-08-24 12:08+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1623639237.000000\n"
+"X-POOTLE-MTIME: 1629799737.000000\n"
 
 #: include/classes/items/CHelpItems.php:1073
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -6964,7 +6964,7 @@ msgstr "グラフ\"%1$s\"は\"%2$s\"にすでに存在します (アイテムは
 #: include/classes/api/services/CGraphGeneral.php:1129
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" as a graph created from graph prototype."
-msgstr ""
+msgstr "グラフ\"%1$s\"はグラフプロトタイプによって作成されたグラフとして\"%2$s\"上に既に存在します。"
 
 #: include/classes/api/services/CGraphGeneral.php:1032
 #: include/classes/api/services/CGraphGeneral.php:1240
@@ -19569,7 +19569,7 @@ msgstr "abs() - 絶対値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:288
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
-msgstr ""
+msgstr "acos() - 角度の値のアークコサイン、ラジアンで示す"
 
 #: include/forms.inc.php:157
 msgid "affects only filtered data"
@@ -19701,7 +19701,7 @@ msgstr "ascii() - 値の左端の文字のASCIIコードを返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:302
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
-msgstr ""
+msgstr "asin() - 角度の値のアークサイン、ラジアンで示す"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:71
 #: app/controllers/CControllerScheduledReportCreate.php:83
@@ -19715,11 +19715,11 @@ msgstr "少なくとも1つのオーバーライドオプションを指定す�
 
 #: app/controllers/CControllerPopupTriggerExpr.php:309
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
-msgstr ""
+msgstr "atan() - 角度の値のアークタンジェント、ラジアンで示す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:316
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
-msgstr ""
+msgstr "atan2() - ラジアンで表された角度として指定された縦座標(exprue)と横座標のアークタンジェント"
 
 #: include/events.inc.php:62
 msgid "autoregistered host"
@@ -19981,15 +19981,15 @@ msgstr "含む"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:480
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
-msgstr ""
+msgstr "cos() - 値のコサイン、ラジアンで示された角度の値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:487
 msgid "cosh() - The hyperbolic cosine of a value"
-msgstr ""
+msgstr "cosh() - 値のハイパボリックコサイン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:494
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
-msgstr ""
+msgstr "cot() - 値のコタンジェント、ラジアンで示された角度の値"
 
 #: include/graphs.inc.php:82
 msgid "count"
@@ -20001,7 +20001,7 @@ msgstr "count() - 期間Tで収集された値V(オペレータOを満たす)の
 
 #: app/controllers/CControllerPopupTriggerExpr.php:508
 msgid "countunique() - The number of unique values"
-msgstr ""
+msgstr "countunique() - ユニークな値の数"
 
 #: include/func.inc.php:579 jsLoader.php:213
 msgctxt "day short"
@@ -20041,7 +20041,7 @@ msgstr "デフォルト"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:533
 msgid "degrees() - Converts a value from radians to degrees"
-msgstr ""
+msgstr "degrees() - 値をラジアンから角度に変換"
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
@@ -20116,7 +20116,7 @@ msgstr "一致しない"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:540
 msgid "e() - Returns Euler's number"
-msgstr ""
+msgstr "e() - オイラー数を返す"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/correlation.inc.php:31
@@ -20142,11 +20142,11 @@ msgstr "存在する"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:545
 msgid "exp() - Euler's number at a power of a value"
-msgstr ""
+msgstr "exp() - オイラー数の累乗値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:552
 msgid "expm1() - Euler's number at a power of a value minus 1"
-msgstr ""
+msgstr "expm1() - オイラー数の累乗値マイナス1"
 
 #: include/classes/parsers/CConditionFormula.php:214
 msgid "expression is empty"
@@ -20158,7 +20158,7 @@ msgstr "JSONの解析に失敗しました"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:559
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
-msgstr ""
+msgstr "find() - 期間TでのパターンV(演算子0を満たす)の発生チェック(1 - 合致する、0 - 合致しない)"
 
 #: app/views/popup.maintenance.period.php:124 include/graphs.inc.php:86
 #: include/maintenances.inc.php:105
@@ -20172,7 +20172,7 @@ msgstr "最初のパラメータを指定してください"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:566
 msgid "first() - The oldest value in the specified time interval"
-msgstr ""
+msgstr "first() - 指定された時間間隔で最も古い値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "floor() - Rounds down to the nearest smaller integer"
@@ -20301,7 +20301,7 @@ msgstr "関数\"%1$s\"の使い方が正しくありません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:607
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
-msgstr ""
+msgstr "insert() - 文字列内の指定した開始位置から指定した文字列かスペースを挿入する"
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -20423,7 +20423,7 @@ msgstr "キーが設定されていません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:630
 msgid "kurtosis() - Measures the \"tailedness\" of the probability distribution"
-msgstr ""
+msgstr "kurtosis() - 確率分布の「テールネス」を測定"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1377
 #: include/classes/graphdraw/CPieGraphDraw.php:296 include/graphs.inc.php:88
@@ -20447,11 +20447,11 @@ msgstr "左"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:644
 msgid "left() - Returns the leftmost count characters"
-msgstr ""
+msgstr "left() - 左端の文字列の数を返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:657
 msgid "length() - Length of last (most recent) T value in characters"
-msgstr ""
+msgstr "length() - 文字列内の最後(最新)のT値の長さ"
 
 #: include/forms.inc.php:1282 include/views/js/item.preprocessing.js.php:134
 msgid "list of characters"
@@ -20483,7 +20483,7 @@ msgstr "ローレベルディスカバリルール"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:698
 msgid "ltrim() - Remove specified characters from the beginning of a string"
-msgstr ""
+msgstr "ltrim() - 文字列の先頭から指定した文字列を削除"
 
 #: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
 msgctxt "minute short"
@@ -20515,7 +20515,7 @@ msgstr "マクロ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:711
 msgid "mad() - Median absolute deviation"
-msgstr ""
+msgstr "mad() - 中央絶対偏差"
 
 #: include/classes/validators/CHistFunctionValidator.php:91
 #, c-format
@@ -20601,7 +20601,7 @@ msgstr "mm"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:750
 msgid "mod() - Division remainder"
-msgstr ""
+msgstr "mod() - 割り算の余り"
 
 #: include/func.inc.php:583
 msgctxt "millisecond short"
@@ -20611,7 +20611,7 @@ msgstr "ms"
 #: include/classes/validators/CApiInputValidator.php:2298
 #, c-format
 msgid "must be %1$s characters long"
-msgstr ""
+msgstr "%1$s文字の長さにしてください"
 
 #: app/views/administration.authentication.edit.php:131
 msgid "must be a valid LDAP user"
@@ -20809,7 +20809,7 @@ msgstr "障害パターン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:801
 msgid "radians() - Converts a value from degrees to radians"
-msgstr ""
+msgstr "radians() - 値を角度からラジアンに変換"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:808
 msgid "rand() - A random integer value"
@@ -20841,7 +20841,7 @@ msgstr "正規表現"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:813
 msgid "repeat() - Returns a string composed of value repeated count times"
-msgstr ""
+msgstr "repeat() - カウント回数だけ値を繰り返した文字列を返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:826
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
@@ -20857,7 +20857,7 @@ msgstr "右"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:844
 msgid "right() - Returns the rightmost count characters"
-msgstr ""
+msgstr "right() - 右端の文字列の数を返す"
 
 #: app/views/popup.services.php:59 app/views/popup.services.php:62
 #: app/views/popup.services.php:64 app/views/popup.services.php:65
@@ -20872,7 +20872,7 @@ msgstr "round() - 小数点以下桁数で四捨五入"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:870
 msgid "rtrim() - Removes specified characters from the end of a string"
-msgstr ""
+msgstr "rtrim() - 文字列の最後から指定した文字列を削除"
 
 #: include/classes/api/services/CItemGeneral.php:2260
 msgid "ruleid of dependent item and master item should match"
@@ -20961,19 +20961,19 @@ msgstr "ゲストとしてサインイン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:883
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
-msgstr ""
+msgstr "signum() - 値が負なら-1、値が0なら0、値が正なら1を返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:890
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
-msgstr ""
+msgstr "sin() - 値のサイン、ラジアンで示された角度の値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:897
 msgid "sinh() - The hyperbolic sine of a value"
-msgstr ""
+msgstr "sinh() - 値のハイパボリックサイン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:904
 msgid "skewness() - Measures the asymmetry of the probability distribution"
-msgstr ""
+msgstr "skewness() - 確率分布の非対称性を測定"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:911
 msgid "sqrt() - Square root of a value"
@@ -20981,11 +20981,11 @@ msgstr "sqrt() - 値の平方根"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:918
 msgid "stddevpop() - Population standard deviation"
-msgstr ""
+msgstr "stddevpop() - 母標準偏差"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:925
 msgid "stddevsamp() - Sample standard deviation"
-msgstr ""
+msgstr "stddevsamp() - サンプル標準偏差"
 
 #: include/graphs.inc.php:84
 msgid "sum"
@@ -20997,7 +20997,7 @@ msgstr "sum() - 期間Tでの合計値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:939
 msgid "sumofsquares() - The sum of squares"
-msgstr ""
+msgstr "sumofsquares() - 平方和"
 
 #: include/classes/api/services/CUser.php:1893
 msgid "supplied credentials are not unique"
@@ -21022,7 +21022,7 @@ msgstr "タグ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:946
 msgid "tan() - The tangent of a value"
-msgstr ""
+msgstr "tan() - 値のタンジェント"
 
 #: include/classes/api/services/CHostBase.php:64
 #, c-format
@@ -21107,7 +21107,7 @@ msgstr "trendavg() - 期間のシフトを含む期間Tでの平均値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:973
 msgid "trendcount() - Number of successfully retrieved values for period T"
-msgstr ""
+msgstr "trendcount() - 期間Tで正常に取得した値の数"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:980
 msgid "trendmax() - Maximum value for period T with exact period shift"
@@ -21145,7 +21145,7 @@ msgstr "リンクのあるトリガーは他のテンプレートやホストに
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1001
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
-msgstr ""
+msgstr "trim() - 文字列の先頭から最後までより指定した文字列を削除"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1014
 msgid "truncate() - Truncates a value to decimal places"
