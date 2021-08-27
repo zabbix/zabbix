@@ -97,7 +97,9 @@ struct _zbx_template_lld_macro_t
 #define ZBX_FLAG_TEMPLATE_LLD_MACRO_DELETE		__UINT64_C(0x000000010000)
 
 	zbx_uint64_t	upd_flags;
+	char		*lld_macro_orig;
 	char		*lld_macro;
+	char		*path_orig;
 	char		*path;
 };
 
@@ -274,43 +276,100 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				item->interfaceid = interfaceids[interface_type - 1];
 		}
 
+		item->name_orig = NULL;
 		item->name = zbx_strdup(NULL, row[1]);
+
+		item->delay_orig = NULL;
 		item->delay = zbx_strdup(NULL, row[5]);
+
+		item->history_orig = NULL;
 		item->history = zbx_strdup(NULL, row[6]);
+
+		item->trends_orig = NULL;
 		item->trends = zbx_strdup(NULL, row[7]);
+
+		item->trapper_hosts_orig = NULL;
 		item->trapper_hosts = zbx_strdup(NULL, row[9]);
+
+		item->units_orig = NULL;
 		item->units = zbx_strdup(NULL, row[10]);
+
+		item->formula_orig = NULL;
 		item->formula = zbx_strdup(NULL, row[11]);
+
+		item->logtimefmt_orig = NULL;
 		item->logtimefmt = zbx_strdup(NULL, row[12]);
+
+		item->params_orig = NULL;
 		item->params = zbx_strdup(NULL, row[14]);
+
+		item->ipmi_sensor_orig = NULL;
 		item->ipmi_sensor = zbx_strdup(NULL, row[15]);
+
+		item->snmp_oid_orig = NULL;
 		item->snmp_oid = zbx_strdup(NULL, row[16]);
+
+		item->username_orig = NULL;
 		item->username = zbx_strdup(NULL, row[18]);
+
+		item->password_orig = NULL;
 		item->password = zbx_strdup(NULL, row[19]);
+
+		item->publickey_orig = NULL;
 		item->publickey = zbx_strdup(NULL, row[20]);
+
+		item->privatekey_orig = NULL;
 		item->privatekey = zbx_strdup(NULL, row[21]);
+
+		item->description_orig = NULL;
 		item->description = zbx_strdup(NULL, row[23]);
+
+		item->lifetime_orig = NULL;
 		item->lifetime = zbx_strdup(NULL, row[25]);
+
+		item->jmx_endpoint_orig = NULL;
 		item->jmx_endpoint = zbx_strdup(NULL, row[28]);
-		ZBX_DBROW2UINT64(item->master_itemid, row[29]);
 
 		ZBX_DBROW2UINT64(item->master_itemid_orig, row[77]);
+		ZBX_DBROW2UINT64(item->master_itemid, row[29]);
 
+		item->timeout_orig = NULL;
 		item->timeout = zbx_strdup(NULL, row[30]);
+
+		item->url_orig = NULL;
 		item->url = zbx_strdup(NULL, row[31]);
+
+		item->query_fields_orig = NULL;
 		item->query_fields = zbx_strdup(NULL, row[32]);
+
+		item->posts_orig = NULL;
 		item->posts = zbx_strdup(NULL, row[33]);
+
+		item->status_codes_orig = NULL;
 		item->status_codes = zbx_strdup(NULL, row[34]);
+
 		ZBX_STR2UCHAR(item->follow_redirects, row[35]);
 		ZBX_STR2UCHAR(item->post_type, row[36]);
+
+		item->http_proxy_orig = NULL;
 		item->http_proxy = zbx_strdup(NULL, row[37]);
+
+		item->headers_orig = NULL;
 		item->headers = zbx_strdup(NULL, row[38]);
+
 		ZBX_STR2UCHAR(item->retrieve_mode, row[39]);
 		ZBX_STR2UCHAR(item->request_method, row[40]);
 		ZBX_STR2UCHAR(item->output_format, row[41]);
+
+		item->ssl_cert_file_orig = NULL;
 		item->ssl_cert_file = zbx_strdup(NULL, row[42]);
+
+		item->ssl_key_file_orig = NULL;
 		item->ssl_key_file = zbx_strdup(NULL, row[43]);
+
+		item->ssl_key_password_orig = NULL;
 		item->ssl_key_password = zbx_strdup(NULL, row[44]);
+
 		ZBX_STR2UCHAR(item->verify_peer, row[45]);
 		ZBX_STR2UCHAR(item->verify_host, row[46]);
 		ZBX_STR2UCHAR(item->allow_traps, row[47]);
@@ -406,7 +465,6 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 			SET_FLAG_UCHAR(row[94], item->verify_host, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_VERIFY_HOST);
 			SET_FLAG_UCHAR(row[95], item->allow_traps, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_ALLOW_TRAPS);
 			SET_FLAG_UCHAR(row[96], item->discover, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_DISCOVER);
-
 		}
 		else
 		{
@@ -684,7 +742,8 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 		for (j = 0; j < rule->conditions.values_num; j++)
 		{
 			zbx_uint64_t			id;
-			zbx_lld_rule_condition_t	*condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+			zbx_lld_rule_condition_t	*condition =
+					(zbx_lld_rule_condition_t *)rule->conditions.values[j];
 
 			if (j < rule->conditionids.values_num)
 				id = rule->conditionids.values[j];
@@ -1033,7 +1092,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 				zbx_db_insert_add_values(&db_insert, rule->conditionid, item->itemid,
 						(int)condition->op, condition->macro, condition->value);
 
-				zbx_audit_discovery_rule_update_json_add_overrides_conditions(item->itemid,
+				zbx_audit_discovery_rule_update_json_add_filter_conditions(item->itemid,
 						rule->conditionid, condition->op, condition->macro, condition->value);
 
 				rule->conditionid++;
@@ -1107,7 +1166,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		/* delete removed rule conditions */
 		for (j = index; j < rule->conditionids.values_num; j++)
 		{
-			zbx_audit_discovery_rule_update_json_delete_overrides_conditions(rule->itemid,
+			zbx_audit_discovery_rule_update_json_delete_filter_conditions(rule->itemid,
 					rule->conditionids.values[j]);
 			zbx_vector_uint64_append(&item_conditionids, rule->conditionids.values[j]);
 		}
@@ -1119,6 +1178,11 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 
 			zbx_db_insert_add_values(&db_insert, rule->conditionid++, rule->itemid,
 					(int)condition->op, condition->macro, condition->value);
+
+			zbx_audit_discovery_rule_update_json_add_filter_conditions(rule->itemid, rule->conditionid,
+					condition->op, condition->macro, condition->value);
+
+			rule->conditionid++;
 		}
 	}
 
@@ -1270,12 +1334,12 @@ static void	zbx_item_preproc_free(zbx_template_item_preproc_t *preproc)
 {
 	if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_PARAMS))
 		zbx_free(preproc->params_orig);
+	zbx_free(preproc->params);
 
+	zbx_free(preproc->error_handler_params);
 	if (0 != (preproc->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS))
 		zbx_free(preproc->error_handler_params_orig);
 
-	zbx_free(preproc->params);
-	zbx_free(preproc->error_handler_params);
 	zbx_free(preproc);
 }
 
@@ -1283,19 +1347,25 @@ static void	zbx_item_params_free(zbx_template_item_param_t *param)
 {
 	if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME))
 		zbx_free(param->name_orig);
+	zbx_free(param->name);
 
 	if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE))
 		zbx_free(param->value_orig);
-
-	zbx_free(param->name);
 	zbx_free(param->value);
+
 	zbx_free(param);
 }
 
 static void	zbx_lld_macros_free(zbx_template_lld_macro_t *macro)
 {
+	if (0 != (macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_LLD_MACRO))
+		zbx_free(macro->lld_macro_orig);
 	zbx_free(macro->lld_macro);
+
+	if (0 != (macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_PATH))
+		zbx_free(macro->path_orig);
 	zbx_free(macro->path);
+
 	zbx_free(macro);
 }
 
@@ -1310,35 +1380,34 @@ static void	zbx_lld_macros_free(zbx_template_lld_macro_t *macro)
  ******************************************************************************/
 static void	free_template_item(zbx_template_item_t *item)
 {
-	zbx_free(item->timeout);
-	zbx_free(item->url);
-	zbx_free(item->query_fields);
-	zbx_free(item->posts);
-	zbx_free(item->status_codes);
-	zbx_free(item->http_proxy);
-	zbx_free(item->headers);
-	zbx_free(item->ssl_cert_file);
-	zbx_free(item->ssl_key_file);
-	zbx_free(item->ssl_key_password);
-	zbx_free(item->jmx_endpoint);
-	zbx_free(item->lifetime);
-	zbx_free(item->description);
-	zbx_free(item->privatekey);
-	zbx_free(item->publickey);
-	zbx_free(item->password);
-	zbx_free(item->username);
-	zbx_free(item->snmp_oid);
-	zbx_free(item->ipmi_sensor);
-	zbx_free(item->params);
-	zbx_free(item->logtimefmt);
-	zbx_free(item->formula);
-	zbx_free(item->units);
-	zbx_free(item->trapper_hosts);
-	zbx_free(item->trends);
-	zbx_free(item->history);
-	zbx_free(item->delay);
-	zbx_free(item->name);
-	zbx_free(item->key);
+	/* zbx_free(item->timeout); */
+	/* zbx_free(item->url); */
+	/* zbx_free(item->query_fields); */
+	/* zbx_free(item->posts); */
+	/* zbx_free(item->status_codes); */
+	/* zbx_free(item->http_proxy); */
+	/* zbx_free(item->headers); */
+	/* zbx_free(item->ssl_cert_file); */
+	/* zbx_free(item->ssl_key_file); */
+	/* zbx_free(item->ssl_key_password); */
+	/* zbx_free(item->jmx_endpoint); */
+	/* zbx_free(item->lifetime); */
+	/* zbx_free(item->description); */
+	/* zbx_free(item->privatekey); */
+	/* zbx_free(item->publickey); */
+	/* zbx_free(item->password); */
+	/* zbx_free(item->username); */
+	/* zbx_free(item->snmp_oid); */
+	/* zbx_free(item->ipmi_sensor); */
+	/* zbx_free(item->params); */
+	/* zbx_free(item->logtimefmt); */
+	/* zbx_free(item->formula); */
+	/* zbx_free(item->units); */
+	/* zbx_free(item->trapper_hosts); */
+	/* zbx_free(item->trends); */
+	/* zbx_free(item->history); */
+	/* zbx_free(item->delay); */
+	/* zbx_free(item->name); */
 
 	zbx_vector_ptr_destroy(&item->dependent_items);
 	zbx_vector_item_preproc_ptr_clear_ext(&item->item_preprocs, zbx_item_preproc_free);
@@ -1361,37 +1430,41 @@ static void	free_template_item(zbx_template_item_t *item)
 #define CLEAN_ORIG(FLAG_POSTFIX, field)							\
 	if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))	\
 	{										\
-		zbx_free(item->field);							\
-	}
-	CLEAN_ORIG(NAME, name_orig)
-	CLEAN_ORIG(DELAY, delay_orig)
-	CLEAN_ORIG(HISTORY, history_orig)
-	CLEAN_ORIG(TRENDS, trends_orig)
-	CLEAN_ORIG(TRAPPER_HOSTS, trapper_hosts_orig)
-	CLEAN_ORIG(UNITS, units_orig)
-	CLEAN_ORIG(FORMULA, formula_orig)
-	CLEAN_ORIG(LOGTIMEFMT, logtimefmt_orig)
-	CLEAN_ORIG(PARAMS, params_orig)
-	CLEAN_ORIG(IPMI_SENSOR, ipmi_sensor_orig)
-	CLEAN_ORIG(SNMP_OID, snmp_oid_orig)
-	CLEAN_ORIG(USERNAME, username_orig)
-	CLEAN_ORIG(PASSWORD, password_orig)
-	CLEAN_ORIG(PUBLICKEY, publickey_orig)
-	CLEAN_ORIG(PRIVATEKEY, privatekey_orig)
-	CLEAN_ORIG(DESCRIPTION, description_orig)
-	CLEAN_ORIG(LIFETIME, lifetime_orig)
-	CLEAN_ORIG(JMX_ENDPOINT, jmx_endpoint_orig)
-	CLEAN_ORIG(TIMEOUT, timeout_orig)
-	CLEAN_ORIG(URL, url_orig)
-	CLEAN_ORIG(QUERY_FIELDS, query_fields_orig)
-	CLEAN_ORIG(POSTS, posts_orig)
-	CLEAN_ORIG(STATUS_CODES, status_codes_orig)
-	CLEAN_ORIG(HTTP_PROXY, http_proxy_orig)
-	CLEAN_ORIG(HEADERS, headers_orig)
-	CLEAN_ORIG(SSL_CERT_FILE, ssl_cert_file_orig)
-	CLEAN_ORIG(SSL_KEY_FILE, ssl_key_file_orig)
-	CLEAN_ORIG(SSL_KEY_PASSWORD, ssl_key_password_orig)
+		zbx_free(item->field##_orig);							\
+	}										\
+	zbx_free(item->field);
+
+	CLEAN_ORIG(NAME, name)
+	CLEAN_ORIG(DELAY, delay)
+	CLEAN_ORIG(HISTORY, history)
+	CLEAN_ORIG(TRENDS, trends)
+	CLEAN_ORIG(TRAPPER_HOSTS, trapper_hosts)
+	CLEAN_ORIG(UNITS, units)
+	CLEAN_ORIG(FORMULA, formula)
+	CLEAN_ORIG(LOGTIMEFMT, logtimefmt)
+	CLEAN_ORIG(PARAMS, params)
+	CLEAN_ORIG(IPMI_SENSOR, ipmi_sensor)
+	CLEAN_ORIG(SNMP_OID, snmp_oid)
+	CLEAN_ORIG(USERNAME, username)
+	CLEAN_ORIG(PASSWORD, password)
+	CLEAN_ORIG(PUBLICKEY, publickey)
+	CLEAN_ORIG(PRIVATEKEY, privatekey)
+	CLEAN_ORIG(DESCRIPTION, description)
+	CLEAN_ORIG(LIFETIME, lifetime)
+	CLEAN_ORIG(JMX_ENDPOINT, jmx_endpoint)
+	CLEAN_ORIG(TIMEOUT, timeout)
+	CLEAN_ORIG(URL, url)
+	CLEAN_ORIG(QUERY_FIELDS, query_fields)
+	CLEAN_ORIG(POSTS, posts)
+	CLEAN_ORIG(STATUS_CODES, status_codes)
+	CLEAN_ORIG(HTTP_PROXY, http_proxy)
+	CLEAN_ORIG(HEADERS, headers)
+	CLEAN_ORIG(SSL_CERT_FILE, ssl_cert_file)
+	CLEAN_ORIG(SSL_KEY_FILE, ssl_key_file)
+	CLEAN_ORIG(SSL_KEY_PASSWORD, ssl_key_password)
 #undef CLEAN_ORIG
+	zbx_free(item->key);
+
 	zbx_free(item);
 }
 
@@ -2052,7 +2125,8 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 				d = ",";
 
 				zbx_audit_discovery_rule_update_json_update_lld_macro_path_lld_macro(item->itemid,
-						lld_macro->lld_macro_pathid, lld_macro->lld_macro, lld_macro->path);
+						lld_macro->lld_macro_pathid, lld_macro->lld_macro_orig,
+						lld_macro->lld_macro);
 			}
 
 			if (0 != (lld_macro->upd_flags & ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_PATH))
@@ -2065,8 +2139,7 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 				zbx_free(path_esc);
 
 				zbx_audit_discovery_rule_update_json_update_lld_macro_path_path(item->itemid,
-						lld_macro->lld_macro_pathid, lld_macro->lld_macro, lld_macro->path);
-
+						lld_macro->lld_macro_pathid, lld_macro->path_orig, lld_macro->path);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where lld_macro_pathid=" ZBX_FS_UI64 ";\n",
@@ -2087,7 +2160,6 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 
 	if (0 != new_lld_macro_num)
 	{
-		zbx_db_insert_autoincrement(&db_insert, "lld_macro_pathid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
@@ -2401,6 +2473,8 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 					zbx_audit_discovery_rule_update_json_add_lld_override_optemplate(
 							(*pitem)->itemid, overrideid, lld_override_optemplateid,
 							override_operation->templateids.values[k]);
+
+					lld_override_optemplateid++;
 				}
 			}
 
@@ -3127,8 +3201,9 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 
 			if (0 != strcmp(ppdst->name, buffer))
 			{
-				zbx_free(ppdst->name);
 				ppdst->name_orig = ppdst->name;
+
+				zbx_free(ppdst->name);
 				ppdst->name = buffer;
 				buffer = NULL;
 				ppdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME;
@@ -3138,8 +3213,9 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 
 			if (0 != strcmp(ppdst->value, buffer))
 			{
-				zbx_free(ppdst->value);
 				ppdst->value_orig = ppdst->value;
+
+				zbx_free(ppdst->value);
 				ppdst->value = buffer;
 				buffer = NULL;
 				ppdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE;
@@ -3291,6 +3367,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 
 			if (0 != strcmp(plmpdst->lld_macro, buffer))
 			{
+				plmpdst->lld_macro_orig = zbx_strdup(NULL, plmpdst->lld_macro);
+
 				zbx_free(plmpdst->lld_macro);
 				plmpdst->lld_macro = buffer;
 				buffer = NULL;
@@ -3301,6 +3379,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 
 			if (0 != strcmp(plmpdst->path, buffer))
 			{
+				plmpdst->path_orig = zbx_strdup(NULL, plmpdst->path);
+
 				zbx_free(plmpdst->path);
 				plmpdst->path = buffer;
 				buffer = NULL;

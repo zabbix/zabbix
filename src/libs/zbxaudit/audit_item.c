@@ -277,14 +277,19 @@ static void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, char *name, 
  * Parameters: sql - [IN] sql statement                                       *
  *             ids - [OUT] sorted list of selected uint64 values              *
  *                                                                            *
+ * Return value: SUCCEED - query SUCCEEDED                                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
-void	DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids)
+int	DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids)
 {
+	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	id;
 
-	result = DBselect("%s", sql);
+	if (NULL == (result = DBselect("%s", sql)))
+		goto out;
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -292,13 +297,17 @@ void	DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids)
 		zbx_vector_uint64_append(ids, id);
 		zbx_audit_item_create_entry_for_delete(id, row[1], item_flag_to_resource_type(atoi(row[2])));
 	}
+
 	DBfree_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	ret = SUCCEED;
+out:
+	return ret;
 }
 
-void	zbx_audit_discovery_rule_update_json_add_overrides_conditions(zbx_uint64_t itemid,
-		zbx_uint64_t item_conditionid, zbx_uint64_t op, const char *macro, const char *value)
+void	zbx_audit_discovery_rule_update_json_add_filter_conditions(zbx_uint64_t itemid, zbx_uint64_t rule_conditionid,
+		zbx_uint64_t op, const char *macro, const char *value)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_operator[AUDIT_DETAILS_KEY_LEN],
 		audit_key_macro[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
@@ -306,13 +315,13 @@ void	zbx_audit_discovery_rule_update_json_add_overrides_conditions(zbx_uint64_t 
 	RETURN_IF_AUDIT_OFF();
 
 	zbx_snprintf(audit_key, sizeof(audit_key),
-			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions", item_conditionid);
+			"discoveryrule.filter[" ZBX_FS_UI64 "].conditions", rule_conditionid);
 	zbx_snprintf(audit_key_operator, sizeof(audit_key_operator),
-			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions.operator", item_conditionid);
+			"discoveryrule.filter[" ZBX_FS_UI64 "].conditions.operator", rule_conditionid);
 	zbx_snprintf(audit_key_macro, sizeof(audit_key_macro),
-			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions.macro", item_conditionid);
+			"discoveryrule.filter.[" ZBX_FS_UI64 "].conditions.macro", rule_conditionid);
 	zbx_snprintf(audit_key_value, sizeof(audit_key_value),
-			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions.value", item_conditionid);
+			"discoveryrule.filter[" ZBX_FS_UI64 "].conditions.value", rule_conditionid);
 
 	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key);
 	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_operator, op);
@@ -328,7 +337,7 @@ void	zbx_audit_discovery_rule_update_json_update_filter_conditions_create_entry(
 	RETURN_IF_AUDIT_OFF();
 
 	zbx_snprintf(audit_key, sizeof(audit_key),
-			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions", item_conditionid);
+			"discoveryrule.filter[" ZBX_FS_UI64 "].conditions", item_conditionid);
 
 	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_UPDATE, audit_key);
 }
@@ -342,7 +351,7 @@ void	zbx_audit_discovery_rule_update_json_update_filter_conditions_##resource(zb
 	RETURN_IF_AUDIT_OFF();											\
 														\
 	zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource),					\
-			"discoveryrule.overrides[" ZBX_FS_UI64 "].filter.conditions."#resource,			\
+			"discoveryrule.filter[" ZBX_FS_UI64 "].conditions."#resource,				\
 			item_conditionid);									\
 														\
 	zbx_audit_update_json_update_##type2(itemid, audit_key_##resource, resource##_old, resource##_new);	\
@@ -352,14 +361,14 @@ PREPARE_AUDIT_DISCOVERY_RULE_UPDATE(macro, const char*, string)
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE(value, const char*, string)
 #undef PREPARE_AUDIT_DISCOVERY_RULE_UPDATE
 
-void	zbx_audit_discovery_rule_update_json_delete_overrides_conditions(zbx_uint64_t itemid,
+void	zbx_audit_discovery_rule_update_json_delete_filter_conditions(zbx_uint64_t itemid,
 		zbx_uint64_t item_conditionid)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(buf, sizeof(buf), "discoveryrule.overrides[" ZBX_FS_UI64 "]", item_conditionid);
+	zbx_snprintf(buf, sizeof(buf), "discoveryrule.filter[" ZBX_FS_UI64 "].conditions", item_conditionid);
 
 	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
@@ -674,7 +683,7 @@ void	zbx_audit_discovery_rule_update_json_delete_lld_macro_path(zbx_uint64_t ite
 	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
 
-void zbx_audit_discovery_rule_update_json_add_lld_override(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+void	zbx_audit_discovery_rule_update_json_add_lld_override(zbx_uint64_t itemid, zbx_uint64_t overrideid,
 		const char *name, int step, int stop)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
@@ -696,7 +705,7 @@ void zbx_audit_discovery_rule_update_json_add_lld_override(zbx_uint64_t itemid, 
 	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_stop, stop);
 }
 
-void zbx_audit_discovery_rule_update_json_add_lld_override_filter(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+void	zbx_audit_discovery_rule_update_json_add_lld_override_filter(zbx_uint64_t itemid, zbx_uint64_t overrideid,
 		int evaltype, const char *formula)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_evaltype[AUDIT_DETAILS_KEY_LEN],
@@ -717,7 +726,7 @@ void zbx_audit_discovery_rule_update_json_add_lld_override_filter(zbx_uint64_t i
 	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_formula, formula);
 }
 
-void zbx_audit_discovery_rule_update_json_add_lld_override_condition(zbx_uint64_t itemid, zbx_uint64_t overrideid,
+void	zbx_audit_discovery_rule_update_json_add_lld_override_condition(zbx_uint64_t itemid, zbx_uint64_t overrideid,
 		zbx_uint64_t override_conditionid, int operator, const char *macro, const char *value)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_operator[AUDIT_DETAILS_KEY_LEN],
