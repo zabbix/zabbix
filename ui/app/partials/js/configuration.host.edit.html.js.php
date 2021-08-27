@@ -489,60 +489,6 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 	jQuery(document).ready(function() {
 		'use strict';
 
-		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
-			// If certificate is selected or checked.
-			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
-					|| jQuery('#tls_in_cert').is(':checked')) {
-				jQuery('#tls_issuer, #tls_subject').closest('li').show();
-			}
-			else {
-				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
-			}
-
-			// If PSK is selected or checked.
-			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
-					|| jQuery('#tls_in_psk').is(':checked')) {
-				jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').show();
-			}
-			else {
-				jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').hide();
-			}
-		});
-
-		// Radio button of inventory modes was clicked.
-		jQuery('input[name=inventory_mode]').click(function() {
-			var inventoryFields = jQuery('#inventorylist :input:gt(2)');
-
-			switch (jQuery(this).val()) {
-				case '<?= HOST_INVENTORY_DISABLED ?>':
-					inventoryFields.prop('disabled', true);
-					jQuery('.populating_item').hide();
-					break;
-				case '<?= HOST_INVENTORY_MANUAL ?>':
-					inventoryFields.prop('disabled', false);
-					jQuery('.populating_item').hide();
-					break;
-				case '<?= HOST_INVENTORY_AUTOMATIC ?>':
-					inventoryFields.prop('disabled', false);
-					inventoryFields.filter('.linked_to_item').prop('disabled', true);
-					jQuery('.populating_item').show();
-					break;
-			}
-		});
-
-		// Refresh field visibility on document load.
-		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
-			jQuery('#tls_in_none').prop('checked', true);
-		}
-		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
-			jQuery('#tls_in_psk').prop('checked', true);
-		}
-		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
-			jQuery('#tls_in_cert').prop('checked', true);
-		}
-
-		jQuery('input[name=tls_connect]').trigger('change');
-
 		window.hostInterfaceManager = new HostInterfaceManager(
 			<?= json_encode($data['host']['interfaces']) ?>,
 			<?= json_encode([
