@@ -476,8 +476,7 @@ class CToken extends CApiService {
 			$token = bin2hex(random_bytes(32));
 			$response[] = [
 				'tokenid' => $tokenid,
-				'token' => $token,
-				'userid' => $db_tokens[$tokenid]['userid']
+				'token' => $token
 			];
 			$upd_tokens[] = [
 				'values' => ['token' => hash('sha512', $token), 'creator_userid' => self::$userData['userid']],
