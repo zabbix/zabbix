@@ -105,12 +105,8 @@ class CAudit {
 		'user.usrgrps' => 'id'
 	];
 
-	private const PARENT_RESOURCES = [
-		self::RESOURCE_AUTH_TOKEN => self::RESOURCE_USER
-	];
-
 	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,
-			?array $db_objects, bool $log_parents = true): void {
+			?array $db_objects): void {
 		if (!self::isAuditEnabled() && ($resource != self::RESOURCE_SETTINGS
 					|| !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
 			return;
@@ -122,14 +118,6 @@ class CAudit {
 		$ip = substr($ip, 0, DB::getFieldLength('auditlog', 'ip'));
 		$recordsetid = self::getRecordSetId();
 
-		$parentids = [];
-		$log_parents = ($log_parents && array_key_exists($resource, self::PARENT_RESOURCES));
-
-		if ($log_parents) {
-			$parent_resource = self::PARENT_RESOURCES[$resource];
-			$parent_key = DB::getPk(self::TABLE_NAMES[$parent_resource]);
-		}
-
 		foreach ($objects as $object) {
 			$resourceid = $object[$table_key];
 			$db_object = ($action == self::ACTION_UPDATE) ? $db_objects[$resourceid] : [];
@@ -139,10 +127,6 @@ class CAudit {
 
 			if ($action == self::ACTION_UPDATE && count($diff) === 0) {
 				continue;
-			}
-
-			if ($log_parents) {
-				$parentids[$object[$parent_key]] = true;
 			}
 
 			$auditlog[] = [
@@ -159,46 +143,7 @@ class CAudit {
 			];
 		}
 
-		if ($log_parents && $parentids) {
-			$auditlog = array_merge($auditlog,
-				self::parentLog($userid, $ip, $username, $parent_resource, array_keys($parentids), $clock)
-			);
-		}
-
 		DB::insertBatch('auditlog', $auditlog);
-	}
-
-	private static function parentLog(string $userid, string $ip, string $username, int $resource,
-			array $resourceids, int $clock): array {
-		$auditlog = [];
-
-		$table_name = self::TABLE_NAMES[$resource];
-		$table_key = DB::getPk($table_name);
-		$field_name = self::FIELD_NAMES[$resource];
-		$recordsetid = self::getRecordSetId();
-
-		$db_options = [
-			'output' => [$table_key, $field_name],
-			'filter' => [$table_key => $resourceids]
-		];
-		$db_result = DBSelect(DB::makeSql($table_name, $db_options));
-
-		while ($row = DBfetch($db_result)) {
-			$auditlog[] = [
-				'userid' => $userid,
-				'username' => $username,
-				'clock' => $clock,
-				'ip' => $ip,
-				'action' => self::ACTION_UPDATE,
-				'resourcetype' => $resource,
-				'resourceid' => $row[$table_key],
-				'resourcename' => $row[$field_name],
-				'recordsetid' => $recordsetid,
-				'details' => ''
-			];
-		}
-
-		return $auditlog;
 	}
 
 	private static function getRecordSetId(): string {

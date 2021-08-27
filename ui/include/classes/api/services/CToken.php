@@ -386,9 +386,8 @@ class CToken extends CApiService {
 	 * @static
 	 *
 	 * @param array $tokenids
-	 * @param bool  $log_parents  Create audit log records for updated users.
 	 */
-	public static function deleteForce(array $tokenids, bool $log_parents = true): void {
+	public static function deleteForce(array $tokenids): void {
 		if (!$tokenids) {
 			return;
 		}
@@ -400,7 +399,7 @@ class CToken extends CApiService {
 
 		DB::delete('token', ['tokenid' => $tokenids]);
 
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_AUTH_TOKEN, $db_tokens, null, $log_parents);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_AUTH_TOKEN, $db_tokens);
 	}
 
 	/**
@@ -465,7 +464,7 @@ class CToken extends CApiService {
 		}
 
 		$db_tokens = DB::select('token', [
-			'output' => ['tokenid', 'userid', 'name', 'token'],
+			'output' => ['tokenid', 'name', 'token'],
 			'tokenids' => $tokenids,
 			'preservekeys' => true
 		]);
