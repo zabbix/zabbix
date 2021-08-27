@@ -81,7 +81,7 @@ if ($data['warning']) {
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
 	'body' => (new CPartial('configuration.host.edit.html', $data))->getOutput(),
-	'script_inline' => getPagePostJs().';setupHostPopup();',
+	'script_inline' => getPagePostJs(),
 	'buttons' => $buttons
 ];
 

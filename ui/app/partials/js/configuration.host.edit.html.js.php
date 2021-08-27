@@ -486,61 +486,6 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		}
 	};
 
-	<?php if (array_key_exists('popup_form', $data)): ?>
-		/**
-		 * In-popup listeners and set up, called when we are sure the popup HTML has been populated.
-		 */
-		function setupHostPopup() {
-			document.getElementById('<?= $data['form_name'] ?>').addEventListener('formSubmitted', (e) =>
-				handle_hostaction_response(e.detail, e.target)
-			);
-
-			$('#tabs').on('tabsactivate change', () => overlays_stack.end().centerDialog());
-			overlays_stack.end().centerDialog();
-
-			var clone_button = document.getElementById('host-clone'),
-				full_clone_button = document.getElementById('host-full_clone');
-
-			/**
-			* Supplies a handler for in-popup clone button click with according action.
-			*
-			* @param {string} operation_type Either 'clone' or 'full_clone'.
-			*
-			* @return {callable}             Click handler.
-			*/
-			function popupCloneHandler(operation_type) {
-				return function() {
-					var $form = overlays_stack.end().$dialogue.find('form'),
-						curl = curl = new Curl(null, false);
-
-					curl.setArgument(operation_type, 1);
-
-					let params = {...host_edit.getCloneData($form[0])};
-					params[operation_type] = 1;
-
-					PopUp('popup.host.edit', params, 'host_edit');
-					history.replaceState({}, '', curl.getUrl());
-				};
-			}
-
-			if (clone_button) {
-				clone_button.addEventListener('click', popupCloneHandler('clone'));
-			}
-
-			if (full_clone_button) {
-				full_clone_button.addEventListener('click', popupCloneHandler('full_clone'));
-			};
-
-			window.addEventListener('popstate', () => {
-				const overlay = overlays_stack.end();
-
-				if (overlay) {
-					overlayDialogueDestroy(overlay.dialogueid);
-				}
-			}, {once: true});
-		}
-	<?php endif; ?>
-
 	jQuery(document).ready(function() {
 		'use strict';
 

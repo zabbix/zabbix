@@ -77,9 +77,41 @@ const host_popup = {
 
 		overlay.$dialogue.addClass('sticked-to-top');
 
+		overlay.xhr.then(function () {
+			$('#tabs', overlay.$dialogue).on('tabsactivate change', () => overlay.centerDialog());
+
+			overlay.$dialogue.find('#host-clone').on('click', host_popup.cloneBtnClickHandler('clone', overlay));
+			overlay.$dialogue.find('#host-full_clone').on('click', host_popup.cloneBtnClickHandler('full_clone', overlay));
+
+			overlay.$dialogue.find('form').on('formSubmitted', (e) =>
+				handle_hostaction_response(e.detail, e.target)
+			);
+		});
+
 		overlay.$dialogue[0].addEventListener('overlay.close', () => {
 			history.replaceState({}, '', this.original_url);
 		}, {once: true});
+	},
+
+	/**
+	* Supplies a handler for in-popup clone button click with according action.
+	*
+	* @param {string}   operation_type Either 'clone' or 'full_clone'.
+	* @param {Overlay}  Overlay object.
+	*
+	* @return {callable}             Click handler.
+	*/
+	cloneBtnClickHandler(operation_type, overlay) {
+		return function() {
+			const url = new Curl(null, false);
+			url.setArgument(operation_type, 1);
+
+			let params = {...host_edit.getCloneData(overlay.$dialogue.find('form')[0])};
+			params[operation_type] = 1;
+
+			PopUp('popup.host.edit', params, 'host_edit');
+			history.replaceState({}, '', url.getUrl());
+		};
 	}
 };
 
