@@ -367,8 +367,8 @@ void	zbx_audit_discovery_rule_update_json_delete_overrides_conditions(zbx_uint64
 #define ITEM_RESOURCE_KEY_RESOLVE_PREPROC(resource, nested)							\
 	if (AUDIT_RESOURCE_ITEM == resource_type)								\
 	{													\
-		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "item.preprocessing[" ZBX_FS_UI64 \
-				"]"#nested#resource, preprocid);						\
+		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "item.preprocessing["		\
+				ZBX_FS_UI64 "]"#nested#resource, preprocid);					\
 	}													\
 	else if (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)						\
 	{													\
@@ -406,8 +406,9 @@ void	zbx_audit_item_update_json_add_item_preproc(zbx_uint64_t itemid, zbx_uint64
 	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, step);
 	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_type, type);
 	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_params, params);
-	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, error_handler);
-	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_step, error_handler_params);
+	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_error_handler, error_handler);
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_error_handler_params,
+			error_handler_params);
 }
 
 void	zbx_audit_item_update_json_update_item_preproc_create_entry(zbx_uint64_t itemid, int item_flags,
