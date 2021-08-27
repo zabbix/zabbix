@@ -240,25 +240,21 @@ foreach ($data['hosts'] as $host) {
 			}
 		}
 
-		$statusCaption = _('Enabled');
-		$statusClass = ZBX_STYLE_GREEN;
-		$confirm_message = _('Disable host?');
-
 		$status_toggle_url->setArgument('status', HOST_STATUS_NOT_MONITORED);
+		$toggle_status_link = (new CLink(_('Enabled'), $status_toggle_url->getUrl()))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_GREEN)
+			->addConfirmation(_('Disable host?'))
+			->addSID();
 	}
 	else {
-		$statusCaption = _('Disabled');
-		$confirm_message = _('Enable host?');
-		$statusClass = ZBX_STYLE_RED;
-
 		$status_toggle_url->setArgument('status', HOST_STATUS_MONITORED);
+		$toggle_status_link = (new CLink(_('Disabled'), $status_toggle_url->getUrl()))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_RED)
+			->addConfirmation(_('Enable host?'))
+			->addSID();
 	}
-
-	$status = (new CLink($statusCaption, $status_toggle_url->getUrl()))
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass($statusClass)
-		->addConfirmation($confirm_message)
-		->addSID();
 
 	if ($maintenance_icon) {
 		$description[] = $maintenance_icon;
@@ -445,7 +441,7 @@ foreach ($data['hosts'] as $host) {
 		getHostInterface($interface),
 		$monitored_by,
 		$hostTemplates,
-		$status,
+		$toggle_status_link,
 		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
 		makeInformationList($info_icons),
@@ -468,12 +464,16 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'ids', [
-		'enable-hosts' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?'),
+		'enable-hosts' => [
+			'name' => _('Enable'),
+			'confirm' => _('Enable selected hosts?'),
 			'redirect' => $status_toggle_url
 				->setArgument('status', HOST_STATUS_MONITORED)
 				->getUrl()
 		],
-		'disable-hosts' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?'),
+		'disable-hosts' => [
+			'name' => _('Disable'),
+			'confirm' => _('Disable selected hosts?'),
 			'redirect' => $status_toggle_url
 				->setArgument('status', HOST_STATUS_NOT_MONITORED)
 				->getUrl()

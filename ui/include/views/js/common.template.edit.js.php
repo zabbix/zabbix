@@ -162,7 +162,9 @@
 
 					if (panel_templateids.xor(templateids).length > 0) {
 						panel.data('templateids', templateids);
-						window.macros_manager.load($show_inherited_macros.val(), linked_templateids.concat(templateids));
+						window.macros_manager.load($show_inherited_macros.val(),
+							linked_templateids.concat(templateids)
+						);
 						panel.data('macros_initialized', true);
 					}
 				}
@@ -175,7 +177,9 @@
 				<?php if ($data['readonly']): ?>
 					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 				<?php else: ?>
-					window.macros_manager.initMacroTable($('#tbl_macros'), $('input[name="show_inherited_macros"]:checked').val() == 1);
+					window.macros_manager.initMacroTable($('#tbl_macros'),
+						($('input[name="show_inherited_macros"]:checked').val() == 1)
+					);
 				<?php endif ?>
 
 				panel.data('macros_initialized', true);

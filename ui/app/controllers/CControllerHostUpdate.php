@@ -34,7 +34,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 
 		return $ret;

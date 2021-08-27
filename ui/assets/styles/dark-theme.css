@@ -6255,9 +6255,6 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     border-top-color: #f2f2f2;
     border-right-color: #f2f2f2; }
 
-.btn-toggle-chevron-captioned {
-  padding-inline-end: 1.5rem; }
-
 .btn-dropdown-toggle {
   white-space: nowrap;
   overflow: hidden; }

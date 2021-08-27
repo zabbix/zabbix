@@ -1649,7 +1649,6 @@ define('ZBX_STYLE_BTN_ADD', 'btn-add');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
 define('ZBX_STYLE_BTN_TOGGLE_CHEVRON', 'btn-toggle-chevron');
-define('ZBX_STYLE_BTN_TOGGLE_CHEVRON_CAPTIONED', 'btn-toggle-chevron-captioned');
 define('ZBX_STYLE_BTN_SPLIT', 'btn-split');
 define('ZBX_STYLE_BTN_TOGGLE', 'btn-dropdown-toggle');
 define('ZBX_STYLE_BTN_BACK_MAP', 'btn-back-map');
