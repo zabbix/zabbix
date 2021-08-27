@@ -118,7 +118,7 @@ class CAudit {
 		'usergroup.userids' => 'id'
 	];
 
-	private const ATTACHED_OBJECTS_RESOURCES = [
+	private const ATTACH_OBJECTS = [
 		self::RESOURCE_USER_GROUP => [
 			'field' => 'userids',
 			'resource' => self::RESOURCE_USER,
@@ -140,9 +140,9 @@ class CAudit {
 		$clock = time();
 		$recordsetid = self::getRecordSetId();
 
-		$is_attach = array_key_exists($resource, self::ATTACHED_OBJECTS_RESOURCES);
+		$is_attach = array_key_exists($resource, self::ATTACH_OBJECTS);
 		if ($is_attach) {
-			$attach = self::ATTACHED_OBJECTS_RESOURCES[$resource];
+			$attach = self::ATTACH_OBJECTS[$resource];
 		}
 
 		foreach ($objects as $object) {
@@ -150,15 +150,14 @@ class CAudit {
 			$db_object = ($action == self::ACTION_UPDATE) ? $db_objects[$resourceid] : [];
 			$resource_name = self::getResourceName($resource, $action, $object, $db_object);
 
-			if ($is_attach && (array_key_exists($attach['field'], $object)
-						|| array_key_exists($attach['field'], $db_object) || $action === self::ACTION_DELETE)) {
-				$attach_objects = self::makeAttachObjects($action, $resourceid, $attach, $object,
-					$db_object
-				);
+			if ($is_attach) {
+				$attach_objects = self::makeAttachObjects($action, $resourceid, $attach, $object, $db_object);
 
-				self::log($userid, $ip, $username, self::ACTION_UPDATE, $attach['resource'], $attach_objects[0],
-					$attach_objects[1], false
-				);
+				if (count($attach_objects[0]) && count($attach_objects[1])) {
+					self::log($userid, $ip, $username, self::ACTION_UPDATE, $attach['resource'], $attach_objects[0],
+						$attach_objects[1], false
+					);
+				}
 			}
 
 			$diff = self::handleObjectDiff($resource, $action, $object, $db_object);
@@ -186,15 +185,15 @@ class CAudit {
 
 	private static function makeAttachObjects(int $action, string $resourceid, array $attach, array $object,
 			array $db_object = null): array {
-		if ($action === self::ACTION_DELETE) {
-			return self::makeDeleteAttachObjects($attach, $resourceid);
-		}
-
 		$attach_object = [];
 		$attach_db_object = [];
 
-		$object = $object[$attach['field']];
+		$object = array_key_exists($attach['field'], $object) ? $object[$attach['field']] : [];
 		$db_object = array_key_exists($attach['field'], $db_object) ? $db_object[$attach['field']] : [];
+
+		if (!$object && !$db_object && $action != self::ACTION_DELETE) {
+			return [$attach_object, $attach_db_object];
+		}
 
 		$table_name = self::TABLE_NAMES[$attach['resource']];
 		$table_key = DB::getSchema($table_name)['key'];
@@ -205,108 +204,69 @@ class CAudit {
 		$nested_table_key = DB::getSchema($nested_table_name)['key'];
 		$nested_table_field = self::NESTED_TABLE_FIELD_NAMES[$nested_table_name];
 
+		$table_ids = array_merge(array_column($object, $table_key), array_column($db_object, $table_key));
+
+		if ($action === self::ACTION_DELETE) {
+			$db_object = DB::select($nested_table_name, [
+				'output' => [$nested_table_key, $table_key],
+				'filter' => [$nested_table_field => $resourceid],
+				'preservekeys' => true
+			]);
+
+			if (!$db_object) {
+				return [$attach_object, $attach_db_object];
+			}
+
+			$table_ids = array_column($db_object, $table_key);
+		}
+
 		$db_result = DB::select($table_name, [
 			'output' => [$table_key, $table_field],
-			'filter' => [$table_key => array_merge(
-					array_column($object, $table_key), array_column($db_object, $table_key)
-				)
-			],
+			'filter' => [$table_key => $table_ids],
 			'preservekeys' => true
 		]);
 
 		// Prepare add actions.
 		foreach ($object as $value) {
-			$key_value = $value[$table_key];
+			$table_key_value = $value[$table_key];
 			unset($value[$table_key]);
 
-			$db_row = $db_result[$key_value];
-			unset($db_result[$key_value]);
+			$db_row = $db_result[$table_key_value];
+			unset($db_result[$table_key_value]);
 
 			if (array_key_exists($value[$nested_table_key], $db_object)) {
 				continue;
 			}
 
 			$attach_object[] = [
-				$table_key => $key_value,
+				$table_key => $table_key_value,
 				$attach['resource_field'] => [$value + [$nested_table_field => $resourceid]]
 			];
 
-			$attach_db_object[$key_value] = [
-				$table_key => $key_value,
+			$attach_db_object[$table_key_value] = [
+				$table_key => $table_key_value,
 				$table_field => $db_row[$table_field]
 			];
 		}
 
 		// Prepare delete actions.
-		foreach ($db_object as $value) {
-			if (!array_key_exists($value[$table_key], $db_result)) {
+		foreach ($db_object as $db_value) {
+			if (!array_key_exists($db_value[$table_key], $db_result)) {
 				continue;
 			}
 
-			$key_value = $value[$table_key];
-			unset($value[$table_key]);
+			$table_key_value = $db_value[$table_key];
 
 			$attach_object[] = [
-				$table_key => $key_value
+				$table_key => $table_key_value
 			];
 
-			$attach_db_object[$key_value] = [
-				$table_key => $key_value,
-				$table_field => $db_result[$key_value][$table_field],
+			$attach_db_object[$table_key_value] = [
+				$table_key => $table_key_value,
+				$table_field => $db_result[$table_key_value][$table_field],
 				$attach['resource_field'] => [
-					$value[$nested_table_key] => [
-						$nested_table_key => $value[$nested_table_key],
-						$nested_table_field => $resourceid
-					]
-				]
-			];
-		}
-
-		return [$attach_object, $attach_db_object];
-	}
-
-	private static function makeDeleteAttachObjects(array $attach, string $resourceid): array {
-		$attach_object = [];
-		$attach_db_object = [];
-
-		$table_name = self::TABLE_NAMES[$attach['resource']];
-		$table_key = DB::getSchema($table_name)['key'];
-		$table_field = self::FIELD_NAMES[$attach['resource']];
-
-		$nested_path = self::API_NAMES[$attach['resource']].'.'.$attach['resource_field'];
-		$nested_table_name = self::NESTED_OBJECTS_TABLE_NAMES[$nested_path];
-		$nested_table_key = DB::getSchema($nested_table_name)['key'];
-		$nested_table_field = self::NESTED_TABLE_FIELD_NAMES[$nested_table_name];
-
-		$db_nested_result = DB::select($nested_table_name, [
-			'output' => [$nested_table_key, $table_key],
-			'filter' => [$nested_table_field => $resourceid],
-			'preservekeys' => true
-		]);
-
-		if (!$db_nested_result) {
-			return [$attach_object, $attach_db_object];
-		}
-
-		$db_result = DB::select($table_name, [
-			'output' => [$table_key, $table_field],
-			'filter' => [$table_key => array_column($db_nested_result, $table_key)],
-			'preservekeys' => true
-		]);
-
-		foreach ($db_nested_result as $db_nested_row) {
-			$key_value = $db_nested_row[$table_key];
-
-			$attach_object[] = [
-				$table_key => $key_value
-			];
-
-			$attach_db_object[$key_value] = [
-				$table_key => $key_value,
-				$table_field => $db_result[$key_value][$table_field],
-				$attach['resource_field'] => [
-					$db_nested_row[$nested_table_key] => [
-						$nested_table_key => $db_nested_row[$nested_table_key],
+					$db_value[$nested_table_key] => [
+						$nested_table_key => $db_value[$nested_table_key],
 						$nested_table_field => $resourceid
 					]
 				]
