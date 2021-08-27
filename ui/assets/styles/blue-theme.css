@@ -6476,3 +6476,15 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     content: '\2013';
     float: left;
     margin-left: -1em; }
+
+.audit-details-popup-wrapper {
+  margin: 5px 10px; }
+  .audit-details-popup-wrapper .audit-details-popup-textarea {
+    width: 100%;
+    height: 135px; }
+
+.audit-details-wrapper {
+  display: flex;
+  justify-content: space-between; }
+  .audit-details-wrapper .audit-show-details-btn-wrapper {
+    margin: 0 5px 0 5px; }

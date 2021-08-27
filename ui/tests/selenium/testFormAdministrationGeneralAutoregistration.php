@@ -87,10 +87,15 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'Action' => 'Update',
 						'ID' => 1,
 						'Details' => [
+							'Details',
 							'autoregistration.tls_accept: 1 => 2',
-							'autoregistration.tls_psk: ****** => ******',
-							'autoregistration.tls_psk_identity: ****** => ******'
+							'autoregistration.tls_psk: ****** => ******'
 						]
+					],
+					'detail_button' => [
+						'autoregistration.tls_accept: 1 => 2',
+						'autoregistration.tls_psk: ****** => ******',
+						'autoregistration.tls_psk_identity: ****** => ******'
 					]
 				]
 			],
@@ -121,10 +126,15 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'Action' => 'Update',
 						'ID' => 1,
 						'Details' => [
+							'Details',
 							'autoregistration.tls_accept: 3 => 1',
-							'autoregistration.tls_psk: ****** => ******',
-							'autoregistration.tls_psk_identity: ****** => ******'
+							'autoregistration.tls_psk: ****** => ******'
 						]
+					],
+					'detail_button' => [
+						'autoregistration.tls_accept: 3 => 1',
+						'autoregistration.tls_psk: ****** => ******',
+						'autoregistration.tls_psk_identity: ****** => ******'
 					]
 				]
 			]
@@ -163,6 +173,13 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 				sort($value);
 			}
 			$this->assertEquals($value, $text);
+		}
+		if (array_key_exists('detail_button', $data)) {
+			$row->getColumn('Details')->query('link:Details')->one()->click();
+			$details = COverlayDialogElement::find()->waitUntilVisible()->one();
+			$details_text = explode("\n", $details->query('xpath://textarea')->one()->getText());
+			sort($details_text);
+			$this->assertEquals($details_text, $data['detail_button']);
 		}
 	}
 
