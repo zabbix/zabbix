@@ -495,13 +495,8 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 				handle_hostaction_response(e.detail, e.target)
 			);
 
-			$('#tabs').on('tabsactivate change', () => {
-				const overlay = overlays_stack.end();
-
-				if (overlay.hasOwnProperty('centerDialog')) {
-					overlays_stack.end().centerDialog();
-				}
-			});
+			$('#tabs').on('tabsactivate change', () => overlays_stack.end().centerDialog());
+			overlays_stack.end().centerDialog();
 
 			var clone_button = document.getElementById('host-clone'),
 				full_clone_button = document.getElementById('host-full_clone');
