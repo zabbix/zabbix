@@ -3202,8 +3202,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 			if (0 != strcmp(ppdst->name, buffer))
 			{
 				ppdst->name_orig = ppdst->name;
-
 				zbx_free(ppdst->name);
+
 				ppdst->name = buffer;
 				buffer = NULL;
 				ppdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME;
@@ -3214,8 +3214,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 			if (0 != strcmp(ppdst->value, buffer))
 			{
 				ppdst->value_orig = ppdst->value;
-
 				zbx_free(ppdst->value);
+
 				ppdst->value = buffer;
 				buffer = NULL;
 				ppdst->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_VALUE;
@@ -3368,8 +3368,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 			if (0 != strcmp(plmpdst->lld_macro, buffer))
 			{
 				plmpdst->lld_macro_orig = zbx_strdup(NULL, plmpdst->lld_macro);
-
 				zbx_free(plmpdst->lld_macro);
+
 				plmpdst->lld_macro = buffer;
 				buffer = NULL;
 				plmpdst->upd_flags |= ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_LLD_MACRO;
@@ -3380,8 +3380,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 			if (0 != strcmp(plmpdst->path, buffer))
 			{
 				plmpdst->path_orig = zbx_strdup(NULL, plmpdst->path);
-
 				zbx_free(plmpdst->path);
+
 				plmpdst->path = buffer;
 				buffer = NULL;
 				plmpdst->upd_flags |= ZBX_FLAG_TEMPLATE_LLD_MACRO_UPDATE_PATH;
