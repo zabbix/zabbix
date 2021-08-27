@@ -1131,114 +1131,113 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			return FAIL;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
+		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
+			return FAIL;
+
+		if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
 		{
-			if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			{
+				send_proxyconfig(sock, &jp);
+			}
+			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server"
+						" at \"%s\", datalen " ZBX_FS_SIZE_T,
+						sock->peer, (zbx_fs_size_t)(jp.end - jp.start + 1));
+				recv_proxyconfig(sock, &jp);
+			}
+			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
+			{
+				/* This is a misconfiguration: the proxy is configured in active mode */
+				/* but server sends requests to it as to a proxy in passive mode. To  */
+				/* prevent logging of this problem for every request we report it     */
+				/* only when the server sends configuration to the proxy and ignore   */
+				/* it for other requests.                                             */
+				active_passive_misconfig(sock);
+			}
+		}
+		else
+		{
+			if (0 != (ZBX_TCP_LARGE & sock->protocol))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "large message is not supported for request received from"
+						" \"%s\": [%s]", sock->peer, value);
+				return FAIL;
+			}
+
+			if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
+			{
+				recv_agenthistory(sock, &jp, ts);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
+			{
+				recv_senderhistory(sock, &jp, ts);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+					zbx_send_task_data(sock, ts);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-				{
-					send_proxyconfig(sock, &jp);
-				}
+					zbx_recv_proxy_data(sock, &jp, ts);
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server"
-							" at \"%s\", datalen " ZBX_FS_SIZE_T,
-							sock->peer, (zbx_fs_size_t)(jp.end - jp.start + 1));
-					recv_proxyconfig(sock, &jp);
-				}
-				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
-				{
-					/* This is a misconfiguration: the proxy is configured in active mode */
-					/* but server sends requests to it as to a proxy in passive mode. To  */
-					/* prevent logging of this problem for every request we report it     */
-					/* only when the server sends configuration to the proxy and ignore   */
-					/* it for other requests.                                             */
-					active_passive_misconfig(sock);
-				}
+					zbx_send_proxy_data(sock, ts);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					recv_proxy_heartbeat(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
+			{
+				ret = send_list_of_active_checks_json(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = node_process_command(sock, s, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = recv_getqueue(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_STATUS))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = recv_getstatus(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
+			{
+				ret = send_internal_stats_json(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					recv_alert_send(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = zbx_trapper_preproc_test(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = zbx_trapper_expressions_evaluate(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					zbx_trapper_item_test(sock, &jp);
 			}
 			else
 			{
-				if (0 != (ZBX_TCP_LARGE & sock->protocol))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "cannot process [%s] request received from \"%s\""
-							": large message is only supported for [%s] request",
-							value, sock->peer, ZBX_PROTO_VALUE_PROXY_CONFIG);
-					return FAIL;
-				}
-
-				if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
-				{
-					recv_agenthistory(sock, &jp, ts);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
-				{
-					recv_senderhistory(sock, &jp, ts);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-						zbx_send_task_data(sock, ts);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-						zbx_recv_proxy_data(sock, &jp, ts);
-					else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-						zbx_send_proxy_data(sock, ts);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-						recv_proxy_heartbeat(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
-				{
-					ret = send_list_of_active_checks_json(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-						ret = node_process_command(sock, s, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-						ret = recv_getqueue(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_STATUS))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-						ret = recv_getstatus(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
-				{
-					ret = send_internal_stats_json(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-						recv_alert_send(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-						ret = zbx_trapper_preproc_test(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-						ret = zbx_trapper_expressions_evaluate(sock, &jp);
-				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
-				{
-					if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-						zbx_trapper_item_test(sock, &jp);
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]",
-							sock->peer, value);
-				}
+				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
+						value);
 			}
 		}
 	}
@@ -1259,7 +1258,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 
 		if (0 != (ZBX_TCP_LARGE & sock->protocol))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "request with invalid protocol received from \"%s\"", sock->peer);
+			zabbix_log(LOG_LEVEL_WARNING, "large message is not supported for XML protocol received from"
+					" \"%s\"", sock->peer);
 			return FAIL;
 		}
 
