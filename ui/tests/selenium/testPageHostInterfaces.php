@@ -411,11 +411,7 @@ class testPageHostInterfaces extends CWebTest {
 	 * @dataProvider getCheckInterfacesData
 	 */
 	public function testPageHostInterfaces_MonitoringHosts($data) {
-		$this->checkInterfaces($data, (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.view')
-			->getUrl(),
-			'host_view'
-		);
+		$this->checkInterfaces($data, 'zabbix.php?action=host.view', 'host_view');
 	}
 
 	/**
@@ -425,20 +421,6 @@ class testPageHostInterfaces extends CWebTest {
 	 */
 	public function testPageHostInterfaces_ConfigurationHosts($data) {
 		$this->checkInterfaces($data, self::HOST_LIST_PAGE, 'hosts');
-	}
-
-	/**
-	 * Test displaying host interfaces on Host form page.
-	 *
-	 * @dataProvider getCheckInterfacesData
-	 */
-	public function testPageHostInterfaces_HostForm($data) {
-		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host ='.zbx_dbstr($data['host']));
-		$link = (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', $id)
-			->getUrl();
-		$this->checkInterfaces($data, $link, $selector = null, true);
 	}
 
 	/**
