@@ -3883,107 +3883,414 @@ class testServices extends CAPITest {
 					'result' => []
 				]
 			],
-//			[
-//				'request' => [
-//					'output' => [],
-//					'tags' => [
-//						['tag' => '', 'operator' => null]
-//					]
-//				],
-//				'expected' => [
-//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
-//					'result' => []
-//				]
-//			],
-//			[
-//				'request' => [
-//					'output' => [],
-//					'tags' => [
-//						['tag' => '', 'operator' => true]
-//					]
-//				],
-//				'expected' => [
-//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
-//					'result' => []
-//				]
-//			],
-//			[
-//				'request' => [
-//					'output' => [],
-//					'tags' => [
-//						['tag' => '', 'operator' => []]
-//					]
-//				],
-//				'expected' => [
-//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
-//					'result' => []
-//				]
-//			],
-//			[
-//				'request' => [
-//					'output' => [],
-//					'tags' => [
-//						['tag' => '', 'operator' => '']
-//					]
-//				],
-//				'expected' => [
-//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
-//					'result' => []
-//				]
-//			],
-//			[
-//				'request' => [
-//					'output' => [],
-//					'tags' => [
-//						['tag' => '', 'operator' => '1.0']
-//					]
-//				],
-//				'expected' => [
-//					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
-//					'result' => []
-//				]
-//			],
-//			[
-//				'request' => [
-//					'output' => [],
-//					'tags' => [
-//						['tag' => '', 'operator' => -1]
-//					]
-//				],
-//				'expected' => [
-//					'error' => 'Invalid parameter "/tags/1/operator": value must be one of '.
-//						implode(', ', [
-//							TAG_OPERATOR_LIKE,
-//							TAG_OPERATOR_EQUAL,
-//							TAG_OPERATOR_NOT_LIKE,
-//							TAG_OPERATOR_NOT_EQUAL,
-//							TAG_OPERATOR_EXISTS,
-//							TAG_OPERATOR_NOT_EXISTS
-//						]).'.',
-//					'result' => []
-//				]
-//			],
-//			[
-//				'request' => [
-//					'output' => [],
-//					'tags' => [
-//						['tag' => '', 'operator' => 999]
-//					]
-//				],
-//				'expected' => [
-//					'error' => 'Invalid parameter "/tags/1/operator": value must be one of '.
-//						implode(', ', [
-//							TAG_OPERATOR_LIKE,
-//							TAG_OPERATOR_EQUAL,
-//							TAG_OPERATOR_NOT_LIKE,
-//							TAG_OPERATOR_NOT_EQUAL,
-//							TAG_OPERATOR_EXISTS,
-//							TAG_OPERATOR_NOT_EXISTS
-//						]).'.',
-//					'result' => []
-//				]
-//			],
-			// problem tags
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'operator' => null]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'operator' => true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'operator' => []]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'operator' => '']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'operator' => '1.0']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'operator' => -1]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/operator": value must be one of '.
+						implode(', ', [
+							TAG_OPERATOR_LIKE,
+							TAG_OPERATOR_EQUAL,
+							TAG_OPERATOR_NOT_LIKE,
+							TAG_OPERATOR_NOT_EQUAL,
+							TAG_OPERATOR_EXISTS,
+							TAG_OPERATOR_NOT_EXISTS
+						]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tags' => [
+						['tag' => '', 'operator' => 999]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tags/1/operator": value must be one of '.
+						implode(', ', [
+							TAG_OPERATOR_LIKE,
+							TAG_OPERATOR_EQUAL,
+							TAG_OPERATOR_NOT_LIKE,
+							TAG_OPERATOR_NOT_EQUAL,
+							TAG_OPERATOR_EXISTS,
+							TAG_OPERATOR_NOT_EXISTS
+						]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => null
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => true
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => ''
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => 0
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [null]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [true]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [0]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => ['']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => ['tag' => 'foo']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [[]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1": the parameter "tag" is missing.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1": unexpected parameter "0".',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => null]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/tag": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/tag": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => []]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/tag": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => 0]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/tag": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'value' => null]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/value": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'value' => true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/value": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'value' => []]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/value": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'value' => 0]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/value": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'operator' => null]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'operator' => true]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'operator' => []]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'operator' => '']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'operator' => '1.0']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/operator": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'operator' => -1]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/operator": value must be one of '.
+						implode(', ', [
+							TAG_OPERATOR_LIKE,
+							TAG_OPERATOR_EQUAL,
+							TAG_OPERATOR_NOT_LIKE,
+							TAG_OPERATOR_NOT_EQUAL,
+							TAG_OPERATOR_EXISTS,
+							TAG_OPERATOR_NOT_EXISTS
+						]).'.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'problem_tags' => [
+						['tag' => '', 'operator' => 999]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/problem_tags/1/operator": value must be one of '.
+						implode(', ', [
+							TAG_OPERATOR_LIKE,
+							TAG_OPERATOR_EQUAL,
+							TAG_OPERATOR_NOT_LIKE,
+							TAG_OPERATOR_NOT_EQUAL,
+							TAG_OPERATOR_EXISTS,
+							TAG_OPERATOR_NOT_EXISTS
+						]).'.',
+					'result' => []
+				]
+			],
 
 			// Input validation, filter object.
 			[
