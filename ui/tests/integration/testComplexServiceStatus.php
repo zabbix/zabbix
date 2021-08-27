@@ -170,15 +170,25 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 	/**
 	 * Inherit the status from the most critical of child nodes
+	 *
+	 * @backup services
+	 *
 	 */
 	public function testComplexServiceStatus_case1() {
+		$response = $this->call('service.update', [
+			'serviceid' => self::$parent_serviceid,
+			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
+		]);
+		$this->assertArrayHasKey('serviceids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['serviceids']);
+
 		$this->reloadConfigurationCache();
 
 		$response = $this->call('service.get', [
 			'serviceids' => self::$parent_serviceid
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertEquals($response['result'][0]['status'], TRIGGER_SEVERITY_HIGH);
+		$this->assertEquals(TRIGGER_SEVERITY_HIGH, $response['result'][0]['status']);
 
 		return true;
 	}
@@ -192,9 +202,10 @@ class testComplexServiceStatus extends CIntegrationTest {
 	public function testComplexServiceStatus_case2() {
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
+			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
 			'status_rules' => [
 				[
-					'type' => 2,
+					'type' => 0,
 					'limit_value' => 2,
 					'limit_status' => TRIGGER_SEVERITY_WARNING,
 					'new_status' => TRIGGER_SEVERITY_DISASTER
@@ -210,7 +221,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 			'serviceids' => self::$parent_serviceid
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertEquals($response['result'][0]['status'], TRIGGER_SEVERITY_DISASTER);
+		$this->assertEquals(TRIGGER_SEVERITY_DISASTER, $response['result'][0]['status']);
 
 		return true;
 	}
