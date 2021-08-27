@@ -489,7 +489,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'copy to' => 'another dashboard',
+					'copy to' => 'another dashboard'
 				]
 			],
 			[
