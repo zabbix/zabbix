@@ -1191,8 +1191,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		if (isset($data['formCheck'])) {
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->filterEntriesAndOpenDiscovery($this->host);
-//			$this->zbxTestClickLinkTextWait($this->host);
-//			$this->zbxTestClickLinkTextWait('Discovery rules');
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Graph prototypes');
 
