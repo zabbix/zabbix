@@ -888,4 +888,6 @@ char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid
  *                                                                            *
  ******************************************************************************/
 char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
+
+int	DCconfig_trigger_exists(const zbx_uint64_t *triggerid);
 #endif
