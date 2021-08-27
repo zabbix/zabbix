@@ -53,12 +53,12 @@ class CService extends CApiService {
 			'tags' =>					['type' => API_OBJECTS, 'default' => [], 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'value' =>					['type' => API_STRING_UTF8],
-				'operator' =>				['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])]
 			]],
 			'problem_tags' =>			['type' => API_OBJECTS, 'default' => [], 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'value' =>					['type' => API_STRING_UTF8],
-				'operator' =>				['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])]
 			]],
 			'without_problem_tags' =>	['type' => API_FLAG, 'default' => false],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
