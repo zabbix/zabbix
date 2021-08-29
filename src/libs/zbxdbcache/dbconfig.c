@@ -7451,12 +7451,18 @@ void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, 
 	UNLOCK_CACHE;
 }
 
-int	DCconfig_trigger_exists(const zbx_uint64_t *triggerid)
+int	DCconfig_trigger_exists(zbx_uint64_t triggerid)
 {
-	if (NULL == zbx_hashset_search(&config->triggers, &triggerid))
-		return FAIL;
+	int	ret = SUCCEED;
 
-	return SUCCEED;
+	RDLOCK_CACHE;
+
+	if (NULL == zbx_hashset_search(&config->triggers, &triggerid))
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
