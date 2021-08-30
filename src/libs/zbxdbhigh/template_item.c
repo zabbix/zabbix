@@ -605,15 +605,12 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 						if (0 != strcmp(row[3], condition->macro))
 						{
 							flags |= ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_MACRO;
-							condition->macro_orig = zbx_strdup(NULL, condition->macro);
-
-							condition->macro = zbx_strdup(condition->macro, row[3]);
+							condition->macro_orig = zbx_strdup(NULL, row[3]);
 						}
 						if (0 != strcmp(row[4], condition->value))
 						{
 							flags |= ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_VALUE;
-							condition->value_orig = zbx_strdup(NULL, condition->value);
-							condition->value = zbx_strdup(condition->value, row[4]);
+							condition->value_orig = zbx_strdup(NULL, row[4]);
 						}
 						condition->upd_flags = flags;
 					}
@@ -2554,6 +2551,24 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	/* remove overrides from existing items with same key */
 	if (0 != lld_itemids->values_num)
 	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select lld_overrideid,itemid from lld_override where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
+				lld_itemids->values_num);
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_uint64_t	delete_lld_overrideid, delete_itemid;
+
+			ZBX_STR2UINT64(delete_lld_overrideid, row[0]);
+			ZBX_STR2UINT64(delete_itemid, row[1]);
+			zbx_audit_discovery_rule_update_json_delete_lld_override(delete_itemid,
+					delete_lld_overrideid);
+		}
+
+		sql_offset = 0;
+		DBfree_result(result);
+
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from lld_override where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
 				lld_itemids->values_num);

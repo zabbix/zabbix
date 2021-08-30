@@ -722,6 +722,17 @@ void	zbx_audit_discovery_rule_update_json_add_lld_override(zbx_uint64_t itemid, 
 	zbx_audit_update_json_append_int(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_stop, stop);
 }
 
+void	zbx_audit_discovery_rule_update_json_delete_lld_override(zbx_uint64_t itemid, zbx_uint64_t overrideid)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, sizeof(buf), "discoveryrule.overrides[" ZBX_FS_UI64 "]", overrideid);
+
+	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_DELETE, buf);
+}
+
 void	zbx_audit_discovery_rule_update_json_add_lld_override_filter(zbx_uint64_t itemid, zbx_uint64_t overrideid,
 		int evaltype, const char *formula)
 {

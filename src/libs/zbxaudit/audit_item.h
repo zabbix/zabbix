@@ -163,6 +163,7 @@ void	zbx_audit_discovery_rule_update_json_delete_lld_macro_path(zbx_uint64_t ite
 
 void	zbx_audit_discovery_rule_update_json_add_lld_override(zbx_uint64_t itemid, zbx_uint64_t overrideid,
 		const char *name, int step, int stop);
+void	zbx_audit_discovery_rule_update_json_delete_lld_override(zbx_uint64_t itemid, zbx_uint64_t overrideid);
 void	zbx_audit_discovery_rule_update_json_add_lld_override_filter(zbx_uint64_t itemid, zbx_uint64_t overrideid,
 		int evaltype, const char *formula);
 
