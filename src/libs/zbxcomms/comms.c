@@ -830,6 +830,14 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 								/* will be short-lived in CPU cache. Static buffer is */
 								/* not used on purpose.				      */
 
+		if (ZBX_MAX_RECV_LARGE_DATA_SIZE < len)
+		{
+			zbx_set_socket_strerror("cannot send data: message size " ZBX_FS_UI64 " exceeds the maximum"
+					" size " ZBX_FS_UI64 " bytes.", len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
+			ret = FAIL;
+			goto cleanup;
+		}
+
 		if (0 != (flags & ZBX_TCP_COMPRESS))
 		{
 			if (SUCCEED != zbx_compress(data, len, &compressed_data, &send_len))
