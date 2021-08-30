@@ -71,7 +71,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 				'params' => '1',
 				'hostid' => self::$hostid,
 				'delay' => '1s',
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -85,7 +85,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 			'goodsla' => 99.99,
 			'showsla' => 0,
 			'weight' => 0,
-			'sortorder' => 0,
+			'sortorder' => 0
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['serviceids']);
@@ -100,7 +100,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 			'high3' => TRIGGER_SEVERITY_HIGH,
 			'warning1' => TRIGGER_SEVERITY_WARNING,
 			'ok1' => TRIGGER_SEVERITY_WARNING,
-			'ok2' => TRIGGER_SEVERITY_WARNING,
+			'ok2' => TRIGGER_SEVERITY_WARNING
 		];
 
 		foreach ($triggers_services as $desc => $severity) {
@@ -167,7 +167,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 	public function testComplexServiceStatus_case1() {
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
-			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
+			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['serviceids']);
@@ -244,7 +244,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 	public function testComplexServiceStatus_case4() {
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
-			'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+			'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['serviceids']);
@@ -269,7 +269,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 	public function testComplexServiceStatus_case5() {
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
-			'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
+			'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['serviceids']);
@@ -323,7 +323,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
-			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
+			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
 		]);
 
 		$response = $this->call('service.update', [
