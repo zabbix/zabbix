@@ -175,18 +175,17 @@ async function handle_hostaction_response(response, host_form = null) {
 		jQuery('head').append(response.script_inline);
 	}
 
-	if (typeof overlay !== 'undefined') {
-		overlay.unsetLoading();
-		overlay.$dialogue.find('.msg-bad, .msg-good').remove();
-	}
+	overlay && overlay.unsetLoading();
 
-	var parent = (host_form !== null) ? host_form : document.querySelector('main');
-
-	if ('error' in response) {
-		alert(response.error);
-	}
-	else if ('errors' in response) {
-		jQuery(response.errors).insertBefore(parent);
+	if ('errors' in response) {
+		if (typeof overlay !== 'undefined') {
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
+			jQuery(response.errors).insertBefore(host_form);
+		}
+		else {
+			clearMessages();
+			addMessage(response.errors);
+		}
 	}
 	else {
 		if (typeof overlay !== 'undefined') {
