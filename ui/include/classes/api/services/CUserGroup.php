@@ -638,11 +638,11 @@ class CUserGroup extends CApiService {
 
 					$right['rightid'] = $db_right['rightid'];
 
-					$upd_token = DB::getUpdatedValues('rights', $right, $db_right);
+					$upd_right = DB::getUpdatedValues('rights', $right, $db_right);
 
-					if ($upd_token) {
+					if ($upd_right) {
 						$upd_rights[] = [
-							'values' => $upd_token,
+							'values' => $upd_right,
 							'where' => ['rightid' => $db_right['rightid']]
 						];
 					}
@@ -662,7 +662,7 @@ class CUserGroup extends CApiService {
 		unset($usrgrp);
 
 		if ($ins_rights) {
-			$ids = DB::insertBatch('rights', $ins_rights);
+			$rightids = DB::insertBatch('rights', $ins_rights);
 		}
 
 		if ($upd_rights) {
@@ -680,7 +680,7 @@ class CUserGroup extends CApiService {
 
 			foreach ($usrgrp['rights'] as &$right) {
 				if (!array_key_exists('rightid', $right)) {
-					$right['rightid'] = array_shift($ids);
+					$right['rightid'] = array_shift($rightids);
 				}
 			}
 			unset($right);
