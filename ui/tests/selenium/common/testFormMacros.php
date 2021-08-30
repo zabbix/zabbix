@@ -1195,13 +1195,13 @@ abstract class testFormMacros extends CWebTest {
 
 			if ($data['type'] === CInputGroupElement::TYPE_TEXT) {
 				$this->assertTrue($value_field->query('xpath:./textarea')->one()->isAttributePresent('readonly'));
-				$this->assertEquals(255, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
+				$this->assertEquals(2048, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isValid());
 				$this->assertFalse($revert_button->isValid());
 			}
 			else {
 				$this->assertFalse($value_field->query('xpath:.//input')->one()->isEnabled());
-				$this->assertEquals(255, $value_field->query('xpath:.//input')->one()->getAttribute('maxlength'));
+				$this->assertEquals(2048, $value_field->query('xpath:.//input')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isEnabled());
 				$this->assertFalse($revert_button->isClickable());
 			}
@@ -1215,7 +1215,7 @@ abstract class testFormMacros extends CWebTest {
 
 			if ($data['type'] === CInputGroupElement::TYPE_SECRET) {
 				$this->assertFalse($value_field->query($textarea_xpath)->exists());
-				$this->assertEquals(255, $value_field->query('xpath:.//input')->one()->getAttribute('maxlength'));
+				$this->assertEquals(2048, $value_field->query('xpath:.//input')->one()->getAttribute('maxlength'));
 
 				$this->assertTrue($change_button->isValid());
 				$this->assertFalse($revert_button->isClickable());
@@ -1233,7 +1233,7 @@ abstract class testFormMacros extends CWebTest {
 			}
 			else {
 				$this->assertTrue($value_field->query($textarea_xpath)->exists());
-				$this->assertEquals(255, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
+				$this->assertEquals(2048, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isValid());
 				$this->assertFalse($revert_button->isValid());
 
