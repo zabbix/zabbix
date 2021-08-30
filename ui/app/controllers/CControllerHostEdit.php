@@ -111,8 +111,6 @@ class CControllerHostEdit extends CController {
 
 	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
-			access_deny(ACCESS_DENY_PAGE);
-
 			return false;
 		}
 
@@ -148,8 +146,6 @@ class CControllerHostEdit extends CController {
 			}
 
 			if (!$this->host) {
-				access_deny(ACCESS_DENY_OBJECT);
-
 				return false;
 			}
 

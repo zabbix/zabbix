@@ -41,8 +41,6 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
-			access_deny(ACCESS_DENY_PAGE);
-
 			return false;
 		}
 
@@ -53,8 +51,6 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			]);
 
 			if (!$hosts) {
-				access_deny(ACCESS_DENY_OBJECT);
-
 				return false;
 			}
 		}
