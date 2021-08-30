@@ -607,13 +607,13 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 							flags |= ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_MACRO;
 							condition->macro_orig = zbx_strdup(NULL, condition->macro);
 
-							condition->macro = zbx_strdup(NULL, row[3]);
+							condition->macro = zbx_strdup(condition->macro, row[3]);
 						}
 						if (0 != strcmp(row[4], condition->value))
 						{
 							flags |= ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_VALUE;
 							condition->value_orig = zbx_strdup(NULL, condition->value);
-							condition->value = zbx_strdup(NULL, row[4]);
+							condition->value = zbx_strdup(condition->value, row[4]);
 						}
 						condition->upd_flags = flags;
 					}
@@ -1479,10 +1479,9 @@ static void	free_template_item(zbx_template_item_t *item)
  ******************************************************************************/
 static void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
 {
-	if (0 != (condition->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_MACRO))
-		zbx_free(condition->macro_orig);
-	if (0 != (condition->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_VALUE))
-		zbx_free(condition->value_orig);
+	/* cannot use update flags to check if orig values were set, because they get reset */
+	zbx_free(condition->macro_orig);
+	zbx_free(condition->value_orig);
 
 	zbx_free(condition->macro);
 	zbx_free(condition->value);
