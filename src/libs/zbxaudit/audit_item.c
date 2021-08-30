@@ -386,7 +386,7 @@ void	zbx_audit_discovery_rule_update_json_delete_filter_conditions(zbx_uint64_t 
 	else if (AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)						\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "discoveryrule.preprocessing["	\
-				ZBX_FS_UI64 "]"#resource, preprocid);						\
+				ZBX_FS_UI64 "]"#nested#resource, preprocid);					\
 	}													\
 	else													\
 		THIS_SHOULD_NEVER_HAPPEN;
