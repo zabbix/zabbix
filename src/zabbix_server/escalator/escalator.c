@@ -411,8 +411,7 @@ static int	check_parent_service_intersection(zbx_vector_uint64_t *parent_ids, zb
 	return PERM_DENY;
 }
 
-static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
-		zbx_vector_tags_t *tags)
+static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_vector_tags_t *tags)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -608,19 +607,20 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 		role = zbx_hashset_insert(roles, &role_local, sizeof(role_local));
 	}
 
-	// check if global read rights are not disabled (services.read:0). In this case individual role rules can be skipped.
+	/* Check if global read rights are not disabled (services.read:0). */
+	/* In this case individual role rules can be skipped.              */
 	if (1 == role->default_read)
 		return PERM_READ;
 
-	// read read/write rule rights
+	/* read read/write rule rights */
 	if (SUCCEED == zbx_vector_uint64_bsearch(&role->serviceids, service->serviceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		return PERM_READ;
 
-	// check if service tags do not match tag rules
+	/* check if service tags do not match tag rules */
 	if (PERM_DENY < (perm = check_service_tags_rule_match(&service->service_tags, &role->tags)))
 		return perm;
 
-	// get service parent ids from service manager
+	/* get service parent ids from service manager */
 	zbx_service_serialize_id(&data, &data_alloc, &data_offset, service->serviceid);
 
 	if (NULL == data)
@@ -632,7 +632,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	zbx_service_deserialize_parentids(response.data, &parent_ids);
 	zbx_ipc_message_clean(&response);
 
-	// check if the returned vector doesn't intersect rule serviceids vector
+	/* check if the returned vector doesn't intersect rule serviceids vector */
 	if (PERM_DENY < (perm = check_parent_service_intersection(&parent_ids, &role->serviceids)))
 		goto out;
 
