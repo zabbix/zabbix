@@ -105,7 +105,7 @@ class CAudit {
 		'user.usrgrps' => 'id'
 	];
 
-	private const SKIP_FIELDS = ['token.creator_userid'];
+	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
 
 	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,
 			?array $db_objects): void {
