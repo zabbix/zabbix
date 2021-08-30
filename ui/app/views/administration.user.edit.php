@@ -432,7 +432,7 @@ if ($data['action'] === 'user.edit') {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
 						? italic(_('All groups'))
-						: [$group_rights['name'], SPACE, italic('('._('including subgroups').')')];
+						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
 				}
 				else {
 					$group_name = $group_rights['name'];
@@ -479,7 +479,7 @@ if ($data['action'] === 'user.edit') {
 
 			foreach ($data['modules'] as $moduleid => $module) {
 				$elements[] = (new CSpan($module['id']))->addClass(
-					CRoleHelper::checkAccess(CRoleHelper::MODULES_MODULE.$moduleid, $data['roleid'])
+					CRoleHelper::checkAccess('modules.module.'.$moduleid, $data['roleid'])
 						? ZBX_STYLE_STATUS_GREEN
 						: ZBX_STYLE_STATUS_GREY
 				);
@@ -493,7 +493,7 @@ if ($data['action'] === 'user.edit') {
 			}
 		}
 
-		$api_access_enabled = CRoleHelper::checkAccess(CRoleHelper::API_ACCESS, $data['roleid']);
+		$api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
 		$permissions_form_list
 			->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
 			->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
@@ -506,7 +506,7 @@ if ($data['action'] === 'user.edit') {
 		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
 
 		if ($api_methods) {
-			$api_access_mode_allowed = CRoleHelper::checkAccess(CRoleHelper::API_MODE, $data['roleid']);
+			$api_access_mode_allowed = CRoleHelper::checkAccess('api.mode', $data['roleid']);
 			$elements = [];
 
 			foreach ($api_methods as $api_method) {

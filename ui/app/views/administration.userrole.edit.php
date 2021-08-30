@@ -33,7 +33,7 @@ $form = (new CForm())
 	->setName('user_role_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
-if ($data['roleid'] != 0) {
+if ($data['roleid'] !== null) {
 	$form->addVar('roleid', $data['roleid']);
 }
 
@@ -90,8 +90,8 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 			(new CCheckBox(str_replace('.', '_', $rule_key), 1))
 				->setId($rule_key)
 				->setChecked(
-					array_key_exists($rule_key, $data['rules'][CRoleHelper::SECTION_UI])
-					&& $data['rules'][CRoleHelper::SECTION_UI][$rule_key]
+					array_key_exists($rule_key, $data['rules']['ui'])
+					&& $data['rules']['ui'][$rule_key]
 				)
 				->setReadonly($data['readonly'])
 				->setLabel($rule_label)
@@ -123,7 +123,7 @@ $form_grid->addItem([
 	new CFormField(
 		(new CCheckBox('ui_default_access', 1))
 			->setId('ui.default_access')
-			->setChecked($data['rules'][CRoleHelper::UI_DEFAULT_ACCESS])
+			->setChecked($data['rules']['ui.default_access'])
 			->setReadonly($data['readonly'])
 			->setUncheckedValue(0)
 	)
@@ -138,13 +138,12 @@ $form_grid
 	->addItem([
 		new CLabel(_('Read-write access to services'), 'service-write-access'),
 		new CFormField(
-			(new CRadioButtonList('service_write_access', (int) $data['service_write_access']))
+			(new CRadioButtonList('service_write_access', (int) $data['rules']['service_write_access']))
 				->setId('service-write-access')
 				->addValue(_('None'), CRoleHelper::SERVICES_ACCESS_NONE)
 				->addValue(_('All'), CRoleHelper::SERVICES_ACCESS_ALL)
 				->addValue(_('Service list'), CRoleHelper::SERVICES_ACCESS_LIST)
 				->setModern(true)
-				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
 		)
 	])
 	->addItem(
@@ -152,7 +151,7 @@ $form_grid
 			(new CMultiSelect([
 				'name' => 'service_write_list[]',
 				'object_name' => 'services',
-				'data' => CArrayHelper::renameObjectsKeys($data['service_write_list'], ['serviceid' => 'id']),
+				'data' => CArrayHelper::renameObjectsKeys($data['rules']['service_write_list'], ['serviceid' => 'id']),
 				'custom_select' => true
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))
@@ -165,11 +164,11 @@ $form_grid
 			->addStyle('display: none;'),
 		(new CFormField(
 			new CHorList([
-				(new CTextBox('service_write_tag_tag'))
+				(new CTextBox('service_write_tag_tag', $data['rules']['service_write_tag']['tag']))
 					->setId('service-write-tag-tag')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_write_tag_value'))
+				(new CTextBox('service_write_tag_value', $data['rules']['service_write_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			])))
@@ -179,13 +178,12 @@ $form_grid
 	->addItem([
 		new CLabel(_('Read-only access to services'), 'service-read-access'),
 		new CFormField(
-			(new CRadioButtonList('service_read_access', (int) $data['service_read_access']))
+			(new CRadioButtonList('service_read_access', (int) $data['rules']['service_read_access']))
 				->setId('service-read-access')
 				->addValue(_('None'), CRoleHelper::SERVICES_ACCESS_NONE)
 				->addValue(_('All'), CRoleHelper::SERVICES_ACCESS_ALL)
 				->addValue(_('Service list'), CRoleHelper::SERVICES_ACCESS_LIST)
 				->setModern(true)
-				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
 		)
 	])
 	->addItem(
@@ -193,7 +191,7 @@ $form_grid
 			(new CMultiSelect([
 				'name' => 'service_read_list[]',
 				'object_name' => 'services',
-				'data' => CArrayHelper::renameObjectsKeys($data['service_read_list'], ['serviceid' => 'id']),
+				'data' => CArrayHelper::renameObjectsKeys($data['rules']['service_read_list'], ['serviceid' => 'id']),
 				'custom_select' => true
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))
@@ -206,11 +204,11 @@ $form_grid
 			->addStyle('display: none;'),
 		(new CFormField(
 			new CHorList([
-				(new CTextBox('service_read_tag_tag'))
+				(new CTextBox('service_read_tag_tag', $data['rules']['service_read_tag']['tag']))
 					->setId('service-read-tag-tag')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_read_tag_value'))
+				(new CTextBox('service_read_tag_value', $data['rules']['service_read_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			])))
@@ -227,7 +225,7 @@ $form_grid->addItem(
 $modules = [];
 foreach ($data['labels']['modules'] as $moduleid => $label) {
 	$modules[] = new CDiv(
-		(new CCheckBox(CRoleHelper::SECTION_MODULES.'['.$moduleid.']', 1))
+		(new CCheckBox('modules['.$moduleid.']', 1))
 			->setChecked(
 				array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true
 			)
@@ -262,7 +260,7 @@ $form_grid
 		new CFormField(
 			(new CCheckBox('modules_default_access', 1))
 				->setId('modules.default_access')
-				->setChecked($data['rules'][CRoleHelper::MODULES_DEFAULT_ACCESS])
+				->setChecked($data['rules']['modules.default_access'])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
 		)
@@ -277,7 +275,7 @@ $form_grid
 		new CFormField(
 			(new CCheckBox('api_access', 1))
 				->setId('api-access')
-				->setChecked($data['rules'][CRoleHelper::API_ACCESS])
+				->setChecked($data['rules']['api.access'])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
 		)
@@ -285,12 +283,12 @@ $form_grid
 	->addItem([
 		new CLabel(_('API methods'), 'api.mode'),
 		new CFormField(
-			(new CRadioButtonList('api_mode', (int) $data['rules'][CRoleHelper::API_MODE]))
+			(new CRadioButtonList('api_mode', (int) $data['rules']['api.mode']))
 				->setId('api.mode')
-				->addValue(_('Allow list'), CRoleHelper::API_MODE_ALLOW)
-				->addValue(_('Deny list'), CRoleHelper::API_MODE_DENY)
+				->addValue(_('Allow list'), ZBX_ROLE_RULE_API_MODE_ALLOW)
+				->addValue(_('Deny list'), ZBX_ROLE_RULE_API_MODE_DENY)
 				->setModern(true)
-				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
+				->setReadonly($data['readonly'] || !$data['rules']['api.access'])
 				->addClass('js-userrole-apimode')
 		)
 	])
@@ -299,8 +297,8 @@ $form_grid
 			(new CMultiSelect([
 				'name' => 'api_methods[]',
 				'object_name' => 'api_methods',
-				'data' => $data['rules'][CRoleHelper::SECTION_API],
-				'disabled' => $data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS],
+				'data' => $data['rules']['api'],
+				'disabled' => $data['readonly'] || !$data['rules']['api.access'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'api_methods',
@@ -327,10 +325,7 @@ foreach ($data['labels']['actions'] as $action => $label) {
 	$actions[] = new CDiv(
 		(new CCheckBox(str_replace('.', '_', $action), 1))
 			->setId($action)
-			->setChecked(
-				array_key_exists($action, $data['rules'][CRoleHelper::SECTION_ACTIONS])
-				&& $data['rules'][CRoleHelper::SECTION_ACTIONS][$action]
-			)
+			->setChecked(array_key_exists($action, $data['rules']['actions']) && $data['rules']['actions'][$action])
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 			->setUncheckedValue(0)
@@ -346,7 +341,7 @@ $form_grid->addItem([
 	new CFormField(
 		(new CCheckBox('actions_default_access', 1))
 			->setId('actions.default_access')
-			->setChecked($data['rules'][CRoleHelper::ACTIONS_DEFAULT_ACCESS])
+			->setChecked($data['rules']['actions.default_access'])
 			->setReadonly($data['readonly'])
 			->setUncheckedValue(0)
 	)
@@ -360,7 +355,7 @@ $cancel_button = (new CRedirectButton(_('Cancel'),
 
 $buttons = [$cancel_button];
 
-if ($data['roleid'] != 0) {
+if ($data['roleid'] !== null) {
 	$buttons = [
 		(new CSimpleButton(_('Clone')))->setId('clone'),
 		(new CRedirectButton(_('Delete'),
@@ -377,7 +372,7 @@ if ($data['roleid'] != 0) {
 
 $form_grid->addItem(
 	new CFormActions(
-		($data['roleid'] != 0)
+		($data['roleid'] !== null)
 			? (new CSubmitButton(_('Update'), 'action', 'userrole.update'))
 				->setId('update')
 				->setEnabled(!$data['readonly'])

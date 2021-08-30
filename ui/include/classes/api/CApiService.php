@@ -1187,6 +1187,8 @@ class CApiService {
 	 * @param string $rule_name  Rule name.
 	 *
 	 * @return bool  Returns true if user has access to specified rule, and false otherwise.
+	 *
+	 * @throws Exception
 	 */
 	protected static function checkAccess(string $rule_name): bool {
 		return (self::$userData && CRoleHelper::checkAccess($rule_name, self::$userData['roleid']));

@@ -24,45 +24,35 @@
  */
 abstract class CControllerUserroleEditGeneral extends CController {
 
-	protected function getRules(int $user_type): array {
-		$rules = [
-			CRoleHelper::UI_DEFAULT_ACCESS => $this->getInput('ui_default_access'),
-			CRoleHelper::ACTIONS_DEFAULT_ACCESS => $this->getInput('actions_default_access'),
-			CRoleHelper::MODULES_DEFAULT_ACCESS => $this->getInput('modules_default_access')
-		];
-
-		$rules += $this->getUiSectionRules($user_type);
-		$rules += $this->getActionSectionRules($user_type);
-		$rules += $this->getServiceSectionRules();
-		$rules += $this->getModuleSectionRules();
-		$rules += $this->getApiSectionRules();
-
-		return $rules;
+	/**
+	 * @throws APIException
+	 */
+	protected function getRulesInput(int $user_type): array {
+		return array_merge(
+			$this->getUiSectionRules($user_type),
+			$this->getServiceSectionRules(),
+			$this->getModuleSectionRules(),
+			$this->getApiSectionRules(),
+			$this->getActionSectionRules($user_type)
+		);
 	}
 
-	protected function getUiSectionRules(int $user_type): array {
+	private function getUiSectionRules(int $user_type): array {
 		return [
-			CRoleHelper::SECTION_UI => array_map(function (string $rule): array {
-				return [
-					'name' => str_replace(CRoleHelper::SECTION_UI.'.', '', $rule),
-					'status' => $this->getInput(str_replace('.', '_', $rule))
-				];
-			}, CRoleHelper::getAllUiElements($user_type))
+			'ui' => array_map(
+				function (string $rule): array {
+					return [
+						'name' => str_replace('ui.', '', $rule),
+						'status' => $this->getInput(str_replace('.', '_', $rule))
+					];
+				},
+				CRoleHelper::getUiElementsByUserType($user_type)
+			),
+			'ui.default_access' => $this->getInput('ui_default_access')
 		];
 	}
 
-	protected function getActionSectionRules(int $user_type): array {
-		return [
-			CRoleHelper::SECTION_ACTIONS => array_map(function (string $rule): array {
-				return [
-					'name' => str_replace(CRoleHelper::SECTION_ACTIONS.'.', '', $rule),
-					'status' => $this->getInput(str_replace('.', '_', $rule))
-				];
-			}, CRoleHelper::getAllActions($user_type))
-		];
-	}
-
-	protected function getServiceSectionRules(): array {
+	private function getServiceSectionRules(): array {
 		$read_access = $this->getInput('service_read_access', CRoleHelper::SERVICES_ACCESS_NONE);
 		$write_access = $this->getInput('service_write_access', CRoleHelper::SERVICES_ACCESS_NONE);
 
@@ -72,7 +62,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				: ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM,
 			'services.read.list' => $read_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? array_map(
-					function (string $serviceid): array {
+					static function (string $serviceid): array {
 						return ['serviceid' => $serviceid];
 					},
 					$this->getInput('service_read_list', []))
@@ -88,7 +78,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				: ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM,
 			'services.write.list' => $write_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? array_map(
-					function (string $serviceid): array {
+					static function (string $serviceid): array {
 						return ['serviceid' => $serviceid];
 					},
 					$this->getInput('service_write_list', []))
@@ -102,223 +92,57 @@ abstract class CControllerUserroleEditGeneral extends CController {
 		];
 	}
 
-	protected function getModuleSectionRules(): array {
-		$moduleids = $this->getModuleIds();
-		if (!$moduleids) {
-			return [];
-		}
-
-		$modules = $this->getInput(CRoleHelper::SECTION_MODULES);
-		return [
-			CRoleHelper::SECTION_MODULES => array_map(function (string $moduleid) use ($modules): array {
-				return [
-					'moduleid' => $moduleid,
-					'status' => $modules[$moduleid]
-				];
-			}, $moduleids)
-		];
-	}
-
-	protected function getApiSectionRules(): array {
-		$rules = [];
-
-		$rules[CRoleHelper::API_ACCESS] = $this->getInput('api_access');
-		if ($rules[CRoleHelper::API_ACCESS]) {
-			$rules[CRoleHelper::API_MODE] = $this->getInput('api_mode');
-
-			if ($this->hasInput('api_methods')) {
-				$rules[CRoleHelper::SECTION_API] = $this->getInput('api_methods');
-			}
-		}
-
-		return $rules;
-	}
-
-	protected function getModuleIds(): array {
-		$response = API::Module()->get([
+	/**
+	 * @throws APIException
+	 */
+	private function getModuleSectionRules(): array {
+		$db_modules = API::Module()->get([
 			'output' => ['moduleid'],
 			'filter' => [
 				'status' => MODULE_STATUS_ENABLED
 			]
 		]);
 
-		if (!$response) {
+		if (!$db_modules) {
 			return [];
 		}
 
-		return array_column($response, 'moduleid');
+		$modules = $this->getInput('modules');
+
+		return [
+			'modules' => array_map(
+				static function (string $moduleid) use ($modules): array {
+					return [
+						'moduleid' => $moduleid,
+						'status' => $modules[$moduleid]
+					];
+				},
+				array_column($db_modules, 'moduleid')
+			),
+			'modules.default_access' => $this->getInput('modules_default_access')
+		];
 	}
 
-	protected function getUiLabels(array $sections): array {
-		$rules_labels = [];
-		foreach (array_keys($sections) as $section) {
-			$rules_labels[$section] = CRoleHelper::getUiSectionRulesLabels($section, USER_TYPE_SUPER_ADMIN);
-		}
-
-		return $rules_labels;
+	private function getApiSectionRules() : array {
+		return  [
+			'api' => $this->getInput('api_methods', []),
+			'api.access' => $this->getInput('api_access'),
+			'api.mode' => $this->getInput('api_mode', ZBX_ROLE_RULE_API_MODE_DENY)
+		];
 	}
 
-	protected function getModulesLabels(): array {
-		$response = API::Module()->get([
-			'output' => ['moduleid', 'relative_path'],
-			'filter' => [
-				'status' => MODULE_STATUS_ENABLED
-			]
-		]);
-
-		if (!$response) {
-			return [];
-		}
-
-		$modules = [];
-		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
-
-		foreach ($response as $module) {
-			$manifest = $module_manager->addModule($module['relative_path']);
-			$modules[$module['moduleid']] = $manifest['name'];
-		}
-
-		return $modules;
-	}
-
-	protected function getRulesValue(int $roleid) {
-		$result = [];
-
-		$response = API::Role()->get([
-			'output' => ['roleid'],
-			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api', 'api.access',
-				'api.mode', 'actions', 'actions.default_access'
-			],
-			'roleids' => $roleid
-		]);
-		$response = $response[0];
-
-		$result[CRoleHelper::UI_DEFAULT_ACCESS] = $response['rules'][CRoleHelper::UI_DEFAULT_ACCESS];
-		$result[CRoleHelper::ACTIONS_DEFAULT_ACCESS] = $response['rules'][CRoleHelper::ACTIONS_DEFAULT_ACCESS];
-		$result[CRoleHelper::MODULES_DEFAULT_ACCESS] = $response['rules'][CRoleHelper::MODULES_DEFAULT_ACCESS];
-
-		if (count($response['rules'][CRoleHelper::SECTION_UI])) {
-			foreach ($response['rules'][CRoleHelper::SECTION_UI] as $ui_rule) {
-				$result[CRoleHelper::SECTION_UI][CRoleHelper::SECTION_UI.'.'.$ui_rule['name']] = $ui_rule['status'];
-			}
-		}
-
-		if (count($response['rules'][CRoleHelper::SECTION_ACTIONS])) {
-			foreach ($response['rules'][CRoleHelper::SECTION_ACTIONS] as $action_rule) {
-				$result[CRoleHelper::SECTION_ACTIONS][CRoleHelper::SECTION_ACTIONS.'.'.$action_rule['name']] = $action_rule['status'];
-			}
-		}
-
-		if (count($response['rules'][CRoleHelper::SECTION_MODULES])) {
-			foreach ($response['rules'][CRoleHelper::SECTION_MODULES] as $module_rule) {
-				$result[CRoleHelper::SECTION_MODULES][$module_rule['moduleid']] = $module_rule['status'];
-			}
-		}
-
-		$result[CRoleHelper::API_ACCESS] = $response['rules'][CRoleHelper::API_ACCESS];
-		$result[CRoleHelper::API_MODE] = $response['rules'][CRoleHelper::API_MODE];
-
-		if (count($response['rules'][CRoleHelper::SECTION_API])) {
-			$result[CRoleHelper::SECTION_API] = array_map(function (string $method): array {
-				return [
-					'id' => $method,
-					'name' => $method
-				];
-			}, $response['rules'][CRoleHelper::SECTION_API]);
-		}
-
-		return $result;
-	}
-
-	protected function overwriteInputs(array $data): array {
-		$this->getInputs($data, ['name', 'type']);
-
-		// Overwrite default access inputs.
-		foreach ([CRoleHelper::UI_DEFAULT_ACCESS, CRoleHelper::MODULES_DEFAULT_ACCESS,
-				CRoleHelper::ACTIONS_DEFAULT_ACCESS] as $label) {
-			$input_name = str_replace('.', '_', $label);
-			if ($this->hasInput($input_name)) {
-				$data['rules'][$label] = $this->getInput($input_name);
-			}
-		}
-
-		// Overwrite UI section.
-		foreach (CRoleHelper::getAllUiElements((int) $data['type']) as $label) {
-			$input_name = str_replace('.', '_', $label);
-			if ($this->hasInput($input_name)) {
-				$data['rules'][CRoleHelper::SECTION_UI][$label] = $this->getInput($input_name);
-			}
-		}
-
-		// Overwrite actions section.
-		foreach (CRoleHelper::getAllActions((int) $data['type']) as $label) {
-			$input_name = str_replace('.', '_', $label);
-			if ($this->hasInput($input_name)) {
-				$data['rules'][CRoleHelper::SECTION_ACTIONS][$label] = $this->getInput($input_name);
-			}
-		}
-
-		// Overwrite Services section.
-		if ($this->hasInput('service_read_access')) {
-			$data['service_read_access'] = $this->getInput('service_read_access');
-		}
-
-		if ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
-			if ($this->hasInput('service_read_list')) {
-				$data['service_read_list'] = $this->getInput('service_read_list');
-			}
-
-			if ($this->hasInput('service_read_tag_tag')) {
-				$data['service_read_tag_tag'] = $this->getInput('service_read_tag_tag');
-				$data['service_read_tag_value'] = $this->getInput('service_read_tag_value');
-			}
-		}
-
-		if ($this->hasInput('service_write_access')) {
-			$data['service_write_access'] = $this->getInput('service_write_access');
-		}
-
-		if ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
-			if ($this->hasInput('service_write_list')) {
-				$data['service_write_list'] = $this->getInput('service_write_list');
-			}
-
-			if ($this->hasInput('service_write_tag_tag')) {
-				$data['service_write_tag_tag'] = $this->getInput('service_write_tag_tag');
-				$data['service_write_tag_value'] = $this->getInput('service_write_tag_value');
-			}
-		}
-
-		// Overwrite modules section.
-		if ($this->hasInput(CRoleHelper::SECTION_MODULES)) {
-			$data['rules'][CRoleHelper::SECTION_MODULES] = $this->getInput('modules');
-		}
-
-		// Overwrite API section.
-		if ($this->hasInput('api_access')) {
-			$data['rules'][CRoleHelper::API_ACCESS] = $this->getInput('api_access');
-		}
-		if ($this->hasInput('api_mode')) {
-			$data['rules'][CRoleHelper::API_MODE] = $this->getInput('api_mode');
-		}
-		if ($this->hasInput('api_methods')) {
-			foreach ($this->getInput('api_methods') as $method) {
-				$data['rules'][CRoleHelper::SECTION_API][] = ['id' => $method, 'name' => $method];
-			}
-		}
-
-		return $data;
-	}
-
-	protected static function getServiceAccessByAccessParams(int $mode, array $list, array $tag): int {
-		if ($mode == 1) {
-			return CRoleHelper::SERVICES_ACCESS_ALL;
-		}
-		elseif ($list || $tag['tag'] !== '') {
-			return CRoleHelper::SERVICES_ACCESS_LIST;
-		}
-		else {
-			return CRoleHelper::SERVICES_ACCESS_NONE;
-		}
+	private function getActionSectionRules(int $user_type): array {
+		return [
+			'actions' => array_map(
+				function (string $rule): array {
+					return [
+						'name' => str_replace('actions.', '', $rule),
+						'status' => $this->getInput(str_replace('.', '_', $rule))
+					];
+				},
+				CRoleHelper::getActionsByUserType($user_type)
+			),
+			'actions.default_access' => $this->getInput('actions_default_access')
+		];
 	}
 }

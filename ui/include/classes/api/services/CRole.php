@@ -160,7 +160,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function validateCreate(array &$roles) {
+	protected function validateCreate(array &$roles): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
@@ -251,7 +251,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function validateUpdate(array &$roles, ?array &$db_roles) {
+	private function validateUpdate(array &$roles, ?array &$db_roles): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
@@ -405,7 +405,7 @@ class CRole extends CApiService {
 
 		$ui_rules = [];
 
-		foreach (CRoleHelper::getAllUiElements($type) as $ui_element) {
+		foreach (CRoleHelper::getUiElementsByUserType($type) as $ui_element) {
 			$ui_rule_name = substr($ui_element, strlen('ui.'));
 			$ui_rules[$ui_rule_name] = $default_access == ZBX_ROLE_RULE_ENABLED;
 		}
@@ -711,7 +711,7 @@ class CRole extends CApiService {
 			return;
 		}
 
-		$all_actions = CRoleHelper::getAllActions($type);
+		$all_actions = CRoleHelper::getActionsByUserType($type);
 
 		foreach ($rules['actions'] as $rule) {
 			if (!in_array('actions.'.$rule['name'], $all_actions)) {
@@ -874,7 +874,7 @@ class CRole extends CApiService {
 
 		$compiled_rules = [];
 
-		foreach (CRoleHelper::getAllUiElements($type) as $ui_rule_name) {
+		foreach (CRoleHelper::getUiElementsByUserType($type) as $ui_rule_name) {
 			$ui_element = substr($ui_rule_name, strlen('ui.'));
 
 			if (array_key_exists($ui_element, $new_ui_rules)) {
@@ -1080,7 +1080,7 @@ class CRole extends CApiService {
 
 		$compiled_rules = [];
 
-		foreach (CRoleHelper::getAllActions($type) as $action_rule_name) {
+		foreach (CRoleHelper::getActionsByUserType($type) as $action_rule_name) {
 			$action_element = substr($action_rule_name, strlen('actions.'));
 
 			if (array_key_exists($action_element, $new_actions_rules)) {
@@ -1294,7 +1294,7 @@ class CRole extends CApiService {
 		$result = [];
 
 		if (in_array('ui', $output)) {
-			$ui = array_fill_keys(CRoleHelper::getAllUiElements($type), $ui_default_access);
+			$ui = array_fill_keys(CRoleHelper::getUiElementsByUserType($type), $ui_default_access);
 			$ui = array_intersect_key($rules, $ui) + $ui;
 
 			$result['ui'] = [];
@@ -1507,7 +1507,7 @@ class CRole extends CApiService {
 		$result = [];
 
 		if (in_array('actions', $output)) {
-			$actions = array_fill_keys(CRoleHelper::getAllActions($type), $actions_default_access);
+			$actions = array_fill_keys(CRoleHelper::getActionsByUserType($type), $actions_default_access);
 			$actions = array_intersect_key($rules, $actions) + $actions;
 
 			$result['actions'] = [];
