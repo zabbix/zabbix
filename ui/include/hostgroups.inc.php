@@ -249,7 +249,7 @@ function makeProblemHostsHintBox(array $hosts, array $data, ?CUrl $url) {
 
 	foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
 		if (in_array($severity, $data['filter']['severities'])) {
-			$header[] = getSeverityName($severity);
+			$header[] = CSeverityHelper::getName($severity);
 		}
 	}
 
@@ -304,7 +304,8 @@ function makeProblemHostsHintBox(array $hosts, array $data, ?CUrl $url) {
 			if (in_array($severity, $data['filter']['severities'])) {
 				$row->addItem(
 					($host_data['severities'][$severity] != 0)
-						? (new CCol($host_data['severities'][$severity]))->addClass(getSeverityStyle($severity))
+						? (new CCol($host_data['severities'][$severity]))
+							->addClass(CSeverityHelper::getStyle($severity))
 						: ''
 				);
 			}

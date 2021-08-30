@@ -1638,3 +1638,7 @@ INSERT INTO triggers (triggerid, description, expression, comments) VALUES (5017
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50237, 50177, 58737, 'last', '$');
 INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50178, 'template-trigger', '{50238}=0', '');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50238, 50178, 58738, 'last', '$');
+
+-- services
+INSERT INTO services (serviceid, name) VALUES (1, 'API Service for delete');
+INSERT INTO services (serviceid, name) VALUES (2, 'API Service for update');

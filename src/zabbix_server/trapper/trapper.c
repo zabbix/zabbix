@@ -46,9 +46,10 @@
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
-extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
+extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 extern int	CONFIG_CONFSYNCER_FORKS;
 

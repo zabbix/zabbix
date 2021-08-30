@@ -1099,7 +1099,7 @@ class CSvgGraph extends CSvg {
 					->setArgument('eventid', $problem['eventid'])
 					->getUrl(),
 				'r_eventid' => $problem['r_eventid'],
-				'severity' => getSeverityStyle($problem['severity'], $problem['r_clock'] == 0),
+				'severity' => CSeverityHelper::getStyle((int) $problem['severity'], $problem['r_clock'] == 0),
 				'status' => $status_str,
 				'status_color' => $status_color
 			];

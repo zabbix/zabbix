@@ -113,7 +113,7 @@ switch ($data['method']) {
 			]);
 
 			foreach ($triggers as $trigger) {
-				$trigger['class_name'] = getSeverityStyle($trigger['priority']);
+				$trigger['class_name'] = CSeverityHelper::getStyle((int) $trigger['priority']);
 				$result[] = $trigger;
 			}
 		}
