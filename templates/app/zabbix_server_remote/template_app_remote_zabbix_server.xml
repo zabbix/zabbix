@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-05-11T06:42:22Z</date>
+    <date>2021-08-11T06:12:23Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -176,41 +176,6 @@
                     </triggers>
                 </item>
                 <item>
-                    <name>Remote Zabbix server: Utilization of availability manager internal processes, in %</name>
-                    <type>DEPENDENT</type>
-                    <key>process.availability_manager.avg.busy</key>
-                    <delay>0</delay>
-                    <history>1w</history>
-                    <value_type>FLOAT</value_type>
-                    <units>%</units>
-                    <description>Average percentage of time availability manager processes have been busy in the last minute</description>
-                    <applications>
-                        <application>
-                            <name>Zabbix server</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <params>$.data.process['availability manager'].busy.avg</params>
-                            <error_handler>CUSTOM_ERROR</error_handler>
-                            <error_handler_params>Processes availability manager not started</error_handler_params>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
-                    </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: Utilization of availability manager processes over 75%</name>
-                            <priority>AVERAGE</priority>
-                        </trigger>
-                    </triggers>
-                </item>
-                <item>
                     <name>Remote Zabbix server: Utilization of configuration syncer internal processes, in %</name>
                     <type>DEPENDENT</type>
                     <key>process.configuration_syncer.avg.busy</key>
@@ -311,41 +276,6 @@
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
                             <name>Remote Zabbix server: Utilization of escalator processes over 75%</name>
-                            <priority>AVERAGE</priority>
-                        </trigger>
-                    </triggers>
-                </item>
-                <item>
-                    <name>Remote Zabbix server: Utilization of history poller data collector processes, in %</name>
-                    <type>DEPENDENT</type>
-                    <key>process.history_poller.avg.busy</key>
-                    <delay>0</delay>
-                    <history>1w</history>
-                    <value_type>FLOAT</value_type>
-                    <units>%</units>
-                    <description>Average percentage of time history poller processes have been busy in the last minute</description>
-                    <applications>
-                        <application>
-                            <name>Zabbix server</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <params>$.data.process['history poller'].busy.avg</params>
-                            <error_handler>CUSTOM_ERROR</error_handler>
-                            <error_handler_params>Processes history poller not started</error_handler_params>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
-                    </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: Utilization of history poller processes over 75%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -806,76 +736,6 @@
                     </triggers>
                 </item>
                 <item>
-                    <name>Remote Zabbix server: Utilization of report manager internal processes, in %</name>
-                    <type>DEPENDENT</type>
-                    <key>process.report_manager.avg.busy</key>
-                    <delay>0</delay>
-                    <history>1w</history>
-                    <value_type>FLOAT</value_type>
-                    <units>%</units>
-                    <description>Average percentage of time report manager processes have been busy in the last minute</description>
-                    <applications>
-                        <application>
-                            <name>Zabbix server</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <params>$.data.process['report manager'].busy.avg</params>
-                            <error_handler>CUSTOM_ERROR</error_handler>
-                            <error_handler_params>Processes report manager not started</error_handler_params>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
-                    </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: Utilization of report manager processes over 75%</name>
-                            <priority>AVERAGE</priority>
-                        </trigger>
-                    </triggers>
-                </item>
-                <item>
-                    <name>Remote Zabbix server: Utilization of report writer internal processes, in %</name>
-                    <type>DEPENDENT</type>
-                    <key>process.report_writer.avg.busy</key>
-                    <delay>0</delay>
-                    <history>1w</history>
-                    <value_type>FLOAT</value_type>
-                    <units>%</units>
-                    <description>Average percentage of time report writer processes have been busy in the last minute</description>
-                    <applications>
-                        <application>
-                            <name>Zabbix server</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <params>$.data.process['report writer'].busy.avg</params>
-                            <error_handler>CUSTOM_ERROR</error_handler>
-                            <error_handler_params>Processes report writer not started</error_handler_params>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
-                    </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Remote Zabbix server: Utilization of report writer processes over 75%</name>
-                            <priority>AVERAGE</priority>
-                        </trigger>
-                    </triggers>
-                </item>
-                <item>
                     <name>Remote Zabbix server: Utilization of self-monitoring internal processes, in %</name>
                     <type>DEPENDENT</type>
                     <key>process.self-monitoring.avg.busy</key>
@@ -1153,58 +1013,6 @@
                     </triggers>
                 </item>
                 <item>
-                    <name>Remote Zabbix server: Trend function cache, % unique requests</name>
-                    <type>DEPENDENT</type>
-                    <key>tcache.pitems</key>
-                    <delay>0</delay>
-                    <history>1w</history>
-                    <value_type>FLOAT</value_type>
-                    <units>%</units>
-                    <description>Effectiveness statistics of the Zabbix trend function cache. Percentage of cached items from cached items + requests. Low percentage most likely means that the cache size can be reduced.</description>
-                    <applications>
-                        <application>
-                            <name>Zabbix server</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <params>$.data.tcache.pitems</params>
-                            <error_handler>CUSTOM_ERROR</error_handler>
-                            <error_handler_params>Not supported this version</error_handler_params>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
-                    </master_item>
-                </item>
-                <item>
-                    <name>Remote Zabbix server: Trend function cache, % misses</name>
-                    <type>DEPENDENT</type>
-                    <key>tcache.pmisses</key>
-                    <delay>0</delay>
-                    <history>1w</history>
-                    <value_type>FLOAT</value_type>
-                    <units>%</units>
-                    <description>Effectiveness statistics of the Zabbix trend function cache.	Percentage of cache misses</description>
-                    <applications>
-                        <application>
-                            <name>Zabbix server</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <params>$.data.tcache.pmisses</params>
-                            <error_handler>CUSTOM_ERROR</error_handler>
-                            <error_handler_params>Not supported this version</error_handler_params>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
-                    </master_item>
-                </item>
-                <item>
                     <name>Remote Zabbix server: Value cache, % used</name>
                     <type>DEPENDENT</type>
                     <key>vcache.buffer.pused</key>
@@ -1212,7 +1020,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Availability statistics of Zabbix value cache.	Percentage of used buffer</description>
+                    <description>Availability statistics of Zabbix value cache. Percentage of used buffer</description>
                     <applications>
                         <application>
                             <name>Zabbix server</name>
@@ -2080,14 +1888,6 @@ Number of processed numeric (unsigned) values.</description>
                         <key>process.vmware_collector.avg.busy</key>
                     </item>
                 </graph_item>
-                <graph_item>
-                    <sortorder>10</sortorder>
-                    <color>5A2B57</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>process.history_poller.avg.busy</key>
-                    </item>
-                </graph_item>
             </graph_items>
         </graph>
         <graph>
@@ -2181,14 +1981,6 @@ Number of processed numeric (unsigned) values.</description>
                     </item>
                 </graph_item>
                 <graph_item>
-                    <sortorder>5</sortorder>
-                    <color>2B5429</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>process.availability_manager.avg.busy</key>
-                    </item>
-                </graph_item>
-                <graph_item>
                     <sortorder>6</sortorder>
                     <color>8048B4</color>
                     <item>
@@ -2240,42 +2032,6 @@ Number of processed numeric (unsigned) values.</description>
                     <item>
                         <host>Template App Remote Zabbix server</host>
                         <key>process.alert_syncer.avg.busy</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>4</sortorder>
-                    <color>990099</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>process.report_manager.avg.busy</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>5</sortorder>
-                    <color>EE0000</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>process.report_writer.avg.busy</key>
-                    </item>
-                </graph_item>
-            </graph_items>
-        </graph>
-        <graph>
-            <name>Remote Zabbix server: Trend function cache effectiveness</name>
-            <graph_items>
-                <graph_item>
-                    <color>C80000</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>tcache.pmisses</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>1</sortorder>
-                    <color>00C800</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>tcache.pitems</key>
                     </item>
                 </graph_item>
             </graph_items>
@@ -2446,14 +2202,6 @@ Number of processed numeric (unsigned) values.</description>
                         <key>process.vmware_collector.avg.busy</key>
                     </item>
                 </graph_item>
-                <graph_item>
-                    <sortorder>11</sortorder>
-                    <color>5A2B57</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>process.history_poller.avg.busy</key>
-                    </item>
-                </graph_item>
             </graph_items>
         </graph>
         <graph>
@@ -2578,30 +2326,6 @@ Number of processed numeric (unsigned) values.</description>
                     <item>
                         <host>Template App Remote Zabbix server</host>
                         <key>process.alert_syncer.avg.busy</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>15</sortorder>
-                    <color>2B5429</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>process.availability_manager.avg.busy</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>16</sortorder>
-                    <color>8048B4</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>process.report_manager.avg.busy</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>17</sortorder>
-                    <color>FD5434</color>
-                    <item>
-                        <host>Template App Remote Zabbix server</host>
-                        <key>process.report_writer.avg.busy</key>
                     </item>
                 </graph_item>
             </graph_items>

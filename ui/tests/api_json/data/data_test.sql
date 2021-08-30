@@ -35,7 +35,7 @@ INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (1
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15086,40068,40067,'vfs.fs.size[{#FSNAME},free]');
 INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'API discovery application',4);
 INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (900,40066,'API discovery application');
-INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,900,'API discovery application');
+INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (101,375,900,'API discovery application');
 INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375,40068);
 INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (9000,900,40067);
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-28T06:27:37Z</date>
+   <date>2021-08-18T09:47:39Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -115,6 +115,7 @@ networking software.</description>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.232.2.2.4.2.0</snmp_oid>
                <key>hp.server.hw.model[cpqSiProductName]</key>
+               <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
@@ -139,6 +140,7 @@ The machine product name. The name of the machine used in this system.</descript
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.232.2.2.2.1.0</snmp_oid>
                <key>hp.server.hw.serialnumber[cpqSiSysSerialNum]</key>
+               <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
                <status>ENABLED</status>
@@ -172,7 +174,7 @@ The serial number of the physical system unit. The string will be empty if the s
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.6.0</snmp_oid>
                <key>hp.server.location[sysLocation]</key>
-               <delay>15m</delay>
+               <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
                <status>ENABLED</status>
@@ -197,7 +199,7 @@ The physical location of this node (e.g., `telephone closet, 3rd floor').  If th
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.5.0</snmp_oid>
                <key>hp.server.name[sysName]</key>
-               <delay>15m</delay>
+               <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
                <status>ENABLED</status>
@@ -367,7 +369,7 @@ The time (in hundredths of a second) since the network management portion of the
                <trends>0</trends>
                <status>ENABLED</status>
                <value_type>LOG</value_type>
-               <description>Item is used to collect all SNMP traps unmatched by other snmptrap items</description>
+               <description>The item is used to collect all SNMP traps unmatched by other snmptrap items</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -491,11 +493,11 @@ Capacitor Failed (7)  The flash backed cache module capacitor is below the suffi
                      <status>ENABLED</status>
                      <description>MIB: CPQIDA-MIB&#13;
 Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.&#13;
-Note that for some controller models, a cache module board that physically attaches to the controller or chipset may not be an available option.&#13;
+&#13;
 &#13;
 The status can be:&#13;
 Other (1)&#13;
- Indicates that the instrument agent does not recognize the status of the cache module. You may need to upgrade the instrument agent.&#13;
+ Indicates that the instrument agent does not recognize the status of the cache module.&#13;
 &#13;
 Invalid (2)&#13;
  Indicates that a cache module board has not been installed in this system or is present but not configured.&#13;
@@ -504,22 +506,20 @@ Enabled (3)&#13;
  Indicates that cache operations are currently configured and enabled for at least one logical drive.&#13;
 &#13;
 Temporarily Disabled (4)&#13;
- Indicates that cache operations have been temporarily disabled. View the cache module board error code object to determine why the write cache operations have been temporarily disabled.&#13;
-&#13;
-Permanently Disabled (5)&#13;
- Indicates that cache operations have been permanently disabled. View the cache module board error code object to determine why the write cache operations have been disabled.&#13;
+ Indicates that cache operations have been temporarily disabled. (5)&#13;
+ Indicates that cache operations have been permanently disabled. &#13;
 &#13;
 Cache Module Flash Memory Not Attached (6)&#13;
  Indicates that the flash memory component of the flash backed cache module is not attached. This status will be set when the flash memory is not attached and the Supercap is attached. This value is only used on flash backed cache modules that support removable flash memory.&#13;
 &#13;
 Cache Module Degraded Failsafe Speed (7)&#13;
- Indicates that the cache module board is currently degraded and operating at a failsafe speed. View variables cpqDaCacheMemoryDataWidth and cpqDaCacheMemoryTransferRate to obtain the cache module board`s current memory data width and memory transfer rate.&#13;
+ Indicates that the cache module board is currently degraded and operating at a failsafe speed. &#13;
 &#13;
 Cache Module Critical Failure (8)&#13;
  Indicates that the cache module board has encountered a critical failure. The controller is currently operating in Zero Memory Raid mode.&#13;
 &#13;
 Read Cache Could Not Be Mapped (9)&#13;
- Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available. This status may be caused by virtual space limitations in certain operating systems and is only applicable to B-Series controllers.</description>
+ Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available.</description>
                      <applications>
                         <application>
                            <name>Disk arrays</name>

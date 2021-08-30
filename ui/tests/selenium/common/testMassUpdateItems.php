@@ -73,8 +73,6 @@ class testMassUpdateItems extends CWebTest{
 	 * Add interface to host.
 	 */
 	public function prepareInterfaceData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('hostinterface.create', [
 			[
 				'hostid' => self::HOSTID,
@@ -1470,8 +1468,6 @@ class testMassUpdateItems extends CWebTest{
 	 * Add items with preprocessing for mass updating.
 	 */
 	public function prepareItemPreprocessingData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => self::HOSTID,

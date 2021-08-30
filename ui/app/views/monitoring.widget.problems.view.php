@@ -255,9 +255,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
 		$problem_update_link,
-		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
-			$data['data']['users'], $data['config']
-		),
+		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['users'], $data['config']),
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));
 }

@@ -1,10 +1,32 @@
+Changes for 5.0.15
+
+5.0.15rc1 was released as 5.0.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.15rc1
 
 New features:
+.........T [ZBXNEXT-6751] added Cisco Adaptive Security Virtual Appliance (ASAv) template (abakaldin)
 .........T [ZBXNEXT-6754] added template Website certificate by Zabbix agent 2 (mchudinov)
 ...G...... [ZBXNEXT-6606] add encrypted tls connection to mysql postgresql plugin for Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6708] added TLS/SSL website certificates validation plugin to Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
+A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
+........S. [ZBX-19658] added query batching when reading event data during maintenance processing (wiper)
+.........T [ZBX-19562] removed the "Oracle by ODBC" and "Asterisk by HTTP" from templates.tmpl file (abakaldin)
+.........T [ZBX-19686] changed 1-st parameter {#IFNAME} in net.if.* items to {#IFGUID} in Windows templates (mchudinov)
+.........T [ZBX-19805] added initial comment with alert content to the incident message (abiba)
+...G...... [ZBX-19482] fixed block device discovery of cd-roms and linked devices (akozlovs)
+...G...... [ZBX-19032] fixed percpu param in Zabbix agent 2 system.cpu.load plugin for Windows (esneiders)
+.........T [ZBX-19762] removed unsupported items in Zabbix server templates (abakaldin)
+.........T [ZBX-19749] changed the value type for .rate items to FLOAT, the value type of Status items to CHAR, changed trigger expression for Status items, removed 3 LLD rules, created new master item for LLD rules with update interval 1h, changed LLD rule names spelling to lower case, added new helpful items in HAProxy templates (mchudinov)
+..F....... [ZBX-18135] fixed warning message close button (agriscenko)
+A......... [ZBX-19341] fixed template export missing inventory mode for Host prototype (jfreibergs)
+..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
+.........T [ZBX-19612] changed host name to visible name for consistency with UI (abiba)
+........S. [ZBX-19737] fixed prometheus preprocessing bug (yurii)
 ........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 A......... [ZBX-19752] fixed multiple types of media type creation having message templates in one API call (gcalenko)
 ..F....... [ZBX-18271] fixed incorrect ordering for tags and overrides in widgets, operations overrides in host prototype form and interface order in item and discovery prototypes forms (gcalenko, Sasha)
@@ -14,6 +36,7 @@ A......... [ZBX-19752] fixed multiple types of media type creation having messag
 ..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
 A......... [ZBX-19342] fixed web scenario items not being cloned for graph prototypes (jfreibergs)
 ...G...... [ZBX-19732] fixed Zabbix agent2 not starting when ListenIP is set to 0.0.0.0 (vso)
+...G...PS. [ZBX-7933] added configurable parameter for TCP queue maximum size (dgoloscapov)
 .........T [ZBX-19692] fixed issues with Zyxel templates (abakaldin)
 A......... [ZBX-19124] fixed PHP runtime errors when passed incorrect value for "output" option (Sasha)
 A......... [ZBX-19539] fixed undefined offset error in host prototype API (miks)
@@ -2176,11 +2199,16 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.33
+
+4.0.33rc1 was released as 4.0.33 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.33rc1
 
-New features:
-
 Bug fixes:
+A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
+..F....... [ZBX-19439] fixed Action log dashboard widget missing Remote command entries (jfreibergs)
 ........S. [ZBX-19703] added fix for json path preprocessing crash (yurii)
 ..F....... [ZBX-19670] resolving config file symlink in CConfigFile.php (yurii)
 ..F....... [ZBX-19589] fixed trailing and leading white-space not getting trimmed in widget configuration form inputs (jfreibergs)
