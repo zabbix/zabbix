@@ -3204,7 +3204,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 
 			if (0 != strcmp(ppdst->name, buffer))
 			{
-				ppdst->name_orig = ppdst->name;
+				ppdst->name_orig = zbx_strdup(NULL, ppdst->name);
 				zbx_free(ppdst->name);
 
 				ppdst->name = buffer;
@@ -3216,7 +3216,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 
 			if (0 != strcmp(ppdst->value, buffer))
 			{
-				ppdst->value_orig = ppdst->value;
+				ppdst->value_orig = zbx_strdup(NULL, ppdst->value);
 				zbx_free(ppdst->value);
 
 				ppdst->value = buffer;
