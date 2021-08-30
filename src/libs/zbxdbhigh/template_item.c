@@ -1942,6 +1942,9 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 			if (0 == (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE))
 				continue;
 
+			zbx_audit_item_update_json_update_params_create_entry(item->itemid, item->flags,
+					param->item_parameterid);
+
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_parameter set ");
 
 			if (0 != (param->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_PARAM_UPDATE_NAME))

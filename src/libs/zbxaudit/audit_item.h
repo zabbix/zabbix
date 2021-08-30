@@ -135,6 +135,9 @@ void	zbx_audit_item_delete_tag(zbx_uint64_t itemid, int item_flags, zbx_uint64_t
 void	zbx_audit_item_update_json_add_params(zbx_uint64_t itemid, int item_flags, zbx_uint64_t item_parameter_id,
 		const char *name, const char *value);
 
+void	zbx_audit_item_update_json_update_params_create_entry(zbx_uint64_t itemid, int item_flags, zbx_uint64_t
+		item_parameter_id);
+
 #define PREPARE_AUDIT_ITEM_PARAMS_UPDATE_H(resource) \
 void	zbx_audit_item_update_json_update_params_##resource(zbx_uint64_t itemid, int item_flags, \
 zbx_uint64_t item_parameter_id, const char *resource##_orig, const char *resource);

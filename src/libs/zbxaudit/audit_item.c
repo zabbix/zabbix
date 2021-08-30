@@ -332,14 +332,13 @@ void	zbx_audit_discovery_rule_update_json_add_filter_conditions(zbx_uint64_t ite
 void	zbx_audit_discovery_rule_update_json_update_filter_conditions_create_entry(zbx_uint64_t itemid,
 		zbx_uint64_t item_conditionid)
 {
-	char	audit_key[AUDIT_DETAILS_KEY_LEN];
+	char	buf[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key, sizeof(audit_key),
-			"discoveryrule.filter[" ZBX_FS_UI64 "].conditions", item_conditionid);
+	zbx_snprintf(buf, sizeof(buf), "discoveryrule.filter[" ZBX_FS_UI64 "].conditions", item_conditionid);
 
-	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_UPDATE, audit_key);
+	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_UPDATE, buf);
 }
 
 #define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE(resource, type1, type2)						\
@@ -578,16 +577,34 @@ void	zbx_audit_item_update_json_add_params(zbx_uint64_t itemid, int item_flags, 
 		const char *name, const char *value)
 {
 	int	resource_type;
-	char	audit_key_name[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
+	char	audit_key_[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
+		audit_key_value[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
+
 	resource_type = item_flag_to_resource_type(item_flags);
 
+	ITEM_RESOURCE_KEY_RESOLVE(,)
 	ITEM_RESOURCE_KEY_RESOLVE(name, .)
 	ITEM_RESOURCE_KEY_RESOLVE(value, .)
 
+	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_);
 	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_name, name);
 	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+}
+
+void	zbx_audit_item_update_json_update_params_create_entry(zbx_uint64_t itemid, int item_flags,
+		zbx_uint64_t item_parameter_id)
+{
+	int	resource_type;
+	char	audit_key_[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = item_flag_to_resource_type(item_flags);
+
+	ITEM_RESOURCE_KEY_RESOLVE(,)
+	zbx_audit_update_json_append_no_value(itemid, AUDIT_DETAILS_ACTION_UPDATE, audit_key_);
 }
 
 #define PREPARE_AUDIT_ITEM_PARAMS_UPDATE(resource)								\
@@ -617,7 +634,7 @@ void	zbx_audit_item_delete_params(zbx_uint64_t itemid, int item_flags, zbx_uint6
 
 	resource_type = item_flag_to_resource_type(item_flags);
 
-	ITEM_RESOURCE_KEY_RESOLVE(, "")
+	ITEM_RESOURCE_KEY_RESOLVE(,)
 
 	zbx_audit_update_json_delete(itemid, AUDIT_DETAILS_ACTION_DELETE, audit_key_);
 }
