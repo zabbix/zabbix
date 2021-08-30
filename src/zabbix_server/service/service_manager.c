@@ -2358,7 +2358,7 @@ static void	process_parentlist(const zbx_ipc_message_t *message, zbx_service_man
 		zbx_ipc_client_t *client)
 {
 	unsigned char		*data = NULL;
-	zbx_uint32_t		data_alloc = 0, data_offset = 0;
+	zbx_uint32_t		data_len = 0;
 	zbx_uint64_t		child_serviceid = 0;
 	zbx_service_t		*service, service_local;
 	zbx_vector_uint64_t	parentids;
@@ -2376,10 +2376,10 @@ static void	process_parentlist(const zbx_ipc_message_t *message, zbx_service_man
 		zbx_vector_uint64_sort(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_service_serialize_parentids(&data, &data_alloc, &data_offset, &parentids);
+		data_len = zbx_service_serialize_parentids(&data, &parentids);
 	}
 
-	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset);
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_len);
 
 	zbx_vector_uint64_destroy(&parentids);
 	zbx_free(data);

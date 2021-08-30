@@ -436,19 +436,16 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids,
 		tag_esc = DBdyn_escape_string(tag->tag);
 
 		if (i > 0)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " or ");
 
-		if (NULL == tag->value)
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(tag='%s')", tag_esc);
-		}
-		else
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "tag='%s'", tag_esc);
+
+		if (NULL != tag->value)
 		{
 			char	*value_esc;
 
 			value_esc = DBdyn_escape_string(tag->value);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(tag='%s' and value='%s')", tag_esc,
-					value_esc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and value='%s'", value_esc);
 			zbx_free(value_esc);
 		}
 
@@ -482,8 +479,11 @@ static int	check_service_tags_rule_match(const zbx_vector_tags_t *service_tags, 
 
 			if (0 == strcmp(service_tag->tag, role_tag->tag))
 			{
-				if (NULL != role_tag->value || 0 == strcmp(service_tag->value, role_tag->value))
+				if (NULL != role_tag->value || 0 == strcmp(service_tag->value,
+						ZBX_NULL2EMPTY_STR(role_tag->value)))
+				{
 					return PERM_READ;
+				}
 			}
 		}
 	}
@@ -496,7 +496,6 @@ static void	zbx_db_cache_service_role(zbx_service_role_t *role)
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	services_read = 1, services_write = 0;
-	int		ret = FAIL;
 
 	result = DBselect("select name,roleid,value_int,value_str,value_serviceid,type from role_rule where roleid="
 			ZBX_FS_UI64 " and name like 'services.%%' order by name", role->roleid);
@@ -508,8 +507,6 @@ static void	zbx_db_cache_service_role(zbx_service_role_t *role)
 
 		name = row[0] + ZBX_CONST_STRLEN(ZBX_SERVICES_RULE_PREFIX);
 		type = atoi(row[5]);
-
-		ret = SUCCEED;
 
 		if (ZBX_ROLE_RULE_TYPE_INT == type) /* services.read or services.write */
 		{
@@ -576,8 +573,6 @@ static void	zbx_db_cache_service_role(zbx_service_role_t *role)
 	}
 
 	DBfree_result(result);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -621,7 +616,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	if (SUCCEED == zbx_vector_uint64_bsearch(&role->serviceids, service->serviceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		return PERM_READ;
 
-	// check if service tags does not match tag rules
+	// check if service tags do not match tag rules
 	if (PERM_DENY < (perm = check_service_tags_rule_match(&service->service_tags, &role->tags)))
 		return perm;
 
@@ -634,7 +629,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	zbx_ipc_message_init(&response);
 	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset, &response);
 	zbx_vector_uint64_create(&parent_ids);
-	zbx_service_deserialize_parentids(response.data, response.size, &parent_ids);
+	zbx_service_deserialize_parentids(response.data, &parent_ids);
 	zbx_ipc_message_clean(&response);
 
 	// check if the returned vector doesn't intersect rule serviceids vector
