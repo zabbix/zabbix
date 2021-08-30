@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/common/testFormMacros.php';
 class testFormMacrosHostPrototype extends testFormMacros {
 
 	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
-	const LLD_ID			= 90001;
+	const LLD_ID		= 90001;
 	const IS_PROTOTYPE	= true;
 
 	use MacrosTrait;
@@ -45,379 +45,92 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 */
 	protected $host_name_remove = 'Host prototype for macros {#DELETE}';
 
-	public static function getCreateMacrosHostPrototypeData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'Name' => 'Host prototype With {#MACROS}',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$1234}',
-							'value' => '!@#$%^&*()_+/*',
-							'description' => '!@#$%^&*()_+/*'
-						],
-						[
-							'macro' => '{$M:regex:^[0-9a-z]}',
-							'value' => 'regex',
-							'description' => 'context macro with regex'
-						],
-						[
-							'macro' => '{$MACRO1}',
-							'value' => 'Value_1',
-							'description' => 'Test macro Description 1'
-						],
-						[
-							'macro' => '{$MACRO3}',
-							'value' => '',
-							'description' => ''
-						],
-						[
-							'macro' => '{$MACRO4}',
-							'value' => 'value',
-							'description' => ''
-						],
-						[
-							'macro' => '{$MACRO5}',
-							'value' => '',
-							'description' => 'DESCRIPTION'
-						],
-						[
-							'macro' => '{$MACRO6}',
-							'value' => 'Значение',
-							'description' => 'Описание'
-						],
-						[
-							'macro' => '{$MACRO:A}',
-							'value' => '{$MACRO:A}',
-							'description' => '{$MACRO:A}'
-						],
-						[
-							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
-							'value' => '',
-							'description' => ''
-						]
-					],
-					'success_message' => 'Host prototype added'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Without dollar in {#MACROS}',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{MACRO}'
-						]
-					],
-					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Host prototype With empty {#MACRO}',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '',
-							'value' => 'Macro_Value',
-							'description' => 'Macro Description'
-						]
-					],
-					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Host prototype With repeated {#MACROS}',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Host prototype With repeated regex {#MACROS}',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
-				]
-			]
-		];
-	}
+	/**
+	 * The id of the host prototype for removing inherited macros.
+	 *
+	 * @var integer
+	 */
+	protected static $host_prototoypeid_remove_inherited;
 
 	/**
-	 * @dataProvider getCreateMacrosHostPrototypeData
+	 * @dataProvider getCreateMacrosData
 	 */
 	public function testFormMacrosHostPrototype_Create($data) {
-		$this->checkCreate($data, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
-	}
-
-	public static function getUpdateMacrosHostPrototypeData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$UPDATED_MACRO1}',
-							'value' => 'updated value1',
-							'description' => 'updated description 1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO2}',
-							'value' => 'Updated value 2',
-							'description' => 'Updated description 2'
-						]
-					],
-					'success_message' => 'Host prototype updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$UPDATED_MACRO1}',
-							'value' => '',
-							'description' => ''
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO2}',
-							'value' => 'Updated Value 2',
-							'description' => ''
-						],
-						[
-							'macro' => '{$UPDATED_MACRO3}',
-							'value' => '',
-							'description' => 'Updated Description 3'
-						]
-					],
-					'success_message' => 'Host prototype updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:A}',
-							'value' => '{$MACRO:B}',
-							'description' => '{$MACRO:C}'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO_1}',
-							'value' => '',
-							'description' => 'DESCRIPTION'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'macro' => '{$UPDATED_MACRO_2}',
-							'value' => 'Значение',
-							'description' => 'Описание'
-						]
-					],
-					'success_message' => 'Host prototype updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:regex:"^[a-z]"}',
-							'value' => 'regex',
-							'description' => ''
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO:regex:^[0-9a-z]}',
-							'value' => '',
-							'description' => 'DESCRIPTION'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'macro' => '{$UPDATED_MACRO_2}',
-							'value' => 'Значение',
-							'description' => 'Описание'
-						]
-					],
-					'success_message' => 'Host prototype updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Without dollar in Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{MACRO}'
-						]
-					],
-					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With empty Macro',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '',
-							'value' => 'Macro_Value',
-							'description' => 'Macro Description'
-						]
-					],
-					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated regex {#MACROS}',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$M:regex:"[a-z]"}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$M:regex:"[a-z]"}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated regex {#MACROS} and quotes',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO:regex:^[0-9].*$}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Macro "{$MACRO:regex:^[0-9].*$}" is not unique.'
-				]
-			]
-		];
+		$this->checkMacros($data, 'host prototype', null, false, self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	/**
-	 * @dataProvider getUpdateMacrosHostPrototypeData
+	 * @dataProvider getUpdateMacrosData
 	 */
 	public function testFormMacrosHostPrototype_Update($data) {
-		$this->checkUpdate($data, $this->host_name_update, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkMacros($data, 'host prototype', $this->host_name_update, true, self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
-	public function testFormMacrosHostPrototype_Remove() {
-		$this->checkRemove($this->host_name_remove, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+	public function testFormMacrosHostPrototype_RemoveAll() {
+		$this->checkRemoveAll($this->host_name_remove, 'host prototype', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
-	public function testFormMacrosHostPrototype_ChangeRemoveInheritedMacro() {
-		$this->checkChangeRemoveInheritedMacro('hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+	/**
+	 * @dataProvider getCheckInheritedMacrosData
+	 */
+	public function testFormMacrosHostPrototype_ChangeInheritedMacro($data) {
+		$this->checkChangeInheritedMacros($data, 'host prototype', self::IS_PROTOTYPE, self::LLD_ID);
+	}
+
+	public function prepareHostPrototypeRemoveMacrosData() {
+		$response = CDataHelper::call('hostprototype.create', [
+				'host' => 'Host prototype for Inherited {#MACROS} removing',
+				'ruleid' => self::LLD_ID,
+				'groupLinks' =>  [
+					[
+						'groupid'=> 4
+					]
+				],
+				'macros' => [
+					[
+						'macro' => '{$TEST_MACRO123}',
+						'value' => 'test123',
+						'description' => 'description 123'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_HOST1}',
+						'value' => 'test1',
+						'description' => 'description 1'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_HOST2}',
+						'value' => 'test2',
+						'description' => 'description 2'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_GLOBAL1}',
+						'value' => 'test global 1',
+						'description' => 'global description 1'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_GLOBAL2}',
+						'value' => 'test global 2',
+						'description' => 'global description 2'
+					],
+					[
+						'macro' => '{$SNMP_COMMUNITY}',
+						'value' => 'redefined value',
+						'description' => 'redefined description'
+					]
+				]
+		]);
+		$this->assertArrayHasKey('hostids', $response);
+		self::$host_prototoypeid_remove_inherited = $response['hostids'][0];
+	}
+
+	/**
+	 * @dataProvider getRemoveInheritedMacrosData
+	 *
+	 * @onBeforeOnce prepareHostPrototypeRemoveMacrosData
+	 */
+	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
+		$this->checkRemoveInheritedMacros($data, self::$host_prototoypeid_remove_inherited, 'host prototype',
+				self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	public function getCreateSecretMacrosData() {

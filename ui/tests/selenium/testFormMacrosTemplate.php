@@ -41,379 +41,88 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	protected $template_name_remove = 'Template to test graphs';
 
-	public static function getCreateMacrosTemplateData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'Name' => 'Template With Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$1234}',
-							'value' => '!@#$%^&*()_+/*',
-							'description' => '!@#$%^&*()_+/*'
-						],
-						[
-							'macro' => '{$M:regex:^[0-9a-z]}',
-							'value' => 'regex',
-							'description' => 'context macro with regex'
-						],
-						[
-							'macro' => '{$MACRO1}',
-							'value' => 'Value_1',
-							'description' => 'Test macro Description 1'
-						],
-						[
-							'macro' => '{$MACRO3}',
-							'value' => '',
-							'description' => ''
-						],
-						[
-							'macro' => '{$MACRO4}',
-							'value' => 'value',
-							'description' => ''
-						],
-						[
-							'macro' => '{$MACRO5}',
-							'value' => '',
-							'description' => 'DESCRIPTION'
-						],
-						[
-							'macro' => '{$MACRO6}',
-							'value' => 'Значение',
-							'description' => 'Описание'
-						],
-						[
-							'macro' => '{$MACRO:A}',
-							'value' => '{$MACRO:A}',
-							'description' => '{$MACRO:A}'
-						],
-						[
-							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
-							'value' => '',
-							'description' => ''
-						]
-					],
-						'success_message' => 'Template added'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Template Without dollar in Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{MACRO}'
-						]
-					],
-					'error_message' => 'Cannot add template',
-					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Template With empty Macro',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '',
-							'value' => 'Macro_Value',
-							'description' => 'Macro Description'
-						]
-					],
-					'error_message' => 'Cannot add template',
-					'error_details' => 'Invalid macro "": macro is empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Template With repeated Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot add template',
-					'error_details' => 'Macro "{$MACRO}" is not unique.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Template With repeated regex Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot add template',
-					'error_details' => 'Macro "{$MACRO:regex:"^[0-9].*$"}" is not unique.'
-				]
-			]
-		];
-	}
+	/**
+	 * The id of the template for removing inherited macros.
+	 *
+	 * @var integer
+	 */
+	protected static $templateid_remove_inherited;
 
 	/**
-	 * @dataProvider getCreateMacrosTemplateData
+	 * @dataProvider getCreateMacrosData
 	 */
 	public function testFormMacrosTemplate_Create($data) {
-		$this->checkCreate($data, 'templates', 'template');
-	}
-
-	public static function getUpdateMacrosTemplateData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$UPDATED_MACRO1}',
-							'value' => 'updated value1',
-							'description' => 'updated description 1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO2}',
-							'value' => 'Updated value 2',
-							'description' => 'Updated description 2'
-						]
-					],
-					'success_message' => 'Template updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$UPDATED_MACRO1}',
-							'value' => '',
-							'description' => ''
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO2}',
-							'value' => 'Updated Value 2',
-							'description' => ''
-						],
-						[
-							'macro' => '{$UPDATED_MACRO3}',
-							'value' => '',
-							'description' => 'Updated Description 3'
-						]
-					],
-					'success_message' => 'Template updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:A}',
-							'value' => '{$MACRO:B}',
-							'description' => '{$MACRO:C}'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO_1}',
-							'value' => '',
-							'description' => 'DESCRIPTION'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'macro' => '{$UPDATED_MACRO_2}',
-							'value' => 'Значение',
-							'description' => 'Описание'
-						]
-					],
-					'success_message' => 'Template updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:regex:"^[a-z]"}',
-							'value' => 'regex',
-							'description' => ''
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO:regex:^[0-9a-z]}',
-							'value' => '',
-							'description' => 'DESCRIPTION'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'macro' => '{$UPDATED_MACRO_2}',
-							'value' => 'Значение',
-							'description' => 'Описание'
-						]
-					],
-					'success_message' => 'Template updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Without dollar in Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{MACRO}'
-						]
-					],
-					'error_message' => 'Cannot update template',
-					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With empty Macro',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '',
-							'value' => 'Macro_Value',
-							'description' => 'Macro Description'
-						]
-					],
-					'error_message' => 'Cannot update template',
-					'error_details' => 'Invalid macro "": macro is empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot update template',
-					'error_details' => 'Macro "{$MACRO}" is not unique.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated regex Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$M:regex:"[a-z]"}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$M:regex:"[a-z]"}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot update template',
-					'error_details' => 'Macro "{$M:regex:"[a-z]"}" is not unique.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated regex Macros and quotes',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO:regex:^[0-9].*$}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_message' => 'Cannot update template',
-					'error_details' => 'Macro "{$MACRO:regex:^[0-9].*$}" is not unique.'
-				]
-			]
-		];
+		$this->checkMacros($data, 'template');
 	}
 
 	/**
-	 * @dataProvider getUpdateMacrosTemplateData
+	 * @dataProvider getUpdateMacrosData
 	 */
 	public function testFormMacrosTemplate_Update($data) {
-		$this->checkUpdate($data, $this->template_name_update, 'templates', 'template');
+		$this->checkMacros($data, 'template', $this->template_name_update, true);
 	}
 
-	public function testFormMacrosTemplate_Remove() {
-		$this->checkRemove($this->template_name_remove, 'templates', 'template');
+	public function testFormMacrosTemplate_RemoveAll() {
+		$this->checkRemoveAll($this->template_name_remove, 'template');
 	}
 
-	public function testFormMacrosTemplate_ChangeRemoveInheritedMacro() {
-		$this->checkChangeRemoveInheritedMacro('templates', 'template');
+	/**
+	 * @dataProvider getCheckInheritedMacrosData
+	 */
+	public function testFormMacrosTemplate_ChangeInheritedMacro($data) {
+		$this->checkChangeInheritedMacros($data, 'template');
+	}
+
+	public function prepareTemplateRemoveMacrosData() {
+		$response = CDataHelper::call('template.create', [
+				'host' => 'Template for Inherited macros removing',
+				'groups' => [
+					['groupid' => '4']
+				],
+				'macros' => [
+					[
+						'macro' => '{$TEST_MACRO123}',
+						'value' => 'test123',
+						'description' => 'description 123'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_HOST1}',
+						'value' => 'test1',
+						'description' => 'description 1'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_HOST2}',
+						'value' => 'test2',
+						'description' => 'description 2'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_GLOBAL1}',
+						'value' => 'test global 1',
+						'description' => 'global description 1'
+					],
+					[
+						'macro' => '{$MACRO_FOR_DELETE_GLOBAL2}',
+						'value' => 'test global 2',
+						'description' => 'global description 2'
+					],
+					[
+						'macro' => '{$SNMP_COMMUNITY}',
+						'value' => 'redefined value',
+						'description' => 'redefined description'
+					]
+				]
+		]);
+		$this->assertArrayHasKey('templateids', $response);
+		self::$templateid_remove_inherited = $response['templateids'][0];
+	}
+
+	/**
+	 * @dataProvider getRemoveInheritedMacrosData
+	 *
+	 * @onBeforeOnce prepareTemplateRemoveMacrosData
+	 */
+	public function testFormMacrosTemplate_RemoveInheritedMacro($data) {
+		$this->checkRemoveInheritedMacros($data, self::$templateid_remove_inherited, 'template');
 	}
 
 	public function getCreateSecretMacrosData() {
