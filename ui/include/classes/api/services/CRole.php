@@ -60,7 +60,7 @@ class CRole extends CApiService {
 	 *
 	 * @return array|int
 	 */
-	public function get(array $options) {
+	public function get(array $options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'roleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -373,7 +373,7 @@ class CRole extends CApiService {
 			$db_rules = $db_roles !== null ? $db_roles[$role['roleid']]['rules'] : null;
 
 			$this->checkUiRules($name, $type, $role['rules'], $db_rules);
-			$this->checkServicesRules($name, $role['rules'], $db_rules);
+			$this->checkServicesRules($name, $type, $role['rules'], $db_rules);
 			$this->checkModulesRules($name, $role['rules']);
 			$this->checkApiRules($name, $role['rules']);
 			$this->checkActionsRules($name, $type, $role['rules']);
@@ -431,14 +431,15 @@ class CRole extends CApiService {
 
 	/**
 	 * @param string     $name
+	 * @param int        $type
 	 * @param array      $rules
 	 * @param array|null $db_rules
 	 *
 	 * @throws APIException
 	 */
-	private function checkServicesRules(string $name, array $rules, array $db_rules = null): void {
+	private function checkServicesRules(string $name, int $type, array $rules, array $db_rules = null): void {
 		$this->checkServicesReadRules($name, $rules, $db_rules);
-		$this->checkServicesWriteRules($name, $rules, $db_rules);
+		$this->checkServicesWriteRules($name, $type, $rules, $db_rules);
 
 		$list = [];
 
@@ -551,12 +552,13 @@ class CRole extends CApiService {
 
 	/**
 	 * @param string     $name
+	 * @param int        $type
 	 * @param array      $rules
 	 * @param array|null $db_rules
 
 	 * @throws APIException
 	 */
-	private function checkServicesWriteRules(string $name, array $rules, array $db_rules = null): void {
+	private function checkServicesWriteRules(string $name, int $type, array $rules, array $db_rules = null): void {
 		if (!array_key_exists('services.write.mode', $rules)
 				&& !array_key_exists('services.write.list', $rules)
 				&& !array_key_exists('services.write.tag', $rules)) {
@@ -573,17 +575,11 @@ class CRole extends CApiService {
 			$mode = ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM;
 		}
 
-		if ($mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
-			if (array_key_exists('services.write.tag', $rules)) {
-				if ($rules['services.write.tag']['tag'] === '' && $rules['services.write.tag']['value'] !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot have non-empty tag value while having empty tag in rule "%2$s" for user role "%1$s".',
-						$name, 'services.write.tag'
-					));
-				}
-			}
-
-			return;
+		if ($type == USER_TYPE_ZABBIX_USER && $mode != ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+				$name, 'services.write.mode', 'type', USER_TYPE_ZABBIX_USER
+			));
 		}
 
 		if (array_key_exists('services.write.list', $rules)) {
@@ -597,10 +593,19 @@ class CRole extends CApiService {
 		}
 
 		if ($has_list) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
-				$name, 'services.write.list', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
-			));
+			if ($mode == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+					$name, 'services.write.list', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+				));
+			}
+
+			if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+					$name, 'services.write.list', 'type', USER_TYPE_ZABBIX_USER
+				));
+			}
 		}
 
 		if (array_key_exists('services.write.tag', $rules)) {
@@ -614,10 +619,28 @@ class CRole extends CApiService {
 		}
 
 		if ($has_tag) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
-				$name, 'services.write.tag', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
-			));
+			if ($mode == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+					$name, 'services.write.tag', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+				));
+			}
+
+			if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+					$name, 'services.write.tag', 'type', USER_TYPE_ZABBIX_USER
+				));
+			}
+		}
+
+		if (array_key_exists('services.write.tag', $rules)) {
+			if ($rules['services.write.tag']['tag'] === '' && $rules['services.write.tag']['value'] !== '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Cannot have non-empty tag value while having empty tag in rule "%2$s" for user role "%1$s".',
+					$name, 'services.write.tag'
+				));
+			}
 		}
 	}
 
@@ -767,12 +790,12 @@ class CRole extends CApiService {
 			$new_rules = $role['rules'] + $old_rules;
 
 			$rules[$roleid] = array_merge(
-				$this->compileUiRules($old_rules, $new_rules, (int) $role['type']),
+				$this->compileUiRules((int) $role['type'], $old_rules, $new_rules),
 				$this->compileServicesReadRules($new_rules),
-				$this->compileServicesWriteRules($new_rules),
+				$this->compileServicesWriteRules((int) $role['type'], $new_rules),
 				$this->compileModulesRules($old_rules, $new_rules),
 				$this->compileApiRules($new_rules),
-				$this->compileActionsRules($old_rules, $new_rules, (int) $role['type'])
+				$this->compileActionsRules((int) $role['type'], $old_rules, $new_rules)
 			);
 		}
 
@@ -837,13 +860,13 @@ class CRole extends CApiService {
 	}
 
 	/**
+	 * @param int   $type
 	 * @param array $old_rules
 	 * @param array $new_rules
-	 * @param int   $type
 	 *
 	 * @return array
 	 */
-	private function compileUiRules(array $old_rules, array $new_rules, int $type): array {
+	private function compileUiRules(int $type, array $old_rules, array $new_rules): array {
 		$old_ui_rules = array_column($old_rules['ui'], null, 'name');
 		$new_ui_rules = array_column($new_rules['ui'], null, 'name');
 
@@ -923,11 +946,12 @@ class CRole extends CApiService {
 	}
 
 	/**
+	 * @param int   $type
 	 * @param array $new_rules
 	 *
 	 * @return array
 	 */
-	private function compileServicesWriteRules(array $new_rules): array {
+	private function compileServicesWriteRules(int $type, array $new_rules): array {
 		$compiled_rules[] = [
 			'name' => 'services.write.mode',
 			'type' => self::RULE_TYPE_INT32,
@@ -968,6 +992,7 @@ class CRole extends CApiService {
 	 * @param array $new_rules
 	 *
 	 * @return array
+	 * @throws APIException
 	 */
 	private function compileModulesRules(array $old_rules, array $new_rules): array {
 		$old_modules_rules = array_column($old_rules['modules'], null, 'moduleid');
@@ -1042,13 +1067,13 @@ class CRole extends CApiService {
 	}
 
 	/**
+	 * @param int   $type
 	 * @param array $old_rules
 	 * @param array $new_rules
-	 * @param int   $type
 	 *
 	 * @return array
 	 */
-	private function compileActionsRules(array $old_rules, array $new_rules, int $type): array {
+	private function compileActionsRules(int $type, array $old_rules, array $new_rules): array {
 		$old_actions_rules = array_column($old_rules['actions'], null, 'name');
 		$new_actions_rules = array_column($new_rules['actions'], null, 'name');
 
@@ -1390,6 +1415,7 @@ class CRole extends CApiService {
 	 * @param array $output
 	 *
 	 * @return array
+	 * @throws APIException
 	 */
 	private function getRelatedModulesRules(array $rules, array $output): array {
 		$modules_default_access = array_key_exists('modules.default_access', $rules)
@@ -1501,22 +1527,17 @@ class CRole extends CApiService {
 
 	/**
 	 * @return array
+	 * @throws APIException
 	 */
 	private static function getEnabledModuleIds(): array {
-		static $modules = null;
+		$modules = API::Module()->get([
+			'output' => 'moduleid',
+			'filter' => [
+				'status' => MODULE_STATUS_ENABLED
+			],
+			'preservekeys' => true
+		], false);
 
-		if ($modules === null) {
-			$modules = DB::select('module', [
-				'output' => ['moduleid'],
-				'filter' => [
-					'status' => MODULE_STATUS_ENABLED
-				],
-				'preservekeys' => true
-			]);
-
-			$modules = array_keys($modules);
-		}
-
-		return $modules;
+		return array_keys($modules);
 	}
 }
