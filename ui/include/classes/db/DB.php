@@ -230,8 +230,8 @@ class DB {
 	 *
 	 * @return string
 	 */
-	public static function getPk($tableName): string {
-		$schema = self::getSchema($tableName);
+	public static function getPk(string $table_name): string {
+		$schema = self::getSchema($table_name);
 
 		return $schema['key'];
 	}
