@@ -1485,11 +1485,21 @@ function num2letter($number) {
 function access_deny($mode = ACCESS_DENY_OBJECT) {
 	// deny access to an object
 	if ($mode == ACCESS_DENY_OBJECT && CWebUser::isLoggedIn()) {
-		show_error_message(_('No permissions to referred object or it does not exist!'));
+		if (detect_page_type() == PAGE_TYPE_JS) {
+			echo (new CView('layout.json', ['main_block' => json_encode([
+				'error' => makeMessageBox(ZBX_STYLE_MSG_BAD, [[
+					'message' => _('No permissions to referred object or it does not exist!')
+				]], null, false)->toString()
+			])]))->getOutput();
+			exit;
+		}
+		else {
+			show_error_message(_('No permissions to referred object or it does not exist!'));
 
-		require_once dirname(__FILE__).'/page_header.php';
-		(new CWidget())->show();
-		require_once dirname(__FILE__).'/page_footer.php';
+			require_once dirname(__FILE__).'/page_header.php';
+			(new CWidget())->show();
+			require_once dirname(__FILE__).'/page_footer.php';
+		}
 	}
 	// deny access to a page
 	else {
@@ -1544,7 +1554,13 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		$data['theme'] = getUserTheme(CWebUser::$data);
 
 		if (detect_page_type() == PAGE_TYPE_JS) {
-			echo (new CView('layout.json', ['main_block' => json_encode(['error' => $data['header']])]))->getOutput();
+			$messages = array_map(function ($msg) {
+				return ['message' => $msg];
+			}, $data['messages']);
+
+			echo (new CView('layout.json', ['main_block' => json_encode([
+				'error' => makeMessageBox(ZBX_STYLE_MSG_BAD, $messages, null, false)->toString()
+			])]))->getOutput();
 		}
 		else {
 			echo (new CView('general.warning', $data))->getOutput();
