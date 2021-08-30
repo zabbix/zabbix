@@ -774,8 +774,8 @@ class CUserGroup extends CApiService {
 	 * @param null|array $db_usrgrps
 	 */
 	private function updateUsersGroups(array &$usrgrps, string $method, array $db_usrgrps = null): void {
-		$ins_userids = [];
-		$del_userids = [];
+		$ins_users_groups = [];
+		$del_ids = [];
 
 		foreach ($usrgrps as &$usrgrp) {
 			if (!array_key_exists('userids', $usrgrp)) {
@@ -794,24 +794,24 @@ class CUserGroup extends CApiService {
 					unset($db_userids[$userid['userid']]);
 				}
 				else {
-					$ins_userids[] = [
-						'usrgrpid' => $usrgrp['usrgrpid'],
-						'userid' => $userid['userid']
+					$ins_users_groups[] = [
+						'userid' => $userid['userid'],
+						'usrgrpid' => $usrgrp['usrgrpid']
 					];
 				}
 			}
 			unset($userid);
 
-			$del_userids = array_merge($del_userids, array_column($db_userids, 'id'));
+			$del_ids = array_merge($del_ids, array_column($db_userids, 'id'));
 		}
 		unset($usrgrp);
 
-		if ($ins_userids) {
-			$ids = DB::insertBatch('users_groups', $ins_userids);
+		if ($ins_users_groups) {
+			$ids = DB::insertBatch('users_groups', $ins_users_groups);
 		}
 
-		if ($del_userids) {
-			DB::delete('users_groups', ['id' => $del_userids]);
+		if ($del_ids) {
+			DB::delete('users_groups', ['id' => $del_ids]);
 		}
 
 		foreach ($usrgrps as &$usrgrp) {
