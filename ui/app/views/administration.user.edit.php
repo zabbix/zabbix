@@ -449,6 +449,8 @@ if ($data['action'] === 'user.edit') {
 			)
 			->addInfo(_('Permissions can be assigned for user groups only.'));
 
+		// UI elements section.
+
 		$permissions_form_list
 			->addRow((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header'));
 
@@ -469,7 +471,103 @@ if ($data['action'] === 'user.edit') {
 			}
 		}
 
-		$permissions_form_list->addRow((new CTag('h4', true, _('Access to modules')))->addClass('input-section-header'));
+		// Services section.
+
+		$permissions_form_list->addRow(
+			(new CTag('h4', true, _('Access to services')))->addClass('input-section-header')
+		);
+
+		if ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_ALL) {
+			$permissions_form_list->addRow(
+				_('Read-write access to services'),
+				(new CDiv((new CSpan(_('All')))->addClass(ZBX_STYLE_STATUS_GREEN)))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+		elseif ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_NONE) {
+			$permissions_form_list->addRow(
+				_('Read-write access to services'),
+				(new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY)))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+		elseif ($data['service_write_list']) {
+			$service_list = [];
+
+			foreach ($data['service_write_list'] as $service) {
+				$service_list[] = (new CSpan($service['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
+			}
+
+			$permissions_form_list->addRow(
+				_('Read-write access to services'),
+				(new CDiv($service_list))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+
+		if ($data['service_write_tag']['tag'] !== '') {
+			$permissions_form_list->addRow(
+				_('Read-write access to services with tag'),
+				(new CDiv(
+					(new CSpan(implode(': ', [$data['service_write_tag']['tag'], $data['service_write_tag']['value']])))
+						->addClass(ZBX_STYLE_TAG)
+				))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+
+		if ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_ALL) {
+			$permissions_form_list->addRow(
+				_('Read-only access to services'),
+				(new CDiv((new CSpan(_('All')))->addClass(ZBX_STYLE_STATUS_GREEN)))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+		elseif ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_NONE) {
+			$permissions_form_list->addRow(
+				_('Read-only access to services'),
+				(new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY)))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+		elseif ($data['service_read_list']) {
+			$service_list = [];
+
+			foreach ($data['service_read_list'] as $service) {
+				$service_list[] = (new CSpan($service['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
+			}
+
+			$permissions_form_list->addRow(
+				_('Read-only access to services'),
+				(new CDiv($service_list))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+
+		if ($data['service_read_tag']['tag'] !== '') {
+			$permissions_form_list->addRow(
+				_('Read-only access to services with tag'),
+				(new CDiv(
+					(new CSpan(implode(': ', [$data['service_read_tag']['tag'], $data['service_read_tag']['value']])))
+						->addClass(ZBX_STYLE_TAG)
+				))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+
+		// Modules section.
+
+		$permissions_form_list->addRow(
+			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
+		);
 
 		if (!$data['modules']) {
 			$permissions_form_list->addRow(italic(_('No enabled modules found.')));
@@ -492,6 +590,8 @@ if ($data['action'] === 'user.edit') {
 				);
 			}
 		}
+
+		// API section.
 
 		$api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
 		$permissions_form_list
@@ -521,6 +621,8 @@ if ($data['action'] === 'user.edit') {
 					->addClass('rules-status-container')
 			);
 		}
+
+		// Actions section.
 
 		$permissions_form_list->addRow((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header'));
 		$elements = [];
