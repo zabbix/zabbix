@@ -361,7 +361,7 @@ zbx_uint64_t	json_parse_value(const char *start, char **error)
 			return json_error("invalid JSON object value starting character", ptr, error);
 	}
 
-	return (ptr - start) + len;
+	return ptr - start + len;
 }
 
 /******************************************************************************

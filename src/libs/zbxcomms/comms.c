@@ -1874,7 +1874,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 				}
 			}
 
-
 			if (sizeof(s->buf_stat) > expected_len)
 			{
 				buf_stat_bytes -= offset;
