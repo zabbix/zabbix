@@ -107,7 +107,7 @@ class CAutoregistration extends CApiService {
 			]);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTOREGISTRATION,
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTOREGISTRATION,
 			[['configid' => $db_autoreg['configid']] + $autoreg], [$db_autoreg['configid'] => $db_autoreg]
 		);
 

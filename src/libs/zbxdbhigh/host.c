@@ -1335,7 +1335,9 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid",
 				itemids->values, itemids->values_num);
 
-		DBselect_delete_for_item(sql, itemids);
+		if (FAIL == DBselect_delete_for_item(sql, itemids))
+			goto clean;
+
 		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != itemids->values_num);
@@ -1370,7 +1372,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
-
+clean:
 	zbx_vector_uint64_destroy(&profileids);
 
 	zbx_free(sql);
@@ -1422,7 +1424,9 @@ static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
 			httptestids->values, httptestids->values_num);
 
-	DBselect_delete_for_item(sql, &itemids);
+	if (FAIL == DBselect_delete_for_item(sql, &itemids))
+		goto clean;
+
 	DBdelete_items(&itemids);
 
 	sql_offset = 0;
@@ -1430,7 +1434,7 @@ static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
 			httptestids->values, httptestids->values_num);
 	DBexecute("%s", sql);
-
+clean:
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(sql);
 out:
@@ -1759,10 +1763,11 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	DBselect_delete_for_item(sql, &itemids);
+	if (FAIL == DBselect_delete_for_item(sql, &itemids))
+		goto clean;
 
 	DBdelete_items(&itemids);
-
+clean:
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(sql);
 
@@ -5242,7 +5247,8 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 
-	DBselect_delete_for_item(sql, &itemids);
+	if (FAIL == DBselect_delete_for_item(sql, &itemids))
+		goto clean;
 
 	DBdelete_items(&itemids);
 
@@ -5273,7 +5279,7 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
-
+clean:
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&selementids);
