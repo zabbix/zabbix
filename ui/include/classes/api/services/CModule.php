@@ -188,7 +188,7 @@ class CModule extends CApiService {
 			$modules[$index]['moduleid'] = $moduleid;
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MODULE, $modules);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MODULE, $modules);
 
 		return ['moduleids' => $moduleids];
 	}
@@ -249,7 +249,7 @@ class CModule extends CApiService {
 
 		DB::update($this->tableName, $update);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MODULE, $modules, $db_modules);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MODULE, $modules, $db_modules);
 
 		return ['moduleids' => array_keys($db_modules)];
 	}
@@ -277,7 +277,7 @@ class CModule extends CApiService {
 		if ($moduleids) {
 			DB::delete($this->tableName, [$this->pk => $moduleids]);
 
-			$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MODULE, $db_modules);
+			$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MODULE, $db_modules);
 		}
 
 		return ['moduleids' => $moduleids];

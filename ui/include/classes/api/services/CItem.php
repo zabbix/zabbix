@@ -731,7 +731,7 @@ class CItem extends CItemGeneral {
 
 		CItemManager::delete($itemids);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $db_items);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM, $db_items);
 
 		return ['itemids' => $itemids];
 	}
