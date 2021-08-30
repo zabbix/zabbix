@@ -697,7 +697,6 @@ class CUserGroup extends CApiService {
 	 */
 	private function updateTagFilters(array &$usrgrps, string $method, array $db_usrgrps = null): void {
 		$ins_tag_filters = [];
-		$upd_tag_filters = [];
 		$del_tag_filterids = [];
 
 		foreach ($usrgrps as &$usrgrp) {
@@ -707,7 +706,7 @@ class CUserGroup extends CApiService {
 
 			$db_tag_filterids_by_tag_value = [];
 			$db_tag_filters = ($method === 'update')
-				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['tag_filters'], null, 'tag_filterid')
+				? $db_usrgrps[$usrgrp['usrgrpid']]['tag_filters']
 				: [];
 
 			foreach ($db_tag_filters as $db_tag_filter) {
@@ -717,31 +716,17 @@ class CUserGroup extends CApiService {
 			}
 
 			foreach ($usrgrp['tag_filters'] as &$tag_filter) {
-				$is_groupid_exist = array_key_exists($tag_filter['groupid'], $db_tag_filterids_by_tag_value);
-				$is_tag_exist = ($is_groupid_exist && array_key_exists($tag_filter['tag'],
-							$db_tag_filterids_by_tag_value[$tag_filter['groupid']]
-						));
-				$is_value_exist = ($is_tag_exist && array_key_exists($tag_filter['value'],
-							$db_tag_filterids_by_tag_value[$tag_filter['groupid']][$tag_filter['tag']]
-						));
+				$groupid = $tag_filter['groupid'];
+				$tag = $tag_filter['tag'];
+				$value = $tag_filter['value'];
 
-				if ($is_value_exist) {
-					$tag_filterid = $db_tag_filterids_by_tag_value[$tag_filter['groupid']][$tag_filter['tag']][
-							$tag_filter['value']
-						];
-					$db_tag_filter = $db_tag_filters[$tag_filterid];
+				if (array_key_exists($groupid, $db_tag_filterids_by_tag_value)
+						&& array_key_exists($tag, $db_tag_filterids_by_tag_value[$groupid])
+						&& array_key_exists($value, $db_tag_filterids_by_tag_value[$groupid][$tag])) {
+					$tag_filterid = $db_tag_filterids_by_tag_value[$groupid][$tag][$value];
 					unset($db_tag_filters[$tag_filterid]);
 
 					$tag_filter['tag_filterid'] = $tag_filterid;
-
-					$upd_tag_filter = DB::getUpdatedValues('tag_filter', $tag_filter, $db_tag_filter);
-
-					if ($upd_tag_filter) {
-						$upd_tag_filters[] = [
-							'values' => $upd_tag_filter,
-							'where' => ['tag_filterid' => $tag_filterid]
-						];
-					}
 				}
 				else {
 					$ins_tag_filters[] = [
@@ -759,11 +744,7 @@ class CUserGroup extends CApiService {
 		unset($usrgrp);
 
 		if ($ins_tag_filters) {
-			$ids = DB::insertBatch('tag_filter', $ins_tag_filters);
-		}
-
-		if ($upd_tag_filters) {
-			DB::update('tag_filter', $upd_tag_filters);
+			$tag_filterids = DB::insertBatch('tag_filter', $ins_tag_filters);
 		}
 
 		if ($del_tag_filterids) {
@@ -777,7 +758,7 @@ class CUserGroup extends CApiService {
 
 			foreach ($usrgrp['tag_filters'] as &$tag_filter) {
 				if (!array_key_exists('tag_filterid', $tag_filter)) {
-					$tag_filter['tag_filterid'] = array_shift($ids);
+					$tag_filter['tag_filterid'] = array_shift($tag_filterids);
 				}
 			}
 			unset($tag_filter);
