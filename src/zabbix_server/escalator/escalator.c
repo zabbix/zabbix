@@ -478,8 +478,7 @@ static int	check_service_tags_rule_match(const zbx_vector_tags_t *service_tags, 
 
 			if (0 == strcmp(service_tag->tag, role_tag->tag))
 			{
-				if (NULL != role_tag->value || 0 == strcmp(service_tag->value,
-						ZBX_NULL2EMPTY_STR(role_tag->value)))
+				if (NULL == role_tag->value || 0 == strcmp(service_tag->value, role_tag->value))
 				{
 					return PERM_READ;
 				}
