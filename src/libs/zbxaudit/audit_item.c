@@ -319,7 +319,7 @@ void	zbx_audit_discovery_rule_update_json_add_filter_conditions(zbx_uint64_t ite
 	zbx_snprintf(audit_key_operator, sizeof(audit_key_operator),
 			"discoveryrule.filter[" ZBX_FS_UI64 "].conditions.operator", rule_conditionid);
 	zbx_snprintf(audit_key_macro, sizeof(audit_key_macro),
-			"discoveryrule.filter.[" ZBX_FS_UI64 "].conditions.macro", rule_conditionid);
+			"discoveryrule.filter[" ZBX_FS_UI64 "].conditions.macro", rule_conditionid);
 	zbx_snprintf(audit_key_value, sizeof(audit_key_value),
 			"discoveryrule.filter[" ZBX_FS_UI64 "].conditions.value", rule_conditionid);
 
