@@ -194,27 +194,33 @@ static int	lld_item_tag_sort_by_tag(const void *d1, const void *d2)
 static void	lld_item_preproc_free(zbx_lld_item_preproc_t *op)
 {
 	zbx_free(op->params);
+	if (0 != (op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS))
+		zbx_free(op->params_orig);
 	zbx_free(op->error_handler_params);
-	zbx_free(op->params_orig);
-	zbx_free(op->error_handler_params_orig);
+	if (0 != (op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS))
+		zbx_free(op->error_handler_params_orig);
 	zbx_free(op);
 }
 
 static void	lld_item_param_free(zbx_lld_item_param_t *param)
 {
 	zbx_free(param->name);
+	if (0 != (param->flags & ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_NAME))
+		zbx_free(param->name_orig);
 	zbx_free(param->value);
-	zbx_free(param->name_orig);
-	zbx_free(param->value_orig);
+	if (0 != (param->flags & ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_VALUE))
+		zbx_free(param->value_orig);
 	zbx_free(param);
 }
 
 static void	lld_item_tag_free(zbx_lld_item_tag_t *tag)
 {
 	zbx_free(tag->tag);
+	if (0 != (tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE_TAG))
+		zbx_free(tag->tag_orig);
 	zbx_free(tag->value);
-	zbx_free(tag->tag_orig);
-	zbx_free(tag->value_orig);
+	if (0 != (tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE_VALUE))
+		zbx_free(tag->value_orig);
 	zbx_free(tag);
 }
 

@@ -113,7 +113,8 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 			if (lastcheck > ts_delete)
 			{
 				zbx_vector_uint64_append(&del_ids, id);
-				if(0 == strncmp(table, "item_discovery", ZBX_CONST_STRLEN("item_discovery")))
+
+				if (0 == strncmp(table, "item_discovery", ZBX_CONST_STRLEN("item_discovery")))
 				{
 					zbx_audit_item_create_entry_for_delete(id, name,
 							(int)ZBX_FLAG_DISCOVERY_CREATED);
@@ -194,8 +195,6 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		cb(&del_ids);
-
-		zbx_free(sql);
 	}
 
 	DBcommit();
