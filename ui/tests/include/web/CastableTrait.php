@@ -308,4 +308,15 @@ trait CastableTrait {
 	public function asFilterTab($options = []) {
 		return $this->cast(CFilterTabElement::class, $options);
 	}
+
+	/**
+	 * Cast object to MainMenu element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CMainMenuElement
+	 */
+	public function asMainMenu($options = []) {
+		return $this->cast(CMainMenuElement::class, $options);
+	}
 }
