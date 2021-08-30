@@ -129,8 +129,7 @@ abstract class testFormMacros extends CWebTest {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".',
-					'error_details_prototype' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
 				]
 			],
 			[
@@ -144,8 +143,7 @@ abstract class testFormMacros extends CWebTest {
 							'macro' => '{$$MACRO}'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}".',
-					'error_details_prototype' => 'Invalid macro "{$$MACRO}": incorrect syntax near "$MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}".'
 				]
 			],
 			[
@@ -159,8 +157,7 @@ abstract class testFormMacros extends CWebTest {
 							'macro' => '{$MAC%^}'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".',
-					'error_details_prototype' => 'Invalid macro "{$MAC%^}": incorrect syntax near "%^}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".'
 				]
 			],
 			[
@@ -174,8 +171,7 @@ abstract class testFormMacros extends CWebTest {
 							'macro' => '{#LLD_MACRO}'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".',
-					'error_details_prototype' => 'Invalid macro "{#LLD_MACRO}": incorrect syntax near "#LLD_MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".'
 				]
 			],
 			[
@@ -191,8 +187,7 @@ abstract class testFormMacros extends CWebTest {
 							'description' => 'Macro Description'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.',
-					'error_details_prototype' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+					'error' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
 				]
 			],
 			[
@@ -213,8 +208,7 @@ abstract class testFormMacros extends CWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.',
-					'error_details_prototype' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
 				]
 			],
 			[
@@ -235,8 +229,7 @@ abstract class testFormMacros extends CWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.',
-					'error_details_prototype' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
+					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
 				]
 			]
 		];
@@ -358,8 +351,7 @@ abstract class testFormMacros extends CWebTest {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".',
-					'error_details_prototype' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
 				]
 			],
 			[
@@ -375,8 +367,7 @@ abstract class testFormMacros extends CWebTest {
 							'description' => 'Macro Description'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.',
-					'error_details_prototype' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+					'error'  => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
 				]
 			],
 			[
@@ -390,8 +381,7 @@ abstract class testFormMacros extends CWebTest {
 							'macro' => '{$$MACRO}'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}',
-					'error_details_prototype' => 'Invalid macro "{$$MACRO}": incorrect syntax near "$MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}'
 				]
 			],
 			[
@@ -405,8 +395,7 @@ abstract class testFormMacros extends CWebTest {
 							'macro' => '{$MAC%^}'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".',
-					'error_details_prototype' => 'Invalid macro "{$MAC%^}": incorrect syntax near "%^}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".'
 				]
 			],
 			[
@@ -420,8 +409,7 @@ abstract class testFormMacros extends CWebTest {
 							'macro' => '{#LLD_MACRO}'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".',
-					'error_details_prototype' => 'Invalid macro "{#LLD_MACRO}": incorrect syntax near "#LLD_MACRO}".'
+					'error'  => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".'
 				]
 			],
 			[
@@ -444,8 +432,7 @@ abstract class testFormMacros extends CWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.',
-					'error_details_prototype' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
 				]
 			],
 			[
@@ -468,8 +455,7 @@ abstract class testFormMacros extends CWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.',
-					'error_details_prototype' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
+					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
 				]
 			],
 			[
@@ -492,8 +478,7 @@ abstract class testFormMacros extends CWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_details_host' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:^[0-9].*$}) already exists.',
-					'error_details_prototype' => 'Macro "{$MACRO:regex:^[0-9].*$}" is not unique.'
+					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:^[0-9].*$}) already exists.'
 				]
 			]
 		];
@@ -520,14 +505,14 @@ abstract class testFormMacros extends CWebTest {
 
 			$this->page->login()->open(
 				$is_prototype
-					? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 			);
 		}
 		else {
 			$this->page->login()->open(
 				$is_prototype
-					? 'host_prototypes.php?form=create&parent_discoveryid='.$lld_id
+					? 'host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id
 					: $host_type.'s.php?form=create'
 			);
 
@@ -556,9 +541,7 @@ abstract class testFormMacros extends CWebTest {
 				break;
 
 			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, $update ? 'Cannot update '.$object : 'Cannot add '.$object,
-						($is_prototype ? $data['error_details_prototype'] : $data['error_details_host'])
-				);
+				$this->assertMessage(TEST_BAD, ($update ? 'Cannot update '.$object : 'Cannot add '.$object), $data['error']);
 				// Check that DB hash is not changed.
 				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL_HOSTS));
 				break;
@@ -578,7 +561,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->page->login()->open(
 			$is_prototype
-				? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
@@ -665,7 +648,7 @@ abstract class testFormMacros extends CWebTest {
 	protected function checkChangeInheritedMacros($data, $host_type, $is_prototype = false, $lld_id = null) {
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		if ($is_prototype) {
-			$this->page->login()->open('host_prototypes.php?form=create&parent_discoveryid='.$lld_id);
+			$this->page->login()->open('host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id);
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			$name = 'Host prototype with edited global {#MACRO} '.time();
 			$form->fill(['Host name' => $name]);
@@ -808,7 +791,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->page->open(
 			$is_prototype
-				? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
@@ -924,7 +907,7 @@ abstract class testFormMacros extends CWebTest {
 	 */
 	protected function checkRemoveInheritedMacros($data, $id, $host_type, $is_prototype = false, $lld_id = null) {
 		$link = $is_prototype
-			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0';
 
 		$this->page->login()->open($link);
@@ -1104,7 +1087,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->page->open(
 			$is_prototype
-				? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
@@ -1450,7 +1433,7 @@ abstract class testFormMacros extends CWebTest {
 			$this->page->login();
 		}
 		$this->page->open($url)->waitUntilReady();
-		$this->query('name:'.$source.'Form')->asForm()->one()->selectTab('Macros');
+		$this->query('id:'.$source.'-form')->asForm()->one()->selectTab('Macros');
 	}
 
 	/**
