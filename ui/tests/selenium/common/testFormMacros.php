@@ -31,6 +31,8 @@ abstract class testFormMacros extends CWebTest {
 
 	use MacrosTrait;
 
+	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
+
 	/**
 	 * Attach Behaviors to the test.
 	 *
@@ -39,8 +41,6 @@ abstract class testFormMacros extends CWebTest {
 	public function getBehaviors() {
 		return ['class' => CMessageBehavior::class];
 	}
-
-	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
 	public static function getHash() {
 		return CDBHelper::getHash(self::SQL_HOSTS);
@@ -533,7 +533,7 @@ abstract class testFormMacros extends CWebTest {
 
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			$name = $is_prototype ? $data['Name'].' {#KEY}' : $data['Name'];
-			$form->fill([($host_type === 'template') ? 'Template name' : 'Host name' => $name]);
+			$form->fill([(($host_type === 'template') ? 'Template name' : 'Host name') => $name]);
 
 			if ($is_prototype) {
 				$form->selectTab('Groups');
