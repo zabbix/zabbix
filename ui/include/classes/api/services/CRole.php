@@ -759,6 +759,8 @@ class CRole extends CApiService {
 	/**
 	 * @param array      $roles
 	 * @param array|null $db_roles
+	 *
+	 * @throws APIException
 	 */
 	private function updateRules(array $roles, array $db_roles = null): void {
 		$default_rules = [
@@ -792,7 +794,7 @@ class CRole extends CApiService {
 			$rules[$roleid] = array_merge(
 				$this->compileUiRules((int) $role['type'], $old_rules, $new_rules),
 				$this->compileServicesReadRules($new_rules),
-				$this->compileServicesWriteRules((int) $role['type'], $new_rules),
+				$this->compileServicesWriteRules($new_rules),
 				$this->compileModulesRules($old_rules, $new_rules),
 				$this->compileApiRules($new_rules),
 				$this->compileActionsRules((int) $role['type'], $old_rules, $new_rules)
@@ -946,12 +948,11 @@ class CRole extends CApiService {
 	}
 
 	/**
-	 * @param int   $type
 	 * @param array $new_rules
 	 *
 	 * @return array
 	 */
-	private function compileServicesWriteRules(int $type, array $new_rules): array {
+	private function compileServicesWriteRules(array $new_rules): array {
 		$compiled_rules[] = [
 			'name' => 'services.write.mode',
 			'type' => self::RULE_TYPE_INT32,
@@ -1201,6 +1202,7 @@ class CRole extends CApiService {
 	 * @param array $result
 	 *
 	 * @return array
+	 * @throws APIException
 	 */
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
