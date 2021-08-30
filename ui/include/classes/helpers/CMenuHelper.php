@@ -343,7 +343,7 @@ class CMenuHelper {
 				->add(
 					(new CMenuItem(_('Integrations')))
 						->setIcon('icon-integrations')
-						->setUrl(new Curl(getIntegrationsUrl($lang)))
+						->setUrl(new CUrl(getIntegrationsUrl($lang)))
 						->setTitle(_('Zabbix Integrations'))
 						->setTarget('_blank')
 				);
