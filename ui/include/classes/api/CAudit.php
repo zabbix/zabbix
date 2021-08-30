@@ -19,7 +19,15 @@
 **/
 
 
+/**
+ * Class to logging audit records.
+ */
 class CAudit {
+	/**
+	 * Audit actions.
+	 *
+	 * @var int
+	 */
 	public const ACTION_ADD = 0;
 	public const ACTION_UPDATE = 1;
 	public const ACTION_DELETE = 2;
@@ -27,6 +35,11 @@ class CAudit {
 	public const ACTION_LOGOUT = 4;
 	public const ACTION_EXECUTE = 7;
 
+	/**
+	 * Audit resources.
+	 *
+	 * @var int
+	 */
 	public const RESOURCE_USER = 0;
 	public const RESOURCE_MEDIA_TYPE = 3;
 	public const RESOURCE_HOST = 4;
@@ -65,27 +78,60 @@ class CAudit {
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
 
+	/**
+	 * Audit detail actions.
+	 *
+	 * @var string
+	 */
 	public const DETAILS_ACTION_ADD = 'add';
 	public const DETAILS_ACTION_UPDATE = 'update';
 	public const DETAILS_ACTION_DELETE = 'delete';
 
+	/**
+	 * Auditlog enabled value.
+	 *
+	 * @var int
+	 */
 	private const AUDITLOG_ENABLE = 1;
 
+	/**
+	 * Table names for audit resources.
+	 * resource => table name
+	 *
+	 * @var array
+	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_USER => 'users'
 	];
 
+	/**
+	 * Name field names for audit resources.
+	 * resource => name field
+	 *
+	 * @var array
+	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_USER => 'username'
 	];
 
+	/**
+	 * API names for audit resources.
+	 * resource => API name
+	 *
+	 * @var array
+	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_USER => 'user'
 	];
 
+	/**
+	 * Array of paths that need to mask in audit details.
+	 *
+	 * @var array
+	 */
 	private const MASKED_PATHS = [
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
 		// self::RESOURCE_MACRO => [
@@ -95,18 +141,46 @@ class CAudit {
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
+	/**
+	 * Table names for audit nested objects.
+	 * path => table name
+	 *
+	 * @var array
+	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups'
 	];
 
+	/**
+	 * Nested id for audit nested objects.
+	 * path => id
+	 *
+	 * @var array
+	 */
 	private const NESTED_OBJECTS_IDS = [
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id'
 	];
 
+	/**
+	 * Field paths to skip in auditlog details.
+	 *
+	 * @var array
+	 */
 	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
 
+	/**
+	 * Add audit records.
+	 *
+	 * @param string     $userid
+	 * @param string     $ip
+	 * @param string     $username
+	 * @param int        $action
+	 * @param int        $resource
+	 * @param array      $objects
+	 * @param array|null $db_objects
+	 */
 	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,
 			?array $db_objects): void {
 		if (!self::isAuditEnabled() && ($resource != self::RESOURCE_SETTINGS
@@ -148,6 +222,11 @@ class CAudit {
 		DB::insertBatch('auditlog', $auditlog);
 	}
 
+	/**
+	 * Return recordsetid and generate if recordsetid is null.
+	 *
+	 * @return string
+	 */
 	private static function getRecordSetId(): string {
 		static $recordsetid = null;
 
@@ -158,10 +237,25 @@ class CAudit {
 		return $recordsetid;
 	}
 
+	/**
+	 * Check audit logging is enabled.
+	 *
+	 * @return bool
+	 */
 	private static function isAuditEnabled(): bool {
 		return CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
 	}
 
+	/**
+	 * Return resource name for auditlog.
+	 *
+	 * @param int   $resource
+	 * @param int   $action
+	 * @param array $object
+	 * @param array $db_object
+	 *
+	 * @return string
+	 */
 	private static function getResourceName(int $resource, int $action, array $object, array $db_object): string {
 		$field_name = self::FIELD_NAMES[$resource];
 		$resource_name = ($field_name !== null)
@@ -177,6 +271,16 @@ class CAudit {
 		return $resource_name;
 	}
 
+	/**
+	 * Handle audit details difference.
+	 *
+	 * @param int   $resource
+	 * @param int   $action
+	 * @param array $object
+	 * @param array $db_object
+	 *
+	 * @return array
+	 */
 	private static function handleObjectDiff(int $resource, int $action, array $object, array $db_object): array {
 		if (!in_array($action, [self::ACTION_ADD, self::ACTION_UPDATE])) {
 			return [];
@@ -195,6 +299,15 @@ class CAudit {
 		}
 	}
 
+	/**
+	 * Check $path is field that need to mask or not.
+	 *
+	 * @param int    $resource
+	 * @param string $path
+	 * @param array  $object
+	 *
+	 * @return bool
+	 */
 	private static function isValueToMask(int $resource, string $path, array $object): bool {
 		if (!array_key_exists($resource, self::MASKED_PATHS)) {
 			return false;
@@ -224,6 +337,14 @@ class CAudit {
 		return false;
 	}
 
+	/**
+	 * Replace object keys to path and convert to one dimension array.
+	 *
+	 * @param string $prefix
+	 * @param array  $object
+	 *
+	 * @return array
+	 */
 	private static function convertKeysToPaths(string $prefix, array $object): array {
 		$result = [];
 
@@ -252,6 +373,15 @@ class CAudit {
 		return $result;
 	}
 
+	/**
+	 * Check value equel to default value from database schema.
+	 *
+	 * @param int     $resource
+	 * @param string  $path
+	 * @param string  $value
+	 *
+	 * @return bool
+	 */
 	private static function isDefaultValue(int $resource, string $path, string $value): bool {
 		$object_path = self::getLastObjectPath($path);
 		$table_name = self::TABLE_NAMES[$resource];
@@ -278,14 +408,35 @@ class CAudit {
 		return $value == $schema_fields[$field_name]['default'];
 	}
 
+	/**
+	 * Check path is nested object or not.
+	 *
+	 * @param string $path
+	 *
+	 * @return bool
+	 */
 	private static function isNestedObjectProperty(string $path): bool {
 		return (count(explode('.', $path)) > 2);
 	}
 
+	/**
+	 * Return parent path.
+	 *
+	 * @param string $path
+	 *
+	 * @return string
+	 */
 	private static function getLastObjectPath(string $path): string {
 		return substr($path, 0, strrpos($path, '.'));
 	}
 
+	/**
+	 * Return nested object paths.
+	 *
+	 * @param array $object
+	 *
+	 * @return array
+	 */
 	private static function getNestedObjectsPaths(array $object): array {
 		$paths = [];
 
@@ -304,6 +455,14 @@ class CAudit {
 		return $paths;
 	}
 
+	/**
+	 * Handle object difference for audit add action.
+	 *
+	 * @param int   $resource
+	 * @param array $object
+	 *
+	 * @return array
+	 */
 	private static function handleAdd(int $resource, array $object): array {
 		$result = [];
 
@@ -327,6 +486,15 @@ class CAudit {
 		return $result;
 	}
 
+	/**
+	 * Handle object difference for audit update action.
+	 *
+	 * @param int   $resource
+	 * @param array $object
+	 * @param array $db_object
+	 *
+	 * @return array
+	 */
 	private static function handleUpdate(int $resource, array $object, array $db_object): array {
 		$result = [];
 		$full_object = $object + $db_object;
