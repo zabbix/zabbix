@@ -30,7 +30,10 @@ $host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 $host_form = (new CForm())
 	->setId($data['form_name'])
 	->setName($data['form_name'])
-	->addVar('action', $data['form_action'])
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', $data['form_action'])
+		->getUrl()
+	)
 	->addVar('hostid', $data['hostid'])
 	->addVar('clone_hostid', $data['clone_hostid'])
 	->addVar('full_clone', $data['full_clone'])
@@ -148,7 +151,7 @@ $host_tab = (new CFormGrid())
 			new CDiv([renderInterfaceHeaders(), $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]),
 			(!$host_is_discovered)
 				? new CDiv(
-					(new CButton('', _('Add')))
+					(new CButton(null, _('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->setMenuPopup([
 							'type' => 'submenu',
