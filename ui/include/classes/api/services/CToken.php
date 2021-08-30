@@ -464,28 +464,38 @@ class CToken extends CApiService {
 		}
 
 		$db_tokens = DB::select('token', [
-			'output' => ['tokenid', 'name', 'token'],
+			'output' => ['tokenid', 'name', 'token', 'creator_userid'],
 			'tokenids' => $tokenids,
 			'preservekeys' => true
 		]);
 
+		$tokens = [];
 		$response = [];
 		$upd_tokens = [];
 		foreach ($tokenids as $tokenid) {
-			$token = bin2hex(random_bytes(32));
+			$new_token = bin2hex(random_bytes(32));
+
+			$token = [
+				'tokenid' => $tokenid,
+				'token' => hash('sha512', $new_token),
+				'creator_userid' => self::$userData['userid']
+			];
+			$tokens[] = $token;
+
 			$response[] = [
 				'tokenid' => $tokenid,
-				'token' => $token
+				'token' => $new_token
 			];
+
 			$upd_tokens[] = [
-				'values' => ['token' => hash('sha512', $token), 'creator_userid' => self::$userData['userid']],
+				'values' => DB::getUpdatedValues('token', $token, $db_tokens[$tokenid]),
 				'where' => ['tokenid' => $tokenid]
 			];
 		}
 
 		DB::update('token', $upd_tokens);
 
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $response, $db_tokens);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $tokens, $db_tokens);
 
 		return $response;
 	}
