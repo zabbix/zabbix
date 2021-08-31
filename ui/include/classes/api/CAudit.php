@@ -20,7 +20,7 @@
 
 
 /**
- * Class to logging audit records.
+ * Class to log audit records.
  */
 class CAudit {
 	/**
@@ -79,7 +79,7 @@ class CAudit {
 	public const RESOURCE_SCHEDULED_REPORT = 46;
 
 	/**
-	 * Audit detail actions.
+	 * Audit details actions.
 	 *
 	 * @var string
 	 */
@@ -95,7 +95,7 @@ class CAudit {
 	private const AUDITLOG_ENABLE = 1;
 
 	/**
-	 * Table names for audit resources.
+	 * Table names of audit resources.
 	 * resource => table name
 	 *
 	 * @var array
@@ -106,7 +106,7 @@ class CAudit {
 	];
 
 	/**
-	 * Name field names for audit resources.
+	 * Name field names of audit resources.
 	 * resource => name field
 	 *
 	 * @var array
@@ -117,7 +117,7 @@ class CAudit {
 	];
 
 	/**
-	 * API names for audit resources.
+	 * API names of audit resources.
 	 * resource => API name
 	 *
 	 * @var array
@@ -128,7 +128,7 @@ class CAudit {
 	];
 
 	/**
-	 * Array of paths that need to mask in audit details.
+	 * Array of paths that should be masked in audit details.
 	 *
 	 * @var array
 	 */
@@ -142,7 +142,7 @@ class CAudit {
 	];
 
 	/**
-	 * Table names for audit nested objects.
+	 * Table names of nested objects.
 	 * path => table name
 	 *
 	 * @var array
@@ -153,8 +153,8 @@ class CAudit {
 	];
 
 	/**
-	 * Nested id for audit nested objects.
-	 * path => id
+	 * ID field names of nested objects.
+	 * path => id field
 	 *
 	 * @var array
 	 */
@@ -164,7 +164,7 @@ class CAudit {
 	];
 
 	/**
-	 * Field paths to skip in auditlog details.
+	 * Array of paths that should be skipped in audit details.
 	 *
 	 * @var array
 	 */
@@ -223,7 +223,7 @@ class CAudit {
 	}
 
 	/**
-	 * Return recordsetid and generate if recordsetid is null.
+	 * Return recordsetid. Generate recordsetid if its not been generated yet.
 	 *
 	 * @return string
 	 */
@@ -247,7 +247,7 @@ class CAudit {
 	}
 
 	/**
-	 * Return resource name for auditlog.
+	 * Return resource name of logging object.
 	 *
 	 * @param int   $resource
 	 * @param int   $action
@@ -272,7 +272,7 @@ class CAudit {
 	}
 
 	/**
-	 * Handle audit details difference.
+	 * Prepares the details for audit log.
 	 *
 	 * @param int   $resource
 	 * @param int   $action
@@ -300,7 +300,7 @@ class CAudit {
 	}
 
 	/**
-	 * Check $path is field that need to mask or not.
+	 * Checks by path, whether the value of the object should be masked.
 	 *
 	 * @param int    $resource
 	 * @param string $path
@@ -338,7 +338,7 @@ class CAudit {
 	}
 
 	/**
-	 * Replace object keys to path and convert to one dimension array.
+	 * Converts the object properties to the one-dimensional array where the key is a path.
 	 *
 	 * @param string $prefix
 	 * @param array  $object
@@ -374,7 +374,7 @@ class CAudit {
 	}
 
 	/**
-	 * Check value equel to default value from database schema.
+	 * Checks by path, whether the value is equal to default value from the database schema.
 	 *
 	 * @param int     $resource
 	 * @param string  $path
@@ -409,7 +409,7 @@ class CAudit {
 	}
 
 	/**
-	 * Check path is nested object or not.
+	 * Checks whether a path is path to nested object property.
 	 *
 	 * @param string $path
 	 *
@@ -420,7 +420,7 @@ class CAudit {
 	}
 
 	/**
-	 * Return parent path.
+	 * Return the path to the parent property object from the passed path.
 	 *
 	 * @param string $path
 	 *
@@ -431,7 +431,7 @@ class CAudit {
 	}
 
 	/**
-	 * Return nested object paths.
+	 * Return the paths to nested object properties from the paths of passing objects.
 	 *
 	 * @param array $object
 	 *
@@ -456,7 +456,7 @@ class CAudit {
 	}
 
 	/**
-	 * Handle object difference for audit add action.
+	 * Prepares the audit details for add action.
 	 *
 	 * @param int   $resource
 	 * @param array $object
@@ -487,7 +487,7 @@ class CAudit {
 	}
 
 	/**
-	 * Handle object difference for audit update action.
+	 * Prepares the audit details for update action.
 	 *
 	 * @param int   $resource
 	 * @param array $object
