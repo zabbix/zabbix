@@ -93,7 +93,7 @@ typedef struct
 	zbx_uint64_t		roleid;
 
 	/* 0 if services.read is set to 0 and services.write is either 0 or absent. 1 otherwise. */
-	unsigned char		default_read;
+	unsigned char		global_read;
 
 	/* the service identifiers listed by services.read.id.* and services.write.id.* */
 	zbx_vector_uint64_t	serviceids;
@@ -560,9 +560,9 @@ static void	zbx_db_cache_service_role(zbx_service_role_t *role)
 	}
 
 	if (0 == services_read && 0 == services_write)
-		role->default_read = 0;
+		role->global_read = 0;
 	else
-		role->default_read = 1;
+		role->global_read = 1;
 
 	if (role->serviceids.values_num > 0)
 	{
@@ -607,17 +607,22 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	}
 
 	/* Check if global read rights are not disabled (services.read:0). */
+
 	/* In this case individual role rules can be skipped.              */
-	if (1 == role->default_read)
+	if (1 == role->global_read)
 		return PERM_READ;
 
-	/* read read/write rule rights */
+	/* check if the target service has read permission */
+
+	/* check read/write rule rights */
 	if (SUCCEED == zbx_vector_uint64_bsearch(&role->serviceids, service->serviceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		return PERM_READ;
 
 	/* check if service tags do not match tag rules */
 	if (PERM_DENY < (perm = check_service_tags_rule_match(&service->service_tags, &role->tags)))
 		return perm;
+
+	/* check if any parent service has read permission */
 
 	/* get service parent ids from service manager */
 	zbx_service_serialize_id(&data, &data_alloc, &data_offset, service->serviceid);
