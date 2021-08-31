@@ -339,11 +339,12 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 		var wide_popup_actions = ['popup.generic', 'popup.dashboard.share.edit', 'dashboard.page.properties.edit',
 				'dashboard.properties.edit', 'dashboard.widget.edit', 'popup.media', 'popup.lldoperation',
 				'popup.lldoverride', 'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep',
-				'popup.testtriggerexpr', 'popup.triggerwizard', 'popup.host.edit'
+				'popup.testtriggerexpr', 'popup.triggerwizard'
 			],
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
-				'popup.mediatype.message', 'popup.scriptexec', 'popup.scheduledreport.test', 'popup.service.edit'
+				'popup.mediatype.message', 'popup.host.edit', 'popup.scriptexec', 'popup.scheduledreport.test',
+				'popup.service.edit'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
 				'popup.massupdate.triggerprototype', 'popup.massupdate.service'
