@@ -209,7 +209,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.checkpoint_write_time
+                - $.checkpoint_sync_time
             -
               type: MULTIPLIER
               parameters:
