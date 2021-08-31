@@ -150,10 +150,10 @@ class HostInterfaceManager {
 			}
 		);
 
-		jQuery(`#interfaces_${iface.interfaceid}_details_version`).on('change', function () {
+		jQuery(`#interfaces_${iface.interfaceid}_details_version`).on('change', (e) => {
 			jQuery(`#interfaces_${iface.interfaceid}_details_securitylevel`).off('change');
 
-			if (jQuery(this).val() == this.SNMP_V3) {
+			if (e.target.value == this.SNMP_V3) {
 				new CViewSwitcher(`interfaces_${iface.interfaceid}_details_securitylevel`, 'change',
 					{
 						[this.SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV]: [],
