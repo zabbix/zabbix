@@ -431,7 +431,7 @@ class CAudit {
 	}
 
 	/**
-	 * Return the paths to nested object properties from the paths of passing objects.
+	 * Return the paths to nested object properties from the paths of passing object.
 	 *
 	 * @param array $object
 	 *
