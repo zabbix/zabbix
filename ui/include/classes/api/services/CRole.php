@@ -913,7 +913,7 @@ class CRole extends CApiService {
 	 */
 	private function compileServicesReadRules(array $new_rules): array {
 		$compiled_rules[] = [
-			'name' => 'services.read.mode',
+			'name' => 'services.read',
 			'type' => self::RULE_TYPE_INT32,
 			'value' => $new_rules['services.read.mode']
 		];
@@ -954,7 +954,7 @@ class CRole extends CApiService {
 	 */
 	private function compileServicesWriteRules(array $new_rules): array {
 		$compiled_rules[] = [
-			'name' => 'services.write.mode',
+			'name' => 'services.write',
 			'type' => self::RULE_TYPE_INT32,
 			'value' => $new_rules['services.write.mode']
 		];
@@ -1323,8 +1323,8 @@ class CRole extends CApiService {
 	private function getRelatedServicesReadRules(array $rules, array $output): array {
 		$result = [];
 
-		$services_read_mode = array_key_exists('services.read.mode', $rules)
-			? $rules['services.read.mode']
+		$services_read_mode = array_key_exists('services.read', $rules)
+			? $rules['services.read']
 			: (string) ZBX_ROLE_RULE_SERVICES_ACCESS_ALL;
 
 		if (in_array('services.read.mode', $output)) {
@@ -1372,8 +1372,8 @@ class CRole extends CApiService {
 	private function getRelatedServicesWriteRules(array $rules, array $output): array {
 		$result = [];
 
-		$services_write_mode = array_key_exists('services.write.mode', $rules)
-			? $rules['services.write.mode']
+		$services_write_mode = array_key_exists('services.write', $rules)
+			? $rules['services.write']
 			: (string) ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM;
 
 		if (in_array('services.write.mode', $output)) {
