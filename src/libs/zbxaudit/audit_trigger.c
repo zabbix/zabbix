@@ -254,3 +254,17 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, i
 	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_tag, tag);
 	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
 }
+
+void	zbx_audit_trigger_update_json_delete_tags(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid)
+{
+	char	audit_key[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	if (ZBX_FLAG_DISCOVERY_NORMAL == flags)
+		zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);
+	else
+		zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "triggerprototype.tags[" ZBX_FS_UI64 "]", triggertagid);
+
+	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
+}
