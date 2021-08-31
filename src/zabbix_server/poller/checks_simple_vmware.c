@@ -321,7 +321,8 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 			SET_UI64_RESULT(result, perfvalue->value);
 			break;
 		default:
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter type of unitInfo is unknown."));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Performance counter type of unitInfo is unknown. "
+					"Counter id:" ZBX_FS_UI64, counterid));
 			goto out;
 		}
 	}
