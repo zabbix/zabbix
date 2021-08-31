@@ -226,7 +226,7 @@ class DB {
 	 *
 	 * @static
 	 *
-	 * @param string $tableName
+	 * @param string $table_name
 	 *
 	 * @return string
 	 */
