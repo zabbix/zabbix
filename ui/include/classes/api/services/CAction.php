@@ -631,7 +631,7 @@ class CAction extends CApiService {
 			if (array_key_exists('update_operations', $action)) {
 				foreach ($action['update_operations'] as &$operation) {
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
-							|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+							|| $operation['operationtype'] == OPERATION_TYPE_UPDATE_MESSAGE) {
 						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
 							? $operation['opmessage']
 							: [];
@@ -886,7 +886,7 @@ class CAction extends CApiService {
 
 					if (!array_key_exists('operationid', $update_operation)) {
 						if ($update_operation['operationtype'] == OPERATION_TYPE_MESSAGE
-								|| $update_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+								|| $update_operation['operationtype'] == OPERATION_TYPE_UPDATE_MESSAGE) {
 							$update_operation['opmessage'] += [
 								'default_msg' => 1,
 								'mediatypeid' => 0,
@@ -899,7 +899,7 @@ class CAction extends CApiService {
 					}
 					elseif (array_key_exists($update_operation['operationid'], $db_update_operations)) {
 						if ($update_operation['operationtype'] == OPERATION_TYPE_MESSAGE
-								|| $update_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+								|| $update_operation['operationtype'] == OPERATION_TYPE_UPDATE_MESSAGE) {
 							$db_opmessage = array_key_exists('opmessage', $db_update_operations[$update_operation['operationid']])
 								? $db_update_operations[$update_operation['operationid']]['opmessage']
 								: [
@@ -1138,7 +1138,7 @@ class CAction extends CApiService {
 					];
 					break;
 
-				case OPERATION_TYPE_ACK_MESSAGE:
+				case OPERATION_TYPE_UPDATE_MESSAGE:
 					// falls through
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 					if (array_key_exists('opmessage', $operation) && $operation['opmessage']) {
@@ -1269,7 +1269,7 @@ class CAction extends CApiService {
 						$opInventoryToDeleteByOpId[] = $operationDb['operationid'];
 						break;
 
-					case OPERATION_TYPE_ACK_MESSAGE:
+					case OPERATION_TYPE_UPDATE_MESSAGE:
 						// falls through
 					case OPERATION_TYPE_RECOVERY_MESSAGE:
 						$opMessagesToDeleteByOpId[] = $operationDb['operationid'];
@@ -1459,7 +1459,7 @@ class CAction extends CApiService {
 					}
 					break;
 
-				case OPERATION_TYPE_ACK_MESSAGE:
+				case OPERATION_TYPE_UPDATE_MESSAGE:
 					// falls through
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 					if ($type_changed) {
@@ -1664,8 +1664,10 @@ class CAction extends CApiService {
 				]
 			],
 			ACTION_UPDATE_OPERATION => [
-				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE],
-				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]
+				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
+					OPERATION_TYPE_UPDATE_MESSAGE
+				],
+				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_UPDATE_MESSAGE]
 			]
 		];
 
@@ -1739,7 +1741,7 @@ class CAction extends CApiService {
 					$all_userids = array_merge($all_userids, $userids);
 					$all_usrgrpids = array_merge($all_usrgrpids, $usrgrpids);
 					// falls through
-				case OPERATION_TYPE_ACK_MESSAGE:
+				case OPERATION_TYPE_UPDATE_MESSAGE:
 					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
 
 					if (array_key_exists('mediatypeid', $message) && $message['mediatypeid']) {
@@ -2457,7 +2459,7 @@ class CAction extends CApiService {
 			);
 
 			switch ($update_operation['operationtype']) {
-				case OPERATION_TYPE_ACK_MESSAGE:
+				case OPERATION_TYPE_UPDATE_MESSAGE:
 					$opmessages[] = $operationid;
 					break;
 				case OPERATION_TYPE_MESSAGE:

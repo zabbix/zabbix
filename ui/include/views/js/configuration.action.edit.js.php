@@ -249,7 +249,7 @@
 		this.operation_steps.attach(this.$wrapper);
 
 		if (this.props.cmd !== null && (this.props.cmd == operation_details.OPERATION_TYPE_MESSAGE
-				|| this.props.cmd == operation_details.OPERATION_TYPE_ACK_MESSAGE
+				|| this.props.cmd == operation_details.OPERATION_TYPE_UPDATE_MESSAGE
 				|| this.props.cmd == operation_details.OPERATION_TYPE_RECOVERY_MESSAGE)) {
 			this.operation_message.attach(this.$wrapper, this.props);
 		}
@@ -478,7 +478,7 @@
 			this.$users.appendTo($wrapper);
 			this.$mediatype_only.appendTo($wrapper);
 		}
-		else if (props.cmd !== null && props.cmd == operation_details.OPERATION_TYPE_ACK_MESSAGE) {
+		else if (props.cmd !== null && props.cmd == operation_details.OPERATION_TYPE_UPDATE_MESSAGE) {
 			this.$mediatype_default.appendTo($wrapper);
 		}
 		else if (props.recovery_phase == operation_details.ACTION_OPERATION
@@ -1168,7 +1168,7 @@
 		}
 	}
 
-	window.operation_details.OPERATION_TYPE_ACK_MESSAGE                = <?= OPERATION_TYPE_ACK_MESSAGE ?>;
+	window.operation_details.OPERATION_TYPE_UPDATE_MESSAGE             = <?= OPERATION_TYPE_UPDATE_MESSAGE ?>;
 	window.operation_details.OPERATION_TYPE_RECOVERY_MESSAGE           = <?= OPERATION_TYPE_RECOVERY_MESSAGE ?>;
 	window.operation_details.OPERATION_TYPE_HOST_INVENTORY             = <?= OPERATION_TYPE_HOST_INVENTORY ?>;
 	window.operation_details.OPERATION_TYPE_TEMPLATE_REMOVE            = <?= OPERATION_TYPE_TEMPLATE_REMOVE ?>;

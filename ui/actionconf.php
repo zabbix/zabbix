@@ -474,7 +474,7 @@ if (hasRequest('form')) {
 		foreach ($data['action'][$operations] as &$operation) {
 			if (($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 					|| $operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE
-					|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE)
+					|| $operation['operationtype'] == OPERATION_TYPE_UPDATE_MESSAGE)
 					&& !array_key_exists('default_msg', $operation['opmessage'])) {
 				$operation['opmessage']['default_msg'] = 1;
 				$operation['opmessage']['subject'] = '';
