@@ -109,7 +109,13 @@ const host_popup = {
 			let params = {...host_edit.getCloneData(overlay.$dialogue.find('form')[0])};
 			params[operation_type] = 1;
 
-			PopUp('popup.host.edit', params, 'host_edit');
+			overlay = PopUp('popup.host.edit', params, 'host_edit');
+			overlay.xhr.then(function () {
+				overlay.$dialogue.find('form').on('formSubmitted', (e) => {
+					handle_hostaction_response(e.detail, e.target)
+				});
+			});
+
 			history.replaceState({}, '', url.getUrl());
 		};
 	}
