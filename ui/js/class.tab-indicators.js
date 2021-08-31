@@ -378,11 +378,11 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const observer_options = {
-				childList: true,
-				subtree: true
-			},
-			multiselect_node = document.querySelector('#add_templates_').parentNode,
-			linked_node = document.querySelector('#linked-template');
+			childList: true,
+			subtree: true
+		};
+		const multiselect_node = document.querySelector('#add_templates_');
+		const linked_node = document.querySelector('#linked-template');
 
 		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
@@ -401,7 +401,7 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 
 		if (multiselect_node) {
 			const multiselect_observer = new MutationObserver(observer_callback);
-			multiselect_observer.observe(multiselect_node, observer_options);
+			multiselect_observer.observe(multiselect_node.parentNode, observer_options);
 		}
 	}
 }
