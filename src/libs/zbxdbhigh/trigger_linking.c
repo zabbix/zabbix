@@ -460,8 +460,8 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, zbx
 			if (NULL != (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(
 					&triggers_flags, &temp_t)))
 			{
-				zbx_audit_trigger_update_json_add_dependency(found->flags, triggerdepid, links.values[i].first,
-						links.values[i].second);
+				zbx_audit_trigger_update_json_add_dependency(found->flags, triggerdepid,
+						links.values[i].first, links.values[i].second);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
