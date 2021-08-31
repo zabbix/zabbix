@@ -921,7 +921,7 @@ class CRole extends CApiService {
 		if ($new_rules['services.read.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
 			foreach ($new_rules['services.read.list'] as $index => $service) {
 				$compiled_rules[] = [
-					'name' => 'services.read.list.'.$index,
+					'name' => 'services.read.id.'.$index,
 					'type' => self::RULE_TYPE_SERVICE,
 					'value' => $service['serviceid']
 				];
@@ -962,7 +962,7 @@ class CRole extends CApiService {
 		if ($new_rules['services.write.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
 			foreach ($new_rules['services.write.list'] as $index => $service) {
 				$compiled_rules[] = [
-					'name' => 'services.write.list.'.$index,
+					'name' => 'services.write.id.'.$index,
 					'type' => self::RULE_TYPE_SERVICE,
 					'value' => $service['serviceid']
 				];
@@ -1335,7 +1335,7 @@ class CRole extends CApiService {
 			$result['services.read.list'] = [];
 
 			if ($services_read_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
-				$enum = 'services.read.list.';
+				$enum = 'services.read.id.';
 
 				foreach ($rules as $rule_name => $rule_value) {
 					if (substr($rule_name, 0, strlen($enum)) === $enum) {
@@ -1384,7 +1384,7 @@ class CRole extends CApiService {
 			$result['services.write.list'] = [];
 
 			if ($services_write_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
-				$enum = 'services.write.list.';
+				$enum = 'services.write.id.';
 
 				foreach ($rules as $rule_name => $rule_value) {
 					if (substr($rule_name, 0, strlen($enum)) === $enum) {
