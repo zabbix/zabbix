@@ -513,6 +513,28 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	if (0 != cur_triggerids->values_num)
 	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select tt.triggertagid,tt.triggerid,t.flags from trigger_tag tt,triggers t where"
+				" tt.triggerid=t.triggerid and ");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", cur_triggerids->values,
+				cur_triggerids->values_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_uint64_t audit_del_triggerid, audit_del_triggertagid;
+
+			ZBX_STR2UINT64(audit_del_triggerid, row[1]);
+			ZBX_STR2UINT64(audit_del_triggertagid, row[0]);
+
+			zbx_audit_trigger_update_json_delete_tags(audit_del_triggerid, atoi(row[2]),
+					audit_del_triggertagid);
+		}
+
+		sql_offset = 0;
+		DBfree_result(result);
+
 		/* remove tags from host triggers that were linking to template triggers */
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_tag where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", cur_triggerids->values,
