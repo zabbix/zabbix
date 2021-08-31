@@ -2985,7 +2985,7 @@ Number of connections currently in queue, sum.</description>
                     <description>A table containing information of virtual servers.</description>
                     <item_prototypes>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Current connections</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Current connections</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.12.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.conn[{#VSERVER.NAME}]</key>
@@ -3005,7 +3005,7 @@ The current connections from client-side to the specified virtual server.</descr
                             </preprocessing>
                         </item_prototype>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Incoming traffic, rate</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Incoming traffic, rate</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.7.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.in.bytes.rate[{#VSERVER.NAME}]</key>
@@ -3030,7 +3030,7 @@ The rate of bytes received by the specified virtual server from client-side.</de
                             </preprocessing>
                         </item_prototype>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Incoming packet, rate</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Incoming packet, rate</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.6.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.in.pkts.rate[{#VSERVER.NAME}]</key>
@@ -3055,7 +3055,7 @@ The rate of packets received by the specified virtual server from client-side.</
                             </preprocessing>
                         </item_prototype>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Outgoing traffic, rate</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Outgoing traffic, rate</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.9.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.out.bytes.rate[{#VSERVER.NAME}]</key>
@@ -3080,7 +3080,7 @@ The rate of bytes sent to client-side from the specified virtual server.</descri
                             </preprocessing>
                         </item_prototype>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Outgoing packet, rate</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Outgoing packet, rate</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.8.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.out.pkts.rate[{#VSERVER.NAME}]</key>
@@ -3105,7 +3105,7 @@ The rate of packets sent to client-side from the specified virtual server.</desc
                             </preprocessing>
                         </item_prototype>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Connections hit a rate limit</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Connections hit a rate limit</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.34.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.overlimit[{#VSERVER.NAME}]</key>
@@ -3126,7 +3126,7 @@ this calculation is only maintained if rate limiting is configured for the servi
                             </preprocessing>
                         </item_prototype>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Duration of exceeding rate limit</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Duration of exceeding rate limit</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.35.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.overtime[{#VSERVER.NAME}]</key>
@@ -3147,7 +3147,7 @@ Duration of time in seconds the specified virtual server has exceeded the config
                             </preprocessing>
                         </item_prototype>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Usage ratio, avg 1m</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 1m</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.32.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.usage.1m[{#VSERVER.NAME}]</key>
@@ -3168,7 +3168,7 @@ The percentage of time Virtual Server was busy over the last 1 minute.</descript
                             </preprocessing>
                         </item_prototype>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Usage ratio, avg 5m</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 5m</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.33.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.usage.5m[{#VSERVER.NAME}]</key>
@@ -3189,7 +3189,7 @@ The percentage of time Virtual Server was busy over the last 5 minutes.</descrip
                             </preprocessing>
                         </item_prototype>
                         <item_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Usage ratio, avg 5s</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 5s</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.31.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.usage.5s[{#VSERVER.NAME}]</key>
@@ -3212,7 +3212,7 @@ The percentage of time Virtual Server was busy over the last 5 seconds.</descrip
                     </item_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}] network</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}] network</name>
                             <graph_items>
                                 <graph_item>
                                     <color>1A7C11</color>
@@ -3250,7 +3250,7 @@ The percentage of time Virtual Server was busy over the last 5 seconds.</descrip
                             </graph_items>
                         </graph_prototype>
                         <graph_prototype>
-                            <name>F5 BIG-IP: Virtual sever [{#VSERVER.NAME}] usage ratio</name>
+                            <name>F5 BIG-IP: Virtual server [{#VSERVER.NAME}] usage ratio</name>
                             <graph_items>
                                 <graph_item>
                                     <color>1A7C11</color>
