@@ -5279,13 +5279,13 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
+
+	for (i = 0; i < hostids->values_num; i++)
+		zbx_audit_host_del(hostids->values[i], hostnames->values[i]);
 clean:
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&selementids);
-
-	for (i = 0; i < hostids->values_num; i++)
-		zbx_audit_host_del(hostids->values[i], hostnames->values[i]);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
