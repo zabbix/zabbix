@@ -328,7 +328,8 @@ class CRole extends CApiService {
 		$names = [];
 
 		foreach ($roles as $role) {
-			if ($db_roles === null || $role['name'] !== $db_roles[$role['roleid']]['name']) {
+			if ($db_roles === null
+					|| (array_key_exists('name', $role) && $role['name'] !== $db_roles[$role['roleid']]['name'])) {
 				$names[] = $role['name'];
 			}
 		}
@@ -372,11 +373,11 @@ class CRole extends CApiService {
 
 			$db_rules = $db_roles !== null ? $db_roles[$role['roleid']]['rules'] : null;
 
-			$this->checkUiRules($name, $type, $role['rules'], $db_rules);
-			$this->checkServicesRules($name, $type, $role['rules'], $db_rules);
+			$this->checkUiRules($name, (int) $type, $role['rules'], $db_rules);
+			$this->checkServicesRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkModulesRules($name, $role['rules']);
 			$this->checkApiRules($name, $role['rules']);
-			$this->checkActionsRules($name, $type, $role['rules']);
+			$this->checkActionsRules($name, (int) $type, $role['rules']);
 		}
 	}
 
