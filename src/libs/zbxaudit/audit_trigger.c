@@ -207,14 +207,14 @@ void	zbx_audit_trigger_update_json_add_dependency(unsigned char flags, zbx_uint6
 	{
 		zbx_snprintf(audit_key, sizeof(audit_key), "trigger.dependencies[" ZBX_FS_UI64 "]", triggerdepid);
 		zbx_snprintf(audit_key_triggerid_up, sizeof(audit_key_triggerid_up), "trigger.dependencies["
-				ZBX_FS_UI64 "]", triggerdepid);
+				ZBX_FS_UI64 "].dependsOnTriggerid", triggerdepid);
 	}
 	else
 	{
 		zbx_snprintf(audit_key, sizeof(audit_key), "triggerprototype.dependencies[" ZBX_FS_UI64 "]",
 				triggerdepid);
 		zbx_snprintf(audit_key_triggerid_up, sizeof(audit_key_triggerid_up), "triggerprototype.dependencies["
-				ZBX_FS_UI64 "]", triggerdepid);
+				ZBX_FS_UI64 "].dependsOnTriggerid", triggerdepid);
 	}
 
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key);
