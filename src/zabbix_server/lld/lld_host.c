@@ -436,14 +436,31 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 	while (NULL != (row = DBfetch(result)))
 	{
 		host = (zbx_lld_host_t *)zbx_malloc(NULL, sizeof(zbx_lld_host_t));
-		memset(host, 0, sizeof(zbx_lld_host_t));
 
 		ZBX_STR2UINT64(host->hostid, row[0]);
 		host->host_proto = zbx_strdup(NULL, row[1]);
 		host->lastcheck = atoi(row[2]);
 		host->ts_delete = atoi(row[3]);
 		host->host = zbx_strdup(NULL, row[4]);
+		host->host_orig = NULL;
 		host->name = zbx_strdup(NULL, row[5]);
+		host->name_orig = NULL;
+		host->ipmi_username_orig = NULL;
+		host->ipmi_password_orig = NULL;
+		host->tls_issuer_orig = NULL;
+		host->tls_subject_orig = NULL;
+		host->tls_psk_identity_orig = NULL;
+		host->tls_psk_orig = NULL;
+		host->jp_row = NULL;
+		host->inventory_mode = 0;
+		host->status = 0;
+		host->custom_interfaces_orig = 0;
+		host->proxy_hostid_orig = 0;
+		host->ipmi_authtype_orig = 0;
+		host->ipmi_privilege_orig = 0;
+		host->tls_connect_orig = 0;
+		host->tls_accept_orig = 0;
+		host->flags = 0x00;
 		ZBX_STR2UCHAR(host->custom_interfaces, row[18]);
 
 		ZBX_DBROW2UINT64(db_proxy_hostid, row[6]);
@@ -813,7 +830,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 {
 	char			*buffer = NULL;
 	int			i;
-	zbx_lld_host_t		*host;
+	zbx_lld_host_t		*host = NULL;
 	zbx_vector_db_tag_ptr_t	tmp_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1909,11 +1926,15 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
 	while (NULL != (row = DBfetch(result)))
 	{
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
-		memset(hostmacro, 0, sizeof(zbx_lld_hostmacro_t));
 
+		hostmacro->hostmacroid = 0;
 		hostmacro->macro = zbx_strdup(NULL, row[0]);
 		hostmacro->value = zbx_strdup(NULL, row[1]);
+		hostmacro->value_orig = NULL;
 		hostmacro->description = zbx_strdup(NULL, row[2]);
+		hostmacro->description_orig = NULL;
+		hostmacro->type_orig = 0;
+		hostmacro->flags = 0;
 		ZBX_STR2UCHAR(hostmacro->type, row[3]);
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
@@ -1974,12 +1995,16 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 	while (NULL != (row = DBfetch(result)))
 	{
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
-		memset(hostmacro, 0, sizeof(zbx_lld_hostmacro_t));
 
+		hostmacro->hostmacroid = 0;
 		hostmacro->macro = zbx_strdup(NULL, row[0]);
 		hostmacro->value = zbx_strdup(NULL, row[1]);
+		hostmacro->value_orig = NULL;
 		hostmacro->description = zbx_strdup(NULL, row[2]);
+		hostmacro->description_orig = NULL;
 		ZBX_STR2UCHAR(hostmacro->type, row[3]);
+		hostmacro->type_orig = hostmacro->type;
+		hostmacro->flags = 0;
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
@@ -1993,14 +2018,17 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 			continue;
 
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
-		memset(hostmacro, 0, sizeof(zbx_lld_hostmacro_t));
 
 		masterhostmacro = (const zbx_lld_hostmacro_t *)masterhostmacros->values[i];
+		hostmacro->hostmacroid = 0;
 		hostmacro->macro = zbx_strdup(NULL, masterhostmacro->macro);
 		hostmacro->value = zbx_strdup(NULL, masterhostmacro->value);
+		hostmacro->value_orig = NULL;
 		hostmacro->description = zbx_strdup(NULL, masterhostmacro->description);
+		hostmacro->description_orig = NULL;
 		hostmacro->type = masterhostmacro->type;
-
+		hostmacro->type_orig = hostmacro->type;
+		hostmacro->flags = 0;
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
 
@@ -2095,7 +2123,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		zbx_vector_ptr_reserve(&host->new_hostmacros, hostmacros->values_num);
+		zbx_vector_ptr_reserve(&host->new_hostmacros, (size_t)hostmacros->values_num);
 		for (j = 0; j < hostmacros->values_num; j++)
 		{
 			hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
@@ -2328,7 +2356,7 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 
 	zbx_vector_db_tag_ptr_sort(&new_tags, zbx_db_tag_compare_func);
 
-	zbx_vector_db_tag_ptr_reserve(&host->tags, new_tags.values_num);
+	zbx_vector_db_tag_ptr_reserve(&host->tags, (size_t)new_tags.values_num);
 
 	/* update host tags or flag them for removal */
 	for (i = 0; i < host->tags.values_num; i++)
@@ -4076,7 +4104,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		zbx_vector_ptr_reserve(&host->interfaces, interfaces->values_num);
+		zbx_vector_ptr_reserve(&host->interfaces, (size_t)interfaces->values_num);
 
 		for (j = 0; j < interfaces->values_num; j++)
 		{
