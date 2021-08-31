@@ -11038,6 +11038,18 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	cfg->flags = flags;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_config_get_hk_mode                                           *
+ *                                                                            *
+ * Purpose: get housekeeping mode for history and trends tables               *
+ *                                                                            *
+ * Parameters: history_mode - [OUT] history housekeeping mode, can be either  *
+ *                                  disabled, enabled or partitioning         *
+ *             trends_mode  - [OUT] trends housekeeping mode, can be either   *
+ *                                  disabled, enabled or partitioning         *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_mode)
 {
 	RDLOCK_CACHE;
