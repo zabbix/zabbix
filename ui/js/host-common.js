@@ -18,7 +18,6 @@
 **/
 
 
-const PAGE_TYPE_JS = 'ajax';
 const MESSAGE_TYPE_SUCCESS = 'success';
 
 const host_popup = {
@@ -71,22 +70,26 @@ const host_popup = {
 	 * @param {array}  host_data['groupids']  Host groups to pre-fill when creating new host.
 	 */
 	edit(host_data = {}) {
-		host_data.output = PAGE_TYPE_JS;
-
 		const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
 		overlay.$dialogue.addClass('sticked-to-top');
 
-		overlay.xhr.then(function () {
-			$('#tabs', overlay.$dialogue).on('tabsactivate change', () => overlay.centerDialog());
+		overlay.xhr
+			.then(function () {
+				$('#tabs', overlay.$dialogue).on('tabsactivate change', () => overlay.centerDialog());
 
-			overlay.$dialogue.find('#host-clone').on('click', host_popup.cloneBtnClickHandler('clone', overlay));
-			overlay.$dialogue.find('#host-full_clone').on('click', host_popup.cloneBtnClickHandler('full_clone', overlay));
+				overlay.$dialogue.find('#host-clone').on('click', host_popup.cloneBtnClickHandler('clone', overlay));
+				overlay.$dialogue.find('#host-full_clone').on('click', host_popup.cloneBtnClickHandler('full_clone', overlay));
 
-			overlay.$dialogue.find('form').on('formSubmitted', (e) =>
-				handle_hostaction_response(e.detail, e.target)
-			);
-		});
+				overlay.$dialogue.find('form').on('formSubmitted', (e) =>
+					handle_hostaction_response(e.detail, e.target)
+				);
+			})
+			.catch(() => {
+				overlay.setProperties({
+					content: makeMessageBox('bad', [t('S_UNEXPECTED_SERVER_ERROR')], null, false, false)
+				});
+			});
 
 		overlay.$dialogue[0].addEventListener('overlay.close', () => {
 			history.replaceState({}, '', this.original_url);
@@ -145,7 +148,6 @@ function hosts_delete(host_form = null) {
 
 	curl.setArgument('action', 'host.massdelete');
 	curl.setArgument('ids', ids);
-	curl.setArgument('output', PAGE_TYPE_JS);
 
 	fetch(curl.getUrl(), {
 		method: 'POST',
@@ -169,10 +171,12 @@ function hosts_delete(host_form = null) {
 async function handle_hostaction_response(response, host_form = null) {
 	try {
 		response = await response.text();
-		response = JSON.parse(response)
+		response = JSON.parse(response);
 	}
 	catch (error) {
-		response = {errors: $(response).find('output').removeClass('msg-global')};
+		response = {
+			errors: makeMessageBox('bad', [t('S_UNEXPECTED_SERVER_ERROR')], null, true, false)[0]
+		};
 	}
 
 	const overlay = overlays_stack.end();

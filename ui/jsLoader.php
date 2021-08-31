@@ -314,6 +314,9 @@ $translate_strings = [
 		'S_CHANGE' => _x('Change', 'verb'),
 		'S_REMOVE' => _('Remove')
 	],
+	'host-common.js' => [
+		'S_UNEXPECTED_SERVER_ERROR' => _('Unexpected server error.')
+	],
 	'multilineinput.js' => [
 		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
 		'S_CLICK_TO_VIEW_OR_EDIT' => _('Click to view or edit'),

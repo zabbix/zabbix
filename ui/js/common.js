@@ -383,11 +383,6 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					content: resp.errors
 				});
 			}
-			else if (typeof resp.error !== 'undefined') {
-				overlay.setProperties({
-					content: resp.error
-				});
-			}
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
 

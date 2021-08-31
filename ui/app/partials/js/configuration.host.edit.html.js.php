@@ -422,7 +422,6 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 			fields.description = fields.description.trim();
 
 			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
-			fields.output = <?= json_encode(PAGE_TYPE_JS) ?>;
 
 			if (document.querySelector('#change_psk')) {
 				delete fields.tls_psk_identity;
