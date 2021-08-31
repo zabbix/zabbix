@@ -267,8 +267,8 @@ class CUser extends CApiService {
 		}
 		unset($user);
 
-		$this->updateUsersGroups($users, __FUNCTION__);
-		$this->updateMedias($users, __FUNCTION__);
+		self::updateUsersGroups($users, __FUNCTION__);
+		self::updateMedias($users, __FUNCTION__);
 
 		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
 
@@ -381,13 +381,12 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * @param array $users
+	 * @static
 	 *
-	 * @return array
+	 * @param array $users
+	 * @param array $db_users
 	 */
-	public function update(array $users) {
-		$this->validateUpdate($users, $db_users);
-
+	public static function updateForce(array $users, array $db_users): void {
 		$upd_users = [];
 
 		foreach ($users as $user) {
@@ -424,10 +423,21 @@ class CUser extends CApiService {
 			DB::update('users', $upd_users);
 		}
 
-		$this->updateUsersGroups($users, __FUNCTION__, $db_users);
-		$this->updateMedias($users, __FUNCTION__, $db_users);
+		self::updateUsersGroups($users, 'update', $db_users);
+		self::updateMedias($users, 'update', $db_users);
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+	}
+
+	/**
+	 * @param array $users
+	 *
+	 * @return array
+	 */
+	public function update(array $users) {
+		$this->validateUpdate($users, $db_users);
+
+		self::updateForce($users, $db_users);
 
 		return ['userids' => array_column($users, 'userid')];
 	}
@@ -1022,11 +1032,13 @@ class CUser extends CApiService {
 	/**
 	 * Update table "users_groups" and populate users.usrgrps by "id" property.
 	 *
+	 * @static
+	 *
 	 * @param array      $users
 	 * @param string     $method
 	 * @param null|array $db_users
 	 */
-	private function updateUsersGroups(array &$users, string $method, array $db_users = null): void {
+	private static function updateUsersGroups(array &$users, string $method, array $db_users = null): void {
 		$ins_users_groups = [];
 		$del_ids = [];
 
@@ -1083,13 +1095,15 @@ class CUser extends CApiService {
 	/**
 	 * Auxiliary function for updateMedias().
 	 *
+	 * @static
+	 *
 	 * @param array  $medias
 	 * @param string $mediatypeid
 	 * @param string $sendto
 	 *
 	 * @return int
 	 */
-	private function getSimilarMedia(array $medias, $mediatypeid, $sendto) {
+	private static function getSimilarMedia(array $medias, $mediatypeid, $sendto) {
 		foreach ($medias as $index => $media) {
 			if (bccomp($media['mediatypeid'], $mediatypeid) == 0 && $media['sendto'] === $sendto) {
 				return $index;
@@ -1103,11 +1117,13 @@ class CUser extends CApiService {
 	 * Update table "media" and populate users.medias by "mediaid" property. Also this function converts "sendto" to the
 	 * string.
 	 *
+	 * @static
+	 *
 	 * @param array      $users
 	 * @param string     $method
 	 * @param null|array $db_users
 	 */
-	private function updateMedias(array &$users, string $method, array $db_users = null): void {
+	private static function updateMedias(array &$users, string $method, array $db_users = null): void {
 		$ins_medias = [];
 		$upd_medias = [];
 		$del_mediaids = [];
@@ -1122,7 +1138,7 @@ class CUser extends CApiService {
 			foreach ($user['medias'] as &$media) {
 				$media['sendto'] = implode("\n", $media['sendto']);
 
-				$index = $this->getSimilarMedia($db_medias, $media['mediatypeid'], $media['sendto']);
+				$index = self::getSimilarMedia($db_medias, $media['mediatypeid'], $media['sendto']);
 
 				if ($index != -1) {
 					$db_media = $db_medias[$index];
