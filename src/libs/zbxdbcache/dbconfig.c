@@ -11038,6 +11038,14 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	cfg->flags = flags;
 }
 
+void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_mode)
+{
+	RDLOCK_CACHE;
+	*history_mode = config->config->hk.history_mode;
+	*trends_mode = config->config->hk.trends_mode;
+	UNLOCK_CACHE;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_config_clean                                                 *
