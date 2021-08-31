@@ -65,7 +65,53 @@ func Test_getParameters(t *testing.T) {
 	}
 }
 
-func Test_validateURL(t *testing.T) {
+func Test_parseParameters(t *testing.T) {
+	type args struct {
+		params []string
+	}
+	tests := []struct {
+		name        string
+		args        args
+		wantAddress string
+		wantPort    string
+		wantDomain  string
+		wantErr     bool
+	}{
+		{"+1st_param_hostname", args{[]string{"example.com", "443", "1.2.3.4"}}, "1.2.3.4", "443", "example.com", false},
+		{"+1st_param_hostname_full",
+			args{[]string{"https://www.example.com", "443", "1.2.3.4"}}, "1.2.3.4", "443", "www.example.com", false,
+		},
+		{"+3rd_param_hostname", args{[]string{"1.2.3.4", "443", "example.com"}}, "example.com", "443", "1.2.3.4", false},
+		{"+1st_param_full",
+			args{[]string{"https://1.2.3.4:443", "443", "example.com"}}, "example.com", "443", "1.2.3.4", false,
+		},
+		{"-not_ip", args{[]string{"example.com", "443", "www.example.com"}}, "www.example.com", "443", "example.com", false},
+		{"-3rd_param_not_hostname", args{[]string{"1.2.3.4", "443", "https://www.example.com"}}, "", "", "", true},
+		{"-1st_param_http", args{[]string{"http://1.2.3.4:443", "443", "example.com"}}, "", "", "", true},
+		{"-not_http", args{[]string{"http://1.2.3.4:443", "443", "example.com"}}, "", "", "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotHost, gotPort, gotDomain, err := getParsedParameters(tt.args.params)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseParameters() error = %v, wantErr %v", err, tt.wantErr)
+
+				return
+			}
+			if gotHost != tt.wantAddress {
+				t.Errorf("parseParameters() gotAddress = %v, want %v", gotHost, tt.wantAddress)
+			}
+			if gotPort != tt.wantPort {
+				t.Errorf("parseParameters() gotPort = %v, want %v", gotPort, tt.wantPort)
+			}
+			if gotDomain != tt.wantDomain {
+				t.Errorf("parseParameters() gotDomain = %v, want %v", gotDomain, tt.wantDomain)
+			}
+		})
+	}
+}
+
+func Test_parseURL(t *testing.T) {
 	type args struct {
 		url  string
 		port string

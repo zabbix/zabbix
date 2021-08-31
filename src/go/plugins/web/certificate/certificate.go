@@ -102,12 +102,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func (p *Plugin) webCertificateGet(params []string) (interface{}, error) {
-	hostname, port, domain, err := getParameters(params)
+	address, port, domain, err := getParameters(params)
 	if err != nil {
 		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
-	certs, err := getCertificatesPEM(fmt.Sprintf("%s:%s", hostname, port), domain, p.options.Timeout)
+	certs, err := getCertificatesPEM(fmt.Sprintf("%s:%s", address, port), domain, p.options.Timeout)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
@@ -180,26 +180,46 @@ func getValidationResult(leaf *x509.Certificate, opts x509.VerifyOptions, subjec
 	return out
 }
 
-func getParameters(params []string) (hostname, port, domain string, err error) {
+func getParameters(params []string) (address, port, domain string, err error) {
 	switch len(params) {
 	case allParameters:
-		hostname, port, err = parseURL(params[0], params[1])
-		domain = hostname
-
-		if params[2] != "" {
-			hostname, port, err = parseURL(params[2], params[1])
-		}
+		address, port, domain, err = getParsedParameters(params)
 	case noThirdParameter:
-		hostname, port, err = parseURL(params[0], params[1])
-		domain = hostname
+		address, port, err = parseURL(params[0], params[1])
+		domain = address
 	case onlyFirstParameter:
-		hostname, port, err = parseURL(params[0], "")
-		domain = hostname
+		address, port, err = parseURL(params[0], "")
+		domain = address
 	case emptyParameters:
 		err = zbxerr.ErrorTooFewParameters
 	default:
 		err = zbxerr.ErrorTooManyParameters
 	}
+
+	return
+}
+
+func getParsedParameters(params []string) (address, port, domain string, err error) {
+	if params[0] != "" {
+		address, port, err = parseURL(params[0], params[1])
+		if err != nil {
+			return
+		}
+	} else {
+		port = params[1]
+	}
+
+	domain = address
+
+	if address != "" && params[2] == "" {
+		return
+	}
+
+	if err = uri.IsHostnameOnly(params[2]); err != nil {
+		return "", "", "", err
+	}
+
+	address = params[2]
 
 	return
 }
