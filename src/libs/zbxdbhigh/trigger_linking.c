@@ -460,7 +460,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, zbx
 			if (NULL != (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(
 					&triggers_flags, &temp_t)))
 			{
-				zbx_audit_trigger_update_json_add_dependency(found, triggerdepid, links.values[i].first,
+				zbx_audit_trigger_update_json_add_dependency(found->flags, triggerdepid, links.values[i].first,
 						links.values[i].second);
 			}
 			else
@@ -898,7 +898,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "flags=%d", (int)found->flags);
 				d = ",";
 
-				zbx_audit_trigger_update_json_update_flags(found->triggerid, found->update_flags,
+				zbx_audit_trigger_update_json_update_flags(found->triggerid, (int)found->update_flags,
 						found->flags_orig, found->flags);
 			}
 
@@ -909,7 +909,8 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				d = ",";
 
 				zbx_audit_trigger_update_json_update_recovery_mode(found->triggerid,
-						found->update_flags, found->recovery_mode_orig, found->recovery_mode);
+						(int)found->update_flags, found->recovery_mode_orig,
+						found->recovery_mode);
 			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE))
@@ -919,7 +920,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				d = ",";
 
 				zbx_audit_trigger_update_json_update_correlation_mode(found->triggerid,
-						found->update_flags, found->correlation_mode_orig,
+						(int)found->update_flags, found->correlation_mode_orig,
 						found->correlation_mode);
 			}
 
@@ -930,7 +931,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				d = ",";
 
 				zbx_audit_trigger_update_json_update_manual_close(found->triggerid,
-						found->update_flags, found->manual_close_orig, found->manual_close);
+						(int)found->update_flags, found->manual_close_orig, found->manual_close);
 			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA))
@@ -942,7 +943,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				d = ",";
 
 				zbx_audit_trigger_update_json_update_opdata(found->triggerid,
-						found->update_flags, found->opdata_orig, found->opdata);
+						(int)found->update_flags, found->opdata_orig, found->opdata);
 			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER))
@@ -951,7 +952,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				d = ",";
 
 				zbx_audit_trigger_update_json_update_discover(found->triggerid,
-						found->update_flags, found->discover_orig, found->discover);
+						(int)found->update_flags, found->discover_orig, found->discover);
 			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME))
@@ -964,13 +965,13 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				zbx_free(event_name_esc);
 
 				zbx_audit_trigger_update_json_update_event_name(found->triggerid,
-						found->update_flags, found->event_name_orig, found->event_name);
+						(int)found->update_flags, found->event_name_orig, found->event_name);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
 					found->templateid);
 
-			zbx_audit_trigger_update_json_update_templateid(found->triggerid, found->update_flags,
+			zbx_audit_trigger_update_json_update_templateid(found->triggerid, (int)found->update_flags,
 					found->templateid_orig, found->templateid);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64 ";\n",

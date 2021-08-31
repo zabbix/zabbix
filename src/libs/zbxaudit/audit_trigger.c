@@ -109,7 +109,7 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 	ADD_STR(comments)
 	ADD_INT(flags)
 	ADD_INT(priority)
-	ADD_INT(state)
+	ADD_UINT64(state)
 	ADD_INT(status)
 	ADD_UINT64(templateid)
 	ADD_INT(type)
