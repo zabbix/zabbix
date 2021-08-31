@@ -35,7 +35,6 @@ class CUserGroup extends CApiService {
 	 * @param array  $options['usrgrpids']
 	 * @param array  $options['userids']
 	 * @param bool   $options['status']
-	 * @param bool   $options['with_gui_access']
 	 * @param bool   $options['selectUsers']
 	 * @param int    $options['count']
 	 * @param string $options['pattern']
@@ -59,7 +58,6 @@ class CUserGroup extends CApiService {
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'status'					=> null,
-			'with_gui_access'			=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -115,11 +113,6 @@ class CUserGroup extends CApiService {
 		// status
 		if (!is_null($options['status'])) {
 			$sqlParts['where'][] = 'g.users_status='.zbx_dbstr($options['status']);
-		}
-
-		// with_gui_access
-		if (!is_null($options['with_gui_access'])) {
-			$sqlParts['where'][] = 'g.gui_access='.GROUP_GUI_ACCESS_ENABLED;
 		}
 
 		// filter
