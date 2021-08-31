@@ -225,6 +225,16 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
+
+			// If the template is not present on this page anymore - check on next page.
+			for ($i = 0; $i < 2; $i++) {
+				if ($this->query('link', $data['template'])->one(false)->isValid() === true) {
+					break;
+				}
+				$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+				$this->page->waitUntilReady();
+			}
+
 			$this->zbxTestClickLinkTextWait($data['template']);
 			$discoveryRule = $this->discoveryRuleTemplate;
 		}

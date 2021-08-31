@@ -22,26 +22,27 @@ AC_DEFUN([CONF_TESTS],[
 		AC_CONFIG_FILES([
 		tests/Makefile
 		tests/libs/Makefile
+		tests/libs/zbxalgo/Makefile
 		tests/libs/zbxcommon/Makefile
+		tests/libs/zbxcomms/Makefile
+		tests/libs/zbxcommshigh/Makefile
 		tests/libs/zbxconf/Makefile
 		tests/libs/zbxdbcache/Makefile
 		tests/libs/zbxdbhigh/Makefile
-		tests/libs/zbxhistory/Makefile
 		tests/libs/zbxeval/Makefile
+		tests/libs/zbxhistory/Makefile
 		tests/libs/zbxjson/Makefile
-		tests/libs/zbxsysinfo/Makefile
-		tests/libs/zbxsysinfo/linux/Makefile
-		tests/libs/zbxsysinfo/common/Makefile
-		tests/libs/zbxcommshigh/Makefile
-		tests/libs/zbxalgo/Makefile
-		tests/libs/zbxserver/Makefile
 		tests/libs/zbxprometheus/Makefile
+		tests/libs/zbxregexp/Makefile
+		tests/libs/zbxserver/Makefile
+		tests/libs/zbxsysinfo/Makefile
+		tests/libs/zbxsysinfo/common/Makefile
+		tests/libs/zbxsysinfo/linux/Makefile
+		tests/libs/zbxtrends/Makefile
 		tests/zabbix_server/Makefile
 		tests/zabbix_server/preprocessor/Makefile
-		tests/libs/zbxcomms/Makefile
+		tests/zabbix_server/service/Makefile
 		tests/zabbix_server/trapper/Makefile
-		tests/libs/zbxregexp/Makefile
-		tests/libs/zbxtrends/Makefile
 		tests/mocks/Makefile
 		tests/mocks/configcache/Makefile
 		tests/mocks/valuecache/Makefile

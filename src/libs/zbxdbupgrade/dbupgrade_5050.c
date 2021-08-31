@@ -493,6 +493,88 @@ static int	DBpatch_5050040(void)
 
 static int	DBpatch_5050041(void)
 {
+	const ZBX_FIELD	field = {"weight", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050042(void)
+{
+	const ZBX_FIELD	field = {"propagation_rule", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050043(void)
+{
+	const ZBX_FIELD	field = {"propagation_value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050044(void)
+{
+	const ZBX_TABLE table =
+		{"service_status_rule", "service_status_ruleid", 0,
+			{
+				{"service_status_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"limit_value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"limit_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"new_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050045(void)
+{
+	return DBcreate_index("service_status_rule", "service_status_rule_1", "serviceid", 0);
+}
+
+static int	DBpatch_5050046(void)
+{
+	const ZBX_FIELD	field = {"serviceid", NULL, "services", "serviceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("service_status_rule", 1, &field);
+}
+
+static int	DBpatch_5050047(void)
+{
+	const ZBX_FIELD	field = {"status", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("services", &field);
+}
+
+static int	DBpatch_5050048(void)
+{
+	const ZBX_FIELD	field = {"value", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("service_alarms", &field);
+}
+
+static int	DBpatch_5050049(void)
+{
+	if (ZBX_DB_OK > DBexecute("update services set status=-1 where status=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050050(void)
+{
+	if (ZBX_DB_OK > DBexecute("update service_alarms set value=-1 where value=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050051(void)
+{
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -502,7 +584,7 @@ static int	DBpatch_5050041(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5050042(void)
+static int	DBpatch_5050052(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -513,7 +595,7 @@ static int	DBpatch_5050042(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5050043(void)
+static int	DBpatch_5050053(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -570,5 +652,15 @@ DBPATCH_ADD(5050040, 0, 1)
 DBPATCH_ADD(5050041, 0, 1)
 DBPATCH_ADD(5050042, 0, 1)
 DBPATCH_ADD(5050043, 0, 1)
+DBPATCH_ADD(5050044, 0, 1)
+DBPATCH_ADD(5050045, 0, 1)
+DBPATCH_ADD(5050046, 0, 1)
+DBPATCH_ADD(5050047, 0, 1)
+DBPATCH_ADD(5050048, 0, 1)
+DBPATCH_ADD(5050049, 0, 1)
+DBPATCH_ADD(5050050, 0, 1)
+DBPATCH_ADD(5050051, 0, 1)
+DBPATCH_ADD(5050052, 0, 1)
+DBPATCH_ADD(5050053, 0, 1)
 
 DBPATCH_END()

@@ -4161,6 +4161,10 @@ a.link-action {
 	}
 }
 
+.normal-bg input[type="radio"]:checked + label {
+	background-color: darken($alt-green, 25%);
+}
+
 .na-bg,
 .normal-bg,
 .info-bg,

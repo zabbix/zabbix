@@ -105,7 +105,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 * @dataProvider dataCreate
 	 */
 	public function testTemplateInheritance_Create($result, $template, $itemName, $keyName, $errorMsgs) {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('templates.php?page=2');
 		$this->zbxTestCheckHeader('Templates');
 
 		$this->zbxTestClickLinkTextWait($template);
@@ -201,7 +201,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateTrigger() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('templates.php?page=2');
 
 		// create a trigger
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -243,7 +243,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateGraph() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('templates.php?page=2');
 
 		// create a graph
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -301,7 +301,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateDiscovery() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('templates.php?page=2');
 
 		// create an LLD rule
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -348,7 +348,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateItemPrototype() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('templates.php?page=2');
 
 		// create an item prototype
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -410,7 +410,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateTriggerPrototype() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('templates.php?page=2');
 
 		// create a trigger prototype
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -466,7 +466,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateGraphPrototype() {
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('templates.php?page=2');
 
 		// create a graph
 		$this->zbxTestClickLinkTextWait($this->templateName);

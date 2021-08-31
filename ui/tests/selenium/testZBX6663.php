@@ -176,6 +176,13 @@ class testZBX6663 extends CLegacyWebTest {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
 			$this->zbxTestOpen('templates.php?page=2');
+
+			// If the template is not present on this page anymore - check on next page.
+			if ($this->query('link', $zbx_data['template'])->one(false)->isValid() === false) {
+				$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+				$this->page->waitUntilReady();
+			}
+
 			$this->zbxTestClickLinkText($zbx_data['template']);
 		}
 
