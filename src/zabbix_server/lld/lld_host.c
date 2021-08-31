@@ -436,22 +436,14 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 	while (NULL != (row = DBfetch(result)))
 	{
 		host = (zbx_lld_host_t *)zbx_malloc(NULL, sizeof(zbx_lld_host_t));
+		memset(host, 0, sizeof(zbx_lld_host_t));
 
 		ZBX_STR2UINT64(host->hostid, row[0]);
 		host->host_proto = zbx_strdup(NULL, row[1]);
 		host->lastcheck = atoi(row[2]);
 		host->ts_delete = atoi(row[3]);
 		host->host = zbx_strdup(NULL, row[4]);
-		host->host_orig = NULL;
 		host->name = zbx_strdup(NULL, row[5]);
-		host->name_orig = NULL;
-		host->ipmi_username_orig = NULL;
-		host->ipmi_password_orig = NULL;
-		host->tls_issuer_orig = NULL;
-		host->tls_subject_orig = NULL;
-		host->tls_psk_identity_orig = NULL;
-		host->tls_psk_orig = NULL;
-		host->flags = 0x00;
 		ZBX_STR2UCHAR(host->custom_interfaces, row[18]);
 
 		ZBX_DBROW2UINT64(db_proxy_hostid, row[6]);
@@ -1917,12 +1909,11 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
 	while (NULL != (row = DBfetch(result)))
 	{
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
+		memset(hostmacro, 0, sizeof(zbx_lld_hostmacro_t));
 
 		hostmacro->macro = zbx_strdup(NULL, row[0]);
 		hostmacro->value = zbx_strdup(NULL, row[1]);
-		hostmacro->value_orig = NULL;
 		hostmacro->description = zbx_strdup(NULL, row[2]);
-		hostmacro->description_orig = NULL;
 		ZBX_STR2UCHAR(hostmacro->type, row[3]);
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
@@ -1983,12 +1974,11 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 	while (NULL != (row = DBfetch(result)))
 	{
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
+		memset(hostmacro, 0, sizeof(zbx_lld_hostmacro_t));
 
 		hostmacro->macro = zbx_strdup(NULL, row[0]);
 		hostmacro->value = zbx_strdup(NULL, row[1]);
-		hostmacro->value_orig = NULL;
 		hostmacro->description = zbx_strdup(NULL, row[2]);
-		hostmacro->description_orig = NULL;
 		ZBX_STR2UCHAR(hostmacro->type, row[3]);
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
@@ -2003,13 +1993,12 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 			continue;
 
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
+		memset(hostmacro, 0, sizeof(zbx_lld_hostmacro_t));
 
 		masterhostmacro = (const zbx_lld_hostmacro_t *)masterhostmacros->values[i];
 		hostmacro->macro = zbx_strdup(NULL, masterhostmacro->macro);
 		hostmacro->value = zbx_strdup(NULL, masterhostmacro->value);
-		hostmacro->value_orig = NULL;
 		hostmacro->description = zbx_strdup(NULL, masterhostmacro->description);
-		hostmacro->description_orig = NULL;
 		hostmacro->type = masterhostmacro->type;
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
@@ -2065,6 +2054,8 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 	hostmacro->description = NULL;
 	hostmacro->description_orig = NULL;
 	hostmacro->flags = ZBX_FLAG_LLD_HMACRO_REMOVE;
+	hostmacro->type = 0;
+	hostmacro->type_orig = 0;
 
 	zbx_vector_ptr_append(hostmacros, hostmacro);
 }
@@ -2114,6 +2105,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 			hostmacro->value = zbx_strdup(NULL, ((zbx_lld_hostmacro_t *)hostmacros->values[j])->value);
 			hostmacro->value_orig = NULL;
 			hostmacro->type = ((zbx_lld_hostmacro_t *)hostmacros->values[j])->type;
+			hostmacro->type_orig = ((zbx_lld_hostmacro_t *)hostmacros->values[j])->type_orig;
 			hostmacro->description = zbx_strdup(NULL,
 					((zbx_lld_hostmacro_t *)hostmacros->values[j])->description);
 			hostmacro->description_orig = NULL;
@@ -3050,7 +3042,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_audit_host_update_json_update_tls_issuer(host->hostid,
 							host->tls_issuer_orig, value_esc);
 
-
 					zbx_free(value_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT))
@@ -3591,7 +3582,6 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 			zbx_ids_names_compare_func);
 #undef IDS_NAMES_HASHSET_DEF_SIZE
 
-
 	zbx_vector_uint64_create(&del_hostids);
 	zbx_vector_str_create(&del_hosts);
 	zbx_vector_uint64_create(&lc_hostids);
@@ -3849,8 +3839,11 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
 
 		ZBX_STR2UINT64(interface->interfaceid, row[0]);
 		interface->type = (unsigned char)atoi(row[1]);
+		interface->type_orig = interface->type;
 		interface->main = (unsigned char)atoi(row[2]);
+		interface->main_orig = interface->main;
 		interface->useip = (unsigned char)atoi(row[3]);
+		interface->useip_orig = interface->useip;
 		interface->ip = zbx_strdup(NULL, row[4]);
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
@@ -3864,20 +3857,26 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
 
 			snmp = (zbx_lld_interface_snmp_t *)zbx_malloc(NULL, sizeof(zbx_lld_interface_snmp_t));
 			ZBX_STR2UCHAR(snmp->version, row[7]);
+			snmp->version_orig = snmp->version;
 			ZBX_STR2UCHAR(snmp->bulk, row[8]);
+			snmp->bulk_orig = snmp->bulk;
 			snmp->community = zbx_strdup(NULL, row[9]);
 			snmp->community_orig = NULL;
 			snmp->securityname = zbx_strdup(NULL, row[10]);
 			snmp->securityname_orig = NULL;
 			ZBX_STR2UCHAR(snmp->securitylevel, row[11]);
+			snmp->securitylevel_orig = snmp->securitylevel;
 			snmp->authpassphrase = zbx_strdup(NULL, row[12]);
 			snmp->authpassphrase_orig = NULL;
 			snmp->privpassphrase = zbx_strdup(NULL, row[13]);
 			snmp->privpassphrase_orig = NULL;
 			ZBX_STR2UCHAR(snmp->authprotocol, row[14]);
+			snmp->authprotocol_orig = snmp->authprotocol;
 			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
+			snmp->privprotocol_orig = snmp->privprotocol;
 			snmp->contextname = zbx_strdup(NULL, row[16]);
 			snmp->contextname_orig = NULL;
+			snmp->flags = 0;
 			interface->data.snmp = snmp;
 			interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 		}
