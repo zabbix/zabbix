@@ -4087,8 +4087,11 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			new_interface->interfaceid = 0;
 			new_interface->parent_interfaceid = interface->interfaceid;
 			new_interface->type = interface->type;
+			new_interface->type_orig = interface->type_orig;
 			new_interface->main = interface->main;
+			new_interface->main_orig = interface->main_orig;
 			new_interface->useip = interface->useip;
+			new_interface->useip_orig = interface->useip_orig;
 			new_interface->ip = zbx_strdup(NULL, interface->ip);
 			new_interface->ip_orig = NULL;
 			new_interface->dns = zbx_strdup(NULL, interface->dns);
