@@ -20,7 +20,6 @@ This template was tested on:
 You must set {$TRAVIS.API.TOKEN} and {$TRAVIS.API.URL} macros.
 {$TRAVIS.API.TOKEN} is a Travis API authentication token located in User -> Settings -> API authentication.
 {$TRAVIS.API.URL} could be in 3 different variations:
- - for an open source project: api.travis-ci.org
  - for a private project : api.travis-ci.com
  - for an enterprise projects: api.example.com (where you replace example.com with the domain Travis CI is running on)
 
