@@ -358,6 +358,8 @@ func main() {
 			fatalExit("cannot process configuration", err)
 		}
 
+		agent.SetPerformTask(scheduler.Scheduler(m).PerformTask)
+
 		if argTest {
 			checkMetric(m, testFlag)
 		} else {
@@ -515,6 +517,7 @@ func main() {
 			idx++
 		}
 	}
+	agent.SetPerformTask(manager.PerformTask)
 
 	for _, listener := range listeners {
 		if err = listener.Start(); err != nil {

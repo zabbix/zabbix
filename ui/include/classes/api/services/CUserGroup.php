@@ -42,7 +42,6 @@ class CUserGroup extends CApiService {
 	 * @param array  $options['usrgrpids']
 	 * @param array  $options['userids']
 	 * @param bool   $options['status']
-	 * @param bool   $options['with_gui_access']
 	 * @param bool   $options['selectUsers']
 	 * @param int    $options['count']
 	 * @param string $options['pattern']
@@ -66,7 +65,6 @@ class CUserGroup extends CApiService {
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'status'					=> null,
-			'with_gui_access'			=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -122,11 +120,6 @@ class CUserGroup extends CApiService {
 		// status
 		if (!is_null($options['status'])) {
 			$sqlParts['where'][] = 'g.users_status='.zbx_dbstr($options['status']);
-		}
-
-		// with_gui_access
-		if (!is_null($options['with_gui_access'])) {
-			$sqlParts['where'][] = 'g.gui_access='.GROUP_GUI_ACCESS_ENABLED;
 		}
 
 		// filter
@@ -197,7 +190,7 @@ class CUserGroup extends CApiService {
 		$this->updateTagFilters($usrgrps, __FUNCTION__);
 		$this->updateUsersGroups($usrgrps, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER_GROUP, $usrgrps);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
@@ -283,7 +276,7 @@ class CUserGroup extends CApiService {
 		$this->updateTagFilters($usrgrps, __FUNCTION__);
 		$this->updateUsersGroups($usrgrps, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 
 		return ['usrgrpids'=> zbx_objectValues($usrgrps, 'usrgrpid')];
 	}
@@ -848,7 +841,7 @@ class CUserGroup extends CApiService {
 		DB::delete('users_groups', ['usrgrpid' => $usrgrpids]);
 		DB::delete('usrgrp', ['usrgrpid' => $usrgrpids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, $db_usrgrps);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}

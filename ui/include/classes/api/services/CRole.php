@@ -212,7 +212,7 @@ class CRole extends CApiService {
 
 		$this->updateRules($roles, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER_ROLE, $roles);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_ROLE, $roles);
 
 		return ['roleids' => $roleids];
 	}
@@ -335,7 +335,7 @@ class CRole extends CApiService {
 			unset($db_roles[$db_roleid]['rules']);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_ROLE, $roles, $db_roles);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_ROLE, $roles, $db_roles);
 
 		return ['roleids' => array_column($roles, 'roleid')];
 	}
@@ -823,7 +823,7 @@ class CRole extends CApiService {
 
 		DB::delete('role', ['roleid' => $roleids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_ROLE, $db_roles);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_ROLE, $db_roles);
 
 		return ['roleids' => $roleids];
 	}

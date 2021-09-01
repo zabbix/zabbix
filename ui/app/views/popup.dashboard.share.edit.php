@@ -23,7 +23,10 @@
  * @var CView $this
  */
 
-$form = (new CForm('post'))->setName('dashboard_share_form');
+$form = (new CForm('post'))
+	->setId('dashboard-share-form')
+	->setName('dashboard_share_form')
+	->addItem(getMessages());
 
 $table_user_groups = (new CTable())
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])
@@ -42,7 +45,7 @@ $table_user_groups = (new CTable())
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(3)
-		))->setId('user_group_list_footer')
+		))->setId('user-group-list-footer')
 	)
 	->addStyle('width: 100%;');
 
@@ -63,9 +66,51 @@ $table_users = (new CTable())
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(3)
-		))->setId('user_list_footer')
+		))->setId('user-list-footer')
 	)
 	->addStyle('width: 100%;');
+
+$user_group_row_template = (new CRow([
+	new CCol([
+		(new CTextBox('userGroups[#{usrgrpid}][usrgrpid]', '#{usrgrpid}'))->setAttribute('type', 'hidden'),
+		'#{name}'
+	]),
+	new CCol(
+		(new CRadioButtonList('userGroups[#{usrgrpid}][permission]', PERM_READ))
+			->addValue(_('Read-only'), PERM_READ, 'user-group-#{usrgrpid}-permission-'.PERM_READ)
+			->addValue(_('Read-write'), PERM_READ_WRITE, 'user-group-#{usrgrpid}-permission-'.PERM_READ_WRITE)
+			->setModern(true)
+	),
+	(new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('dashboard_share_edit_popup.removeUserGroupShares("#{usrgrpid}");')
+			->removeId()
+	))->addClass(ZBX_STYLE_NOWRAP)
+]))
+	->setId('user-group-shares-#{usrgrpid}')
+	->toString();
+
+$user_row_template = (new CRow([
+	new CCol([
+		(new CTextBox('users[#{id}][userid]', '#{id}'))->setAttribute('type', 'hidden'),
+		'#{name}'
+	]),
+	new CCol(
+		(new CRadioButtonList('users[#{id}][permission]', PERM_READ))
+			->addValue(_('Read-only'), PERM_READ, 'user_#{id}_permission_'.PERM_READ)
+			->addValue(_('Read-write'), PERM_READ_WRITE, 'user_#{id}_permission_'.PERM_READ_WRITE)
+			->setModern(true)
+	),
+	(new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('dashboard_share_edit_popup.removeUserShares("#{id}");')
+			->removeId()
+	))->addClass(ZBX_STYLE_NOWRAP)
+]))
+	->setId('user-shares-#{id}')
+	->toString();
 
 $form
 	->addItem(getMessages())
@@ -91,20 +136,30 @@ $form
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		)
+	)
+	->addItem(
+		(new CScriptTag('
+			dashboard_share_edit_popup.init('.json_encode([
+				'dashboard' => $data['dashboard'],
+				'user_group_row_template' => $user_group_row_template,
+				'user_row_template' => $user_row_template
+			]).');
+		'))->setOnDocumentReady()
 	);
 
 $output = [
 	'header' => _('Dashboard sharing'),
 	'body' => $form->toString(),
-	'script_inline' => 'initializeDashboardShare('.json_encode($data['dashboard']).');',
 	'buttons' => [
 		[
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'window.dashboard_share.submit(overlay);'
+			'action' => 'dashboard_share_edit_popup.submit();'
 		]
-	]
+	],
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.dashboard.share.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

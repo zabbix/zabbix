@@ -124,8 +124,8 @@ extern int	CONFIG_AVAILMAN_FORKS;
 extern int	CONFIG_SERVICEMAN_FORKS;
 extern int	CONFIG_PROBLEMHOUSEKEEPER_FORKS;
 
-extern unsigned char	process_type;
-extern int		process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern ZBX_THREAD_LOCAL int		process_num;
 
 /******************************************************************************
  *                                                                            *

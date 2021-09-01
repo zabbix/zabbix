@@ -838,7 +838,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Clone_6 of Host prototype {#1}',
-					'template' => 'Mac OS X'
+					'template' => 'macOS'
 				]
 			],
 			[

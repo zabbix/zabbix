@@ -28,7 +28,7 @@ $filterForm = (new CFilter())->setResetUrl(new CUrl('toptriggers.php'));
 $severities = [];
 foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
 	$severities[] = [
-		'name' => getSeverityName($severity),
+		'name' => CSeverityHelper::getName($severity),
 		'value' => $severity
 	];
 }
@@ -96,7 +96,7 @@ foreach ($data['triggers'] as $trigger) {
 	$table->addRow([
 		$hostName,
 		$triggerDescription,
-		getSeverityCell($trigger['priority']),
+		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$trigger['cnt_event']
 	]);
 }

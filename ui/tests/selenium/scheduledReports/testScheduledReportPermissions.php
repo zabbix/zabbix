@@ -103,7 +103,7 @@ class testScheduledReportPermissions extends CWebTest {
 		$users = CDataHelper::call('user.create', [
 			[
 				'username' => 'admin without report permissions',
-				'passwd' => 'zabbix',
+				'passwd' => 'xibbaz123',
 				'roleid' => self::$roleids['admin role without access to reports'],
 				'usrgrps' => [
 					[
@@ -113,7 +113,7 @@ class testScheduledReportPermissions extends CWebTest {
 			],
 			[
 				'username' => 'super-admin without report permissions',
-				'passwd' => 'zabbix',
+				'passwd' => 'xibbaz123',
 				'roleid' => self::$roleids['super-admin role without access to reports'],
 				'usrgrps' => [
 					[
@@ -123,7 +123,7 @@ class testScheduledReportPermissions extends CWebTest {
 			],
 			[
 				'username' => 'admin report permissions',
-				'passwd' => 'zabbix',
+				'passwd' => 'xibbaz123',
 				'roleid' => self::$roleids['admin role for reports'],
 				'usrgrps' => [
 					[
@@ -139,7 +139,7 @@ class testScheduledReportPermissions extends CWebTest {
 			],
 			[
 				'username' => 'super-admin report permissions',
-				'passwd' => 'zabbix',
+				'passwd' => 'xibbaz123',
 				'roleid' => self::$roleids['super-admin role for reports'],
 				'usrgrps' => [
 					[
@@ -149,7 +149,7 @@ class testScheduledReportPermissions extends CWebTest {
 			],
 			[
 				'username' => 'second super-admin report permissions',
-				'passwd' => 'zabbix',
+				'passwd' => 'xibbaz123',
 				'roleid' => self::$roleids['super-admin role for reports'],
 				'usrgrps' => [
 					[
@@ -263,14 +263,14 @@ class testScheduledReportPermissions extends CWebTest {
 			[
 				[
 					'alias' => 'admin without report permissions',
-					'password' => 'zabbix',
+					'password' => 'xibbaz123',
 					'type' => 'admin'
 				]
 			],
 			[
 				[
 					'alias' => 'super-admin without report permissions',
-					'password' => 'zabbix',
+					'password' => 'xibbaz123',
 					'type' => 'super-admin'
 				]
 			]
@@ -437,7 +437,7 @@ class testScheduledReportPermissions extends CWebTest {
 			]
 		];
 
-		$this->page->userLogin('admin report permissions', 'zabbix');
+		$this->page->userLogin('admin report permissions', 'xibbaz123');
 		$this->page->open('zabbix.php?action=scheduledreport.list')->waitUntilReady();
 		$this->query('link', $report)->waitUntilClickable()->one()->click();
 		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asFluidForm()->one();
@@ -466,7 +466,7 @@ class testScheduledReportPermissions extends CWebTest {
 			[
 				[
 					'alias' => 'admin report permissions',
-					'password' => 'zabbix',
+					'password' => 'xibbaz123',
 					'Subscriptions' => [
 						[
 							'Recipient' => 'admin without report permissions',
@@ -498,7 +498,7 @@ class testScheduledReportPermissions extends CWebTest {
 			[
 				[
 					'alias' => 'second super-admin report permissions',
-					'password' => 'zabbix',
+					'password' => 'xibbaz123',
 					'Subscriptions' => [
 						[
 							'Recipient' => 'Admin (Zabbix Administrator)',
@@ -584,14 +584,14 @@ class testScheduledReportPermissions extends CWebTest {
 			[
 				[
 					'alias' => 'admin report permissions',
-					'password' => 'zabbix',
+					'password' => 'xibbaz123',
 					'type' => 'admin'
 				]
 			],
 			[
 				[
 					'alias' => 'super-admin report permissions',
-					'password' => 'zabbix',
+					'password' => 'xibbaz123',
 					'type' => 'super-admin'
 				]
 			]

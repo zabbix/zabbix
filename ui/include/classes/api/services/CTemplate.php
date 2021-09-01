@@ -407,7 +407,7 @@ class CTemplate extends CHostGeneral {
 			$this->link($link_templateids, $link_hostids);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templates);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE, $templates);
 
 		return ['templateids' => array_column($templates, 'templateid')];
 	}
@@ -628,7 +628,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->updateTags(array_column($templates, 'tags', 'templateid'));
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE, $templates, $db_templates);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
 
 		return ['templateids' => array_column($templates, 'templateid')];
 	}
@@ -888,7 +888,7 @@ class CTemplate extends CHostGeneral {
 			info(_s('Deleted: Template "%1$s".', $db_template['name']));
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TEMPLATE, $db_templates);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
 	}

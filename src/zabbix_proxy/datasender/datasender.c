@@ -33,9 +33,9 @@
 #include "../servercomms.h"
 #include "zbxcrypto.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
-
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -66,7 +66,7 @@ static void	get_hist_upload_state(const char *buffer, int *state)
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN];
 
-	if ('\0' == *buffer || SUCCEED != zbx_json_open(buffer, &jp))
+	if (NULL == buffer || '\0' == *buffer || SUCCEED != zbx_json_open(buffer, &jp))
 		return;
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROXY_UPLOAD, value, sizeof(value), NULL))

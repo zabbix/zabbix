@@ -1,0 +1,52 @@
+---
+- name: A1
+  status: 0
+  algorithm: MIN
+  children: [BOK, B1, B2, B3, B4]
+- name: A2
+  status: 0
+  algorithm: MIN
+  children: [B4, B3, B2, B1, BOK]
+- name: A3
+  status: 0
+  algorithm: MAX
+  children: [BOK, B1, B2, B3, B4]
+- name: A4
+  status: 0
+  algorithm: MAX
+  children: [B4, B3, B2, B1, BOK]
+- name: A5
+  status: 0
+  algorithm: MIN
+  children: [B1, B2, B3]
+- name: A6
+  status: 0
+  algorithm: MIN
+  children: [B3, B2, B1]
+- name: A7
+  status: 0
+  algorithm: MAX
+  children: [B1, B2, B3]
+- name: A8
+  status: 0
+  algorithm: MAX
+  children: [B3, B2, B1]
+- name: A9
+  status: 0
+  algorithm: OK
+  children: [BOK, B1, B2, B3, B4]
+- name: A10
+  status: 0
+  algorithm: OK
+  children: [B1, B2, B3, B4]
+- name: BOK
+  status: -1
+- name: B1
+  status: 1
+- name: B2
+  status: 2
+- name: B3
+  status: 3
+- name: B4
+  status: 4
+...

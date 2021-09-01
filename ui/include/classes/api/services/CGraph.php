@@ -337,7 +337,7 @@ class CGraph extends CGraphGeneral {
 
 		CGraphManager::delete($graphids);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, $db_graphs);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_GRAPH, $db_graphs);
 
 		return ['graphids' => $graphids];
 	}

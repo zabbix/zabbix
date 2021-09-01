@@ -188,7 +188,7 @@ abstract class CControllerServiceListGeneral extends CController {
 			$filter_status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
 		elseif ($filter['status'] == SERVICE_STATUS_PROBLEM) {
-			$filter_status = array_column(getSeverities(TRIGGER_SEVERITY_INFORMATION), 'value');
+			$filter_status = array_column(CSeverityHelper::getSeverities(TRIGGER_SEVERITY_INFORMATION), 'value');
 		}
 		else {
 			$filter_status = null;

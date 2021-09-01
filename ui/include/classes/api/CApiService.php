@@ -271,15 +271,15 @@ class CApiService {
 	}
 
 	/**
-	 * Unsets fields $fields from the given objects if they are not requested in $output.
+	 * Unset those fields of the objects, which are not requested for the $output.
 	 *
 	 * @param array        $objects
 	 * @param array        $fields
-	 * @param string|array $output		desired output
+	 * @param string|array $output   requested output
 	 *
 	 * @return array
 	 */
-	protected function unsetExtraFields(array $objects, array $fields, $output) {
+	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		// find the fields that have not been requested
 		$extraFields = [];
 		foreach ($fields as $field) {
@@ -1152,15 +1152,31 @@ class CApiService {
 	// }
 
 	/**
-	 * Add audit records.
+	 * Legacy method to add audit log records.
 	 *
-	 * @param int    $action        AUDIT_ACTION_*
-	 * @param int    $resourcetype  AUDIT_RESOURCE_*
-	 * @param array  $objects
-	 * @param array  $objects_old
+	 * @param int   $action        CAudit::ACTION_*
+	 * @param int   $resourcetype  CAudit::RESOURCE_*
+	 * @param array $objects
+	 * @param array $objects_old
 	 */
 	protected function addAuditBulk($action, $resourcetype, array $objects, array $objects_old = null) {
-		CAudit::addBulk(self::$userData, $action, $resourcetype, $objects, $objects_old);
+		CAuditOld::addBulk(self::$userData['userid'], self::$userData['userip'], self::$userData['username'], $action,
+			$resourcetype, $objects, $objects_old
+		);
+	}
+
+	/**
+	 * Add audit log records.
+	 *
+	 * @param int   $resource     CAudit::RESOURCE_*
+	 * @param int   $action       CAudit::ACTION_*
+	 * @param array $objects
+	 * @param array $objects_old
+	 */
+	protected function addAuditLog(int $action, int $resource, array $objects, array $objects_old = null): void {
+		CAudit::log(self::$userData['userid'], self::$userData['userip'], self::$userData['username'], $action,
+			$resource, $objects, $objects_old
+		);
 	}
 
 	/**

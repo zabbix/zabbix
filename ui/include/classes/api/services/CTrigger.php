@@ -617,7 +617,7 @@ class CTrigger extends CTriggerGeneral {
 
 		CTriggerManager::delete($triggerids);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $db_triggers);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_TRIGGER, $db_triggers);
 
 		return ['triggerids' => $triggerids];
 	}

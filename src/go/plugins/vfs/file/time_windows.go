@@ -29,6 +29,7 @@ import (
 	"unsafe"
 
 	"golang.org/x/sys/windows"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -45,6 +46,23 @@ type FILE_BASIC_INFO struct {
 	_ uint32
 }
 
+func getFileChange(path string) (unixTimeNano int64, err error) {
+	var f *os.File
+	if f, err = os.Open(path); err != nil {
+		return 0, zbxerr.New(fmt.Sprintf("Cannot open file")).Wrap(err)
+	}
+	defer f.Close()
+
+	var bi FILE_BASIC_INFO
+	err = windows.GetFileInformationByHandleEx(windows.Handle(f.Fd()), fileBasicInfo, (*byte)(unsafe.Pointer(&bi)),
+		uint32(unsafe.Sizeof(bi)))
+
+	if err != nil {
+		return 0, zbxerr.New(fmt.Sprintf("Cannot obtain file information")).Wrap(err)
+	}
+	return bi.ChangeTime.Nanoseconds(), nil
+}
+
 // Export -
 func (p *Plugin) exportTime(params []string) (result interface{}, err error) {
 	if len(params) > 2 || len(params) == 0 {
@@ -56,13 +74,13 @@ func (p *Plugin) exportTime(params []string) (result interface{}, err error) {
 
 	if len(params) == 1 || params[1] == "" || params[1] == "modify" {
 		if fi, ferr := os.Stat(params[0]); ferr != nil {
-			return nil, fmt.Errorf("Cannot stat file: %s", ferr)
+			return nil, zbxerr.New(fmt.Sprintf("Cannot stat file")).Wrap(err)
 		} else {
 			return fi.ModTime().Unix(), nil
 		}
 	} else if params[1] == "access" {
 		if fi, ferr := os.Stat(params[0]); ferr != nil {
-			return nil, fmt.Errorf("Cannot stat file: %s", ferr)
+			return nil, zbxerr.New(fmt.Sprintf("Cannot stat file")).Wrap(err)
 		} else {
 			if stat, ok := fi.Sys().(*syscall.Win32FileAttributeData); !ok {
 				return nil, errors.New("Invalid system data returned by stat.")
@@ -71,20 +89,10 @@ func (p *Plugin) exportTime(params []string) (result interface{}, err error) {
 			}
 		}
 	} else if params[1] == "change" {
-		var f *os.File
-		if f, err = os.Open(params[0]); err != nil {
-			return nil, fmt.Errorf("Cannot open file: %s", err)
+		if utn, err := getFileChange(params[0]); err == nil {
+			return utn / 1e9, nil
 		}
-		defer f.Close()
-
-		var bi FILE_BASIC_INFO
-		err = windows.GetFileInformationByHandleEx(windows.Handle(f.Fd()), fileBasicInfo, (*byte)(unsafe.Pointer(&bi)),
-			uint32(unsafe.Sizeof(bi)))
-
-		if err != nil {
-			return nil, fmt.Errorf("Cannot obtain file information: %s", err)
-		}
-		return bi.ChangeTime.Nanoseconds() / 1e9, nil
+		return
 	} else {
 		return nil, errors.New("Invalid second parameter.")
 	}

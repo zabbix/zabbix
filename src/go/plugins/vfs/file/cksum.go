@@ -23,7 +23,12 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"zabbix.com/pkg/std"
+	"zabbix.com/pkg/zbxerr"
 )
+
+type checkSum func(file std.File, start time.Time, timeout int) (result interface{}, err error)
 
 var crctable []uint32 = []uint32{
 	0x0,
@@ -80,26 +85,11 @@ var crctable []uint32 = []uint32{
 	0xa2f33668, 0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,
 }
 
-func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
-	if len(params) > 1 {
-		return nil, errors.New("Too many parameters.")
-	}
-	if len(params) == 0 || params[0] == "" {
-		return nil, errors.New("Invalid first parameter.")
-	}
-
-	start := time.Now()
-
-	file, err := stdOs.Open(params[0])
-	if err != nil {
-		return nil, fmt.Errorf("Cannot open file %s", params[0])
-	}
-	defer file.Close()
-
+func crc32(file std.File, start time.Time, timeout int) (result interface{}, err error) {
+	var crc uint32
+	var flen uint32
 	bnum := 16 * 1024
 	buf := make([]byte, bnum)
-
-	var crc, flen uint32
 
 	for bnum > 0 {
 		bnum, _ = file.Read(buf)
@@ -109,8 +99,8 @@ func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
 		}
 
 		flen += uint32(bnum)
-		if time.Since(start) > time.Duration(p.options.Timeout)*time.Second {
-			return nil, errors.New("Timeout while processing item")
+		if time.Since(start) > time.Duration(timeout)*time.Second {
+			return 0, errors.New("Timeout while processing item.")
 		}
 	}
 
@@ -118,6 +108,42 @@ func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
 		crc = (crc << 8) ^ crctable[((crc>>24)^flen)&0xff]
 		flen >>= 8
 	}
-	return ^crc, nil
 
+	return ^crc, nil
+}
+
+func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
+	if len(params) > 2 {
+		return nil, zbxerr.ErrorTooManyParameters
+	}
+	if len(params) == 0 || params[0] == "" {
+		return nil, errors.New("Invalid first parameter.")
+	}
+
+	mode := "crc32"
+	if len(params) == 2 && params[1] != "" {
+		mode = params[1]
+	}
+
+	var ckSum checkSum
+	switch mode {
+	case "crc32":
+		ckSum = crc32
+	case "md5":
+		ckSum = md5sum
+	case "sha256":
+		ckSum = sha256sum
+	default:
+		return nil, errors.New("Invalid second parameter.")
+	}
+
+	start := time.Now()
+
+	file, err := stdOs.Open(params[0])
+	if err != nil {
+		return nil, fmt.Errorf("Cannot open file %s.", params[0])
+	}
+	defer file.Close()
+
+	return ckSum(file, start, p.options.Timeout)
 }

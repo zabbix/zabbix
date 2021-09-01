@@ -254,7 +254,7 @@ class CScript extends CApiService {
 			DB::insertBatch('script_param', $scripts_params);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCRIPT, $scripts);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_SCRIPT, $scripts);
 
 		return ['scriptids' => $scriptids];
 	}
@@ -496,7 +496,7 @@ class CScript extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT, $scripts, $db_scripts);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SCRIPT, $scripts, $db_scripts);
 
 		return ['scriptids' => zbx_objectValues($scripts, 'scriptid')];
 	}
@@ -949,7 +949,7 @@ class CScript extends CApiService {
 
 		DB::delete('scripts', ['scriptid' => $scriptids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, $db_scripts);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_SCRIPT, $db_scripts);
 
 		return ['scriptids' => $scriptids];
 	}

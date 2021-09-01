@@ -374,7 +374,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 	else
 	{
 		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
-				"Content-Type: %s\r\n"
+				"Content-Type: %s; charset=\"UTF-8\"\r\n"
 				"Content-Transfer-Encoding: base64\r\n",
 				ZBX_MEDIA_CONTENT_TYPE_HTML == content_type ? "text/html" : "text/plain");
 	}
@@ -873,7 +873,7 @@ char	*zbx_email_make_body(const char *message, unsigned char content_type,  cons
 
 	zbx_snprintf_alloc(&body, &body_alloc, &body_offset,
 			"--" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n"
-			"Content-Type: %s\r\n"
+			"Content-Type: %s; charset=\"UTF-8\"\r\n"
 			"Content-Transfer-Encoding: base64\r\n"
 			"\r\n"
 			"%s\r\n"

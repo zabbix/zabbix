@@ -495,7 +495,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 					clickCallback: function () {
 						jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-						PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+						PopUp('popup.dashboard.share.edit', popup_options, 'dashboard_share_edit', trigger_elmnt);
 					},
 					disabled: !options.editable
 				},
@@ -1115,6 +1115,7 @@ jQuery(function($) {
 							? document.querySelector('.wrapper').clientWidth
 							: document.querySelector('.wrapper').clientWidth - data.element.width;
 
+						pos.top = Math.max(0, pos.top);
 						pos.left = Math.max(0, Math.min(max_left, pos.left));
 
 						data.element.element[0].style.top = `${pos.top}px`;

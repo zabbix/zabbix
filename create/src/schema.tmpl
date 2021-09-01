@@ -752,11 +752,14 @@ INDEX		|2		|id
 TABLE|services|serviceid|ZBX_DATA
 FIELD		|serviceid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
-FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|status		|t_integer	|'-1'	|NOT NULL	|0
 FIELD		|algorithm	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|showsla	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|goodsla	|t_double	|'99.9'	|NOT NULL	|0
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|weight		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|propagation_rule|t_integer	|'0'	|NOT NULL	|0
+FIELD		|propagation_value|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|services_links|linkid|ZBX_DATA
 FIELD		|linkid		|t_id		|	|NOT NULL	|0
@@ -1106,7 +1109,7 @@ FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|resourceid	|t_id		|	|NOT NULL	|0
 FIELD		|resourcename	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|recordsetid	|t_cuid		|	|NOT NULL	|0
-FIELD		|details	|t_text		|''	|NOT NULL	|0
+FIELD		|details	|t_longtext	|''	|NOT NULL	|0
 INDEX		|1		|userid,clock
 INDEX		|2		|clock
 INDEX		|3		|resourcetype,resourceid
@@ -1115,7 +1118,7 @@ TABLE|service_alarms|servicealarmid|0
 FIELD		|servicealarmid	|t_id		|	|NOT NULL	|0
 FIELD		|serviceid	|t_id		|	|NOT NULL	|0			|1|services
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
-FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value		|t_integer	|'-1'	|NOT NULL	|0
 INDEX		|1		|serviceid,clock
 INDEX		|2		|clock
 
@@ -1312,7 +1315,7 @@ FIELD		|idx		|t_varchar(96)	|''	|NOT NULL	|0
 FIELD		|idx2		|t_id		|'0'	|NOT NULL	|0
 FIELD		|value_id	|t_id		|'0'	|NOT NULL	|0
 FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|value_str	|t_text	|''	|NOT NULL	|0
+FIELD		|value_str	|t_text		|''	|NOT NULL	|0
 FIELD		|source		|t_varchar(96)	|''	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|userid,idx,idx2
@@ -1874,7 +1877,16 @@ FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|serviceid
 
+TABLE|service_status_rule|service_status_ruleid|ZBX_DATA
+FIELD		|service_status_ruleid|t_id	|	|NOT NULL	|0
+FIELD		|serviceid	|t_id		|	|NOT NULL	|0		|1|services|serviceid
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|limit_value	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|limit_status	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|new_status	|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|serviceid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050034	|5050034
+ROW		|5050050	|5050050

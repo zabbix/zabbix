@@ -123,7 +123,7 @@ class CHousekeeping extends CApiService {
 			]);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOUSEKEEPING,
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOUSEKEEPING,
 			[['configid' => $db_hk['configid']] + $hk], [$db_hk['configid'] => $db_hk]
 		);
 

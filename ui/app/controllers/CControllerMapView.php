@@ -117,7 +117,7 @@ class CControllerMapView extends CController {
 
 		$severities_dropdown = [];
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severity_name = getSeverityName($severity);
+			$severity_name = CSeverityHelper::getName($severity);
 
 			$severities_dropdown[$severity] = ($severity == $map['severity_min'])
 				? $severity_name.' ('._('default').')'
