@@ -68,15 +68,14 @@ void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *grap
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_graph_copy_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_width[AUDIT_DETAILS_KEY_LEN], audit_key_height[AUDIT_DETAILS_KEY_LEN],
-		audit_key_yaxismin[AUDIT_DETAILS_KEY_LEN],
-		audit_key_yaxismax[AUDIT_DETAILS_KEY_LEN], audit_key_templateid[AUDIT_DETAILS_KEY_LEN],
-		audit_key_show_work_period[AUDIT_DETAILS_KEY_LEN], audit_key_show_triggers[AUDIT_DETAILS_KEY_LEN],
-		audit_key_graphtype[AUDIT_DETAILS_KEY_LEN], audit_key_show_legend[AUDIT_DETAILS_KEY_LEN],
-		audit_key_show_3d[AUDIT_DETAILS_KEY_LEN], audit_key_percent_left[AUDIT_DETAILS_KEY_LEN],
-		audit_key_percent_right[AUDIT_DETAILS_KEY_LEN], audit_key_ymin_type[AUDIT_DETAILS_KEY_LEN],
-		audit_key_ymax_type[AUDIT_DETAILS_KEY_LEN], audit_key_ymin_itemid[AUDIT_DETAILS_KEY_LEN],
-		audit_key_ymax_itemid[AUDIT_DETAILS_KEY_LEN],  audit_key_flags[AUDIT_DETAILS_KEY_LEN],
-		audit_key_discover[AUDIT_DETAILS_KEY_LEN];
+		audit_key_yaxismin[AUDIT_DETAILS_KEY_LEN], audit_key_yaxismax[AUDIT_DETAILS_KEY_LEN],
+		audit_key_templateid[AUDIT_DETAILS_KEY_LEN], audit_key_show_work_period[AUDIT_DETAILS_KEY_LEN],
+		audit_key_show_triggers[AUDIT_DETAILS_KEY_LEN], audit_key_graphtype[AUDIT_DETAILS_KEY_LEN],
+		audit_key_show_legend[AUDIT_DETAILS_KEY_LEN], audit_key_show_3d[AUDIT_DETAILS_KEY_LEN],
+		audit_key_percent_left[AUDIT_DETAILS_KEY_LEN], audit_key_percent_right[AUDIT_DETAILS_KEY_LEN],
+		audit_key_ymin_type[AUDIT_DETAILS_KEY_LEN], audit_key_ymax_type[AUDIT_DETAILS_KEY_LEN],
+		audit_key_ymin_itemid[AUDIT_DETAILS_KEY_LEN], audit_key_ymax_itemid[AUDIT_DETAILS_KEY_LEN],
+		audit_key_flags[AUDIT_DETAILS_KEY_LEN], audit_key_discover[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
@@ -196,8 +195,8 @@ PREPARE_AUDIT_GRAPH_UPDATE(show_triggers, int, int)
 PREPARE_AUDIT_GRAPH_UPDATE(graphtype, int, int)
 PREPARE_AUDIT_GRAPH_UPDATE(show_legend, int, int)
 PREPARE_AUDIT_GRAPH_UPDATE(show_3d, int, int)
-PREPARE_AUDIT_GRAPH_UPDATE(percent_left, int, int)
-PREPARE_AUDIT_GRAPH_UPDATE(percent_right, int, int)
+PREPARE_AUDIT_GRAPH_UPDATE(percent_left, double, double)
+PREPARE_AUDIT_GRAPH_UPDATE(percent_right, double, double)
 PREPARE_AUDIT_GRAPH_UPDATE(ymin_type, int, int)
 PREPARE_AUDIT_GRAPH_UPDATE(ymax_type, int, int)
 PREPARE_AUDIT_GRAPH_UPDATE(ymin_itemid, uint64_t, uint64)

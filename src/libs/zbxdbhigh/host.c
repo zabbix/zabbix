@@ -1229,7 +1229,7 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
 	zbx_vector_uint64_create(&children_graphids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct gd.graphid,g.name,g.flags from"
-			" graph_discovery gd, graphd g where g.graphid=gd.graphid and ");
+			" graph_discovery gd,graphd g where g.graphid=gd.graphid and ");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid", graphids->values,
 			graphids->values_num);
 
