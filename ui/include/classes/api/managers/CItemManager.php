@@ -30,6 +30,8 @@ class CItemManager {
 	 * @param array $itemids
 	 */
 	public static function delete(array $itemids) {
+		global $DB;
+
 		$del_itemids = [];
 		$del_ruleids = [];
 		$del_item_prototypeids = [];
@@ -209,6 +211,22 @@ class CItemManager {
 		];
 
 		$ins_housekeeper = [];
+
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			$config = select_config();
+
+			if ($config['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+				if ($config['hk_history_mode'] != 0 && $config['hk_history_global'] == 1) {
+					$table_names = array_diff($table_names,
+						['history', 'history_str', 'history_uint', 'history_log', 'history_text']
+					);
+				}
+
+				if ($config['hk_trends_mode'] != 0 && $config['hk_trends_global'] == 1) {
+					$table_names = array_diff($table_names, ['trends', 'trends_uint']);
+				}
+			}
+		}
 
 		foreach ($del_itemids as $del_itemid) {
 			foreach ($table_names as $table_name) {
