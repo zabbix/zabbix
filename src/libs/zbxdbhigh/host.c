@@ -27,6 +27,7 @@
 #include "../../libs/zbxaudit/audit_host.h"
 #include "../../libs/zbxaudit/audit_item.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
+#include "../../libs/zbxaudit/audit_httptest.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "../zbxalgo/vectorimpl.h"
@@ -4277,6 +4278,7 @@ httptestitem_t;
 typedef struct
 {
 	zbx_uint64_t		templateid;
+	zbx_uint64_t		templateid_orig;
 	zbx_uint64_t		httptestid;
 	char			*name;
 	char			*delay;
@@ -4334,7 +4336,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.httptestid,t.name,t.delay,t.status,t.agent,t.authentication,"
-				"t.http_user,t.http_password,t.http_proxy,t.retries,h.httptestid"
+				"t.http_user,t.http_password,t.http_proxy,t.retries,h.httptestid,h.templateid"
 			" from httptest t"
 				" left join httptest h"
 					" on h.hostid=" ZBX_FS_UI64
@@ -4350,6 +4352,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		httptest = (httptest_t *)zbx_calloc(NULL, 1, sizeof(httptest_t));
 
 		ZBX_STR2UINT64(httptest->templateid, row[0]);
+		ZBX_STR2UINT64(httptest->templateid_orig, row[11]);
 		ZBX_DBROW2UINT64(httptest->httptestid, row[10]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
@@ -4861,16 +4864,26 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 		{
 			httptest->httptestid = httptestid++;
 
+			zbx_audit_httptest_create_entry(AUDIT_ACTION_ADD, httptest->httptestid, httptest->name);
+
 			zbx_db_insert_add_values(&db_insert_htest, httptest->httptestid, httptest->name,
 					httptest->delay, (int)httptest->status, httptest->agent,
 					(int)httptest->authentication, httptest->http_user, httptest->http_password,
 					httptest->http_proxy, httptest->retries, hostid, httptest->templateid);
+
+			zbx_audit_httptest_update_json_add_data(httptest->httptestid, httptest->templateid,
+					httptest->name, httptest->delay, (int)httptest->status, httptest->agent,
+					(int)httptest->authentication, httptest->http_user, httptest->http_password,
+					httptest->http_proxy, httptest->retries, hostid);
 
 			for (j = 0; j < httptest->fields.values_num; j++)
 			{
 				httpfield = (httpfield_t *)httptest->fields.values[j];
 
 				zbx_db_insert_add_values(&db_insert_tfield, httptestfieldid, httptest->httptestid,
+						httpfield->type, httpfield->name, httpfield->value);
+
+				zbx_audit_httptest_update_json_add_httptest_field(httptest->httptestid, httptestfieldid,
 						httpfield->type, httpfield->name, httpfield->value);
 
 				httptestfieldid++;
@@ -4886,6 +4899,12 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 						httpstep->follow_redirects, httpstep->retrieve_mode,
 						httpstep->post_type);
 
+				zbx_audit_httptest_update_json_add_httptest_httpstep(httptest->httptestid, httpstepid,
+						httpstep->name, httpstep->no, httpstep->url, httpstep->timeout,
+						httpstep->posts, httpstep->required, httpstep->status_codes,
+						httpstep->follow_redirects, httpstep->retrieve_mode,
+						httpstep->post_type);
+
 				for (k = 0; k < httpstep->fields.values_num; k++)
 				{
 					httpfield = (httpfield_t *)httpstep->fields.values[k];
@@ -4893,6 +4912,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 					zbx_db_insert_add_values(&db_insert_sfield, httpstepfieldid, httpstepid,
 							httpfield->type, httpfield->name, httpfield->value);
 
+					zbx_audit_httptest_update_json_add_httpstep_field(httptest->httptestid,
+							httpstepid, httpstepfieldid, httpfield->type, httpfield->name,
+							httpfield->value);
 					httpstepfieldid++;
 				}
 
@@ -4926,16 +4948,24 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 				zbx_db_insert_add_values(&db_insert_httag, httptesttagid, httptest->httptestid,
 						httptesttag->tag, httptesttag->value);
 
+				zbx_audit_httptest_update_json_add_httptest_tag(httptest->httptestid, httptesttagid,
+						httptesttag->tag, httptesttag->value);
+
 				httptesttagid++;
 			}
 		}
 		else
 		{
+			zbx_audit_httptest_create_entry(AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update httptest"
 					" set templateid=" ZBX_FS_UI64
 					" where httptestid=" ZBX_FS_UI64 ";\n",
 					httptest->templateid, httptest->httptestid);
+
+			zbx_audit_httptest_update_json_update_templateid(httptest->httptestid,
+					httptest->templateid_orig, httptest->templateid);
 		}
 	}
 
