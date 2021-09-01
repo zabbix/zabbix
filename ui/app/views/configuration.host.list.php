@@ -52,11 +52,12 @@ $filter = (new CFilter())
 	->setResetUrl($action_url)
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
+	->addVar('action', $data['action'])
 	->addFilterTab(_('Filter'), [
-		(new CFormList())
-			->addVar('action', $data['action'])
-			->addRow(
-				(new CLabel(_('Host groups'), 'filter_groups__ms')),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Host groups'), 'filter_groups__ms'),
 				(new CMultiSelect([
 					'name' => 'filter_groups[]',
 					'object_name' => 'hostGroup',
@@ -73,9 +74,9 @@ $filter = (new CFilter())
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(
-				(new CLabel(_('Templates'), 'filter_templates__ms')),
+			])
+			->addItem([
+				new CLabel(_('Templates'), 'filter_templates__ms'),
 				(new CMultiSelect([
 					'name' => 'filter_templates[]',
 					'object_name' => 'templates',
@@ -90,29 +91,35 @@ $filter = (new CFilter())
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(_('Name'),
+			])
+			->addItem([
+				new CLabel(_('Name'), 'filter_host'),
 				(new CTextBox('filter_host', $data['filter']['host']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(_('DNS'),
+			])
+			->addItem([
+				new CLabel(_('DNS'), 'filter_dns'),
 				(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(_('IP'),
+			])
+			->addItem([
+				new CLabel(_('IP'), 'filter_ip'),
 				(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(_('Port'),
-				(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			),
-		(new CFormList())
-			->addRow(_('Monitored by'),
+			])
+			->addItem([
+				new CLabel(_('Port'), 'filter_port'),
+				(new CTextBox('', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			]),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Monitored by'), 'filter_monitored_by'),
 				(new CRadioButtonList('filter_monitored_by', (int) $data['filter']['monitored_by']))
 					->addValue(_('Any'), ZBX_MONITORED_BY_ANY)
 					->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
 					->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
 					->setModern(true)
-			)
-			->addRow(
-				(new CLabel(_('Proxy'), 'filter_proxyids__ms')),
+			])
+			->addItem([
+				new CLabel(_('Proxy'), 'filter_proxyids__ms'),
 				(new CMultiSelect([
 					'name' => 'filter_proxyids[]',
 					'object_name' => 'proxies',
@@ -128,11 +135,14 @@ $filter = (new CFilter())
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(_('Tags'), CTagFilterFieldHelper::getTagFilterField([
-				'evaltype' => $data['filter']['evaltype'],
-				'tags' => $data['filter']['tags']
-			]))
+			])
+			->addItem([
+				new CLabel(_('Tags')),
+				CTagFilterFieldHelper::getTagFilterField([
+					'evaltype' => $data['filter']['evaltype'],
+					'tags' => $data['filter']['tags']
+				])
+			])
 	]);
 
 $widget->addItem($filter);
