@@ -3171,6 +3171,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	{
 		value_esc = DBdyn_escape_string(item->units);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sunits='%s'", d, value_esc);
+		d = ",";
 		zbx_audit_item_update_json_update_units(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED, item->units_orig,
 				item->units);
 		zbx_free(value_esc);
