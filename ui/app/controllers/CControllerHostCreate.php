@@ -174,7 +174,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 		$valuemaps = $this->getInput('valuemaps', []);
 		$clone_mode = ($this->hasInput('full_clone') || $this->hasInput('clone'));
 
-		foreach($valuemaps as $key => $valuemap) {
+		foreach ($valuemaps as $key => $valuemap) {
 			if ($clone_mode) {
 				unset($valuemap['valuemapid']);
 			}

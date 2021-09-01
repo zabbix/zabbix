@@ -147,6 +147,8 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	 *
 	 * @param array $groups Submitted groups.
 	 *
+	 * @throws Exception
+	 *
 	 * @return array Groups for assigning to host.
 	 */
 	protected function processHostGroups(array $groups): array {
@@ -161,10 +163,11 @@ abstract class CControllerHostUpdateGeneral extends CController {
 
 		if ($new_groups) {
 			$new_groupid = API::HostGroup()->create($new_groups);
-
-			if ($new_groupid) {
-				$groups = array_merge($groups, $new_groupid['groupids']);
+			if (!$new_groupid) {
+				throw new Exception();
 			}
+
+			$groups = array_merge($groups, $new_groupid['groupids']);
 		}
 
 		return zbx_toObject($groups, 'groupid');
