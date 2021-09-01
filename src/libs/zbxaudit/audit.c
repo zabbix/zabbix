@@ -74,6 +74,14 @@ static void	append_int_json(struct zbx_json *json, const char *audit_op, const c
 	zbx_json_close(json);
 }
 
+static void	append_double_json(struct zbx_json *json, const char *audit_op, const char *key, double val)
+{
+	zbx_json_addarray(json, key);
+	zbx_json_addstring(json, NULL, audit_op, ZBX_JSON_TYPE_STRING);
+	zbx_json_addfloat(json, NULL, val);
+	zbx_json_close(json);
+}
+
 static void	append_json_no_value(struct zbx_json *json, const char *audit_op, const char *key)
 {
 	zbx_json_addarray(json, key);
@@ -303,6 +311,8 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 	}
 
 	append_str_json(&((*found_audit_entry)->details_json), audit_op, key, value);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "BUFFER: ->%s<-\n ", (*found_audit_entry)->details_json.buffer);
 }
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audit_op, const char *key,
@@ -350,6 +360,12 @@ void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_o
 	append_int_json(&((*found_audit_entry)->details_json), audit_op, key, value);
 }
 
+void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const char *audit_op, const char *key, double value)
+{
+	PREPARE_UPDATE_JSON_APPEND_OP();
+	append_double_json(&((*found_audit_entry)->details_json), audit_op, key, value);
+}
+
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
 		const char *value_new)
 {
@@ -366,6 +382,13 @@ void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key,
 
 void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const char *key, int value_old,
 		int value_new)
+{
+	PREPARE_UPDATE_JSON_APPEND_OP();
+	update_int_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
+}
+
+void	zbx_audit_update_json_update_double(const zbx_uint64_t id, const char *key, double value_old,
+		double value_new)
 {
 	PREPARE_UPDATE_JSON_APPEND_OP();
 	update_int_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
