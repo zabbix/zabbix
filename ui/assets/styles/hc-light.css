@@ -2935,8 +2935,6 @@ form.is-loading {
     margin: 10px 5px 0; }
   .filter-forms select {
     vertical-align: top; }
-  .filter-forms #filter-tags td {
-    padding: 0 5px 5px 0; }
   .filter-forms .table-forms .table-forms-td-right td {
     padding: 0 5px 5px 0;
     vertical-align: middle; }
