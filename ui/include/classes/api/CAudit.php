@@ -103,7 +103,7 @@ class CAudit {
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
-		'usergroup.userids' => 'users_groups'
+		'usergroup.users' => 'users_groups'
 	];
 
 	private const NESTED_OBJECTS_IDS = [
@@ -111,7 +111,7 @@ class CAudit {
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
-		'usergroup.userids' => 'id'
+		'usergroup.users' => 'id'
 	];
 
 	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,

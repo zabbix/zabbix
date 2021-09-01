@@ -183,7 +183,7 @@ class CUserGroup extends CApiService {
 		$ins_usrgrps = [];
 
 		foreach ($usrgrps as $usrgrp) {
-			unset($usrgrp['rights'], $usrgrp['userids']);
+			unset($usrgrp['rights'], $usrgrp['tag_filters'], $usrgrp['users']);
 			$ins_usrgrps[] = $usrgrp;
 		}
 		$usrgrpids = DB::insert('usrgrp', $ins_usrgrps);
@@ -226,11 +226,26 @@ class CUserGroup extends CApiService {
 				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
 				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
 			]],
-			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE]
+			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
+			'users' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
+				'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		foreach ($usrgrps as &$usrgrp) {
+			if (array_key_exists('userids', $usrgrp)) {
+				if (array_key_exists('users', $usrgrp)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'userids'));
+				}
+
+				$usrgrp['users'] = zbx_toObject($usrgrp['userids'], 'userid');
+				unset($usrgrp['userids']);
+			}
+		}
+		unset($usrgrp);
 
 		$this->checkDuplicates(array_column($usrgrps, 'name'));
 		$this->checkUsers($usrgrps);
@@ -301,7 +316,10 @@ class CUserGroup extends CApiService {
 				'tag' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
 				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
 			]],
-			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE]
+			'userids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
+			'users' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
+				'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -316,12 +334,21 @@ class CUserGroup extends CApiService {
 
 		$names = [];
 
-		foreach ($usrgrps as $usrgrp) {
+		foreach ($usrgrps as &$usrgrp) {
 			// Check if this user group exists.
 			if (!array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
+			}
+
+			if (array_key_exists('userids', $usrgrp)) {
+				if (array_key_exists('users', $usrgrp)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'userids'));
+				}
+
+				$usrgrp['users'] = zbx_toObject($usrgrp['userids'], 'userid');
+				unset($usrgrp['userids']);
 			}
 
 			$db_usrgrp = $db_usrgrps[$usrgrp['usrgrpid']];
@@ -330,6 +357,7 @@ class CUserGroup extends CApiService {
 				$names[] = $usrgrp['name'];
 			}
 		}
+		unset($usrgrp);
 
 		$this->addAffectedObjects($usrgrps, $db_usrgrps);
 
@@ -366,7 +394,8 @@ class CUserGroup extends CApiService {
 	 * Check for valid users.
 	 *
 	 * @param array  $usrgrps
-	 * @param array  $usrgrps[]['userids']   (optional)
+	 * @param array  $usrgrps[]['users']              (optional)
+	 * @param string $usrgrps[]['users'][]['userid']
 	 *
 	 * @throws APIException
 	 */
@@ -374,9 +403,9 @@ class CUserGroup extends CApiService {
 		$userids = [];
 
 		foreach ($usrgrps as $usrgrp) {
-			if (array_key_exists('userids', $usrgrp)) {
-				foreach ($usrgrp['userids'] as $userid) {
-					$userids[$userid] = true;
+			if (array_key_exists('users', $usrgrp)) {
+				foreach ($usrgrp['users'] as $user) {
+					$userids[$user['userid']] = true;
 				}
 			}
 		}
@@ -499,7 +528,7 @@ class CUserGroup extends CApiService {
 			$groups_users = [];
 
 			foreach ($usrgrps as $usrgrp) {
-				if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps) && !array_key_exists('userids', $usrgrp)) {
+				if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps) && !array_key_exists('users', $usrgrp)) {
 					$groups_users[$usrgrp['usrgrpid']] = [];
 				}
 			}
@@ -511,13 +540,12 @@ class CUserGroup extends CApiService {
 				]);
 
 				foreach ($db_users_groups as $db_user_group) {
-					$groups_users[$db_user_group['usrgrpid']][] = $db_user_group['userid'];
+					$groups_users[$db_user_group['usrgrpid']][] = ['userid' => $db_user_group['userid']];
 				}
 
 				foreach ($usrgrps as &$usrgrp) {
-					if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps)
-							&& !array_key_exists('userids', $usrgrp)) {
-						$usrgrp['userids'] = $groups_users[$usrgrp['usrgrpid']];
+					if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps) && !array_key_exists('users', $usrgrp)) {
+						$usrgrp['users'] = $groups_users[$usrgrp['usrgrpid']];
 					}
 				}
 				unset($usrgrp);
@@ -525,12 +553,14 @@ class CUserGroup extends CApiService {
 		}
 
 		foreach ($usrgrps as $usrgrp) {
-			if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps)
-					&& array_key_exists('userids', $usrgrp)
-					&& uint_in_array(self::$userData['userid'], $usrgrp['userids'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('User cannot add himself to a disabled group or a group with disabled GUI access.')
-				);
+			if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps) && array_key_exists('users', $usrgrp)) {
+				foreach ($usrgrp['users'] as $user) {
+					if (bccomp(self::$userData['userid'], $user['userid']) == 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('User cannot add himself to a disabled group or a group with disabled GUI access.')
+						);
+					}
+				}
 			}
 		}
 	}
@@ -540,7 +570,8 @@ class CUserGroup extends CApiService {
 	 *
 	 * @param array  $usrgrps
 	 * @param array  $usrgrps[]['usrgrpid']
-	 * @param array  $usrgrps[]['userids']   (optional)
+	 * @param array  $usrgrps[]['users']              (optional)
+	 * @param string $usrgrps[]['users'][]['userid']
 	 *
 	 * @throws APIException
 	 */
@@ -548,11 +579,11 @@ class CUserGroup extends CApiService {
 		$users_groups = [];
 
 		foreach ($usrgrps as $usrgrp) {
-			if (array_key_exists('userids', $usrgrp)) {
+			if (array_key_exists('users', $usrgrp)) {
 				$users_groups[$usrgrp['usrgrpid']] = [];
 
-				foreach ($usrgrp['userids'] as $userid) {
-					$users_groups[$usrgrp['usrgrpid']][$userid] = true;
+				foreach ($usrgrp['users'] as $user) {
+					$users_groups[$usrgrp['usrgrpid']][$user['userid']] = true;
 				}
 			}
 		}
@@ -784,31 +815,29 @@ class CUserGroup extends CApiService {
 		$del_ids = [];
 
 		foreach ($usrgrps as &$usrgrp) {
-			if (!array_key_exists('userids', $usrgrp)) {
+			if (!array_key_exists('users', $usrgrp)) {
 				continue;
 			}
 
-			$db_userids = ($method === 'update')
-				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['userids'], null, 'userid')
+			$db_users = ($method === 'update')
+				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['users'], null, 'userid')
 				: [];
 
-			foreach ($usrgrp['userids'] as &$userid) {
-				$userid = ['userid' => $userid];
-
-				if (array_key_exists($userid['userid'], $db_userids)) {
-					$userid['id'] = $db_userids[$userid['userid']]['id'];
-					unset($db_userids[$userid['userid']]);
+			foreach ($usrgrp['users'] as &$user) {
+				if (array_key_exists($user['userid'], $db_users)) {
+					$user['id'] = $db_users[$user['userid']]['id'];
+					unset($db_users[$user['userid']]);
 				}
 				else {
 					$ins_users_groups[] = [
-						'userid' => $userid['userid'],
+						'userid' => $user['userid'],
 						'usrgrpid' => $usrgrp['usrgrpid']
 					];
 				}
 			}
-			unset($userid);
+			unset($user);
 
-			$del_ids = array_merge($del_ids, array_column($db_userids, 'id'));
+			$del_ids = array_merge($del_ids, array_column($db_users, 'id'));
 		}
 		unset($usrgrp);
 
@@ -821,16 +850,16 @@ class CUserGroup extends CApiService {
 		}
 
 		foreach ($usrgrps as &$usrgrp) {
-			if (!array_key_exists('userids', $usrgrp)) {
+			if (!array_key_exists('users', $usrgrp)) {
 				continue;
 			}
 
-			foreach ($usrgrp['userids'] as &$userid) {
-				if (!array_key_exists('id', $userid)) {
-					$userid['id'] = array_shift($ids);
+			foreach ($usrgrp['users'] as &$user) {
+				if (!array_key_exists('id', $user)) {
+					$user['id'] = array_shift($ids);
 				}
 			}
-			unset($userid);
+			unset($user);
 		}
 		unset($usrgrp);
 	}
@@ -886,7 +915,7 @@ class CUserGroup extends CApiService {
 
 			$usrgrps[] = [
 				'usrgrpid' => $usrgrpid,
-				'userids' => []
+				'users' => []
 			];
 		}
 
@@ -1058,7 +1087,7 @@ class CUserGroup extends CApiService {
 	 * @param array $db_usrgrps
 	 */
 	private function addAffectedObjects(array $usrgrps, array &$db_usrgrps): void {
-		$usrgrpids = ['rights' => [], 'tag_filters' => [], 'userids' => []];
+		$usrgrpids = ['rights' => [], 'tag_filters' => [], 'users' => []];
 
 		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('rights', $usrgrp)) {
@@ -1071,9 +1100,9 @@ class CUserGroup extends CApiService {
 				$db_usrgrps[$usrgrp['usrgrpid']]['tag_filters'] = [];
 			}
 
-			if (array_key_exists('userids', $usrgrp)) {
-				$usrgrpids['userids'][] = $usrgrp['usrgrpid'];
-				$db_usrgrps[$usrgrp['usrgrpid']]['userids'] = [];
+			if (array_key_exists('users', $usrgrp)) {
+				$usrgrpids['users'][] = $usrgrp['usrgrpid'];
+				$db_usrgrps[$usrgrp['usrgrpid']]['users'] = [];
 			}
 		}
 
@@ -1110,15 +1139,15 @@ class CUserGroup extends CApiService {
 			}
 		}
 
-		if ($usrgrpids['userids']) {
+		if ($usrgrpids['users']) {
 			$options = [
 				'output' => ['id', 'usrgrpid', 'userid'],
-				'filter' => ['usrgrpid' => $usrgrpids['userids']]
+				'filter' => ['usrgrpid' => $usrgrpids['users']]
 			];
 			$db_users = DBselect(DB::makeSql('users_groups', $options));
 
 			while ($db_user = DBfetch($db_users)) {
-				$db_usrgrps[$db_user['usrgrpid']]['userids'][$db_user['id']] = [
+				$db_usrgrps[$db_user['usrgrpid']]['users'][$db_user['id']] = [
 					'id' => $db_user['id'],
 					'userid' => $db_user['userid']
 				];
