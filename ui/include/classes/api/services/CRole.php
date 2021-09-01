@@ -56,9 +56,9 @@ class CRole extends CApiService {
 	/**
 	 * @param array $options
 	 *
-	 * @throws APIException
-	 *
 	 * @return array|int
+	 *
+	 * @throws APIException
 	 */
 	public function get(array $options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -128,6 +128,7 @@ class CRole extends CApiService {
 	 * @param array $roles
 	 *
 	 * @return array
+	 *
 	 * @throws APIException
 	 */
 	public function create(array $roles): array {
@@ -160,7 +161,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function validateCreate(array &$roles): void {
+	private function validateCreate(array &$roles): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
@@ -191,9 +192,9 @@ class CRole extends CApiService {
 					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
 				'modules.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
+				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'api.access' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
 				'api.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],
-				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
@@ -214,6 +215,7 @@ class CRole extends CApiService {
 	 * @param array $roles
 	 *
 	 * @return array
+	 *
 	 * @throws APIException
 	 */
 	public function update(array $roles): array {
@@ -283,9 +285,9 @@ class CRole extends CApiService {
 					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
 				'modules.default_access' =>	['type' => API_INT32, ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
+				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'api.access' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
 				'api.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],
-				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'status' =>					['type' => API_INT32, ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
@@ -319,12 +321,58 @@ class CRole extends CApiService {
 	}
 
 	/**
+	 * @param array $roleids
+	 *
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
+	public function delete(array $roleids): array {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $roleids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_roles = $this->get([
+			'output' => ['roleid', 'name', 'readonly'],
+			'selectUsers' => ['userid'],
+			'roleids' => $roleids,
+			'preservekeys' => true
+		]);
+
+		if (count($db_roles) != count($roleids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		foreach ($db_roles as $db_role) {
+			if ($db_role['readonly'] == 1) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Cannot delete readonly user role "%1$s".', $db_role['name'])
+				);
+			}
+
+			if ($db_role['users']) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Cannot delete assigned user role "%1$s".', $db_role['name'])
+				);
+			}
+		}
+
+		DB::delete('role', ['roleid' => $roleids]);
+
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_ROLE, $db_roles);
+
+		return ['roleids' => $roleids];
+	}
+
+	/**
 	 * @param array      $roles
 	 * @param array|null $db_roles
 	 *
 	 * @throws APIException
 	 */
-	protected function checkDuplicates(array $roles, array $db_roles = null): void {
+	private function checkDuplicates(array $roles, array $db_roles = null): void {
 		$names = [];
 
 		foreach ($roles as $role) {
@@ -691,8 +739,8 @@ class CRole extends CApiService {
 				continue;
 			}
 
-			if (!in_array($rule, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN))
-					&& !in_array($rule, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN))) {
+			if (!in_array($rule, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN), true)
+					&& !in_array($rule, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN), true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid API method "%2$s" for user role "%1$s".', $name, $rule)
 				);
@@ -775,9 +823,9 @@ class CRole extends CApiService {
 			'services.write.tag' => ['tag' => '', 'value' => ''],
 			'modules' => [],
 			'modules.default_access' => ZBX_ROLE_RULE_ENABLED,
+			'api' => [],
 			'api.access' => ZBX_ROLE_RULE_ENABLED,
 			'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY,
-			'api' => [],
 			'actions' => [],
 			'actions.default_access' => ZBX_ROLE_RULE_ENABLED
 		];
@@ -994,6 +1042,7 @@ class CRole extends CApiService {
 	 * @param array $new_rules
 	 *
 	 * @return array
+	 *
 	 * @throws APIException
 	 */
 	private function compileModulesRules(array $old_rules, array $new_rules): array {
@@ -1114,51 +1163,6 @@ class CRole extends CApiService {
 	}
 
 	/**
-	 * @param array $roleids
-	 *
-	 * @return array
-	 * @throws APIException
-	 */
-	public function delete(array $roleids): array {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-
-		if (!CApiInputValidator::validate($api_input_rules, $roleids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_roles = $this->get([
-			'output' => ['roleid', 'name', 'readonly'],
-			'selectUsers' => ['userid'],
-			'roleids' => $roleids,
-			'preservekeys' => true
-		]);
-
-		if (count($db_roles) != count($roleids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		foreach ($db_roles as $db_role) {
-			if ($db_role['readonly'] == 1) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('Cannot delete readonly user role "%1$s".', $db_role['name'])
-				);
-			}
-
-			if ($db_role['users']) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('Cannot delete assigned user role "%1$s".', $db_role['name'])
-				);
-			}
-		}
-
-		DB::delete('role', ['roleid' => $roleids]);
-
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_ROLE, $db_roles);
-
-		return ['roleids' => $roleids];
-	}
-
-	/**
 	 * @param string $table_name
 	 * @param string $table_alias
 	 * @param array  $options
@@ -1189,10 +1193,8 @@ class CRole extends CApiService {
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (!$options['countOutput']) {
-			if ($options['selectRules'] !== null) {
-				$sql_parts = $this->addQuerySelect('r.type', $sql_parts);
-			}
+		if (!$options['countOutput'] && $options['selectRules'] !== null) {
+			$sql_parts = $this->addQuerySelect('r.type', $sql_parts);
 		}
 
 		return $sql_parts;
@@ -1203,6 +1205,7 @@ class CRole extends CApiService {
 	 * @param array $result
 	 *
 	 * @return array
+	 *
 	 * @throws APIException
 	 */
 	protected function addRelatedObjects(array $options, array $result): array {
@@ -1214,7 +1217,7 @@ class CRole extends CApiService {
 			if ($options['selectRules'] === API_OUTPUT_EXTEND) {
 				$output = ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
 					'services.write.mode', 'services.write.list', 'services.write.tag', 'modules',
-					'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access'
+					'modules.default_access', 'api', 'api.access', 'api.mode', 'actions', 'actions.default_access'
 				];
 			}
 			else {
@@ -1294,7 +1297,7 @@ class CRole extends CApiService {
 
 		$result = [];
 
-		if (in_array('ui', $output)) {
+		if (in_array('ui', $output, true)) {
 			$ui = array_fill_keys(CRoleHelper::getUiElementsByUserType($type), $ui_default_access);
 			$ui = array_intersect_key($rules, $ui) + $ui;
 
@@ -1308,7 +1311,7 @@ class CRole extends CApiService {
 			}
 		}
 
-		if (in_array('ui.default_access', $output)) {
+		if (in_array('ui.default_access', $output, true)) {
 			$result['ui.default_access'] = $ui_default_access;
 		}
 
@@ -1328,25 +1331,25 @@ class CRole extends CApiService {
 			? $rules['services.read']
 			: (string) ZBX_ROLE_RULE_SERVICES_ACCESS_ALL;
 
-		if (in_array('services.read.mode', $output)) {
+		if (in_array('services.read.mode', $output, true)) {
 			$result['services.read.mode'] = $services_read_mode;
 		}
 
-		if (in_array('services.read.list', $output)) {
+		if (in_array('services.read.list', $output, true)) {
 			$result['services.read.list'] = [];
 
 			if ($services_read_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
 				$enum = 'services.read.id.';
 
 				foreach ($rules as $rule_name => $rule_value) {
-					if (substr($rule_name, 0, strlen($enum)) === $enum) {
+					if (strpos($rule_name, $enum) === 0) {
 						$result['services.read.list'][] = ['serviceid' => $rule_value];
 					}
 				}
 			}
 		}
 
-		if (in_array('services.read.tag', $output)) {
+		if (in_array('services.read.tag', $output, true)) {
 			$result['services.read.tag'] = ['tag' => '', 'value' => ''];
 
 			if ($services_read_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
@@ -1377,25 +1380,25 @@ class CRole extends CApiService {
 			? $rules['services.write']
 			: (string) ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM;
 
-		if (in_array('services.write.mode', $output)) {
+		if (in_array('services.write.mode', $output, true)) {
 			$result['services.write.mode'] = $services_write_mode;
 		}
 
-		if (in_array('services.write.list', $output)) {
+		if (in_array('services.write.list', $output, true)) {
 			$result['services.write.list'] = [];
 
 			if ($services_write_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
 				$enum = 'services.write.id.';
 
 				foreach ($rules as $rule_name => $rule_value) {
-					if (substr($rule_name, 0, strlen($enum)) === $enum) {
+					if (strpos($rule_name, $enum) === 0) {
 						$result['services.write.list'][] = ['serviceid' => $rule_value];
 					}
 				}
 			}
 		}
 
-		if (in_array('services.write.tag', $output)) {
+		if (in_array('services.write.tag', $output, true)) {
 			$result['services.write.tag'] = ['tag' => '', 'value' => ''];
 
 			if ($services_write_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
@@ -1418,6 +1421,7 @@ class CRole extends CApiService {
 	 * @param array $output
 	 *
 	 * @return array
+	 *
 	 * @throws APIException
 	 */
 	private function getRelatedModulesRules(array $rules, array $output): array {
@@ -1427,7 +1431,7 @@ class CRole extends CApiService {
 
 		$result = [];
 
-		if (in_array('modules', $output)) {
+		if (in_array('modules', $output, true)) {
 			$modules = [];
 
 			foreach (self::getEnabledModuleIds() as $moduleid) {
@@ -1440,7 +1444,7 @@ class CRole extends CApiService {
 			$enum = 'modules.module.';
 
 			foreach ($rules as $rule_name => $rule_value) {
-				if (substr($rule_name, 0, strlen($enum)) === $enum && array_key_exists($rule_value, $modules)) {
+				if (array_key_exists($rule_value, $modules) && strpos($rule_name, $enum) === 0) {
 					$modules[$rule_value]['status'] = $modules_default_access == ZBX_ROLE_RULE_ENABLED
 						? (string) ZBX_ROLE_RULE_DISABLED
 						: (string) ZBX_ROLE_RULE_ENABLED;
@@ -1450,7 +1454,7 @@ class CRole extends CApiService {
 			$result['modules'] = array_values($modules);
 		}
 
-		if (in_array('modules.default_access', $output)) {
+		if (in_array('modules.default_access', $output, true)) {
 			$result['modules.default_access'] = $modules_default_access;
 		}
 
@@ -1466,25 +1470,25 @@ class CRole extends CApiService {
 	private function getRelatedApiRules(array $rules, array $output): array {
 		$result = [];
 
-		if (in_array('api.access', $output)) {
+		if (in_array('api.access', $output, true)) {
 			$result['api.access'] = array_key_exists('api.access', $rules)
 				? $rules['api.access']
 				: (string) ZBX_ROLE_RULE_ENABLED;
 		}
 
-		if (in_array('api.mode', $output)) {
+		if (in_array('api.mode', $output, true)) {
 			$result['api.mode'] = array_key_exists('api.mode', $rules)
 				? $rules['api.mode']
 				: (string) ZBX_ROLE_RULE_API_MODE_DENY;
 		}
 
-		if (in_array('api', $output)) {
+		if (in_array('api', $output, true)) {
 			$result['api'] = [];
 
 			$enum = 'api.method.';
 
 			foreach ($rules as $rule_name => $rule_value) {
-				if (substr($rule_name, 0, strlen($enum)) === $enum) {
+				if (strpos($rule_name, $enum) === 0) {
 					$result['api'][] = $rule_value;
 				}
 			}
@@ -1507,7 +1511,7 @@ class CRole extends CApiService {
 
 		$result = [];
 
-		if (in_array('actions', $output)) {
+		if (in_array('actions', $output, true)) {
 			$actions = array_fill_keys(CRoleHelper::getActionsByUserType($type), $actions_default_access);
 			$actions = array_intersect_key($rules, $actions) + $actions;
 
@@ -1521,7 +1525,7 @@ class CRole extends CApiService {
 			}
 		}
 
-		if (in_array('actions.default_access', $output)) {
+		if (in_array('actions.default_access', $output, true)) {
 			$result['actions.default_access'] = $actions_default_access;
 		}
 
@@ -1530,6 +1534,7 @@ class CRole extends CApiService {
 
 	/**
 	 * @return array
+	 *
 	 * @throws APIException
 	 */
 	private static function getEnabledModuleIds(): array {
