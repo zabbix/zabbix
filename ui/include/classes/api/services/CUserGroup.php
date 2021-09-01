@@ -193,9 +193,9 @@ class CUserGroup extends CApiService {
 		}
 		unset($usrgrp);
 
-		$this->updateRights($usrgrps, __FUNCTION__);
-		$this->updateTagFilters($usrgrps, __FUNCTION__);
-		$this->updateUsersGroups($usrgrps, __FUNCTION__);
+		self::updateRights($usrgrps, __FUNCTION__);
+		self::updateTagFilters($usrgrps, __FUNCTION__);
+		self::updateUsersGroups($usrgrps, __FUNCTION__);
 
 		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
 
@@ -266,9 +266,9 @@ class CUserGroup extends CApiService {
 			DB::update('usrgrp', $upd_usrgrps);
 		}
 
-		$this->updateRights($usrgrps, __FUNCTION__, $db_usrgrps);
-		$this->updateTagFilters($usrgrps, __FUNCTION__, $db_usrgrps);
-		$this->updateUsersGroups($usrgrps, __FUNCTION__, $db_usrgrps);
+		self::updateRights($usrgrps, __FUNCTION__, $db_usrgrps);
+		self::updateTagFilters($usrgrps, __FUNCTION__, $db_usrgrps);
+		self::updateUsersGroups($usrgrps, __FUNCTION__, $db_usrgrps);
 
 		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 
@@ -613,11 +613,13 @@ class CUserGroup extends CApiService {
 	/**
 	 * Update table "rights".
 	 *
+	 * @static
+	 *
 	 * @param array      $usrgrps
 	 * @param string     $method
 	 * @param null|array $db_usrgrps
 	 */
-	private function updateRights(array &$usrgrps, string $method, array $db_usrgrps = null): void {
+	private static function updateRights(array &$usrgrps, string $method, array $db_usrgrps = null): void {
 		$ins_rights = [];
 		$upd_rights = [];
 		$del_rightids = [];
@@ -691,11 +693,13 @@ class CUserGroup extends CApiService {
 	/**
 	 * Update table "tag_filter".
 	 *
+	 * @static
+	 *
 	 * @param array      $usrgrps
 	 * @param string     $method
 	 * @param null|array $db_usrgrps
 	 */
-	private function updateTagFilters(array &$usrgrps, string $method, array $db_usrgrps = null): void {
+	private static function updateTagFilters(array &$usrgrps, string $method, array $db_usrgrps = null): void {
 		$ins_tag_filters = [];
 		$del_tag_filterids = [];
 
@@ -769,11 +773,13 @@ class CUserGroup extends CApiService {
 	/**
 	 * Update table "users_groups".
 	 *
+	 * @static
+	 *
 	 * @param array      $usrgrps
 	 * @param string     $method
 	 * @param null|array $db_usrgrps
 	 */
-	private function updateUsersGroups(array &$usrgrps, string $method, array $db_usrgrps = null): void {
+	private static function updateUsersGroups(array &$usrgrps, string $method, array $db_usrgrps = null): void {
 		$ins_users_groups = [];
 		$del_ids = [];
 

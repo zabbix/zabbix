@@ -381,12 +381,13 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $users
-	 * @param array $db_users
+	 *
+	 * @return array
 	 */
-	public static function updateForce(array $users, array $db_users): void {
+	public function update(array $users) {
+		$this->validateUpdate($users, $db_users);
+
 		$upd_users = [];
 
 		foreach ($users as $user) {
@@ -426,18 +427,7 @@ class CUser extends CApiService {
 		self::updateUsersGroups($users, 'update', $db_users);
 		self::updateMedias($users, 'update', $db_users);
 
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
-	}
-
-	/**
-	 * @param array $users
-	 *
-	 * @return array
-	 */
-	public function update(array $users) {
-		$this->validateUpdate($users, $db_users);
-
-		self::updateForce($users, $db_users);
+		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
 
 		return ['userids' => array_column($users, 'userid')];
 	}
