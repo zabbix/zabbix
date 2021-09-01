@@ -29,8 +29,7 @@ $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
-$action = (new CUrl('zabbix.php'))
-	->setArgument('action', ($data['regexid'] == 0) ? 'regex.create' : 'regex.update');
+$action = (new CUrl('zabbix.php'))->setArgument('action', ($data['regexid'] == 0) ? 'regex.create' : 'regex.update');
 
 if ($data['regexid'] != 0) {
 	$action->setArgument('regexid', $data['regexid']);
@@ -57,7 +56,7 @@ foreach ($data['expressions'] as $i => $expression) {
 		->setValue($expression['exp_delimiter'])
 		->setId('expressions_'.$i.'_exp_delimiter')
 		->addClass('js-expression-delimiter-select')
-		->addOptions(CSelect::createOptionsFromArray(expressionDelimiters()));
+		->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expressionDelimiters()));
 
 	if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
 		$exp_delimiter->addStyle('display: none;');
@@ -67,7 +66,7 @@ foreach ($data['expressions'] as $i => $expression) {
 		(new CSelect('expressions['.$i.'][expression_type]'))
 			->setId('expressions_'.$i.'_expression_type')
 			->addClass('js-expression-type-select')
-			->addOptions(CSelect::createOptionsFromArray(expression_type2str()))
+			->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expression_type2str()))
 			->setValue($expression['expression_type']),
 		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)

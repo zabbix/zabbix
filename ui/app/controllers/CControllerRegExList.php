@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/regexp.inc.php';
-
 class CControllerRegExList extends CController {
 
 	protected function init() {
@@ -40,35 +38,17 @@ class CControllerRegExList extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'regexes'  => [],
-			'db_exps'  => [],
-			'uncheck'  => $this->hasInput('uncheck')
-		];
+		$data['uncheck'] = $this->hasInput('uncheck');
 
-		$db_regex = DBselect('SELECT re.* FROM regexps re');
+		$db_regexs = API::Regex()->get([
+			'output' => ['regexpid', 'name'],
+			'selectExpressions' => ['expression', 'expression_type'],
+			'preservekeys' => true
+		]);
 
-		while ($regex = DBfetch($db_regex)) {
-			$regex['expressions'] = [];
-			$data['regexes'][$regex['regexpid']] = $regex;
-		}
+		$data['regexs'] = $db_regexs;
 
-		order_result($data['regexes'], 'name');
-
-		$db_expressions = DBselect(
-			'SELECT e.*'.
-			' FROM expressions e'.
-			' WHERE '.dbConditionInt('e.regexpid', array_keys($data['regexes'])).
-			' ORDER BY e.expression_type'
-		);
-
-		while ($expr = DBfetch($db_expressions)) {
-			$data['db_exps'][] = [
-				'regexid' => $expr['regexpid'],
-				'expression' => $expr['expression'],
-				'expression_type' => $expr['expression_type']
-			];
-		}
+		order_result($data['regexs'], 'name');
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of regular expressions'));

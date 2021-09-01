@@ -19,16 +19,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/regexp.inc.php';
-
 class CControllerRegExUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'         => 'required | string | not_empty | db regexps.name',
-			'test_string'  => 'string | db regexps.test_string',
-			'regexid'      => 'fatal | required | db regexps.regexpid',
-			'expressions'  => 'required | array',
+			'regexid'      => 'fatal|required|db regexps.regexpid',
+			'name'         => 'required|string|not_empty|db regexps.name',
+			'test_string'  => 'string|db regexps.test_string',
+			'expressions'  => 'required|array',
 			'form_refresh' => ''
 		];
 
@@ -37,9 +35,10 @@ class CControllerRegExUpdate extends CController {
 		if (!$ret) {
 			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'regex.edit')
-						->setArgument('regexid', $this->getInput('regexid'))
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'regex.edit')
+							->setArgument('regexid', $this->getInput('regexid'))
 					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update regular expression'));
@@ -57,16 +56,22 @@ class CControllerRegExUpdate extends CController {
 
 	protected function checkPermissions() {
 		if ($this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
-			return (bool) DBfetch(DBselect(
-				'SELECT NULL FROM regexps WHERE '.dbConditionInt('regexpid', (array) $this->getInput('regexid'))
-			));
+			$db_regexs = API::Regex()->get([
+				'output' => ['regexpid'],
+				'regexpids' => [$this->getInput('regexid')]
+			]);
+
+			if (!$db_regexs) {
+				return false;
+			}
+
+			return true;
 		}
 
 		return false;
 	}
 
 	protected function doAction() {
-		/** @var array $expressions */
 		$expressions = $this->getInput('expressions', []);
 
 		foreach ($expressions as &$expression) {
@@ -76,27 +81,22 @@ class CControllerRegExUpdate extends CController {
 		}
 		unset($expression);
 
-		DBstart();
-		$result = updateRegexp([
-			'regexpid'    => $this->getInput('regexid'),
-			'name'        => $this->getInput('name'),
-			'test_string' => $this->getInput('test_string')
-		], $expressions);
-
-		// if ($result) {
-		// 	add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$this->getInput('name'));
-		// }
-
-		$result = DBend($result);
+		$result = API::Regex()->update([
+			'regexpid' => $this->getInput('regexid'),
+			'name' => $this->getInput('name'),
+			'test_string' => $this->getInput('test_string'),
+			'expressions' => $expressions
+		]);
 
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
 			CMessageHelper::setSuccessTitle(_('Regular expression updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'regex.edit')
-				->setArgument('regexid', $this->getInput('regexid')));
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'regex.edit')
+					->setArgument('regexid', $this->getInput('regexid')));
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update regular expression'));
 		}

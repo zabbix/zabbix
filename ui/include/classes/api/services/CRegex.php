@@ -25,10 +25,10 @@
 class CRegex extends CApiService {
 
 	public const ACCESS_RULES = [
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'regexps';
@@ -135,16 +135,41 @@ class CRegex extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['regexpid', 'name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('regexps', 'name')],
 			'test_string' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
-			'expressions' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-				'expression' =>			['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'expressions' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'expression' =>			['type' => API_MULTIPLE, 'rules' => [
+					[
+						'if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
+						'type' => API_REGEX,
+						'length' => DB::getFieldLength('expressions', 'expression'),
+						'flags' => API_REQUIRED
+					],
+					[
+						'if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED])],
+						'type' => API_STRING_UTF8,
+						'length' => DB::getFieldLength('expressions', 'expression'),
+						'flags' => API_REQUIRED | API_NOT_EMPTY
+					],
+				]],
 				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
-				'exp_delimiter' =>		['type' => API_STRING_UTF8],
+				'exp_delimiter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('expressions', 'exp_delimiter')],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
 			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $regexs, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['expression', 'expression_type']], 'fields' => [
+			'expression' =>			['type' => API_STRING_UTF8],
+			'expression_type' =>	['type' => API_INT32]
+		]];
+
+		foreach (array_column($regexs, 'expressions') as $index => $expressions) {
+			$path = '/'.$index.'/expressions';
+			if (!CApiInputValidator::validateUniqueness($api_input_rules, $expressions, $path, $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
 		}
 
 		$this->checkDuplicateNames(array_column($regexs, 'name'));
@@ -180,30 +205,60 @@ class CRegex extends CApiService {
 	 */
 	protected function updateExpressions(array &$regexs, string $method, array $db_regexs = null): void {
 		$ins_expressions = [];
+		$upd_expressions = [];
 		$del_expressionids = [];
 
-		foreach ($regexs as  $regex) {
+		foreach ($regexs as &$regex) {
 			if (!array_key_exists('expressions', $regex)) {
 				continue;
 			}
 
 			$db_expressions = ($method === 'update') ? $db_regexs[$regex['regexpid']]['expressions'] : [];
 
-			foreach ($regex['expressions'] as $expression) {
-				$ins_expressions[] = [
-					'regexpid' => $regex['regexpid'],
-					'expression' => $expression['expression'],
-					'expression_type' => $expression['expression_type'],
-					'exp_delimiter' => $expression['exp_delimiter'],
-					'case_sensitive' => $expression['case_sensitive']
-				];
+			foreach ($regex['expressions'] as &$expression) {
+				$db_expression = current(
+					array_filter($db_expressions, function (array $db_expression) use ($expression): bool {
+						return ($expression['expression'] === $db_expression['expression']
+							&& $expression['expression_type'] == $db_expression['expression_type']);
+					})
+				);
+
+				if ($db_expression) {
+					$expression['expressionid'] = $db_expression['expressionid'];
+
+					$upd_expression = DB::getUpdatedValues('expressions', $expression, $db_expression);
+
+					if ($upd_expression) {
+						$upd_expressions[] = [
+							'values' => $upd_expression,
+							'where' => ['expressionid' => $db_expression['expressionid']]
+						];
+					}
+
+					unset($db_expressions[$db_expression['expressionid']]);
+				}
+				else {
+					$ins_expressions[] = [
+						'regexpid' => $regex['regexpid'],
+						'expression' => $expression['expression'],
+						'expression_type' => $expression['expression_type'],
+						'exp_delimiter' => $expression['exp_delimiter'],
+						'case_sensitive' => $expression['case_sensitive']
+					];
+				}
 			}
+			unset($expression);
 
 			$del_expressionids = array_merge($del_expressionids, array_column($db_expressions, 'expressionid'));
 		}
+		unset($regex);
 
 		if ($del_expressionids) {
 			DB::delete('expressions', ['expressionid' => $del_expressionids]);
+		}
+
+		if ($upd_expressions) {
+			DB::update('expressions', $upd_expressions);
 		}
 
 		if ($ins_expressions) {
@@ -270,15 +325,40 @@ class CRegex extends CApiService {
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('regexps', 'name')],
 			'test_string' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
 			'expressions' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-				'expression' =>			['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'expression' =>			['type' => API_MULTIPLE, 'rules' => [
+					[
+						'if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
+						'type' => API_REGEX,
+						'length' => DB::getFieldLength('expressions', 'expression'),
+						'flags' => API_REQUIRED
+					],
+					[
+						'if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED])],
+						'type' => API_STRING_UTF8,
+						'length' => DB::getFieldLength('expressions', 'expression'),
+						'flags' => API_REQUIRED | API_NOT_EMPTY
+					],
+				]],
 				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
-				'exp_delimiter' =>		['type' => API_STRING_UTF8],
+				'exp_delimiter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('expressions', 'exp_delimiter')],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
 			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $regexs, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['expression', 'expression_type']], 'fields' => [
+			'expression' =>			['type' => API_STRING_UTF8],
+			'expression_type' =>	['type' => API_INT32]
+		]];
+
+		foreach (array_column($regexs, 'expressions') as $index => $expressions) {
+			$path = '/'.$index.'/expressions';
+			if (!CApiInputValidator::validateUniqueness($api_input_rules, $expressions, $path, $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
 		}
 
 		$db_regexs = $this->get([
@@ -341,7 +421,6 @@ class CRegex extends CApiService {
 	protected function addRelatedObjects(array $options, array $db_regexs) {
 		$db_regexs = parent::addRelatedObjects($options, $db_regexs);
 
-		// Select mappings for value map.
 		if ($options['selectExpressions'] !== null) {
 			$def_expression = ($options['selectExpressions'] == API_OUTPUT_COUNT) ? '0' : [];
 
@@ -363,12 +442,11 @@ class CRegex extends CApiService {
 			}
 			else {
 				$db_expressions = API::getApiService()->select('expressions', [
-					'output' => $this->outputExtend($options['selectExpressions'], ['expression', 'expression_type',
-						'exp_delimiter', 'case_sensitive'
+					'output' => $this->outputExtend($options['selectExpressions'], ['regexpid', 'expression',
+						'expression_type', 'exp_delimiter', 'case_sensitive'
 					]),
 					'filter' => ['regexpid' => array_keys($db_regexs)]
 				]);
-				CArrayHelper::sort($db_expressions, [['field' => 'sortorder', 'order' => ZBX_SORT_UP]]);
 
 				foreach ($db_expressions as $db_expression) {
 					$regexpid = $db_expression['regexpid'];
@@ -410,7 +488,7 @@ class CRegex extends CApiService {
 				$db_regexs[$db_expression['regexpid']]['expressions'][$db_expression['expressionid']] = [
 					'expressionid' => $db_expression['expressionid'],
 					'expression' => $db_expression['expression'],
-					'expression_type' => $db_expression['iexpression_typed'],
+					'expression_type' => $db_expression['expression_type'],
 					'exp_delimiter' => $db_expression['exp_delimiter'],
 					'case_sensitive' => $db_expression['case_sensitive']
 				];
