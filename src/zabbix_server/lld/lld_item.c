@@ -495,10 +495,10 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->password_orig = NULL;
 
 		item->publickey_orig = NULL;
-		if (0 != strcmp(row[20], item_prototype->publickey))
+		if (0 != strcmp(row[22], item_prototype->publickey))
 		{
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY;
-			item->publickey_orig = zbx_strdup(NULL, row[20]);
+			item->publickey_orig = zbx_strdup(NULL, row[22]);
 		}
 
 		item->privatekey_orig = NULL;
