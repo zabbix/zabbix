@@ -193,12 +193,15 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_Layout() {
-		$this->page->login()->open((new Curl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', self::$hostids['testFormHost with items'])
-			->getUrl()
-		);
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$hostname = 'testFormHost with items';
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name');
+		$column->query('link', $hostname)->asPopupButton()->one()->select('Configuration');
+		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+
+		// $this->page->login()->open('zabbix.php?action=host.edit&hostid='.self::$hostids['testFormHost with items']);
+		// $form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+
 		// Check tabs available in the form
 		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
 		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
@@ -731,11 +734,11 @@ class testFormHost extends CWebTest {
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 		}
 
-		$this->page->login()->open((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.create')
-			->getUrl()
-		);
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$this->query('button:Create host')->one()->waitUntilClickable()->click();
+		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+
+		// $form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1347,12 +1350,15 @@ class testFormHost extends CWebTest {
 			]
 		];
 
-		$this->page->login()->open((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', self::$hostids['testFormHost_Update'])
-			->getUrl()
-		);
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$hostname = 'testFormHost_Update Visible name';
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name');
+		$column->query('link', $hostname)->asPopupButton()->one()->select('Configuration');
+		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+
+		// $this->page->login()->open('zabbix.php?action=host.edit&hostid='.self::$hostids['testFormHost_Update'])->waitUntilReady();
+		// $form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1587,15 +1593,17 @@ class testFormHost extends CWebTest {
 	 * @param type $full_clone	type of cloning
 	 */
 	private function cloneHost($data, $full_clone = false) {
-		$name = 'testFormHost with items';
+		$hostname = 'testFormHost with items';
 		$type = $full_clone ? 'Full clone' : 'Clone';
-		$this->page->login()->open((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', self::$hostids[$name])
-			->getUrl()
-		);
 
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name');
+		$column->query('link', $hostname)->asPopupButton()->one()->select('Configuration');
+		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+
+		// $this->page->login()->open('zabbix.php?action=host.edit&hostid='.self::$hostids[$hostname])->waitUntilReady();
+		// $form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+
 		$form->setFilter(new CElementFilter(CElementFilter::VISIBLE));
 		// Get values from form.
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
@@ -1671,22 +1679,19 @@ class testFormHost extends CWebTest {
 		];
 
 		if ($data['action'] === 'Add') {
-			$this->page->login()->open((new CUrl('zabbix.php'))
-				->setArgument('action', 'host.create')
-				->getUrl()
-			);
+			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+			$this->query('button:Create host')->one()->waitUntilClickable()->click();
 		}
 		else {
 			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
-			$this->page->login()->open((new CUrl('zabbix.php'))
-				->setArgument('action', 'host.edit')
-				->setArgument('hostid', $hostid)
-				->getUrl()
-			);
+			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
+			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
 		}
 
 		// Change the host data to make sure that the changes are not saved to the database after cancellation.
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		// $form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 		$form->fill(['Host name' => $new_name]);
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']]);
 		$interfaces_form->fill($interface);
@@ -1751,11 +1756,10 @@ class testFormHost extends CWebTest {
 			$ids = array_column($interfaceids, 'interfaceid');
 		}
 
-		$this->page->login()->open((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', $hostid)
-			->getUrl()
-		);
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $data['name'])->getColumn('Name');
+		$column->query('link', $data['name'])->asPopupButton()->one()->select('Configuration');
+
 		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 
