@@ -133,7 +133,8 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 			}
 			else if (FAIL == DCconfig_trigger_exists(triggerid))
 			{
-				DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+				DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE,
+						taskid);
 				ret = SUCCEED;
 			}
 		}
