@@ -569,8 +569,6 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 
 		if (NULL == (service = zbx_hashset_search(&service_manager->services, &service_local)))
 		{
-			service_local.revision = revision;
-
 			zbx_vector_ptr_create(&service_local.tags);
 			zbx_vector_ptr_create(&service_local.children);
 			zbx_vector_ptr_create(&service_local.parents);
@@ -582,7 +580,6 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 			service = zbx_hashset_insert(&service_manager->services, &service_local, sizeof(service_local));
 
 			update = 1;
-			continue;
 		}
 		else
 		{
