@@ -811,6 +811,7 @@ unsigned int	DCget_internal_action_count(void);
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
+void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_mode);
 
 int	DCset_interfaces_availability(zbx_vector_availability_ptr_t *availabilities);
 
