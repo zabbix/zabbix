@@ -85,7 +85,7 @@ class CAudit {
 
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
-		self::RESOURCE_REGEXP => 'regex',
+		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_USER => 'user'
 	];
 
@@ -101,13 +101,13 @@ class CAudit {
 	private const NESTED_OBJECTS_TABLE_NAMES = [
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
-		'regex.expressions' => 'expressions'
+		'regexp.expressions' => 'expressions'
 	];
 
 	private const NESTED_OBJECTS_IDS = [
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
-		'regex.expressions' => 'expressionid'
+		'regexp.expressions' => 'expressionid'
 	];
 
 	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,

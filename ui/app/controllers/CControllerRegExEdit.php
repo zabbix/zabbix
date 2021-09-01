@@ -51,7 +51,7 @@ class CControllerRegExEdit extends CController {
 		}
 
 		if ($this->hasInput('regexid')) {
-			$db_regexs = API::Regex()->get([
+			$db_regexs = API::Regexp()->get([
 				'output' => ['name', 'test_string'],
 				'selectExpressions' => ['expression', 'expression_type', 'exp_delimiter', 'case_sensitive'],
 				'regexpids' => [$this->getInput('regexid')],

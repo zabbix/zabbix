@@ -40,7 +40,7 @@ class CControllerRegExList extends CController {
 	protected function doAction() {
 		$data['uncheck'] = $this->hasInput('uncheck');
 
-		$db_regexs = API::Regex()->get([
+		$db_regexs = API::Regexp()->get([
 			'output' => ['regexpid', 'name'],
 			'selectExpressions' => ['expression', 'expression_type'],
 			'preservekeys' => true

@@ -22,7 +22,7 @@
 /**
  * Class containing methods for operations with regular expressions.
  */
-class CRegex extends CApiService {
+class CRegexp extends CApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],

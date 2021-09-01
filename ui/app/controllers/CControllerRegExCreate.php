@@ -65,7 +65,7 @@ class CControllerRegExCreate extends CController {
 		}
 		unset($expression);
 
-		$result = API::Regex()->create([
+		$result = API::Regexp()->create([
 			'name' => $this->getInput('name'),
 			'test_string' => $this->getInput('test_string', ''),
 			'expressions' => $expressions

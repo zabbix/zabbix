@@ -41,7 +41,7 @@ class CControllerRegExDelete extends CController {
 		}
 
 		$regexids = $this->getinput('regexids');
-		$db_count = API::Regex()->get([
+		$db_count = API::Regexp()->get([
 			'countOutput' => true,
 			'regexpids' => $regexids
 		]);
@@ -55,7 +55,7 @@ class CControllerRegExDelete extends CController {
 
 	protected function doAction() {
 		$regexids = $this->getinput('regexids');
-		$result = API::Regex()->delete($this->getinput('regexids'));
+		$result = API::Regexp()->delete($this->getinput('regexids'));
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
 		if ($result) {

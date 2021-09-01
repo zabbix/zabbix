@@ -56,7 +56,7 @@ class CControllerRegExUpdate extends CController {
 
 	protected function checkPermissions() {
 		if ($this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
-			$db_regexs = API::Regex()->get([
+			$db_regexs = API::Regexp()->get([
 				'output' => ['regexpid'],
 				'regexpids' => [$this->getInput('regexid')]
 			]);
@@ -81,7 +81,7 @@ class CControllerRegExUpdate extends CController {
 		}
 		unset($expression);
 
-		$result = API::Regex()->update([
+		$result = API::Regexp()->update([
 			'regexpid' => $this->getInput('regexid'),
 			'name' => $this->getInput('name'),
 			'test_string' => $this->getInput('test_string'),

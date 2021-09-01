@@ -340,10 +340,10 @@ class API {
 	}
 
 	/**
-	 * @return CRegex
+	 * @return CRegexp
 	 */
-	public static function Regex() {
-		return self::getApi('regex');
+	public static function Regexp() {
+		return self::getApi('regexp');
 	}
 
 	/**
