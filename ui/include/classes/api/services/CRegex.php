@@ -20,7 +20,7 @@
 
 
 /**
- * Class containing methods for operations with authorization tokens.
+ * Class containing methods for operations with regular expressions.
  */
 class CRegex extends CApiService {
 
@@ -260,7 +260,7 @@ class CRegex extends CApiService {
 
 	/**
 	 * @param array $regexs
-	 * @param array $db_tokens
+	 * @param array $db_regexs
 	 *
 	 * @throws APIException  if the input is invalid
 	 */
