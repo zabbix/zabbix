@@ -843,11 +843,11 @@ class CUserGroup extends CApiService {
 	public function delete(array $usrgrpids) {
 		$this->validateDelete($usrgrpids, $db_usrgrps);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
-
 		DB::delete('rights', ['groupid' => $usrgrpids]);
 		DB::delete('users_groups', ['usrgrpid' => $usrgrpids]);
 		DB::delete('usrgrp', ['usrgrpid' => $usrgrpids]);
+
+		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
