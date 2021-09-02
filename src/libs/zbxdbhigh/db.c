@@ -751,6 +751,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 	if (NULL == (table = DBget_table(tablename)))
 	{
+		zabbix_log(LOG_LEVEL_CRIT, "Error getting table: %s", tablename);
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}

@@ -28,9 +28,9 @@
 #include "db.h"
 #include "report_writer.h"
 #include "report_protocol.h"
-
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern char	*CONFIG_WEBSERVICE_URL;
 extern char	*CONFIG_TLS_CA_FILE;
