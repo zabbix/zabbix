@@ -422,9 +422,7 @@ class CRegexp extends CApiService {
 			unset($db_regex);
 
 			$db_expressions = API::getApiService()->select('expressions', [
-				'output' => $this->outputExtend($options['selectExpressions'], ['regexpid', 'expression',
-					'expression_type', 'exp_delimiter', 'case_sensitive'
-				]),
+				'output' => $this->outputExtend($options['selectExpressions'], ['regexpid']),
 				'filter' => ['regexpid' => array_keys($db_regexs)]
 			]);
 
@@ -438,7 +436,6 @@ class CRegexp extends CApiService {
 
 		return $db_regexs;
 	}
-
 
 	/**
 	 * Add the existing expressions to $db_regexs whether these are affected by the update.
