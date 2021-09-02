@@ -439,11 +439,41 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Returns unescaped array of "in" rules.
+	 *
+	 * @static
+	 *
+	 * @param string $in  A comma-delimited character string. For example, 'xml,json' or '\,,.,/'.
+	 *
+	 * @return array  An array of "in" rules. For example, ['xml', 'json'] or [',', '.', '/'].
+	 */
+	private static function unescapeInRule(string $in): array {
+		$result = [];
+		$pos = 0;
+
+		do {
+			preg_match('/^([^,\\\\]|\\\\[,\\\\])*/', substr($in, $pos), $matches);
+			$result[] = strtr($matches[0], ['\\,' => ',', '\\\\' => '\\']);
+			$pos += strlen($matches[0]);
+
+			if (!isset($in[$pos])) {
+				break;
+			}
+
+			$pos++;
+		}
+		while (true);
+
+		return $result;
+	}
+
+	/**
 	 * String validator.
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL
-	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: 'xml,json'
+	 * @param string $rule['in']      (optional) A comma-delimited character string, for example: 'xml,json'.
+	 *                                           Comma and backslash char can be escaped.
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -462,7 +492,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (array_key_exists('in', $rule) && !in_array($data, explode(',', $rule['in']), true)) {
+		if (array_key_exists('in', $rule) && !in_array($data, self::unescapeInRule($rule['in']), true)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_s('value must be one of %1$s', str_replace(',', ', ', $rule['in']))
 			);
