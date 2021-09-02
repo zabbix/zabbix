@@ -26,7 +26,7 @@
 #include "../zbxdbhigh/template.h"
 
 #define	PREPARE_AUDIT_GRAPH_H(funcname)										\
-void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t triggerid, const char *name);
+void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t graphiid, const char *name);
 PREPARE_AUDIT_GRAPH_H(graph)
 PREPARE_AUDIT_GRAPH_H(graph_prototype)
 
