@@ -1473,6 +1473,8 @@ class CService extends CApiService {
 			return;
 		}
 
+		$one_of_parent_names = [];
+
 		foreach ($services as $service) {
 			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
@@ -1563,6 +1565,8 @@ class CService extends CApiService {
 					foreach (array_keys(array_diff_key($old_child_services, $new_child_services)) as $serviceid) {
 						if ($rw_services[$serviceid] !== null) {
 							$rw_services[$serviceid]--;
+
+							$one_of_parent_names[$serviceid] = $name;
 						}
 					}
 
@@ -1583,8 +1587,10 @@ class CService extends CApiService {
 						'serviceids' => $serviceid
 					])[0];
 
-					$error_detail = _('read-write access to the service must be retained');
-					$error = _s('Cannot update service "%1$s": %2$s.', $inaccessible_service['name'], $error_detail);
+					$error_detail = _s('read-write access to the child service "%1$s" must be retained',
+						$inaccessible_service['name']
+					);
+					$error = _s('Cannot update service "%1$s": %2$s.', $one_of_parent_names, $error_detail);
 
 					self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 				}
