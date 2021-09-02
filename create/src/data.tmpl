@@ -900,21 +900,28 @@ FIELDS|autoreg_tlsid|tls_psk_identity|tls_psk|
 ROW   |1            |                |       |
 
 TABLE |role_rule
-FIELDS|role_ruleid|roleid|type|name                  |value_int|value_str|value_moduleid|
-ROW   |1          |1     |0   |ui.default_access     |1        |         |NULL          |
-ROW   |2          |1     |0   |modules.default_access|1        |         |NULL          |
-ROW   |3          |1     |0   |api.access            |1        |         |NULL          |
-ROW   |4          |1     |0   |actions.default_access|1        |         |NULL          |
-ROW   |5          |2     |0   |ui.default_access     |1        |         |NULL          |
-ROW   |6          |2     |0   |modules.default_access|1        |         |NULL          |
-ROW   |7          |2     |0   |api.access            |1        |         |NULL          |
-ROW   |8          |2     |0   |actions.default_access|1        |         |NULL          |
-ROW   |9          |3     |0   |ui.default_access     |1        |         |NULL          |
-ROW   |10         |3     |0   |modules.default_access|1        |         |NULL          |
-ROW   |11         |3     |0   |api.access            |1        |         |NULL          |
-ROW   |12         |3     |0   |actions.default_access|1        |         |NULL          |
-ROW   |13         |4     |0   |ui.default_access     |1        |         |NULL          |
-ROW   |14         |4     |0   |modules.default_access|1        |         |NULL          |
-ROW   |15         |4     |0   |api.access            |0        |         |NULL          |
-ROW   |16         |4     |0   |actions.default_access|0        |         |NULL          |
-
+FIELDS|role_ruleid|roleid|type|name                  |value_int|value_str|value_moduleid|value_serviceid|
+ROW   |1          |1     |0   |ui.default_access     |1        |         |NULL          |NULL           |
+ROW   |2          |1     |0   |services.read         |1        |         |NULL          |NULL           |
+ROW   |3          |1     |0   |services.write        |0        |         |NULL          |NULL           |
+ROW   |4          |1     |0   |modules.default_access|1        |         |NULL          |NULL           |
+ROW   |5          |1     |0   |api.access            |1        |         |NULL          |NULL           |
+ROW   |6          |1     |0   |actions.default_access|1        |         |NULL          |NULL           |
+ROW   |7          |2     |0   |ui.default_access     |1        |         |NULL          |NULL           |
+ROW   |8          |2     |0   |services.read         |1        |         |NULL          |NULL           |
+ROW   |9          |2     |0   |services.write        |1        |         |NULL          |NULL           |
+ROW   |10         |2     |0   |modules.default_access|1        |         |NULL          |NULL           |
+ROW   |11         |2     |0   |api.access            |1        |         |NULL          |NULL           |
+ROW   |12         |2     |0   |actions.default_access|1        |         |NULL          |NULL           |
+ROW   |13         |3     |0   |ui.default_access     |1        |         |NULL          |NULL           |
+ROW   |14         |3     |0   |services.read         |1        |         |NULL          |NULL           |
+ROW   |15         |3     |0   |services.write        |1        |         |NULL          |NULL           |
+ROW   |16         |3     |0   |modules.default_access|1        |         |NULL          |NULL           |
+ROW   |17         |3     |0   |api.access            |1        |         |NULL          |NULL           |
+ROW   |18         |3     |0   |actions.default_access|1        |         |NULL          |NULL           |
+ROW   |19         |4     |0   |ui.default_access     |1        |         |NULL          |NULL           |
+ROW   |20         |4     |0   |services.read         |0        |         |NULL          |NULL           |
+ROW   |21         |4     |0   |services.write        |0        |         |NULL          |NULL           |
+ROW   |22         |4     |0   |modules.default_access|1        |         |NULL          |NULL           |
+ROW   |23         |4     |0   |api.access            |0        |         |NULL          |NULL           |
+ROW   |24         |4     |0   |actions.default_access|0        |         |NULL          |NULL           |
