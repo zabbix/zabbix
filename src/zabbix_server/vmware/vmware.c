@@ -5167,7 +5167,7 @@ out:
 		service->eventlog.req_sz = 0;
 	}
 
-	if (0 == service->eventlog.skip_old && 0 != evt_pause)
+	if (0 != evt_pause)
 	{
 		zbx_vector_ptr_append_array(&events, service->data->events.values, service->data->events.values_num);
 		zbx_vector_ptr_reserve(&data->events, data->events.values_num + service->data->events.values_num);
