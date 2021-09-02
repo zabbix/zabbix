@@ -60,7 +60,7 @@ class CRegexp extends CApiService {
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['regexpid', 'name', 'test_string']), 'default' => API_OUTPUT_EXTEND],
-			'selectExpressions' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['expression', 'expression_type', 'exp_delimiter', 'case_sensitive']), 'default' => null],
+			'selectExpressions' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['expression', 'expression_type', 'exp_delimiter', 'case_sensitive']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -416,38 +416,23 @@ class CRegexp extends CApiService {
 		$db_regexs = parent::addRelatedObjects($options, $db_regexs);
 
 		if ($options['selectExpressions'] !== null) {
-			$def_expression = ($options['selectExpressions'] == API_OUTPUT_COUNT) ? '0' : [];
-
-			foreach ($db_regexs as $regexid => $foo) {
-				$db_regexs[$regexid]['expressions'] = $def_expression;
+			foreach ($db_regexs as &$db_regex) {
+				$db_regex['expressions'] = [];
 			}
+			unset($db_regex);
 
-			if ($options['selectExpressions'] == API_OUTPUT_COUNT) {
-				$db_expressions = DBselect(
-					'SELECT e.regexpid,COUNT(*) AS cnt'.
-					' FROM expressions e'.
-					' WHERE '.dbConditionInt('e.regexpid', array_keys($db_regexs)).
-					' GROUP BY e.regexpid'
-				);
+			$db_expressions = API::getApiService()->select('expressions', [
+				'output' => $this->outputExtend($options['selectExpressions'], ['regexpid', 'expression',
+					'expression_type', 'exp_delimiter', 'case_sensitive'
+				]),
+				'filter' => ['regexpid' => array_keys($db_regexs)]
+			]);
 
-				while ($db_expression = DBfetch($db_expressions)) {
-					$db_regexs[$db_expression['regexpid']]['expressions'] = $db_expression['cnt'];
-				}
-			}
-			else {
-				$db_expressions = API::getApiService()->select('expressions', [
-					'output' => $this->outputExtend($options['selectExpressions'], ['regexpid', 'expression',
-						'expression_type', 'exp_delimiter', 'case_sensitive'
-					]),
-					'filter' => ['regexpid' => array_keys($db_regexs)]
-				]);
+			foreach ($db_expressions as $db_expression) {
+				$regexpid = $db_expression['regexpid'];
+				unset($db_expression['expressionid'], $db_expression['regexpid']);
 
-				foreach ($db_expressions as $db_expression) {
-					$regexpid = $db_expression['regexpid'];
-					unset($db_expression['expressionid'], $db_expression['regexpid']);
-
-					$db_regexs[$regexpid]['expressions'][] = $db_expression;
-				}
+				$db_regexs[$regexpid]['expressions'][] = $db_expression;
 			}
 		}
 
