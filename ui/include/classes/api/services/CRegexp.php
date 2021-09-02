@@ -91,7 +91,7 @@ class CRegexp extends CApiService {
 			$db_regexs = $this->unsetExtraFields($db_regexs, ['regexpid'], $options['output']);
 
 			if (!$options['preservekeys']) {
-				$db_regexs = zbx_cleanHashes($db_regexs);
+				$db_regexs = array_values($db_regexs);
 			}
 		}
 
