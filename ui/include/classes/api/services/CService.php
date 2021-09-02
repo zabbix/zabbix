@@ -1605,7 +1605,10 @@ class CService extends CApiService {
 			$_services = [];
 
 			foreach (array_intersect_key($relations, $services) as $child_services) {
-				$root_r_services = array_diff_key($root_r_services, $child_services);
+				if ($root_r_services !== null) {
+					$root_r_services = array_diff_key($root_r_services, $child_services);
+				}
+
 				$root_rw_services = array_diff_key($root_rw_services, $child_services);
 				$_services += $child_services;
 
