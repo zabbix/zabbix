@@ -1312,10 +1312,9 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	size_t			sql_alloc = 256, sql_offset;
 	zbx_vector_uint64_t	profileids;
 	int			num;
-	const char		*history_tables[] = {"history", "history_str", "history_uint", "history_log",
-				"history_text", "trends", "trends_uint"};
 	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
+	unsigned char		history_mode, trends_mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
 
@@ -1345,7 +1344,28 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBdelete_graphs_by_itemids(itemids);
 	DBdelete_triggers_by_itemids(itemids);
 
-	DBadd_to_housekeeper(itemids, "itemid", history_tables, ARRSIZE(history_tables));
+	zbx_config_get_hk_mode(&history_mode, &trends_mode);
+
+	if (ZBX_HK_MODE_PARTITION != history_mode && ZBX_HK_MODE_PARTITION != trends_mode)
+	{
+		const char	*history_trends_tables[] = {"history", "history_str", "history_uint", "history_log",
+				"history_text", "trends", "trends_uint"};
+
+		DBadd_to_housekeeper(itemids, "itemid", history_trends_tables, ARRSIZE(history_trends_tables));
+	}
+	else if (ZBX_HK_MODE_PARTITION != history_mode)
+	{
+		const char	*history_tables[] = {"history", "history_str", "history_uint", "history_log",
+				"history_text"};
+
+		DBadd_to_housekeeper(itemids, "itemid", history_tables, ARRSIZE(history_tables));
+	}
+	else if (ZBX_HK_MODE_PARTITION != trends_mode)
+	{
+		const char	*trend_tables[] = {"trends", "trends_uint"};
+
+		DBadd_to_housekeeper(itemids, "itemid", trend_tables, ARRSIZE(trend_tables));
+	}
 
 	/* add housekeeper task to delete problems associated with item, this allows old events to be deleted */
 	DBadd_to_housekeeper(itemids, "itemid", event_tables, ARRSIZE(event_tables));

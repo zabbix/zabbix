@@ -47,7 +47,7 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	 */
 	private static function getSeverities(): array {
 		$ordered = [];
-		$severities = getSeverities();
+		$severities = CSeverityHelper::getSeverities();
 		$severities_count = count($severities);
 		$max_rows = (int) ceil($severities_count / self::COLUMNS);
 

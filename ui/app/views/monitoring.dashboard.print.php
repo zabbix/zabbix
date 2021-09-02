@@ -65,11 +65,11 @@ $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 	->show();
 
 (new CScriptTag('
-	initializeView(
-		'.json_encode($data['dashboard']).',
-		'.json_encode($data['widget_defaults']).',
-		'.json_encode($data['time_period']).'
-	);
+	view.init('.json_encode([
+		'dashboard' => $data['dashboard'],
+		'widget_defaults' => $data['widget_defaults'],
+		'time_period' => $data['time_period']
+	]).');
 '))
 	->setOnDocumentReady()
 	->show();

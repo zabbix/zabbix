@@ -33,9 +33,9 @@
 #include "../servercomms.h"
 #include "zbxcrypto.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
-
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002

@@ -323,13 +323,16 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severity_name = getSeverityName($severity);
+			$severity_name = CSeverityHelper::getName($severity);
 
 			$media_active = ($media['severity'] & (1 << $severity));
 
 			$media_severity[$severity] = (new CSpan(mb_substr($severity_name, 0, 1)))
 				->setHint($severity_name.' ('.($media_active ? _('on') : _('off')).')', '', false)
-				->addClass($media_active ? getSeverityStatusStyle($severity) : ZBX_STYLE_STATUS_DISABLED_BG);
+				->addClass($media_active
+					? CSeverityHelper::getStatusStyle($severity)
+					: ZBX_STYLE_STATUS_DISABLED_BG
+				);
 		}
 
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
@@ -607,7 +610,7 @@ if ($data['action'] !== 'user.edit') {
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 		$triggers_table->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
-				->setLabel(getSeverityName($severity))
+				->setLabel(CSeverityHelper::getName($severity))
 				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
 				->setUncheckedValue(0),
 			[

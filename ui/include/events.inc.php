@@ -186,7 +186,7 @@ function make_event_details(array $event, array $allowed) {
 		])
 		->addRow([
 			_('Severity'),
-			getSeverityCell($event['severity'])
+			CSeverityHelper::makeSeverityCell((int) $event['severity'])
 		])
 		->addRow([
 			_('Time'),
