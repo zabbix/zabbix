@@ -186,7 +186,10 @@ class CControllerMenuPopup extends CController {
 				$menu_data['isWriteable'] = $rw_hosts;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
-					$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');
+					$menu_data['severities'] = array_column(
+						CSeverityHelper::getSeverities((int) $data['severity_min']),
+						'value'
+					);
 				}
 				if (array_key_exists('show_suppressed', $data)) {
 					$menu_data['show_suppressed'] = $data['show_suppressed'];
@@ -433,7 +436,10 @@ class CControllerMenuPopup extends CController {
 							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
 						];
 						if (array_key_exists('severity_min', $data)) {
-							$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');
+							$menu_data['severities'] = array_column(
+								CSeverityHelper::getSeverities((int) $data['severity_min']),
+								'value'
+							);
 						}
 						if ($db_map['show_suppressed']) {
 							$menu_data['show_suppressed'] = true;
@@ -473,7 +479,10 @@ class CControllerMenuPopup extends CController {
 							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
 						];
 						if (array_key_exists('severity_min', $data)) {
-							$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');
+							$menu_data['severities'] = array_column(
+								CSeverityHelper::getSeverities((int) $data['severity_min']),
+								'value'
+							);
 						}
 						if ($db_map['show_suppressed']) {
 							$menu_data['show_suppressed'] = true;

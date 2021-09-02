@@ -31,8 +31,9 @@
 #include "housekeeper.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static int	hk_period;
 

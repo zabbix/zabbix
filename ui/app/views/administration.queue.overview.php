@@ -66,17 +66,17 @@ foreach ($data['item_types'] as $item_type) {
 	$table->addRow([
 		item_type2str($item_type),
 		($item_type_queue['delay5'] == 0) ? 0 : (new CCol($item_type_queue['delay5']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_NOT_CLASSIFIED)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_NOT_CLASSIFIED)),
 		($item_type_queue['delay10'] == 0) ? 0 : (new CCol($item_type_queue['delay10']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_INFORMATION)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_INFORMATION)),
 		($item_type_queue['delay30'] == 0) ? 0 : (new CCol($item_type_queue['delay30']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_WARNING)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_WARNING)),
 		($item_type_queue['delay60'] == 0) ? 0 : (new CCol($item_type_queue['delay60']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_AVERAGE)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_AVERAGE)),
 		($item_type_queue['delay300'] == 0) ? 0 : (new CCol($item_type_queue['delay300']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_HIGH)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_HIGH)),
 		($item_type_queue['delay600'] == 0) ? 0 : (new CCol($item_type_queue['delay600']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_DISASTER))
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_DISASTER))
 	]);
 }
 

@@ -35,7 +35,7 @@ window.service_time_edit_popup = {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		document
-			.getElementById('service_time_type')
+			.getElementById('service-time-type')
 			.addEventListener('change', (e) => this.typeChange(e));
 	},
 

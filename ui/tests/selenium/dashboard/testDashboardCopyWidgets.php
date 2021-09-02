@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup widget, profiles
@@ -29,9 +30,133 @@ class testDashboardCopyWidgets extends CWebTest {
 	const PASTE_DASHBOARD_ID = 131;
 	const NEW_PAGE_ID = 143;
 	const NEW_PAGE_NAME = 'Test_page';
+	const UPDATE_TEMPLATEID = 50000;
+	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
 
 	private static $replaced_widget_name = "Test widget for replace";
 	private static $replaced_widget_size = [ 'width' => '13', 'height' => '8'];
+
+	private static $dashboardid_with_widgets;
+	private static $empty_dashboardid;
+	private static $templated_page_id;
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
+
+	/**
+	 * Function creates template dashboards and defines the corresponding dashboard IDs.
+	 */
+	public static function prepareTemplateDashboardsData() {
+		CDataHelper::setSessionId(null);
+
+		$response = CDataHelper::call('templatedashboard.create', [
+			[
+				'templateid' => self::UPDATE_TEMPLATEID,
+				'name' => 'Dashboard with all widgets',
+				'pages' => [
+					[
+						'name' => 'Page with widgets',
+						'widgets' => [
+							[
+								'type' => 'clock',
+								'name' => 'Clock widget',
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'graph',
+								'name' => 'Graph (classic) widget',
+								'x' => 4,
+								'y' => 0,
+								'width' => 8,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source_type',
+										'value' => 1
+									],
+									[
+										'type' => 4,
+										'name' => 'itemid',
+										'value' => 40041
+									]
+								]
+							],
+							[
+								'type' => 'plaintext',
+								'name' => 'Plain text widget',
+								'x' => 12,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 4,
+										'name' => 'itemids',
+										'value' => 40041
+									]
+								]
+							],
+							[
+								'type' => 'url',
+								'name' => 'URL widget',
+								'x' => 18,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'url',
+										'value' => 'http://zabbix.com'
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'name' => 'Graph prototype widget',
+								'x' => 0,
+								'y' => 4,
+								'width' => 12,
+								'height' => 6,
+								'fields' => [
+									[
+										'type' => 7,
+										'name' => 'graphid',
+										'value' => 700016
+									]
+								]
+							]
+						]
+					],
+					[
+						'name' => 'Page for pasting widgets',
+						'widgets' => []
+					]
+				]
+			],
+			[
+				'templateid' => self::UPDATE_TEMPLATEID,
+				'name' => 'Dashboard without widgets',
+				'pages' => [[]]
+			]
+		]);
+
+		self::$dashboardid_with_widgets = $response['dashboardids'][0];
+		self::$empty_dashboardid = $response['dashboardids'][1];
+		self::$templated_page_id = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE name='
+				.zbx_dbstr(self::TEMPLATED_PAGE_NAME)
+		);
+	}
 
 	/**
 	 * Data provider for copying widgets.
@@ -75,7 +200,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$this->copyWidgets($data, false, false, true);
 	}
 
-	private function copyWidgets($data, $new_dashboard = false, $replace = false, $new_page = false) {
+	private function copyWidgets($data, $new_dashboard = false, $replace = false, $new_page = false, $templated = false) {
 		$name = $data['name'];
 
 		// Exclude Map navigation tree widget from replacing tests.
@@ -90,6 +215,22 @@ class testDashboardCopyWidgets extends CWebTest {
 			self::$replaced_widget_name = $name;
 		}
 
+		// Use the appropriate dashboard and page in case of templated dashboard widgets.
+		if ($templated) {
+			$dashboard_id = self::$dashboardid_with_widgets;
+			$new_dashboard_id = self::$empty_dashboardid;
+			$new_page_name = self::TEMPLATED_PAGE_NAME;
+			$new_page_id = self::$templated_page_id;
+			$url = 'zabbix.php?action=template.dashboard.edit&dashboardid=';
+		}
+		else {
+			$dashboard_id = self::DASHBOARD_ID;
+			$new_dashboard_id = self::PASTE_DASHBOARD_ID;
+			$new_page_name = self::NEW_PAGE_NAME;
+			$new_page_id = self::NEW_PAGE_ID;
+			$url = 'zabbix.php?action=dashboard.view&dashboardid=';
+		}
+
 		// Mapping for tags in problem widgets.
 		$mapping = [
 			'tag',
@@ -99,7 +240,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			'value'
 		];
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::DASHBOARD_ID);
+		$this->page->login()->open($url.$dashboard_id);
 		$dashboard = CDashboardElement::find()->one();
 
 		// Get fields from widget form to compare them with new widget after copying.
@@ -117,7 +258,7 @@ class testDashboardCopyWidgets extends CWebTest {
 					' FROM widget w WHERE EXISTS ('.
 						'SELECT NULL FROM dashboard_page dp'.
 						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-							' AND dp.dashboardid='.self::DASHBOARD_ID.
+							' AND dp.dashboardid='.$dashboard_id.
 					')'.
 					' AND w.name='.zbx_dbstr($name).' ORDER BY w.widgetid DESC'
 			);
@@ -128,14 +269,14 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		// Open other dashboard for paste widgets.
 		if ($new_dashboard) {
-			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::PASTE_DASHBOARD_ID);
+			$this->page->open($url.$new_dashboard_id);
 			$dashboard = CDashboardElement::find()->one();
 		}
 
 		if ($new_page) {
-			$this->query('xpath://div[@class="dashboard-navigation-tabs"]//span[text()="'.self::NEW_PAGE_NAME.'"]')
+			$this->query('xpath://div[@class="dashboard-navigation-tabs"]//span[text()="'.$new_page_name.'"]')
 					->waitUntilClickable()->one()->click();
-			$this->query('xpath://div[@class="selected-tab"]//span[text()="'.self::NEW_PAGE_NAME.'"]')
+			$this->query('xpath://div[@class="selected-tab"]//span[text()="'.$new_page_name.'"]')
 					->waitUntilVisible()->one();
 		}
 
@@ -174,18 +315,248 @@ class testDashboardCopyWidgets extends CWebTest {
 		// Close overlay and save dashboard to get new widget size from DB.
 		$copied_overlay = COverlayDialogElement::find()->one();
 		$copied_overlay->close();
-		$dashboard->save();
+
+		if ($templated) {
+			$this->query('button:Save changes')->one()->click();
+		}
+		else {
+			$dashboard->save();
+		}
 		$this->page->waitUntilReady();
 
+		// For templated dashboards the below SQL is executed faster than the corresponding record is added to DB.
+		if ($templated) {
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		}
 		$copied_widget_size = CDBHelper::getRow('SELECT w.width, w.height'.
 				' FROM widget w WHERE EXISTS ('.
 					'SELECT NULL'.
 					' FROM dashboard_page dp'.
-					' WHERE w.dashboard_pageid='.($new_page ? self::NEW_PAGE_ID : 'dp.dashboard_pageid').
-						' AND dp.dashboardid='.($new_dashboard ? self::PASTE_DASHBOARD_ID : self::DASHBOARD_ID).
+					' WHERE w.dashboard_pageid='.($new_page ? $new_page_id : 'dp.dashboard_pageid').
+						' AND dp.dashboardid='.($new_dashboard ? $new_dashboard_id : $dashboard_id).
 				')'.
 				' AND w.name='.zbx_dbstr($name).' ORDER BY w.widgetid DESC'
 		);
 		$this->assertEquals($original_widget_size, $copied_widget_size);
+	}
+
+	public static function getTemplateDashboardWidgetData() {
+		return [
+			[
+				[
+					'name' => 'Clock widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'Graph (classic) widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'URL widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'Plain text widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'URL widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'Clock widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Graph (classic) widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'URL widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Plain text widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'URL widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Clock widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Graph (classic) widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'URL widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Plain text widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'URL widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Clock widget',
+					'copy to' => 'another template'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Function that checks copy operation for template dashboard widgets to different locations.
+	 *
+	 * @dataProvider getTemplateDashboardWidgetData
+	 *
+	 * @backupOnce dashboard
+	 *
+	 * @onBeforeOnce prepareTemplateDashboardsData
+	 */
+	public function testDashboardCopyWidgets_CopyTemplateWidgets($data) {
+		switch ($data['copy to']) {
+			case 'same page':
+				$this->copyWidgets($data, false, false, false, true);
+				break;
+
+			case 'another page':
+				$this->copyWidgets($data, false, false, true, true);
+				break;
+
+			case 'another dashboard':
+				$this->copyWidgets($data, true, false, false, true);
+				break;
+
+			case 'another template':
+				$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
+				$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+				$dashboard->copyWidget($data['name']);
+
+				$this->page->open('zabbix.php?action=template.dashboard.edit&templateid=50002');
+				$this->page->waitUntilReady();
+				COverlayDialogElement::find()->one()->close();
+				$this->query('id:dashboard-add')->one()->click();
+				$this->assertFalse(CPopupMenuElement::find()->one()->getItem('Paste widget')->isEnabled());
+
+				$this->closeDialogues();
+				break;
+		}
+	}
+
+	public static function getTemplateDashboardPageData() {
+		return [
+			[
+				[
+					'copy to' => 'same dashboard'
+				]
+			],
+			[
+				[
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'copy to' => 'another template'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Function that checks copy operation for template dashboard pages to different locations.
+	 *
+	 * @dataProvider getTemplateDashboardPageData
+	 *
+	 * @onBeforeOnce prepareTemplateDashboardsData
+	 */
+	public function testDashboardCopyWidgets_CopyTemplateDashboardPage($data) {
+		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
+		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+
+		$dashboard->query('xpath://span[text()= "Page with widgets"]/../button')->one()->click();
+		CPopupMenuElement::find()->one()->waitUntilVisible()->select('Copy');
+
+		switch ($data['copy to']) {
+			case 'same dashboard':
+				$this->query('id:dashboard-add')->one()->click();
+				CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
+				$dashboard->query('xpath:(//span[@title="Page with widgets"])[2]')->waitUntilVisible()->one();
+				$this->assertEquals(2, $dashboard->query('xpath://span[@title="Page with widgets"]')->all()->count());
+				break;
+
+			case 'another dashboard':
+				$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$empty_dashboardid);
+				$this->page->waitUntilReady();
+
+				$this->query('id:dashboard-add')->one()->click();
+				CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
+				$this->assertEquals(1, $dashboard->query('xpath://span[@title="Page with widgets"]')
+						->waitUntilVisible()->all()->count()
+				);
+				break;
+
+			case 'another template':
+				$this->page->open('zabbix.php?action=template.dashboard.edit&templateid=50002');
+				$this->page->waitUntilReady();
+				COverlayDialogElement::find()->one()->close();
+				$this->query('id:dashboard-add')->one()->click();
+				$this->assertFalse(CPopupMenuElement::find()->one()->getItem('Paste page')->isEnabled());
+				break;
+		}
+
+		$this->closeDialogues();
+	}
+
+	/**
+	 * Function that closes all dialogs and alerts on a template dashboard before proceeding to the next test.
+	 */
+	private function closeDialogues() {
+		$overlay = COverlayDialogElement::find()->one(false);
+		if ($overlay->isValid()) {
+			$overlay->close();
+		}
+		$this->query('link:Cancel')->one()->forceClick();
+
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
 	}
 }

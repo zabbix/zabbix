@@ -25,7 +25,7 @@
 
 $form = (new CForm())
 	->setId('service-time-form')
-	->setName('service-time-form')
+	->setName('service_time_form')
 	->addVar('edit', $data['is_edit'] ? '1' : null)
 	->addVar('row_index', $data['row_index'])
 	->addItem(getMessages());
@@ -36,16 +36,18 @@ $form->addItem((new CInput('submit'))->addStyle('display: none;'));
 $form_grid = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
-		(new CLabel(_('Period type'), 'service_time_type_focusable')),
-		(new CSelect('type'))
-			->setId('service_time_type')
-			->setFocusableElementId('service_time_type_focusable')
-			->setValue($data['form']['type'])
-			->addOptions(CSelect::createOptionsFromArray([
-				SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
-				SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
-				SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
-			]))
+		new CLabel(_('Period type'), 'service-time-type-focusable'),
+		new CFormField(
+			(new CSelect('type'))
+				->setId('service-time-type')
+				->setFocusableElementId('service-time-type-focusable')
+				->setValue($data['form']['type'])
+				->addOptions(CSelect::createOptionsFromArray([
+					SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
+					SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
+					SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
+				]))
+		)
 	]);
 
 switch ($data['form']['type']) {
@@ -58,56 +60,60 @@ switch ($data['form']['type']) {
 
 		$form_grid
 			->addItem([
-				(new CLabel(_('From'), 'service_time_from_week_focusable'))->setAsteriskMark(),
-				(new CHorList([
-					(new CSelect('from_week'))
-						->setId('service_time_from_week')
-						->setFocusableElementId('service_time_from_week_focusable')
-						->setValue($data['form']['from_week'])
-						->addOptions(CSelect::createOptionsFromArray($week_days)),
-					_('Time'),
-					(new CDiv([
-						(new CTextBox('from_hour', $data['form']['from_hour']))
-							->setId('service_time_from_hour')
-							->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-							->setAttribute('placeholder', _('hh'))
-							->setAriaRequired(),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						':',
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CTextBox('from_minute', $data['form']['from_minute']))
-							->setId('service_time_from_minute')
-							->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-							->setAttribute('placeholder', _('mm'))
-							->setAriaRequired()
-					]))
-				]))
+				(new CLabel(_('From'), 'service-time-from-week-focusable'))->setAsteriskMark(),
+				new CFormField(
+					new CHorList([
+						(new CSelect('from_week'))
+							->setId('service-time-from-week')
+							->setFocusableElementId('service-time-from-week-focusable')
+							->setValue($data['form']['from_week'])
+							->addOptions(CSelect::createOptionsFromArray($week_days)),
+						_('Time'),
+						(new CDiv([
+							(new CTextBox('from_hour', $data['form']['from_hour']))
+								->setId('service-time-from-hour')
+								->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+								->setAttribute('placeholder', _('hh'))
+								->setAriaRequired(),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							':',
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CTextBox('from_minute', $data['form']['from_minute']))
+								->setId('service-time-from-minute')
+								->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+								->setAttribute('placeholder', _('mm'))
+								->setAriaRequired()
+						]))
+					])
+				)
 			])
 			->addItem([
-				(new CLabel(_('Till'), 'service_time_till_week_focusable'))->setAsteriskMark(),
-				(new CHorList([
-					(new CSelect('till_week'))
-						->setId('service_time_till_week')
-						->setFocusableElementId('service_time_till_week_focusable')
-						->setValue($data['form']['till_week'])
-						->addOptions(CSelect::createOptionsFromArray($week_days)),
-					_('Time'),
-					(new CDiv([
-						(new CTextBox('till_hour', $data['form']['till_hour']))
-							->setId('service_time_till_hour')
-							->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-							->setAttribute('placeholder', _('hh'))
-							->setAriaRequired(),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						':',
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CTextBox('till_minute', $data['form']['till_minute']))
-							->setId('service_time_till_minute')
-							->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-							->setAttribute('placeholder', _('mm'))
-							->setAriaRequired()
+				(new CLabel(_('Till'), 'service-time-till-week-focusable'))->setAsteriskMark(),
+				new CFormField(
+					(new CHorList([
+						(new CSelect('till_week'))
+							->setId('service-time-till-week')
+							->setFocusableElementId('service-time-till-week-focusable')
+							->setValue($data['form']['till_week'])
+							->addOptions(CSelect::createOptionsFromArray($week_days)),
+						_('Time'),
+						(new CDiv([
+							(new CTextBox('till_hour', $data['form']['till_hour']))
+								->setId('service-time-till-hour')
+								->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+								->setAttribute('placeholder', _('hh'))
+								->setAriaRequired(),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							':',
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							(new CTextBox('till_minute', $data['form']['till_minute']))
+								->setId('service-time-till-minute')
+								->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+								->setAttribute('placeholder', _('mm'))
+								->setAriaRequired()
+						]))
 					]))
-				]))
+				)
 			]);
 		break;
 
@@ -115,26 +121,32 @@ switch ($data['form']['type']) {
 		$form_grid
 			->addItem([
 				new CLabel(_('Note'), 'time_note'),
-				(new CTextBox('note', $data['form']['note']))
-					->setId('service_time_note')
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAttribute('placeholder', _('short description'))
+				new CFormField(
+					(new CTextBox('note', $data['form']['note']))
+						->setId('service-time-note')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAttribute('placeholder', _('short description'))
+				)
 			])
 			->addItem([
 				(new CLabel(_('From'), 'time_from'))->setAsteriskMark(),
-				(new CDateSelector('from', $data['form']['from']))
-					->setId('service_time_from')
-					->setDateFormat(DATE_TIME_FORMAT)
-					->setPlaceholder(_('YYYY-MM-DD hh:mm'))
-					->setAriaRequired()
+				new CFormField(
+					(new CDateSelector('from', $data['form']['from']))
+						->setId('service-time-from')
+						->setDateFormat(DATE_TIME_FORMAT)
+						->setPlaceholder(_('YYYY-MM-DD hh:mm'))
+						->setAriaRequired()
+				)
 			])
 			->addItem([
 				(new CLabel(_('Till'), 'time_till'))->setAsteriskMark(),
-				(new CDateSelector('till', $data['form']['till']))
-					->setId('service_time_till')
-					->setDateFormat(DATE_TIME_FORMAT)
-					->setPlaceholder(_('YYYY-MM-DD hh:mm'))
-					->setAriaRequired()
+				new CFormField(
+					(new CDateSelector('till', $data['form']['till']))
+						->setId('service-time-till')
+						->setDateFormat(DATE_TIME_FORMAT)
+						->setPlaceholder(_('YYYY-MM-DD hh:mm'))
+						->setAriaRequired()
+				)
 			]);
 		break;
 }

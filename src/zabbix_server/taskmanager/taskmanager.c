@@ -34,8 +34,9 @@
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 #define ZBX_TASKMANAGER_TIMEOUT		5
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
