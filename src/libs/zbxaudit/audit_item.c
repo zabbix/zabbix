@@ -44,35 +44,35 @@ static int	item_flag_to_resource_type(int flag)
 	}
 }
 
-#define	PREPARE_AUDIT_ITEM_CREATE(resource, audit_resource_flag)						\
-void	zbx_audit_##resource##_create_entry(int audit_action, zbx_uint64_t itemid, const char *name)		\
-{														\
-	zbx_audit_entry_t	local_audit_item_entry, **found_audit_item_entry;				\
-	zbx_audit_entry_t	*local_audit_item_entry_x = &local_audit_item_entry;				\
-														\
-	RETURN_IF_AUDIT_OFF();											\
-														\
-	local_audit_item_entry.id = itemid;									\
-														\
-	found_audit_item_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),		\
-			&(local_audit_item_entry_x));								\
-	if (NULL == found_audit_item_entry)									\
-	{													\
-		zbx_audit_entry_t	*local_audit_item_entry_insert;						\
-														\
-		local_audit_item_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));\
-		local_audit_item_entry_insert->id = itemid;							\
-		local_audit_item_entry_insert->name = zbx_strdup(NULL, name);					\
-		local_audit_item_entry_insert->audit_action = audit_action;					\
-		local_audit_item_entry_insert->resource_type = audit_resource_flag;				\
-		zbx_json_init(&(local_audit_item_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);		\
-		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_item_entry_insert,			\
-				sizeof(local_audit_item_entry_insert));						\
-	}													\
-}														\
+void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name, int flags)
+{
+	int	resource_type;
 
-PREPARE_AUDIT_ITEM_CREATE(item, AUDIT_RESOURCE_ITEM)
-#undef PREPARE_AUDIT_ITEM_CREATE
+	zbx_audit_entry_t	local_audit_item_entry, **found_audit_item_entry;
+	zbx_audit_entry_t	*local_audit_item_entry_x = &local_audit_item_entry;
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = item_flag_to_resource_type(flags);
+
+	local_audit_item_entry.id = itemid;
+
+	found_audit_item_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
+			&(local_audit_item_entry_x));
+	if (NULL == found_audit_item_entry)
+	{
+		zbx_audit_entry_t	*local_audit_item_entry_insert;
+
+		local_audit_item_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
+		local_audit_item_entry_insert->id = itemid;
+		local_audit_item_entry_insert->name = zbx_strdup(NULL, name);
+		local_audit_item_entry_insert->audit_action = audit_action;
+		local_audit_item_entry_insert->resource_type = resource_type;
+		zbx_json_init(&(local_audit_item_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_item_entry_insert,
+				sizeof(local_audit_item_entry_insert));
+	}
+}
 
 #define ONLY_ITEM (AUDIT_RESOURCE_ITEM == resource_type)
 #define ONLY_ITEM_PROTOTYPE (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)
@@ -137,7 +137,7 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 
 	if ONLY_LLD_RULE
 	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, "discoveryryle.lifetime",
+		zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, "discoveryrule.lifetime",
 				item->lifetime);
 	}
 

@@ -25,7 +25,7 @@
 
 #include "../zbxdbhigh/template.h"
 
-void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name);
+void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name, int flags);
 void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item, zbx_uint64_t hostid);
 
 #define PREPARE_AUDIT_ITEM_UPDATE_H(resource, type1)								\
