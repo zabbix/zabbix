@@ -492,11 +492,27 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (array_key_exists('in', $rule) && !in_array($data, self::unescapeInRule($rule['in']), true)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_s('value must be one of %1$s', str_replace(',', ', ', $rule['in']))
-			);
-			return false;
+		if (array_key_exists('in', $rule)) {
+			$in = self::unescapeInRule($rule['in']);
+
+			if (!in_array($data, $in, true)) {
+				if (($i = array_search('', $in)) !== false) {
+					unset($in[$i]);
+				}
+
+				if ($i === false) {
+					$error = _s('value must be one of %1$s', implode(', ', $in));
+				}
+				elseif ($in) {
+					$error = _s('value must be empty or one of %1$s', implode(', ', $in));
+				}
+				else {
+					$error = _s('value must be empty');
+				}
+
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, $error);
+				return false;
+			}
 		}
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
