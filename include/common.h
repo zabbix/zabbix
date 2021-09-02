@@ -1485,14 +1485,14 @@ typedef struct
 }
 zbx_strloc_t;
 
-/* data used by macros, ldd macros and objectid tokens */
+/* data used by macros, lld macros and objectid tokens */
 typedef struct
 {
 	zbx_strloc_t	name;
 }
 zbx_token_macro_t;
 
-/* data used by macros, ldd macros and objectid tokens */
+/* data used by macros, lld macros and objectid tokens */
 typedef struct
 {
 	zbx_strloc_t	expression;
