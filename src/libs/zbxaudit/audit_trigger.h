@@ -25,10 +25,7 @@
 
 #include "../zbxdbhigh/template.h"
 
-#define	PREPARE_AUDIT_TRIGGER_H(funcname, audit_resource_flag)							\
-void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t triggerid, const char *name);
-PREPARE_AUDIT_TRIGGER_H(trigger, AUDIT_RESOURCE_TRIGGER)
-PREPARE_AUDIT_TRIGGER_H(trigger_prototype, AUDIT_RESOURCE_TRIGGER_PROTOTYPE)
+void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, const char *name, int flags);
 
 void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t templateid,
 		unsigned char recovery_mode, unsigned char status, unsigned char type, zbx_uint64_t value,
