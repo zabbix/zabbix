@@ -129,7 +129,8 @@ class CRegexp extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('regexps', 'name')],
 			'test_string' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
-			'expressions' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+			'expressions' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
 				'expression' =>			['type' => API_MULTIPLE, 'rules' => [
 					[
 						'if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
@@ -144,7 +145,6 @@ class CRegexp extends CApiService {
 						'flags' => API_REQUIRED | API_NOT_EMPTY
 					],
 				]],
-				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
 				'exp_delimiter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('expressions', 'exp_delimiter')],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
 			]]
@@ -319,6 +319,7 @@ class CRegexp extends CApiService {
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('regexps', 'name')],
 			'test_string' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
 			'expressions' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
 				'expression' =>			['type' => API_MULTIPLE, 'rules' => [
 					[
 						'if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
@@ -333,7 +334,6 @@ class CRegexp extends CApiService {
 						'flags' => API_REQUIRED | API_NOT_EMPTY
 					],
 				]],
-				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
 				'exp_delimiter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('expressions', 'exp_delimiter')],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
 			]]
