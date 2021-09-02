@@ -41,10 +41,9 @@ $data += [
 				->onClick('return confirm('.json_encode(_('Delete selected host?')).')
 					? host_edit.deleteHost()
 					: false')
-				->setAttribute('id', 'host-delete')
 				->setAttribute('data-redirect', (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.massdelete')
-					->setArgument('ids', [$data['hostid']])
+					->setArgument('hostids[]', $data['hostid'])
 					->setArgumentSID()
 					->getUrl()
 				),

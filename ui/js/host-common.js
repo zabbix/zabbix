@@ -147,7 +147,7 @@ function hosts_delete(host_form = null) {
 	}
 
 	curl.setArgument('action', 'host.massdelete');
-	curl.setArgument('ids', ids);
+	curl.setArgument('hostids', ids);
 
 	fetch(curl.getUrl(), {
 		method: 'POST',

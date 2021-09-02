@@ -63,7 +63,6 @@ else {
 			'isSubmit' => false
 		],
 		[
-			'id' => 'host-delete',
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected host?'),
 			'class' => 'btn-alt',
