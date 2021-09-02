@@ -1335,7 +1335,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid",
 				itemids->values, itemids->values_num);
 
-		if (FAIL == DBselect_delete_for_item(sql, itemids))
+		if (FAIL == zbx_audit_DBselect_delete_for_item(sql, itemids))
 			goto clean;
 
 		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1393,7 +1393,7 @@ out:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
+static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -1424,7 +1424,7 @@ static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
 			httptestids->values, httptestids->values_num);
 
-	if (FAIL == DBselect_delete_for_item(sql, &itemids))
+	if (FAIL == zbx_audit_DBselect_delete_for_item(sql, &itemids))
 		goto clean;
 
 	DBdelete_items(&itemids);
@@ -1449,7 +1449,7 @@ out:
  *                                      will be deleted                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeids)
+static void	DBgroup_prototypes_delete(const zbx_vector_uint64_t *del_group_prototypeids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
@@ -1763,7 +1763,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	if (FAIL == DBselect_delete_for_item(sql, &itemids))
+	if (FAIL == zbx_audit_DBselect_delete_for_item(sql, &itemids))
 		goto clean;
 
 	DBdelete_items(&itemids);
@@ -5247,7 +5247,7 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 
-	if (FAIL == DBselect_delete_for_item(sql, &itemids))
+	if (FAIL == zbx_audit_DBselect_delete_for_item(sql, &itemids))
 		goto clean;
 
 	DBdelete_items(&itemids);
