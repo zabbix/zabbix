@@ -75,14 +75,8 @@ class CRegexp extends CApiService {
 		}
 
 		$db_regexs = [];
-		$sql_parts = $this->createSelectQueryParts($this->tableName(), $this->tableAlias(), $options);
 
-		// regexpids
-		if ($options['regexpids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('r.regexpid', $options['regexpids']);
-		}
-
-		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
+		$result = DBselect($this->createSelectQuery($this->tableName, $options));
 
 		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
