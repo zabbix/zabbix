@@ -609,9 +609,14 @@ ZABBIX.apps.map = (function($) {
 						can_remove = false,
 						can_reorder = false;
 
-					if (item_data.type && typeof that.selection[item_data.type][item_data.id] === 'undefined') {
+					if (typeof item_data.id === 'undefined') {
+						that.clearSelection();
+					}
+					else if (item_data.type && typeof that.selection[item_data.type][item_data.id] === 'undefined') {
 						that.selectElements([item_data]);
 					}
+
+					$('#map-window').hide()
 
 					can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0);
 					can_remove = can_copy;
@@ -727,6 +732,12 @@ ZABBIX.apps.map = (function($) {
 							]
 						}
 					];
+
+					const overlay = overlays_stack.end();
+
+					if (typeof overlay !== 'undefined' && 'element' in overlay && overlay.element !== event.target) {
+						$('.menu-popup-top').menuPopup('close', null, false);
+					}
 
 					$(event.target).menuPopup(items, event);
 				});
