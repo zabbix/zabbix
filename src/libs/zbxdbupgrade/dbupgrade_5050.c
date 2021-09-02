@@ -592,12 +592,68 @@ static int	DBpatch_5050053(void)
 	return DBcreate_index("role_rule", "role_rule_3", "value_serviceid", 0);
 }
 
+static void	DBpatch_5050054_calc_services_write_value(zbx_uint64_t roleid, int *value)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		manage_services = -1, default_access = 0;
+
+	result = DBselect("select name,value_int from role_rule where roleid=" ZBX_FS_UI64, roleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 == strcmp("actions.manage_services", row[0]))
+		{
+			manage_services = atoi(row[1]);
+			break;
+		}
+		else if (0 == strcmp("actions.default_access", row[0]))
+			default_access = atoi(row[1]);
+	}
+	DBfree_result(result);
+
+	if (-1 != manage_services)
+		*value = manage_services;
+	else
+		*value = default_access;
+}
+
 static int	DBpatch_5050054(void)
 {
-	if (ZBX_DB_OK > DBexecute("update role_rule set name='services.write' where name='actions.manage_services'"))
-		return FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_db_insert_t	db_insert;
+	int		ret = FAIL;
 
-	return SUCCEED;
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int",
+			"value_str", "value_moduleid", NULL);
+
+	result = DBselect("select distinct roleid from role_rule");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	roleid;
+		int		services_write;
+
+		ZBX_STR2UINT64(roleid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 1, "service.read", 1, "", NULL);
+		DBpatch_5050054_calc_services_write_value(roleid, &services_write);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 1, "services.write", services_write, "",
+				NULL);
+
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
 }
 
 #endif
