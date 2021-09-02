@@ -49,7 +49,7 @@ class CService extends CApiService {
 
 	/**
 	 * @param array      $options
-	 * @param array|null $permission_data
+	 * @param array|null $permissions
 	 *
 	 * @return array|string
 	 *
@@ -109,10 +109,13 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($options['editable']) {
-			$accessible_services = $rw_services;
+		if ($permissions === null) {
+			$accessible_services = null;
 		}
-		elseif ($permissions === null || $permissions['r_services'] === null || $permissions['rw_services'] === null) {
+		elseif ($options['editable']) {
+			$accessible_services = $permissions['rw_services'];
+		}
+		elseif ($permissions['r_services'] === null || $permissions['rw_services'] === null) {
 			$accessible_services = null;
 		}
 		else {
@@ -127,8 +130,10 @@ class CService extends CApiService {
 
 		if ($options['parentids'] !== null && in_array(0, $options['parentids'])
 				&& $permissions !== null && $permissions['root_services'] !== null) {
-			$options['parentids'] = array_diff($options['parentids'], [0]);
-			$options['parentids'] = array_merge($options['parentids'], array_keys($permissions['root_services']));
+			$options['parentids'] = count($options['parentids']) > 1 ? array_diff($options['parentids'], [0]) : null;
+			$options['serviceids'] = array_key_exists('serviceids', $options) && $options['serviceids'] !== null
+				? array_keys(array_intersect_key($permissions['root_services'], array_flip($options['serviceids'])))
+				: array_keys($permissions['root_services']);
 		}
 
 		$db_services = [];
@@ -171,7 +176,9 @@ class CService extends CApiService {
 	 * @throws APIException
 	 */
 	public function create(array $services): array {
-		$this->validateCreate($services);
+		$permissions = self::getPermissions();
+
+		$this->validateCreate($services, $permissions);
 
 		$ins_services = [];
 
@@ -185,7 +192,7 @@ class CService extends CApiService {
 
 		$this->updateTags($services, __FUNCTION__);
 		$this->updateProblemTags($services, __FUNCTION__);
-		$this->updateParents($services, __FUNCTION__);
+		$this->updateParents($services, __FUNCTION__, $permissions);
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services,  __FUNCTION__);
 
@@ -201,10 +208,11 @@ class CService extends CApiService {
 
 	/**
 	 * @param array $services
+	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function validateCreate(array &$services): void {
+	private function validateCreate(array &$services, array $permissions): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
 			'algorithm' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE])],
@@ -244,7 +252,7 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkPermissions($services);
+		$this->checkPermissions($permissions, $services);
 
 		$this->checkGoodSla($services);
 		$this->checkAlgorithmDependencies($services);
@@ -261,7 +269,9 @@ class CService extends CApiService {
 	 * @throws APIException
 	 */
 	public function update(array $services): array {
-		$this->validateUpdate($services, $db_services);
+		$permissions = self::getPermissions();
+
+		$this->validateUpdate($services, $db_services, $permissions);
 
 		$upd_services = [];
 
@@ -284,7 +294,7 @@ class CService extends CApiService {
 
 		$this->updateTags($services, __FUNCTION__);
 		$this->updateProblemTags($services, __FUNCTION__);
-		$this->updateParents($services, __FUNCTION__);
+		$this->updateParents($services, __FUNCTION__, $permissions);
 		$this->updateChildren($services, __FUNCTION__);
 		$this->updateTimes($services, __FUNCTION__);
 
@@ -296,10 +306,11 @@ class CService extends CApiService {
 	/**
 	 * @param array      $services
 	 * @param array|null $db_services
+	 * @param array      $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function validateUpdate(array &$services, &$db_services = null): void {
+	private function validateUpdate(array &$services, ?array &$db_services, array $permissions): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['serviceid']], 'fields' => [
 			'serviceid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
@@ -354,7 +365,7 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkPermissions($services, $db_services);
+		$this->checkPermissions($permissions, $services, $db_services);
 
 		$this->checkGoodSla($services, $db_services);
 		$this->checkAlgorithmDependencies($services, $db_services);
@@ -998,8 +1009,9 @@ class CService extends CApiService {
 	/**
 	 * @param array  $services
 	 * @param string $method
+	 * @param array  $permissions
 	 */
-	private function updateParents(array $services, string $method): void {
+	private function updateParents(array $services, string $method, array $permissions): void {
 		$serviceids = [];
 
 		foreach ($services as $serviceid => $service) {
@@ -1016,9 +1028,18 @@ class CService extends CApiService {
 		$ins_parents = [];
 
 		if ($method === 'update') {
+			if ($permissions['r_services'] === null || $permissions['rw_services'] === null) {
+				$accessible_services = null;
+			}
+			else {
+				$accessible_services = $permissions['r_services'] + $permissions['rw_services'];
+			}
+
 			$db_parents = DB::select('services_links', [
 				'output' => ['linkid', 'serviceupid', 'servicedownid'],
-				'filter' => ['servicedownid' => array_keys($serviceids)]
+				'filter' => $accessible_services !== null
+					? ['servicedownid' => array_keys($serviceids), 'serviceupid' => array_keys($accessible_services)]
+					: ['servicedownid' => array_keys($serviceids)]
 			]);
 
 			foreach ($db_parents as $db_parent) {
@@ -1220,7 +1241,8 @@ class CService extends CApiService {
 			return [
 				'r_services' => [],
 				'rw_services' => [],
-				'root_services' => []
+				'root_services' => [],
+				'rw_tag' => ['tag' => '', 'value' => '']
 			];
 		}
 
@@ -1230,7 +1252,8 @@ class CService extends CApiService {
 			return [
 				'r_services' => null,
 				'rw_services' => null,
-				'root_services' => null
+				'root_services' => null,
+				'rw_tag' => ['tag' => '', 'value' => '']
 			];
 		}
 
@@ -1334,12 +1357,19 @@ class CService extends CApiService {
 		];
 	}
 
-	private function checkPermissions(array $services, array $db_services = null): void {
+	/**
+	 * @param array      $permissions
+	 * @param array      $services
+	 * @param array|null $db_services
+	 *
+	 * @throws APIException
+	 */
+	private function checkPermissions(array $permissions, array $services, array $db_services = null): void {
 		[
 			'r_services' => $r_services,
 			'rw_services' => $rw_services,
 			'rw_tag' => $rw_tag
-		] = self::getPermissions();
+		] = $permissions;
 
 		if ($r_services === null || $rw_services === null) {
 			$accessible_services = null;
@@ -1503,8 +1533,6 @@ class CService extends CApiService {
 				}
 			}
 		}
-
-		self::exception(ZBX_API_ERROR_PERMISSIONS, 'TEST FAILED');
 	}
 
 	// TODO
