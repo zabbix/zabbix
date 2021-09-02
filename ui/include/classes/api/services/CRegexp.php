@@ -144,23 +144,31 @@ class CRegexp extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicateNames(array_column($regexs, 'name'));
+		$this->checkDuplicates($regexs);
 	}
 
 	/**
-	 * Check uniqueness of regular expressions.
+	 * Check for unique global regular expression names.
 	 *
-	 * @param array $regex_names
+	 * @param array      $regexs
+	 * @param array|null $db_regexs
 	 *
-	 * @throws APIException  if regular expression already exists.
+	 * @throws APIException if global regular expression names are not unique.
 	 */
-	protected function checkDuplicateNames(array $regex_names): void {
-		$duplicate = DBfetch(DBselect(
-			'SELECT r.name'.
-			' FROM regexps r'.
-			' WHERE '.dbConditionString('r.name', $regex_names),
-			1
-		));
+	protected function checkDuplicates(array $regexs, array $db_regexs = null): void {
+		$names = [];
+
+		foreach ($regexs as $regex) {
+			if ($db_regexs === null || $regex['name'] !== $db_regexs[$regex['regexpid']]['name']) {
+				$names[] = $regex['name'];
+			}
+		}
+
+		if (!$names) {
+			return;
+		}
+
+		$duplicate = DBfetch(DBselect('SELECT r.name FROM regexps r WHERE '.dbConditionString('r.name', $names), 1));
 
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -317,21 +325,11 @@ class CRegexp extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$names = [];
-
-		foreach ($regexs as $regex) {
-			if (!array_key_exists($regex['regexpid'], $db_regexs)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-
-			if (array_key_exists('name', $regex) && $regex['name'] !== $db_regexs[$regex['regexpid']]['name']) {
-				$names[] = $regex['name'];
-			}
+		if (count($db_regexs) != count($regexs)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if ($names) {
-			$this->checkDuplicateNames($names);
-		}
+		$this->checkDuplicates($regexs, $db_regexs);
 
 		$this->addAffectedObjects($regexs, $db_regexs);
 	}
