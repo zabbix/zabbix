@@ -126,7 +126,7 @@ class CRegexp extends CApiService {
 	 * @throws APIException  if the input is invalid
 	 */
 	protected function validateCreate(array &$regexs): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['regexpid', 'name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('regexps', 'name')],
 			'test_string' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
 			'expressions' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
