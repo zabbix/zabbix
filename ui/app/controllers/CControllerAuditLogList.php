@@ -188,7 +188,8 @@ class CControllerAuditLogList extends CController {
 	 */
 	private static function getActionsList(): array {
 		return [
-			CAudit::ACTION_LOGIN => _('Login'),
+			CAudit::ACTION_LOGIN_SUCCESS => _('Login (success)'),
+			CAudit::ACTION_LOGIN_FAILED => _('Login (failed)'),
 			CAudit::ACTION_LOGOUT => _('Logout'),
 			CAudit::ACTION_ADD => _('Add'),
 			CAudit::ACTION_UPDATE => _('Update'),

@@ -270,7 +270,7 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__);
 		$this->updateMedias($users, __FUNCTION__);
 
-		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
 
 		return ['userids' => $userids];
 	}
@@ -427,7 +427,7 @@ class CUser extends CApiService {
 		$this->updateUsersGroups($users, __FUNCTION__, $db_users);
 		$this->updateMedias($users, __FUNCTION__, $db_users);
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
 
 		return ['userids' => array_column($users, 'userid')];
 	}
@@ -1193,7 +1193,7 @@ class CUser extends CApiService {
 		]);
 		DB::delete('users', ['userid' => $userids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
 
 		return ['userids' => $userids];
 	}
@@ -1447,7 +1447,7 @@ class CUser extends CApiService {
 			'where' => ['sessionid' => $sessionid]
 		]);
 
-		// $this->addAuditDetails(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER);
+		self::addAuditLog(CAudit::ACTION_LOGOUT, CAudit::RESOURCE_USER);
 
 		self::$userData = null;
 
@@ -1526,22 +1526,41 @@ class CUser extends CApiService {
 			}
 		}
 		catch (APIException $e) {
+			$attempt_failed = $db_user['attempt_failed'];
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS) {
-				++$db_user['attempt_failed'];
+				++$attempt_failed;
 			}
 
 			DB::update('users', [
 				'values' => [
-					'attempt_failed' => $db_user['attempt_failed'],
+					'attempt_failed' => $attempt_failed,
 					'attempt_clock' => time(),
 					'attempt_ip' => substr($db_user['userip'], 0, 39)
 				],
 				'where' => ['userid' => $db_user['userid']]
 			]);
 
-			// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
-			// 	$db_user['userip']
-			// );
+			self::$userData = [
+				'userid' => $db_user['userid'],
+				'userip' => CWebUser::getIp(),
+				'username' => $user['username']
+			];
+
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER,
+				[[
+					'userid' => $db_user['userid'],
+					'username' => $db_user['username'],
+					'attempt_failed' => $attempt_failed
+				]],
+				[
+					$db_user['userid'] => [
+						'userid' => $db_user['userid'],
+						'username' => $db_user['username'],
+						'attempt_failed' => $db_user['attempt_failed']
+					]
+				]
+			);
+			self::addAuditLog(CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER);
 
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
 					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
@@ -1556,9 +1575,8 @@ class CUser extends CApiService {
 		// Start session.
 		unset($db_user['passwd']);
 		$db_user = self::createSession($db_user);
-		self::$userData = $db_user;
 
-		// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
 		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
 	}
@@ -1575,7 +1593,8 @@ class CUser extends CApiService {
 		if (strlen($db_user['passwd']) > ZBX_MD5_SIZE) {
 			return password_verify($password, $db_user['passwd']);
 		}
-		elseif (hash_equals($db_user['passwd'], md5($password))) {
+
+		if (hash_equals($db_user['passwd'], md5($password))) {
 			DB::update('users', [
 				'values' => ['passwd' => password_hash($password, PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])],
 				'where' => ['userid' => $db_user['userid']]
@@ -1611,9 +1630,8 @@ class CUser extends CApiService {
 
 		unset($db_user['passwd']);
 		$db_user = self::createSession($db_user);
-		self::$userData = $db_user;
 
-		// $this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
 		return $db_user;
 	}
@@ -1867,6 +1885,7 @@ class CUser extends CApiService {
 	 */
 	private static function createSession(array $db_user): array {
 		$db_user['sessionid'] = CEncryptHelper::generateKey();
+		self::$userData = $db_user;
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
@@ -1880,6 +1899,21 @@ class CUser extends CApiService {
 				'values' => ['attempt_failed' => 0],
 				'where' => ['userid' => $db_user['userid']]
 			]);
+
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER,
+				[[
+					'userid' => $db_user['userid'],
+					'username' => $db_user['username'],
+					'attempt_failed' => 0
+				]],
+				[
+					$db_user['userid'] => [
+						'userid' => $db_user['userid'],
+						'username' => $db_user['username'],
+						'attempt_failed' => $db_user['attempt_failed']
+					]
+				]
+			);
 		}
 
 		return $db_user;

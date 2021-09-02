@@ -71,7 +71,8 @@
 		getActionsByResource(resource) {
 			// [Action => [Resources]]
 			const resources = <?php echo json_encode([
-					CAudit::ACTION_LOGIN => [CAudit::RESOURCE_USER],
+					CAudit::ACTION_LOGIN_SUCCESS => [CAudit::RESOURCE_USER],
+					CAudit::ACTION_LOGIN_FAILED => [CAudit::RESOURCE_USER],
 					CAudit::ACTION_LOGOUT => [CAudit::RESOURCE_USER],
 					CAudit::ACTION_ADD => [
 						CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTH_TOKEN, CAudit::RESOURCE_AUTOREGISTRATION,

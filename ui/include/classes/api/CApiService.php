@@ -1134,24 +1134,6 @@ class CApiService {
 	}
 
 	/**
-	 * Add simple audit record.
-	 *
-	 * @param int    $action        AUDIT_ACTION_*
-	 * @param int    $resourcetype  AUDIT_RESOURCE_*
-	 * @param string $details
-	 * @param string $userid
-	 * @param string $ip
-	 */
-	// protected function addAuditDetails($action, $resourcetype, $details = '', $userid = null, $ip = null) {
-	// 	if ($userid === null) {
-	// 		$userid = self::$userData['userid'];
-	// 		$ip = self::$userData['userip'];
-	// 	}
-
-	// 	CAudit::addDetails($userid, $ip, $action, $resourcetype, $details);
-	// }
-
-	/**
 	 * Legacy method to add audit log records.
 	 *
 	 * @param int   $action        CAudit::ACTION_*
@@ -1168,12 +1150,13 @@ class CApiService {
 	/**
 	 * Add audit log records.
 	 *
-	 * @param int   $resource     CAudit::RESOURCE_*
-	 * @param int   $action       CAudit::ACTION_*
-	 * @param array $objects
-	 * @param array $objects_old
+	 * @param int        $action       CAudit::ACTION_*
+	 * @param int        $resource     CAudit::RESOURCE_*
+	 * @param array      $objects      (optional)
+	 * @param array|null $objects_old  (optional)
 	 */
-	protected function addAuditLog(int $action, int $resource, array $objects, array $objects_old = null): void {
+	protected static function addAuditLog(int $action, int $resource, array $objects = [],
+			array $objects_old = null): void {
 		CAudit::log(self::$userData['userid'], self::$userData['userip'], self::$userData['username'], $action,
 			$resource, $objects, $objects_old
 		);

@@ -23,9 +23,10 @@ class CAudit {
 	public const ACTION_ADD = 0;
 	public const ACTION_UPDATE = 1;
 	public const ACTION_DELETE = 2;
-	public const ACTION_LOGIN = 3;
 	public const ACTION_LOGOUT = 4;
 	public const ACTION_EXECUTE = 7;
+	public const ACTION_LOGIN_SUCCESS = 8;
+	public const ACTION_LOGIN_FAILED = 9;
 
 	public const RESOURCE_USER = 0;
 	public const RESOURCE_MEDIA_TYPE = 3;
@@ -113,33 +114,55 @@ class CAudit {
 		}
 
 		$auditlog = [];
-		$table_key = DB::getSchema(self::TABLE_NAMES[$resource])['key'];
 		$clock = time();
+		$ip = substr($ip, 0, 39);
 		$recordsetid = self::getRecordSetId();
 
-		foreach ($objects as $object) {
-			$resourceid = $object[$table_key];
-			$db_object = ($action == self::ACTION_UPDATE) ? $db_objects[$resourceid] : [];
-			$resource_name = self::getResourceName($resource, $action, $object, $db_object);
+		switch ($action) {
+			case self::ACTION_LOGOUT:
+			case self::ACTION_LOGIN_SUCCESS:
+			case self::ACTION_LOGIN_FAILED:
+				$auditlog[] = [
+					'userid' => $userid,
+					'username' => $username,
+					'clock' => $clock,
+					'ip' => $ip,
+					'action' => $action,
+					'resourcetype' => $resource,
+					'resourceid' => $userid,
+					'resourcename' => '',
+					'recordsetid' => $recordsetid,
+					'details' => ''
+				];
+				break;
 
-			$diff = self::handleObjectDiff($resource, $action, $object, $db_object);
+			default:
+				$table_key = DB::getSchema(self::TABLE_NAMES[$resource])['key'];
 
-			if ($action == self::ACTION_UPDATE && count($diff) === 0) {
-				continue;
-			}
+				foreach ($objects as $object) {
+					$resourceid = $object[$table_key];
+					$db_object = ($action == self::ACTION_UPDATE) ? $db_objects[$resourceid] : [];
+					$resource_name = self::getResourceName($resource, $action, $object, $db_object);
 
-			$auditlog[] = [
-				'userid' => $userid,
-				'username' => $username,
-				'clock' => $clock,
-				'ip' => substr($ip, 0, 39),
-				'action' => $action,
-				'resourcetype' => $resource,
-				'resourceid' => $resourceid,
-				'resourcename' => $resource_name,
-				'recordsetid' => $recordsetid,
-				'details' => (count($diff) == 0) ? '' : json_encode($diff)
-			];
+					$diff = self::handleObjectDiff($resource, $action, $object, $db_object);
+
+					if ($action == self::ACTION_UPDATE && count($diff) === 0) {
+						continue;
+					}
+
+					$auditlog[] = [
+						'userid' => $userid,
+						'username' => $username,
+						'clock' => $clock,
+						'ip' => $ip,
+						'action' => $action,
+						'resourcetype' => $resource,
+						'resourceid' => $resourceid,
+						'resourcename' => $resource_name,
+						'recordsetid' => $recordsetid,
+						'details' => (count($diff) == 0) ? '' : json_encode($diff)
+					];
+				}
 		}
 
 		DB::insertBatch('auditlog', $auditlog);
