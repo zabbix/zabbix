@@ -978,7 +978,7 @@ class CMacrosResolverGeneral {
 						$value = $history[$function['itemid']][0]['source'];
 						break;
 					case 'ITEM.LOG.SEVERITY':
-						$value = getSeverityName($history[$function['itemid']][0]['severity']);
+						$value = CSeverityHelper::getName((int) $history[$function['itemid']][0]['severity']);
 						break;
 					case 'ITEM.LOG.NSEVERITY':
 						$value = $history[$function['itemid']][0]['severity'];

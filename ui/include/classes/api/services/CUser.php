@@ -270,7 +270,7 @@ class CUser extends CApiService {
 		self::updateUsersGroups($users, __FUNCTION__);
 		self::updateMedias($users, __FUNCTION__);
 
-		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
 
 		return ['userids' => $userids];
 	}
@@ -423,7 +423,7 @@ class CUser extends CApiService {
 		self::updateUsersGroups($users, 'update', $db_users);
 		self::updateMedias($users, 'update', $db_users);
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
 
 		return ['userids' => array_column($users, 'userid')];
 	}
@@ -1193,9 +1193,17 @@ class CUser extends CApiService {
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
 		]);
+
+		$tokenids = DB::select('token', [
+			'output' => [],
+			'filter' => ['userid' => $userids],
+			'preservekeys' => true
+		]);
+		CToken::deleteForce(array_keys($tokenids), false);
+
 		DB::delete('users', ['userid' => $userids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
 
 		return ['userids' => $userids];
 	}

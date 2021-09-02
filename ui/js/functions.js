@@ -707,8 +707,8 @@ function parseUrlString(url) {
  * @param {string}       type            Message type. ('good'|'bad'|'warning')
  * @param {string|array} messages        Array with details messages or message string with normal font.
  * @param {string}       title           Larger font title.
- * @param {bool}         show_close_box  Show close button.
- * @param {bool}         show_details    Show details on opening.
+ * @param {boolean}      show_close_box  Show close button.
+ * @param {boolean}      show_details    Show details on opening.
  *
  * @return {jQuery}
  */

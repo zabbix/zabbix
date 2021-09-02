@@ -25,9 +25,16 @@
 ?>
 
 <script>
-	function initializeView(dashboard, widget_defaults, time_period, page) {
+	const view = {
+		dashboard: null,
+		page: null,
+		is_busy: false,
+		is_busy_saving: false,
 
-		const init = () => {
+		init({dashboard, widget_defaults, time_period, page}) {
+			this.dashboard = dashboard;
+			this.page = page;
+
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
 				containers: {
 					grid: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_GRID ?>'),
@@ -83,39 +90,39 @@
 
 			document
 				.getElementById('dashboard-add')
-				.addEventListener('click', events.addClick);
+				.addEventListener('click', this.events.addClick);
 
 			document
 				.getElementById('dashboard-save')
-				.addEventListener('click', () => save());
+				.addEventListener('click', () => this.save());
 
 			document
 				.getElementById('dashboard-cancel')
 				.addEventListener('click', (e) => {
-					cancelEditing();
+					this.cancelEditing();
 					e.preventDefault();
 				}
 			);
 
-			ZABBIX.Dashboard.on(DASHBOARD_EVENT_BUSY, events.busy);
-			ZABBIX.Dashboard.on(DASHBOARD_EVENT_IDLE, events.idle);
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_BUSY, this.events.busy);
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_IDLE, this.events.idle);
 
-			enableNavigationWarning();
+			this.enableNavigationWarning();
 
 			if (dashboard.dashboardid === null) {
 				ZABBIX.Dashboard.editProperties();
 			}
-		};
+		},
 
-		const save = () => {
+		save() {
 			clearMessages();
 
-			is_busy_saving = true;
-			updateBusy();
+			this.is_busy_saving = true;
+			this.updateBusy();
 
 			const request_data = ZABBIX.Dashboard.save();
 
-			request_data.sharing = dashboard.sharing;
+			request_data.sharing = this.dashboard.sharing;
 
 			const curl = new Curl('zabbix.php');
 
@@ -123,9 +130,7 @@
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-				},
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 				body: urlEncodeData(request_data)
 			})
 				.then((response) => response.json())
@@ -138,15 +143,15 @@
 						postMessageOk(response['system-message-ok']);
 					}
 
-					disableNavigationWarning();
-					cancelEditing();
+					this.disableNavigationWarning();
+					this.cancelEditing();
 				})
 				.catch((error) => {
 					if (typeof error === 'object' && 'html_string' in error) {
 						addMessage(error.html_string);
 					}
 					else {
-						const message = dashboard.dashboardid === null
+						const message = this.dashboard.dashboardid === null
 							? t('Failed to create dashboard')
 							: t('Failed to update dashboard');
 
@@ -154,38 +159,38 @@
 					}
 				})
 				.finally(() => {
-					is_busy_saving = false;
-					updateBusy();
+					this.is_busy_saving = false;
+					this.updateBusy();
 				});
-		};
+		},
 
-		const updateBusy = () => {
-			document.getElementById('dashboard-save').disabled = is_busy || is_busy_saving;
-		};
+		updateBusy() {
+			document.getElementById('dashboard-save').disabled = this.is_busy || this.is_busy_saving;
+		},
 
-		const cancelEditing = () => {
+		cancelEditing() {
 			const curl = new Curl('zabbix.php', false);
 
 			curl.setArgument('action', 'template.dashboard.list');
-			curl.setArgument('templateid', dashboard.templateid);
+			curl.setArgument('templateid', this.dashboard.templateid);
 
-			if (page !== null) {
-				curl.setArgument('page', page);
+			if (this.page !== null) {
+				curl.setArgument('page', this.page);
 			}
 
 			location.replace(curl.getUrl());
-		};
+		},
 
-		const enableNavigationWarning = () => {
-			window.addEventListener('beforeunload', events.beforeUnload, {passive: false});
-		};
+		enableNavigationWarning() {
+			window.addEventListener('beforeunload', this.events.beforeUnload, {passive: false});
+		},
 
-		const disableNavigationWarning = () => {
-			window.removeEventListener('beforeunload', events.beforeUnload);
-		};
+		disableNavigationWarning() {
+			window.removeEventListener('beforeunload', this.events.beforeUnload);
+		},
 
-		const events = {
-			addClick: (e) => {
+		events: {
+			addClick(e) {
 				const menu = [
 					{
 						items: [
@@ -219,7 +224,7 @@
 					}
 				];
 
-				$(e.target).menuPopup(menu, new jQuery.Event(e), {
+				jQuery(e.target).menuPopup(menu, new jQuery.Event(e), {
 					position: {
 						of: e.target,
 						my: 'left top',
@@ -229,7 +234,7 @@
 				});
 			},
 
-			beforeUnload: (e) => {
+			beforeUnload(e) {
 				if (ZABBIX.Dashboard.isUnsaved()) {
 					// Display confirmation message.
 					e.preventDefault();
@@ -237,20 +242,15 @@
 				}
 			},
 
-			busy: () => {
-				is_busy = true;
-				updateBusy();
+			busy() {
+				view.is_busy = true;
+				view.updateBusy();
 			},
 
-			idle: () => {
-				is_busy = false;
-				updateBusy();
+			idle() {
+				view.is_busy = false;
+				view.updateBusy();
 			}
-		};
-
-		let is_busy = false;
-		let is_busy_saving = false;
-
-		init();
+		}
 	}
 </script>
