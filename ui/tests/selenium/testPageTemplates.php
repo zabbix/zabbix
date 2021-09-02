@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
  */
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Linux by Zabbix agent';
+	public $templateName = 'Huawei OceanStor 5300 V5 SNMP';
 
 	use FilterTrait;
 	use TableTrait;
@@ -43,7 +43,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Host groups')->select('Templates');
+		$filter->getField('Host groups')->select('Templates/SAN');
 		$filter->submit();
 		$this->zbxTestTextPresent($this->templateName);
 
@@ -113,11 +113,11 @@ class testPageTemplates extends CLegacyWebTest {
 	public function testPageTemplates_FilterTemplateByName() {
 		$this->zbxTestLogin('templates.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Host groups')->select('Templates');
+		$filter->getField('Host groups')->select('Templates/SAN');
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {

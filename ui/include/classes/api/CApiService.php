@@ -271,11 +271,11 @@ class CApiService {
 	}
 
 	/**
-	 * Unsets fields $fields from the given objects if they are not requested in $output.
+	 * Unset those fields of the objects, which are not requested for the $output.
 	 *
 	 * @param array        $objects
 	 * @param array        $fields
-	 * @param string|array $output		desired output
+	 * @param string|array $output   requested output
 	 *
 	 * @return array
 	 */
@@ -1168,12 +1168,14 @@ class CApiService {
 	/**
 	 * Add audit log records.
 	 *
+	 * @static
+	 *
 	 * @param int   $resource     CAudit::RESOURCE_*
 	 * @param int   $action       CAudit::ACTION_*
 	 * @param array $objects
 	 * @param array $objects_old
 	 */
-	protected function addAuditLog(int $action, int $resource, array $objects, array $objects_old = null): void {
+	protected static function addAuditLog(int $action, int $resource, array $objects, array $objects_old = null): void {
 		CAudit::log(self::$userData['userid'], self::$userData['userip'], self::$userData['username'], $action,
 			$resource, $objects, $objects_old
 		);

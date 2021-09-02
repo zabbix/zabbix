@@ -746,9 +746,9 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_OPERATION_MODE_UPDATE	2
 
 /* algorithms for service status calculation */
-#define SERVICE_ALGORITHM_NONE	0
-#define SERVICE_ALGORITHM_MAX	1
-#define SERVICE_ALGORITHM_MIN	2
+#define ZBX_SERVICE_STATUS_CALC_SET_OK			0
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL	1
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE	2
 
 /* HTTP item types */
 #define ZBX_HTTPITEM_TYPE_RSPCODE	0
