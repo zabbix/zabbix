@@ -208,10 +208,6 @@ class CUserGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreate(array &$usrgrps) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create user groups.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
 			'debug_mode' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED])],
@@ -297,10 +293,6 @@ class CUserGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateUpdate(array &$usrgrps, array &$db_usrgrps = null) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update user groups.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['usrgrpid'], ['name']], 'fields' => [
 			'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
@@ -888,10 +880,6 @@ class CUserGroup extends CApiService {
 	 * @param array $db_usrgrps
 	 */
 	protected function validateDelete(array &$usrgrpids, array &$db_usrgrps = null) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
-		}
-
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrpids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

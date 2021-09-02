@@ -281,10 +281,6 @@ class CUser extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreate(array &$users) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to create users.'));
-		}
-
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
 		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
