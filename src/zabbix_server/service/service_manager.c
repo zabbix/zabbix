@@ -2864,10 +2864,94 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 	zbx_vector_uint64_destroy(&serviceids);
 }
 
-static void	process_event_severities(const zbx_ipc_message_t *message)
+/******************************************************************************
+ *                                                                            *
+ * Function: service_update_event_severity                                    *
+ *                                                                            *
+ * Purpose: update cached service problem and queue service for update        *
+ *                                                                            *
+ ******************************************************************************/
+static void	service_update_event_severity(zbx_service_manager_t *service_manager, zbx_service_t *service,
+		zbx_uint64_t eventid, int severity)
+{
+	int			index;
+	zbx_service_problem_t	*service_problem;
+	zbx_services_diff_t	*services_diff, services_diff_local;
+
+	if (FAIL == (index = zbx_vector_ptr_search(&service->service_problems, &eventid,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	{
+		return;
+	}
+
+	service_problem = (zbx_service_problem_t *)service->service_problems.values[index];
+	service_problem->severity = severity;
+
+	services_diff_local.serviceid = service->serviceid;
+
+	if (NULL == (services_diff = zbx_hashset_search(&service_manager->service_diffs, &services_diff_local)))
+	{
+		zbx_vector_ptr_create(&services_diff_local.service_problems);
+		zbx_vector_ptr_create(&services_diff_local.service_problems_recovered);
+		services_diff_local.flags = ZBX_FLAG_SERVICE_UPDATE;
+		zbx_hashset_insert(&service_manager->service_diffs, &services_diff_local, sizeof(services_diff_local));
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_update_service_problems                                       *
+ *                                                                            *
+ * Purpose: update service_problem table with the changed event severities    *
+ *                                                                            *
+ ******************************************************************************/
+static int	db_update_service_problems(const zbx_vector_ptr_t *event_severities)
+{
+	int	i, txn_rc;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0;
+
+	do
+	{
+		size_t	sql_offset = 0;
+
+		DBbegin();
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		for (i = 0; i < event_severities->values_num; i++)
+		{
+			zbx_event_severity_t	*es = (zbx_event_severity_t *)event_severities->values[i];
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update service_problem set severity=%d where eventid=" ZBX_FS_UI64 ";\n",
+					es->severity, es->eventid);
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)
+			DBexecute("%s", sql);
+	}
+	while (ZBX_DB_DOWN == (txn_rc = DBcommit()));
+
+	zbx_free(sql);
+
+	return (ZBX_DB_FAIL != txn_rc ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_event_severities                                         *
+ *                                                                            *
+ * Purpose: update event severities, service statuses in cache and database   *
+ *          according to the event severity changes during acknowledgment     *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_event_severities(const zbx_ipc_message_t *message, zbx_service_manager_t *service_manager)
 {
 	zbx_vector_ptr_t	event_severities;
-	int			severities_num;
+	int			i, j, severities_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:%u" , __func__, message->size);
 
@@ -2876,8 +2960,42 @@ static void	process_event_severities(const zbx_ipc_message_t *message)
 	zbx_service_deserialize_event_severities(message->data, &event_severities);
 	severities_num = event_severities.values_num;
 
-	// TODO: update service problems/services
+	if (SUCCEED != db_update_service_problems(&event_severities))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot update service problem severities in database");
+		goto out;
+	}
 
+	for (i = 0; i < event_severities.values_num; i++)
+	{
+		zbx_event_severity_t		*es = (zbx_event_severity_t *)event_severities.values[i];
+		zbx_event_t			event_local = {.eventid = es->eventid}, *event = &event_local;
+		zbx_service_problem_index_t	*pi, pi_local;
+
+		/* update event severity in problem cache */
+
+		if (NULL == (event = *(zbx_event_t **)zbx_hashset_search(&service_manager->problem_events, &event)))
+			continue;
+
+		event->severity = es->severity;
+
+		/* update event severities in service problems lists */
+
+		pi_local.eventid = es->eventid;
+
+		if (NULL == (pi = zbx_hashset_search(&service_manager->service_problems_index, &pi_local)))
+			continue;
+
+		for (j = 0; j < pi->services.values_num; j++)
+		{
+			zbx_service_t	*service = (zbx_service_t *)pi->services.values[j];
+			service_update_event_severity(service_manager, service, es->eventid, es->severity);
+		}
+
+	}
+
+	db_update_services(service_manager);
+out:
 	zbx_vector_ptr_clear_ext(&event_severities, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&event_severities);
 
@@ -3281,7 +3399,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					process_rootcause(message, &service_manager, client);
 					break;
 				case ZBX_IPC_SERVICE_EVENT_SEVERITIES:
-					process_event_severities(message);
+					process_event_severities(message, &service_manager);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;

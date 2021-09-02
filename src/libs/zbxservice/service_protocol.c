@@ -321,7 +321,7 @@ zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const 
 
 	size = sizeof(event_severities->values_num);
 	size += event_severities->values_num * (sizeof(es->eventid) + sizeof(es->severity));
-	ptr = *data = (zbx_uint32_t *)zbx_malloc(NULL, size);
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, size);
 
 	ptr += zbx_serialize_value(ptr, event_severities->values_num);
 	for (i = 0; i < event_severities->values_num; i++)
