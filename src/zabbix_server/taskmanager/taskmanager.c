@@ -29,6 +29,7 @@
 #include "export.h"
 #include "taskmanager.h"
 #include "zbxdiag.h"
+#include "service_protocol.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -301,6 +302,42 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	notify_service_manager(const zbx_vector_ptr_t *ack_tasks)
+{
+	int			i;
+	zbx_vector_ptr_t	event_severities;
+
+	zbx_vector_ptr_create(&event_severities);
+
+	for (i = 0; i < ack_tasks->values_num; i++)
+	{
+		zbx_ack_task_t	*ack_task = (zbx_ack_task_t *)ack_tasks->values[i];
+
+		if (ack_task->old_severity != ack_task->new_severity)
+		{
+			zbx_event_severity_t	*es;
+
+			es = (zbx_event_severity_t *)zbx_malloc(NULL, sizeof(zbx_event_severity_t));
+			es->eventid = ack_task->eventid;
+			es->severity = ack_task->new_severity;
+			zbx_vector_ptr_append(&event_severities, es);
+		}
+	}
+
+	if (0 != event_severities.values_num)
+	{
+		unsigned char		*data;
+		zbx_uint32_t		size;
+
+		size = zbx_service_serialize_event_severities(&data, &event_severities);
+		zbx_service_send(ZBX_IPC_SERVICE_EVENT_SEVERITIES, data, size, NULL);
+		zbx_free(data);
+	}
+
+	zbx_vector_ptr_clear_ext(&event_severities, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&event_severities);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: tm_process_acknowledgements                                      *
@@ -327,7 +364,7 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_ptr_create(&ack_tasks);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select a.eventid,ta.acknowledgeid,ta.taskid"
+			"select a.eventid,ta.acknowledgeid,ta.taskid,a.old_severity,a.new_severity"
 			" from task_acknowledge ta"
 			" left join acknowledges a"
 				" on ta.acknowledgeid=a.acknowledgeid"
@@ -354,6 +391,8 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 		ZBX_STR2UINT64(ack_task->eventid, row[0]);
 		ZBX_STR2UINT64(ack_task->acknowledgeid, row[1]);
 		ZBX_STR2UINT64(ack_task->taskid, row[2]);
+		ack_task->old_severity = atoi(row[3]);
+		ack_task->new_severity = atoi(row[4]);
 		zbx_vector_ptr_append(&ack_tasks, ack_task);
 	}
 	DBfree_result(result);
@@ -362,6 +401,8 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 	{
 		zbx_vector_ptr_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		processed_num = process_actions_by_acknowledgements(&ack_tasks);
+
+		notify_service_manager(&ack_tasks);
 	}
 
 	sql_offset = 0;

@@ -2864,6 +2864,27 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 	zbx_vector_uint64_destroy(&serviceids);
 }
 
+static void	process_event_severities(const zbx_ipc_message_t *message)
+{
+	zbx_vector_ptr_t	event_severities;
+	int			severities_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:%u" , __func__, message->size);
+
+	zbx_vector_ptr_create(&event_severities);
+
+	zbx_service_deserialize_event_severities(message->data, &event_severities);
+	severities_num = event_severities.values_num;
+
+	// TODO: update service problems/services
+
+	zbx_vector_ptr_clear_ext(&event_severities, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&event_severities);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() severities_num:%d", __func__, severities_num);
+}
+
+
 static void	service_manager_init(zbx_service_manager_t *service_manager)
 {
 	zbx_hashset_create_ext(&service_manager->problem_events, 1000, default_uint64_ptr_hash_func,
@@ -3258,6 +3279,9 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE:
 					process_rootcause(message, &service_manager, client);
+					break;
+				case ZBX_IPC_SERVICE_EVENT_SEVERITIES:
+					process_event_severities(message);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
