@@ -31,7 +31,8 @@ class CUser extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'checkauthentication' => [],
 		'login' => [],
-		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'unblock' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'users';
@@ -1734,6 +1735,55 @@ class CUser extends CApiService {
 		self::$userData = $db_user;
 
 		return $db_user;
+	}
+
+	/**
+	 * Unblock user account.
+	 *
+	 * @param array $userids
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	public function unblock(array $userids): array {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $userids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_users = $this->get([
+			'output' => ['userid', 'username', 'attempt_failed'],
+			'userids' => $userids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		if (count($db_users) != count($userids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$users = [];
+		$upd_users = [];
+
+		foreach ($userids as $userid) {
+			$users[$userid] = ['userid' => $userid, 'attempt_failed' => 0];
+			$upd_user = DB::getUpdatedValues('users', $users[$userid], $db_users[$userid]);
+
+			if ($upd_user) {
+				$upd_users[] = [
+					'values' => $upd_user,
+					'where' => ['userid' => $userid]
+				];
+			}
+		}
+
+		if ($upd_users) {
+			DB::update('users', $upd_users);
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		}
+
+		return ['userids' => $userids];
 	}
 
 	private function getUserGroupsData($userid) {

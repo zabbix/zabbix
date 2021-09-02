@@ -1657,7 +1657,7 @@ class testUsers extends CAPITest {
 				'user' => ['10'],
 				'expected_error' => null
 			],
-						[
+			[
 				'user' => ['11', '12'],
 				'expected_error' => null
 			]
@@ -1677,27 +1677,104 @@ class testUsers extends CAPITest {
 		}
 	}
 
+	public static function user_unblock_data_invalid(): array {
+		return [
+			[
+				'user' => [],
+				'expected_error' => 'Invalid parameter "/": cannot be empty.'
+			],
+			[
+				'user' => [null],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'user' => [true],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'user' => [[]],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'user' => [''],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'user' => ['1.0'],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'user' => [-1],
+				'expected_error' => 'Invalid parameter "/1": a number is expected.'
+			],
+			[
+				'user' => ['123456'], // Non-existing user.
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'user' => ['15', '15'],
+				'expected_error' => 'Invalid parameter "/2": value (15) already exists.'
+			]
+		];
+	}
+
+	public static function user_unblock_data_valid(): array {
+		return [
+			[
+				'user' => ['15'],
+				'expected_error' => null
+			],
+			[
+				'user' => ['14', '15'],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider user_unblock_data_invalid
+	 * @dataProvider user_unblock_data_valid
+	 */
+	public function testUsers_Unblock($users, ?string $expected_error): void {
+		$response = $this->call('user.unblock', $users, $expected_error);
+
+		if ($expected_error !== null) {
+			return;
+		}
+
+		$db_users = CDBHelper::getAll(
+			'SELECT u.attempt_failed'.
+			' FROM users u'.
+			' WHERE '.dbConditionId('u.userid', $response['result']['userids']).
+			' ORDER BY u.userid ASC'
+		);
+
+		foreach ($db_users as $db_user) {
+			$this->assertEquals(0, $db_user['attempt_failed']);
+		}
+	}
+
 	public static function user_permissions() {
 		return [
 			[
 				'method' => 'user.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'user' => [
-							'username' => 'API user create as zabbix admin',
-							'passwd' => 'zabbix',
-							'usrgrps' => [
-								['usrgrpid' => 7]
-							]
-						],
+					'username' => 'API user create as zabbix admin',
+					'passwd' => 'zabbix',
+					'usrgrps' => [
+						['usrgrpid' => 7]
+					]
+				],
 				'expected_error' => 'No permissions to call "user.create".'
 			],
 			[
 				'method' => 'user.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'user' => [
-							'userid' => '9',
-							'username' => 'API user update as zabbix admin without permissions'
-						],
+					'userid' => '9',
+					'username' => 'API user update as zabbix admin without permissions'
+				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -1710,21 +1787,21 @@ class testUsers extends CAPITest {
 				'method' => 'user.create',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'user' => [
-							'username' => 'API user create as zabbix user',
-							'passwd' => 'zabbix',
-							'usrgrps' => [
-								['usrgrpid' => 7]
-							]
-						],
+					'username' => 'API user create as zabbix user',
+					'passwd' => 'zabbix',
+					'usrgrps' => [
+						['usrgrpid' => 7]
+					]
+				],
 				'expected_error' => 'No permissions to call "user.create".'
 			],
 			[
 				'method' => 'user.update',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'user' => [
-							'userid' => '9',
-							'username' => 'API user update as zabbix user without permissions'
-						],
+					'userid' => '9',
+					'username' => 'API user update as zabbix user without permissions'
+				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -1732,6 +1809,18 @@ class testUsers extends CAPITest {
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'user' => ['9'],
 				'expected_error' => 'No permissions to call "user.delete".'
+			],
+			[
+				'method' => 'user.unblock',
+				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
+				'user' => ['15'],
+				'expected_error' => 'No permissions to call "user.unblock".'
+			],
+			[
+				'method' => 'user.unblock',
+				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
+				'user' => ['15'],
+				'expected_error' => 'No permissions to call "user.unblock".'
 			]
 		];
 	}
