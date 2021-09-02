@@ -128,13 +128,7 @@ class CService extends CApiService {
 				: array_keys($accessible_services);
 		}
 
-		if ($options['parentids'] !== null && in_array(0, $options['parentids'])
-				&& $permissions !== null && $permissions['root_services'] !== null) {
-			$options['parentids'] = count($options['parentids']) > 1 ? array_diff($options['parentids'], [0]) : null;
-			$options['serviceids'] = array_key_exists('serviceids', $options) && $options['serviceids'] !== null
-				? array_keys(array_intersect_key($permissions['root_services'], array_flip($options['serviceids'])))
-				: array_keys($permissions['root_services']);
-		}
+		$options['root_services'] = $permissions['root_services'];
 
 		$db_services = [];
 
@@ -418,17 +412,47 @@ class CService extends CApiService {
 		return ['serviceids' => $serviceids];
 	}
 
+	/**
+	 * @param string $table_name
+	 * @param string $table_alias
+	 * @param array  $options
+	 * @param array  $sql_parts
+	 *
+	 * @return array
+	 */
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if ($options['parentids'] !== null) {
-			$sql_parts['left_table'] = ['table' => 'services', 'alias' => 's'];
-			$sql_parts['left_join'][] = [
-				'table' => 'services_links',
-				'alias' => 'slp',
-				'using' => 'servicedownid'
-			];
-			$sql_parts['where'][] = dbConditionId('slp.serviceupid', $options['parentids']);
+			if (in_array(0, $options['parentids']) && $options['root_services'] !== null) {
+				if (count($options['parentids']) > 1) {
+					$conditions = [
+						'slp.serviceupid' => dbConditionId('slp.serviceupid', array_diff($options['parentids'], [0])),
+						's.serviceid' => dbConditionId('s.serviceid', array_keys($options['root_services']))
+					];
+				}
+				else {
+					$conditions = [
+						's.serviceid' => dbConditionId('s.serviceid', array_keys($options['root_services']))
+					];
+				}
+			}
+			else {
+				$conditions = [
+					'slp.serviceupid' => dbConditionId('slp.serviceupid', $options['parentids'])
+				];
+			}
+
+			if (array_key_exists('slp.serviceupid', $conditions)) {
+				$sql_parts['left_table'] = ['table' => 'services', 'alias' => 's'];
+				$sql_parts['left_join'][] = [
+					'table' => 'services_links',
+					'alias' => 'slp',
+					'using' => 'servicedownid'
+				];
+			}
+
+			$sql_parts['where'][] = '('.implode(' OR ', $conditions).')';
 		}
 
 		if ($options['childids'] !== null) {
@@ -468,10 +492,10 @@ class CService extends CApiService {
 	/**
 	 * @param array      $options
 	 * @param array      $result
-	 * @param array|null $r_services
-	 * @param array|null $rw_services
+	 * @param array|null $permissions
 	 *
 	 * @return array
+	 *
 	 * @throws APIException
 	 */
 	protected function addRelatedObjects(array $options, array $result, array $permissions = null): array {
