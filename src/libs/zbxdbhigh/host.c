@@ -1585,7 +1585,7 @@ static void	DBdelete_template_httptests(zbx_uint64_t hostid, const zbx_vector_ui
 	zbx_vector_uint64_create(&httptestids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select h.httptestid"
+			"select h.httptestid,h.name"
 			" from httptest h"
 				" join httptest t"
 					" on");
@@ -1594,7 +1594,7 @@ static void	DBdelete_template_httptests(zbx_uint64_t hostid, const zbx_vector_ui
 						" and t.httptestid=h.templateid"
 			" where h.hostid=" ZBX_FS_UI64, hostid);
 
-	DBselect_uint64(sql, &httptestids);
+	DBselect_delete_for_httptest(sql, &httptestids);
 
 	DBdelete_httptests(&httptestids);
 

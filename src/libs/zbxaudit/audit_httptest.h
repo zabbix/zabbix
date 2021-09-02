@@ -43,25 +43,14 @@ void	DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids);
 void	zbx_audit_httptest_update_json_add_httptest_tag(zbx_uint64_t httptestid, zbx_uint64_t tagid, const char *tag,
 		const char *value);
 
-///void	zbx_audit_httptest_update_json_update_httptest_tag_create_entry(zbx_uint64_t httptestid, zbx_uint64_t tagid);
-
 void	zbx_audit_httptest_update_json_add_httptest_httpstep(zbx_uint64_t httptestid, zbx_uint64_t httpstepid,
 		const char *name, int no, const char *url, const char *timeout, const char *posts, const char *required,
 		const char *status_codes, int follow_redirects, int retrieve_mode, int post_type);
 
-///void	zbx_audit_httptest_update_json_update_httptest_httpstep_create_entry(zbx_uint64_t httptestid,
-///		zbx_uint64_t httpstepid);
-
 void	zbx_audit_httptest_update_json_add_httptest_field(zbx_uint64_t httptestid, zbx_uint64_t httptestfieldid,
 		int type, const char *name, const char *value);
 
-///void	zbx_audit_httptest_update_json_update_httptest_field_create_entry(zbx_uint64_t httptestid,
-///		zbx_uint64_t httptestfieldid);
-
 void	zbx_audit_httptest_update_json_add_httpstep_field(zbx_uint64_t httptestid, zbx_uint64_t httpstepid,
 		zbx_uint64_t httpstepfieldid, int type, const char *name, const char *value);
-
-///void	zbx_audit_httptest_update_json_update_httpstep_field_create_entry(zbx_uint64_t httptestid,
-///		zbx_uint64_t httpstepid, zbx_uint64_t httpstepfieldid);
 
 #endif	/* ZABBIX_AUDIT_HTTPTEST_H */
