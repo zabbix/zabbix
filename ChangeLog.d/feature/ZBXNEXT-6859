@@ -1,1 +1,1 @@
-A......... [ZBXNEXT-6470,ZBXNEXT-6859] made auditlog function private in API; updated and optimized audit architecture (rlataria, Sasha)
+A......... [ZBXNEXT-6470,ZBXNEXT-6859] added logging of deleted tokens when deleting a user (rlataria, Sasha)
