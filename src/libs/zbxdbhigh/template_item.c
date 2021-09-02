@@ -249,16 +249,34 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	{
 		item = (zbx_template_item_t *)zbx_malloc(NULL, sizeof(zbx_template_item_t));
 
+		item->templateid_orig = 0;
 		ZBX_STR2UINT64(item->templateid, row[0]);
+
+		item->type_orig = 0;
 		ZBX_STR2UCHAR(item->type, row[3]);
+
+		item->value_type_orig = 0;
 		ZBX_STR2UCHAR(item->value_type, row[4]);
+
+		item->status_orig = 0;
 		ZBX_STR2UCHAR(item->status, row[8]);
+
+		item->valuemapid_orig = 0;
 		ZBX_DBROW2UINT64(item->valuemapid, row[13]);
+
+		item->authtype_orig = 0;
 		ZBX_STR2UCHAR(item->authtype, row[17]);
+
+		item->flags_orig = 0;
 		ZBX_STR2UCHAR(item->flags, row[22]);
+
+		item->inventory_link_orig = 0;
 		ZBX_STR2UCHAR(item->inventory_link, row[24]);
+
+		item->evaltype_orig = 0;
 		ZBX_STR2UCHAR(item->evaltype, row[27]);
 
+		item->interfaceid_orig = 0;
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
 			case INTERFACE_TYPE_UNKNOWN:
@@ -348,7 +366,10 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->status_codes_orig = NULL;
 		item->status_codes = zbx_strdup(NULL, row[34]);
 
+		item->follow_redirects_orig = 0;
 		ZBX_STR2UCHAR(item->follow_redirects, row[35]);
+
+		item->post_type_orig = 0;
 		ZBX_STR2UCHAR(item->post_type, row[36]);
 
 		item->http_proxy_orig = NULL;
@@ -357,8 +378,13 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->headers_orig = NULL;
 		item->headers = zbx_strdup(NULL, row[38]);
 
+		item->retrieve_mode_orig = 0;
 		ZBX_STR2UCHAR(item->retrieve_mode, row[39]);
+
+		item->request_method_orig = 0;
 		ZBX_STR2UCHAR(item->request_method, row[40]);
+
+		item->output_format_orig = 0;
 		ZBX_STR2UCHAR(item->output_format, row[41]);
 
 		item->ssl_cert_file_orig = NULL;
@@ -370,9 +396,16 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->ssl_key_password_orig = NULL;
 		item->ssl_key_password = zbx_strdup(NULL, row[44]);
 
+		item->verify_peer_orig = 0;
 		ZBX_STR2UCHAR(item->verify_peer, row[45]);
+
+		item->verify_host_orig = 0;
 		ZBX_STR2UCHAR(item->verify_host, row[46]);
+
+		item->allow_traps_orig = 0;
 		ZBX_STR2UCHAR(item->allow_traps, row[47]);
+
+		item->discover_orig = 0;
 		ZBX_STR2UCHAR(item->discover, row[48]);
 
 		item->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RESET_FLAG;
@@ -498,7 +531,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
  *          from database                                                     *
  *                                                                            *
  * Parameters: items - [IN] the host items including lld rules                *
- *             rules - [OUT] the ldd rule mapping                             *
+ *             rules - [OUT] the lld rule mapping                             *
  *                                                                            *
  ******************************************************************************/
 static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules)
@@ -643,7 +676,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
  *                                                                            *
  * Purpose: calculate identifiers for new item conditions                     *
  *                                                                            *
- * Parameters: rules - [IN] the ldd rule mapping                              *
+ * Parameters: rules - [IN] the lld rule mapping                              *
  *                                                                            *
  * Return value: The number of new item conditions to be inserted.            *
  *                                                                            *
@@ -709,7 +742,7 @@ static void	update_template_lld_formula(char **formula, zbx_uint64_t id_proto, z
  *          identifiers instead.                                              *
  *                                                                            *
  * Parameters:  items  - [IN] the template items                              *
- *              rules  - [IN] the ldd rule mapping                            *
+ *              rules  - [IN] the lld rule mapping                            *
  *                                                                            *
  ******************************************************************************/
 static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules)
@@ -1037,7 +1070,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
  *          database                                                          *
  *                                                                            *
  * Parameters:  items          - [IN] the template items                      *
- *              rules          - [IN] the ldd rule mapping                    *
+ *              rules          - [IN] the lld rule mapping                    *
  *              new_conditions - [IN] the number of new item conditions to    *
  *                                    be inserted                             *
  *                                                                            *
