@@ -109,7 +109,7 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla'],
+			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
 			'selectParents' => $is_filtered ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],

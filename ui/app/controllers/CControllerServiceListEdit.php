@@ -49,11 +49,35 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES);
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES) || !$this->canEdit()) {
+			return false;
+		}
+
+		if ($this->hasInput('serviceid')) {
+			$db_service = API::Service()->get([
+				'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+				'serviceids' => $this->getInput('serviceid'),
+				'selectParents' => ['serviceid'],
+				'selectTags' => ['tag', 'value']
+			]);
+
+			if (!$db_service) {
+				return false;
+			}
+
+			$this->service = $db_service[0];
+		}
+
+		return true;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function doAction(): void {
 		parent::doAction();
 
@@ -148,7 +172,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla'],
+			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
 			'selectParents' => $is_filtered ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],

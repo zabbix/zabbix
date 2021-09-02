@@ -75,7 +75,6 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'actions_execute_scripts' => 				'in 0,1',
 			'actions_manage_api_tokens' => 				'in 0,1',
 			'actions_manage_scheduled_reports' => 		'in 0,1',
-			'actions_manage_services' => 				'in 0,1',
 			'modules' => 								'array',
 			'api_mode' => 								'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
 			'api_methods' => 							'array',

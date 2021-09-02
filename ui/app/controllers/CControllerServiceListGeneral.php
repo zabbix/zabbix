@@ -32,25 +32,31 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	protected $service;
 
+	/**
+	 * @throws APIException
+	 */
+	protected function canEdit(): bool {
+		$db_roles = API::Role()->get([
+			'output' => [],
+			'selectRules' => ['services.write.mode', 'services.write.list', 'services.write.tag'],
+			'roleids' => CWebUser::$data['roleid']
+		]);
+
+		if ($db_roles) {
+			return ($db_roles[0]['rules']['services.write.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+				|| $db_roles[0]['rules']['services.write.list']
+				|| $db_roles[0]['rules']['services.write.tag']['tag'] !== '');
+		}
+
+		return false;
+	}
+
+	/**
+	 * @throws APIException
+	 */
 	protected function doAction(): void {
-		if ($this->hasInput('serviceid')) {
-			$db_service = API::Service()->get([
-				'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla'],
-				'serviceids' => $this->getInput('serviceid'),
-				'selectParents' => ['serviceid'],
-				'selectTags' => ['tag', 'value']
-			]);
-
-			if (!$db_service) {
-				$this->setResponse(new CControllerResponseData([
-					'error' => _('No permissions to referred object or it does not exist!')
-				]));
-
-				return;
-			}
-
-			$this->service = reset($db_service);
-			$this->service['tags'] = makeTags([$this->service], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT);
+		if ($this->service !== null) {
+			$this->service['tags'] = makeTags([$this->service], true, 'serviceid');
 			$this->service['parents'] = API::Service()->get([
 				'output' => ['serviceid', 'name'],
 				'serviceids' => array_column($this->service['parents'], 'serviceid'),

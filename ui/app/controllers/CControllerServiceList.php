@@ -45,10 +45,35 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
+			return false;
+		}
+
+		if ($this->hasInput('serviceid')) {
+			$db_service = API::Service()->get([
+				'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+				'serviceids' => $this->getInput('serviceid'),
+				'selectParents' => ['serviceid'],
+				'selectTags' => ['tag', 'value']
+			]);
+
+			if (!$db_service) {
+				return false;
+			}
+
+			$this->service = $db_service[0];
+		}
+
+		return true;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function doAction(): void {
 		parent::doAction();
 
@@ -99,7 +124,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
 
 		$data = [
-			'can_edit' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES),
+			'can_edit' => $this->canEdit(),
 			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 			'path' => $path,
 			'breadcrumbs' => $this->getBreadcrumbs($path, $is_filtered),
@@ -121,7 +146,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla'],
+			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
 			'selectParents' => $is_filtered ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
