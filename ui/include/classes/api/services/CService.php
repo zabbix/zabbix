@@ -376,22 +376,7 @@ class CService extends CApiService {
 	 * @throws APIException
 	 */
 	public function delete(array $serviceids): array {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-
-		if (!CApiInputValidator::validate($api_input_rules, $serviceids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$this->checkDeletePermissions($serviceids);
-
-		$db_services = $this->get([
-			'output' => ['serviceid', 'name'],
-			'serviceids' => $serviceids
-		]);
-
-		if (count($db_services) != count($serviceids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+		$this->validateDelete($serviceids, $db_services);
 
 		DB::delete('services', ['serviceid' => $serviceids]);
 
@@ -410,6 +395,54 @@ class CService extends CApiService {
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_IT_SERVICE, $db_services);
 
 		return ['serviceids' => $serviceids];
+	}
+
+	/**
+	 * @param array      $serviceids
+	 * @param array|null $db_services
+	 *
+	 * @throws APIException
+	 */
+	private function validateDelete(array $serviceids, ?array &$db_services): void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $serviceids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$permissions = self::getPermissions();
+
+		$db_services = $this->doGet([
+			'output' => ['serviceid', 'name'],
+			'selectChildren' => $permissions['rw_services'] !== null ? ['serviceid', 'name'] : null,
+			'serviceids' => $serviceids,
+			'editable' => true
+		], $permissions);
+
+		if (count($db_services) != count($serviceids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		if ($permissions['rw_services'] === null) {
+			return;
+		}
+
+		foreach ($db_services as $db_service) {
+			foreach ($db_service['children'] as $child_service) {
+				if ($permissions['rw_services'][$child_service['serviceid']] !== null) {
+					$permissions['rw_services'][$child_service['serviceid']]--;
+
+					if ($permissions['rw_services'][$child_service['serviceid']] == 0) {
+						$error_detail = _s('read-write access to the child service "%1$s" must be retained',
+							$child_service['name']
+						);
+						$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
+
+						self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -452,7 +485,7 @@ class CService extends CApiService {
 				];
 			}
 
-			$sql_parts['where'][] = '('.implode(' OR ', $conditions).')';
+			$sql_parts['where'][] = count($conditions) > 1 ? '('.implode(' OR ', $conditions).')' : reset($conditions);
 		}
 
 		if ($options['childids'] !== null) {
