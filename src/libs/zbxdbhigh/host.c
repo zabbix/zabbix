@@ -4352,18 +4352,18 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		httptest = (httptest_t *)zbx_calloc(NULL, 1, sizeof(httptest_t));
 
 		ZBX_STR2UINT64(httptest->templateid, row[0]);
-		ZBX_STR2UINT64(httptest->templateid_orig, row[11]);
+		ZBX_DBROW2UINT64(httptest->templateid_orig, row[11]);
 		ZBX_DBROW2UINT64(httptest->httptestid, row[10]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
 		zbx_vector_ptr_create(&httptest->fields);
 		zbx_vector_ptr_create(&httptest->httptesttags);
+		httptest->name = zbx_strdup(NULL, row[1]);
 
 		zbx_vector_ptr_append(httptests, httptest);
 
 		if (0 == httptest->httptestid)
 		{
-			httptest->name = zbx_strdup(NULL, row[1]);
 			httptest->delay = zbx_strdup(NULL, row[2]);
 			httptest->status = (unsigned char)atoi(row[3]);
 			httptest->agent = zbx_strdup(NULL, row[4]);
