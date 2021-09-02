@@ -144,18 +144,20 @@ class CRegexp extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates($regexs);
+		self::checkDuplicates($regexs);
 	}
 
 	/**
 	 * Check for unique global regular expression names.
+	 *
+	 * @static
 	 *
 	 * @param array      $regexs
 	 * @param array|null $db_regexs
 	 *
 	 * @throws APIException if global regular expression names are not unique.
 	 */
-	protected function checkDuplicates(array $regexs, array $db_regexs = null): void {
+	protected static function checkDuplicates(array $regexs, array $db_regexs = null): void {
 		$names = [];
 
 		foreach ($regexs as $regex) {
@@ -329,7 +331,7 @@ class CRegexp extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkDuplicates($regexs, $db_regexs);
+		self::checkDuplicates($regexs, $db_regexs);
 
 		$this->addAffectedObjects($regexs, $db_regexs);
 	}
