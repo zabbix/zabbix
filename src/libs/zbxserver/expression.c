@@ -2604,12 +2604,11 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
  *                                                                            *
  ******************************************************************************/
 static int	get_expression_macro_result(const DB_EVENT *event, char *data, zbx_strloc_t *loc,
-		char **replace_to, char **error)
+		zbx_timespec_t *ts, char **replace_to, char **error)
 {
 	int				ret = FAIL;
 	zbx_eval_context_t		ctx;
 	const zbx_vector_uint64_t	*hostids;
-	zbx_timespec_t			ts;
 	zbx_variant_t			value;
 	zbx_expression_eval_t		eval;
 	char				*expression = NULL;
@@ -2635,13 +2634,10 @@ static int	get_expression_macro_result(const DB_EVENT *event, char *data, zbx_st
 		goto out;
 	}
 
-	ts.sec = event->clock;
-	ts.ns = event->ns;
-
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_NORMAL, &ctx);
 	zbx_expression_eval_resolve_trigger_hosts(&eval, &event->trigger);
 
-	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, &ts, &value, error)))
+	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, ts, &value, error)))
 	{
 		*replace_to = zbx_strdup(NULL, zbx_variant_value_desc(&value));
 		zbx_variant_clear(&value);
@@ -2978,10 +2974,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 				else if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
 				{
+					zbx_timespec_t	ts;
 					char		*errmsg = NULL;
 
+					zbx_timespec(&ts);
+
 					if (SUCCEED != (ret = get_expression_macro_result(event, *data,
-							&inner_token.data.expression_macro.expression, &replace_to,
+							&inner_token.data.expression_macro.expression, &ts, &replace_to,
 							&errmsg)))
 					{
 						*errmsg = tolower(*errmsg);
@@ -4190,10 +4189,14 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					if (0 != (macro_type & MACRO_TYPE_EVENT_NAME))
 					{
+						zbx_timespec_t	ts;
 						char		*errmsg = NULL;
 
+						ts.sec = event->clock;
+						ts.ns = event->ns;
+
 						if (SUCCEED != (ret = get_expression_macro_result(event, *data,
-								&inner_token.data.expression_macro.expression,
+								&inner_token.data.expression_macro.expression, &ts,
 								&replace_to, &errmsg)))
 						{
 							*errmsg = tolower(*errmsg);
