@@ -80,7 +80,7 @@ int	lld_end_of_life(int lastcheck, int lifetime)
 void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_vector_ptr_t *objects,
 		int lifetime, int lastcheck, delete_ids_f cb, get_object_info_f cb_info)
 {
-	char				*sql = NULL, *name;
+	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t		del_ids, lc_ids, ts_ids;
 	zbx_vector_uint64_pair_t	discovery_ts;
@@ -100,6 +100,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 	{
 		zbx_uint64_t	id;
 		int		discovery_flag, object_lastcheck, object_ts_delete;
+		char		*name;
 
 		cb_info(objects->values[i], &id, &discovery_flag, &object_lastcheck, &object_ts_delete, &name);
 
@@ -114,7 +115,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 			{
 				zbx_vector_uint64_append(&del_ids, id);
 
-				if (0 == strncmp(table, "item_discovery", ZBX_CONST_STRLEN("item_discovery")))
+				if (0 == strcmp(table, "item_discovery"))
 				{
 					zbx_audit_item_create_entry_for_delete(id, name,
 							(int)ZBX_FLAG_DISCOVERY_CREATED);

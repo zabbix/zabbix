@@ -319,7 +319,7 @@ PREPARE_AUDIT_ITEM_UPDATE(key,			const char*,	string)
  *             flag - [IN] resource flag                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, char *name, int flag)
+void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, const char *name, int flag)
 {
 	int			resource_type;
 	zbx_audit_entry_t	local_audit_item_entry, **found_audit_item_entry;
