@@ -106,7 +106,7 @@ class CRegexp extends CApiService {
 	public function create(array $regexs): array {
 		$this->validateCreate($regexs);
 
-		$regexids = DB::insertBatch('regexps', $regexs);
+		$regexids = DB::insert('regexps', $regexs);
 
 		foreach ($regexs as $index => &$regex) {
 			$regex['regexpid'] = $regexids[$index];
