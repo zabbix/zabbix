@@ -217,7 +217,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 		if ($data['rules']['service_read_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
 			if ($this->hasInput('service_read_list')) {
-				$data['rules']['service_read_list'] = $this->getInput('service_read_list');
+				foreach ($this->getInput('service_read_list') as $serviceid) {
+					$data['rules']['service_read_list'][] = ['serviceid' => $serviceid];
+				}
 			}
 
 			if ($this->hasInput('service_read_tag_tag')) {
@@ -235,7 +237,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 		if ($data['rules']['service_write_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
 			if ($this->hasInput('service_write_list')) {
-				$data['rules']['service_write_list'] = $this->getInput('service_write_list');
+				foreach ($this->getInput('service_write_list') as $serviceid) {
+					$data['rules']['service_write_list'][] = ['serviceid' => $serviceid];
+				}
 			}
 
 			if ($this->hasInput('service_write_tag_tag')) {

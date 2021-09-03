@@ -88,7 +88,8 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			'service_write_access' => 					'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
 			'service_write_list' => 					'array_db services.serviceid',
 			'service_write_tag_tag' => 					'string',
-			'service_write_tag_value' => 				'string'
+			'service_write_tag_value' => 				'string',
+			'form_refresh' => 							'int32'
 		];
 
 		$ret = $this->validateInput($fields);
