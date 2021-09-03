@@ -229,7 +229,7 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 	ADD_JSON_S(delay);
 	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(hostid), hostid);
 	ADD_JSON_S(name);
-	ADD_JSON_S(key); // API HAS 'key_' , but SQL 'key'
+	ADD_JSON_S(key);
 	ADD_JSON_P_UI(type);
 	ADD_JSON_P_UI(value_type);
 	ADD_JSON_S(history);
