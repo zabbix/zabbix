@@ -445,10 +445,9 @@ class CService extends CApiService {
 		$permissions = self::getPermissions();
 
 		$db_services = $this->doGet([
-			'output' => ['serviceid', 'name'],
+			'output' => ['serviceid', 'name', 'readonly'],
 			'selectChildren' => $permissions['rw_services'] !== null ? ['serviceid', 'name'] : null,
-			'serviceids' => $serviceids,
-			'editable' => true
+			'serviceids' => $serviceids
 		], $permissions);
 
 		if (count($db_services) != count($serviceids)) {
@@ -457,6 +456,15 @@ class CService extends CApiService {
 
 		if ($permissions['rw_services'] === null) {
 			return;
+		}
+
+		foreach ($db_services as $db_service) {
+			if ($db_service['readonly'] == 1) {
+				$error_detail = _('read-write access to the service is required');
+				$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
+
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
 
 		foreach ($db_services as $db_service) {
@@ -800,9 +808,7 @@ class CService extends CApiService {
 	 */
 	private function checkStatusPropagation(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
-			$name = array_key_exists('name', $service)
-				? $service['name']
-				: $db_services[$service['serviceid']]['name'];
+			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
 			if (array_key_exists('propagation_rule', $service) && !array_key_exists('propagation_value', $service)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
@@ -858,9 +864,7 @@ class CService extends CApiService {
 	 */
 	private function checkGoodSla(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
-			$name = array_key_exists('name', $service)
-				? $service['name']
-				: $db_services[$service['serviceid']]['name'];
+			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
 			if (array_key_exists('goodsla', $service)
 					&& round($service['goodsla'], 4) != $service['goodsla']) {
@@ -879,9 +883,7 @@ class CService extends CApiService {
 	 */
 	private function checkAlgorithmDependencies(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
-			$name = array_key_exists('name', $service)
-				? $service['name']
-				: $db_services[$service['serviceid']]['name'];
+			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
 			$algorithm = array_key_exists('algorithm', $service)
 				? $service['algorithm']
@@ -1844,7 +1846,11 @@ class CService extends CApiService {
 		}
 
 		if ($db_services !== null) {
-			foreach ($rw_services as $serviceid => $num_rw_parents) {
+			$affected_rw_services = array_intersect_key($rw_services, array_column($services, 'serviceid',
+				'serviceid'
+			));
+
+			foreach ($affected_rw_services as $serviceid => $num_rw_parents) {
 				if ($num_rw_parents !== null && $num_rw_parents < 1) {
 					$inaccessible_service = $this->doGet([
 						'output' => ['name'],
