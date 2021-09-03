@@ -800,9 +800,7 @@ class CService extends CApiService {
 	 */
 	private function checkStatusPropagation(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
-			$name = array_key_exists('name', $service)
-				? $service['name']
-				: $db_services[$service['serviceid']]['name'];
+			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
 			if (array_key_exists('propagation_rule', $service) && !array_key_exists('propagation_value', $service)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
@@ -858,9 +856,7 @@ class CService extends CApiService {
 	 */
 	private function checkGoodSla(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
-			$name = array_key_exists('name', $service)
-				? $service['name']
-				: $db_services[$service['serviceid']]['name'];
+			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
 			if (array_key_exists('goodsla', $service)
 					&& round($service['goodsla'], 4) != $service['goodsla']) {
@@ -879,9 +875,7 @@ class CService extends CApiService {
 	 */
 	private function checkAlgorithmDependencies(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
-			$name = array_key_exists('name', $service)
-				? $service['name']
-				: $db_services[$service['serviceid']]['name'];
+			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
 			$algorithm = array_key_exists('algorithm', $service)
 				? $service['algorithm']
