@@ -394,7 +394,7 @@ static duk_ret_t	es_httprequest_delete(duk_context *ctx)
  *                                                                            *
  * Function: es_httprequest_head                                              *
  *                                                                            *
- * Purpose: HttpRequest.Head / CurlHttpRequest.Head method                    *
+ * Purpose: HttpRequest.head method                                           *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_head(duk_context *ctx)
@@ -406,7 +406,7 @@ static duk_ret_t	es_httprequest_head(duk_context *ctx)
  *                                                                            *
  * Function: es_httprequest_patch                                             *
  *                                                                            *
- * Purpose: HttpRequest.patch / CurlHttpRequest.Patch method                  *
+ * Purpose: HttpRequest.patch method                                          *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_patch(duk_context *ctx)
@@ -418,7 +418,7 @@ static duk_ret_t	es_httprequest_patch(duk_context *ctx)
  *                                                                            *
  * Function: es_httprequest_options                                           *
  *                                                                            *
- * Purpose: HttpRequest.options / CurlHttpRequest.Options method              *
+ * Purpose: HttpRequest.options method                                        *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_options(duk_context *ctx)
@@ -430,7 +430,7 @@ static duk_ret_t	es_httprequest_options(duk_context *ctx)
  *                                                                            *
  * Function: es_httprequest_trace                                             *
  *                                                                            *
- * Purpose: HttpRequest.trace / CurlHttpRequest.Trace method                  *
+ * Purpose: HttpRequest.trace method                                          *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_trace(duk_context *ctx)
@@ -442,7 +442,7 @@ static duk_ret_t	es_httprequest_trace(duk_context *ctx)
  *                                                                            *
  * Function: es_httprequest_connect                                           *
  *                                                                            *
- * Purpose: HttpRequest.connect / CurlHttpRequest.Connect method              *
+ * Purpose: HttpRequest.connect method                                        *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_connect(duk_context *ctx)
@@ -454,7 +454,7 @@ static duk_ret_t	es_httprequest_connect(duk_context *ctx)
  *                                                                            *
  * Function: es_httprequest_customrequest                                     *
  *                                                                            *
- * Purpose: HttpRequest.customRequest / CurlHttpRequest.CustomRequest method  *
+ * Purpose: HttpRequest.customRequest method                                  *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_customrequest(duk_context *ctx)
@@ -642,16 +642,10 @@ static const duk_function_list_entry	curlhttprequest_methods[] = {
 	{"Put", es_httprequest_put, 2},
 	{"Post", es_httprequest_post, 2},
 	{"Delete", es_httprequest_delete, 2},
-	{"Head", es_httprequest_head, 2},
-	{"Patch", es_httprequest_patch, 2},
-	{"Options", es_httprequest_options, 2},
-	{"Trace", es_httprequest_trace, 2},
-	{"Connect", es_httprequest_connect, 2},
 	{"Status", es_httprequest_status, 0},
 	{"SetProxy", es_httprequest_set_proxy, 1},
 	{"GetHeaders", es_httprequest_get_headers, 0},
 	{"SetHttpAuth", es_httprequest_set_httpauth, 3},
-	{"CustomRequest", es_httprequest_customrequest, 3},
 	{NULL, NULL, 0}
 };
 
