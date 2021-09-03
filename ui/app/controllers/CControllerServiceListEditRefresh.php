@@ -115,7 +115,8 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 				->setArgument('filter_without_problem_tags', $filter['without_problem_tags'] ? 1 : 0)
 				->setArgument('filter_tag_source', $filter['tag_source'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
-				->setArgument('filter_tags', $filter['tags']);
+				->setArgument('filter_tags', $filter['tags'])
+				->setArgument('filter_set', 1);
 		}
 
 		$data['back_url'] = (clone $paging_curl)

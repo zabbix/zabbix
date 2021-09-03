@@ -102,7 +102,8 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
-				->setArgument('filter_tags', $filter['tags']);
+				->setArgument('filter_tags', $filter['tags'])
+				->setArgument('filter_set', 1);
 		}
 
 		$page_num = $this->getInput('page', 1);
