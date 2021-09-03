@@ -572,7 +572,7 @@ class CMacrosResolverHelper {
 	 *
 	 * @param array  $links
 	 * @param string $links[]['label']
-	 * @param array  $fields            A maping between source and destination fields.
+	 * @param array  $fields            A mapping between source and destination fields.
 	 *
 	 * @return array
 	 */
@@ -588,7 +588,7 @@ class CMacrosResolverHelper {
 	 * @param string $map_name
 	 * @param array  $shapes
 	 * @param string $shapes[]['text']
-	 * @param array  $fields            A maping between source and destination fields.
+	 * @param array  $fields            A mapping between source and destination fields.
 	 *
 	 * @return array
 	 */
