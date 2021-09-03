@@ -298,7 +298,7 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 			continue;
 
 		if (NULL != service)
-			zbx_vector_uint64_reserve(&service->eventids, values_num);
+			zbx_vector_uint64_reserve(&service->eventids, (size_t)values_num);
 
 		for (i = 0; i < values_num; i++)
 		{
@@ -320,7 +320,7 @@ zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const 
 	zbx_event_severity_t	*es;
 
 	size = sizeof(event_severities->values_num);
-	size += event_severities->values_num * (sizeof(es->eventid) + sizeof(es->severity));
+	size += (zbx_uint32_t)event_severities->values_num * (sizeof(es->eventid) + sizeof(es->severity));
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, size);
 
 	ptr += zbx_serialize_value(ptr, event_severities->values_num);
@@ -341,7 +341,7 @@ void	zbx_service_deserialize_event_severities(const unsigned char *data, zbx_vec
 	zbx_event_severity_t	*es;
 
 	data += zbx_deserialize_value(data, &es_num);
-	zbx_vector_ptr_reserve(event_severities, es_num);
+	zbx_vector_ptr_reserve(event_severities, (size_t)es_num);
 
 	for (i = 0; i < es_num; i++)
 	{
