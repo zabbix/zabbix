@@ -56,7 +56,8 @@ foreach ($data['expressions'] as $i => $expression) {
 		->setValue($expression['exp_delimiter'])
 		->setId('expressions_'.$i.'_exp_delimiter')
 		->addClass('js-expression-delimiter-select')
-		->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expressionDelimiters()));
+		->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expressionDelimiters()))
+		->setDisabled($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED);
 
 	if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
 		$exp_delimiter->addStyle('display: none;');

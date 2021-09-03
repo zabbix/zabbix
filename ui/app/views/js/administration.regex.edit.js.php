@@ -37,6 +37,7 @@
 				->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expressionDelimiters()))
 				->setId('expressions_#{rowNum}_exp_delimiter')
 				->addClass('js-expression-delimiter-select')
+				->setDisabled(true)
 				->addStyle('display: none;'),
 			new CCheckBox('expressions[#{rowNum}][case_sensitive]'),
 			(new CCol(
@@ -237,6 +238,7 @@
 				$(e.target)
 					.closest('[data-index]')
 					.find('.js-expression-delimiter-select')
+					.prop('disabled', e.target.value !== '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>')
 					.toggle(e.target.value === '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>');
 			});
 

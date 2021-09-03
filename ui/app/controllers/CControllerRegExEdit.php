@@ -102,9 +102,7 @@ class CControllerRegExEdit extends CController {
 			]]);
 
 			foreach ($data['expressions'] as &$expression) {
-				if (!array_key_exists('case_sensitive', $expression)) {
-					$expression['case_sensitive'] = 0;
-				}
+				$expression += ['exp_delimiter' => ',', 'case_sensitive' => 0];
 			}
 			unset($expression);
 		}
