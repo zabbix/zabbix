@@ -65,15 +65,6 @@ abstract class CControllerServiceListGeneral extends CController {
 		}
 	}
 
-	protected function isDefaultFilter(array $filter): bool {
-		return ($filter['name'] == self::FILTER_DEFAULT_NAME
-			&& $filter['status'] == self::FILTER_DEFAULT_STATUS
-			&& $filter['without_children'] == self::FILTER_DEFAULT_WITHOUT_CHILDREN
-			&& $filter['without_problem_tags'] == self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS
-			&& !$filter['tags']
-		);
-	}
-
 	/**
 	 * @return array
 	 *
