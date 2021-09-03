@@ -3548,7 +3548,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		}
 		else
 		{
-			zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name,
+			zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid,
+					(NULL == item->name_proto) ? item->name : item->name_proto,
 					ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
