@@ -391,6 +391,7 @@ class CService extends CApiService {
 
 		$this->checkPermissions($permissions, $services, $db_services);
 
+		$this->checkParentChildRelations($services, $db_services);
 		$this->checkStatusPropagation($services, $db_services);
 		$this->checkGoodSla($services, $db_services);
 		$this->checkAlgorithmDependencies($services, $db_services);
@@ -754,6 +755,41 @@ class CService extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array $services
+	 * @param array $db_services
+	 *
+	 * @throws APIException
+	 */
+	private function checkParentChildRelations(array $services, array $db_services): void {
+		$services = array_column($services, null, 'serviceid');
+
+		foreach ($services as $serviceid => $service) {
+			if (!array_key_exists('parents', $service)) {
+				continue;
+			}
+
+			$parent_services = array_intersect_key($services,
+				array_column($service['parents'], 'serviceid', 'serviceid')
+			);
+
+			foreach ($parent_services as $parent_serviceid => $parent_service) {
+				if (!array_key_exists('children', $parent_service)) {
+					continue;
+				}
+
+				$parent_child_services = array_column($parent_service['children'], 'serviceid', 'serviceid');
+
+				if (!array_key_exists($serviceid, $parent_child_services)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Parent-child relation conflict in services "%1$s" and "%2$s".',
+						$db_services[$parent_serviceid]['name'], $db_services[$serviceid]['name']
+					));
+				}
+			}
+		}
 	}
 
 	/**
@@ -1735,23 +1771,26 @@ class CService extends CApiService {
 					}
 				}
 
+				if ($has_rw_tag && $db_services !== null) {
+					$rw_services[$service['serviceid']] = null;
+				}
+
 				$is_rw_service = $has_rw_tag;
 			}
 
 			if (!$is_rw_service) {
 				if (array_key_exists('parents', $service)) {
 					$parent_services = array_column($service['parents'], 'serviceid', 'serviceid');
-				}
-				elseif ($db_services !== null) {
-					$parent_services = array_column($db_services[$service['serviceid']]['parents'], 'serviceid',
-						'serviceid'
-					);
+
+					$has_rw_parents = (bool) array_intersect_key($parent_services, $rw_services);
+
+					if ($has_rw_parents && $db_services !== null) {
+						$rw_services[$service['serviceid']] = null;
+					}
 				}
 				else {
-					$parent_services = [];
+					$has_rw_parents = $db_services !== null;
 				}
-
-				$has_rw_parents = (bool) array_intersect_key($parent_services, $rw_services);
 
 				$is_rw_service = $has_rw_parents;
 			}
