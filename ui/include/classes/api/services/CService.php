@@ -1846,7 +1846,11 @@ class CService extends CApiService {
 		}
 
 		if ($db_services !== null) {
-			foreach ($rw_services as $serviceid => $num_rw_parents) {
+			$affected_rw_services = array_intersect_key($rw_services, array_column($services, 'serviceid',
+				'serviceid'
+			));
+
+			foreach ($affected_rw_services as $serviceid => $num_rw_parents) {
 				if ($num_rw_parents !== null && $num_rw_parents < 1) {
 					$inaccessible_service = $this->doGet([
 						'output' => ['name'],
