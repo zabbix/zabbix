@@ -132,7 +132,7 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 	ADD_UINT64(templateid)
 	ADD_INT(type)
 	ADD_STR(url)
-	ADD_INT(value)
+	ADD_UINT64(value)
 	ADD_INT(recovery_mode)
 	ADD_INT(correlation_mode)
 	ADD_STR(correlation_tag)
@@ -193,7 +193,7 @@ void	DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	id, flags;
+	zbx_uint64_t	id;
 
 	result = DBselect("%s", sql);
 
@@ -201,9 +201,8 @@ void	DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids)
 	{
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
-		ZBX_STR2UINT64(flags, row[2]);
 
-		zbx_audit_trigger_create_entry(AUDIT_ACTION_DELETE, id, row[1], flags);
+		zbx_audit_trigger_create_entry(AUDIT_ACTION_DELETE, id, row[1], atoi(row[2]));
 	}
 
 	DBfree_result(result);
