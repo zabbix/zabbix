@@ -98,7 +98,7 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 		for deactivate := true; deactivate; {
 			deactivate = false
 			for _, t := range p.tasks {
-				if t.isRecurring() {
+				if t.isActive() && t.isRecurring() {
 					t.deactivate()
 					// deactivation can change tasks ordering, so repeat the iteration if task was deactivated
 					deactivate = true
