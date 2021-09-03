@@ -1005,7 +1005,6 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env);
 const char	*zbx_dc_get_instanceid(void);
 
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid);
-char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
 		char **value, char **error);
 

@@ -14123,17 +14123,6 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t host
 	return buf;
 }
 
-char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid)
-{
-	char	*resolved_params;
-
-	RDLOCK_CACHE;
-	resolved_params = dc_expand_user_macros_in_func_params(params, hostid);
-	UNLOCK_CACHE;
-
-	return resolved_params;
-}
-
 /*********************************************************************************
  *                                                                               *
  * Function: zbx_get_host_interfaces_availability                                *
