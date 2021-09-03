@@ -181,10 +181,10 @@ abstract class CControllerServiceListGeneral extends CController {
 	 */
 	protected function prepareData(array $filter, bool $is_filtered): array {
 		if ($filter['status'] == SERVICE_STATUS_OK) {
-			$filter_status = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+			$filter_status = ZBX_SEVERITY_OK;
 		}
 		elseif ($filter['status'] == SERVICE_STATUS_PROBLEM) {
-			$filter_status = array_column(CSeverityHelper::getSeverities(TRIGGER_SEVERITY_INFORMATION), 'value');
+			$filter_status = array_column(CSeverityHelper::getSeverities(), 'value');
 		}
 		else {
 			$filter_status = null;
