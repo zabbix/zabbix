@@ -722,7 +722,7 @@ class CHost extends CHostGeneral {
 			DB::insert('host_inventory', $hosts_inventory, false);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hosts);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST, $hosts);
 
 		return ['hostids' => array_column($hosts, 'hostid')];
 	}
@@ -1259,7 +1259,7 @@ class CHost extends CHostGeneral {
 			$new_hosts[] = $new_host;
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $new_hosts, $db_hosts);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST, $new_hosts, $db_hosts);
 
 		return ['hostids' => $inputHostIds];
 	}
@@ -1494,7 +1494,7 @@ class CHost extends CHostGeneral {
 			info(_s('Deleted: Host "%1$s".', $db_host['name']));
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $db_hosts);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST, $db_hosts);
 
 		return ['hostids' => $hostIds];
 	}

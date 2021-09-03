@@ -746,9 +746,9 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_OPERATION_MODE_UPDATE	2
 
 /* algorithms for service status calculation */
-#define SERVICE_ALGORITHM_NONE	0
-#define SERVICE_ALGORITHM_MAX	1
-#define SERVICE_ALGORITHM_MIN	2
+#define ZBX_SERVICE_STATUS_CALC_SET_OK			0
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL	1
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE	2
 
 /* HTTP item types */
 #define ZBX_HTTPITEM_TYPE_RSPCODE	0
@@ -1400,7 +1400,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length,
 		unsigned char *context_op);
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
-char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
+char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
 
 #define ZBX_SESSION_ACTIVE		0
 #define ZBX_SESSION_PASSIVE		1
@@ -1485,14 +1485,14 @@ typedef struct
 }
 zbx_strloc_t;
 
-/* data used by macros, ldd macros and objectid tokens */
+/* data used by macros, lld macros and objectid tokens */
 typedef struct
 {
 	zbx_strloc_t	name;
 }
 zbx_token_macro_t;
 
-/* data used by macros, ldd macros and objectid tokens */
+/* data used by macros, lld macros and objectid tokens */
 typedef struct
 {
 	zbx_strloc_t	expression;

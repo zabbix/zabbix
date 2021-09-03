@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0alpha1');
+define('ZABBIX_VERSION',		'6.0.0alpha2');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050047);
+define('ZABBIX_DB_VERSION',		5050063);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -153,8 +153,9 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 define('ZBX_DB_MAX_INSERTS', 10000);
 
 // Default db and field character set (MYSQL & POSTGRESQL)
-define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
-define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+define('ZBX_DB_POSTGRESQL_ALLOWED_CHARSET', 'UTF8');
+define('ZBX_DB_MYSQL_ALLOWED_CHARSETS', ['UTF8', 'UTF8MB3']);
+define('ZBX_DB_MYSQL_ALLOWED_COLLATIONS', ['utf8_bin', 'utf8mb3_bin']);
 
 // Default db defines for Oracle DB
 define('ORACLE_MAX_STRING_SIZE', 4000);
@@ -220,57 +221,6 @@ define('ZBX_TCP_HEADER_VERSION',	"\1");
 define('ZBX_TCP_HEADER',			ZBX_TCP_HEADER_DATA.ZBX_TCP_HEADER_VERSION);
 define('ZBX_TCP_HEADER_LEN',		5);
 define('ZBX_TCP_DATALEN_LEN',		8);
-
-define('AUDIT_ACTION_ADD',		0);
-define('AUDIT_ACTION_UPDATE',	1);
-define('AUDIT_ACTION_DELETE',	2);
-define('AUDIT_ACTION_LOGIN',	3);
-define('AUDIT_ACTION_LOGOUT',	4);
-define('AUDIT_ACTION_EXECUTE',	7);
-
-define('AUDIT_RESOURCE_USER',				0);
-define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
-define('AUDIT_RESOURCE_HOST',				4);
-define('AUDIT_RESOURCE_ACTION',				5);
-define('AUDIT_RESOURCE_GRAPH',				6);
-define('AUDIT_RESOURCE_USER_GROUP',			11);
-define('AUDIT_RESOURCE_TRIGGER',			13);
-define('AUDIT_RESOURCE_HOST_GROUP',			14);
-define('AUDIT_RESOURCE_ITEM',				15);
-define('AUDIT_RESOURCE_IMAGE',				16);
-define('AUDIT_RESOURCE_VALUE_MAP',			17);
-define('AUDIT_RESOURCE_IT_SERVICE',			18);
-define('AUDIT_RESOURCE_MAP',				19);
-define('AUDIT_RESOURCE_SCENARIO',			22);
-define('AUDIT_RESOURCE_DISCOVERY_RULE',		23);
-define('AUDIT_RESOURCE_SCRIPT',				25);
-define('AUDIT_RESOURCE_PROXY',				26);
-define('AUDIT_RESOURCE_MAINTENANCE',		27);
-define('AUDIT_RESOURCE_REGEXP',				28);
-define('AUDIT_RESOURCE_MACRO',				29);
-define('AUDIT_RESOURCE_TEMPLATE',			30);
-define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE',	31);
-define('AUDIT_RESOURCE_ICON_MAP',			32);
-define('AUDIT_RESOURCE_DASHBOARD',			33);
-define('AUDIT_RESOURCE_CORRELATION',		34);
-define('AUDIT_RESOURCE_GRAPH_PROTOTYPE',	35);
-define('AUDIT_RESOURCE_ITEM_PROTOTYPE',		36);
-define('AUDIT_RESOURCE_HOST_PROTOTYPE',		37);
-define('AUDIT_RESOURCE_AUTOREGISTRATION',	38);
-define('AUDIT_RESOURCE_MODULE',				39);
-define('AUDIT_RESOURCE_SETTINGS',			40);
-define('AUDIT_RESOURCE_HOUSEKEEPING',		41);
-define('AUDIT_RESOURCE_AUTHENTICATION',		42);
-define('AUDIT_RESOURCE_TEMPLATE_DASHBOARD',	43);
-define('AUDIT_RESOURCE_USER_ROLE',			44);
-define('AUDIT_RESOURCE_AUTH_TOKEN',			45);
-define('AUDIT_RESOURCE_SCHEDULED_REPORT',	46);
-
-define('AUIDT_DETAILS_ACTION_ADD',		'add');
-define('AUIDT_DETAILS_ACTION_UPDATE',	'update');
-define('AUIDT_DETAILS_ACTION_DELETE',	'delete');
-define('AUIDT_DETAILS_ACTION_ATTACH',	'attach');
-define('AUIDT_DETAILS_ACTION_DETACH',	'detach');
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -690,11 +640,9 @@ define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
 define('MAP_LINK_DRAWTYPE_DOT',				3);
 define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
-define('SERVICE_ALGORITHM_NONE',	0); // do not calculate
-define('SERVICE_ALGORITHM_MAX',		1); // problem, if one children has a problem
-define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
-
-define('SERVICE_SLA', '99.9000');
+define('ZBX_SERVICE_STATUS_CALC_SET_OK',			0);
+define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL',	1);
+define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE',	2);
 
 define('SERVICE_SHOW_SLA_OFF',	0);
 define('SERVICE_SHOW_SLA_ON',	1);
@@ -734,6 +682,7 @@ define('TRIGGER_VALUE_TRUE',	1);
 define('TRIGGER_STATE_NORMAL',	0);
 define('TRIGGER_STATE_UNKNOWN',	1);
 
+define('ZBX_SEVERITY_OK',					-1);
 define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 define('TRIGGER_SEVERITY_INFORMATION',		1);
 define('TRIGGER_SEVERITY_WARNING',			2);
@@ -896,6 +845,21 @@ define('CALC_FNC_AVG', 2);
 define('CALC_FNC_MAX', 4);
 define('CALC_FNC_ALL', 7);
 define('CALC_FNC_LST', 9);
+
+define('ZBX_SERVICE_STATUS_RULE_TYPE_N_GE',		0);
+define('ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE',	1);
+define('ZBX_SERVICE_STATUS_RULE_TYPE_N_L',		2);
+define('ZBX_SERVICE_STATUS_RULE_TYPE_NP_L',		3);
+define('ZBX_SERVICE_STATUS_RULE_TYPE_W_GE',		4);
+define('ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE',	5);
+define('ZBX_SERVICE_STATUS_RULE_TYPE_W_L',		6);
+define('ZBX_SERVICE_STATUS_RULE_TYPE_WP_L',		7);
+
+define('ZBX_SERVICE_STATUS_PROPAGATION_AS_IS',		0);
+define('ZBX_SERVICE_STATUS_PROPAGATION_INCREASE',	1);
+define('ZBX_SERVICE_STATUS_PROPAGATION_DECREASE',	2);
+define('ZBX_SERVICE_STATUS_PROPAGATION_IGNORE',		3);
+define('ZBX_SERVICE_STATUS_PROPAGATION_FIXED',		4);
 
 define('SERVICE_TIME_TYPE_UPTIME',				0);
 define('SERVICE_TIME_TYPE_DOWNTIME',			1);
@@ -1894,6 +1858,7 @@ define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
 define('ZBX_STYLE_SERVER_NAME', 'server-name');
 define('ZBX_STYLE_SERVICE_ACTIONS', 'service-actions');
 define('ZBX_STYLE_SERVICE_INFO', 'service-info');
+define('ZBX_STYLE_SERVICE_INFO_GRID', 'service-info-grid');
 define('ZBX_STYLE_SERVICE_INFO_LABEL', 'service-info-label');
 define('ZBX_STYLE_SERVICE_INFO_VALUE', 'service-info-value');
 define('ZBX_STYLE_SERVICE_NAME', 'service-name');
@@ -1937,6 +1902,7 @@ define('ZBX_STYLE_TABLE_PAGING', 'table-paging');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
+define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT', 'textarea-flexible-parent');

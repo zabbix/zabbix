@@ -490,7 +490,7 @@ class CRoleHelper {
 
 		$labels += [
 			self::ACTIONS_ADD_PROBLEM_COMMENTS => _('Add problem comments'),
-			self::ACTIONS_CHANGE_SEVERITY => ('Change severity'),
+			self::ACTIONS_CHANGE_SEVERITY => _('Change severity'),
 			self::ACTIONS_ACKNOWLEDGE_PROBLEMS => _('Acknowledge problems'),
 			self::ACTIONS_CLOSE_PROBLEMS => _('Close problems'),
 			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts'),

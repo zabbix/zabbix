@@ -502,7 +502,7 @@ class CCorrelation extends CApiService {
 
 		DB::delete('correlation', ['correlationid' => $correlationids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_CORRELATION, $db_correlations);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_CORRELATION, $db_correlations);
 
 		return ['correlationids' => $correlationids];
 	}

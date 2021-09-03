@@ -2696,36 +2696,36 @@ INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (141, 141);
 INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 133800, 'Override for update 1', 1, 1, 0);
 INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5001, 133800, 'Override for update 2', 2, 0, 0);
 
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (300, 5000, 8, '{#MACRO1}', 'test expression_1');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (301, 5000, 9, '{#MACRO2}', 'test expression_2');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (302, 5000, 12, '{#MACRO3}', '');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (303, 5000, 13, '{#MACRO4}', '');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3000, 5000, 8, '{#MACRO1}', 'test expression_1');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3001, 5000, 9, '{#MACRO2}', 'test expression_2');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3002, 5000, 12, '{#MACRO3}', '');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3003, 5000, 13, '{#MACRO4}', '');
 
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (400, 5000, 0, 0, 'test item pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (401, 5000, 1, 1, 'test trigger pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (402, 5001, 2, 8, 'test graph pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (403, 5001, 3, 9, 'test host pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4000, 5000, 0, 0, 'test item pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4001, 5000, 1, 1, 'test trigger pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4002, 5001, 2, 8, 'test graph pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4003, 5001, 3, 9, 'test host pattern');
 
-INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (400, 0);
-INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (402, 0);
+INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (4000, 0);
+INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (4002, 0);
 
-INSERT INTO lld_override_ophistory (lld_override_operationid, history) values (400, 0);
+INSERT INTO lld_override_ophistory (lld_override_operationid, history) values (4000, 0);
 
-INSERT INTO lld_override_opinventory (lld_override_operationid, inventory_mode) values (403, 1);
+INSERT INTO lld_override_opinventory (lld_override_operationid, inventory_mode) values (4003, 1);
 
-INSERT INTO lld_override_opperiod (lld_override_operationid, delay) values (400, '1m;50s/1-7,00:00-24:00;wd1-5h9-18');
+INSERT INTO lld_override_opperiod (lld_override_operationid, delay) values (4000, '1m;50s/1-7,00:00-24:00;wd1-5h9-18');
 
-INSERT INTO lld_override_opseverity (lld_override_operationid, severity) values (401, 2);
+INSERT INTO lld_override_opseverity (lld_override_operationid, severity) values (4001, 2);
 
-INSERT INTO lld_override_opstatus (lld_override_operationid, status) values (400, 0);
+INSERT INTO lld_override_opstatus (lld_override_operationid, status) values (4000, 0);
 
-INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (300, 401, 'tag1', 'value1');
-INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (301, 403, 'name1', 'value1');
-INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (302, 403, 'name2', 'value2');
+INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (3000, 4001, 'tag1', 'value1');
+INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (3001, 4003, 'name1', 'value1');
+INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (3002, 4003, 'name2', 'value2');
 
-INSERT INTO lld_override_optemplate (lld_override_optemplateid, lld_override_operationid, templateid) values (300, 403, 99137);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid, lld_override_operationid, templateid) values (3000, 4003, 99137);
 
-INSERT INTO lld_override_optrends (lld_override_operationid, trends) values (400, 0);
+INSERT INTO lld_override_optrends (lld_override_operationid, trends) values (4000, 0);
 
 UPDATE config SET session_key='caf1c06dcf802728c4cfc24d645e1e73' WHERE configid = 1;
 

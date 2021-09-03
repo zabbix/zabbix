@@ -468,7 +468,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->triggers[] = [
 					'yaxisside' => $item['yaxisside'],
 					'val' => $number_parser->calcValue(),
-					'color' => getSeverityColor($trigger['priority']),
+					'color' => CSeverityHelper::getColor((int) $trigger['priority']),
 					'description' => _('Trigger').NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger),
 					'constant' => '['.$matches['operator'].' '.$matches['constant'].']'
 				];

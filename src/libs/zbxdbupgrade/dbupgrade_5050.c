@@ -31,11 +31,6 @@ extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 
-static int	DBpatch_5050000(void)
-{
-	return SUCCEED;
-}
-
 static int	DBpatch_5050001(void)
 {
 	const ZBX_TABLE	table =
@@ -396,57 +391,10 @@ static int	DBpatch_5050024(void)
 	return DBdrop_table("auditlog_details");
 }
 
-static int	DBpatch_5050025(void)
-{
-	return DBdrop_table("auditlog");
-}
-
-static int	DBpatch_5050026(void)
-{
-	const ZBX_TABLE table =
-		{"auditlog", "auditid", 0,
-			{
-				{"auditid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
-				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-				{"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"ip", "", NULL, NULL, 39, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"action", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"resourcetype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"resourcename", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"recordsetid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
-				{"details", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_5050027(void)
-{
-	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
-}
-
-static int	DBpatch_5050028(void)
-{
-	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
-}
-
-static int	DBpatch_5050029(void)
-{
-	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
-}
-
 static int	DBpatch_5050030(void)
 {
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog' and field_name='auditid'"))
-		return FAIL;
 
 	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog_details' and field_name='auditdetailid'"))
 		return FAIL;
@@ -488,6 +436,143 @@ static int	DBpatch_5050034(void)
 	const ZBX_FIELD	field = {"default_lang", "en_US", NULL, NULL, 5, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("config", &field);
+}
+
+static int	DBpatch_5050035(void)
+{
+	return DBdrop_table("auditlog");
+}
+
+static int	DBpatch_5050036(void)
+{
+	const ZBX_TABLE table =
+		{"auditlog", "auditid", 0,
+			{
+				{"auditid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"ip", "", NULL, NULL, 39, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"action", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"resourcetype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"resourcename", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"recordsetid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+				{"details", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050037(void)
+{
+	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
+}
+
+static int	DBpatch_5050038(void)
+{
+	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
+}
+
+static int	DBpatch_5050039(void)
+{
+	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
+}
+
+static int	DBpatch_5050040(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog' and field_name='auditid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050041(void)
+{
+	const ZBX_FIELD	field = {"weight", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050042(void)
+{
+	const ZBX_FIELD	field = {"propagation_rule", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050043(void)
+{
+	const ZBX_FIELD	field = {"propagation_value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050044(void)
+{
+	const ZBX_TABLE table =
+		{"service_status_rule", "service_status_ruleid", 0,
+			{
+				{"service_status_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"limit_value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"limit_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"new_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050045(void)
+{
+	return DBcreate_index("service_status_rule", "service_status_rule_1", "serviceid", 0);
+}
+
+static int	DBpatch_5050046(void)
+{
+	const ZBX_FIELD	field = {"serviceid", NULL, "services", "serviceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("service_status_rule", 1, &field);
+}
+
+static int	DBpatch_5050047(void)
+{
+	const ZBX_FIELD	field = {"status", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("services", &field);
+}
+
+static int	DBpatch_5050048(void)
+{
+	const ZBX_FIELD	field = {"value", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("service_alarms", &field);
+}
+
+static int	DBpatch_5050049(void)
+{
+	if (ZBX_DB_OK > DBexecute("update services set status=-1 where status=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050050(void)
+{
+	if (ZBX_DB_OK > DBexecute("update service_alarms set value=-1 where value=0"))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 #define DBPATCH_MESSAGE_SUBJECT_LEN		255
@@ -583,78 +668,78 @@ static int	dbpatch_update_simple_macro(const char *table, const char *field, con
 	return ret;
 }
 
-static int	DBpatch_5050035(void)
+static int	DBpatch_5050051(void)
 {
 	return dbpatch_update_simple_macro("opmessage", "subject", "operationid", DBPATCH_MESSAGE_SUBJECT_LEN,
 			"operation message subject");
 }
 
-static int	DBpatch_5050036(void)
+static int	DBpatch_5050052(void)
 {
 	return dbpatch_update_simple_macro("opmessage", "message", "operationid", DBPATCH_SHORTTEXT_LEN,
 			"operation message body");
 }
 
-static int	DBpatch_5050037(void)
+static int	DBpatch_5050053(void)
 {
 	return dbpatch_update_simple_macro("media_type_message", "subject", "mediatype_messageid",
 			DBPATCH_MESSAGE_SUBJECT_LEN, "media message subject");
 }
 
-static int	DBpatch_5050038(void)
+static int	DBpatch_5050054(void)
 {
 	return dbpatch_update_simple_macro("media_type_message", "message", "mediatype_messageid",
 			DBPATCH_SHORTTEXT_LEN, "media message body");
 }
 
-static int	DBpatch_5050039(void)
+static int	DBpatch_5050055(void)
 {
 	return dbpatch_update_simple_macro("graphs", "name", "graphid", DBPATCH_GRAPH_NAME_LEN, "graph name");
 }
 
-static int	DBpatch_5050040(void)
+static int	DBpatch_5050056(void)
 {
 	return dbpatch_update_simple_macro("sysmaps", "label_string_host", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
 			"maps label host");
 }
 
-static int	DBpatch_5050041(void)
+static int	DBpatch_5050057(void)
 {
 	return dbpatch_update_simple_macro("sysmaps", "label_string_hostgroup", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
 			"maps label hostgroup");
 }
 
-static int	DBpatch_5050042(void)
+static int	DBpatch_5050058(void)
 {
 	return dbpatch_update_simple_macro("sysmaps", "label_string_trigger", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
 			"maps label trigger");
 }
 
-static int	DBpatch_5050043(void)
+static int	DBpatch_5050059(void)
 {
 	return dbpatch_update_simple_macro("sysmaps", "label_string_map", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
 			"maps label map");
 }
 
-static int	DBpatch_5050044(void)
+static int	DBpatch_5050060(void)
 {
 	return dbpatch_update_simple_macro("sysmaps", "label_string_image", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
 			"maps label image");
 }
 
-static int	DBpatch_5050045(void)
+static int	DBpatch_5050061(void)
 {
 	return dbpatch_update_simple_macro("sysmaps_elements", "label", "selementid",
 			DBPATCH_SYSMAPS_ELEMENTS_LABEL_LEN, "maps element label");
 }
 
-static int	DBpatch_5050046(void)
+static int	DBpatch_5050062(void)
 {
 	return dbpatch_update_simple_macro("sysmaps_links", "label", "linkid", DBPATCH_SYSMAPS_LINKS_LABEL_LEN,
 			"maps link label");
 }
 
-static int	DBpatch_5050047(void)
+static int	DBpatch_5050063(void)
 {
 	return dbpatch_update_simple_macro("sysmap_shape", "text", "sysmap_shapeid", DBPATCH_SHORTTEXT_LEN,
 			"maps shape text");
@@ -665,7 +750,6 @@ DBPATCH_START(5050)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(5050000, 0, 1)
 DBPATCH_ADD(5050001, 0, 1)
 DBPATCH_ADD(5050002, 0, 1)
 DBPATCH_ADD(5050003, 0, 1)
@@ -690,11 +774,6 @@ DBPATCH_ADD(5050021, 0, 1)
 DBPATCH_ADD(5050022, 0, 1)
 DBPATCH_ADD(5050023, 0, 1)
 DBPATCH_ADD(5050024, 0, 1)
-DBPATCH_ADD(5050025, 0, 1)
-DBPATCH_ADD(5050026, 0, 1)
-DBPATCH_ADD(5050027, 0, 1)
-DBPATCH_ADD(5050028, 0, 1)
-DBPATCH_ADD(5050029, 0, 1)
 DBPATCH_ADD(5050030, 0, 1)
 DBPATCH_ADD(5050031, 0, 1)
 DBPATCH_ADD(5050032, 0, 1)
@@ -713,5 +792,20 @@ DBPATCH_ADD(5050044, 0, 1)
 DBPATCH_ADD(5050045, 0, 1)
 DBPATCH_ADD(5050046, 0, 1)
 DBPATCH_ADD(5050047, 0, 1)
+DBPATCH_ADD(5050048, 0, 1)
+DBPATCH_ADD(5050049, 0, 1)
+DBPATCH_ADD(5050050, 0, 1)
+DBPATCH_ADD(5050052, 0, 1)
+DBPATCH_ADD(5050053, 0, 1)
+DBPATCH_ADD(5050054, 0, 1)
+DBPATCH_ADD(5050055, 0, 1)
+DBPATCH_ADD(5050056, 0, 1)
+DBPATCH_ADD(5050057, 0, 1)
+DBPATCH_ADD(5050058, 0, 1)
+DBPATCH_ADD(5050059, 0, 1)
+DBPATCH_ADD(5050060, 0, 1)
+DBPATCH_ADD(5050061, 0, 1)
+DBPATCH_ADD(5050062, 0, 1)
+DBPATCH_ADD(5050063, 0, 1)
 
 DBPATCH_END()

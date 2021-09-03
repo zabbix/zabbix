@@ -1,0 +1,1 @@
+...G...... [ZBX-19613] fixed Zabbix agent 2 redis plugin to closer match redis-cli connection (esneiders)
