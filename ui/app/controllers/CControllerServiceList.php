@@ -33,6 +33,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'filter_status' =>		'in '.implode(',', [SERVICE_STATUS_ANY, SERVICE_STATUS_OK, SERVICE_STATUS_PROBLEM]),
 			'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>		'array',
+			'filter_set' =>			'in 1',
 			'page' =>				'ge 1'
 		];
 
@@ -87,7 +88,8 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'without_problem_tags' => self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS,
 			'tag_source' => self::FILTER_DEFAULT_TAG_SOURCE,
 			'evaltype' => $this->getInput('filter_evaltype', self::FILTER_DEFAULT_EVALTYPE),
-			'tags' => []
+			'tags' => [],
+			'filter_set' => $this->hasInput('filter_set')
 		];
 
 		foreach ($this->getInput('filter_tags', []) as $tag) {
@@ -98,8 +100,6 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			$filter['tags'][] = $tag;
 		}
 
-		$is_filtered = !$this->isDefaultFilter($filter);
-
 		$reset_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list')
 			->setArgument('path', $path ?: null)
@@ -107,12 +107,13 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 
 		$paging_curl = clone $reset_curl;
 
-		if ($is_filtered) {
+		if ($filter['filter_set']) {
 			$paging_curl
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
-				->setArgument('filter_tags', $filter['tags']);
+				->setArgument('filter_tags', $filter['tags'])
+				->setArgument('filter_set', 1);
 		}
 
 		$edit_mode_curl = (clone $paging_curl)
@@ -127,9 +128,9 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'can_edit' => $this->canEdit(),
 			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 			'path' => $path,
-			'breadcrumbs' => $this->getBreadcrumbs($path, $is_filtered),
+			'breadcrumbs' => $this->getBreadcrumbs($path, $filter['filter_set']),
 			'filter' => $filter,
-			'is_filtered' => $is_filtered,
+			'is_filtered' => $filter['filter_set'],
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
 			'reset_curl' => $reset_curl,
 			'edit_mode_url' => $edit_mode_curl->getUrl(),
@@ -139,7 +140,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'service' => $this->service
 		];
 
-		$db_serviceids = $this->prepareData($filter, $is_filtered);
+		$db_serviceids = $this->prepareData($filter, $filter['filter_set']);
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('service.list', $page_num);
@@ -147,7 +148,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 
 		$data['services'] = API::Service()->get([
 			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
-			'selectParents' => $is_filtered ? ['serviceid', 'name'] : null,
+			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
 			'serviceids' => $db_serviceids,
