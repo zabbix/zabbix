@@ -451,6 +451,15 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		host->tls_subject_orig = NULL;
 		host->tls_psk_identity_orig = NULL;
 		host->tls_psk_orig = NULL;
+		host->jp_row = NULL;
+		host->inventory_mode = 0;
+		host->status = 0;
+		host->custom_interfaces_orig = 0;
+		host->proxy_hostid_orig = 0;
+		host->ipmi_authtype_orig = 0;
+		host->ipmi_privilege_orig = 0;
+		host->tls_connect_orig = 0;
+		host->tls_accept_orig = 0;
 		host->flags = 0x00;
 		ZBX_STR2UCHAR(host->custom_interfaces, row[18]);
 
@@ -821,7 +830,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 {
 	char			*buffer = NULL;
 	int			i;
-	zbx_lld_host_t		*host;
+	zbx_lld_host_t		*host = NULL;
 	zbx_vector_db_tag_ptr_t	tmp_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -892,6 +901,12 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			zbx_vector_db_tag_ptr_create(&host->tags);
 			zbx_vector_ptr_create(&host->interfaces);
 			host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
+			host->jp_row = NULL;
+			host->inventory_mode_orig = host->inventory_mode;
+			host->custom_interfaces_orig = host->custom_interfaces;
+			host->proxy_hostid_orig = 0;
+			host->ipmi_authtype_orig = 0;
+			host->ipmi_privilege_orig = 0;
 
 			zbx_vector_ptr_append(hosts, host);
 		}
@@ -1086,7 +1101,8 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 				/* host groups which should be unlinked */
 				ZBX_STR2UINT64(hostgroupid, row[2]);
 				zbx_vector_uint64_append(del_hostgroupids, hostgroupid);
-				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, host->name);
+				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid,
+						(NULL == host->name_orig) ? host->name : host->name_orig);
 				zbx_audit_hostgroup_update_json_delete_group(hostid, hostgroupid, groupid);
 			}
 			else
@@ -1918,11 +1934,14 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
 	{
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
 
+		hostmacro->hostmacroid = 0;
 		hostmacro->macro = zbx_strdup(NULL, row[0]);
 		hostmacro->value = zbx_strdup(NULL, row[1]);
 		hostmacro->value_orig = NULL;
 		hostmacro->description = zbx_strdup(NULL, row[2]);
 		hostmacro->description_orig = NULL;
+		hostmacro->type_orig = 0;
+		hostmacro->flags = 0;
 		ZBX_STR2UCHAR(hostmacro->type, row[3]);
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
@@ -1984,12 +2003,15 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 	{
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
 
+		hostmacro->hostmacroid = 0;
 		hostmacro->macro = zbx_strdup(NULL, row[0]);
 		hostmacro->value = zbx_strdup(NULL, row[1]);
 		hostmacro->value_orig = NULL;
 		hostmacro->description = zbx_strdup(NULL, row[2]);
 		hostmacro->description_orig = NULL;
 		ZBX_STR2UCHAR(hostmacro->type, row[3]);
+		hostmacro->type_orig = hostmacro->type;
+		hostmacro->flags = 0;
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
@@ -2005,13 +2027,15 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
 
 		masterhostmacro = (const zbx_lld_hostmacro_t *)masterhostmacros->values[i];
+		hostmacro->hostmacroid = 0;
 		hostmacro->macro = zbx_strdup(NULL, masterhostmacro->macro);
 		hostmacro->value = zbx_strdup(NULL, masterhostmacro->value);
 		hostmacro->value_orig = NULL;
 		hostmacro->description = zbx_strdup(NULL, masterhostmacro->description);
 		hostmacro->description_orig = NULL;
 		hostmacro->type = masterhostmacro->type;
-
+		hostmacro->type_orig = hostmacro->type;
+		hostmacro->flags = 0;
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
 
@@ -2065,6 +2089,8 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 	hostmacro->description = NULL;
 	hostmacro->description_orig = NULL;
 	hostmacro->flags = ZBX_FLAG_LLD_HMACRO_REMOVE;
+	hostmacro->type = 0;
+	hostmacro->type_orig = 0;
 
 	zbx_vector_ptr_append(hostmacros, hostmacro);
 }
@@ -2104,7 +2130,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		zbx_vector_ptr_reserve(&host->new_hostmacros, hostmacros->values_num);
+		zbx_vector_ptr_reserve(&host->new_hostmacros, (size_t)hostmacros->values_num);
 		for (j = 0; j < hostmacros->values_num; j++)
 		{
 			hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
@@ -2114,6 +2140,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 			hostmacro->value = zbx_strdup(NULL, ((zbx_lld_hostmacro_t *)hostmacros->values[j])->value);
 			hostmacro->value_orig = NULL;
 			hostmacro->type = ((zbx_lld_hostmacro_t *)hostmacros->values[j])->type;
+			hostmacro->type_orig = ((zbx_lld_hostmacro_t *)hostmacros->values[j])->type_orig;
 			hostmacro->description = zbx_strdup(NULL,
 					((zbx_lld_hostmacro_t *)hostmacros->values[j])->description);
 			hostmacro->description_orig = NULL;
@@ -2336,7 +2363,7 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 
 	zbx_vector_db_tag_ptr_sort(&new_tags, zbx_db_tag_compare_func);
 
-	zbx_vector_db_tag_ptr_reserve(&host->tags, new_tags.values_num);
+	zbx_vector_db_tag_ptr_reserve(&host->tags, (size_t)new_tags.values_num);
 
 	/* update host tags or flag them for removal */
 	for (i = 0; i < host->tags.values_num; i++)
@@ -2706,7 +2733,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		}
 		else
 		{
-			zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, host->hostid, host->name);
+			zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, host->hostid,
+					(NULL == host->name_orig) ? host->name : host->name_orig);
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
 				upd_hosts++;
@@ -2753,7 +2781,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_interfaceids, interface->interfaceid);
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
-						host->hostid, host->name);
+						host->hostid, (NULL == host->name_orig) ? host->name : host->name_orig);
 				zbx_audit_host_update_json_delete_interface(
 						host->hostid, interface->interfaceid);
 			}
@@ -2762,7 +2790,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
-						host->hostid, host->name);
+						host->hostid, (NULL == host->name_orig) ? host->name : host->name_orig);
 				zbx_audit_host_update_json_delete_interface(
 						host->hostid, interface->interfaceid);
 			}
@@ -2796,7 +2824,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				zbx_vector_uint64_append(&del_hostmacroids, hostmacro->hostmacroid);
 
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
-						host->hostid, host->name);
+						host->hostid, (NULL == host->name_orig) ? host->name : host->name_orig);
 				zbx_audit_host_update_json_delete_hostmacro(
 						host->hostid, hostmacro->hostmacroid);
 			}
@@ -3049,7 +3077,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 					zbx_audit_host_update_json_update_tls_issuer(host->hostid,
 							host->tls_issuer_orig, value_esc);
-
 
 					zbx_free(value_esc);
 				}
@@ -3591,7 +3618,6 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 			zbx_ids_names_compare_func);
 #undef IDS_NAMES_HASHSET_DEF_SIZE
 
-
 	zbx_vector_uint64_create(&del_hostids);
 	zbx_vector_str_create(&del_hosts);
 	zbx_vector_uint64_create(&lc_hostids);
@@ -3849,14 +3875,18 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
 
 		ZBX_STR2UINT64(interface->interfaceid, row[0]);
 		interface->type = (unsigned char)atoi(row[1]);
+		interface->type_orig = interface->type;
 		interface->main = (unsigned char)atoi(row[2]);
+		interface->main_orig = interface->main;
 		interface->useip = (unsigned char)atoi(row[3]);
+		interface->useip_orig = interface->useip;
 		interface->ip = zbx_strdup(NULL, row[4]);
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
 		interface->ip_orig = NULL;
 		interface->dns_orig = NULL;
 		interface->port_orig = NULL;
+		interface->parent_interfaceid = 0;
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
@@ -3864,20 +3894,26 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
 
 			snmp = (zbx_lld_interface_snmp_t *)zbx_malloc(NULL, sizeof(zbx_lld_interface_snmp_t));
 			ZBX_STR2UCHAR(snmp->version, row[7]);
+			snmp->version_orig = snmp->version;
 			ZBX_STR2UCHAR(snmp->bulk, row[8]);
+			snmp->bulk_orig = snmp->bulk;
 			snmp->community = zbx_strdup(NULL, row[9]);
 			snmp->community_orig = NULL;
 			snmp->securityname = zbx_strdup(NULL, row[10]);
 			snmp->securityname_orig = NULL;
 			ZBX_STR2UCHAR(snmp->securitylevel, row[11]);
+			snmp->securitylevel_orig = snmp->securitylevel;
 			snmp->authpassphrase = zbx_strdup(NULL, row[12]);
 			snmp->authpassphrase_orig = NULL;
 			snmp->privpassphrase = zbx_strdup(NULL, row[13]);
 			snmp->privpassphrase_orig = NULL;
 			ZBX_STR2UCHAR(snmp->authprotocol, row[14]);
+			snmp->authprotocol_orig = snmp->authprotocol;
 			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
+			snmp->privprotocol_orig = snmp->privprotocol;
 			snmp->contextname = zbx_strdup(NULL, row[16]);
 			snmp->contextname_orig = NULL;
+			snmp->flags = 0;
 			interface->data.snmp = snmp;
 			interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 		}
@@ -4077,7 +4113,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		zbx_vector_ptr_reserve(&host->interfaces, interfaces->values_num);
+		zbx_vector_ptr_reserve(&host->interfaces, (size_t)interfaces->values_num);
 
 		for (j = 0; j < interfaces->values_num; j++)
 		{
@@ -4088,8 +4124,11 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			new_interface->interfaceid = 0;
 			new_interface->parent_interfaceid = interface->interfaceid;
 			new_interface->type = interface->type;
+			new_interface->type_orig = interface->type_orig;
 			new_interface->main = interface->main;
+			new_interface->main_orig = interface->main_orig;
 			new_interface->useip = interface->useip;
+			new_interface->useip_orig = interface->useip_orig;
 			new_interface->ip = zbx_strdup(NULL, interface->ip);
 			new_interface->ip_orig = NULL;
 			new_interface->dns = zbx_strdup(NULL, interface->dns);
