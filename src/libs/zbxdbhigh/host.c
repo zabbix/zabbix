@@ -23,7 +23,6 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
-#include "template.h"
 #include "../../libs/zbxaudit/audit_host.h"
 #include "../../libs/zbxaudit/audit_item.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
