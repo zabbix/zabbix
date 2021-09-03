@@ -624,11 +624,17 @@ class CRole extends CApiService {
 			$mode = ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM;
 		}
 
-		if ($type == USER_TYPE_ZABBIX_USER && $mode != ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
-				$name, 'services.write.mode', 'type', USER_TYPE_ZABBIX_USER
-			));
+		if ($mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+			if (array_key_exists('services.write.tag', $rules)) {
+				if ($rules['services.write.tag']['tag'] === '' && $rules['services.write.tag']['value'] !== '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot have non-empty tag value while having empty tag in rule "%2$s" for user role "%1$s".',
+						$name, 'services.write.tag'
+					));
+				}
+			}
+
+			return;
 		}
 
 		if (array_key_exists('services.write.list', $rules)) {
@@ -642,19 +648,10 @@ class CRole extends CApiService {
 		}
 
 		if ($has_list) {
-			if ($mode == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
-					$name, 'services.write.list', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
-				));
-			}
-
-			if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
-					$name, 'services.write.list', 'type', USER_TYPE_ZABBIX_USER
-				));
-			}
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+				$name, 'services.write.list', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+			));
 		}
 
 		if (array_key_exists('services.write.tag', $rules)) {
@@ -668,28 +665,10 @@ class CRole extends CApiService {
 		}
 
 		if ($has_tag) {
-			if ($mode == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
-					$name, 'services.write.tag', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
-				));
-			}
-
-			if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
-					$name, 'services.write.tag', 'type', USER_TYPE_ZABBIX_USER
-				));
-			}
-		}
-
-		if (array_key_exists('services.write.tag', $rules)) {
-			if ($rules['services.write.tag']['tag'] === '' && $rules['services.write.tag']['value'] !== '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Cannot have non-empty tag value while having empty tag in rule "%2$s" for user role "%1$s".',
-					$name, 'services.write.tag'
-				));
-			}
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+				$name, 'services.write.tag', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+			));
 		}
 	}
 
