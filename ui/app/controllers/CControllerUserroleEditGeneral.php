@@ -69,8 +69,8 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				: [],
 			'services.read.tag' => $read_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? [
-					'tag' => $this->getInput('service_read_tag_tag', ''),
-					'value' => $this->getInput('service_read_tag_value', '')
+					'tag' => trim($this->getInput('service_read_tag_tag', '')),
+					'value' => trim($this->getInput('service_read_tag_value', ''))
 				]
 				: ['tag' => '', 'value' => ''],
 			'services.write.mode' => $write_access == CRoleHelper::SERVICES_ACCESS_ALL
@@ -85,8 +85,8 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				: [],
 			'services.write.tag' => $write_access == CRoleHelper::SERVICES_ACCESS_LIST
 				? [
-					'tag' => $this->getInput('service_write_tag_tag', ''),
-					'value' => $this->getInput('service_write_tag_value', '')
+					'tag' => trim($this->getInput('service_write_tag_tag', '')),
+					'value' => trim($this->getInput('service_write_tag_value', ''))
 				]
 				: ['tag' => '', 'value' => '']
 		];

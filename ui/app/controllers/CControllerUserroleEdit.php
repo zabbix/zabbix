@@ -221,11 +221,11 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 
 			if ($this->hasInput('service_read_tag_tag')) {
-				$data['rules']['service_read_tag']['tag'] = $this->getInput('service_read_tag_tag');
+				$data['rules']['service_read_tag']['tag'] = trim($this->getInput('service_read_tag_tag'));
 			}
 
 			if ($this->hasInput('service_read_tag_value')) {
-				$data['rules']['service_read_tag']['value'] = $this->getInput('service_read_tag_value');
+				$data['rules']['service_read_tag']['value'] = trim($this->getInput('service_read_tag_value'));
 			}
 		}
 
@@ -239,11 +239,11 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 
 			if ($this->hasInput('service_write_tag_tag')) {
-				$data['rules']['service_write_tag']['tag'] = $this->getInput('service_write_tag_tag');
+				$data['rules']['service_write_tag']['tag'] = trim($this->getInput('service_write_tag_tag'));
 			}
 
 			if ($this->hasInput('service_write_tag_value')) {
-				$data['rules']['service_write_tag']['value'] = $this->getInput('service_write_tag_value');
+				$data['rules']['service_write_tag']['value'] = trim($this->getInput('service_write_tag_value'));
 			}
 		}
 
