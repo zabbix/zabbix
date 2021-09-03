@@ -411,13 +411,8 @@ class CRole extends CApiService {
 				continue;
 			}
 
-			$name = array_key_exists('name', $role)
-				? $role['name']
-				: $db_roles[$role['roleid']]['name'];
-
-			$type = array_key_exists('type', $role)
-				? $role['type']
-				: $db_roles[$role['roleid']]['type'];
+			$name = array_key_exists('name', $role) ? $role['name'] : $db_roles[$role['roleid']]['name'];
+			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
 
 			$db_rules = $db_roles !== null ? $db_roles[$role['roleid']]['rules'] : null;
 
@@ -816,16 +811,18 @@ class CRole extends CApiService {
 				continue;
 			}
 
+			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
+
 			$old_rules = $db_roles !== null ? $db_roles[$roleid]['rules'] : $default_rules;
 			$new_rules = $role['rules'] + $old_rules;
 
 			$rules[$roleid] = array_merge(
-				$this->compileUiRules((int) $role['type'], $old_rules, $new_rules),
+				$this->compileUiRules((int) $type, $old_rules, $new_rules),
 				$this->compileServicesReadRules($new_rules),
 				$this->compileServicesWriteRules($new_rules),
 				$this->compileModulesRules($old_rules, $new_rules),
 				$this->compileApiRules($new_rules),
-				$this->compileActionsRules((int) $role['type'], $old_rules, $new_rules)
+				$this->compileActionsRules((int) $type, $old_rules, $new_rules)
 			);
 		}
 
