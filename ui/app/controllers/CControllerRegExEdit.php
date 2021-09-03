@@ -54,15 +54,14 @@ class CControllerRegExEdit extends CController {
 			$db_regexs = API::Regexp()->get([
 				'output' => ['name', 'test_string'],
 				'selectExpressions' => ['expression', 'expression_type', 'exp_delimiter', 'case_sensitive'],
-				'regexpids' => [$this->getInput('regexid')],
-				'preservekeys' => true
+				'regexpids' => [$this->getInput('regexid')]
 			]);
 
 			if (!$db_regexs) {
 				return false;
 			}
 
-			$this->db_regex = $db_regexs[$this->getInput('regexid')];
+			$this->db_regex = $db_regexs[0];
 		}
 
 		return true;
@@ -70,7 +69,7 @@ class CControllerRegExEdit extends CController {
 
 	protected function doAction() {
 		$data = [
-			'regexid' => $this->hasInput('regexid') ? $this->getInput('regexid') : 0,
+			'regexid' => $this->getInput('regexid', 0),
 			'name' => $this->hasInput('regexid')
 				? $this->getInput('name', $this->db_regex['name'])
 				: $this->getInput('name', ''),

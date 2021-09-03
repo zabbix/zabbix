@@ -55,37 +55,15 @@ class CControllerRegExUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
-			$db_regexs = API::Regexp()->get([
-				'output' => ['regexpid'],
-				'regexpids' => [$this->getInput('regexid')]
-			]);
-
-			if (!$db_regexs) {
-				return false;
-			}
-
-			return true;
-		}
-
-		return false;
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction() {
-		$expressions = $this->getInput('expressions', []);
-
-		foreach ($expressions as &$expression) {
-			if (!array_key_exists('case_sensitive', $expression)) {
-				$expression['case_sensitive'] = 0;
-			}
-		}
-		unset($expression);
-
 		$result = API::Regexp()->update([
 			'regexpid' => $this->getInput('regexid'),
 			'name' => $this->getInput('name'),
-			'test_string' => $this->getInput('test_string'),
-			'expressions' => $expressions
+			'test_string' => $this->getInput('test_string', ''),
+			'expressions' => $this->getInput('expressions')
 		]);
 
 		if ($result) {

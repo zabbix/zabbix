@@ -56,19 +56,10 @@ class CControllerRegExCreate extends CController {
 	}
 
 	protected function doAction() {
-		$expressions = $this->getInput('expressions', []);
-
-		foreach ($expressions as &$expression) {
-			if (!array_key_exists('case_sensitive', $expression)) {
-				$expression['case_sensitive'] = 0;
-			}
-		}
-		unset($expression);
-
 		$result = API::Regexp()->create([
 			'name' => $this->getInput('name'),
 			'test_string' => $this->getInput('test_string', ''),
-			'expressions' => $expressions
+			'expressions' => $this->getInput('expressions')
 		]);
 
 		if ($result) {

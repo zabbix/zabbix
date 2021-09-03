@@ -36,26 +36,13 @@ class CControllerRegExDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
-			return false;
-		}
-
-		$regexids = $this->getinput('regexids');
-		$db_count = API::Regexp()->get([
-			'countOutput' => true,
-			'regexpids' => $regexids
-		]);
-
-		if ($db_count != count($regexids)) {
-			return false;
-		}
-
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction() {
 		$regexids = $this->getinput('regexids');
-		$result = API::Regexp()->delete($this->getinput('regexids'));
+
+		$result = API::Regexp()->delete($regexids);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
 		if ($result) {
