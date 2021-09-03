@@ -203,13 +203,14 @@ class CRegexp extends CApiService {
 			foreach ($regex['expressions'] as &$expression) {
 				$db_expression = current(
 					array_filter($db_expressions, function (array $db_expression) use ($expression): bool {
-						return ($expression['expression'] === $db_expression['expression']
-							&& $expression['expression_type'] == $db_expression['expression_type']);
+						return ($expression['expression_type'] == $db_expression['expression_type']
+							&& $expression['expression'] === $db_expression['expression']);
 					})
 				);
 
 				if ($db_expression) {
 					$expression['expressionid'] = $db_expression['expressionid'];
+					unset($db_expressions[$db_expression['expressionid']]);
 
 					$upd_expression = DB::getUpdatedValues('expressions', $expression, $db_expression);
 
@@ -219,22 +220,14 @@ class CRegexp extends CApiService {
 							'where' => ['expressionid' => $db_expression['expressionid']]
 						];
 					}
-
-					unset($db_expressions[$db_expression['expressionid']]);
 				}
 				else {
-					$ins_expressions[] = [
-						'regexpid' => $regex['regexpid'],
-						'expression' => $expression['expression'],
-						'expression_type' => $expression['expression_type'],
-						'exp_delimiter' => $expression['exp_delimiter'],
-						'case_sensitive' => $expression['case_sensitive']
-					];
+					$ins_expressions[] = ['regexpid' => $regex['regexpid']] + $expression;
 				}
 			}
 			unset($expression);
 
-			$del_expressionids = array_merge($del_expressionids, array_column($db_expressions, 'expressionid'));
+			$del_expressionids = array_merge($del_expressionids, array_keys($db_expressions));
 		}
 		unset($regex);
 
@@ -417,7 +410,9 @@ class CRegexp extends CApiService {
 
 		if ($regexids) {
 			$options = [
-				'output' => ['expressionid', 'regexpid', 'expression', 'expression_type', 'exp_delimiter', 'case_sensitive'],
+				'output' => ['expressionid', 'regexpid', 'expression', 'expression_type', 'exp_delimiter',
+					'case_sensitive'
+				],
 				'filter' => ['regexpid' => $regexids]
 			];
 			$db_expressions = DBselect(DB::makeSql('expressions', $options));
