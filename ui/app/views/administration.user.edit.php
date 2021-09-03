@@ -515,8 +515,10 @@ if ($data['action'] === 'user.edit') {
 			$permissions_form_list->addRow(
 				_('Read-write access to services with tag'),
 				(new CDiv(
-					(new CSpan(implode(': ', [$data['service_write_tag']['tag'], $data['service_write_tag']['value']])))
-						->addClass(ZBX_STYLE_TAG)
+					(new CSpan([
+						$data['service_write_tag']['tag'],
+						$data['service_write_tag']['value'] !== '' ? ': '.$data['service_write_tag']['value'] : null
+					]))->addClass(ZBX_STYLE_TAG)
 				))
 					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->addClass('rules-status-container')
@@ -558,8 +560,10 @@ if ($data['action'] === 'user.edit') {
 			$permissions_form_list->addRow(
 				_('Read-only access to services with tag'),
 				(new CDiv(
-					(new CSpan(implode(': ', [$data['service_read_tag']['tag'], $data['service_read_tag']['value']])))
-						->addClass(ZBX_STYLE_TAG)
+					(new CSpan([
+						$data['service_read_tag']['tag'],
+						$data['service_read_tag']['value'] !== '' ? ': '.$data['service_read_tag']['value'] : null
+					]))->addClass(ZBX_STYLE_TAG)
 				))
 					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->addClass('rules-status-container')

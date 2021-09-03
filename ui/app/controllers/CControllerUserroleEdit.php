@@ -221,8 +221,11 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 
 			if ($this->hasInput('service_read_tag_tag')) {
-				$data['rules']['service_read_tag_tag'] = $this->getInput('service_read_tag_tag');
-				$data['rules']['service_read_tag_value'] = $this->getInput('service_read_tag_value');
+				$data['rules']['service_read_tag']['tag'] = $this->getInput('service_read_tag_tag');
+			}
+
+			if ($this->hasInput('service_read_tag_value')) {
+				$data['rules']['service_read_tag']['value'] = $this->getInput('service_read_tag_value');
 			}
 		}
 
@@ -230,14 +233,17 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$data['rules']['service_write_access'] = $this->getInput('service_write_access');
 		}
 
-		if ($data['rules']['services']['service_write_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
+		if ($data['rules']['service_write_access'] == CRoleHelper::SERVICES_ACCESS_LIST) {
 			if ($this->hasInput('service_write_list')) {
 				$data['rules']['service_write_list'] = $this->getInput('service_write_list');
 			}
 
 			if ($this->hasInput('service_write_tag_tag')) {
-				$data['rules']['service_write_tag_tag'] = $this->getInput('service_write_tag_tag');
-				$data['rules']['service_write_tag_value'] = $this->getInput('service_write_tag_value');
+				$data['rules']['service_write_tag']['tag'] = $this->getInput('service_write_tag_tag');
+			}
+
+			if ($this->hasInput('service_write_tag_value')) {
+				$data['rules']['service_write_tag']['value'] = $this->getInput('service_write_tag_value');
 			}
 		}
 
