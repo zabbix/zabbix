@@ -995,8 +995,19 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.16rc1
 
 New features:
+........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
 
 Bug fixes:
+.........T [ZBX-19865] fixed typos in "F5 Big-IP SNMP" template (abakaldin)
+.........T [ZBX-19849] fixed a trigger name typo in the "MSSQL by ODBC" template (mchudinov)
+...G...... [ZBX-19613] fixed Zabbix agent 2 redis plugin to closer match redis-cli connection (esneiders)
+...G...... [ZBX-19510] fixed re-reading of old Windows events for various Windows event system synchronization problems (MVekslers)
+...G...... [ZBX-16803] fixed ability to use Interface Guid in network interface LLD (akozlovs)
+........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
+.........T [ZBX-18680] fixed multi-channel notification issue in "Slack" media type (abiba)
+.........T [ZBX-19623] fixed Jira Service Desk URL in webhook (abiba)
+A.......S. [ZBX-19822] fixed Zabbix server not to populate housekeeper table with tasks that are never deleted when TimescaleDB partitioning is used (jfreibergs, vso)
+A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.15
