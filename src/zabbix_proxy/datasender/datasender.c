@@ -65,7 +65,7 @@ static void	get_hist_upload_state(const char *buffer, int *state)
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN];
 
-	if ('\0' == *buffer || SUCCEED != zbx_json_open(buffer, &jp))
+	if (NULL == buffer || '\0' == *buffer || SUCCEED != zbx_json_open(buffer, &jp))
 		return;
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROXY_UPLOAD, value, sizeof(value), NULL))

@@ -283,9 +283,7 @@ class CScreenHostTriggers extends CScreenBase {
 				zbx_date2age($problem['clock']),
 				makeInformationList($info_icons),
 				$problem_update_link,
-				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'],
-					$config
-				)
+				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $config)
 			]);
 		}
 

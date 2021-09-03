@@ -877,7 +877,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
             <item>
                <name>Network interfaces WMI get</name>
                <type>ZABBIX_ACTIVE</type>
-               <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+               <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -887,6 +887,12 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                      <name>Zabbix raw items</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
             </item>
          </items>
          <discovery_rules>
@@ -938,7 +944,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded</name>
                      <type>ZABBIX_ACTIVE</type>
-                     <key>net.if.in["{#IFNAME}",dropped]</key>
+                     <key>net.if.in["{#IFGUID}",dropped]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>The number of incoming packets dropped on the network interface.</description>
@@ -957,7 +963,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors</name>
                      <type>ZABBIX_ACTIVE</type>
-                     <key>net.if.in["{#IFNAME}",errors]</key>
+                     <key>net.if.in["{#IFGUID}",errors]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>The number of incoming packets with errors on the network interface.</description>
@@ -976,7 +982,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Bits received</name>
                      <type>ZABBIX_ACTIVE</type>
-                     <key>net.if.in["{#IFNAME}"]</key>
+                     <key>net.if.in["{#IFGUID}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <units>bps</units>
@@ -1000,7 +1006,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded</name>
                      <type>ZABBIX_ACTIVE</type>
-                     <key>net.if.out["{#IFNAME}",dropped]</key>
+                     <key>net.if.out["{#IFGUID}",dropped]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>The number of outgoing packets dropped on the network interface.</description>
@@ -1019,7 +1025,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors</name>
                      <type>ZABBIX_ACTIVE</type>
-                     <key>net.if.out["{#IFNAME}",errors]</key>
+                     <key>net.if.out["{#IFGUID}",errors]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>The number of outgoing packets with errors on the network interface.</description>
@@ -1038,7 +1044,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Bits sent</name>
                      <type>ZABBIX_ACTIVE</type>
-                     <key>net.if.out["{#IFNAME}"]</key>
+                     <key>net.if.out["{#IFGUID}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <units>bps</units>
@@ -1062,7 +1068,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Speed</name>
                      <type>DEPENDENT</type>
-                     <key>net.if.speed["{#IFNAME}"]</key>
+                     <key>net.if.speed["{#IFGUID}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0d</trends>
@@ -1076,7 +1082,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#IFNAME}")].Speed.first()</params>
+                           <params>$[?(@.GUID == "{#IFGUID}")].Speed.first()</params>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
                         </step>
@@ -1091,13 +1097,13 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Operational status</name>
                      <type>DEPENDENT</type>
-                     <key>net.if.status["{#IFNAME}"]</key>
+                     <key>net.if.status["{#IFGUID}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1113,7 +1119,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#IFNAME}")].NetConnectionStatus.first()</params>
+                           <params>$[?(@.GUID == "{#IFGUID}")].NetConnectionStatus.first()</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1121,7 +1127,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1145,7 +1151,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Interface type</name>
                      <type>DEPENDENT</type>
-                     <key>net.if.type["{#IFNAME}"]</key>
+                     <key>net.if.type["{#IFGUID}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0d</trends>
@@ -1161,7 +1167,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#IFNAME}")].AdapterTypeId.first()</params>
+                           <params>$[?(@.GUID == "{#IFGUID}")].AdapterTypeId.first()</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1169,16 +1175,16 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].change()}&lt;0 and&#13;
-{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}&gt;0 and&#13;
-{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2</expression>
+                     <expression>{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFGUID}"].change()}&lt;0 and&#13;
+{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFGUID}"].last()}&gt;0 and&#13;
+{Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].last()}=2</expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before</name>
                      <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
@@ -1187,19 +1193,19 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>({Template Module Windows network by Zabbix agent active:net.if.in["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} or&#13;
-{Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}) and&#13;
-{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}&gt;0</expression>
+                     <expression>({Template Module Windows network by Zabbix agent active:net.if.in["{#IFGUID}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFGUID}"].last()} or&#13;
+{Template Module Windows network by Zabbix agent active:net.if.out["{#IFGUID}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFGUID}"].last()}) and&#13;
+{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFGUID}"].last()}&gt;0</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.in["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} and&#13;
-{Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
+                     <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.in["{#IFGUID}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFGUID}"].last()} and&#13;
+{Template Module Windows network by Zabbix agent active:net.if.out["{#IFGUID}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFGUID}"].last()}</recovery_expression>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt;{$IF.UTIL.MAX:"{#IFNAME}"}%)</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
@@ -1207,18 +1213,18 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Module Windows network by Zabbix agent active:net.if.in["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
-or {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
+                     <expression>{Template Module Windows network by Zabbix agent active:net.if.in["{#IFGUID}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
+or {Template Module Windows network by Zabbix agent active:net.if.out["{#IFGUID}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
-and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.in["{#IFGUID}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
+and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFGUID}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -1226,8 +1232,8 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFGUID}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1241,7 +1247,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <color>1A7C11</color>
                            <item>
                               <host>Template Module Windows network by Zabbix agent active</host>
-                              <key>net.if.in["{#IFNAME}"]</key>
+                              <key>net.if.in["{#IFGUID}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1250,7 +1256,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <color>2774A4</color>
                            <item>
                               <host>Template Module Windows network by Zabbix agent active</host>
-                              <key>net.if.out["{#IFNAME}"]</key>
+                              <key>net.if.out["{#IFGUID}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1259,7 +1265,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Windows network by Zabbix agent active</host>
-                              <key>net.if.out["{#IFNAME}",errors]</key>
+                              <key>net.if.out["{#IFGUID}",errors]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1268,7 +1274,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Windows network by Zabbix agent active</host>
-                              <key>net.if.in["{#IFNAME}",errors]</key>
+                              <key>net.if.in["{#IFGUID}",errors]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1277,7 +1283,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Windows network by Zabbix agent active</host>
-                              <key>net.if.out["{#IFNAME}",dropped]</key>
+                              <key>net.if.out["{#IFGUID}",dropped]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1286,14 +1292,14 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Windows network by Zabbix agent active</host>
-                              <key>net.if.in["{#IFNAME}",dropped]</key>
+                              <key>net.if.in["{#IFGUID}",dropped]</key>
                            </item>
                         </graph_item>
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
                <master_item>
-                  <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+                  <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                </master_item>
                <preprocessing>
                   <step>
@@ -1302,7 +1308,8 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
     return {
         "{#IFNAME}": net.Name,
         "{#IFDESCR}": net.Description,
-        "{#IFALIAS}" : net.NetConnectionID
+        "{#IFALIAS}": net.NetConnectionID,
+        "{#IFGUID}": net.GUID
     }})
 return JSON.stringify({"data": output})</params>
                   </step>

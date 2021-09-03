@@ -37,7 +37,6 @@ class testEscalations extends CIntegrationTest {
 
 	const TRAPPER_ITEM_NAME = 'trap';
 	const HOST_NAME = 'test_actions';
-	const ITEM_UNSUPP_FILENAME = '/tmp/item_unsupported_test';
 
 	/**
 	 * @inheritdoc
@@ -262,9 +261,9 @@ class testEscalations extends CIntegrationTest {
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 3);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
-		]);
+		], 5, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
@@ -272,9 +271,10 @@ class testEscalations extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
-		$response = $this->call('alert.get', [
-			'actionids' => [self::$trigger_actionid]
-		]);
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'actionids' => [self::$trigger_actionid],
+			'sortfield' => 'alertid'
+		], 5, 2);
 		$this->assertArrayHasKey(1, $response['result']);
 		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
 	}
@@ -327,9 +327,9 @@ class testEscalations extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
-		]);
+		], 5, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
@@ -340,9 +340,10 @@ class testEscalations extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
 
-		$response = $this->call('alert.get', [
-			'actionids' => [self::$trigger_actionid]
-		]);
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'actionids' => [self::$trigger_actionid],
+			'sortfield' => 'alertid'
+		], 5, 2);
 		$this->assertArrayHasKey(1, $response['result']);
 		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
 	}
@@ -412,9 +413,9 @@ class testEscalations extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
-		]);
+		], 5, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
@@ -422,9 +423,10 @@ class testEscalations extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
 
-		$response = $this->call('alert.get', [
-			'actionids' => [self::$trigger_actionid]
-		]);
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'actionids' => [self::$trigger_actionid],
+			'sortfield' => 'alertid'
+		], 5, 2);
 		$this->assertArrayHasKey(1, $response['result']);
 		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
 	}
@@ -499,14 +501,15 @@ class testEscalations extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_cancel()', true, 120);
 
-		$response = $this->call('alert.get', [
-			'actionids' => [self::$trigger_actionid]
-		]);
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'actionids' => [self::$trigger_actionid],
+			'sortfield' => 'alertid'
+		], 5, 2);
 		$esc_msg = 'NOTE: Escalation cancelled';
 		$this->assertArrayHasKey(1, $response['result']);
 		$this->assertEquals(0, strncmp($esc_msg, $response['result'][1]['message'], strlen($esc_msg)));
 
-		// trigger value is not update during configuration cache sync (only initialized)
+		// trigger value is not updated during configuration cache sync (only initialized)
 		// therefore need to restore it manually by sending OK value
 		$response = $this->call('trigger.update', [
 			'triggerid' => self::$triggerid,
@@ -567,17 +570,17 @@ class testEscalations extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 7);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 200);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 200);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
-		$response = $this->call('alert.get', [
-			'output' => 'extend',
-			'actionsids' => [self::$trigger_actionid]
-			]
-		);
+		$response = $this->callUntilDataIsPresent('alert.get', [
+				'output' => 'extend',
+				'actionids' => [self::$trigger_actionid],
+				'sortfield' => 'alertid'
+		], 5, 2);
 		$this->assertCount(2, $response['result']);
 		$this->assertEquals(1, $response['result'][0]['esc_step']);
 		$this->assertEquals(2, $response['result'][1]['esc_step']);
@@ -698,20 +701,20 @@ HEREDOC;
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 8);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 200);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => $actionid
-		]);
+		], 5, 2);
 		$this->assertCount(1, $response['result']);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 200);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => $actionid
-		]);
+		], 5, 2);
 		$this->assertCount(2, $response['result']);
 	}
 
