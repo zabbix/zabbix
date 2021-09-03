@@ -749,7 +749,12 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __func__, tablename);
 
-	table = DBget_table(tablename);
+	if (NULL == (table = DBget_table(tablename)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Error getting table: %s", tablename);
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 
 	while (FAIL == found)
 	{
