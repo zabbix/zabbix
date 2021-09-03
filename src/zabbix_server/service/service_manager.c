@@ -1224,7 +1224,7 @@ static void	service_problems_index_clean(void *data)
  *                                                                            *
  * Parameters: service - [IN] the service                                     *
  *             status  - [OUT] the service status                             *
-*                                                                             *
+ *                                                                            *
  * Return value: SUCCEED - the status is returned                             *
  *               FAIL    - the service must be ignored                        *
  *                                                                            *
