@@ -178,7 +178,6 @@ void	zbx_audit_trigger_update_json_update_##resource(zbx_uint64_t triggerid, uns
 	zbx_audit_update_json_update_##type2(triggerid, buf, resource##_old, resource##_new);			\
 }
 
-PREPARE_AUDIT_TRIGGER_UPDATE(flags, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(recovery_mode, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(correlation_mode, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(manual_close, int, int)
@@ -240,16 +239,14 @@ void	zbx_audit_trigger_update_json_add_dependency(unsigned char flags, zbx_uint6
 void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,
 		const char *tag, const char *value)
 {
-	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_triggerid[AUDIT_DETAILS_KEY_LEN],
-		audit_key_tag[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN];
+	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_tag[AUDIT_DETAILS_KEY_LEN],
+		audit_key_value[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
 	if (ZBX_FLAG_DISCOVERY_NORMAL == flags)
 	{
 		zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);
-		zbx_snprintf(audit_key_triggerid, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "].triggerid",
-				triggertagid);
 		zbx_snprintf(audit_key_tag, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "].tag", triggertagid);
 		zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "].value",
 				triggertagid);
@@ -257,8 +254,6 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, i
 	else
 	{
 		zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "triggerprototype.tags[" ZBX_FS_UI64 "]", triggertagid);
-		zbx_snprintf(audit_key_triggerid, AUDIT_DETAILS_KEY_LEN, "triggerprototype.tags[" ZBX_FS_UI64
-				"].triggerid", triggertagid);
 		zbx_snprintf(audit_key_tag, AUDIT_DETAILS_KEY_LEN, "triggerprototype.tags[" ZBX_FS_UI64 "].tag",
 				triggertagid);
 		zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN, "triggerprototype.tags[" ZBX_FS_UI64 "].value",
@@ -266,7 +261,6 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, i
 	}
 
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key);
-	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_triggerid, tag);
 	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_tag, tag);
 	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
 }

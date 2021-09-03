@@ -62,7 +62,6 @@ typedef struct
 
 	zbx_uint64_t	templateid_orig;
 	zbx_uint64_t	templateid;
-	zbx_uint64_t	flags_orig;
 	unsigned char	flags;
 	unsigned char	recovery_mode_orig;
 	unsigned char	recovery_mode;
@@ -78,20 +77,19 @@ typedef struct
 	char		*event_name;
 
 #define ZBX_FLAG_LINK_TRIGGER_UNSET			__UINT64_C(0x00)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS		__UINT64_C(0x01)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE	__UINT64_C(0x02)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE	__UINT64_C(0x04)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE	__UINT64_C(0x08)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x10)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER		__UINT64_C(0x20)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME		__UINT64_C(0x40)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x80)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE	__UINT64_C(0x01)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE	__UINT64_C(0x02)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE	__UINT64_C(0x04)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x08)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER		__UINT64_C(0x10)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME		__UINT64_C(0x20)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x40)
 
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE									\
-	(ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS | ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE |		\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE |	\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA | ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER |			\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
+	(ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE |	\
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE | ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA |		\
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER | ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME |		\
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
 
 	zbx_uint64_t	update_flags;
 }
@@ -750,7 +748,7 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);
-		ZBX_STR2UINT64(target_host_trigger_entry.flags_orig, row[4]);
+		ZBX_STR2UINT64(target_host_trigger_entry.flags, row[4]);
 		ZBX_STR2UCHAR(target_host_trigger_entry.recovery_mode_orig, row[5]);
 		ZBX_STR2UCHAR(target_host_trigger_entry.correlation_mode_orig, row[6]);
 		ZBX_STR2UCHAR(target_host_trigger_entry.manual_close_orig, row[7]);
@@ -847,12 +845,6 @@ out:
 static void	mark_updates_for_host_trigger(zbx_trigger_copy_t *trigger_copy,
 		zbx_target_host_trigger_entry_t *main_found)
 {
-	if (trigger_copy->flags != main_found->flags_orig)
-	{
-		main_found->flags = trigger_copy->flags;
-		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS;
-	}
-
 	if (trigger_copy->recovery_mode != main_found->recovery_mode_orig)
 	{
 		main_found->recovery_mode = trigger_copy->recovery_mode;
@@ -915,15 +907,6 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 		if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set ");
-
-			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_FLAGS))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "flags=%d", (int)found->flags);
-				d = ",";
-
-				zbx_audit_trigger_update_json_update_flags(found->triggerid, (int)found->update_flags,
-						found->flags_orig, found->flags);
-			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE))
 			{
