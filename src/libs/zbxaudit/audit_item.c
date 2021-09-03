@@ -178,10 +178,6 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 	{
 		zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, ONLY_ITEM ? "item.trends" :
 				"itemprototype.trends", item->trends);
-	}
-
-	if ONLY_ITEM_AND_ITEM_PROTOTYPE
-	{
 		zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, ONLY_ITEM ? "item.units" :
 				"itemprototype.units", item->units);
 	}
@@ -390,7 +386,7 @@ void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, const char *name, i
 
 /******************************************************************************
  *                                                                            *
- * Function: DBselect_delete_for_item                                         *
+ * Function: zbx_audit_DBselect_delete_for_item                               *
  *                                                                            *
  * Parameters: sql - [IN] sql statement                                       *
  *             ids - [OUT] sorted list of selected uint64 values              *

@@ -226,12 +226,12 @@ class DB {
 	 *
 	 * @static
 	 *
-	 * @param string $tableName
+	 * @param string $table_name
 	 *
-	 * @return string|array
+	 * @return string
 	 */
-	protected static function getPk($tableName) {
-		$schema = self::getSchema($tableName);
+	public static function getPk(string $table_name): string {
+		$schema = self::getSchema($table_name);
 
 		return $schema['key'];
 	}
@@ -997,20 +997,25 @@ class DB {
 	 * @return array
 	 */
 	public static function select($table_name, array $options, $table_alias = null) {
+		$db_result = DBSelect(self::makeSql($table_name, $options, $table_alias), $options['limit']);
+
+		if ($options['countOutput']) {
+			return DBfetch($db_result)['rowscount'];
+		}
+
 		$result = [];
 		$field_names = array_flip($options['output']);
-		$db_result = DBSelect(self::makeSql($table_name, $options, $table_alias), $options['limit']);
 
 		if ($options['preservekeys']) {
 			$pk = self::getPk($table_name);
 
 			while ($db_row = DBfetch($db_result)) {
-				$result[$db_row[$pk]] = $options['countOutput'] ? $db_row : array_intersect_key($db_row, $field_names);
+				$result[$db_row[$pk]] = array_intersect_key($db_row, $field_names);
 			}
 		}
 		else {
 			while ($db_row = DBfetch($db_result)) {
-				$result[] = $options['countOutput'] ? $db_row : array_intersect_key($db_row, $field_names);
+				$result[] = array_intersect_key($db_row, $field_names);
 			}
 		}
 
