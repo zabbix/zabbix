@@ -245,7 +245,7 @@ class CRegexp extends CApiService {
 		}
 
 		if ($ins_expressions) {
-			$expressionids = DB::insertBatch('expressions', $ins_expressions);
+			$expressionids = DB::insert('expressions', $ins_expressions);
 		}
 
 		foreach ($regexs as &$regex) {
