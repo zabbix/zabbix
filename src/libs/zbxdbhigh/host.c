@@ -1097,7 +1097,7 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid", triggerids->values,
 			triggerids->values_num);
 
-	DBselect_delete_for_trigger(sql, &children_triggerids);
+	zbx_audit_DBselect_delete_for_trigger(sql, &children_triggerids);
 	zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	DBdelete_triggers(&children_triggerids);
@@ -1701,7 +1701,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	DBselect_delete_for_trigger(sql, &triggerids);
+	zbx_audit_DBselect_delete_for_trigger(sql, &triggerids);
 
 	DBdelete_trigger_hierarchy(&triggerids);
 	zbx_vector_uint64_destroy(&triggerids);

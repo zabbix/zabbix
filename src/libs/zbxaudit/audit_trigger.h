@@ -48,7 +48,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE_H(discover, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(event_name, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(templateid, zbx_uint64_t, uint64)
 
-void	DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids);
+void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids);
 void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t triggerdepid,
 		zbx_uint64_t triggerid, zbx_uint64_t triggerid_up);
 void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,

@@ -202,7 +202,18 @@ PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
 #undef PREPARE_AUDIT_ITEM_UPDATE
 #undef TR_OR_TRP
 
-void	DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_audit_DBselect_delete_for_trigger                            *
+ *                                                                            *
+ * Parameters: sql - [IN] sql statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ * Return value: SUCCEED - query SUCCEEDED                                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
