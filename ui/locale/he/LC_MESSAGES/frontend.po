@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-20 19:52+0300\n"
+"POT-Creation-Date: 2021-09-03 19:52+0300\n"
 "PO-Revision-Date: 2021-03-19 17:59+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -7441,7 +7441,7 @@ msgstr "סוג תווית קבוצת מארחים"
 
 #: include/classes/api/services/CDashboard.php:696
 #: include/classes/api/services/CScript.php:459
-#: include/classes/api/services/CUserGroup.php:445
+#: include/classes/api/services/CUserGroup.php:438
 #, c-format
 msgid "Host group with ID \"%1$s\" is not available."
 msgstr "קבוצת מארחים עם המזהה „%1$s” אינה זמינה."
@@ -9151,7 +9151,7 @@ msgstr "ערך שגוי לשדה „%1$s”."
 #: include/classes/api/services/CTriggerGeneral.php:729
 #: include/classes/api/services/CTriggerGeneral.php:736
 #: include/classes/api/services/CTriggerGeneral.php:742
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:241
@@ -12283,8 +12283,8 @@ msgstr "אין הרשאות לגישה למערכת."
 #: include/classes/api/services/CTriggerPrototype.php:522
 #: include/classes/api/services/CTriggerPrototype.php:700
 #: include/classes/api/services/CTriggerPrototype.php:718
-#: include/classes/api/services/CUserGroup.php:329
-#: include/classes/api/services/CUserGroup.php:877
+#: include/classes/api/services/CUserGroup.php:322
+#: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
 #: include/classes/api/services/CUserMacro.php:464
 #: include/classes/api/services/CUserMacro.php:820
@@ -12808,7 +12808,7 @@ msgstr "רק משתמשי על יכולים ליצור קבוצות מארחים
 msgid "Only Super Admins can create media types."
 msgstr "רק משתמשי על יכולים ליצור סוגי מדיה."
 
-#: include/classes/api/services/CUserGroup.php:205
+#: include/classes/api/services/CUserGroup.php:198
 msgid "Only Super Admins can create user groups."
 msgstr "רק משתמשי על יכולים ליצור קבוצות משתמשים."
 
@@ -12816,7 +12816,7 @@ msgstr "רק משתמשי על יכולים ליצור קבוצות משתמשי
 msgid "Only Super Admins can delete media types."
 msgstr "רק משתמשי על יכולים למחוק סוגי מדיה."
 
-#: include/classes/api/services/CUserGroup.php:857
+#: include/classes/api/services/CUserGroup.php:850
 msgid "Only Super Admins can delete user groups."
 msgstr "רק משתמשי על יכולים למחוק קבוצות משתמשים."
 
@@ -12824,7 +12824,7 @@ msgstr "רק משתמשי על יכולים למחוק קבוצות משתמשי
 msgid "Only Super Admins can edit media types."
 msgstr "רק משתמשי על יכולים לערוך סוגי מדיה."
 
-#: include/classes/api/services/CUserGroup.php:292
+#: include/classes/api/services/CUserGroup.php:285
 msgid "Only Super Admins can update user groups."
 msgstr "רק משתמשי על יכולים לעדכן קבוצות משתמשים."
 
@@ -18045,7 +18045,7 @@ msgstr "בשימוש בפריטים"
 msgid "User"
 msgstr "משתמש"
 
-#: include/classes/api/services/CUserGroup.php:611
+#: include/classes/api/services/CUserGroup.php:604
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "המשתמש „%1$s” לא יכול להיות ללא קבוצת משתמשים."
@@ -18091,7 +18091,7 @@ msgstr "מחרוזת סוכן משתמש"
 msgid "User can't change type for himself"
 msgstr "המשתמש לא יכול לשנות את הסוג לעצמו"
 
-#: include/classes/api/services/CUserGroup.php:536
+#: include/classes/api/services/CUserGroup.php:529
 #: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "המשתמש לא יכול להוסיף את עצמו לקבוצת משתמשים מושבתת או לקבוצה שהגישה שלה למנשק המשתמש הושבתה."
@@ -18115,22 +18115,22 @@ msgstr[1] ""
 msgid "User group"
 msgstr "קבוצת משתמשים"
 
-#: include/classes/api/services/CUserGroup.php:365
+#: include/classes/api/services/CUserGroup.php:358
 #, c-format
 msgid "User group \"%1$s\" already exists."
 msgstr "קבוצת המשתמשים „%1$s” כבר קיימת."
 
-#: include/classes/api/services/CUserGroup.php:898
+#: include/classes/api/services/CUserGroup.php:891
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
 msgstr "כבר נעשה שימוש בקבוצת המשתמשים „%1$s” בפעולה „%2$s”."
 
-#: include/classes/api/services/CUserGroup.php:921
+#: include/classes/api/services/CUserGroup.php:914
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "נעשה שימוש בקבוצת המשתמשים „%1$s” בהגדרות לקבלת הודעות על מסד נתונים מושבת."
 
-#: include/classes/api/services/CUserGroup.php:911
+#: include/classes/api/services/CUserGroup.php:904
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "נעשה שימוש בקבוצת המשתמשים „%1$s” בקבוצה „%2$s”."
@@ -18271,7 +18271,7 @@ msgstr "משתמש עודכן"
 
 #: app/controllers/CControllerDashboardPropertiesCheck.php:73
 #: include/classes/api/services/CDashboard.php:491
-#: include/classes/api/services/CUserGroup.php:402
+#: include/classes/api/services/CUserGroup.php:395
 #, c-format
 msgid "User with ID \"%1$s\" is not available."
 msgstr "המשתמש עם המזהה „%1$s” לא זמין."
@@ -19722,7 +19722,7 @@ msgstr "לא ניתן לשנות"
 #: include/classes/api/services/CProxy.php:584
 #: include/classes/api/services/CTriggerGeneral.php:703
 #: include/classes/api/services/CTriggerGeneral.php:736
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:786
@@ -20596,7 +20596,7 @@ msgstr "פרטי הגישה שסופקו אינם יחודיים"
 #: app/views/js/monitoring.problem.view.js.php:46
 #: app/views/monitoring.host.view.php:62
 #: app/views/monitoring.problem.view.php:252
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/widgets/CWidgetHelper.php:489
 #: include/classes/widgets/CWidgetHelper.php:536 include/forms.inc.php:1984
 #: include/views/configuration.host.list.php:63

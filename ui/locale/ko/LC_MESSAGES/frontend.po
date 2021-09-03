@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-20 19:52+0300\n"
+"POT-Creation-Date: 2021-09-03 19:52+0300\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -7366,7 +7366,7 @@ msgstr "호스트 그룹의 라벨타입"
 
 #: include/classes/api/services/CDashboard.php:696
 #: include/classes/api/services/CScript.php:459
-#: include/classes/api/services/CUserGroup.php:445
+#: include/classes/api/services/CUserGroup.php:438
 #, c-format
 msgid "Host group with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 호스트그룹은 사용할 수 없습니다."
@@ -9075,7 +9075,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:729
 #: include/classes/api/services/CTriggerGeneral.php:736
 #: include/classes/api/services/CTriggerGeneral.php:742
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:241
@@ -12188,8 +12188,8 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CTriggerPrototype.php:522
 #: include/classes/api/services/CTriggerPrototype.php:700
 #: include/classes/api/services/CTriggerPrototype.php:718
-#: include/classes/api/services/CUserGroup.php:329
-#: include/classes/api/services/CUserGroup.php:877
+#: include/classes/api/services/CUserGroup.php:322
+#: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
 #: include/classes/api/services/CUserMacro.php:464
 #: include/classes/api/services/CUserMacro.php:820
@@ -12713,7 +12713,7 @@ msgstr "최고관리자만 호스트 그룹을 작성할 수 있습니다."
 msgid "Only Super Admins can create media types."
 msgstr "최고관리자만 미디어 타입을 작성할 수 있습니다."
 
-#: include/classes/api/services/CUserGroup.php:205
+#: include/classes/api/services/CUserGroup.php:198
 msgid "Only Super Admins can create user groups."
 msgstr "최고 관리자만 미디어타입을 작성할 수 있습니다."
 
@@ -12721,7 +12721,7 @@ msgstr "최고 관리자만 미디어타입을 작성할 수 있습니다."
 msgid "Only Super Admins can delete media types."
 msgstr "최고관리자만 미디어 타입을 삭제할 수 있습니다."
 
-#: include/classes/api/services/CUserGroup.php:857
+#: include/classes/api/services/CUserGroup.php:850
 msgid "Only Super Admins can delete user groups."
 msgstr "최고관리자만 유저 그룹을 삭제할 수 있습니다."
 
@@ -12729,7 +12729,7 @@ msgstr "최고관리자만 유저 그룹을 삭제할 수 있습니다."
 msgid "Only Super Admins can edit media types."
 msgstr "최고관리자만 미디어 타입을 수정할 수 있습니다."
 
-#: include/classes/api/services/CUserGroup.php:292
+#: include/classes/api/services/CUserGroup.php:285
 msgid "Only Super Admins can update user groups."
 msgstr "최고관리자만 유저 그룹을 갱신할 수 있습니다."
 
@@ -17939,7 +17939,7 @@ msgstr "아이템으로 사용"
 msgid "User"
 msgstr "유저"
 
-#: include/classes/api/services/CUserGroup.php:611
+#: include/classes/api/services/CUserGroup.php:604
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "유저 \"%1$s\"에 유저 그룹을 설정해주세요."
@@ -17985,7 +17985,7 @@ msgstr "유저 에이전트 문자열"
 msgid "User can't change type for himself"
 msgstr "사용자는 자신의 사용자타입을 변경할 수 없습니다"
 
-#: include/classes/api/services/CUserGroup.php:536
+#: include/classes/api/services/CUserGroup.php:529
 #: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "사용자는 비활성의 그룹이나 GUI액세스가 비활성인 그룹에 자기자신을 추가할 수 없습니다."
@@ -18008,22 +18008,22 @@ msgstr[0] "사용자를 삭제하였습니다"
 msgid "User group"
 msgstr "유저 그룹"
 
-#: include/classes/api/services/CUserGroup.php:365
+#: include/classes/api/services/CUserGroup.php:358
 #, c-format
 msgid "User group \"%1$s\" already exists."
 msgstr "유저 그룹 \"%1$s\"은 이미 존재합니다."
 
-#: include/classes/api/services/CUserGroup.php:898
+#: include/classes/api/services/CUserGroup.php:891
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
 msgstr "유저 그룹 \"%1$s\"는 \"%2$s\"액션 내에서 사용되고 있습니다."
 
-#: include/classes/api/services/CUserGroup.php:921
+#: include/classes/api/services/CUserGroup.php:914
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "유저 그룹 \"%1$s\"는 데이터베이스 정지 메시지의 설정에 이용되고 있습니다."
 
-#: include/classes/api/services/CUserGroup.php:911
+#: include/classes/api/services/CUserGroup.php:904
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "유저 그룹 \"%1$s\"는 스크립트\"%2$s\"에 이용되고 있습니다."
@@ -18161,7 +18161,7 @@ msgstr "사용자를 갱신하였습니다"
 
 #: app/controllers/CControllerDashboardPropertiesCheck.php:73
 #: include/classes/api/services/CDashboard.php:491
-#: include/classes/api/services/CUserGroup.php:402
+#: include/classes/api/services/CUserGroup.php:395
 #, c-format
 msgid "User with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 유저는 사용할 수 없습니다."
@@ -19609,7 +19609,7 @@ msgstr "변경할 수 없습니다"
 #: include/classes/api/services/CProxy.php:584
 #: include/classes/api/services/CTriggerGeneral.php:703
 #: include/classes/api/services/CTriggerGeneral.php:736
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:786
@@ -20484,7 +20484,7 @@ msgstr "지정된 자격 정보는 유니크 값이 아닙니다."
 #: app/views/js/monitoring.problem.view.js.php:46
 #: app/views/monitoring.host.view.php:62
 #: app/views/monitoring.problem.view.php:252
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/widgets/CWidgetHelper.php:489
 #: include/classes/widgets/CWidgetHelper.php:536 include/forms.inc.php:1984
 #: include/views/configuration.host.list.php:63

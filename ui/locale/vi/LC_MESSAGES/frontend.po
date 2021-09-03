@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-20 19:52+0300\n"
+"POT-Creation-Date: 2021-09-03 19:52+0300\n"
 "PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -7376,7 +7376,7 @@ msgstr "Kiểu nhãn nhóm host"
 
 #: include/classes/api/services/CDashboard.php:696
 #: include/classes/api/services/CScript.php:459
-#: include/classes/api/services/CUserGroup.php:445
+#: include/classes/api/services/CUserGroup.php:438
 #, c-format
 msgid "Host group with ID \"%1$s\" is not available."
 msgstr "Nhóm máy chủ với ID \"%1$s\" không sẵn sàng."
@@ -9085,7 +9085,7 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:729
 #: include/classes/api/services/CTriggerGeneral.php:736
 #: include/classes/api/services/CTriggerGeneral.php:742
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:241
@@ -12198,8 +12198,8 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CTriggerPrototype.php:522
 #: include/classes/api/services/CTriggerPrototype.php:700
 #: include/classes/api/services/CTriggerPrototype.php:718
-#: include/classes/api/services/CUserGroup.php:329
-#: include/classes/api/services/CUserGroup.php:877
+#: include/classes/api/services/CUserGroup.php:322
+#: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
 #: include/classes/api/services/CUserMacro.php:464
 #: include/classes/api/services/CUserMacro.php:820
@@ -12723,7 +12723,7 @@ msgstr "Chỉ các Super Admin mới có thể tạo các nhóm host."
 msgid "Only Super Admins can create media types."
 msgstr "Chỉ các Super Admin mới có thể tạo các media type."
 
-#: include/classes/api/services/CUserGroup.php:205
+#: include/classes/api/services/CUserGroup.php:198
 msgid "Only Super Admins can create user groups."
 msgstr "Chỉ Siêu Admin mới có thể tạo nhóm người dùng."
 
@@ -12731,7 +12731,7 @@ msgstr "Chỉ Siêu Admin mới có thể tạo nhóm người dùng."
 msgid "Only Super Admins can delete media types."
 msgstr "Chỉ các Super Admin mới có thể xóa các media type."
 
-#: include/classes/api/services/CUserGroup.php:857
+#: include/classes/api/services/CUserGroup.php:850
 msgid "Only Super Admins can delete user groups."
 msgstr "Chỉ các Super Admin mới có thể xóa các nhóm người dùng."
 
@@ -12739,7 +12739,7 @@ msgstr "Chỉ các Super Admin mới có thể xóa các nhóm người 
 msgid "Only Super Admins can edit media types."
 msgstr "Chỉ các Super Admin mới có thể chỉnh sửa các media type."
 
-#: include/classes/api/services/CUserGroup.php:292
+#: include/classes/api/services/CUserGroup.php:285
 msgid "Only Super Admins can update user groups."
 msgstr "Chỉ Siêu Admin mới có thể cập nhật nhóm người dùng."
 
@@ -17949,7 +17949,7 @@ msgstr "Các mục đã được sử dụng"
 msgid "User"
 msgstr "Người dùng"
 
-#: include/classes/api/services/CUserGroup.php:611
+#: include/classes/api/services/CUserGroup.php:604
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "Người dùng \"%1$s\" không thể không có nhóm người dùng."
@@ -17995,7 +17995,7 @@ msgstr "Chuỗi người dùng agent"
 msgid "User can't change type for himself"
 msgstr "Người dùng không thể thay đổi kiểu cho chính mình"
 
-#: include/classes/api/services/CUserGroup.php:536
+#: include/classes/api/services/CUserGroup.php:529
 #: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Người dùng không thể thêm chính mình vào một nhóm đã bị vô hiệu hóa hoặc một nhóm tiếp cận với giao diện người dùng."
@@ -18018,22 +18018,22 @@ msgstr[0] "Người dùng đã được xóa"
 msgid "User group"
 msgstr "Nhóm người dùng"
 
-#: include/classes/api/services/CUserGroup.php:365
+#: include/classes/api/services/CUserGroup.php:358
 #, c-format
 msgid "User group \"%1$s\" already exists."
 msgstr "Nhóm người dùng \"%1$s\" đã tồn tại."
 
-#: include/classes/api/services/CUserGroup.php:898
+#: include/classes/api/services/CUserGroup.php:891
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
 msgstr "Nhóm người dùng \"%1$s\" sử dùn trong hoạt động \"%2$s\"."
 
-#: include/classes/api/services/CUserGroup.php:921
+#: include/classes/api/services/CUserGroup.php:914
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "Nhóm người dùng \"%1$s\" được sử dụng trong cấu hình cho cơ sở dữ liệu tin nhắn không hoạt động."
 
-#: include/classes/api/services/CUserGroup.php:911
+#: include/classes/api/services/CUserGroup.php:904
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "Nhóm người dùng \"%1$s\" được sử dụng trong tập lệnh \"%2$s\"."
@@ -18171,7 +18171,7 @@ msgstr "Người dùng được cập nhật"
 
 #: app/controllers/CControllerDashboardPropertiesCheck.php:73
 #: include/classes/api/services/CDashboard.php:491
-#: include/classes/api/services/CUserGroup.php:402
+#: include/classes/api/services/CUserGroup.php:395
 #, c-format
 msgid "User with ID \"%1$s\" is not available."
 msgstr "Người dùng có ID \"%1$s\" không khả dụng."
@@ -19622,7 +19622,7 @@ msgstr "không thể thay đổi"
 #: include/classes/api/services/CProxy.php:584
 #: include/classes/api/services/CTriggerGeneral.php:703
 #: include/classes/api/services/CTriggerGeneral.php:736
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:786
@@ -20496,7 +20496,7 @@ msgstr "thông tin được cung cấp không phải là duy nhất"
 #: app/views/js/monitoring.problem.view.js.php:46
 #: app/views/monitoring.host.view.php:62
 #: app/views/monitoring.problem.view.php:252
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/widgets/CWidgetHelper.php:489
 #: include/classes/widgets/CWidgetHelper.php:536 include/forms.inc.php:1984
 #: include/views/configuration.host.list.php:63

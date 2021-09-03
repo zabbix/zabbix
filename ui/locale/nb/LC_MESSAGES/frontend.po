@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-20 19:52+0300\n"
+"POT-Creation-Date: 2021-09-03 19:52+0300\n"
 "PO-Revision-Date: 2021-03-19 18:01+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -7445,7 +7445,7 @@ msgstr "Vertsgruppe etikett type"
 
 #: include/classes/api/services/CDashboard.php:696
 #: include/classes/api/services/CScript.php:459
-#: include/classes/api/services/CUserGroup.php:445
+#: include/classes/api/services/CUserGroup.php:438
 #, c-format
 msgid "Host group with ID \"%1$s\" is not available."
 msgstr "Vertsgruppe med ID \"%1$s\" er ikke tilgjengelig."
@@ -9155,7 +9155,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:729
 #: include/classes/api/services/CTriggerGeneral.php:736
 #: include/classes/api/services/CTriggerGeneral.php:742
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:241
@@ -12289,8 +12289,8 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: include/classes/api/services/CTriggerPrototype.php:522
 #: include/classes/api/services/CTriggerPrototype.php:700
 #: include/classes/api/services/CTriggerPrototype.php:718
-#: include/classes/api/services/CUserGroup.php:329
-#: include/classes/api/services/CUserGroup.php:877
+#: include/classes/api/services/CUserGroup.php:322
+#: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
 #: include/classes/api/services/CUserMacro.php:464
 #: include/classes/api/services/CUserMacro.php:820
@@ -12814,7 +12814,7 @@ msgstr "Bare superadministratorer kan opprette vertsgrupper."
 msgid "Only Super Admins can create media types."
 msgstr "Bare superadministratorer kan opprette medietyper."
 
-#: include/classes/api/services/CUserGroup.php:205
+#: include/classes/api/services/CUserGroup.php:198
 msgid "Only Super Admins can create user groups."
 msgstr "Bare superadministratorer kan opprette brukergrupper."
 
@@ -12822,7 +12822,7 @@ msgstr "Bare superadministratorer kan opprette brukergrupper."
 msgid "Only Super Admins can delete media types."
 msgstr "Bare Super Admins kan slette medietyper."
 
-#: include/classes/api/services/CUserGroup.php:857
+#: include/classes/api/services/CUserGroup.php:850
 msgid "Only Super Admins can delete user groups."
 msgstr "Bare Super Admins kan slette brukergrupper."
 
@@ -12830,7 +12830,7 @@ msgstr "Bare Super Admins kan slette brukergrupper."
 msgid "Only Super Admins can edit media types."
 msgstr "Bare Super Admins kan redigere medietyper."
 
-#: include/classes/api/services/CUserGroup.php:292
+#: include/classes/api/services/CUserGroup.php:285
 msgid "Only Super Admins can update user groups."
 msgstr "Bare Super Admins kan oppdatere brukergrupper."
 
@@ -18051,7 +18051,7 @@ msgstr "Brukes i elementer"
 msgid "User"
 msgstr "Bruker"
 
-#: include/classes/api/services/CUserGroup.php:611
+#: include/classes/api/services/CUserGroup.php:604
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "Bruker \"%1$s\" kan ikke være uten brukergruppe."
@@ -18097,7 +18097,7 @@ msgstr "Brukeragent streng"
 msgid "User can't change type for himself"
 msgstr "Brukeren kan ikke endre type for seg selv"
 
-#: include/classes/api/services/CUserGroup.php:536
+#: include/classes/api/services/CUserGroup.php:529
 #: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Brukeren kan ikke legge seg til en deaktivert gruppe eller en gruppe med deaktivert GUI-tilgang."
@@ -18121,22 +18121,22 @@ msgstr[1] ""
 msgid "User group"
 msgstr "Brukergruppe"
 
-#: include/classes/api/services/CUserGroup.php:365
+#: include/classes/api/services/CUserGroup.php:358
 #, c-format
 msgid "User group \"%1$s\" already exists."
 msgstr "Brukergruppe \"%1$s\" eksisterer allerede."
 
-#: include/classes/api/services/CUserGroup.php:898
+#: include/classes/api/services/CUserGroup.php:891
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
 msgstr "Brukergruppe \"%1$s\" brukes i \"%2$s\" handling."
 
-#: include/classes/api/services/CUserGroup.php:921
+#: include/classes/api/services/CUserGroup.php:914
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "Brukergruppe \"%1$s\" brukes i konfigurasjon for nedlastingsmeldinger."
 
-#: include/classes/api/services/CUserGroup.php:911
+#: include/classes/api/services/CUserGroup.php:904
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "Brukergruppe \"%1$s\" brukes i skriptet \"%2$s\"."
@@ -18277,7 +18277,7 @@ msgstr "Bruker oppdatert"
 
 #: app/controllers/CControllerDashboardPropertiesCheck.php:73
 #: include/classes/api/services/CDashboard.php:491
-#: include/classes/api/services/CUserGroup.php:402
+#: include/classes/api/services/CUserGroup.php:395
 #, c-format
 msgid "User with ID \"%1$s\" is not available."
 msgstr "Bruker med ID \"%1$s\" er ikke tilgjengelig."
@@ -19728,7 +19728,7 @@ msgstr "kan ikke endres"
 #: include/classes/api/services/CProxy.php:584
 #: include/classes/api/services/CTriggerGeneral.php:703
 #: include/classes/api/services/CTriggerGeneral.php:736
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
 #: include/classes/import/CConfigurationImport.php:786
@@ -20603,7 +20603,7 @@ msgstr ""
 #: app/views/js/monitoring.problem.view.js.php:46
 #: app/views/monitoring.host.view.php:62
 #: app/views/monitoring.problem.view.php:252
-#: include/classes/api/services/CUserGroup.php:463
+#: include/classes/api/services/CUserGroup.php:456
 #: include/classes/widgets/CWidgetHelper.php:489
 #: include/classes/widgets/CWidgetHelper.php:536 include/forms.inc.php:1984
 #: include/views/configuration.host.list.php:63
