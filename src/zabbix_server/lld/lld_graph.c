@@ -1280,16 +1280,17 @@ out:
 }
 
 static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		int *ts_delete)
+		int *ts_delete, const char **name)
 {
-	zbx_lld_graph_t	*graph;
+	const zbx_lld_graph_t	*graph;
 
-	graph = (zbx_lld_graph_t *)object;
+	graph = (const zbx_lld_graph_t *)object;
 
 	*id = graph->graphid;
 	*discovery_flag = graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED;
 	*lastcheck = graph->lastcheck;
 	*ts_delete = graph->ts_delete;
+	*name = graph->name;
 }
 
 /******************************************************************************

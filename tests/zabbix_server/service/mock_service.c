@@ -200,7 +200,7 @@ void	mock_init_service_cache(const char *path)
 					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_W_L;
 				else if (0 == strcmp(value, "WP_LT"))
 					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_WP_L;
-				else if (0 == strcmp(value, "NP_GE"))
+				else
 					fail_msg("unsupported service '%s' rule type '%s'", service->name, value);
 				rule->limit_status = zbx_mock_get_object_member_int(hrule, "limit");
 				rule->limit_value = zbx_mock_get_object_member_int(hrule, "value");

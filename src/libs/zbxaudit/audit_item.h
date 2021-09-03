@@ -24,9 +24,12 @@
 #include "audit.h"
 
 #include "../zbxdbhigh/template.h"
+#include "../../zabbix_server/lld/lld.h"
 
 void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name, int flags);
 void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item, zbx_uint64_t hostid);
+void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
+		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid);
 
 #define PREPARE_AUDIT_ITEM_UPDATE_H(resource, type1)								\
 void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,				\
@@ -81,7 +84,9 @@ PREPARE_AUDIT_ITEM_UPDATE_H(verify_peer, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(verify_host, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(allow_traps, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(discover, int)
+PREPARE_AUDIT_ITEM_UPDATE_H(key, const char*)
 
+void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, const char *name, int flag);
 int	zbx_audit_DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids);
 
 void	zbx_audit_discovery_rule_update_json_add_filter_conditions(zbx_uint64_t itemid, zbx_uint64_t rule_conditionid,
