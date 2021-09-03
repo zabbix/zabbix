@@ -34,6 +34,7 @@ import (
 const (
 	errorEmptyIpTable = "Empty IP address table returned."
 	errorCannotFindIf = "Cannot obtain network interface information."
+	guidStringLen     = 38
 )
 
 func (p *Plugin) nToIP(addr uint32) net.IP {
@@ -85,6 +86,10 @@ func (p *Plugin) getIfRowByIP(ipaddr string, ifs []win32.MIB_IF_ROW2) (row *win3
 	return
 }
 
+func (p *Plugin) getGuidString(winGuid win32.GUID) string {
+	return fmt.Sprintf("{%08X-%04X-%04X-%02X-%02X}", winGuid.Data1, winGuid.Data2, winGuid.Data3, winGuid.Data4[:2], winGuid.Data4[2:])
+}
+
 func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
 	var ifTable *win32.MIB_IF_TABLE2
 	if ifTable, err = win32.GetIfTable2(); err != nil {
@@ -96,7 +101,9 @@ func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (re
 
 	var row *win32.MIB_IF_ROW2
 	for i := range ifs {
-		if networkIf == windows.UTF16ToString(ifs[i].Description[:]) {
+		if len(networkIf) == guidStringLen && networkIf[0] == '{' && networkIf[guidStringLen-1] == '}' &&
+			networkIf == p.getGuidString(ifs[i].InterfaceGuid) ||
+			networkIf == windows.UTF16ToString(ifs[i].Description[:]) {
 			row = &ifs[i]
 			break
 		}
@@ -154,7 +161,8 @@ func (p *Plugin) getDevDiscovery() (devices []msgIfDiscovery, err error) {
 	devices = make([]msgIfDiscovery, 0, table.NumEntries)
 	rows := (*win32.RGMIB_IF_ROW2)(unsafe.Pointer(&table.Table[0]))[:table.NumEntries:table.NumEntries]
 	for i := range rows {
-		devices = append(devices, msgIfDiscovery{windows.UTF16ToString(rows[i].Description[:])})
+		guid := p.getGuidString(rows[i].InterfaceGuid)
+		devices = append(devices, msgIfDiscovery{windows.UTF16ToString(rows[i].Description[:]), &guid})
 	}
 	return
 }
