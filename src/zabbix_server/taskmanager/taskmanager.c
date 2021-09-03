@@ -301,7 +301,13 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
+/******************************************************************************
+ *                                                                            *
+ * Function: notify_service_manager                                           *
+ *                                                                            *
+ * Purpose: notify service manager about problem severity changes             *
+ *                                                                            *
+ ******************************************************************************/
 static void	notify_service_manager(const zbx_vector_ptr_t *ack_tasks)
 {
 	int			i;
@@ -326,8 +332,8 @@ static void	notify_service_manager(const zbx_vector_ptr_t *ack_tasks)
 
 	if (0 != event_severities.values_num)
 	{
-		unsigned char		*data;
-		zbx_uint32_t		size;
+		unsigned char	*data;
+		zbx_uint32_t	size;
 
 		size = zbx_service_serialize_event_severities(&data, &event_severities);
 		zbx_service_send(ZBX_IPC_SERVICE_EVENT_SEVERITIES, data, size, NULL);
