@@ -144,6 +144,7 @@ $form_grid
 				->addValue(_('All'), CRoleHelper::SERVICES_ACCESS_ALL)
 				->addValue(_('Service list'), CRoleHelper::SERVICES_ACCESS_LIST)
 				->setModern(true)
+				->setReadonly($data['readonly'])
 		)
 	])
 	->addItem(
@@ -184,6 +185,7 @@ $form_grid
 				->addValue(_('All'), CRoleHelper::SERVICES_ACCESS_ALL)
 				->addValue(_('Service list'), CRoleHelper::SERVICES_ACCESS_LIST)
 				->setModern(true)
+				->setReadonly($data['readonly'])
 		)
 	])
 	->addItem(
