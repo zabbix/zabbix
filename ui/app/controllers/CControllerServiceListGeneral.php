@@ -102,7 +102,6 @@ abstract class CControllerServiceListGeneral extends CController {
 				$db_service = reset($db_services);
 				$path_serviceids = [];
 				$path[] = $db_service['serviceid'];
-				$db_service = $db_service;
 			}
 		}
 
