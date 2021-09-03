@@ -596,7 +596,7 @@ static void	DBpatch_5050054_calc_services_write_value(zbx_uint64_t roleid, int *
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		manage_services = -1, default_access = 0;
+	int		manage_services = -1, default_access = 1;
 
 	result = DBselect("select name,value_int from role_rule where roleid=" ZBX_FS_UI64, roleid);
 
@@ -631,7 +631,7 @@ static int	DBpatch_5050054(void)
 	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int",
 			"value_str", "value_moduleid", NULL);
 
-	result = DBselect("select distinct roleid from role_rule");
+	result = DBselect("select roleid from role");
 
 	while (NULL != (row = DBfetch(result)))
 	{
