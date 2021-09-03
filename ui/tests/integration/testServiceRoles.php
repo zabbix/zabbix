@@ -286,7 +286,7 @@ class testServiceRoles extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
 		self::$actionid = $response['result']['actionids'][0];
-	
+
 		return true;
 	}
 
