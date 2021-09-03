@@ -135,7 +135,10 @@ class CRegexp extends CApiService {
 											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])], 'type' => API_REGEX, 'length' => DB::getFieldLength('expressions', 'expression')],
 											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('expressions', 'expression')]
 				]],
-				'exp_delimiter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('expressions', 'exp_delimiter')],
+				'exp_delimiter' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_ANY_INCLUDED])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/'],
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])], 'type' => API_STRING_UTF8, 'in' => '']
+				]],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
 			]]
 		]];
@@ -312,7 +315,10 @@ class CRegexp extends CApiService {
 											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])], 'type' => API_REGEX, 'length' => DB::getFieldLength('expressions', 'expression')],
 											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('expressions', 'expression')]
 				]],
-				'exp_delimiter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('expressions', 'exp_delimiter')],
+				'exp_delimiter' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_ANY_INCLUDED])], 'type' => API_STRING_UTF8, 'in' => '\\,,.,/'],
+											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])], 'type' => API_STRING_UTF8, 'in' => '']
+				]],
 				'case_sensitive' =>		['type' => API_INT32, 'in' => '0,1']
 			]]
 		]];
