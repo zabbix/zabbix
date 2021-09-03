@@ -2991,7 +2991,6 @@ static void	process_event_severities(const zbx_ipc_message_t *message, zbx_servi
 			zbx_service_t	*service = (zbx_service_t *)pi->services.values[j];
 			service_update_event_severity(service_manager, service, es->eventid, es->severity);
 		}
-
 	}
 
 	db_update_services(service_manager);
