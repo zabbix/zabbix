@@ -179,7 +179,7 @@ class testServiceRoles extends CIntegrationTest {
 					'value' => 'c11value'
 				],
 				[
-					'tag' => 'c11tagwovalue',
+					'tag' => 'c11tagwovalue'
 				]
 			],
 			'problem_tags' => [
@@ -200,7 +200,7 @@ class testServiceRoles extends CIntegrationTest {
 			"type" => USER_TYPE_ZABBIX_USER,
 			"rules" => [
 				'services.read.mode' => 0,
-				'services.write.mode' => 0,
+				'services.write.mode' => 0
 			]
 		]);
 		$this->assertArrayHasKey('roleids', $response['result']);
@@ -286,7 +286,7 @@ class testServiceRoles extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
 		self::$actionid = $response['result']['actionids'][0];
-		
+	
 		return true;
 	}
 
@@ -306,7 +306,7 @@ class testServiceRoles extends CIntegrationTest {
 
 	/**
 	 * services.read.0 / services.read.1 check
-	 * 
+	 *
 	 * @backup alerts, history, history_uint, role_rule, events, problem
 	 */
 	public function testServiceRoles_case1() {
@@ -331,7 +331,7 @@ class testServiceRoles extends CIntegrationTest {
 			'roleid' => self::$roleid,
 			"rules" => [
 				'services.read.mode' => 1,
-				'services.write.mode' => 0,
+				'services.write.mode' => 0
 			]
 		]);
 		$this->reloadConfigurationCache();
@@ -364,7 +364,7 @@ class testServiceRoles extends CIntegrationTest {
 				'services.read.tag' => [
 					'tag' => 'c11tag',
 					'value' => 'c11value'
-				],
+				]
 			]
 		]);
 		$this->reloadConfigurationCache();
@@ -382,7 +382,7 @@ class testServiceRoles extends CIntegrationTest {
 			'userids' => [self::$userid]
 		]);
 		$this->assertCount(1, $response['result']);
-		
+
 		return true;
 	}
 
@@ -398,8 +398,8 @@ class testServiceRoles extends CIntegrationTest {
 			"rules" => [
 				'services.read.mode' => 0,
 				'services.read.tag' => [
-					'tag' => 'c11tagwovalue',
-				],
+					'tag' => 'c11tagwovalue'
+				]
 			]
 		]);
 		$this->reloadConfigurationCache();
@@ -417,7 +417,7 @@ class testServiceRoles extends CIntegrationTest {
 			'userids' => [self::$userid]
 		]);
 		$this->assertCount(1, $response['result']);
-		
+
 		return true;
 	}
 
@@ -435,7 +435,7 @@ class testServiceRoles extends CIntegrationTest {
 				'services.read.tag' => [
 					'tag' => 'c1tag1',
 					'value' => 'c1tag1value'
-				],
+				]
 			]
 		]);
 		$this->reloadConfigurationCache();
@@ -453,7 +453,7 @@ class testServiceRoles extends CIntegrationTest {
 			'userids' => [self::$userid]
 		]);
 		$this->assertCount(1, $response['result']);
-		
+
 		return true;
 	}
 
@@ -471,7 +471,7 @@ class testServiceRoles extends CIntegrationTest {
 				'services.read.tag' => [
 					'tag' => 'c1tagwovalue',
 					'value' => ''
-				],
+				]
 			]
 		]);
 		$this->reloadConfigurationCache();
@@ -489,7 +489,7 @@ class testServiceRoles extends CIntegrationTest {
 			'userids' => [self::$userid]
 		]);
 		$this->assertCount(1, $response['result']);
-		
+
 		return true;
 	}
 
@@ -551,13 +551,13 @@ class testServiceRoles extends CIntegrationTest {
 				],
 				'services.write.list' => [
 					['serviceid' => self::$parent_serviceid]
-				],
+				]
 			]
 		]);
-		
+
 		$response = $this->call('user.logout', []);
 		$this->authorize('John', 'Doe123123');
-		
+
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
 			'goodsla' => 33.3
@@ -577,8 +577,7 @@ class testServiceRoles extends CIntegrationTest {
 				'services.read.list' => [
 					['serviceid' => self::$parent_serviceid]
 				],
-				'services.write.list' => [
-				],
+				'services.write.list' => []
 			]
 		]);
 
@@ -591,7 +590,7 @@ class testServiceRoles extends CIntegrationTest {
 		], 'Cannot update service "Parent": read-write access to the service is required.');
 
 		$response = $this->call('service.get', [
-			'serviceids' => [self::$parent_serviceid],
+			'serviceids' => [self::$parent_serviceid]
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
 
@@ -604,10 +603,8 @@ class testServiceRoles extends CIntegrationTest {
 			"rules" => [
 				'services.read.mode' => 0,
 				'services.write.mode' => 0,
-				'services.read.list' => [
-				],
-				'services.write.list' => [
-				],
+				'services.read.list' => [],
+				'services.write.list' => []
 			]
 		]);
 
@@ -615,10 +612,10 @@ class testServiceRoles extends CIntegrationTest {
 		$this->authorize('John', 'Doe123123');
 
 		$response = $this->call('service.get', [
-			'serviceids' => [self::$parent_serviceid],
+			'serviceids' => [self::$parent_serviceid]
 		]);
 		$this->assertEmpty($response['result']);
-		
+
 		return true;
 	}
 
@@ -637,10 +634,10 @@ class testServiceRoles extends CIntegrationTest {
 				'services.write.mode' => 1
 			]
 		]);
-		
+
 		$response = $this->call('user.logout', []);
 		$this->authorize('John', 'Doe123123');
-		
+
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
 			'goodsla' => 33.3
@@ -657,7 +654,6 @@ class testServiceRoles extends CIntegrationTest {
 			"rules" => [
 				'services.read.mode' => 1,
 				'services.write.mode' => 0
-				
 			]
 		]);
 
@@ -670,7 +666,7 @@ class testServiceRoles extends CIntegrationTest {
 		], 'Cannot update service "Parent": read-write access to the service is required.');
 
 		$response = $this->call('service.get', [
-			'serviceids' => [self::$parent_serviceid],
+			'serviceids' => [self::$parent_serviceid]
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
 
@@ -683,10 +679,8 @@ class testServiceRoles extends CIntegrationTest {
 			"rules" => [
 				'services.read.mode' => 0,
 				'services.write.mode' => 0,
-				'services.read.list' => [
-				],
-				'services.write.list' => [
-				],
+				'services.read.list' => [],
+				'services.write.list' => []
 			]
 		]);
 
@@ -694,10 +688,10 @@ class testServiceRoles extends CIntegrationTest {
 		$this->authorize('John', 'Doe123123');
 
 		$response = $this->call('service.get', [
-			'serviceids' => [self::$parent_serviceid],
+			'serviceids' => [self::$parent_serviceid]
 		]);
 		$this->assertEmpty($response['result']);
-		
+
 		return true;
 	}
 
@@ -724,10 +718,10 @@ class testServiceRoles extends CIntegrationTest {
 				]
 			]
 		]);
-		
+
 		$response = $this->call('user.logout', []);
 		$this->authorize('John', 'Doe123123');
-		
+
 		$response = $this->call('service.update', [
 			'serviceid' => self::$child1_1_serviceid,
 			'goodsla' => 33.3
@@ -764,7 +758,7 @@ class testServiceRoles extends CIntegrationTest {
 		], 'Cannot update service "Child 1-1": read-write access to the service is required.');
 
 		$response = $this->call('service.get', [
-			'serviceids' => [self::$child1_1_serviceid],
+			'serviceids' => [self::$child1_1_serviceid]
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
 
@@ -797,7 +791,7 @@ class testServiceRoles extends CIntegrationTest {
 		], 'Cannot update service "Child 1-1": read-write access to the service is required.');
 
 		$response = $this->call('service.get', [
-			'serviceids' => [self::$child1_1_serviceid],
+			'serviceids' => [self::$child1_1_serviceid]
 		]);
 		$this->assertArrayHasKey(0, $response['result']);
 
@@ -825,10 +819,10 @@ class testServiceRoles extends CIntegrationTest {
 		$this->authorize('John', 'Doe123123');
 
 		$response = $this->call('service.get', [
-			'serviceids' => [self::$child1_1_serviceid],
+			'serviceids' => [self::$child1_1_serviceid]
 		]);
 		$this->assertEmpty($response['result']);
-		
+
 		return true;
 	}
 }
