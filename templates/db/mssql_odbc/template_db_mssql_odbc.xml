@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-24T21:00:17Z</date>
+   <date>2021-08-30T17:48:41Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -25,7 +25,7 @@ The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -47,7 +47,6 @@ Template tooling version used: 0.38</description>
                <delay>10m</delay>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <params>SELECT sj.name AS JobName
 , sj.enabled AS Enabled
@@ -84,7 +83,6 @@ WHERE Enabled = 1</params>
                <delay>10m</delay>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <params>SELECT bs.database_name as dbname,[type], DATEDIFF(SECOND, bs.backup_finish_date, getdate()) as timesincelastbackup, (DATEDIFF(SECOND, bs.backup_start_date, bs.backup_finish_date)) as duration
 FROM msdb.dbo.backupset as bs WHERE bs.database_name not in (
@@ -114,7 +112,6 @@ ORDER BY bs.database_name</params>
                <delay>0;m0-59</delay>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <params>SELECT object_name,counter_name,instance_name,cntr_value
 FROM sys.dm_os_performance_counters
@@ -165,7 +162,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.autoparam_attempts_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of auto-parameterization attempts per second. The total should be the sum of the failed, safe, and unsafe auto-parameterizations. Auto-parameterization occurs when an instance of SQL Server tries to parameterize a Transact-SQL request by replacing some literals with parameters to me reuse of the resulting cached execution plan across multiple similar-looking requests possible. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server. This counter does not include forced parameterizations.</description>
                <applications>
@@ -193,7 +189,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.average_latch_wait_time</key>
                <delay>0;m0-59s3</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>ms</units>
                <params>(last(mssql.average_latch_wait_time_raw) - prev(mssql.average_latch_wait_time_raw)) /
@@ -212,7 +207,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.average_latch_wait_time_base</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>For internal use only.</description>
                <applications>
                   <application>
@@ -235,7 +229,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.average_latch_wait_time_raw</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>ms</units>
                <description>Average latch wait time (in milliseconds) for latch requests that had to wait.</description>
                <applications>
@@ -259,7 +252,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.average_wait_time</key>
                <delay>0;m0-59s3</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>ms</units>
                <params>(last(mssql.average_wait_time_raw) - prev(mssql.average_wait_time_raw)) /
@@ -286,7 +278,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.average_wait_time_base</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>For internal use only.</description>
                <applications>
                   <application>
@@ -309,7 +300,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.average_wait_time_raw</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>ms</units>
                <description>Average amount of wait time (in milliseconds) for each lock request that resulted in a wait. Information for all locks.</description>
                <applications>
@@ -333,7 +323,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.batch_requests_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>rps</units>
                <description>Number of Transact-SQL command batches received per second. This statistic is affected by all constraints (such as I/O, number of users, cache size, complexity of requests, and so on). High batch requests mean good throughput.</description>
@@ -362,7 +351,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.buffer_cache_hit_ratio</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Indicates the percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio changes very little. Since reading from the cache is much less expensive than reading from the disk, a higher value is preferred for this item. To increase the buffer cache hit ratio, consider increasing the amount of memory available to SQL Server or using the buffer pool extension feature.</description>
@@ -407,7 +395,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.cache_hit_ratio</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Ratio between cache hits and lookups.</description>
@@ -432,7 +419,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.cache_object_counts</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of cache objects in the cache.</description>
                <applications>
                   <application>
@@ -455,7 +441,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.cache_objects_in_use</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of cache objects in use.</description>
                <applications>
                   <application>
@@ -478,7 +463,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.cache_pages</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of 8-kilobyte (KB) pages used by cache objects.</description>
                <applications>
                   <application>
@@ -501,7 +485,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.checkpoint_pages_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Indicates the number of pages flushed to disk per second by a checkpoint or other operation which required all dirty pages to be flushed.</description>
                <applications>
@@ -529,7 +512,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.data_files_size</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Total size of all data files.</description>
                <applications>
@@ -557,7 +539,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.database_pages</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Indicates the number of pages in the buffer pool with database content.</description>
                <applications>
                   <application>
@@ -580,7 +561,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.errors_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of errors per second.</description>
                <applications>
@@ -608,7 +588,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.failed_autoparams_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of failed auto-parameterization attempts per second. This number should be small. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server.</description>
                <applications>
@@ -636,7 +615,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.forwarded_records_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of records per second fetched through forwarded record pointers.</description>
                <applications>
@@ -664,7 +642,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.free_list_stalls_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>rps</units>
                <description>Indicates the number of requests per second that had to wait for a free page.</description>
@@ -701,7 +678,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.full_scans_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of unrestricted full scans per second. These can be either base-table or full-index scans. Values greater than 1 or 2 indicate that there are table / Index page scans. If that is combined with high CPU, this counter requires further investigation, otherwise, if the full scans are on small tables, it can be ignored.</description>
                <applications>
@@ -729,7 +705,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.granted_workspace_memory</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Specifies the total amount of memory currently granted to executing processes, such as hash, sort, bulk copy, and index creation operations.</description>
                <applications>
@@ -757,7 +732,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.index_searches_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of index searches per second. These are used to start a range scan, reposition a range scan, revalidate a scan point, fetch a single index record, and search down the index to locate where to insert a new row.</description>
                <applications>
@@ -785,7 +759,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.info_errors_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of errors per second.</description>
                <applications>
@@ -813,7 +786,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.kill_connection_errors_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of errors per second.</description>
                <applications>
@@ -841,7 +813,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.latch_waits_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>rps</units>
                <description>The number of latch requests that could not be granted immediately. Latches are lightweight means of holding a very transient server resource, such as an address in memory.</description>
@@ -870,7 +841,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.lazy_writes_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Indicates the number of buffers written per second by the buffer manager's lazy writer. The lazy writer is a system process that flushes out batches of dirty, aged buffers (buffers that contain changes that must be written back to disk before the buffer can be reused for a different page) and makes them available to user processes. The lazy writer eliminates the need to perform frequent checkpoints in order to create available buffers.</description>
                <applications>
@@ -906,7 +876,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.lock_requests_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>rps</units>
                <description>Number of new locks and lock conversions per second requested from the lock manager.</description>
@@ -943,7 +912,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.lock_timeouts_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>rps</units>
                <description>Number of timed out lock requests per second, including requests for NOWAIT locks.</description>
@@ -980,7 +948,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.lock_wait_time</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>ms</units>
                <description>Average of total wait time (in milliseconds) for locks in the last second.</description>
@@ -1009,7 +976,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.lock_waits_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>rps</units>
                <description>Number of lock requests per second that required the caller to wait.</description>
@@ -1046,7 +1012,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.log_files_size</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Total size of all the transaction log files.</description>
                <applications>
@@ -1074,7 +1039,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.log_files_used_size</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>The cumulative used size of all the log files in the database.</description>
                <applications>
@@ -1102,7 +1066,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.logins_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Total number of logins started per second. This does not include pooled connections. Any value over 2 may indicate insufcient connection pooling.</description>
                <applications>
@@ -1130,7 +1093,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.logouts_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Total number of logout operations started per second. Any value over 2 may indicate insufcient connection pooling.</description>
                <applications>
@@ -1158,7 +1120,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.maximum_workspace_memory</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Indicates the maximum amount of memory available for executing processes, such as hash, sort, bulk copy, and index creation operations.</description>
                <applications>
@@ -1186,7 +1147,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.memory_grants_outstanding</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Specifies the total number of processes that have successfully acquired a workspace memory grant.</description>
                <applications>
                   <application>
@@ -1209,7 +1169,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.memory_grants_pending</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Specifies the total number of processes waiting for a workspace memory grant.</description>
                <applications>
                   <application>
@@ -1232,7 +1191,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.number_deadlocks_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>rps</units>
                <description>Number of lock requests per second that resulted in a deadlock.</description>
@@ -1269,7 +1227,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.offline_errors_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of errors per second.</description>
                <applications>
@@ -1297,7 +1254,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.page_life_expectancy</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>Indicates the number of seconds a page will stay in the buffer pool without references.</description>
@@ -1330,7 +1286,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.page_lookups_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>rps</units>
                <description>Indicates the number of requests per second to find a page in the buffer pool.</description>
@@ -1359,7 +1314,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.page_reads_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Indicates the number of physical database page reads that are issued per second. This statistic displays the total number of physical page reads across all databases. Because physical I/O is expensive, you may be able to minimize the cost, either by using a larger data cache, intelligent indexes, and more efficient queries, or by changing the database design.</description>
                <applications>
@@ -1395,7 +1349,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.page_splits_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of page splits per second that occur as the result of overflowing index pages.</description>
                <applications>
@@ -1423,7 +1376,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.page_writes_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Indicates the number of physical database page writes that are issued per second.</description>
                <applications>
@@ -1459,7 +1411,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.percent_of_adhoc_queries</key>
                <delay>0;m0-59s3</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>last(mssql.sql_compilations_sec.rate) * 100 /
@@ -1485,7 +1436,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.percent_recompilations_to_compilations</key>
                <delay>0;m0-59s3</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>last(mssql.sql_recompilations_sec.rate) * 100 /
@@ -1511,7 +1461,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.processes_blocked</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of currently blocked processes.</description>
                <applications>
                   <application>
@@ -1534,7 +1483,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.readahead_pages_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Indicates the number of pages read per second in anticipation of use.</description>
                <applications>
@@ -1562,7 +1510,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.safe_autoparams_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of safe auto-parameterization attempts per second. Safe refers to a determination that a cached execution plan can be shared between different similar-looking Transact-SQL statements. SQL Server makes many auto-parameterization attempts some of which turn out to be safe and others fail. Note that auto-parameterizations are also known as simple parameterizations in the newer versions of SQL Server. This does not include forced parameterizations.</description>
                <applications>
@@ -1590,7 +1537,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.scan_to_search</key>
                <delay>0;m0-59s3</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <params>last(mssql.full_scans_sec.rate) / (last(mssql.index_searches_sec.rate) + (last(mssql.index_searches_sec.rate)=0))</params>
                <description>The ratio of Full scans per second to Index searches per second. The threshold recommendation is strictly for OLTP workloads.</description>
@@ -1602,7 +1548,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <triggers>
                   <trigger>
                      <expression>{min(15m)} &gt; 0.001</expression>
-                     <name>MSSQL: Index and table scans are often than index searches for 15m</name>
+                     <name>MSSQL: Number of index and table scans exceeds index searches in the last 15m</name>
                      <priority>WARNING</priority>
                      <description>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</description>
                   </trigger>
@@ -1614,7 +1560,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.sql_compilations_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes compiles caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.</description>
                <applications>
@@ -1642,7 +1587,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.sql_recompilations_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of statement recompiles per second. Counts the number of times statement recompiles are triggered. Generally, you want the recompiles to be low.</description>
                <applications>
@@ -1670,7 +1614,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.table_lock_escalations.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of times locks on a table were escalated to the TABLE or HoBT granularity.</description>
                <applications>
@@ -1698,7 +1641,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.target_pages</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The optimal number of pages in the buffer pool.</description>
                <applications>
                   <application>
@@ -1721,7 +1663,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.target_server_memory</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Indicates the ideal amount of memory the server can consume.</description>
                <applications>
@@ -1749,7 +1690,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.total_latch_wait_time</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>ms</units>
                <description>Total latch wait time (in milliseconds) for latch requests in the last second. This value should stay stable compared to the number of latch waits per second.</description>
@@ -1778,7 +1718,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.total_server_memory</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Specifies the amount of memory the server has committed using the memory manager.</description>
                <applications>
@@ -1806,7 +1745,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.transactions</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The number of currently active transactions of all types.</description>
                <applications>
                   <application>
@@ -1829,7 +1767,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.transactions_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Total number of transactions started for all databases per second.</description>
                <applications>
@@ -1857,7 +1794,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.unsafe_autoparams_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of unsafe auto-parameterization attempts per second. For example, the query has some characteristics that prevent the cached plan from being shared. These are designated as unsafe. This does not count the number of forced parameterizations.</description>
                <applications>
@@ -1886,7 +1822,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <delay>0</delay>
                <history>2w</history>
                <trends>0d</trends>
-               <status>ENABLED</status>
                <units>uptime</units>
                <description>MS SQL Server uptime in 'N days, hh:mm:ss' format.</description>
                <applications>
@@ -1905,13 +1840,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>MSSQL: has been restarted (uptime &lt; 10m)</name>
-                     <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-                  <trigger>
                      <expression>{nodata(30m)}=1</expression>
                      <name>MSSQL: Failed to fetch info data (or no data for 30m)</name>
                      <priority>INFO</priority>
@@ -1923,6 +1851,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                         </dependency>
                      </dependencies>
                   </trigger>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>MSSQL: Service has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
                </triggers>
             </item>
             <item>
@@ -1931,7 +1866,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.user_connections</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of users connected to MS SQL Server.</description>
                <applications>
                   <application>
@@ -1954,7 +1888,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.user_errors_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of errors per second.</description>
                <applications>
@@ -1983,7 +1916,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <delay>0</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MS SQL Server version.</description>
                <applications>
@@ -2020,7 +1952,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.workfiles_created_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of work files created per second. For example, work files can be used to store temporary results for hash joins and hash aggregates.</description>
                <applications>
@@ -2056,7 +1987,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.worktables_created_sec.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of work tables created per second. For example, work tables can be used to store temporary results for query spool, lob variables, XML variables, and cursors.</description>
                <applications>
@@ -2092,7 +2022,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>mssql.worktables_from_cache_ratio</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Percentage of work tables created where the initial two pages of the work table were not allocated but were immediately available from the work table cache.</description>
@@ -2125,7 +2054,6 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <key>net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}]</key>
                <delay>30s</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Test the availability of MS SQL Server on a TCP port.</description>
                <applications>
                   <application>
@@ -2169,7 +2097,6 @@ FROM sys.availability_groups</params>
                      <key>db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <params>SELECT ag.name as group_name,
 ISNULL(ags.primary_recovery_health, 2) as primary_recovery_health,
@@ -2192,7 +2119,6 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <key>mssql.primary_recovery_health["{#GROUP_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Indicates the recovery health of the primary replica:&#13;
 0 = In progress&#13;
 1 = Online&#13;
@@ -2234,7 +2160,6 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Name of the server instance that is hosting the current primary replica.</description>
                      <application_prototypes>
@@ -2262,7 +2187,6 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <key>mssql.secondary_recovery_health["{#GROUP_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Indicates the recovery health of a secondary replica replica:&#13;
 0 = In progress&#13;
 1 = Online&#13;
@@ -2303,7 +2227,6 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <key>mssql.synchronization_health["{#GROUP_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Reflects a rollup of the synchronization_health of all availability replicas in the availability group:&#13;
 0: Not healthy. None of the availability replicas have a healthy synchronization.&#13;
 1: Partially healthy. The synchronization of some, but not all, availability replicas is healthy.&#13;
@@ -2386,7 +2309,6 @@ FROM sys.databases</params>
                      <key>mssql.backup.diff.duration["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>s</units>
                      <description>Duration of the last differential backup.</description>
                      <application_prototypes>
@@ -2412,7 +2334,6 @@ FROM sys.databases</params>
                      <key>mssql.backup.diff["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>s</units>
                      <description>The amount of time since the last differential backup.</description>
                      <application_prototypes>
@@ -2462,7 +2383,6 @@ FROM sys.databases</params>
                      <key>mssql.backup.full.duration["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>s</units>
                      <description>Duration of the last full backup.</description>
                      <application_prototypes>
@@ -2488,7 +2408,6 @@ FROM sys.databases</params>
                      <key>mssql.backup.full["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>s</units>
                      <description>The amount of time since the last full backup.</description>
                      <application_prototypes>
@@ -2538,7 +2457,6 @@ FROM sys.databases</params>
                      <key>mssql.backup.log.duration["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>s</units>
                      <description>Duration of the last log backup.</description>
                      <application_prototypes>
@@ -2564,7 +2482,6 @@ FROM sys.databases</params>
                      <key>mssql.backup.log["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>s</units>
                      <description>The amount of time since the last log backup.</description>
                      <application_prototypes>
@@ -2614,7 +2531,6 @@ FROM sys.databases</params>
                      <key>mssql.db.active_transactions["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of active transactions for the database.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2637,7 +2553,6 @@ FROM sys.databases</params>
                      <key>mssql.db.data_files_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Cumulative size of all the data files in the database including any automatic growth. Monitoring this counter is useful, for example, for determining the correct size of tempdb.</description>
                      <application_prototypes>
@@ -2665,7 +2580,6 @@ FROM sys.databases</params>
                      <key>mssql.db.log_bytes_flushed_sec.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>Bps</units>
                      <description>Total number of log bytes flushed per second. Useful for determining trends and utilization of the transaction log.</description>
@@ -2694,7 +2608,6 @@ FROM sys.databases</params>
                      <key>mssql.db.log_files_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Cumulative size of all the transaction log files in the database.</description>
                      <application_prototypes>
@@ -2722,7 +2635,6 @@ FROM sys.databases</params>
                      <key>mssql.db.log_files_used_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Cumulative used size of all the log files in the database.</description>
                      <application_prototypes>
@@ -2750,7 +2662,6 @@ FROM sys.databases</params>
                      <key>mssql.db.log_flush_wait_time["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>ms</units>
                      <description>Total wait time (in milliseconds) to flush the log. On an AlwaysOn secondary database, this value indicates the wait time for log records to be hardened to disk.</description>
@@ -2787,7 +2698,6 @@ FROM sys.databases</params>
                      <key>mssql.db.log_flush_waits_sec.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of commits per second waiting for the log flush.</description>
                      <application_prototypes>
@@ -2823,7 +2733,6 @@ FROM sys.databases</params>
                      <key>mssql.db.log_flushes_sec.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of log flushes per second.</description>
                      <application_prototypes>
@@ -2851,7 +2760,6 @@ FROM sys.databases</params>
                      <key>mssql.db.log_growths["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Total number of times the transaction log for the database has been expanded.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2874,7 +2782,6 @@ FROM sys.databases</params>
                      <key>mssql.db.log_shrinks["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Total number of times the transaction log for the database has been shrunk.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2897,7 +2804,6 @@ FROM sys.databases</params>
                      <key>mssql.db.log_truncations["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Number of times the transaction log has been shrunk.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2920,7 +2826,6 @@ FROM sys.databases</params>
                      <key>mssql.db.percent_log_used["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>Percentage of space in the log that is in use.</description>
@@ -2953,7 +2858,6 @@ FROM sys.databases</params>
                      <key>mssql.db.state["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>0 = ONLINE&#13;
 1 = RESTORING&#13;
 2 = RECOVERING | SQL Server 2008 and later&#13;
@@ -2999,7 +2903,6 @@ FROM sys.databases</params>
                      <key>mssql.db.transactions_sec.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of transactions started for the database per second.</description>
                      <application_prototypes>
@@ -3125,7 +3028,6 @@ FROM sys.databases</params>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>The last date-time of the job run.</description>
                      <application_prototypes>
@@ -3155,7 +3057,6 @@ FROM sys.databases</params>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>The informational message about the last run of the job.</description>
                      <application_prototypes>
@@ -3185,7 +3086,6 @@ FROM sys.databases</params>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>The next date-time of the job run.</description>
                      <application_prototypes>
@@ -3214,7 +3114,6 @@ FROM sys.databases</params>
                      <key>mssql.job.run_duration["{#JOBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>s</units>
                      <description>Duration of the last run job.</description>
                      <application_prototypes>
@@ -3253,7 +3152,6 @@ FROM sys.databases</params>
                      <key>mssql.job.runstatus["{#JOBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The job status possible values:&#13;
 0 ⇒ Failed&#13;
 1 ⇒ Succeeded&#13;
@@ -3323,7 +3221,6 @@ WHERE drs.is_local = 1</params>
                      <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <params>SELECT drs.database_state as database_state, 
 drs.is_suspended as is_suspended, 
@@ -3350,7 +3247,6 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <key>mssql.local_db.is_suspended["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Database state:&#13;
 0 = Resumed&#13;
 1 = Suspended</description>
@@ -3379,7 +3275,6 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <key>mssql.local_db.state["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>0 = Online&#13;
 1 = Restoring&#13;
 2 = Recovering&#13;
@@ -3423,7 +3318,6 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <key>mssql.local_db.synchronization_health["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Reflects the intersection of the synchronization state of a database that is joined to the availability group on the availability replica and the availability mode of the availability replica (synchronous-commit or asynchronous-commit mode):&#13;
 0 = Not healthy. The synchronization_state of the database is 0 (NOT SYNCHRONIZING).&#13;
 1 = Partially healthy. A database on a synchronous-commit availability replica is considered &#13;
@@ -3496,7 +3390,6 @@ of the sysadmin fixed server role.</description>
                      <key>db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <params>SELECT ISNULL(m.mirroring_role,0) as mirroring_role,
 ISNULL(m.mirroring_role_sequence,0) as mirroring_role_sequence,
@@ -3521,7 +3414,6 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <key>mssql.mirroring.role_sequence["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>The number of times that mirroring partners have switched the principal and mirror roles due to a failover or forced service.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -3548,7 +3440,6 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <key>mssql.mirroring.role["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Current role of the local database plays in the database mirroring session.&#13;
 1 = Principal&#13;
 2 = Mirror</description>
@@ -3580,7 +3471,6 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <key>mssql.mirroring.safety_level["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Safety setting for updates on the mirror database:&#13;
 0 = Unknown state&#13;
 1 = Off [asynchronous]&#13;
@@ -3613,7 +3503,6 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <key>mssql.mirroring.state["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>State of the mirror database and of the database mirroring session.&#13;
 0 = Suspended&#13;
 1 = Disconnected from the other partner&#13;
@@ -3670,7 +3559,6 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <key>mssql.mirroring.witness_state["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>State of the witness in the database mirroring session of the database:&#13;
 0 = Unknown&#13;
 1 = Connected&#13;
@@ -3758,7 +3646,6 @@ WHERE drs.is_local = 0</params>
                      <key>db.odbc.get["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <params>SELECT drs.log_send_queue_size as log_send_queue_size,
 drs.redo_queue_size as redo_queue_size,
@@ -3784,7 +3671,6 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <key>mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Amount of the log records of the primary database that has not been sent to the secondary databases.</description>
                      <application_prototypes>
@@ -3824,7 +3710,6 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <key>mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Amount of log records in the log files of the secondary replica that has not yet been redone.</description>
                      <application_prototypes>
@@ -3887,7 +3772,6 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <key>db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <params>SELECT ars.connected_state as connected_state,
 ars.is_local as is_local,
@@ -3917,7 +3801,6 @@ WHERE ag.name = '{#GROUP_NAME}' AND arcs.replica_server_name = '{#REPLICA_NAME}'
                      <key>mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Whether a secondary replica is currently connected to the primary replica:&#13;
 0 : Disconnected. The response of an availability replica to the DISCONNECTED state depends on its role:&#13;
 On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED on the primary replica, which waits for the secondary to reconnect;&#13;
@@ -3951,7 +3834,6 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <key>mssql.replica.is_local["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Whether the replica is local:&#13;
 0 = Indicates a remote secondary replica in an availability group whose primary replica is hosted by the local server instance. This value occurs only on the primary replica location.&#13;
 1 = Indicates a local replica. On secondary replicas, this is the only available value for the availability group to which the replica belongs.</description>
@@ -3983,7 +3865,6 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <key>mssql.replica.join_state["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>0 = Not joined&#13;
 1 = Joined, standalone instance&#13;
 2 = Joined, failover cluster instance</description>
@@ -4015,7 +3896,6 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <key>mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Current operational state of the replica:&#13;
 0 = Pending failover&#13;
 1 = Pending&#13;
@@ -4072,7 +3952,6 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <key>mssql.replica.recovery_health["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Rollup of the database_state column of the sys.dm_hadr_database_replica_states dynamic management view:&#13;
 0 : In progress. At least one joined database has a database state other than ONLINE &#13;
 (database_state is not 0).&#13;
@@ -4113,7 +3992,6 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <key>mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Current Always On availability groups role of a local replica or a connected remote replica:&#13;
 0 = Resolving&#13;
 1 = Primary&#13;
@@ -4146,7 +4024,6 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <key>mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>Reflects a rollup of the database synchronization state (synchronization_state)of all joined availability databases (also known as replicas) and the availability mode of the replica (synchronous-commit or asynchronous-commit mode). The rollup will reflect the least healthy accumulated state of the databases on the replica:&#13;
 0 : Not healthy. At least one joined database is in the NOT SYNCHRONIZING state.&#13;
 1 : Partially healthy. Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.&#13;
@@ -5047,19 +4924,6 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <mapping>
                <value>2</value>
                <newvalue>Secondary</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>MSSQL AG Suspend state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Resumed</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Suspended</newvalue>
             </mapping>
          </mappings>
       </value_map>
