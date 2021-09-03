@@ -459,7 +459,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, zbx
 			if (NULL != (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(
 					&triggers_flags, &temp_t)))
 			{
-				zbx_audit_trigger_update_json_add_dependency(found->flags, triggerdepid,
+				zbx_audit_trigger_update_json_add_dependency(atoi(found->flags), triggerdepid,
 						links.values[i].first, links.values[i].second);
 			}
 			else
@@ -751,7 +751,7 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);
 		ZBX_DBROW2UINT64(target_host_trigger_entry.templateid_orig, row[11]);
-		target_host_trigger_entry.templateid = NULL;
+		target_host_trigger_entry.templateid = 0;
 		ZBX_STR2UINT64(target_host_trigger_entry.flags, row[4]);
 
 		ZBX_STR2UCHAR(target_host_trigger_entry.recovery_mode_orig, row[5]);
