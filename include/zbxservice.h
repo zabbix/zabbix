@@ -32,6 +32,7 @@ ZBX_PTR_VECTOR_DECL(service, DB_SERVICE *)
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS	2
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE	3
 #define ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE	4
+#define ZBX_IPC_SERVICE_EVENT_SEVERITIES	5
 
 void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
 void	zbx_service_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response);
