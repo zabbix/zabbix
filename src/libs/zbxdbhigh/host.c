@@ -23,7 +23,6 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
-#include "template.h"
 #include "../../libs/zbxaudit/audit_host.h"
 #include "../../libs/zbxaudit/audit_item.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
@@ -1319,10 +1318,9 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	size_t			sql_alloc = 256, sql_offset;
 	zbx_vector_uint64_t	profileids;
 	int			num;
-	const char		*history_tables[] = {"history", "history_str", "history_uint", "history_log",
-				"history_text", "trends", "trends_uint"};
 	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
+	unsigned char		history_mode, trends_mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
 
@@ -1342,7 +1340,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid",
 				itemids->values, itemids->values_num);
 
-		if (FAIL == DBselect_delete_for_item(sql, itemids))
+		if (FAIL == zbx_audit_DBselect_delete_for_item(sql, itemids))
 			goto clean;
 
 		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1352,7 +1350,28 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBdelete_graphs_by_itemids(itemids);
 	DBdelete_triggers_by_itemids(itemids);
 
-	DBadd_to_housekeeper(itemids, "itemid", history_tables, ARRSIZE(history_tables));
+	zbx_config_get_hk_mode(&history_mode, &trends_mode);
+
+	if (ZBX_HK_MODE_PARTITION != history_mode && ZBX_HK_MODE_PARTITION != trends_mode)
+	{
+		const char	*history_trends_tables[] = {"history", "history_str", "history_uint", "history_log",
+				"history_text", "trends", "trends_uint"};
+
+		DBadd_to_housekeeper(itemids, "itemid", history_trends_tables, ARRSIZE(history_trends_tables));
+	}
+	else if (ZBX_HK_MODE_PARTITION != history_mode)
+	{
+		const char	*history_tables[] = {"history", "history_str", "history_uint", "history_log",
+				"history_text"};
+
+		DBadd_to_housekeeper(itemids, "itemid", history_tables, ARRSIZE(history_tables));
+	}
+	else if (ZBX_HK_MODE_PARTITION != trends_mode)
+	{
+		const char	*trend_tables[] = {"trends", "trends_uint"};
+
+		DBadd_to_housekeeper(itemids, "itemid", trend_tables, ARRSIZE(trend_tables));
+	}
 
 	/* add housekeeper task to delete problems associated with item, this allows old events to be deleted */
 	DBadd_to_housekeeper(itemids, "itemid", event_tables, ARRSIZE(event_tables));
@@ -1400,7 +1419,7 @@ out:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
+static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -1431,7 +1450,7 @@ static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
 			httptestids->values, httptestids->values_num);
 
-	if (FAIL == DBselect_delete_for_item(sql, &itemids))
+	if (FAIL == zbx_audit_DBselect_delete_for_item(sql, &itemids))
 		goto clean;
 
 	DBdelete_items(&itemids);
@@ -1456,7 +1475,7 @@ out:
  *                                      will be deleted                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeids)
+static void	DBgroup_prototypes_delete(const zbx_vector_uint64_t *del_group_prototypeids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
@@ -1771,7 +1790,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	if (FAIL == DBselect_delete_for_item(sql, &itemids))
+	if (FAIL == zbx_audit_DBselect_delete_for_item(sql, &itemids))
 		goto clean;
 
 	DBdelete_items(&itemids);
@@ -5284,7 +5303,7 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 
-	if (FAIL == DBselect_delete_for_item(sql, &itemids))
+	if (FAIL == zbx_audit_DBselect_delete_for_item(sql, &itemids))
 		goto clean;
 
 	DBdelete_items(&itemids);
@@ -5316,13 +5335,13 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
+
+	for (i = 0; i < hostids->values_num; i++)
+		zbx_audit_host_del(hostids->values[i], hostnames->values[i]);
 clean:
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&selementids);
-
-	for (i = 0; i < hostids->values_num; i++)
-		zbx_audit_host_del(hostids->values[i], hostnames->values[i]);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

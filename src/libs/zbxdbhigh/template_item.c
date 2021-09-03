@@ -249,16 +249,34 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	{
 		item = (zbx_template_item_t *)zbx_malloc(NULL, sizeof(zbx_template_item_t));
 
+		item->templateid_orig = 0;
 		ZBX_STR2UINT64(item->templateid, row[0]);
+
+		item->type_orig = 0;
 		ZBX_STR2UCHAR(item->type, row[3]);
+
+		item->value_type_orig = 0;
 		ZBX_STR2UCHAR(item->value_type, row[4]);
+
+		item->status_orig = 0;
 		ZBX_STR2UCHAR(item->status, row[8]);
+
+		item->valuemapid_orig = 0;
 		ZBX_DBROW2UINT64(item->valuemapid, row[13]);
+
+		item->authtype_orig = 0;
 		ZBX_STR2UCHAR(item->authtype, row[17]);
+
+		item->flags_orig = 0;
 		ZBX_STR2UCHAR(item->flags, row[22]);
+
+		item->inventory_link_orig = 0;
 		ZBX_STR2UCHAR(item->inventory_link, row[24]);
+
+		item->evaltype_orig = 0;
 		ZBX_STR2UCHAR(item->evaltype, row[27]);
 
+		item->interfaceid_orig = 0;
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
 			case INTERFACE_TYPE_UNKNOWN:
@@ -348,7 +366,10 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->status_codes_orig = NULL;
 		item->status_codes = zbx_strdup(NULL, row[34]);
 
+		item->follow_redirects_orig = 0;
 		ZBX_STR2UCHAR(item->follow_redirects, row[35]);
+
+		item->post_type_orig = 0;
 		ZBX_STR2UCHAR(item->post_type, row[36]);
 
 		item->http_proxy_orig = NULL;
@@ -357,8 +378,13 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->headers_orig = NULL;
 		item->headers = zbx_strdup(NULL, row[38]);
 
+		item->retrieve_mode_orig = 0;
 		ZBX_STR2UCHAR(item->retrieve_mode, row[39]);
+
+		item->request_method_orig = 0;
 		ZBX_STR2UCHAR(item->request_method, row[40]);
+
+		item->output_format_orig = 0;
 		ZBX_STR2UCHAR(item->output_format, row[41]);
 
 		item->ssl_cert_file_orig = NULL;
@@ -370,9 +396,16 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		item->ssl_key_password_orig = NULL;
 		item->ssl_key_password = zbx_strdup(NULL, row[44]);
 
+		item->verify_peer_orig = 0;
 		ZBX_STR2UCHAR(item->verify_peer, row[45]);
+
+		item->verify_host_orig = 0;
 		ZBX_STR2UCHAR(item->verify_host, row[46]);
+
+		item->allow_traps_orig = 0;
 		ZBX_STR2UCHAR(item->allow_traps, row[47]);
+
+		item->discover_orig = 0;
 		ZBX_STR2UCHAR(item->discover, row[48]);
 
 		item->upd_flags = ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RESET_FLAG;
@@ -498,7 +531,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
  *          from database                                                     *
  *                                                                            *
  * Parameters: items - [IN] the host items including lld rules                *
- *             rules - [OUT] the ldd rule mapping                             *
+ *             rules - [OUT] the lld rule mapping                             *
  *                                                                            *
  ******************************************************************************/
 static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules)
@@ -597,21 +630,25 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 
 						condition = (zbx_lld_rule_condition_t *)rule->conditions.values[index];
 						ZBX_STR2UCHAR(uchar_orig, row[2]);
+
 						if (uchar_orig != condition->op)
 						{
 							flags |= ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_OPERATOR;
 							condition->op_orig = uchar_orig;
 						}
+
 						if (0 != strcmp(row[3], condition->macro))
 						{
 							flags |= ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_MACRO;
 							condition->macro_orig = zbx_strdup(NULL, row[3]);
 						}
+
 						if (0 != strcmp(row[4], condition->value))
 						{
 							flags |= ZBX_FLAG_TEMPLATE_ITEM_CONDITION_UPDATE_VALUE;
 							condition->value_orig = zbx_strdup(NULL, row[4]);
 						}
+
 						condition->upd_flags = flags;
 					}
 
@@ -639,7 +676,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
  *                                                                            *
  * Purpose: calculate identifiers for new item conditions                     *
  *                                                                            *
- * Parameters: rules - [IN] the ldd rule mapping                              *
+ * Parameters: rules - [IN] the lld rule mapping                              *
  *                                                                            *
  * Return value: The number of new item conditions to be inserted.            *
  *                                                                            *
@@ -705,7 +742,7 @@ static void	update_template_lld_formula(char **formula, zbx_uint64_t id_proto, z
  *          identifiers instead.                                              *
  *                                                                            *
  * Parameters:  items  - [IN] the template items                              *
- *              rules  - [IN] the ldd rule mapping                            *
+ *              rules  - [IN] the lld rule mapping                            *
  *                                                                            *
  ******************************************************************************/
 static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules)
@@ -846,7 +883,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					item->field##_orig, item->field);					\
 		}
 
-		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name);
+		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
 		PREPARE_UPDATE_ID(INTERFACEID, interfaceid)
 		PREPARE_UPDATE_STR(NAME, name)
 		PREPARE_UPDATE_UC(TYPE, type)
@@ -916,7 +953,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
-		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name);
+		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
 		zbx_audit_item_update_json_add_data(*itemid, item, hostid);
 
 		item->itemid = (*itemid)++;
@@ -1033,7 +1070,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
  *          database                                                          *
  *                                                                            *
  * Parameters:  items          - [IN] the template items                      *
- *              rules          - [IN] the ldd rule mapping                    *
+ *              rules          - [IN] the lld rule mapping                    *
  *              new_conditions - [IN] the number of new item conditions to    *
  *                                    be inserted                             *
  *                                                                            *
@@ -1173,7 +1210,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		{
 			condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
 
-			zbx_db_insert_add_values(&db_insert, rule->conditionid++, rule->itemid,
+			zbx_db_insert_add_values(&db_insert, rule->conditionid, rule->itemid,
 					(int)condition->op, condition->macro, condition->value);
 
 			zbx_audit_discovery_rule_update_json_add_filter_conditions(rule->itemid, rule->conditionid,
@@ -1377,35 +1414,6 @@ static void	zbx_lld_macros_free(zbx_template_lld_macro_t *macro)
  ******************************************************************************/
 static void	free_template_item(zbx_template_item_t *item)
 {
-	/* zbx_free(item->timeout); */
-	/* zbx_free(item->url); */
-	/* zbx_free(item->query_fields); */
-	/* zbx_free(item->posts); */
-	/* zbx_free(item->status_codes); */
-	/* zbx_free(item->http_proxy); */
-	/* zbx_free(item->headers); */
-	/* zbx_free(item->ssl_cert_file); */
-	/* zbx_free(item->ssl_key_file); */
-	/* zbx_free(item->ssl_key_password); */
-	/* zbx_free(item->jmx_endpoint); */
-	/* zbx_free(item->lifetime); */
-	/* zbx_free(item->description); */
-	/* zbx_free(item->privatekey); */
-	/* zbx_free(item->publickey); */
-	/* zbx_free(item->password); */
-	/* zbx_free(item->username); */
-	/* zbx_free(item->snmp_oid); */
-	/* zbx_free(item->ipmi_sensor); */
-	/* zbx_free(item->params); */
-	/* zbx_free(item->logtimefmt); */
-	/* zbx_free(item->formula); */
-	/* zbx_free(item->units); */
-	/* zbx_free(item->trapper_hosts); */
-	/* zbx_free(item->trends); */
-	/* zbx_free(item->history); */
-	/* zbx_free(item->delay); */
-	/* zbx_free(item->name); */
-
 	zbx_vector_ptr_destroy(&item->dependent_items);
 	zbx_vector_item_preproc_ptr_clear_ext(&item->item_preprocs, zbx_item_preproc_free);
 	zbx_vector_item_preproc_ptr_clear_ext(&item->template_preprocs, zbx_item_preproc_free);
@@ -1427,7 +1435,7 @@ static void	free_template_item(zbx_template_item_t *item)
 #define CLEAN_ORIG(FLAG_POSTFIX, field)							\
 	if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))	\
 	{										\
-		zbx_free(item->field##_orig);							\
+		zbx_free(item->field##_orig);						\
 	}										\
 	zbx_free(item->field);
 
@@ -2956,16 +2964,11 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 			}
 
 			item = (zbx_template_item_t *)items->values[index];
-
-			ptdst = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
-
-			ptdst->flags = ZBX_FLAG_DB_TAG_UNSET;
+			ptdst = zbx_db_tag_create(row[2], row[3]);
 			ZBX_STR2UINT64(ptdst->tagid, row[0]);
-			ptdst->tag = zbx_strdup(NULL, row[2]);
-			ptdst->value = zbx_strdup(NULL, row[3]);
-
 			zbx_vector_item_tag_ptr_append(&item->item_tags, ptdst);
 		}
+
 		DBfree_result(result);
 		zbx_free(sql);
 		sql_offset = 0;
@@ -2986,18 +2989,15 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
 
 		ZBX_STR2UINT64(item_local.templateid, row[1]);
+
 		if (NULL == (pitem = (zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
-		ptdst = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
 
-		ptdst->flags = ZBX_FLAG_DB_TAG_UNSET;
+		ptdst = zbx_db_tag_create(row[2], row[3]);
 		ZBX_STR2UINT64(ptdst->tagid, row[0]);
-		ptdst->tag = zbx_strdup(NULL, row[2]);
-		ptdst->value = zbx_strdup(NULL, row[3]);
-
 		zbx_vector_item_tag_ptr_append(&(*pitem)->template_tags, ptdst);
 	}
 	DBfree_result(result);
@@ -3020,11 +3020,8 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 			if (j >= item->item_tags.values_num)
 			{
 				ptsrc = (zbx_db_tag_t *)item->template_tags.values[j];
-				ptdst = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+				ptdst = zbx_db_tag_create(ptsrc->tag, ptsrc->value);
 				ptdst->tagid = 0;
-				ptdst->flags = ZBX_FLAG_DB_TAG_UNSET;
-				ptdst->tag = zbx_strdup(NULL, ptsrc->tag);
-				ptdst->value = zbx_strdup(NULL, ptsrc->value);
 				zbx_vector_item_tag_ptr_append(&item->item_tags, ptdst);
 				continue;
 			}
@@ -3174,6 +3171,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 
 		zbx_vector_item_param_ptr_append(&(*pitem)->template_params, ppdst);
 	}
+
 	DBfree_result(result);
 	zbx_free(sql);
 

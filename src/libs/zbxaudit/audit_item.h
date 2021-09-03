@@ -25,11 +25,11 @@
 
 #include "../zbxdbhigh/template.h"
 
-void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name);
+void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name, int flags);
 void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item, zbx_uint64_t hostid);
 
-#define PREPARE_AUDIT_ITEM_UPDATE_H(resource, type1)					\
-void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,	\
+#define PREPARE_AUDIT_ITEM_UPDATE_H(resource, type1)								\
+void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,				\
 		type1 resource##_old, type1 resource##_new);
 
 PREPARE_AUDIT_ITEM_UPDATE_H(interfaceid, zbx_uint64_t)
@@ -82,11 +82,10 @@ PREPARE_AUDIT_ITEM_UPDATE_H(verify_host, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(allow_traps, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(discover, int)
 
-int	DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids);
+int	zbx_audit_DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids);
 
 void	zbx_audit_discovery_rule_update_json_add_filter_conditions(zbx_uint64_t itemid, zbx_uint64_t rule_conditionid,
 		zbx_uint64_t op, const char *macro, const char *value);
-
 void	zbx_audit_discovery_rule_update_json_update_filter_conditions_create_entry(zbx_uint64_t itemid,
 		zbx_uint64_t item_conditionid);
 
@@ -106,8 +105,8 @@ void	zbx_audit_item_update_json_add_item_preproc(zbx_uint64_t itemid, zbx_uint64
 void	zbx_audit_item_update_json_update_item_preproc_create_entry(zbx_uint64_t itemid, int item_flags,
 		zbx_uint64_t preprocid);
 
-#define PREPARE_AUDIT_ITEM_UPDATE_PREPROC_H(resource, type1)						\
-void	zbx_audit_item_update_json_update_item_preproc_##resource(zbx_uint64_t itemid, int item_flags,	\
+#define PREPARE_AUDIT_ITEM_UPDATE_PREPROC_H(resource, type1)							\
+void	zbx_audit_item_update_json_update_item_preproc_##resource(zbx_uint64_t itemid, int item_flags,		\
 		zbx_uint64_t preprocid, type1 resource##_old, type1 resource##_new);
 
 PREPARE_AUDIT_ITEM_UPDATE_PREPROC_H(type, int)
@@ -123,8 +122,8 @@ void	zbx_audit_item_update_json_add_item_tag(zbx_uint64_t itemid, zbx_uint64_t t
 void	zbx_audit_item_update_json_update_item_tag_create_entry(zbx_uint64_t itemid, int item_flags,
 		zbx_uint64_t tagid);
 
-#define PREPARE_AUDIT_ITEM_UPDATE_TAG_H(resource, type1)						\
-void	zbx_audit_item_update_json_update_item_tag_##resource(zbx_uint64_t itemid, int item_flags,	\
+#define PREPARE_AUDIT_ITEM_UPDATE_TAG_H(resource, type1)							\
+void	zbx_audit_item_update_json_update_item_tag_##resource(zbx_uint64_t itemid, int item_flags,		\
 		zbx_uint64_t tagid, type1 resource##_old, type1 resource##_new);
 
 PREPARE_AUDIT_ITEM_UPDATE_TAG_H(tag, const char*)
@@ -138,9 +137,9 @@ void	zbx_audit_item_update_json_add_params(zbx_uint64_t itemid, int item_flags, 
 void	zbx_audit_item_update_json_update_params_create_entry(zbx_uint64_t itemid, int item_flags, zbx_uint64_t
 		item_parameter_id);
 
-#define PREPARE_AUDIT_ITEM_PARAMS_UPDATE_H(resource) \
-void	zbx_audit_item_update_json_update_params_##resource(zbx_uint64_t itemid, int item_flags, \
-zbx_uint64_t item_parameter_id, const char *resource##_orig, const char *resource);
+#define PREPARE_AUDIT_ITEM_PARAMS_UPDATE_H(resource)								\
+void	zbx_audit_item_update_json_update_params_##resource(zbx_uint64_t itemid, int item_flags,		\
+		zbx_uint64_t item_parameter_id, const char *resource##_orig, const char *resource);
 
 PREPARE_AUDIT_ITEM_PARAMS_UPDATE_H(name)
 PREPARE_AUDIT_ITEM_PARAMS_UPDATE_H(value)
@@ -153,7 +152,7 @@ void	zbx_audit_discovery_rule_update_json_add_lld_macro_path(zbx_uint64_t itemid
 void	zbx_audit_discovery_rule_update_json_lld_macro_path_create_update_entry(zbx_uint64_t itemid,
 		zbx_uint64_t lld_macro_pathid);
 
-#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(resource)	\
+#define PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(resource)						\
 void	zbx_audit_discovery_rule_update_json_update_lld_macro_path_##resource(zbx_uint64_t itemid,		\
 		zbx_uint64_t lld_macro_pathid, const char *resource##_old, const char *resource##_new);
 PREPARE_AUDIT_DISCOVERY_RULE_UPDATE_LLD_MACRO_PATH_H(lld_macro)
@@ -168,10 +167,10 @@ void	zbx_audit_discovery_rule_update_json_add_lld_override_filter(zbx_uint64_t i
 		int evaltype, const char *formula);
 
 void	zbx_audit_discovery_rule_update_json_add_lld_override_condition(zbx_uint64_t itemid, zbx_uint64_t overrideid,
-		zbx_uint64_t override_conditionid, int operator, const char *macro, const char *value);
+		zbx_uint64_t override_conditionid, int condition_operator, const char *macro, const char *value);
 
 void	zbx_audit_discovery_rule_update_json_add_lld_override_operation(zbx_uint64_t itemid, zbx_uint64_t overrideid,
-		zbx_uint64_t override_operationid,  int operator, const char *value);
+		zbx_uint64_t override_operationid,  int condition_operator, const char *value);
 
 #define PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD_H(resource, type)						\
 void	zbx_audit_discovery_rule_update_json_add_lld_override_##resource(zbx_uint64_t itemid,			\

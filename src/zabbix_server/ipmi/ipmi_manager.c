@@ -40,8 +40,9 @@
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern int	CONFIG_IPMIPOLLER_FORKS;
 

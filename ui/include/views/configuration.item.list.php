@@ -209,7 +209,7 @@ foreach ($data['items'] as $item) {
 		}
 
 		$triggerHintTable->addRow([
-			getSeverityCell($trigger['priority']),
+			CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 			$trigger_description,
 			(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))

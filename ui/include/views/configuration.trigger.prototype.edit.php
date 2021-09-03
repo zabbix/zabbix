@@ -86,7 +86,7 @@ $triggersFormList
 	)
 	->addRow(
 		_('Severity'),
-		new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']])
+		new CSeverity('priority', (int) $data['priority'])
 	);
 
 // append expression to form list

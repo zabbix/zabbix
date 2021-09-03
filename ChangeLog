@@ -1,6 +1,7 @@
 Changes for 6.0.0alpha2
 
 New features:
+A.F....... [ZBXNEXT-6800] implemented complex service status calculation and propagation rules (ashubin, averza, wiper)
 
 Bug fixes:
 
@@ -12,7 +13,7 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6775] implemented new audit log; added new audi
 ........S. [ZBXNEXT-6810] implemented audit on server (processing of LLD rules and discovered hosts) (akozlovs)
 ..F.....S. [ZBXNEXT-6802] implemented audit for server (linking templates - host, host prototypes) (arimdjonoks, vmaksimovs)
 .........T [ZBXNEXT-6702] added {#FSLABEL} macro in item names of the "Windows filesystems by Zabbix agent/agent active" templates, changed vfs.file.cksum[/etc/passwd] key to vfs.file.cksum[/etc/passwd,sha256] in Unix templates (mchudinov)
-A.F.I...S. [ZBXNEXT-6813] changed UI language from en_GB to en_US (rlataria)
+A.F.I...S. [ZBXNEXT-6813] dropped support of British English as frontend language (rlataria)
 ...G...... [ZBXNEXT-6688] added new items for Agent and Agent2 (asestakovs, MVekslers)
 A.F.....S. [ZBXNEXT-6601] added monoinc() and monodec() functions (arimdjonoks)
 ........S. [ZBXNEXT-6470,ZBXNEXT-6768] implemented audit for server (except for linking and LLD) (arimdjonoks)
@@ -29,6 +30,18 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.5rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.4.4
+
+5.4.4rc1 was released as 5.4.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.4.4rc1
@@ -1011,6 +1024,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.16rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.15
+
+5.0.15rc1 was released as 5.0.15 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.15rc1
@@ -3207,6 +3232,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.34rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.33
+
+4.0.33rc1 was released as 4.0.33 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.33rc1

@@ -34,8 +34,10 @@
 #include "zbxalgo.h"
 #include "preproc_history.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num, CONFIG_PREPROCESSOR_FORKS;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
+extern int				CONFIG_PREPROCESSOR_FORKS;
 
 #define ZBX_PREPROCESSING_MANAGER_DELAY	1
 

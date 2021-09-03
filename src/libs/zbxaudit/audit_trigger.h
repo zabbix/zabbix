@@ -25,23 +25,19 @@
 
 #include "../zbxdbhigh/template.h"
 
-#define	PREPARE_AUDIT_TRIGGER_H(funcname, audit_resource_flag)							\
-void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t triggerid, const char *name);
-PREPARE_AUDIT_TRIGGER_H(trigger, AUDIT_RESOURCE_TRIGGER)
-PREPARE_AUDIT_TRIGGER_H(trigger_prototype, AUDIT_RESOURCE_TRIGGER_PROTOTYPE)
+void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, const char *name, int flags);
 
 void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t templateid,
 		unsigned char recovery_mode, unsigned char status, unsigned char type, zbx_uint64_t value,
-		zbx_uint64_t state, unsigned char priority, const char *comments, const char *url, unsigned char flags,
+		zbx_uint64_t state, unsigned char priority, const char *comments, const char *url, int flags,
 		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close,
 		const char *opdata, unsigned char discover, const char *event_name);
 
-void	zbx_audit_trigger_update_json_add_expr(zbx_uint64_t triggerid, unsigned char flags, const char *expression);
-void	zbx_audit_trigger_update_json_add_rexpr(zbx_uint64_t triggerid, unsigned char flags,
-		const char *recovery_expression);
+void	zbx_audit_trigger_update_json_add_expr(zbx_uint64_t triggerid, int flags, const char *expression);
+void	zbx_audit_trigger_update_json_add_rexpr(zbx_uint64_t triggerid, int flags, const char *recovery_expression);
 
 #define PREPARE_AUDIT_TRIGGER_UPDATE_H(resource, type1, type2)							\
-void	zbx_audit_trigger_update_json_update_##resource(zbx_uint64_t triggerid, unsigned char flags,		\
+void	zbx_audit_trigger_update_json_update_##resource(zbx_uint64_t triggerid, int flags,			\
 		type1 resource##_old, type1 resource##_new);
 PREPARE_AUDIT_TRIGGER_UPDATE_H(flags, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(recovery_mode, int, int)
@@ -53,7 +49,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE_H(event_name, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(templateid, zbx_uint64_t, uint64)
 
 void	DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids);
-void	zbx_audit_trigger_update_json_add_dependency(unsigned char flags, zbx_uint64_t triggerdepid,
+void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t triggerdepid,
 		zbx_uint64_t triggerid, zbx_uint64_t triggerid_up);
 void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,
 		const char *tag, const char *value);

@@ -74,7 +74,7 @@ $form_list
 				->onClick('javascript: jQuery("#severity input").attr("disabled", this.checked ? false : true)')
 				->setChecked($data['change_severity'])
 				->setEnabled($data['allowed_change_severity'] && $data['problem_severity_can_be_changed']),
-			(new CSeverity(['name' => 'severity', 'value' => $data['severity']], $data['change_severity']))
+			(new CSeverity('severity', (int) $data['severity'], $data['change_severity']))
 		]))
 			->addClass(ZBX_STYLE_HOR_LIST)
 	);
