@@ -38,15 +38,14 @@ class CControllerRegExList extends CController {
 	}
 
 	protected function doAction() {
-		$data['uncheck'] = $this->hasInput('uncheck');
-
-		$db_regexs = API::Regexp()->get([
-			'output' => ['regexpid', 'name'],
-			'selectExpressions' => ['expression', 'expression_type'],
-			'preservekeys' => true
-		]);
-
-		$data['regexs'] = $db_regexs;
+		$data = [
+			'regexs' => API::Regexp()->get([
+				'output' => ['regexpid', 'name'],
+				'selectExpressions' => ['expression', 'expression_type'],
+				'preservekeys' => true
+			]),
+			'uncheck' => $this->hasInput('uncheck')
+		];
 
 		order_result($data['regexs'], 'name');
 
