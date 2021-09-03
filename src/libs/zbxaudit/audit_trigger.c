@@ -206,6 +206,7 @@ void	DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids)
 
 		zbx_audit_trigger_create_entry(AUDIT_ACTION_DELETE, id, row[1], flags);
 	}
+
 	DBfree_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
