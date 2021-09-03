@@ -901,6 +901,12 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			zbx_vector_db_tag_ptr_create(&host->tags);
 			zbx_vector_ptr_create(&host->interfaces);
 			host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
+			host->jp_row = NULL;
+			host->inventory_mode_orig = host->inventory_mode;
+			host->custom_interfaces_orig = host->custom_interfaces;
+			host->proxy_hostid_orig = 0;
+			host->ipmi_authtype_orig = 0;
+			host->ipmi_privilege_orig = 0;
 
 			zbx_vector_ptr_append(hosts, host);
 		}
@@ -3878,6 +3884,7 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
 		interface->ip_orig = NULL;
 		interface->dns_orig = NULL;
 		interface->port_orig = NULL;
+		interface->parent_interfaceid = 0;
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{

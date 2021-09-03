@@ -100,7 +100,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 	{
 		zbx_uint64_t	id;
 		int		discovery_flag, object_lastcheck, object_ts_delete;
-		char		*name;
+		const char	*name;
 
 		cb_info(objects->values[i], &id, &discovery_flag, &object_lastcheck, &object_ts_delete, &name);
 

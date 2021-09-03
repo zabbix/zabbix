@@ -134,8 +134,8 @@ zbx_lld_item_ref_t;
 /* items index hashset support functions */
 static zbx_hash_t	lld_item_index_hash_func(const void *data)
 {
-	zbx_lld_item_index_t	*item_index = (zbx_lld_item_index_t *)data;
-	zbx_hash_t		hash;
+	const zbx_lld_item_index_t	*item_index = (const zbx_lld_item_index_t *)data;
+	zbx_hash_t			hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&item_index->parent_itemid,
 			sizeof(item_index->parent_itemid), ZBX_DEFAULT_HASH_SEED);
@@ -144,8 +144,8 @@ static zbx_hash_t	lld_item_index_hash_func(const void *data)
 
 static int	lld_item_index_compare_func(const void *d1, const void *d2)
 {
-	zbx_lld_item_index_t	*i1 = (zbx_lld_item_index_t *)d1;
-	zbx_lld_item_index_t	*i2 = (zbx_lld_item_index_t *)d2;
+	const zbx_lld_item_index_t	*i1 = (const zbx_lld_item_index_t *)d1;
+	const zbx_lld_item_index_t	*i2 = (const zbx_lld_item_index_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->parent_itemid, i2->parent_itemid);
 	ZBX_RETURN_IF_NOT_EQUAL(i1->lld_row, i2->lld_row);
@@ -3059,7 +3059,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
-		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name);
+		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name, ZBX_FLAG_DISCOVERY_CREATED);
 		zbx_audit_item_update_json_add_lld_data(*itemid, item, item_prototype, hostid);
 		item->itemid = (*itemid)++;
 	}
@@ -3547,7 +3547,10 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 			new_items++;
 		}
 		else
-			zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name);
+		{
+			zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name,
+					ZBX_FLAG_DISCOVERY_CREATED);
+		}
 
 		if (0 != item->itemid && 0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
 		{
@@ -4292,7 +4295,7 @@ out:
 }
 
 static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		int *ts_delete, char **name)
+		int *ts_delete, const char **name)
 {
 	zbx_lld_item_t	*item;
 
