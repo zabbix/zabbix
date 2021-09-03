@@ -1739,9 +1739,17 @@ class CService extends CApiService {
 			}
 
 			if (!$is_rw_service) {
-				$parent_services = array_key_exists('parents', $service)
-					? array_column($service['parents'], 'serviceid', 'serviceid')
-					: [];
+				if (array_key_exists('parents', $service)) {
+					$parent_services = array_column($service['parents'], 'serviceid', 'serviceid');
+				}
+				elseif ($db_services !== null) {
+					$parent_services = array_column($db_services[$service['serviceid']]['parents'], 'serviceid',
+						'serviceid'
+					);
+				}
+				else {
+					$parent_services = [];
+				}
 
 				$has_rw_parents = (bool) array_intersect_key($parent_services, $rw_services);
 
@@ -1813,7 +1821,7 @@ class CService extends CApiService {
 					$error_detail = _s('read-write access to the child service "%1$s" must be retained',
 						$inaccessible_service['name']
 					);
-					$error = _s('Cannot update service "%1$s": %2$s.', $one_of_parent_names, $error_detail);
+					$error = _s('Cannot update service "%1$s": %2$s.', $one_of_parent_names[$serviceid], $error_detail);
 
 					self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 				}
