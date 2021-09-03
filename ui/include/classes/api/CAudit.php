@@ -102,7 +102,18 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
-		self::RESOURCE_USER => 'users'
+		self::RESOURCE_USER => 'users',
+		self::RESOURCE_PROXY => 'hosts'
+	];
+
+	/**
+	 * Table primary keys of audit resources.
+	 * resource => table key
+	 *
+	 * @var array
+	 */
+	private const TABLE_PKS = [
+		self::RESOURCE_PROXY => 'proxyid'
 	];
 
 	/**
@@ -113,7 +124,8 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
-		self::RESOURCE_USER => 'username'
+		self::RESOURCE_USER => 'username',
+		self::RESOURCE_PROXY => 'host'
 	];
 
 	/**
@@ -124,7 +136,8 @@ class CAudit {
 	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
-		self::RESOURCE_USER => 'user'
+		self::RESOURCE_USER => 'user',
+		self::RESOURCE_PROXY => 'proxy'
 	];
 
 	/**
@@ -138,18 +151,20 @@ class CAudit {
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		// ],
-		self::RESOURCE_USER => ['paths' => ['user.passwd']]
+		self::RESOURCE_USER => ['paths' => ['user.passwd']],
+		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']]
 	];
 
 	/**
-	 * Table names of nested objects.
+	 * Table names of nested objects to check default values.
 	 * path => table name
 	 *
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
 		'user.medias' => 'media',
-		'user.usrgrps' => 'users_groups'
+		'user.usrgrps' => 'users_groups',
+		'proxy.interface' => 'interface'
 	];
 
 	/**
@@ -160,7 +175,8 @@ class CAudit {
 	 */
 	private const NESTED_OBJECTS_IDS = [
 		'user.medias' => 'mediaid',
-		'user.usrgrps' => 'id'
+		'user.usrgrps' => 'id',
+		'proxy.interface' => 'interfaceid',
 	];
 
 	/**
@@ -168,7 +184,7 @@ class CAudit {
 	 *
 	 * @var array
 	 */
-	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
+	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at', 'proxy.hosts'];
 
 	/**
 	 * Add audit records.
@@ -189,7 +205,9 @@ class CAudit {
 		}
 
 		$auditlog = [];
-		$table_key = DB::getPk(self::TABLE_NAMES[$resource]);
+		$table_key = array_key_exists($resource, self::TABLE_PKS)
+			? self::TABLE_PKS[$resource]
+			: DB::getPk(self::TABLE_NAMES[$resource]);
 		$clock = time();
 		$ip = substr($ip, 0, DB::getFieldLength('auditlog', 'ip'));
 		$recordsetid = self::getRecordSetId();
@@ -351,6 +369,10 @@ class CAudit {
 		foreach ($object as $key => $value) {
 			$index = '.'.$key;
 
+			if (is_array($value) && count($value) === 0) {
+				continue;
+			}
+
 			if (array_key_exists($prefix, self::NESTED_OBJECTS_IDS)) {
 				$index = '['.$value[self::NESTED_OBJECTS_IDS[$prefix]].']';
 				unset($value[self::NESTED_OBJECTS_IDS[$prefix]]);
@@ -363,6 +385,10 @@ class CAudit {
 			}
 
 			if (is_array($value)) {
+				if (array_key_exists($new_prefix, self::NESTED_OBJECTS_IDS) && !zbx_ctype_digit(key($value))) {
+					$value = [$value];
+				}
+
 				$result += self::convertKeysToPaths($new_prefix, $value);
 			}
 			else {
@@ -531,7 +557,7 @@ class CAudit {
 			}
 			else {
 				$is_value_to_mask = self::isValueToMask($resource, $path, $full_object);
-				if ($is_value_to_mask || $value != $db_value) {
+				if ($value != $db_value) {
 					if (self::isNestedObjectProperty($path)) {
 						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
 					}
