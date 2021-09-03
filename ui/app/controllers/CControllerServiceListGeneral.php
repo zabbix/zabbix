@@ -84,45 +84,35 @@ abstract class CControllerServiceListGeneral extends CController {
 			return [];
 		}
 
+		$path_serviceids = $this->getInput('path', []);
+
 		$path = [];
 		$db_service = $this->service;
 
-		while (true) {
-			if ($this->hasInput('path')) {
-				$path_serviceids = $this->getInput('path', []);
-
-				$db_services = API::Service()->get([
-					'output' => [],
-					'serviceids' => $path_serviceids,
-					'preservekeys' => true
-				]);
-
-				foreach (array_reverse($path_serviceids) as $serviceid) {
-					if (array_key_exists($serviceid, $db_services)) {
-						$path[] = $serviceid;
-					}
-				}
-
-				break;
-			}
-
-			if (!$db_service['parents']) {
-				break;
-			}
-
-			$db_service = API::Service()->get([
+		while ($db_service['parents']) {
+			$db_services  = API::Service()->get([
 				'output' => ['serviceid'],
-				'serviceids' => $db_service['parents'][0]['serviceid'],
-				'selectParents' => ['serviceid']
+				'serviceids' => array_column($db_service['parents'], 'serviceid'),
+				'selectParents' => ['serviceid'],
+				'preservekeys' => true
 			]);
 
-			if (!$db_service) {
+			if (!$db_services) {
 				break;
 			}
 
-			$db_service = reset($db_service);
+			$path_serviceid = array_pop($path_serviceids);
 
-			$path[] = $db_service['serviceid'];
+			if ($path_serviceid !== null && array_key_exists($path_serviceid, $db_services)) {
+				$path[] = $path_serviceid;
+				$db_service = $db_services[$path_serviceid];
+			}
+			else {
+				$db_service = reset($db_services);
+				$path_serviceids = [];
+				$path[] = $db_service['serviceid'];
+				$db_service = $db_service;
+			}
 		}
 
 		return array_reverse($path);
