@@ -53,7 +53,7 @@ class CControllerRegExEdit extends CController {
 		if ($this->hasInput('regexid')) {
 			$db_regexs = API::Regexp()->get([
 				'output' => ['name', 'test_string'],
-				'selectExpressions' => ['expression', 'expression_type', 'exp_delimiter', 'case_sensitive'],
+				'selectExpressions' => ['expression_type', 'expression', 'exp_delimiter', 'case_sensitive'],
 				'regexpids' => [$this->getInput('regexid')]
 			]);
 
@@ -83,8 +83,8 @@ class CControllerRegExEdit extends CController {
 		if ($data['form_refresh'] == 0) {
 			if ($data['regexid'] == 0) {
 				$data['expressions'] = [[
-					'expression' => '',
 					'expression_type' => EXPRESSION_TYPE_INCLUDED,
+					'expression' => '',
 					'exp_delimiter' => ',',
 					'case_sensitive' => 0
 				]];
@@ -95,8 +95,8 @@ class CControllerRegExEdit extends CController {
 		}
 		else {
 			$data['expressions'] = $this->getInput('expressions', [[
-				'expression' => '',
 				'expression_type' => EXPRESSION_TYPE_INCLUDED,
+				'expression' => '',
 				'exp_delimiter' => ',',
 				'case_sensitive' => 0
 			]]);
