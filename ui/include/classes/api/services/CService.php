@@ -129,7 +129,7 @@ class CService extends CApiService {
 				: array_keys($accessible_services);
 		}
 
-		$options['root_services'] = $permissions['root_services'];
+		$options['root_services'] = $permissions !== null ? $permissions['root_services'] : null;
 
 		$db_services = [];
 
