@@ -640,10 +640,10 @@ static int	DBpatch_5050054(void)
 
 		ZBX_STR2UINT64(roleid, row[0]);
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 1, "service.read", 1, "", NULL);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "service.read", 1, "", NULL);
 		DBpatch_5050054_calc_services_write_value(roleid, &services_write);
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 1, "services.write", services_write, "",
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "services.write", services_write, "",
 				NULL);
 
 	}
