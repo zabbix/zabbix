@@ -459,7 +459,7 @@ static duk_ret_t	es_httprequest_connect(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_httprequest_customrequest(duk_context *ctx)
 {
-	char	*method;
+	const char	*method;
 
 	if (0 != duk_is_null_or_undefined(ctx, 0))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "HTTP method cannot be undefined or null");
