@@ -3239,6 +3239,7 @@ Changes for 4.0.34rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.33
