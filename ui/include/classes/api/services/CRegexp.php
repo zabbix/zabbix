@@ -208,6 +208,11 @@ class CRegexp extends CApiService {
 					})
 				);
 
+				if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
+					// Set default value for expression delimiter.
+					$expression += ['exp_delimiter' => ','];
+				}
+
 				if ($db_expression) {
 					$expression['expressionid'] = $db_expression['expressionid'];
 					unset($db_expressions[$db_expression['expressionid']]);
