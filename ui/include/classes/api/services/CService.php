@@ -445,10 +445,9 @@ class CService extends CApiService {
 		$permissions = self::getPermissions();
 
 		$db_services = $this->doGet([
-			'output' => ['serviceid', 'name'],
+			'output' => ['serviceid', 'name', 'readonly'],
 			'selectChildren' => $permissions['rw_services'] !== null ? ['serviceid', 'name'] : null,
-			'serviceids' => $serviceids,
-			'editable' => true
+			'serviceids' => $serviceids
 		], $permissions);
 
 		if (count($db_services) != count($serviceids)) {
@@ -457,6 +456,15 @@ class CService extends CApiService {
 
 		if ($permissions['rw_services'] === null) {
 			return;
+		}
+
+		foreach ($db_services as $db_service) {
+			if ($db_service['readonly'] == 1) {
+				$error_detail = _('read-write access to the service is required');
+				$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
+
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			}
 		}
 
 		foreach ($db_services as $db_service) {
