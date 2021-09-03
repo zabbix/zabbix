@@ -1588,7 +1588,7 @@ class CService extends CApiService {
 			}
 		}
 
-		$rw_services = array_column($rules['services.write.list'], 'serviceid', 'serviceid');
+		$rw_services = array_fill_keys(array_column($rules['services.write.list'], 'serviceid'), null);
 
 		if ($rules['services.write.tag']['tag'] !== '') {
 			$tags = DB::select('service_tag', [
@@ -1598,7 +1598,7 @@ class CService extends CApiService {
 					: ['tag' => $rules['services.write.tag']['tag']]
 			]);
 
-			$rw_services += array_column($tags, 'serviceid', 'serviceid');
+			$rw_services += array_fill_keys(array_column($tags, 'serviceid'), 0);
 		}
 
 		$relations = [];
@@ -1632,8 +1632,6 @@ class CService extends CApiService {
 
 			$r_services = array_diff_key($r_services, $rw_services);
 		}
-
-		$rw_services = array_fill_keys(array_keys($rw_services), null);
 
 		$services = $rw_services;
 
@@ -1731,8 +1729,6 @@ class CService extends CApiService {
 		if ($rw_services === null) {
 			return;
 		}
-
-		$one_of_parent_names = [];
 
 		foreach ($services as $service) {
 			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
@@ -1835,8 +1831,6 @@ class CService extends CApiService {
 					foreach (array_keys(array_diff_key($old_child_services, $new_child_services)) as $serviceid) {
 						if ($rw_services[$serviceid] !== null) {
 							$rw_services[$serviceid]--;
-
-							$one_of_parent_names[$serviceid] = $name;
 						}
 					}
 
@@ -1857,10 +1851,8 @@ class CService extends CApiService {
 						'serviceids' => $serviceid
 					])[0];
 
-					$error_detail = _s('read-write access to the child service "%1$s" must be retained',
-						$inaccessible_service['name']
-					);
-					$error = _s('Cannot update service "%1$s": %2$s.', $one_of_parent_names[$serviceid], $error_detail);
+					$error_detail = _('read-write access to the service must be retained');
+					$error = _s('Cannot update service "%1$s": %2$s.', $inaccessible_service['name'], $error_detail);
 
 					self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 				}
