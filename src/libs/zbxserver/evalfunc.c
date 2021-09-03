@@ -21,10 +21,8 @@
 #include "db.h"
 #include "log.h"
 #include "zbxserver.h"
-#include "valuecache.h"
 #include "evalfunc.h"
 #include "zbxregexp.h"
-#include "zbxtrends.h"
 #include "../zbxalgo/vectorimpl.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
