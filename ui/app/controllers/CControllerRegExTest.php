@@ -81,20 +81,10 @@ class CControllerRegExTest extends CController {
 				}
 				break;
 
-			case EXPRESSION_TYPE_INCLUDED:
-			case EXPRESSION_TYPE_NOT_INCLUDED:
+			default:
 				if ($expression['expression'] === '') {
 					throw new Exception(_('Expression cannot be empty'));
 				}
-				break;
-
-			case EXPRESSION_TYPE_ANY_INCLUDED:
-				foreach (explode($expression['exp_delimiter'], $expression['expression']) as $string) {
-					if ($expression['expression'] === '') {
-						throw new Exception(_('Expression cannot be empty'));
-					}
-				}
-				break;
 		}
 	}
 }
