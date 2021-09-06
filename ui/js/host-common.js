@@ -143,7 +143,7 @@ function hosts_delete(host_form = null) {
 	}
 	else {
 		parent = document.querySelector('[name="hosts"]');
-		ids = getFormFields(parent).hosts;
+		ids = getFormFields(parent).ids;
 	}
 
 	curl.setArgument('action', 'host.massdelete');
