@@ -639,7 +639,7 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 	if (NULL != (graph = lld_graph_get(graphs, &lld_row->item_links)))
 	{
 		buffer = zbx_strdup(buffer, name_proto);
-		substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_SIMPLE, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(graph->name, buffer))
 		{
@@ -676,7 +676,7 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 
 		graph->name = zbx_strdup(NULL, name_proto);
 		graph->name_orig = NULL;
-		substitute_lld_macros(&graph->name, jp_row, lld_macro_paths, ZBX_MACRO_SIMPLE, NULL, 0);
+		substitute_lld_macros(&graph->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(graph->name, ZBX_WHITESPACE);
 
 		lld_override_graph(&lld_row->overrides, graph->name, &discover_proto);
@@ -1280,16 +1280,17 @@ out:
 }
 
 static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		int *ts_delete)
+		int *ts_delete, const char **name)
 {
-	zbx_lld_graph_t	*graph;
+	const zbx_lld_graph_t	*graph;
 
-	graph = (zbx_lld_graph_t *)object;
+	graph = (const zbx_lld_graph_t *)object;
 
 	*id = graph->graphid;
 	*discovery_flag = graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED;
 	*lastcheck = graph->lastcheck;
 	*ts_delete = graph->ts_delete;
+	*name = graph->name;
 }
 
 /******************************************************************************
