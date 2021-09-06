@@ -316,7 +316,7 @@ class CRole extends CApiService {
 
 		$this->checkDuplicates($roles, $db_roles);
 		$this->checkRules($roles, $db_roles);
-		$this->checkReadonly($roles, $db_roles);
+		$this->checkReadonly($db_roles);
 		$this->checkOwnRoleType($roles);
 	}
 
@@ -411,7 +411,7 @@ class CRole extends CApiService {
 				continue;
 			}
 
-			$name = array_key_exists('name', $role) ? $role['name'] : $db_roles[$role['roleid']]['name'];
+			$name = $db_roles !== null ? $db_roles[$role['roleid']]['name'] : $role['name'];
 			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
 
 			$db_rules = $db_roles !== null ? $db_roles[$role['roleid']]['rules'] : null;
@@ -746,12 +746,11 @@ class CRole extends CApiService {
 	}
 
 	/**
-	 * @param array $roles
 	 * @param array $db_roles
 	 *
 	 * @throws APIException
 	 */
-	private function checkReadonly(array $roles, array $db_roles): void {
+	private function checkReadonly(array $db_roles): void {
 		foreach ($db_roles as $db_role) {
 			if ($db_role['readonly'] == 1) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update readonly user role "%1$s".',
