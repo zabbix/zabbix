@@ -140,7 +140,7 @@ class testServiceRoles extends CIntegrationTest {
 			],
 			'parents' => [
 				['serviceid' => self::$parent_serviceid]
-			],
+			]
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['serviceids']);
@@ -156,7 +156,7 @@ class testServiceRoles extends CIntegrationTest {
 			'sortorder' => 0,
 			'parents' => [
 				['serviceid' => self::$parent_serviceid]
-			],
+			]
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['serviceids']);
@@ -510,7 +510,7 @@ class testServiceRoles extends CIntegrationTest {
 				],
 				'services.read.list' => [
 					['serviceid' => self::$child1_serviceid]
-				],
+				]
 			]
 		]);
 		$this->reloadConfigurationCache();
