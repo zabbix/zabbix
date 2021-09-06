@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('inventory.host.view.js.php');
+
 // Overview tab.
 $overviewFormList = new CFormList();
 
@@ -175,11 +177,9 @@ $overviewFormList->addRow(_('Monitoring'),
 
 // configuration
 if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
-	$hostLink = (new CLink(_('Host'), (new CUrl('zabbix.php'))
-		->setArgument('action', 'host.edit')
-		->setArgument('hostid', $data['host']['hostid'])
-	))
-		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT);
+	$hostLink = (new CLink(_('Host')))
+		->onClick('view.hostEdit({hostid:\''.$data['host']['hostid'].'\'})');
+//		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT);
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('items.php'))
 			->setArgument('filter_set', '1')
@@ -272,6 +272,6 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 	)
 	->show();
 
-(new CScriptTag('host_popup.init()'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

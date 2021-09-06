@@ -68,7 +68,7 @@ else {
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'host_edit.deleteHost();'
+			'action' => 'host_edit_popup.deleteHost(event, "'.$data['hostid'].'");'
 		]
 	];
 }
@@ -80,7 +80,9 @@ if ($data['warning']) {
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
 	'body' => (new CPartial('configuration.host.edit.html', $data))->getOutput(),
-	'script_inline' => getPagePostJs(),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.host.edit.js.php').
+		'host_edit_popup.init();',
 	'buttons' => $buttons
 ];
 

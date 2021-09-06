@@ -70,7 +70,7 @@ var chkbxRange = {
 			this.update(this.pageGoName);
 		}
 
-		this.footerButtons = jQuery('#action_buttons button');
+		this.footerButtons = jQuery('#action_buttons button:not([onclick])');
 		var thisChkbxRange = this;
 		this.footerButtons.each(function() {
 			addListener(this, 'click', thisChkbxRange.submitFooterButton.bindAsEventListener(thisChkbxRange), false);

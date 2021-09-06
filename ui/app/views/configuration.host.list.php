@@ -518,10 +518,11 @@ $form->addItem([
 				->addClass(ZBX_STYLE_BTN_ALT)
 		],
 		'host.massdelete' => [
-			'content' => (new CButton('delete', _('Delete')))
-				->onClick('return confirm('.json_encode(_('Delete selected hosts?')).')
-							? hosts_delete() : false')
+			'content' => (new CSimpleButton(_('Delete')))
+				->setAttribute('confirm', _('Delete selected hosts?'))
+				->onClick('view.massDeleteHosts(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->removeAttribute('id')
 		]
 	], 'hosts')
 ]);
@@ -530,6 +531,6 @@ $widget
 	->addItem($form)
 	->show();
 
-(new CScriptTag('host_popup.init();'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

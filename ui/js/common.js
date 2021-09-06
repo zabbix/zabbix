@@ -992,3 +992,28 @@ function openMassupdatePopup(elem, popup_name, data = {}) {
 
 	return PopUp(popup_name, data, null, elem);
 }
+
+/**
+ * Clears session storage from markers of checked table rows.
+ * Or keeps only accessible IDs in the list of checked rows.
+ *
+ * @param {string}       page
+ * @param {array|Object} keepids
+ */
+function uncheckTableRows(page, keepids = []) {
+	// This key only works for new MVC pages.
+	const key = 'cb_zabbix_'+page;
+
+	if (keepids) {
+		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
+		let keepids_formatted = {};
+		for(const id of Object.values(keepids)) {
+			keepids_formatted[id] = id;
+		}
+
+		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));
+	}
+	else {
+		sessionStorage.removeItem(key);
+	}
+}

@@ -576,8 +576,6 @@ $host_form
 	->addItem($tabs)
 	->show();
 
-(new CScriptTag(
-	'host_edit.init()'
-))
-	->setOnDocumentReady()
-	->show();
+//(new CScriptTag('host_edit.init();'))
+//	->setOnDocumentReady()
+//	->show();

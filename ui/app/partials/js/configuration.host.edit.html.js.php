@@ -107,11 +107,15 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 <script>
 	'use strict';
 
-	var host_edit = {
+	window.host_edit = {
+		form: null,
+
 		/**
 		 * Host form setup.
 		 */
 		init() {
+			this.form = document.getElementById('host-form');
+
 			this.initHostTab();
 			this.initTemplatesTab();
 			this.initMacrosTab();
@@ -446,15 +450,23 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		 * Handles current host deletion.
 		 */
 		deleteHost() {
-			const original_curl = new Curl(host_popup.original_url);
+			// const original_curl = new Curl(host_popup.original_url);
 
-			if (basename(original_curl.getPath()) === 'hostinventories.php') {
-				original_curl.unsetArgument('hostid');
-				original_curl.unsetArgument('sid');
-				host_popup.original_url = original_curl.getUrl();
-			}
+			// if (basename(original_curl.getPath()) === 'hostinventories.php') {
+				// original_curl.unsetArgument('hostid');
+				// original_curl.unsetArgument('sid');
+				// host_popup.original_url = original_curl.getUrl();
+			// }
 
-			return hosts_delete(document.getElementById('<?= $data['form_name'] ?>'));
+			// return hosts_delete(document.getElementById('<?//= $data['form_name'] ?>//'));
+
+			const response = {title: 'Title', messages: 'Messages'}; // TODO VM: temporary
+			this.form.dispatchEvent(new CustomEvent('host.delete', {
+				detail: {
+					title: response.title,
+					messages: ('messages' in response) ? response.messages : null
+				}
+			}));
 		},
 
 		/**

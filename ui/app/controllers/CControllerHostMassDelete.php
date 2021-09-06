@@ -29,7 +29,14 @@ class CControllerHostMassDelete extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData([
+					'main_block' => json_encode(['error' => [
+						'title' => CMessageHelper::getTitle(),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]])
+				])
+			);
 		}
 
 		return $ret;
@@ -40,19 +47,35 @@ class CControllerHostMassDelete extends CController {
 	}
 
 	protected function doAction(): void {
+		$output = [];
+		$hostids = $this->getInput('hostids');
+		$result = API::Host()->delete($hostids);
 
-		$result = API::Host()->delete($this->getInput('hostids'));
+		if (!$result) {
+			$hostids = API::Host()->get([
+				'output' => [],
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			$output['keepids'] = array_column($hostids, 'hostid');
+		}
 
 		if ($result) {
-			$output = ['title' => _('Host deleted')];
+			$success = ['title' => _('Host deleted')];
 
-			if ($messages = CMessageHelper::getMessages()) {
-				$output['messages'] = array_column($messages, 'message');
+			if ($messages = get_and_clear_messages()) {
+				$success['messages'] = array_column($messages, 'message');
 			}
+
+			$output['success'] = $success;
 		}
 		else {
-			$output = [
-				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), _('Cannot delete host'))->toString()
+			CMessageHelper::setErrorTitle(_('Cannot delete host'));
+
+			$output['error'] = [
+				'title' => CMessageHelper::getTitle(),
+				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
 
