@@ -119,7 +119,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User'
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'User role with name "User role" already exists.'
+					'message_details' => 'User role "User role" already exists.'
 				]
 			],
 			[
@@ -130,7 +130,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Admin'
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'User role with name "Admin role" already exists.'
+					'message_details' => 'User role "Admin role" already exists.'
 				]
 			],
 			[
@@ -141,7 +141,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin'
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'User role with name "Super admin role" already exists.'
+					'message_details' => 'User role "Super admin role" already exists.'
 				]
 			],
 			// Empty name field.
@@ -224,7 +224,7 @@ class testFormUserRoles extends CWebTest {
 						'Reports' => []
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "user_ui_checked_out".'
 				]
 			],
 			[
@@ -239,7 +239,7 @@ class testFormUserRoles extends CWebTest {
 						'Configuration' => []
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "admin_ui_checked_out".'
 				]
 			],
 			[
@@ -255,7 +255,7 @@ class testFormUserRoles extends CWebTest {
 						'Administration' => []
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "super_admin_ui_checked_out".'
 				]
 			],
 			// Remove everything.
@@ -282,7 +282,7 @@ class testFormUserRoles extends CWebTest {
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "user_everything_removed".'
 				]
 			],
 			[
@@ -311,7 +311,7 @@ class testFormUserRoles extends CWebTest {
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "admin_everything_removed".'
 				]
 			],
 			[
@@ -341,7 +341,7 @@ class testFormUserRoles extends CWebTest {
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "super_admin_everything_removed".'
 				]
 			],
 			// Special symbols in the name.
@@ -727,7 +727,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'User role '
 					],
 					'message_header' => 'Cannot update user role',
-					'message_details' => 'User role with name "User role" already exists.'
+					'message_details' => 'User role "User role" already exists.'
 				]
 			],
 			// All UI elements disabled.
@@ -740,7 +740,7 @@ class testFormUserRoles extends CWebTest {
 						'Reports' => []
 					],
 					'message_header' => 'Cannot update user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "role_for_update".'
 				]
 			],
 			// Change name.
@@ -883,8 +883,7 @@ class testFormUserRoles extends CWebTest {
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
 			if ($role === 'Admin role') {
-				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'The role "Admin role" is assigned to'.
-						' at least one user and cannot be deleted.');
+				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'Cannot delete assigned user role "Admin role".');
 				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
 			}
 			else {
@@ -964,7 +963,7 @@ class testFormUserRoles extends CWebTest {
 		$form->fill($data['fields']);
 
 		if (array_key_exists('api_methods', $data)) {
-			$this->query('class:multiselect-control')->asMultiselect()->one()->fill($data['api_methods']);
+			$this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->fill($data['api_methods']);
 		}
 		$form->submit();
 
@@ -997,7 +996,7 @@ class testFormUserRoles extends CWebTest {
 			$form->checkValue($data['fields']);
 
 			if (array_key_exists('api_methods', $data)) {
-				$api_methods = $this->query('class:multiselect-control')->asMultiselect()->one()->getValue();
+				$api_methods = $this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->getValue();
 				rsort($api_methods);
 				$this->assertEquals($data['api_methods'], $api_methods);
 			}
