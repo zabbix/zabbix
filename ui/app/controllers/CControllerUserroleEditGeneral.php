@@ -103,10 +103,6 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			]
 		]);
 
-		if (!$db_modules) {
-			return [];
-		}
-
 		$modules = $this->getInput('modules');
 
 		return [
