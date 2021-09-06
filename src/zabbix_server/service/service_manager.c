@@ -3019,15 +3019,15 @@ static void	process_event_severities(const zbx_ipc_message_t *message, zbx_servi
 	for (i = 0; i < event_severities.values_num; i++)
 	{
 		zbx_event_severity_t		*es = (zbx_event_severity_t *)event_severities.values[i];
-		zbx_event_t			event_local = {.eventid = es->eventid}, *event = &event_local;
+		zbx_event_t			event_local = {.eventid = es->eventid}, *event = &event_local, **pevent;
 		zbx_service_problem_index_t	*pi, pi_local;
 
 		/* update event severity in problem cache */
 
-		if (NULL == (event = *(zbx_event_t **)zbx_hashset_search(&service_manager->problem_events, &event)))
+		if (NULL == (pevent = (zbx_event_t **)zbx_hashset_search(&service_manager->problem_events, &event)))
 			continue;
 
-		event->severity = es->severity;
+		(*pevent)->severity = es->severity;
 
 		/* update event severities in service problems lists */
 
