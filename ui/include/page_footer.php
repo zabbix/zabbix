@@ -63,9 +63,9 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		makePageFooter()->show();
 	}
 
-	require_once 'include/views/js/common.init.js.php';
-
 	insertPagePostJs(true);
+
+	require_once 'include/views/js/common.init.js.php';
 
 	echo '</div></body></html>';
 }

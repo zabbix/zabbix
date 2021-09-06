@@ -34,9 +34,8 @@
 			window.flickerfreeScreen.responsiveness = <?php echo SCREEN_REFRESH_RESPONSIVENESS * 1000; ?>;
 		<?php endif ?>
 
-		cookie.init();
-
 		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies
-		setTimeout(() => chkbxRange.init());
+		cookie.init();
+		chkbxRange.init();
 	});
 </script>
