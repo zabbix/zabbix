@@ -2461,7 +2461,7 @@ int	zbx_db_strlen_n(const char *text_loc, size_t maxlen)
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
-		zbx_uint32_t max_version)
+		zbx_uint32_t max_version, zbx_uint32_t min_supported_version)
 {
 	int	flag;
 
@@ -2481,6 +2481,11 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
 		flag = DB_VERSION_HIGHER_THAN_MAXIMUM;
 		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version is %lu which is higher than maximum of %lu",
 				database, (unsigned long)current_version, (unsigned long)max_version);
+	}
+	else if (min_supported_version > current_version && ZBX_DBVERSION_UNDEFINED != min_supported_version)
+	{
+		flag = DB_VERSION_LOWER_THAN_SUPPORTED;
+		/* log message must be handled by server or proxy */
 	}
 	else
 		flag = DB_VERSION_SUPPORTED;
@@ -2606,7 +2611,7 @@ int	zbx_dbms_mariadb_used(void)
  *          For "<anything else>"                                                       => DBVERSION_UNDEFINED *
  *                                                                                                             *
  **************************************************************************************************************/
-zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
+void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info, struct zbx_json *json)
 {
 #define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 #if defined(HAVE_MYSQL)
@@ -2639,15 +2644,23 @@ zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
 
 	if (ON == ZBX_MARIADB_SFORK)
 	{
-		flag = zbx_db_version_check("MariaDB",  ZBX_MYSQL_SVERSION, ZBX_MARIA_MIN_VERSION, ZBX_DBVERSION_UNDEFINED);
-		zbx_db_version_json_create(json, "MariaDB", version_friendly,
-				ZBX_MARIA_MIN_VERSION_FRIENDLY, ZBX_MARIA_MAX_VERSION_FRIENDLY, flag);
+		flag = zbx_db_version_check("MariaDB",  ZBX_MYSQL_SVERSION, ZBX_MARIA_MIN_VERSION, ZBX_DBVERSION_UNDEFINED,
+				ZBX_MARIA_MIN_SUPPORTED_VERSION);
+		if (NULL != json)
+		{
+			zbx_db_version_json_create(json, "MariaDB", version_friendly,
+					ZBX_MARIA_MIN_VERSION_FRIENDLY, ZBX_MARIA_MAX_VERSION_FRIENDLY, flag);
+		}
 	}
 	else
 	{
-		flag = zbx_db_version_check("MySQL", ZBX_MYSQL_SVERSION, ZBX_MYSQL_MIN_VERSION, ZBX_MYSQL_MAX_VERSION);
-		zbx_db_version_json_create(json, "MySQL", version_friendly,
-				ZBX_MYSQL_MIN_VERSION_FRIENDLY, ZBX_MYSQL_MAX_VERSION_FRIENDLY, flag);
+		flag = zbx_db_version_check("MySQL", ZBX_MYSQL_SVERSION, ZBX_MYSQL_MIN_VERSION, ZBX_MYSQL_MAX_VERSION,
+				ZBX_MYSQL_MIN_SUPPORTED_VERSION);
+		if (NULL != json)
+		{
+			zbx_db_version_json_create(json, "MySQL", version_friendly,
+					ZBX_MYSQL_MIN_VERSION_FRIENDLY, ZBX_MYSQL_MAX_VERSION_FRIENDLY, flag);
+		}
 	}
 
 	zbx_free(version_friendly);
@@ -2660,9 +2673,12 @@ zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
 	version_friendly = zbx_dsprintf(NULL, "%d.%d.%d", RIGHT2(ZBX_PG_SVERSION/10000),
 			RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
 	flag = zbx_db_version_check("PostgreSQL", ZBX_PG_SVERSION, ZBX_POSTGRESQL_MIN_VERSION,
-			ZBX_POSTGRESQL_MAX_VERSION);
-	zbx_db_version_json_create(json, "PostgreSQL", version_friendly,
-			ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY, ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY, flag);
+			ZBX_POSTGRESQL_MAX_VERSION, ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION);
+	if (NULL != json)
+	{
+		zbx_db_version_json_create(json, "PostgreSQL", version_friendly,
+				ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY, ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY, flag);
+	}
 	zbx_free(version_friendly);
 #elif defined(HAVE_ORACLE)
 #	ifdef HAVE_OCI_SERVER_RELEASE2
@@ -2737,15 +2753,22 @@ out:
 #	endif
 	}
 
-	flag = zbx_db_version_check("Oracle", ZBX_ORACLE_SVERSION, ZBX_ORACLE_MIN_VERSION, ZBX_ORACLE_MAX_VERSION);
-	zbx_db_version_json_create(json, "Oracle", version_friendly, ZBX_ORACLE_MIN_VERSION_FRIENDLY,
-			ZBX_ORACLE_MAX_VERSION_FRIENDLY, flag);
+	flag = zbx_db_version_check("Oracle", ZBX_ORACLE_SVERSION, ZBX_ORACLE_MIN_VERSION, ZBX_ORACLE_MAX_VERSION,
+			ZBX_ORACLE_MIN_SUPPORTED_VERSION);
+	if (NULL != json)
+	{
+		zbx_db_version_json_create(json, "Oracle", version_friendly, ZBX_ORACLE_MIN_VERSION_FRIENDLY,
+				ZBX_ORACLE_MAX_VERSION_FRIENDLY, flag);
+	}
 #else
+	int	flag = DB_VERSION_SUPPORTED;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)zbx_dbms_version_get());
 
-	return zbx_dbms_version_get();
+	version_info->version = zbx_dbms_version_get();
+	version_info->version_status = flag;
 }
 
 #if defined(HAVE_POSTGRESQL)

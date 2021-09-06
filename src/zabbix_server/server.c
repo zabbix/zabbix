@@ -268,6 +268,7 @@ char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
 char	*CONFIG_EXPORT_DIR		= NULL;
 char	*CONFIG_EXPORT_TYPE		= NULL;
 int	CONFIG_DBPORT			= 0;
+int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
@@ -837,6 +838,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPort",			&CONFIG_DBPORT,				TYPE_INT,
 			PARM_OPT,	1024,			65535},
+		{"AllowUnsupportedDbVersions",	&CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS,	TYPE_INT,
+			PARM_OPT,	0,			1},
 		{"DBTLSConnect",		&CONFIG_DB_TLS_CONNECT,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBTLSCertFile",		&CONFIG_DB_TLS_CERT_FILE,		TYPE_STRING,
@@ -1091,19 +1094,45 @@ static void	zbx_main_sigusr_handler(int flags)
 
 static void	zbx_check_db(void)
 {
-	struct zbx_json	db_ver;
+	struct zbx_db_version_info_t	db_version_info;
+	struct zbx_json			db_version_json;
 
-	zbx_json_initarray(&db_ver, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
+	DBextract_version_info(&db_version_info, &db_version_json);
 
-	if (SUCCEED != DBcheck_capabilities(DBextract_version(&db_ver)) || SUCCEED != DBcheck_version())
+	if (DB_VERSION_LOWER_THAN_SUPPORTED == db_version_info.version_status)
 	{
-		zbx_json_free(&db_ver);
+		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "");
+			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix server due to unsupported " ZBX_DB_NAME_STR
+				" database server version (%u)", db_version_info.version);
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDbVersions=1"
+				" in Zabbix server configuration file at your own risk.");
+			zabbix_log(LOG_LEVEL_ERR, "");
+			zbx_json_free(&db_version_json);
+			exit(EXIT_FAILURE);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, "");
+			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported " ZBX_DB_NAME_STR
+				" database server version (%u). ", db_version_info.version);
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, "");
+		}
+	}
+
+	if (SUCCEED != DBcheck_capabilities(db_version_info.version) || SUCCEED != DBcheck_version())
+	{
+		zbx_json_free(&db_version_json);
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_history_check_version(&db_ver);
-	DBflush_version_requirements(db_ver.buffer);
-	zbx_json_free(&db_ver);
+	zbx_history_check_version(&db_version_json);
+	DBflush_version_requirements(db_version_json.buffer);
+	zbx_json_free(&db_version_json);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)

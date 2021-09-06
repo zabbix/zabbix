@@ -1111,7 +1111,8 @@ out:
 		}
 	}
 
-	flag = zbx_db_version_check("ElasticDB", version, ZBX_ELASTIC_MIN_VERSION, ZBX_DBVERSION_UNDEFINED);
+	flag = zbx_db_version_check("ElasticDB", version, ZBX_ELASTIC_MIN_VERSION,
+			ZBX_DBVERSION_UNDEFINED, ZBX_DBVERSION_UNDEFINED);
 	zbx_db_version_json_create(json, "ElasticDB", version_friendly, ZBX_ELASTIC_MIN_VERSION_FRIENDLY, "", flag);
 	ZBX_ELASTIC_SVERSION = version;
 	zbx_free(version_friendly);
