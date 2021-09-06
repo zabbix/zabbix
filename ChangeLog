@@ -1,6 +1,7 @@
 Changes for 6.0.0alpha2
 
 New features:
+A.F.I...S. [ZBXNEXT-6787] added support of user permissions for service tree (ashubin, averza, dgoloscapov)
 A.F.....S. [ZBXNEXT-6824] replaced simple macros with expression macros (asestakovs, Sasha)
 ........S. [ZBXNEXT-6870] implemented support of additional HTTP methods for webhooks (dgoloscapov)
 A......... [ZBXNEXT-6470,ZBXNEXT-6866] implemented audit logging of usergroup API object (rlataria, Sasha)
