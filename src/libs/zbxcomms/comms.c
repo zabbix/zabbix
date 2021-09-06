@@ -1860,25 +1860,30 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 				offset += sizeof(len32_le);
 				reserved = zbx_letoh_uint32(len32_le);
 
-				if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
+				if (0 == (flags & ZBX_TCP_LARGE))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from %s exceeds the "
-							"maximum size " ZBX_FS_UI64 " bytes. Message ignored.",
-							(zbx_uint64_t)expected_len, s->peer,
-							(zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
-					nbytes = ZBX_PROTO_ERROR;
-					goto out;
-				}
+					if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from %s"
+								" exceeds the maximum size " ZBX_FS_UI64 " bytes."
+								" Message ignored.",
+								(zbx_uint64_t)expected_len, s->peer,
+								(zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
+						nbytes = ZBX_PROTO_ERROR;
+						goto out;
+					}
 
-				/* compressed protocol stores uncompressed packet size in the reserved data */
-				if (0 != (protocol_version & ZBX_TCP_COMPRESS) && ZBX_MAX_RECV_DATA_SIZE < reserved)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64
-							" from %s exceeds the maximum size " ZBX_FS_UI64
-							" bytes. Message ignored.", (zbx_uint64_t)reserved, s->peer,
-							(zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
-					nbytes = ZBX_PROTO_ERROR;
-					goto out;
+					/* compressed protocol stores uncompressed packet size in the reserved data */
+					if (0 != (protocol_version & ZBX_TCP_COMPRESS) &&
+							ZBX_MAX_RECV_DATA_SIZE < reserved)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64
+								" from %s exceeds the maximum size " ZBX_FS_UI64
+								" bytes. Message ignored.", (zbx_uint64_t)reserved,
+								s->peer, (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
+						nbytes = ZBX_PROTO_ERROR;
+						goto out;
+					}
 				}
 			}
 

@@ -25,7 +25,7 @@
 
 #include "log.h"
 
-static zbx_uint64_t	json_parse_object(const char *start, char **error);
+static zbx_int64_t	json_parse_object(const char *start, char **error);
 
 /******************************************************************************
  *                                                                            *
@@ -72,7 +72,7 @@ static int	json_error(const char *message, const char *json_buffer, char **error
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	json_parse_string(const char *start, char **error)
+static zbx_int64_t	json_parse_string(const char *start, char **error)
 {
 	const char	*ptr = start;
 
@@ -149,10 +149,10 @@ static zbx_uint64_t	json_parse_string(const char *start, char **error)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	json_parse_array(const char *start, char **error)
+static zbx_int64_t	json_parse_array(const char *start, char **error)
 {
 	const char	*ptr = start;
-	zbx_uint64_t	len;
+	zbx_int64_t	len;
 
 	ptr++;
 	SKIP_WHITESPACE(ptr);
@@ -198,7 +198,7 @@ static zbx_uint64_t	json_parse_array(const char *start, char **error)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	json_parse_number(const char *start, char **error)
+static zbx_int64_t	json_parse_number(const char *start, char **error)
 {
 	const char	*ptr = start;
 	char		first_digit;
@@ -277,7 +277,7 @@ static zbx_uint64_t	json_parse_number(const char *start, char **error)
  *           false.                                                           *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	json_parse_literal(const char *start, const char *text, char **error)
+static zbx_int64_t	json_parse_literal(const char *start, const char *text, char **error)
 {
 	const char	*ptr = start;
 
@@ -308,10 +308,10 @@ static zbx_uint64_t	json_parse_literal(const char *start, const char *text, char
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	json_parse_value(const char *start, char **error)
+zbx_int64_t	json_parse_value(const char *start, char **error)
 {
 	const char	*ptr = start;
-	zbx_uint64_t	len;
+	zbx_int64_t	len;
 
 	SKIP_WHITESPACE(ptr);
 
@@ -380,10 +380,10 @@ zbx_uint64_t	json_parse_value(const char *start, char **error)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	json_parse_object(const char *start, char **error)
+static zbx_int64_t	json_parse_object(const char *start, char **error)
 {
 	const char	*ptr = start;
-	zbx_uint64_t	len;
+	zbx_int64_t	len;
 
 	/* parse object name */
 	SKIP_WHITESPACE(ptr);
@@ -451,9 +451,9 @@ static zbx_uint64_t	json_parse_object(const char *start, char **error)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_json_validate(const char *start, char **error)
+zbx_int64_t	zbx_json_validate(const char *start, char **error)
 {
-	zbx_uint64_t	len;
+	zbx_int64_t	len;
 
 	/* parse object name */
 	SKIP_WHITESPACE(start);
