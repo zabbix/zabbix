@@ -683,7 +683,7 @@ class ZBase {
 		$modules_missing = [];
 
 		foreach ($db_modules as $db_module) {
-			if (!CWebUser::checkAccess(CRoleHelper::MODULES_MODULE.$db_module['moduleid'])) {
+			if (!CWebUser::checkAccess('modules.module.'.$db_module['moduleid'])) {
 				continue;
 			}
 

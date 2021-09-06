@@ -99,10 +99,12 @@ class CControllerServiceCreate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function doAction(): void {
 		$service = [
 			'showsla' => $this->hasInput('showsla') ? SERVICE_SHOW_SLA_ON : SERVICE_SHOW_SLA_OFF,

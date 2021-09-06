@@ -345,6 +345,7 @@ typedef struct
 	char			*name;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
+	zbx_vector_tags_t	service_tags;
 }
 DB_SERVICE;
 

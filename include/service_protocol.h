@@ -49,6 +49,9 @@ void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, s
 void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_service_t *services);
 
+zbx_uint32_t	zbx_service_serialize_parentids(unsigned char **data, const zbx_vector_uint64_t *ids);
+void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_vector_uint64_t *ids);
+
 zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const zbx_vector_ptr_t *event_severities);
 void	zbx_service_deserialize_event_severities(const unsigned char *data, zbx_vector_ptr_t *event_severities);
 

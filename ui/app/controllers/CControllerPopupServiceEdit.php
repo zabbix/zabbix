@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/forms.inc.php';
+require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerPopupServiceEdit extends CController {
 
@@ -44,9 +44,11 @@ class CControllerPopupServiceEdit extends CController {
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-				|| !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES)) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
 			return false;
 		}
 
@@ -74,6 +76,9 @@ class CControllerPopupServiceEdit extends CController {
 		return true;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function doAction(): void {
 		if ($this->service !== null) {
 			CArrayHelper::sort($this->service['parents'], ['name']);
