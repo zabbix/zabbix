@@ -72,7 +72,7 @@ typedef struct
 }
 zbx_lld_item_preproc_t;
 
-static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_preprocid, int flags,
+static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_preprocid, zbx_uint64_t flags,
 		int step, int type, const char *params, int error_handler, const char *error_handler_params)
 
 {
