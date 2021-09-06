@@ -103,7 +103,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			]
 		]);
 
-		$modules = $this->getInput('modules');
+		$modules = $this->getInput('modules', []);
 
 		return [
 			'modules' => array_map(
