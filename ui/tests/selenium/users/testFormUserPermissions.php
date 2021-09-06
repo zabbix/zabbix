@@ -376,7 +376,8 @@ class testFormUserPermissions extends CWebTest {
 					}
 					else {
 						// Change Deny to Allow list and add request. Now they became green on permission page.
-						$form->fill(['API methods' => 'Allow list'])->waitUntilReady();
+						$form->fill(['API methods' => 'Allow list']);
+						$form->waitUntilReady();
 						$this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()
 								->one()->fill(['host.create', 'host.delete']);
 					}
