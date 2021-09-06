@@ -208,15 +208,6 @@ DC_FUNCTION;
 
 typedef struct
 {
-	char	*tag;
-	char	*value;
-}
-zbx_tag_t;
-
-ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
-
-typedef struct
-{
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	itemid;
 	zbx_tag_t	tag;
@@ -698,6 +689,7 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers(void);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
+int	DCconfig_trigger_exists(zbx_uint64_t triggerid);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
 int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
@@ -878,7 +870,6 @@ typedef struct
 }
 zbx_hc_item_t;
 
-void	zbx_free_tag(zbx_tag_t *tag);
 void	zbx_free_item_tag(zbx_item_tag_t *item_tag);
 
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
@@ -1004,7 +995,6 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env);
 const char	*zbx_dc_get_instanceid(void);
 
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid);
-char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
 		char **value, char **error);
 

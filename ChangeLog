@@ -1,9 +1,29 @@
 Changes for 6.0.0alpha2
 
 New features:
+A.F.....S. [ZBXNEXT-6824] replaced simple macros with expression macros (asestakovs, Sasha)
+........S. [ZBXNEXT-6870] implemented support of additional HTTP methods for webhooks (dgoloscapov)
+A......... [ZBXNEXT-6470,ZBXNEXT-6866] implemented audit logging of usergroup API object (rlataria, Sasha)
+........S. [ZBXNEXT-6830] implemented audit on server (processing discovered items) (akozlovs)
+........S. [ZBXNEXT-6817] implemented audit for server (linking templates - items, items prototypes, discovery rules) (arimdjonoks)
+........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
+A......... [ZBXNEXT-6470,ZBXNEXT-6859] added logging of deleted tokens when deleting a user (rlataria, Sasha)
+.........T [ZBXNEXT-6789] added template for Travis CI (abiba)
 A.F....... [ZBXNEXT-6800] implemented complex service status calculation and propagation rules (ashubin, averza, wiper)
 
 Bug fixes:
+.........T [ZBX-19865] fixed typos in "F5 Big-IP SNMP" template (abakaldin)
+.........T [ZBX-19835] fixed incorrect master item in template "Hikvision camera by HTTP" (abakaldin)
+.........T [ZBX-19849] fixed a trigger name typo in the "MSSQL by ODBC" template (mchudinov)
+...G...... [ZBX-19613] fixed Zabbix agent 2 redis plugin to closer match redis-cli connection (esneiders)
+...G...... [ZBX-19510] fixed re-reading of old Windows events for various Windows event system synchronization problems (MVekslers)
+...G...... [ZBX-16803] fixed ability to use Interface Guid in network interface LLD (akozlovs)
+........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
+..F....... [ZBX-19581] fixed untranslated and incorrectly translated strings (agriscenko)
+.........T [ZBX-18680] fixed multi-channel notification issue in "Slack" media type (abiba)
+A.......S. [ZBX-19822] fixed Zabbix server not to populate housekeeper table with tasks that are never deleted when TimescaleDB partitioning is used (jfreibergs, vso)
+.........T [ZBX-19623] fixed Jira Service Desk URL in webhook (abiba)
+A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0alpha1
@@ -35,8 +55,22 @@ Bug fixes:
 Changes for 5.4.5rc1
 
 New features:
+........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
+.........T [ZBXNEXT-6789] added template for Travis CI (abiba)
 
 Bug fixes:
+.........T [ZBX-19865] fixed typos in "F5 Big-IP SNMP" template (abakaldin)
+.........T [ZBX-19835] fixed incorrect master item in template "Hikvision camera by HTTP" (abakaldin)
+.........T [ZBX-19849] fixed a trigger name typo in the "MSSQL by ODBC" template (mchudinov)
+...G...... [ZBX-19613] fixed Zabbix agent 2 redis plugin to closer match redis-cli connection (esneiders)
+...G...... [ZBX-19510] fixed re-reading of old Windows events for various Windows event system synchronization problems (MVekslers)
+...G...... [ZBX-16803] fixed ability to use Interface Guid in network interface LLD (akozlovs)
+........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
+..F....... [ZBX-19581] fixed untranslated and incorrectly translated strings (agriscenko)
+.........T [ZBX-18680] fixed multi-channel notification issue in "Slack" media type (abiba)
+A.......S. [ZBX-19822] fixed Zabbix server not to populate housekeeper table with tasks that are never deleted when TimescaleDB partitioning is used (jfreibergs, vso)
+.........T [ZBX-19623] fixed Jira Service Desk URL in webhook (abiba)
+A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.4
@@ -56,6 +90,7 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6569] improved performance of graphs and graphs
 A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 
 Bug fixes:
+...G...... [ZBX-19915] fixed go-sqlite3 in zabbix_agent2 (esneiders)
 .......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
 A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ........S. [ZBX-19745] fixed Zabbix server exiting when quoted user macro context ends with backslash (vso)
@@ -1029,8 +1064,19 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.16rc1
 
 New features:
+........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
 
 Bug fixes:
+.........T [ZBX-19865] fixed typos in "F5 Big-IP SNMP" template (abakaldin)
+.........T [ZBX-19849] fixed a trigger name typo in the "MSSQL by ODBC" template (mchudinov)
+...G...... [ZBX-19613] fixed Zabbix agent 2 redis plugin to closer match redis-cli connection (esneiders)
+...G...... [ZBX-19510] fixed re-reading of old Windows events for various Windows event system synchronization problems (MVekslers)
+...G...... [ZBX-16803] fixed ability to use Interface Guid in network interface LLD (akozlovs)
+........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
+.........T [ZBX-18680] fixed multi-channel notification issue in "Slack" media type (abiba)
+.........T [ZBX-19623] fixed Jira Service Desk URL in webhook (abiba)
+A.......S. [ZBX-19822] fixed Zabbix server not to populate housekeeper table with tasks that are never deleted when TimescaleDB partitioning is used (jfreibergs, vso)
+A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.15
@@ -3239,6 +3285,7 @@ Changes for 4.0.34rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.33

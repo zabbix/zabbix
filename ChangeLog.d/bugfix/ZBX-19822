@@ -1,1 +1,0 @@
-A.......S. [ZBX-19822] fixed Zabbix server not to populate housekeeper table with tasks that are never deleted when TimescaleDB partitioning is used (jfreibergs, vso)

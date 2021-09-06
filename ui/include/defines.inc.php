@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha2');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050050);
+define('ZABBIX_DB_VERSION',		5050068);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -153,8 +153,9 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 define('ZBX_DB_MAX_INSERTS', 10000);
 
 // Default db and field character set (MYSQL & POSTGRESQL)
-define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
-define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+define('ZBX_DB_POSTGRESQL_ALLOWED_CHARSET', 'UTF8');
+define('ZBX_DB_MYSQL_ALLOWED_CHARSETS', ['UTF8', 'UTF8MB3']);
+define('ZBX_DB_MYSQL_ALLOWED_COLLATIONS', ['utf8_bin', 'utf8mb3_bin']);
 
 // Default db defines for Oracle DB
 define('ORACLE_MAX_STRING_SIZE', 4000);
@@ -1233,37 +1234,6 @@ define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_LLD_MACROS', '(\{\#'.ZBX_PREG_MACRO_NAME_LLD.'\})');
 
-// !!! should be used with "x" modifier
-define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
-	(?P>param) # match recursive parameter group
-	|
-	(\" # match quoted string
-		(
-			((\\\\)+?[^\\\\]) # match any amount of backslash with non-backslash ending
-			|
-			[^\"\\\\] # match any character except \ or "
-		)*? # match \" or any character except "
-	\")
-	|
-	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at beginning and any character except , and ] afterwards
-	|
-	() # match empty and only empty part
-)');
-define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
-(?P<param>( # name parameter group used in recursion
-	\[ # match opening bracket
-		(
-			\s*?'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match spaces and parameter
-			(
-				\s*?,\s*? # match spaces, comma and spaces
-				'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match parameter
-			)*? # match spaces, comma, spaces, parameter zero or more times
-			\s*? #matches spaces
-		)
-	\] # match closing bracket
-))*? # matches non comma separated brackets with parameters zero or more times
-)');
-
 define('TRIGGER_QUERY_PLACEHOLDER', '$'); // !!! Don't forget sync code with C !!!
 
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
@@ -2043,18 +2013,6 @@ define('ZBX_PROPERTY_INHERITED',	0x01);
 define('ZBX_PROPERTY_OWN',			0x02);
 define('ZBX_PROPERTY_BOTH',			0x03);	// ZBX_PROPERTY_INHERITED | ZBX_PROPERTY_OWN
 
-// init $_REQUEST
-ini_set('variables_order', 'GP');
-$_REQUEST = $_POST + $_GET;
-
-// init precision
-ini_set('precision', 14);
-
-// BC Math scale. bcscale() can be undefined prior requirement check in setup.
-if (function_exists('bcscale')) {
-	bcscale(7);
-}
-
 // Number of tags to display in Problems widget and Monitoring > Problems.
 define('PROBLEMS_SHOW_TAGS_NONE', 0);
 define('PROBLEMS_SHOW_TAGS_1', 1);
@@ -2070,5 +2028,26 @@ define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
 define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
 
+define('ZBX_ROLE_RULE_DISABLED',				0);
+define('ZBX_ROLE_RULE_ENABLED',					1);
+define('ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM',	0);
+define('ZBX_ROLE_RULE_SERVICES_ACCESS_ALL',		1);
+define('ZBX_ROLE_RULE_API_MODE_DENY',			0);
+define('ZBX_ROLE_RULE_API_MODE_ALLOW',			1);
+define('ZBX_ROLE_RULE_API_WILDCARD',			'*');
+define('ZBX_ROLE_RULE_API_WILDCARD_ALIAS',		'*.*');
+
 // Allows to set "rel" tag value "noreferer" when setting target="_blank".
 define('ZBX_NOREFERER', true);
+
+// init $_REQUEST
+ini_set('variables_order', 'GP');
+$_REQUEST = $_POST + $_GET;
+
+// init precision
+ini_set('precision', 14);
+
+// BC Math scale. bcscale() can be undefined prior requirement check in setup.
+if (function_exists('bcscale')) {
+	bcscale(7);
+}

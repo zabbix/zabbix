@@ -460,4 +460,6 @@ int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list
 int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
 void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
 
+ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
+
 #endif

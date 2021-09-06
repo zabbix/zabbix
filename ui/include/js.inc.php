@@ -139,11 +139,11 @@ function zbx_add_post_js($script) {
 	}
 }
 
-function insertPagePostJs() {
+function insertPagePostJs($jQueryDocumentReady = false) {
 	global $ZBX_PAGE_POST_JS;
 
 	if ($ZBX_PAGE_POST_JS) {
-		echo get_js(implode("\n", $ZBX_PAGE_POST_JS), true);
+		echo get_js(implode("\n", $ZBX_PAGE_POST_JS), $jQueryDocumentReady);
 	}
 }
 

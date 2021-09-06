@@ -33,6 +33,7 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 			'filter_status' =>		'in '.implode(',', [SERVICE_STATUS_ANY, SERVICE_STATUS_OK, SERVICE_STATUS_PROBLEM]),
 			'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>		'array',
+			'filter_set' =>			'in 1',
 			'page' =>				'ge 1'
 		];
 
@@ -66,7 +67,8 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 			'without_problem_tags' => self::FILTER_DEFAULT_WITHOUT_PROBLEM_TAGS,
 			'tag_source' => self::FILTER_DEFAULT_TAG_SOURCE,
 			'evaltype' => $this->getInput('filter_evaltype', self::FILTER_DEFAULT_EVALTYPE),
-			'tags' => []
+			'tags' => [],
+			'filter_set' => $this->hasInput('filter_set')
 		];
 
 		foreach ($this->getInput('filter_tags', []) as $tag) {
@@ -77,12 +79,10 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 			$filter['tags'][] = $tag;
 		}
 
-		$is_filtered = !$this->isDefaultFilter($filter);
-
 		$data = [
 			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 			'path' => $path,
-			'is_filtered' => $is_filtered,
+			'is_filtered' => $filter['filter_set'],
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'service' => $this->service,
 			'user' => [
@@ -90,27 +90,28 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 			]
 		];
 
-		$db_serviceids = $this->prepareData($filter, $is_filtered);
+		$db_serviceids = $this->prepareData($filter, $filter['filter_set']);
 
 		$paging_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list')
 			->setArgument('path', $path ?: null)
 			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null);
 
-		if ($is_filtered) {
+		if ($filter['filter_set']) {
 			$paging_curl
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
-				->setArgument('filter_tags', $filter['tags']);
+				->setArgument('filter_tags', $filter['tags'])
+				->setArgument('filter_set', 1);
 		}
 
 		$page_num = $this->getInput('page', 1);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla'],
-			'selectParents' => $is_filtered ? ['serviceid', 'name'] : null,
+			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
 			'serviceids' => $db_serviceids,
