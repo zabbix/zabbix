@@ -25,8 +25,11 @@
 
 $data['form_name'] = 'host-form';
 $data['popup_form'] = true;
+$popup_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'host.edit');
 
 if ($data['hostid'] == 0) {
+	$popup_url->setArgument('groupids', $data['groupids']); // TODO VM: check
 	$buttons = [
 		[
 			'id' => 'host-add',
@@ -39,6 +42,7 @@ if ($data['hostid'] == 0) {
 	];
 }
 else {
+	$popup_url->setArgument('hostid', $data['hostid']);
 	$buttons = [
 		[
 			'id' => 'host-update',
@@ -82,7 +86,9 @@ $output = [
 	'body' => (new CPartial('configuration.host.edit.html', $data))->getOutput(),
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.host.edit.js.php').
-		'host_edit_popup.init();',
+		'host_edit_popup.init('.json_encode([
+			'popup_url' => $popup_url->getUrl()
+		]).');',
 	'buttons' => $buttons
 ];
 

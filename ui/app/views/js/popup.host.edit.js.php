@@ -29,10 +29,12 @@ window.host_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init() {
+	init({popup_url}) {
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+
+		history.pushState({}, '', popup_url);
 
 		host_edit.init();
 	},

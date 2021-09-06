@@ -26,25 +26,36 @@
 
 <script>
 	const view = {
+		original_url: null,
+
 		init() {
+			this.current_url = new Curl('', false);
+			// const url = this.current_url.getUrl();
+			// history.pushState({}, '', url); // TODO VM: use this to restore url
+
 			host_popup.init();
 		},
 
 		hostEdit({hostid}) {
 			const overlay = PopUp('popup.host.edit', {hostid}, 'host_edit', document.activeElement);
 
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				const detail = e.detail;
-				debugger;
-				alert('DELETE!');
-				// const data = [];
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete);
+		},
 
-				// for (const service of e.detail) {
-				// 	data.push({id: service.serviceid, name: service.name});
-				// }
+		events: {
+			hostDelete: (e) => {
+				const data = e.detail;
 
-				// jQuery('#parent_serviceids_').multiSelect('addData', data);
-			});
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = new Curl('hostinventories.php', false).getUrl();
+			}
 		}
 	}
 </script>
