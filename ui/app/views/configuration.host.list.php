@@ -419,7 +419,7 @@ foreach ($data['hosts'] as $host) {
 	}
 
 	$table->addRow([
-		new CCheckBox('ids['.$host['hostid'].']', $host['hostid']),
+		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),

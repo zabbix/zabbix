@@ -59,7 +59,7 @@ class CControllerHostList extends CController {
 	}
 
 	protected function doAction(): void {
-		if (hasRequest('filter_set')) {
+		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.hosts.filter_ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hosts.filter_dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hosts.filter_host', $this->getInput('filter_host', ''), PROFILE_TYPE_STR);
@@ -93,7 +93,7 @@ class CControllerHostList extends CController {
 			CProfile::updateArray('web.hosts.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.hosts.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 		}
-		elseif (hasRequest('filter_rst')) {
+		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.hosts.filter_ip');
 			CProfile::delete('web.hosts.filter_dns');
 			CProfile::delete('web.hosts.filter_host');

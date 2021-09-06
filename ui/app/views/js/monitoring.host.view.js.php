@@ -90,11 +90,13 @@
 			return $.post('zabbix.php', {
 				action: 'host.view.refresh',
 				filter_counters: 1
-			}).done((json) => {
+			})
+			.done((json) => {
 				if (json.filter_counters) {
 					this.filter.updateCounters(json.filter_counters);
 				}
-			}).always(() => {
+			})
+			.always(() => {
 				if (this.refresh_interval > 0) {
 					this.refresh_counters = this.createCountersRefresh(this.refresh_interval);
 				}
@@ -135,14 +137,12 @@
 		},
 
 		bindDataEvents(deferred) {
-			const that = this;
-
 			deferred
-				.done(function (response) {
-					that.onDataDone.call(that, response);
+				.done((response) => {
+					this.onDataDone.call(this, response);
 				})
-				.fail(function (jqXHR) {
-					that.onDataFail.call(that, jqXHR);
+				.fail((jqXHR) => {
+					this.onDataFail.call(this, jqXHR);
 				})
 				.always(this.onDataAlways.bind(this));
 
@@ -176,7 +176,8 @@
 
 			if (messages.length) {
 				this.host_view_form.html(messages);
-			} else {
+			}
+			else {
 				this.host_view_form.html(jqXHR.responseText);
 			}
 		},
@@ -209,5 +210,5 @@
 				this.deferred.abort();
 			}
 		}
-	}
+	};
 </script>
