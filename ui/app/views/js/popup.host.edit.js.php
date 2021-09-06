@@ -38,7 +38,6 @@ window.host_edit_popup = {
 	},
 
 	deleteHost(e, hostid) {
-		debugger;
 		// const original_curl = new Curl(host_popup.original_url);
 
 		// if (basename(original_curl.getPath()) === 'hostinventories.php') {
@@ -59,7 +58,7 @@ window.host_edit_popup = {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData({ids: [hostid]})
+			body: urlEncodeData({hostids: [hostid]})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -67,7 +66,7 @@ window.host_edit_popup = {
 					throw {error: response.error};
 				}
 
-				this.form.dispatchEvent(new CustomEvent('dialogue.delete', {
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
 					detail: {
 						success: response.success
 					}
