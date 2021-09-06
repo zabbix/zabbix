@@ -25,7 +25,7 @@
 
 $form = (new CForm())
 	->setId('service-list')
-	->setName('service-list');
+	->setName('service_list');
 
 if ($data['is_filtered']) {
 	$path = null;
@@ -104,9 +104,8 @@ foreach ($data['services'] as $serviceid => $service) {
 				CViewHelper::showNum($service['children'])
 			]
 			: $service['name'],
-		in_array($service['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])
-			? (new CCol(_('OK')))->addClass(ZBX_STYLE_GREEN)
-			: (new CCol(getSeverityName($service['status'])))->addClass(getSeverityStyle($service['status'])),
+			(new CCol(CSeverityHelper::getName((int) $service['status'])))
+				->addClass(CSeverityHelper::getStyle((int) $service['status'])),
 		$root_cause,
 		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
 		$data['tags'][$serviceid]

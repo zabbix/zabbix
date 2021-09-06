@@ -251,14 +251,14 @@ $widget
 	->show();
 
 (new CScriptTag('
-	initializeView(
-		'.json_encode($data['dashboard']).',
-		'.json_encode($data['widget_defaults']).',
-		'.json_encode($data['has_time_selector']).',
-		'.json_encode($data['time_period']).',
-		'.json_encode($data['dynamic']).',
-		'.json_encode($web_layout_mode).'
-	);
+	view.init('.json_encode([
+		'dashboard' => $data['dashboard'],
+		'widget_defaults' => $data['widget_defaults'],
+		'has_time_selector' => $data['has_time_selector'],
+		'time_period' => $data['time_period'],
+		'dynamic' => $data['dynamic'],
+		'web_layout_mode' => $web_layout_mode
+	]).');
 '))
 	->setOnDocumentReady()
 	->show();

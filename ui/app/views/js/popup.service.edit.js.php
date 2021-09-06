@@ -27,12 +27,27 @@
 window.service_edit_popup = {
 	algorithm_names: <?= json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT) ?>,
 
+	child_template: null,
 	serviceid: null,
 	overlay: null,
 	dialogue: null,
 	form: null,
 
 	init({serviceid, children, children_problem_tags_html, problem_tags}) {
+		this.child_template = new Template(`
+			<tr>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
+					#{name}
+					<input name="child_serviceids[#{serviceid}]" type="hidden" value="#{serviceid}">
+				</td>
+				<td>#{algorithm}</td>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
+				<td>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+				</td>
+			</tr>
+		`);
+
 		this.serviceid = serviceid;
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -78,7 +93,7 @@ window.service_edit_popup = {
 
 		// Update form field state according to the form data.
 
-		for (const id of ['algorithm', 'showsla']) {
+		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm', 'showsla']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this.update());
@@ -91,6 +106,21 @@ window.service_edit_popup = {
 			template: '#problem-tag-row-tmpl',
 			rows: problem_tags
 		});
+
+		// Setup Service rules.
+		document
+			.getElementById('status_rules')
+			.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-add')) {
+					this.editStatusRule();
+				}
+				else if (e.target.classList.contains('js-edit')) {
+					this.editStatusRule(e.target.closest('tr'));
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					e.target.closest('tr').remove();
+				}
+			});
 
 		// Setup Service times.
 		document
@@ -121,14 +151,83 @@ window.service_edit_popup = {
 	},
 
 	update() {
-		const status_enabled = document.getElementById('algorithm').value != <?= SERVICE_ALGORITHM_NONE ?>;
+		const advanced_configuration = document.getElementById('advanced_configuration').checked;
+		const propagation_rule = document.getElementById('propagation_rule').value;
+		const status_enabled = document.getElementById('algorithm').value != <?= ZBX_SERVICE_STATUS_CALC_SET_OK ?>;
 		const showsla = document.getElementById('showsla').checked;
 
-		document.getElementById('problem_tags_label').style.display = status_enabled ? '' : 'none';
-		document.getElementById('problem_tags_field').style.display = status_enabled ? '' : 'none';
+		document.getElementById('additional_rules_label').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('additional_rules_field').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('status_propagation_rules_label').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('status_propagation_rules_field').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('status_propagation_value_field').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('weight_label').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('weight_field').style.display = advanced_configuration ? '' : 'none';
+
+		switch (propagation_rule) {
+			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_INCREASE ?>':
+			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_DECREASE ?>':
+				document.getElementById('propagation_value_number').style.display = '';
+				document.getElementById('propagation_value_status').style.display = 'none';
+				break;
+
+			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_FIXED ?>':
+				document.getElementById('propagation_value_number').style.display = 'none';
+				document.getElementById('propagation_value_status').style.display = '';
+				break;
+
+			default:
+				document.getElementById('propagation_value_number').style.display = 'none';
+				document.getElementById('propagation_value_status').style.display = 'none';
+				document.getElementById('status_propagation_value_field').style.display = 'none';
+		}
 
 		document.getElementById('showsla').disabled = !status_enabled;
 		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
+	},
+
+	editStatusRule(row = null) {
+		let popup_params;
+
+		if (row !== null) {
+			const row_index = row.dataset.row_index;
+
+			popup_params = {
+				edit: '1',
+				row_index,
+				new_status: row.querySelector(`[name="status_rules[${row_index}][new_status]"`).value,
+				type: row.querySelector(`[name="status_rules[${row_index}][type]"`).value,
+				limit_value: row.querySelector(`[name="status_rules[${row_index}][limit_value]"`).value,
+				limit_status: row.querySelector(`[name="status_rules[${row_index}][limit_status]"`).value
+			};
+		}
+		else {
+			let row_index = 0;
+
+			while (document.querySelector(`#status_rules [data-row_index="${row_index}"]`) !== null) {
+				row_index++;
+			}
+
+			popup_params = {row_index};
+		}
+
+		const overlay = PopUp('popup.service.statusrule.edit', popup_params, 'service_status_rule_edit',
+			document.activeElement
+		);
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			const new_row = e.detail;
+
+			if (row !== null) {
+				row.insertAdjacentHTML('afterend', new_row);
+				row.remove();
+			}
+			else {
+				document
+					.querySelector('#status_rules tbody')
+					.insertAdjacentHTML('beforeend', new_row);
+			}
+		});
 	},
 
 	editTime(row = null) {
@@ -174,42 +273,18 @@ window.service_edit_popup = {
 	},
 
 	addChild(service) {
-		const input_name = `child_serviceids[${service.serviceid}]`;
-
-		if (document.querySelector(`#children tbody input[name="${input_name}"]`) !== null) {
+		if (document.querySelector(`#children tbody input[name="child_serviceids[${service.serviceid}]"]`) !== null) {
 			return;
 		}
 
-		const template = document.createElement('template');
-
-		template.innerHTML = `
-			<tr>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-name" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
-					<input type="hidden">
-				</td>
-				<td class="js-algorithm"></td>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-problem_tags_html"></td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"></button>
-				</td>
-			</tr>
-		`;
-
-		const row = template.content.firstElementChild;
-
-		row.querySelector('.js-name').insertAdjacentText('afterbegin', service.name);
-
-		const input = row.querySelector('.js-name input');
-		input.name = input_name;
-		input.value = service.serviceid;
-
-		row.querySelector('.js-algorithm').textContent = this.algorithm_names[service.algorithm];
-		row.querySelector('.js-problem_tags_html').innerHTML = service.problem_tags_html;
-		row.querySelector('.js-remove').textContent = <?= json_encode(_('Remove')); ?>;
-
 		document
 			.querySelector('#children tbody')
-			.appendChild(row);
+			.insertAdjacentHTML('beforeend', this.child_template.evaluate({
+				serviceid: service.serviceid,
+				name: service.name,
+				algorithm: this.algorithm_names[service.algorithm],
+				problem_tags_html: service.problem_tags_html
+			}));
 	},
 
 	selectChildren() {
@@ -224,7 +299,7 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-			title: <?= json_encode(_('Add child services')); ?>,
+			title: <?= json_encode(_('Add child services')) ?>,
 			exclude_serviceids
 		}, 'services', document.activeElement);
 
@@ -247,7 +322,7 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-			title: <?= json_encode(_('Add parent services')); ?>,
+			title: <?= json_encode(_('Add parent services')) ?>,
 			exclude_serviceids
 		}, 'services', document.activeElement);
 

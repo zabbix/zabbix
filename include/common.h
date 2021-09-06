@@ -746,9 +746,9 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_OPERATION_MODE_UPDATE	2
 
 /* algorithms for service status calculation */
-#define SERVICE_ALGORITHM_NONE	0
-#define SERVICE_ALGORITHM_MAX	1
-#define SERVICE_ALGORITHM_MIN	2
+#define ZBX_SERVICE_STATUS_CALC_SET_OK			0
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL	1
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE	2
 
 /* HTTP item types */
 #define ZBX_HTTPITEM_TYPE_RSPCODE	0
@@ -1485,14 +1485,14 @@ typedef struct
 }
 zbx_strloc_t;
 
-/* data used by macros, ldd macros and objectid tokens */
+/* data used by macros, lld macros and objectid tokens */
 typedef struct
 {
 	zbx_strloc_t	name;
 }
 zbx_token_macro_t;
 
-/* data used by macros, ldd macros and objectid tokens */
+/* data used by macros, lld macros and objectid tokens */
 typedef struct
 {
 	zbx_strloc_t	expression;
@@ -1574,6 +1574,7 @@ zbx_token_t;
 #define ZBX_TOKEN_SEARCH_REFERENCES		0x01
 #define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
 #define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
+#define ZBX_TOKEN_SEARCH_SIMPLE_MACRO		0x08	/* used by the upgrade patches only */
 
 typedef int zbx_token_search_t;
 
@@ -1583,7 +1584,8 @@ int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_to
 int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token);
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
+		zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 

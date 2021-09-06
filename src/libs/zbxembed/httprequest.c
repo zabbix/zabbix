@@ -346,7 +346,7 @@ out:
  *                                                                            *
  * Function: es_httprequest_get                                               *
  *                                                                            *
- * Purpose: CurlHttpRequest.Get method                                        *
+ * Purpose: HttpRequest.Get / CurlHttpRequest.Get method                      *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_get(duk_context *ctx)
@@ -358,7 +358,7 @@ static duk_ret_t	es_httprequest_get(duk_context *ctx)
  *                                                                            *
  * Function: es_httprequest_put                                               *
  *                                                                            *
- * Purpose: CurlHttpRequest.Put method                                        *
+ * Purpose: HttpRequest.Put / CurlHttpRequest.Put method                      *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_put(duk_context *ctx)
@@ -370,7 +370,7 @@ static duk_ret_t	es_httprequest_put(duk_context *ctx)
  *                                                                            *
  * Function: es_httprequest_post                                              *
  *                                                                            *
- * Purpose: CurlHttpRequest.Post method                                       *
+ * Purpose: HttpRequest.Post / CurlHttpRequest.Post method                    *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_post(duk_context *ctx)
@@ -382,13 +382,94 @@ static duk_ret_t	es_httprequest_post(duk_context *ctx)
  *                                                                            *
  * Function: es_httprequest_delete                                            *
  *                                                                            *
- * Purpose: CurlHttpRequest.Delete method                                     *
+ * Purpose: HttpRequest.Delete / CurlHttpRequest.Delete method                *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_delete(duk_context *ctx)
 {
 	return es_httprequest_query(ctx, "DELETE");
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_head                                              *
+ *                                                                            *
+ * Purpose: HttpRequest.head method                                           *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_head(duk_context *ctx)
+{
+	return es_httprequest_query(ctx, "HEAD");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_patch                                             *
+ *                                                                            *
+ * Purpose: HttpRequest.patch method                                          *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_patch(duk_context *ctx)
+{
+	return es_httprequest_query(ctx, "PATCH");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_options                                           *
+ *                                                                            *
+ * Purpose: HttpRequest.options method                                        *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_options(duk_context *ctx)
+{
+	return es_httprequest_query(ctx, "OPTIONS");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_trace                                             *
+ *                                                                            *
+ * Purpose: HttpRequest.trace method                                          *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_trace(duk_context *ctx)
+{
+	return es_httprequest_query(ctx, "TRACE");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_connect                                           *
+ *                                                                            *
+ * Purpose: HttpRequest.connect method                                        *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_connect(duk_context *ctx)
+{
+	return es_httprequest_query(ctx, "CONNECT");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_customrequest                                     *
+ *                                                                            *
+ * Purpose: HttpRequest.customRequest method                                  *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_customrequest(duk_context *ctx)
+{
+	const char	*method;
+
+	if (0 != duk_is_null_or_undefined(ctx, 0))
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "HTTP method cannot be undefined or null");
+
+	method = duk_to_string(ctx, 0);
+	duk_remove(ctx, 0);
+
+	return es_httprequest_query(ctx, method);
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -470,7 +551,7 @@ static void	es_put_header(duk_context *ctx, int idx, char *header)
  *                                                                            *
  * Function: es_httprequest_get_headers                                       *
  *                                                                            *
- * Purpose: CurlHttpRequest.GetHeaders method                                 *
+ * Purpose: HttpRequest.Get / CurlHttpRequest.GetHeaders method               *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
@@ -575,10 +656,16 @@ static const duk_function_list_entry	httprequest_methods[] = {
 	{"put", es_httprequest_put, 2},
 	{"post", es_httprequest_post, 2},
 	{"delete", es_httprequest_delete, 2},
+	{"head", es_httprequest_head, 2},
+	{"patch", es_httprequest_patch, 2},
+	{"options", es_httprequest_options, 2},
+	{"trace", es_httprequest_trace, 2},
+	{"connect", es_httprequest_connect, 2},
 	{"getStatus", es_httprequest_status, 0},
 	{"setProxy", es_httprequest_set_proxy, 1},
 	{"getHeaders", es_httprequest_get_headers, 0},
 	{"setHttpAuth", es_httprequest_set_httpauth, 3},
+	{"customRequest", es_httprequest_customrequest, 3},
 	{NULL, NULL, 0}
 };
 

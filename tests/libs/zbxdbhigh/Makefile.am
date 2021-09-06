@@ -41,6 +41,7 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
@@ -86,6 +87,7 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_srcdir)/src/zabbix_server/service/libservice.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
+	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(COMMON_LIB)
 

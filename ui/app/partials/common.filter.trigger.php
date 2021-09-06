@@ -38,7 +38,7 @@ $filterForm = (new CFilter())
 
 $severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$severityNames[] = getSeverityName($severity);
+	$severityNames[] = CSeverityHelper::getName($severity);
 }
 
 $column1 = (new CFormList())

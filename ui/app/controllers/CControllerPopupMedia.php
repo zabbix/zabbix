@@ -26,7 +26,7 @@ class CControllerPopupMedia extends CController {
 		$this->disableSIDvalidation();
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$this->severities[$severity] = getSeverityName($severity);
+			$this->severities[$severity] = CSeverityHelper::getName($severity);
 		}
 	}
 

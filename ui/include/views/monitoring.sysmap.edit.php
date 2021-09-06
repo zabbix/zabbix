@@ -265,7 +265,7 @@ $map_tab->addRow(new CLabel(_('Problem display'), 'label-show-unack'),
 );
 
 $map_tab->addRow(_('Minimum severity'),
-	new CSeverity(['name' => 'severity_min', 'value' => (int) $data['sysmap']['severity_min']])
+	new CSeverity('severity_min', (int) $data['sysmap']['severity_min'])
 );
 
 $map_tab->addRow(_('Show suppressed problems'),
