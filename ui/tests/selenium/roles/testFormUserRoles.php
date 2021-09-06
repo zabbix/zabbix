@@ -671,7 +671,7 @@ class testFormUserRoles extends CWebTest {
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 
 			// List of API requests.
-			$this->query('button:Select')->one()->click();
+			$this->query('xpath://div[@id="api_methods_"]/following::button[text()="Select"]')->one()->click();
 			$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->assertScreenshot($this->query('xpath://div[@role="dialog"]')->one(), $role.'api');
 			$overlay->close();
