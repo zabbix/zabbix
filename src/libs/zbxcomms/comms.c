@@ -1854,9 +1854,9 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 			/* compressed protocol stores uncompressed packet size in the reserved data */
 			if (max_len < reserved)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64 "from %s exceeds"
-						" the maximum size " ZBX_FS_UI64 " bytes. Message ignored.", reserved,
-						s->peer, max_len);
+				zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64 " from %s"
+						" exceeds the maximum size " ZBX_FS_UI64 " bytes. Message ignored.",
+						reserved, s->peer, max_len);
 				nbytes = ZBX_PROTO_ERROR;
 				goto out;
 			}
