@@ -480,7 +480,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 60, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 30, 3);
-		sleep(10);
+
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
 			'actionsids' => self::$actionid,
@@ -519,7 +519,6 @@ class testServiceRoles extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 60, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 30, 3);
-		sleep(10);
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
