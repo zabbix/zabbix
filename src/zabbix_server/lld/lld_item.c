@@ -229,6 +229,24 @@ typedef struct
 }
 zbx_lld_item_preproc_t;
 
+static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_preprocid, int flags,
+		int step, int type, const char *params, int error_handler, const char *error_handler_params)
+
+{
+	zbx_lld_item_preproc_t	*preproc_op;
+
+	preproc_op = (zbx_lld_item_preproc_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_preproc_t));
+	preproc_op->flags = flags;
+	preproc_op->item_preprocid = item_preprocid;
+	preproc_op->step = step;
+	preproc_op->type = type;
+	preproc_op->params = zbx_strdup(NULL, params);
+	preproc_op->error_handler = error_handler;
+	preproc_op->error_handler_params = zbx_strdup(NULL, error_handler_params);
+
+	return preproc_op;
+}
+
 #define ZBX_ITEM_PARAMETER_FIELD_NAME	1
 #define ZBX_ITEM_PARAMETER_FIELD_VALUE	2
 
@@ -739,6 +757,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_t	item_preprocid;
+
 		ZBX_STR2UINT64(itemid, row[1]);
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -748,15 +768,9 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		}
 
 		item = (zbx_lld_item_t *)items->values[index];
-
-		preproc_op = (zbx_lld_item_preproc_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_preproc_t));
-		preproc_op->flags = ZBX_FLAG_LLD_ITEM_PREPROC_UNSET;
-		ZBX_STR2UINT64(preproc_op->item_preprocid, row[0]);
-		preproc_op->step = atoi(row[2]);
-		preproc_op->type = atoi(row[3]);
-		preproc_op->params = zbx_strdup(NULL, row[4]);
-		preproc_op->error_handler = atoi(row[5]);
-		preproc_op->error_handler_params = zbx_strdup(NULL, row[6]);
+		ZBX_STR2UINT64(item_preprocid, row[0]);
+		preproc_op = zbx_init_lld_item_preproc(item_preprocid, ZBX_FLAG_LLD_ITEM_PREPROC_UNSET, atoi(row[2]),
+				atoi(row[3]), row[4], atoi(row[5]), row[6]);
 		zbx_vector_ptr_append(&item->preproc_ops, preproc_op);
 	}
 	DBfree_result(result);
@@ -2743,15 +2757,9 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
 			if (j >= item->preproc_ops.values_num)
 			{
 				ppsrc = (zbx_lld_item_preproc_t *)item_proto->preproc_ops.values[j];
-				ppdst = (zbx_lld_item_preproc_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_preproc_t));
-				ppdst->item_preprocid = 0;
-				ppdst->flags = ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE;
-				ppdst->step = ppsrc->step;
-				ppdst->type = ppsrc->type;
-				ppdst->params = zbx_strdup(NULL, ppsrc->params);
-				ppdst->error_handler = ppsrc->error_handler;
-				ppdst->error_handler_params = zbx_strdup(NULL, ppsrc->error_handler_params);
-
+				ppdst = zbx_init_lld_item_preproc(0, ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED |
+						ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE, ppsrc->step, ppsrc->type,
+						ppsrc->params, ppsrc->error_handler, ppsrc->error_handler_params);
 				substitute_lld_macros_in_preproc_params(ppsrc->type, item->lld_row, lld_macro_paths,
 						&ppdst->params);
 				substitute_lld_macros(&ppdst->error_handler_params, &item->lld_row->jp_row,
@@ -3680,7 +3688,8 @@ out:
  ******************************************************************************/
 static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int *host_locked)
 {
-	int			ret = SUCCEED, i, j, new_preproc_num = 0, update_preproc_num = 0, delete_preproc_num = 0;
+	int			ret = SUCCEED, i, j, new_preproc_num = 0, update_preproc_num = 0,
+				delete_preproc_num = 0;
 	zbx_lld_item_t		*item;
 	zbx_lld_item_preproc_t	*preproc_op;
 	zbx_vector_uint64_t	deleteids;
@@ -4367,13 +4376,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		}
 
 		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
-
-		preproc_op = (zbx_lld_item_preproc_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_preproc_t));
-		preproc_op->step = atoi(row[1]);
-		preproc_op->type = atoi(row[2]);
-		preproc_op->params = zbx_strdup(NULL, row[3]);
-		preproc_op->error_handler = atoi(row[4]);
-		preproc_op->error_handler_params = zbx_strdup(NULL, row[5]);
+		preproc_op = zbx_init_lld_item_preproc(0, ZBX_FLAG_LLD_ITEM_PREPROC_UNSET, atoi(row[1]), atoi(row[2]),
+				row[3], atoi(row[4]), row[5]);
 		zbx_vector_ptr_append(&item_prototype->preproc_ops, preproc_op);
 	}
 	DBfree_result(result);
