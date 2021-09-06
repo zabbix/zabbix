@@ -289,7 +289,7 @@ class testPageUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'message_header' => 'Cannot delete user roles',
-					'message_details' => 'The role "Admin role" is assigned to at least one user and cannot be deleted.',
+					'message_details' => 'Cannot delete assigned user role "Admin role".',
 					'roles' => [
 						'Admin role',
 						'Remove_role_1'
@@ -300,7 +300,7 @@ class testPageUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'message_header' => 'Cannot delete user role',
-					'message_details' => 'The role "Admin role" is assigned to at least one user and cannot be deleted.',
+					'message_details' => 'Cannot delete assigned user role "Admin role".',
 					'roles' => [
 						'Admin role'
 					]
@@ -310,7 +310,7 @@ class testPageUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'message_header' => 'Cannot delete user roles',
-					'message_details' => 'The role "Admin role" is assigned to at least one user and cannot be deleted.',
+					'message_details' => 'Cannot delete assigned user role "Admin role".',
 					'roles' => [
 						'All'
 					]
