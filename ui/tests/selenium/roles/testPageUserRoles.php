@@ -310,7 +310,7 @@ class testPageUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'message_header' => 'Cannot delete user roles',
-					'message_details' => 'Cannot delete assigned user role "Admin role".',
+					'message_details' => 'Cannot delete assigned user role "User role".',
 					'roles' => [
 						'All'
 					]
