@@ -36,7 +36,7 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6569] improved performance of graphs and graphs
 A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 
 Bug fixes:
-...G...... [DEV-1944] upgraded go-sqlite3 in zabbix_agent2 (esneiders)
+...G...... [ZBX-19915] fixed go-sqlite3 in zabbix_agent2 (esneiders)
 .......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
 A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ........S. [ZBX-19745] fixed Zabbix server exiting when quoted user macro context ends with backslash (vso)
