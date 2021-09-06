@@ -2314,7 +2314,7 @@ class testDiscoveryRule extends CAPITest {
 					'itemids' => [$itemid],
 					'selectLLDMacroPaths' => ['lld_macro', 'path']
 				],
-				'get_result' => [
+				'expected_result' => [
 					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
@@ -2347,7 +2347,7 @@ class testDiscoveryRule extends CAPITest {
 					'itemids' => [$itemid],
 					'selectLLDMacroPaths' => ['lld_macro_pathid', 'lld_macro', 'path']
 				],
-				'get_result' => [
+				'expected_result' => [
 					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
@@ -2385,7 +2385,7 @@ class testDiscoveryRule extends CAPITest {
 					'itemids' => [$itemid],
 					'selectLLDMacroPaths' => 'extend'
 				],
-				'get_result' => [
+				'expected_result' => [
 					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
@@ -2423,27 +2423,27 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_lld_macro_paths_get_data_valid
 	 */
-	public function testDiscoveryRuleLLDMacroPaths_Get($discoveryrule, $get_result, $expected_error) {
+	public function testDiscoveryRuleLLDMacroPaths_Get($discoveryrule, $expected_result, $expected_error) {
 		$result = $this->call('discoveryrule.get', $discoveryrule);
 
 		if ($expected_error === null) {
 			foreach ($result['result'] as $entry) {
-				$this->assertSame($entry['itemid'], $get_result['itemid']);
+				$this->assertSame($expected_result['itemid'], $entry['itemid']);
 
 				// Check related objects.
 				if (array_key_exists('selectLLDMacroPaths', $discoveryrule)) {
-					$this->assertArrayHasKey('lld_macro_paths', $get_result);
-					CTestArrayHelper::usort($get_result['lld_macro_paths'], ['lld_macro']);
+					$this->assertArrayHasKey('lld_macro_paths', $entry);
+					CTestArrayHelper::usort($entry['lld_macro_paths'], ['lld_macro']);
 
-					$this->assertSame($entry['lld_macro_paths'], $get_result['lld_macro_paths']);
+					$this->assertSame($expected_result['lld_macro_paths'], $entry['lld_macro_paths']);
 				}
 				else {
-					$this->assertArrayNotHasKey('lld_macro_paths', $get_result);
+					$this->assertArrayNotHasKey('lld_macro_paths', $entry);
 				}
 			}
 		}
 		else {
-			$this->assertSame($result['result'], $get_result);
+			$this->assertSame($result['result'], $expected_result);
 		}
 	}
 
