@@ -1165,8 +1165,8 @@ class CApiService {
 			$user_data = self::$userData;
 		}
 
-		CAudit::log($user_data['userid'], $user_data['userip'], $user_data['username'], $action,
-			$resource, $objects, $objects_old
+		CAudit::log($user_data['userid'], $user_data['userip'], $user_data['username'], $action, $resource, $objects,
+			$objects_old
 		);
 	}
 
