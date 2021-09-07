@@ -185,7 +185,7 @@ void	zbx_audit_trigger_update_json_update_##resource(zbx_uint64_t triggerid, int
 	RETURN_IF_AUDIT_OFF();											\
 														\
 	resource_type = trigger_flag_to_resource_type(flags);							\
-														\
+													\
 	zbx_snprintf(buf, sizeof(buf), TR_OR_TRP(resource));							\
 														\
 	zbx_audit_update_json_update_##type2(triggerid, buf, resource##_old, resource##_new);			\
@@ -193,6 +193,7 @@ void	zbx_audit_trigger_update_json_update_##resource(zbx_uint64_t triggerid, int
 
 PREPARE_AUDIT_TRIGGER_UPDATE(recovery_mode, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(correlation_mode, int, int)
+PREPARE_AUDIT_TRIGGER_UPDATE(correlation_tag, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(manual_close, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(opdata, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(discover, int, int)

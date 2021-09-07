@@ -68,6 +68,8 @@ typedef struct
 	unsigned char	recovery_mode;
 	unsigned char	correlation_mode_orig;
 	unsigned char	correlation_mode;
+	char		*correlation_tag_orig;
+	char		*correlation_tag;
 	unsigned char	manual_close_orig;
 	unsigned char	manual_close;
 	char		*opdata_orig;
@@ -80,17 +82,18 @@ typedef struct
 #define ZBX_FLAG_LINK_TRIGGER_UNSET			__UINT64_C(0x00)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE	__UINT64_C(0x01)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE	__UINT64_C(0x02)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE	__UINT64_C(0x04)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x08)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER		__UINT64_C(0x10)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME		__UINT64_C(0x20)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x40)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG	__UINT64_C(0x04)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE	__UINT64_C(0x08)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x10)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER		__UINT64_C(0x20)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME		__UINT64_C(0x40)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x80)
 
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE									\
 	(ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE |	\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE | ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA |		\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER | ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME |		\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG | ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE |	\
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA | ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER |			\
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
 
 	zbx_uint64_t	update_flags;
 }
@@ -129,6 +132,9 @@ static void	zbx_host_triggers_main_data_clean(zbx_hashset_t *h)
 		zbx_free(trigger_entry->description);
 		zbx_free(trigger_entry->expression);
 		zbx_free(trigger_entry->recovery_expression);
+		zbx_free(trigger_entry->correlation_tag_orig);
+		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG))
+			zbx_free(trigger_entry->correlation_tag);
 		zbx_free(trigger_entry->opdata_orig);
 		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA))
 			zbx_free(trigger_entry->opdata);
@@ -772,8 +778,8 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
-			",t.flags,t.recovery_mode,t.correlation_mode,t.manual_close,t.opdata,t.discover,t.event_name"
-			",t.templateid"
+			",t.flags,t.recovery_mode,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata"
+			",t.discover,t.event_name,t.templateid"
 		" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -798,7 +804,7 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);
-		ZBX_DBROW2UINT64(target_host_trigger_entry.templateid_orig, row[11]);
+		ZBX_DBROW2UINT64(target_host_trigger_entry.templateid_orig, row[12]);
 		target_host_trigger_entry.templateid = 0;
 		ZBX_STR2UINT64(target_host_trigger_entry.flags, row[4]);
 
@@ -806,13 +812,15 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		target_host_trigger_entry.recovery_mode = 0;
 		ZBX_STR2UCHAR(target_host_trigger_entry.correlation_mode_orig, row[6]);
 		target_host_trigger_entry.correlation_mode = 0;
-		ZBX_STR2UCHAR(target_host_trigger_entry.manual_close_orig, row[7]);
+		target_host_trigger_entry.correlation_tag_orig = zbx_strdup(NULL, row[7]);
+		target_host_trigger_entry.correlation_tag = NULL;
+		ZBX_STR2UCHAR(target_host_trigger_entry.manual_close_orig, row[8]);
 		target_host_trigger_entry.manual_close = 0;
-		target_host_trigger_entry.opdata_orig = zbx_strdup(NULL, row[8]);
+		target_host_trigger_entry.opdata_orig = zbx_strdup(NULL, row[9]);
 		target_host_trigger_entry.opdata = NULL;
-		ZBX_STR2UCHAR(target_host_trigger_entry.discover_orig, row[9]);
+		ZBX_STR2UCHAR(target_host_trigger_entry.discover_orig, row[10]);
 		target_host_trigger_entry.discover = 0;
-		target_host_trigger_entry.event_name_orig = zbx_strdup(NULL, row[10]);
+		target_host_trigger_entry.event_name_orig = zbx_strdup(NULL, row[11]);
 		target_host_trigger_entry.event_name = NULL;
 
 		zbx_hashset_insert(zbx_host_triggers_main_data, &target_host_trigger_entry,
@@ -917,6 +925,12 @@ static void	mark_updates_for_host_trigger(zbx_trigger_copy_t *trigger_copy,
 		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE;
 	}
 
+	if (0 != strcmp(trigger_copy->correlation_tag, main_found->correlation_tag_orig))
+	{
+		main_found->correlation_tag = zbx_strdup(NULL, trigger_copy->correlation_tag);
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG;
+	}
+
 	if (trigger_copy->manual_close != main_found->manual_close_orig)
 	{
 		main_found->manual_close = trigger_copy->manual_close;
@@ -987,6 +1001,19 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 
 				zbx_audit_trigger_update_json_update_correlation_mode(found->triggerid,
 						(int)found->flags, found->correlation_mode_orig, found->correlation_mode);
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG))
+			{
+				char	*correlation_tag_esc = DBdyn_escape_string(found->correlation_tag);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scorrelation_tag='%s'", d,
+						correlation_tag_esc);
+				zbx_free(correlation_tag_esc);
+				d = ",";
+
+				zbx_audit_trigger_update_json_update_correlation_tag(found->triggerid, (int)found->flags,
+						found->correlation_tag_orig, found->correlation_tag);
 			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE))

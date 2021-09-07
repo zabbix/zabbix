@@ -42,6 +42,7 @@ void	zbx_audit_trigger_update_json_update_##resource(zbx_uint64_t triggerid, int
 PREPARE_AUDIT_TRIGGER_UPDATE_H(flags, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(recovery_mode, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(correlation_mode, int, int)
+PREPARE_AUDIT_TRIGGER_UPDATE_H(correlation_tag, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(manual_close, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(opdata, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(discover, int, int)
