@@ -711,7 +711,7 @@ class CReport extends CApiService {
 				$report_param = $report_params[$db_report_param['reportid']][$db_report_param['name']];
 				unset($report_params[$db_report_param['reportid']][$db_report_param['name']]);
 
-				$upd_report_param = DB::getUpdatedValues('report_param', $report_param, $db_report_param);;
+				$upd_report_param = DB::getUpdatedValues('report_param', $report_param, $db_report_param);
 
 				if ($upd_report_param) {
 					$upd_report_params[] = [
