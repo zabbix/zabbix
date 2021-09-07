@@ -637,9 +637,12 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	zbx_free(sql);
 
-	zbx_db_insert_autoincrement(&db_insert, "triggertagid");
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+	if (0 < trigger_tag_insert_temps.values_num)
+	{
+		zbx_db_insert_autoincrement(&db_insert, "triggertagid");
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
 
 	zbx_vector_uint64_destroy(&triggerids);
 
