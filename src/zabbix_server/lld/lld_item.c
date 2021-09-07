@@ -83,9 +83,13 @@ static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_prepr
 	preproc_op->item_preprocid = item_preprocid;
 	preproc_op->step = step;
 	preproc_op->type = type;
+	preproc_op->type_orig = 0;
 	preproc_op->params = zbx_strdup(NULL, params);
+	preproc_op->params_orig = NULL;
 	preproc_op->error_handler = error_handler;
+	preproc_op->error_handler_orig = NULL;
 	preproc_op->error_handler_params = zbx_strdup(NULL, error_handler_params);
+	preproc_op->error_handler_params_orig = NULL;
 
 	return preproc_op;
 }
@@ -4327,8 +4331,11 @@ static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx
 		{
 			item_index_local.lld_row = (zbx_lld_row_t *)lld_rows->values[j];
 
-			if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
+			if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index,
+					&item_index_local)))
+			{
 				continue;
+			}
 
 			if (0 == (item_index->item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 				continue;
