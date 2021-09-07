@@ -429,6 +429,7 @@ class CProxy extends CApiService {
 	 */
 	private function validateDelete(array &$proxyids, array &$db_proxies = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $proxyids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -440,12 +441,8 @@ class CProxy extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($proxyids as $proxyid) {
-			if (!array_key_exists($proxyid, $db_proxies)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($proxyids) != count($db_proxies)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$this->checkUsedInDiscovery($db_proxies);
