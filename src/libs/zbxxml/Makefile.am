@@ -6,4 +6,3 @@ libzbxxml_a_SOURCES = \
 	xml.c
 
 libzbxxml_a_CFLAGS = $(LIBXML2_CFLAGS)
-
