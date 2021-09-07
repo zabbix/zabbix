@@ -198,6 +198,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE(manual_close, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(opdata, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(discover, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(event_name, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(type, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
 
 #undef PREPARE_AUDIT_ITEM_UPDATE

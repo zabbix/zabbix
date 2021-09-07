@@ -47,6 +47,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE_H(manual_close, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(opdata, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(discover, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(event_name, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE_H(type, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(templateid, zbx_uint64_t, uint64)
 
 void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids);

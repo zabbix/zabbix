@@ -78,22 +78,26 @@ typedef struct
 	unsigned char	discover;
 	char		*event_name_orig;
 	char		*event_name;
+	unsigned char	type_orig;
+	unsigned char	type;
 
-#define ZBX_FLAG_LINK_TRIGGER_UNSET			__UINT64_C(0x00)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE	__UINT64_C(0x01)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE	__UINT64_C(0x02)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG	__UINT64_C(0x04)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE	__UINT64_C(0x08)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x10)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER		__UINT64_C(0x20)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME		__UINT64_C(0x40)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x80)
+#define ZBX_FLAG_LINK_TRIGGER_UNSET			__UINT64_C(0x00000000)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE	__UINT64_C(0x00000001)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE	__UINT64_C(0x00000002)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG	__UINT64_C(0x00000004)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE	__UINT64_C(0x00000008)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x00000010)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER		__UINT64_C(0x00000020)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME		__UINT64_C(0x00000040)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE		__UINT64_C(0x00000080)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x00000100)
 
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE									\
 	(ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE |	\
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG | ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE |	\
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA | ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER |			\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE |			\
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
 
 	zbx_uint64_t	update_flags;
 }
@@ -779,7 +783,7 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
 			",t.flags,t.recovery_mode,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata"
-			",t.discover,t.event_name,t.templateid"
+			",t.discover,t.event_name,t.templateid,t.type"
 		" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -822,6 +826,8 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		target_host_trigger_entry.discover = 0;
 		target_host_trigger_entry.event_name_orig = zbx_strdup(NULL, row[11]);
 		target_host_trigger_entry.event_name = NULL;
+		ZBX_STR2UCHAR(target_host_trigger_entry.type_orig, row[13]);
+		target_host_trigger_entry.type = 0;
 
 		zbx_hashset_insert(zbx_host_triggers_main_data, &target_host_trigger_entry,
 				sizeof(target_host_trigger_entry));
@@ -955,6 +961,12 @@ static void	mark_updates_for_host_trigger(zbx_trigger_copy_t *trigger_copy,
 		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME;
 	}
 
+	if (trigger_copy->type != main_found->type_orig)
+	{
+		main_found->type = trigger_copy->type;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE;
+	}
+
 	main_found->templateid = trigger_copy->triggerid;
 	main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID;
 }
@@ -1058,6 +1070,16 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 
 				zbx_audit_trigger_update_json_update_event_name(found->triggerid,
 						(int)found->flags, found->event_name_orig, found->event_name);
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stype='%d'", d,
+						found->type);
+				d = ",";
+
+				zbx_audit_trigger_update_json_update_type(found->triggerid,
+						(int)found->flags, found->type_orig, found->type);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stemplateid=" ZBX_FS_UI64, d,
