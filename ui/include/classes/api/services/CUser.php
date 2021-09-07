@@ -1777,14 +1777,18 @@ class CUser extends CApiService {
 		$upd_users = [];
 
 		foreach ($userids as $userid) {
-			$users[$userid] = ['userid' => $userid, 'attempt_failed' => 0];
-			$upd_user = DB::getUpdatedValues('users', $users[$userid], $db_users[$userid]);
+			$upd_user = DB::getUpdatedValues('users', ['userid' => $userid, 'attempt_failed' => 0], $db_users[$userid]);
 
 			if ($upd_user) {
 				$upd_users[] = [
 					'values' => $upd_user,
 					'where' => ['userid' => $userid]
 				];
+
+				$users[] = $upd_user + ['userid' => $userid];
+			}
+			else {
+				unset($db_users[$userid]);
 			}
 		}
 
