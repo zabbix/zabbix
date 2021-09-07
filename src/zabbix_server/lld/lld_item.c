@@ -83,11 +83,14 @@ static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_prepr
 	preproc_op->item_preprocid = item_preprocid;
 	preproc_op->step = step;
 	preproc_op->type = type;
+	/* Note: temporary initialization to 0 which is not a valid value for 'type'. */
+	/* Must be set later when the value is known. */
 	preproc_op->type_orig = 0;
 	preproc_op->params = zbx_strdup(NULL, params);
 	preproc_op->params_orig = NULL;
 	preproc_op->error_handler = error_handler;
-	preproc_op->error_handler_orig = 0;
+	/* Note: temporary initialization to 0. Must be set later when the value is known. */
+	preproc_op->error_handler_orig = ZBX_PREPROC_FAIL_DEFAULT;
 	preproc_op->error_handler_params = zbx_strdup(NULL, error_handler_params);
 	preproc_op->error_handler_params_orig = NULL;
 
