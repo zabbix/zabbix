@@ -267,10 +267,10 @@ class CUser extends CApiService {
 		}
 		unset($user);
 
-		$this->updateUsersGroups($users, __FUNCTION__);
-		$this->updateMedias($users, __FUNCTION__);
+		self::updateUsersGroups($users, __FUNCTION__);
+		self::updateMedias($users, __FUNCTION__);
 
-		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
 
 		return ['userids' => $userids];
 	}
@@ -281,10 +281,6 @@ class CUser extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreate(array &$users) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to create users.'));
-		}
-
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
 		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
@@ -424,10 +420,10 @@ class CUser extends CApiService {
 			DB::update('users', $upd_users);
 		}
 
-		$this->updateUsersGroups($users, __FUNCTION__, $db_users);
-		$this->updateMedias($users, __FUNCTION__, $db_users);
+		self::updateUsersGroups($users, 'update', $db_users);
+		self::updateMedias($users, 'update', $db_users);
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
 
 		return ['userids' => array_column($users, 'userid')];
 	}
@@ -1022,11 +1018,13 @@ class CUser extends CApiService {
 	/**
 	 * Update table "users_groups" and populate users.usrgrps by "id" property.
 	 *
+	 * @static
+	 *
 	 * @param array      $users
 	 * @param string     $method
 	 * @param null|array $db_users
 	 */
-	private function updateUsersGroups(array &$users, string $method, array $db_users = null): void {
+	private static function updateUsersGroups(array &$users, string $method, array $db_users = null): void {
 		$ins_users_groups = [];
 		$del_ids = [];
 
@@ -1083,13 +1081,15 @@ class CUser extends CApiService {
 	/**
 	 * Auxiliary function for updateMedias().
 	 *
+	 * @static
+	 *
 	 * @param array  $medias
 	 * @param string $mediatypeid
 	 * @param string $sendto
 	 *
 	 * @return int
 	 */
-	private function getSimilarMedia(array $medias, $mediatypeid, $sendto) {
+	private static function getSimilarMedia(array $medias, $mediatypeid, $sendto) {
 		foreach ($medias as $index => $media) {
 			if (bccomp($media['mediatypeid'], $mediatypeid) == 0 && $media['sendto'] === $sendto) {
 				return $index;
@@ -1103,11 +1103,13 @@ class CUser extends CApiService {
 	 * Update table "media" and populate users.medias by "mediaid" property. Also this function converts "sendto" to the
 	 * string.
 	 *
+	 * @static
+	 *
 	 * @param array      $users
 	 * @param string     $method
 	 * @param null|array $db_users
 	 */
-	private function updateMedias(array &$users, string $method, array $db_users = null) {
+	private static function updateMedias(array &$users, string $method, array $db_users = null): void {
 		$ins_medias = [];
 		$upd_medias = [];
 		$del_mediaids = [];
@@ -1122,7 +1124,7 @@ class CUser extends CApiService {
 			foreach ($user['medias'] as &$media) {
 				$media['sendto'] = implode("\n", $media['sendto']);
 
-				$index = $this->getSimilarMedia($db_medias, $media['mediatypeid'], $media['sendto']);
+				$index = self::getSimilarMedia($db_medias, $media['mediatypeid'], $media['sendto']);
 
 				if ($index != -1) {
 					$db_media = $db_medias[$index];
@@ -1191,9 +1193,17 @@ class CUser extends CApiService {
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
 		]);
+
+		$tokenids = DB::select('token', [
+			'output' => [],
+			'filter' => ['userid' => $userids],
+			'preservekeys' => true
+		]);
+		CToken::deleteForce(array_keys($tokenids), false);
+
 		DB::delete('users', ['userid' => $userids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
 
 		return ['userids' => $userids];
 	}

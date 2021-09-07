@@ -819,7 +819,6 @@ void	zbx_audit_host_group_create_entry(int audit_action, zbx_uint64_t groupid, c
 		local_audit_group_entry_insert->name = zbx_strdup(NULL, name);
 		local_audit_group_entry_insert->audit_action = audit_action;
 		local_audit_group_entry_insert->resource_type =  AUDIT_RESOURCE_HOST_GROUP;
-;
 		zbx_json_init(&(local_audit_group_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_group_entry_insert,
 				sizeof(local_audit_group_entry_insert));

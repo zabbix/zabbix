@@ -1168,12 +1168,14 @@ class CApiService {
 	/**
 	 * Add audit log records.
 	 *
+	 * @static
+	 *
 	 * @param int   $resource     CAudit::RESOURCE_*
 	 * @param int   $action       CAudit::ACTION_*
 	 * @param array $objects
 	 * @param array $objects_old
 	 */
-	protected function addAuditLog(int $action, int $resource, array $objects, array $objects_old = null): void {
+	protected static function addAuditLog(int $action, int $resource, array $objects, array $objects_old = null): void {
 		CAudit::log(self::$userData['userid'], self::$userData['userip'], self::$userData['username'], $action,
 			$resource, $objects, $objects_old
 		);
@@ -1187,6 +1189,8 @@ class CApiService {
 	 * @param string $rule_name  Rule name.
 	 *
 	 * @return bool  Returns true if user has access to specified rule, and false otherwise.
+	 *
+	 * @throws Exception
 	 */
 	protected static function checkAccess(string $rule_name): bool {
 		return (self::$userData && CRoleHelper::checkAccess($rule_name, self::$userData['roleid']));

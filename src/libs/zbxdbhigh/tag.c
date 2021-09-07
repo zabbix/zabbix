@@ -51,14 +51,24 @@ void	zbx_db_tag_free(zbx_db_tag_t *tag)
 
 int	zbx_db_tag_compare_func(const void *d1, const void *d2)
 {
-	const zbx_db_tag_t	*tag1 = *(const zbx_db_tag_t **)d1;
-	const zbx_db_tag_t	*tag2 = *(const zbx_db_tag_t **)d2;
+	const zbx_db_tag_t	* const tag1 = *(const zbx_db_tag_t * const *)d1;
+	const zbx_db_tag_t	* const tag2 = *(const zbx_db_tag_t * const *)d2;
 	int			ret;
 
 	if (0 != (ret = strcmp(tag1->tag, tag2->tag)))
 		return ret;
 
 	return strcmp(tag1->value, tag2->value);
+}
+
+int	zbx_db_tag_compare_func_template(const void *d1, const void *d2)
+{
+	const zbx_db_tag_t	* const it1 = *(const zbx_db_tag_t * const *)d1;
+	const zbx_db_tag_t	* const it2 = *(const zbx_db_tag_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(it1->tag, it2->tag);
+
+	return 0;
 }
 
 ZBX_PTR_VECTOR_IMPL(db_tag_ptr, zbx_db_tag_t *)

@@ -37,6 +37,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'filter_tag_source' =>				'in '.implode(',', [ZBX_SERVICE_FILTER_TAGS_ANY, ZBX_SERVICE_FILTER_TAGS_SERVICE, ZBX_SERVICE_FILTER_TAGS_PROBLEM]),
 			'filter_evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>					'array',
+			'filter_set' =>						'in 1',
 			'page' =>							'ge 1'
 		];
 
@@ -49,11 +50,35 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES);
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES) || !$this->canEdit()) {
+			return false;
+		}
+
+		if ($this->hasInput('serviceid')) {
+			$db_service = API::Service()->get([
+				'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+				'serviceids' => $this->getInput('serviceid'),
+				'selectParents' => ['serviceid'],
+				'selectTags' => ['tag', 'value']
+			]);
+
+			if (!$db_service) {
+				return false;
+			}
+
+			$this->service = $db_service[0];
+		}
+
+		return true;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function doAction(): void {
 		parent::doAction();
 
@@ -79,7 +104,8 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			),
 			'tag_source' => $this->getInput('filter_tag_source', self::FILTER_DEFAULT_TAG_SOURCE),
 			'evaltype' => $this->getInput('filter_evaltype', self::FILTER_DEFAULT_EVALTYPE),
-			'tags' => []
+			'tags' => [],
+			'filter_set' => $this->hasInput('filter_set')
 		];
 
 		foreach ($this->getInput('filter_tags', []) as $tag) {
@@ -90,8 +116,6 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			$filter['tags'][] = $tag;
 		}
 
-		$is_filtered = !$this->isDefaultFilter($filter);
-
 		$reset_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list.edit')
 			->setArgument('path', $path ?: null)
@@ -99,7 +123,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		$paging_curl = clone $reset_curl;
 
-		if ($is_filtered) {
+		if ($filter['filter_set']) {
 			$paging_curl
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
@@ -107,7 +131,8 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 				->setArgument('filter_without_problem_tags', $filter['without_problem_tags'] ? 1 : 0)
 				->setArgument('filter_tag_source', $filter['tag_source'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
-				->setArgument('filter_tags', $filter['tags']);
+				->setArgument('filter_tags', $filter['tags'])
+				->setArgument('filter_set', 1);
 		}
 
 		$view_mode_curl = (clone $paging_curl)
@@ -128,9 +153,9 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 			'uncheck' => $uncheck,
 			'path' => $path,
-			'breadcrumbs' => $this->getBreadcrumbs($path, $is_filtered),
+			'breadcrumbs' => $this->getBreadcrumbs($path, $filter['filter_set']),
 			'filter' => $filter,
-			'is_filtered' => $is_filtered,
+			'is_filtered' => $filter['filter_set'],
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
 			'reset_curl' => $reset_curl,
 			'view_mode_url' => $view_mode_curl->getUrl(),
@@ -141,15 +166,15 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'service' => $this->service
 		];
 
-		$db_serviceids = $this->prepareData($filter, $is_filtered);
+		$db_serviceids = $this->prepareData($filter, $filter['filter_set']);
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('service.list.edit', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla'],
-			'selectParents' => $is_filtered ? ['serviceid', 'name'] : null,
+			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
 			'serviceids' => $db_serviceids,
