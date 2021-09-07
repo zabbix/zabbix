@@ -755,6 +755,14 @@ footer {
 .btn-remove:not(:first-child) {
   margin-left: 5px; }
 
+.btn-add[disabled], .btn-add[disabled]:hover,
+.btn-edit[disabled],
+.btn-edit[disabled]:hover,
+.btn-remove[disabled],
+.btn-remove[disabled]:hover {
+  background-color: transparent;
+  opacity: .25; }
+
 .overlay-close-btn {
   position: absolute;
   top: 1px;

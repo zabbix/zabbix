@@ -59,7 +59,7 @@ $table = (new CTableInfo())
 	]));
 
 foreach ($data['services'] as $serviceid => $service) {
-	$row = [new CCheckBox('serviceids['.$serviceid.']', $serviceid)];
+	$row = [(new CCheckBox('serviceids['.$serviceid.']', $serviceid))->setEnabled(!$service['readonly'])];
 
 	if ($data['is_filtered']) {
 		$parents = [];
@@ -118,17 +118,20 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addClass(ZBX_STYLE_BTN_ADD)
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Add child service')),
+				->setTitle(_('Add child service'))
+				->setEnabled(!$service['readonly']),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_EDIT)
 				->addClass('js-edit-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Edit')),
+				->setTitle(_('Edit'))
+				->setEnabled(!$service['readonly']),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
 				->addClass('js-remove-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Delete'))
+				->setEnabled(!$service['readonly'])
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	])));
 }

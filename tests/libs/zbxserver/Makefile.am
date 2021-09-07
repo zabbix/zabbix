@@ -33,13 +33,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/odbc/libzbxodbc.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
-	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
-	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
-	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
-	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
@@ -66,6 +59,24 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
+	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
+	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
@@ -83,7 +94,8 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
-	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 

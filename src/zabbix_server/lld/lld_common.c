@@ -21,6 +21,8 @@
 #include "log.h"
 #include "db.h"
 
+#include "../../libs/zbxaudit/audit_item.h"
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_field_str_rollback                                           *
@@ -98,8 +100,9 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 	{
 		zbx_uint64_t	id;
 		int		discovery_flag, object_lastcheck, object_ts_delete;
+		const char	*name;
 
-		cb_info(objects->values[i], &id, &discovery_flag, &object_lastcheck, &object_ts_delete);
+		cb_info(objects->values[i], &id, &discovery_flag, &object_lastcheck, &object_ts_delete, &name);
 
 		if (0 == id)
 			continue;
@@ -111,6 +114,12 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 			if (lastcheck > ts_delete)
 			{
 				zbx_vector_uint64_append(&del_ids, id);
+
+				if (0 == strcmp(table, "item_discovery"))
+				{
+					zbx_audit_item_create_entry_for_delete(id, name,
+							(int)ZBX_FLAG_DISCOVERY_CREATED);
+				}
 			}
 			else if (object_ts_delete != ts_delete)
 			{
@@ -185,6 +194,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 	if (0 != del_ids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		cb(&del_ids);
 	}
 

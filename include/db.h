@@ -345,6 +345,7 @@ typedef struct
 	char			*name;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
+	zbx_vector_tags_t	service_tags;
 }
 DB_SERVICE;
 
@@ -900,6 +901,7 @@ zbx_db_tag_t;
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
 void		zbx_db_tag_free(zbx_db_tag_t *tag);
 int		zbx_db_tag_compare_func(const void *d1, const void *d2);
+int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
 ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
 
