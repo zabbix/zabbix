@@ -638,6 +638,12 @@ function make_status_of_zbx() {
 							$error = _('Unable to retrieve database version.');
 							$dbversion->current_version = '';
 							break;
+
+						case DB_VERSION_LOWER_THAN_SUPPORTED:
+							$error = _s('Unsupported %1$s database version! Minimum supported version is %2$s.',
+								$dbversion->database, $dbversion->max_version
+							);
+							break;
 					}
 
 					$table->addRow(
