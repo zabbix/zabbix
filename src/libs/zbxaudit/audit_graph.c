@@ -242,7 +242,7 @@ PREPARE_AUDIT_GRAPH_UPDATE(type, int, int)
 #undef PREPARE_AUDIT_GRAPH_UPDATE
 #undef AUDIT_KEY_GITEMS_SNPRINTF
 
-void	DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *ids)
+void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *ids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;

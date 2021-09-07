@@ -1229,11 +1229,11 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
 	zbx_vector_uint64_create(&children_graphids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct gd.graphid,g.name,g.flags from"
-			" graph_discovery gd,graphd g where g.graphid=gd.graphid and ");
+			" graph_discovery gd,graphs g where g.graphid=gd.graphid and ");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid", graphids->values,
 			graphids->values_num);
 
-	DBselect_delete_for_graph(sql, &children_graphids);
+	zbx_audit_DBselect_delete_for_graph(sql, &children_graphids);
 	zbx_vector_uint64_setdiff(graphids, &children_graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	DBdelete_graphs(&children_graphids);
@@ -1275,10 +1275,11 @@ static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
 
 	/* select all graphs with items */
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select distinct graphid from graphs_items where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select distinct gi.graphid,g.name,g.flags from "
+			"graphs_items gi,graphs g where gi.graphid=g.graphid and ");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "gi.itemid", itemids->values, itemids->values_num);
 
-	DBselect_delete_for_graph(sql, &graphids);
+	zbx_audit_DBselect_delete_for_graph(sql, &graphids);
 
 	if (0 == graphids.values_num)
 		goto clean;
@@ -1665,7 +1666,7 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint6
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	DBselect_delete_for_graph(sql, &graphids);
+	zbx_audit_DBselect_delete_for_graph(sql, &graphids);
 
 	DBdelete_graph_hierarchy(&graphids);
 

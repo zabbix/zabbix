@@ -78,6 +78,6 @@ PREPARE_AUDIT_GRAPH_UPDATE(calc_fnc, int)
 PREPARE_AUDIT_GRAPH_UPDATE(type, int)
 #undef PREPARE_AUDIT_GRAPH_UPDATE
 
-void	DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *ids);
+void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *ids);
 
 #endif	/* ZABBIX_AUDIT_GRAPH_H */
