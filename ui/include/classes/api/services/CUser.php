@@ -1551,27 +1551,12 @@ class CUser extends CApiService {
 				'where' => ['userid' => $db_user['userid']]
 			]);
 
-			self::$userData = [
-				'userid' => $db_user['userid'],
-				'userip' => CWebUser::getIp(),
-				'username' => $user['username']
-			];
+			$users = [['userid' => $db_user['userid'], 'attempt_failed' => $attempt_failed]];
+			$db_users = [$db_user['userid'] => $db_user];
+			$user_data = array_intersect_key($db_user, array_flip(['userid', 'userip', 'username']));
 
-			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER,
-				[[
-					'userid' => $db_user['userid'],
-					'username' => $db_user['username'],
-					'attempt_failed' => $attempt_failed
-				]],
-				[
-					$db_user['userid'] => [
-						'userid' => $db_user['userid'],
-						'username' => $db_user['username'],
-						'attempt_failed' => $db_user['attempt_failed']
-					]
-				]
-			);
-			self::addAuditLog(CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER);
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users, $user_data);
+			self::addAuditLog(CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER, [], null, $user_data);
 
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
 					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
@@ -1959,25 +1944,17 @@ class CUser extends CApiService {
 		]], false);
 
 		if ($db_user['attempt_failed'] != 0) {
+			$upd_user = ['attempt_failed' => 0];
+
 			DB::update('users', [
-				'values' => ['attempt_failed' => 0],
+				'values' => $upd_user,
 				'where' => ['userid' => $db_user['userid']]
 			]);
 
-			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER,
-				[[
-					'userid' => $db_user['userid'],
-					'username' => $db_user['username'],
-					'attempt_failed' => 0
-				]],
-				[
-					$db_user['userid'] => [
-						'userid' => $db_user['userid'],
-						'username' => $db_user['username'],
-						'attempt_failed' => $db_user['attempt_failed']
-					]
-				]
-			);
+			$users = [$upd_user + ['userid' => $db_user['userid']]];
+			$db_users = [$db_user['userid'] => $db_user];
+
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
 		}
 
 		return $db_user;
