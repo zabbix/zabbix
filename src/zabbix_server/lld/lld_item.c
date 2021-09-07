@@ -87,7 +87,7 @@ static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_prepr
 	preproc_op->params = zbx_strdup(NULL, params);
 	preproc_op->params_orig = NULL;
 	preproc_op->error_handler = error_handler;
-	preproc_op->error_handler_orig = NULL;
+	preproc_op->error_handler_orig = 0;
 	preproc_op->error_handler_params = zbx_strdup(NULL, error_handler_params);
 	preproc_op->error_handler_params_orig = NULL;
 
