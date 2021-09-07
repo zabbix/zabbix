@@ -80,8 +80,7 @@ class CControllerServiceStatusRuleValidate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
 	}
 
 	protected function doAction(): void {

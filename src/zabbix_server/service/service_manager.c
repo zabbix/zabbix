@@ -29,6 +29,7 @@
 #include "zbxalgo.h"
 #include "service_protocol.h"
 #include "service_actions.h"
+#include "zbxserialize.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -384,6 +385,7 @@ static void	add_service_problem_tag_index(zbx_hashset_t *service_problem_tags_in
 		value_eq_local.value = service_problem_tag->value;
 		if (NULL == (value_eq = zbx_hashset_search(&tag_services->values, &value_eq_local)))
 		{
+
 			value_eq_local.value = zbx_strdup(NULL, service_problem_tag->value);
 			zbx_vector_ptr_create(&value_eq_local.service_problem_tags);
 			value_eq = zbx_hashset_insert(&tag_services->values, &value_eq_local, sizeof(value_eq_local));
@@ -1219,7 +1221,7 @@ static void	service_problems_index_clean(void *data)
  *                                                                            *
  * Parameters: service - [IN] the service                                     *
  *             status  - [OUT] the service status                             *
-*                                                                             *
+ *                                                                            *
  * Return value: SUCCEED - the status is returned                             *
  *               FAIL    - the service must be ignored                        *
  *                                                                            *
@@ -2864,6 +2866,54 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 	zbx_vector_uint64_destroy(&serviceids);
 }
 
+static void	get_parent_serviceids(zbx_service_t *service, zbx_vector_uint64_t *parentids)
+{
+	int	i;
+
+	for (i = 0; i < service->parents.values_num; i++)
+	{
+		zbx_service_t	*parent;
+
+		parent = (zbx_service_t*)(service->parents.values[i]);
+
+		zbx_vector_uint64_append(parentids, parent->serviceid);
+
+		get_parent_serviceids(parent, parentids);
+	}
+}
+
+static void	process_parentlist(const zbx_ipc_message_t *message, zbx_service_manager_t *service_manager,
+		zbx_ipc_client_t *client)
+{
+	unsigned char		*data = NULL;
+	zbx_uint32_t		data_len = 0;
+	zbx_uint64_t		child_serviceid = 0;
+	zbx_service_t		*service, service_local;
+	zbx_vector_uint64_t	parentids;
+
+	(void)zbx_deserialize_uint64(message->data, &child_serviceid);
+
+	service_local.serviceid = child_serviceid;
+
+	zbx_vector_uint64_create(&parentids);
+
+	if (NULL != (service = zbx_hashset_search(&service_manager->services, &service_local)))
+	{
+		get_parent_serviceids(service, &parentids);
+
+		zbx_vector_uint64_sort(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		data_len = zbx_service_serialize_parentids(&data, &parentids);
+	}
+
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_len);
+
+	zbx_vector_uint64_destroy(&parentids);
+	zbx_free(data);
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Function: service_update_event_severity                                    *
@@ -2969,15 +3019,15 @@ static void	process_event_severities(const zbx_ipc_message_t *message, zbx_servi
 	for (i = 0; i < event_severities.values_num; i++)
 	{
 		zbx_event_severity_t		*es = (zbx_event_severity_t *)event_severities.values[i];
-		zbx_event_t			event_local = {.eventid = es->eventid}, *event = &event_local;
+		zbx_event_t			event_local = {.eventid = es->eventid}, *event = &event_local, **pevent;
 		zbx_service_problem_index_t	*pi, pi_local;
 
 		/* update event severity in problem cache */
 
-		if (NULL == (event = *(zbx_event_t **)zbx_hashset_search(&service_manager->problem_events, &event)))
+		if (NULL == (pevent = (zbx_event_t **)zbx_hashset_search(&service_manager->problem_events, &event)))
 			continue;
 
-		event->severity = es->severity;
+		(*pevent)->severity = es->severity;
 
 		/* update event severities in service problems lists */
 
@@ -3000,7 +3050,6 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() severities_num:%d", __func__, severities_num);
 }
-
 
 static void	service_manager_init(zbx_service_manager_t *service_manager)
 {
@@ -3396,6 +3445,9 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					break;
 				case ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE:
 					process_rootcause(message, &service_manager, client);
+					break;
+				case ZBX_IPC_SERVICE_SERVICE_PARENT_LIST:
+					process_parentlist(message, &service_manager, client);
 					break;
 				case ZBX_IPC_SERVICE_EVENT_SEVERITIES:
 					process_event_severities(message, &service_manager);

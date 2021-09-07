@@ -312,6 +312,48 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 	}
 }
 
+zbx_uint32_t	zbx_service_serialize_parentids(unsigned char **data, const zbx_vector_uint64_t *ids)
+{
+	zbx_uint32_t	data_len = 0;
+	int		i;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, ids->values_num);
+
+	for (i = 0; i < ids->values_num; i++)
+		zbx_serialize_prepare_value(data_len, ids->values[i]);
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr += zbx_serialize_value(ptr, ids->values_num);
+
+	for (i = 0; i < ids->values_num; i++)
+		ptr += zbx_serialize_value(ptr, ids->values[i]);
+
+	return data_len;
+}
+
+void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_vector_uint64_t *ids)
+{
+	int		values_num, i;
+
+	data += zbx_deserialize_value(data, &values_num);
+
+	if (0 == values_num)
+		return;
+
+	zbx_vector_uint64_reserve(ids, values_num);
+
+	for (i = 0; i < values_num; i++)
+	{
+		zbx_uint64_t	id;
+
+		data += zbx_deserialize_value(data, &id);
+
+		zbx_vector_uint64_append(ids, id);
+	}
+}
+
 zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const zbx_vector_ptr_t *event_severities)
 {
 	zbx_uint32_t		size;
