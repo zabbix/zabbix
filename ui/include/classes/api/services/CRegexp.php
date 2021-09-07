@@ -115,7 +115,7 @@ class CRegexp extends CApiService {
 
 		$this->updateExpressions($regexs, __FUNCTION__);
 
-		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_REGEXP, $regexs);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_REGEXP, $regexs);
 
 		return ['regexpids' => $regexids];
 	}
@@ -291,7 +291,7 @@ class CRegexp extends CApiService {
 
 		$this->updateExpressions($regexs, __FUNCTION__, $db_regexs);
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_REGEXP, $regexs, $db_regexs);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_REGEXP, $regexs, $db_regexs);
 
 		return ['regexpids' => array_column($regexs, 'regexpid')];
 	}
@@ -367,7 +367,7 @@ class CRegexp extends CApiService {
 
 		DB::delete('regexps', ['regexpid' => $regexpids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_REGEXP, $db_regexs);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_REGEXP, $db_regexs);
 
 		return ['regexpids' => $regexpids];
 	}
