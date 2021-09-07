@@ -35,7 +35,8 @@ DIST_SUBDIRS = \
 	zbxdiag \
 	zbxtrends \
 	zbxavailability \
-	zbxeval
+	zbxeval \
+	zbxxml
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -53,6 +54,7 @@ SERVER_SUBDIRS = \
 	zbxtasks \
 	zbxhistory \
 	zbxcompress \
+	zbxxml \
 	zbxembed \
 	zbxprometheus \
 	zbxvault \
@@ -76,6 +78,7 @@ PROXY_SUBDIRS = \
 	zbxtasks \
 	zbxhistory \
 	zbxcompress \
+	zbxxml \
 	zbxembed \
 	zbxprometheus \
 	zbxvault \
@@ -103,6 +106,7 @@ SUBDIRS = \
 	zbxregexp \
 	zbxipcservice \
 	zbxcompress \
+	zbxxml \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)
