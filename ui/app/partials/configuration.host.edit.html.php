@@ -352,7 +352,8 @@ $tags_tab = (new CFormGrid())
 	->addItem(new CPartial('configuration.tags.tab', [
 		'source' => 'host',
 		'tags' => $data['host']['tags'],
-		'readonly' => $host_is_discovered
+		'readonly' => $host_is_discovered,
+		'tabs_id' => 'host-tabs'
 	]));
 
 // Macros tab.
@@ -548,7 +549,7 @@ if (!$host_is_discovered) {
 }
 
 // main output
-$tabs = (new CTabView())
+$tabs = (new CTabView(['id' => 'host-tabs']))
 	->setSelected(0)
 	->addTab('host-tab', _('Host'), $host_tab)
 	->addTab('template-tab', _('Templates'), $templates_tab, TAB_INDICATOR_LINKED_TEMPLATE)

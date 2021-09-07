@@ -129,7 +129,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		initHostTab() {
 			const host_field = document.getElementById('host');
 
-			'input paste'.split(' ').forEach((event_type) => {
+			['input', 'paste'].forEach((event_type) => {
 				host_field.addEventListener(event_type, (e) => this.setVisibleNamePlaceholder(e.target.value));
 			});
 			this.setVisibleNamePlaceholder(host_field.value);
@@ -245,7 +245,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 				]
 			]) ?>);
 
-			$('#tabs').on('tabscreate tabsactivate', (e, ui) => {
+			$('#host-tabs').on('tabscreate tabsactivate', (e, ui) => {
 				var panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 				if (panel.attr('id') === 'macros-tab') {

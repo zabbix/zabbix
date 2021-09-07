@@ -76,7 +76,7 @@ const host_popup = {
 
 		overlay.xhr
 			.then(function () {
-				$('#tabs', overlay.$dialogue).on('tabsactivate change', () => overlay.centerDialog());
+				$('#host-tabs', overlay.$dialogue).on('tabsactivate change', () => overlay.centerDialog());
 
 				overlay.$dialogue.find('#host-clone').on('click', host_popup.cloneBtnClickHandler('clone', overlay));
 				overlay.$dialogue.find('#host-full_clone').on('click', host_popup.cloneBtnClickHandler('full_clone', overlay));

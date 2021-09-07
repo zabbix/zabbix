@@ -35,11 +35,16 @@ class TabIndicators {
 
 	constructor() {
 		try {
+			this.tabs_id = 'tabs';
 			this.form = this.getForm();
 			this.activateIndicators();
 		} catch (error) {
 			return false;
 		}
+	}
+
+	setTabsId(tabs_id) {
+		this.tabs_id = tabs_id;
 	}
 
 	/**
@@ -113,7 +118,7 @@ class TabIndicators {
 	 * Activate tab indicators.
 	 */
 	activateIndicators() {
-		const tabs = this.form.querySelectorAll('#tabs a');
+		const tabs = this.form.querySelectorAll('#'+this.tabs_id+' a');
 
 		Object.values(tabs).map((element) => {
 			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(element));
