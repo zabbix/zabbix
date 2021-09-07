@@ -699,6 +699,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 	{
 		t_flags = (unsigned char)atoi(trow[2]);
 		h_flags = (unsigned char)atoi(trow[4]);
+
 		if (t_flags != h_flags)
 		{
 			ret = FAIL;
@@ -789,7 +790,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			break;
 	}
 
-	if (FAIL == ret)
+	if (FAIL == ret && 0 < graphs.values_num)
 	{
 		graph = (zbx_template_graph_valid_t *)graphs.values[i];
 
@@ -3117,7 +3118,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 						break;
 				}
 
-				if (host_prototype->hostid != hostid)
+				if (NULL != host_prototype && host_prototype->hostid != hostid)
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
