@@ -779,7 +779,7 @@ class CReport extends CApiService {
 				$report_user = $report_users[$db_report_user['reportid']][$db_report_user['userid']];
 				unset($report_users[$db_report_user['reportid']][$db_report_user['userid']]);
 
-				$upd_report_user = DB::getUpdatedValues('report_user', $report_user, $db_report_user);;
+				$upd_report_user = DB::getUpdatedValues('report_user', $report_user, $db_report_user);
 
 				if ($upd_report_user) {
 					$upd_report_users[] = [
@@ -847,7 +847,7 @@ class CReport extends CApiService {
 				$report_usrgrp = $report_usrgrps[$db_report_usrgrp['reportid']][$db_report_usrgrp['usrgrpid']];
 				unset($report_usrgrps[$db_report_usrgrp['reportid']][$db_report_usrgrp['usrgrpid']]);
 
-				$upd_report_usrgrp = DB::getUpdatedValues('report_usrgrp', $report_usrgrp, $db_report_usrgrp);;
+				$upd_report_usrgrp = DB::getUpdatedValues('report_usrgrp', $report_usrgrp, $db_report_usrgrp);
 
 				if ($upd_report_usrgrp) {
 					$upd_report_usrgrps[] = [
