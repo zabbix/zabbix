@@ -175,6 +175,9 @@ class CApiInputValidator {
 			case API_IP:
 				return self::validateIp($rule, $data, $path, $error);
 
+			case API_IP_RANGES:
+				return self::validateIpRanges($rule, $data, $path, $error);
+
 			case API_DNS:
 				return self::validateDns($rule, $data, $path, $error);
 
@@ -259,6 +262,7 @@ class CApiInputValidator {
 			case API_VARIABLE_NAME:
 			case API_URL:
 			case API_IP:
+			case API_IP_RANGES:
 			case API_DNS:
 			case API_PORT:
 			case API_TRIGGER_EXPRESSION:
@@ -2004,6 +2008,43 @@ class CApiInputValidator {
 
 		if ($ip_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP address is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate IP ranges. Multiple IPs separated by comma character.
+	 * Example:
+	 *   127.0.0.1,192.168.3.2
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateIpRanges($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+
+		if (!$ip_range_parser->parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $ip_range_parser->getError());
 			return false;
 		}
 
