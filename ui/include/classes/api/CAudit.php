@@ -102,9 +102,9 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_PROXY => 'hosts',
 		self::RESOURCE_USER => 'users',
-		self::RESOURCE_USER_GROUP => 'usrgrp',
-		self::RESOURCE_PROXY => 'hosts'
+		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
 
 	/**
@@ -125,9 +125,9 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_PROXY => 'host',
 		self::RESOURCE_USER => 'username',
-		self::RESOURCE_USER_GROUP => 'name',
-		self::RESOURCE_PROXY => 'host'
+		self::RESOURCE_USER_GROUP => 'name'
 	];
 
 	/**
@@ -138,9 +138,9 @@ class CAudit {
 	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_USER => 'user',
-		self::RESOURCE_USER_GROUP => 'usergroup',
-		self::RESOURCE_PROXY => 'proxy'
+		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
 
 	/**
@@ -154,8 +154,8 @@ class CAudit {
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		// ],
-		self::RESOURCE_USER => ['paths' => ['user.passwd']],
-		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']]
+		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
+		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
 	/**
@@ -165,12 +165,12 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'proxy.interface' => 'interface',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
-		'usergroup.users' => 'users_groups',
-		'proxy.interface' => 'interface'
+		'usergroup.users' => 'users_groups'
 	];
 
 	/**
@@ -180,12 +180,12 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'proxy.interface' => 'interfaceid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
-		'usergroup.users' => 'id',
-		'proxy.interface' => 'interfaceid',
+		'usergroup.users' => 'id'
 	];
 
 	/**
@@ -193,7 +193,7 @@ class CAudit {
 	 *
 	 * @var array
 	 */
-	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at', 'proxy.hosts'];
+	private const SKIP_FIELDS = ['proxy.hosts', 'token.creator_userid', 'token.created_at'];
 
 	/**
 	 * Add audit records.
