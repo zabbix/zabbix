@@ -74,7 +74,8 @@ class CControllerRegExUpdate extends CController {
 			$response = new CControllerResponseRedirect(
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'regex.edit')
-					->setArgument('regexid', $this->getInput('regexid')));
+					->setArgument('regexid', $this->getInput('regexid'))
+			);
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update regular expression'));
 		}
