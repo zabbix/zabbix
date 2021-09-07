@@ -8056,13 +8056,6 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	}
 }
 
-void	zbx_free_tag(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
-}
-
 void	zbx_free_item_tag(zbx_item_tag_t *item_tag)
 {
 	zbx_free(item_tag->tag.tag);
@@ -14121,17 +14114,6 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t host
 	}
 
 	return buf;
-}
-
-char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid)
-{
-	char	*resolved_params;
-
-	RDLOCK_CACHE;
-	resolved_params = dc_expand_user_macros_in_func_params(params, hostid);
-	UNLOCK_CACHE;
-
-	return resolved_params;
 }
 
 /*********************************************************************************

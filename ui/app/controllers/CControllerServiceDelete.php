@@ -36,9 +36,11 @@ class CControllerServiceDelete extends CController {
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-				|| !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES)) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
 			return false;
 		}
 
@@ -50,6 +52,9 @@ class CControllerServiceDelete extends CController {
 		return ($service_count == count($this->getInput('serviceids')));
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function doAction(): void {
 		$serviceids = $this->getInput('serviceids');
 

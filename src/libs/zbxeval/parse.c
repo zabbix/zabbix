@@ -174,7 +174,7 @@ static int	eval_parse_macro(zbx_eval_context_t *ctx, int pos, zbx_token_t *tok)
 		return SUCCEED;
 	}
 	else if ('{' == ctx->expression[pos + 1] && SUCCEED == zbx_token_parse_nested_macro(ctx->expression,
-			ctx->expression + pos, tok))
+			ctx->expression + pos, 0, tok))
 	{
 		return SUCCEED;
 	}

@@ -5003,8 +5003,7 @@ class testServices extends CAPITest {
 					'selectChildren' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectChildren/1": value must be one of '.
-						implode(', ', array_keys(DB::getSchema('services')['fields'])).'.',
+					'error' => 'Invalid parameter "/selectChildren/1": value must be one of serviceid, name, status, algorithm, showsla, goodsla, sortorder, weight, propagation_rule, propagation_value, readonly.',
 					'result' => []
 				]
 			],
@@ -5085,8 +5084,7 @@ class testServices extends CAPITest {
 					'selectParents' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectParents/1": value must be one of '.
-						implode(', ', array_keys(DB::getSchema('services')['fields'])).'.',
+					'error' => 'Invalid parameter "/selectParents/1": value must be one of serviceid, name, status, algorithm, showsla, goodsla, sortorder, weight, propagation_rule, propagation_value, readonly.',
 					'result' => []
 				]
 			],
