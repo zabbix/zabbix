@@ -91,9 +91,9 @@ class PostgresqlDbBackend extends DbBackend {
 			' WHERE datname='.zbx_dbstr($DB['DATABASE'])
 		));
 
-		if ($row && $row['db_charset'] != ZBX_DB_DEFAULT_CHARSET) {
+		if ($row && $row['db_charset'] != ZBX_DB_POSTGRESQL_ALLOWED_CHARSET) {
 			$this->setWarning(_s('Incorrect default charset for Zabbix database: %1$s.',
-				_s('"%1$s" instead "%2$s"', $row['db_charset'], ZBX_DB_DEFAULT_CHARSET)
+				_s('"%1$s" instead "%2$s"', $row['db_charset'], ZBX_DB_POSTGRESQL_ALLOWED_CHARSET)
 			));
 			return false;
 		}

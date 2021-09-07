@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:27Z'
+  date: '2021-08-24T05:53:26Z'
   groups:
     -
       uuid: d37f71c7e3f7469bab645852a69a2018
@@ -485,7 +485,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: hikvision_cam.get_streaming
+            key: hikvision_cam.get_status
           tags:
             -
               tag: Application
