@@ -1150,24 +1150,32 @@ class CApiService {
 	/**
 	 * Add audit log records.
 	 *
-	 * @param int        $action                 CAudit::ACTION_*
-	 * @param int        $resource               CAudit::RESOURCE_*
-	 * @param array      $objects                (optional)
-	 * @param array|null $objects_old            (optional)
-	 * @param array      $user_data              (optional)
-	 * @param string     $user_data['userid']
-	 * @param string     $user_data['userip']
-	 * @param string     $user_data['username']
+	 * @param int   $action       CAudit::ACTION_*
+	 * @param int   $resource     CAudit::RESOURCE_*
+	 * @param array $objects      (optional)
+	 * @param array $objects_old  (optional)
 	 */
 	protected static function addAuditLog(int $action, int $resource, array $objects = [],
-			array $objects_old = null, array $user_data = []): void {
-		if (!$user_data) {
-			$user_data = self::$userData;
-		}
-
-		CAudit::log($user_data['userid'], $user_data['userip'], $user_data['username'], $action, $resource, $objects,
-			$objects_old
+			array $objects_old = []): void {
+		CAudit::log(self::$userData['userid'], self::$userData['userip'], self::$userData['username'], $action,
+			$resource, $objects, $objects_old
 		);
+	}
+
+	/**
+	 * Add audit log records on behalf of the given user.
+	 *
+	 * @param string $userid
+	 * @param string $ip
+	 * @param string $username
+	 * @param int    $action       CAudit::ACTION_*
+	 * @param int    $resource     CAudit::RESOURCE_*
+	 * @param array  $objects      (optional)
+	 * @param array  $objects_old  (optional)
+	 */
+	protected static function addAuditLogByUser(string $userid, string $ip, string $username, int $action,
+			int $resource, array $objects = [], array $objects_old = []): void {
+		CAudit::log($userid, $ip, $username, $action, $resource, $objects, $objects_old);
 	}
 
 	/**

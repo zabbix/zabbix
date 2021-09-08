@@ -183,16 +183,16 @@ class CAudit {
 	/**
 	 * Add audit records.
 	 *
-	 * @param string     $userid
-	 * @param string     $ip
-	 * @param string     $username
-	 * @param int        $action
-	 * @param int        $resource
-	 * @param array      $objects
-	 * @param array|null $db_objects
+	 * @param string $userid
+	 * @param string $ip
+	 * @param string $username
+	 * @param int    $action      CAudit::ACTION_*
+	 * @param int    $resource    CAudit::RESOURCE_*
+	 * @param array  $objects
+	 * @param array  $db_objects
 	 */
 	public static function log(string $userid, string $ip, string $username, int $action, int $resource, array $objects,
-			?array $db_objects): void {
+			array $db_objects): void {
 		if (!self::isAuditEnabled() && ($resource != self::RESOURCE_SETTINGS
 					|| !array_key_exists(CSettingsHelper::AUDITLOG_ENABLED, current($objects)))) {
 			return;

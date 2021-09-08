@@ -1551,10 +1551,13 @@ class CUser extends CApiService {
 
 				$users = [['userid' => $db_user['userid'], 'attempt_failed' => $attempt_failed]];
 				$db_users = [$db_user['userid'] => $db_user];
-				$user_data = array_intersect_key($db_user, array_flip(['userid', 'userip', 'username']));
 
-				self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users, $user_data);
-				self::addAuditLog(CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER, [], null, $user_data);
+				self::addAuditLogByUser($db_user['userid'], $db_user['userip'], $db_user['username'],
+					CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
+				);
+				self::addAuditLogByUser($db_user['userid'], $db_user['userip'], $db_user['username'],
+					CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
+				);
 
 				if ($attempt_failed >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
