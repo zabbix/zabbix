@@ -1537,32 +1537,30 @@ class CUser extends CApiService {
 			}
 		}
 		catch (APIException $e) {
-			$attempt_failed = $db_user['attempt_failed'];
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS) {
-				++$attempt_failed;
-			}
+				$attempt_failed = $db_user['attempt_failed'] + 1;
 
-			DB::update('users', [
-				'values' => [
-					'attempt_failed' => $attempt_failed,
-					'attempt_clock' => time(),
-					'attempt_ip' => substr($db_user['userip'], 0, 39)
-				],
-				'where' => ['userid' => $db_user['userid']]
-			]);
+				DB::update('users', [
+					'values' => [
+						'attempt_failed' => $attempt_failed,
+						'attempt_clock' => time(),
+						'attempt_ip' => substr($db_user['userip'], 0, 39)
+					],
+					'where' => ['userid' => $db_user['userid']]
+				]);
 
-			$users = [['userid' => $db_user['userid'], 'attempt_failed' => $attempt_failed]];
-			$db_users = [$db_user['userid'] => $db_user];
-			$user_data = array_intersect_key($db_user, array_flip(['userid', 'userip', 'username']));
+				$users = [['userid' => $db_user['userid'], 'attempt_failed' => $attempt_failed]];
+				$db_users = [$db_user['userid'] => $db_user];
+				$user_data = array_intersect_key($db_user, array_flip(['userid', 'userip', 'username']));
 
-			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users, $user_data);
-			self::addAuditLog(CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER, [], null, $user_data);
+				self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users, $user_data);
+				self::addAuditLog(CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER, [], null, $user_data);
 
-			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
-					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('Incorrect user name or password or account is temporarily blocked.')
-				);
+				if ($attempt_failed >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('Incorrect user name or password or account is temporarily blocked.')
+					);
+				}
 			}
 
 			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
