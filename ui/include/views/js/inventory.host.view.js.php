@@ -30,8 +30,6 @@
 
 		init() {
 			this.current_url = new Curl('', false);
-			// const url = this.current_url.getUrl();
-			// history.pushState({}, '', url); // TODO VM: use this to restore url
 
 			host_popup.init();
 		},
@@ -40,6 +38,7 @@
 			const overlay = PopUp('popup.host.edit', {hostid}, 'host_edit', document.activeElement);
 
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete);
+			overlay.$dialogue[0].addEventListener('dialogue.close', this.events.closeDialogue);
 		},
 
 		events: {
@@ -55,6 +54,11 @@
 				}
 
 				location.href = new Curl('hostinventories.php', false).getUrl();
+			},
+
+			closeDialogue: () => {
+				const url = view.current_url.getUrl();
+				history.replaceState({}, '', url);
 			}
 		}
 	}

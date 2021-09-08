@@ -89,7 +89,8 @@ $output = [
 		'host_edit_popup.init('.json_encode([
 			'popup_url' => $popup_url->getUrl()
 		]).');',
-	'buttons' => $buttons
+	'buttons' => $buttons,
+	'cancel_action' => 'host_edit_popup.closePopup();'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

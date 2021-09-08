@@ -34,23 +34,12 @@ window.host_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		history.pushState({}, '', popup_url);
+		history.replaceState({}, '', popup_url);
 
 		host_edit.init();
 	},
 
 	deleteHost(e, hostid) {
-		// const original_curl = new Curl(host_popup.original_url);
-
-		// if (basename(original_curl.getPath()) === 'hostinventories.php') {
-			// original_curl.unsetArgument('hostid');
-			// original_curl.unsetArgument('sid');
-			// host_popup.original_url = original_curl.getUrl();
-		// }
-
-		// return hosts_delete(document.getElementById('<?//= $data['form_name'] ?>//'));
-
-
 		const button = e.target;
 		button.classList.add('is-loading');
 
@@ -67,6 +56,8 @@ window.host_edit_popup = {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
+
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
 					detail: {
@@ -96,5 +87,9 @@ window.host_edit_popup = {
 			.finally(() => {
 				button.classList.remove('is-loading');
 			});
+	},
+
+	closePopup() {
+		this.dialogue.dispatchEvent(new CustomEvent('dialogue.close'));
 	}
 }
