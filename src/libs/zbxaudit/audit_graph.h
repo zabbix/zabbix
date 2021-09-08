@@ -37,7 +37,7 @@ void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx
 
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1)								\
-void	zbx_audit_graph_update_json_update_##resource(zbx_uint64_t graphid, unsigned char flags,		\
+void	zbx_audit_graph_update_json_update_##resource(zbx_uint64_t graphid, int flags,				\
 		type1 resource##_old, type1 resource##_new);							\
 
 PREPARE_AUDIT_GRAPH_UPDATE(name, const char*)
@@ -63,7 +63,7 @@ PREPARE_AUDIT_GRAPH_UPDATE(templateid, uint64_t)
 void	zbx_audit_graph_update_json_update_gitem_create_entry(zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid);
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1)								\
-void	zbx_audit_graph_update_json_update_gitem_update_##resource(zbx_uint64_t graphid, unsigned char flags,	\
+void	zbx_audit_graph_update_json_update_gitem_update_##resource(zbx_uint64_t graphid, int flags,		\
 		zbx_uint64_t gitemid, type1 resource##_old, type1 resource##_new);
 PREPARE_AUDIT_GRAPH_UPDATE(drawtype, int)
 PREPARE_AUDIT_GRAPH_UPDATE(sortorder, int)

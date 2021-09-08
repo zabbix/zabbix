@@ -565,7 +565,7 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 		ZBX_DBROW2UINT64(graph_copy.ymax_itemid_orig, row[16]);
 		graph_copy.discover_orig = (unsigned char)atoi(row[17]);
 		ZBX_DBROW2UINT64(graph_copy.templateid_orig, row[18]);
-		graph_copy.flags = atoi(row[19]);
+		graph_copy.flags = (unsigned char)atoi(row[19]);
 
 		zbx_hashset_insert(host_graphs_main_data, &graph_copy, sizeof(graph_copy));
 

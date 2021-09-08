@@ -116,6 +116,15 @@ static void	update_int_json(struct zbx_json *json, const char *key, int val_old,
 	zbx_json_close(json);
 }
 
+static void	update_double_json(struct zbx_json *json, const char *key, double val_old, double val_new)
+{
+	zbx_json_addarray(json, key);
+	zbx_json_addstring(json, NULL, "update", ZBX_JSON_TYPE_STRING);
+	zbx_json_addfloat(json, NULL, val_new);
+	zbx_json_addfloat(json, NULL, val_old);
+	zbx_json_close(json);
+}
+
 static void	delete_json(struct zbx_json *json, const char *audit_op, const char *key)
 {
 	zbx_json_addarray(json, key);
@@ -391,7 +400,7 @@ void	zbx_audit_update_json_update_double(const zbx_uint64_t id, const char *key,
 		double value_new)
 {
 	PREPARE_UPDATE_JSON_APPEND_OP();
-	update_int_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
+	update_double_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_delete(const zbx_uint64_t id, const char *audit_op, const char *key)

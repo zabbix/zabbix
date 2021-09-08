@@ -177,19 +177,19 @@ void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx
 
 	zbx_audit_update_json_append_no_value(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_);
 #define ADD_STR(r) zbx_audit_update_json_append_string(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_UINT64(r) zbx_audit_update_json_append_uint64(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-	ADD_UINT64(drawtype)
-	ADD_UINT64(sortorder)
+#define ADD_INT(r) zbx_audit_update_json_append_int(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
+	ADD_INT(drawtype)
+	ADD_INT(sortorder)
 	ADD_STR(color);
-	ADD_UINT64(yaxisside)
-	ADD_UINT64(calc_fnc)
-	ADD_UINT64(type)
+	ADD_INT(yaxisside)
+	ADD_INT(calc_fnc)
+	ADD_INT(type)
 #undef ADD_STR
-#undef ADD_UINT64
+#undef ADD_INT
 }
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1, type2)							\
-void	zbx_audit_graph_update_json_update_##resource(zbx_uint64_t graphid, unsigned char flags,		\
+void	zbx_audit_graph_update_json_update_##resource(zbx_uint64_t graphid, int flags,				\
 		type1 resource##_old, type1 resource##_new)							\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\
@@ -242,7 +242,7 @@ void	zbx_audit_graph_update_json_update_gitem_create_entry(zbx_uint64_t graphid,
 
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1, type2)							\
-void	zbx_audit_graph_update_json_update_gitem_update_##resource(zbx_uint64_t graphid, unsigned char flags,	\
+void	zbx_audit_graph_update_json_update_gitem_update_##resource(zbx_uint64_t graphid, int flags,		\
 		zbx_uint64_t gitemid, type1 resource##_old, type1 resource##_new)				\
 {														\
 	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
@@ -270,7 +270,8 @@ void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *i
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	id, flags;
+	zbx_uint64_t	id;
+	int		flags;
 
 	result = DBselect("%s", sql);
 
@@ -278,7 +279,7 @@ void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *i
 	{
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
-		ZBX_STR2UINT64(flags, row[2]);
+		flags = atoi(row[2]);
 
 		zbx_audit_graph_create_entry(AUDIT_ACTION_DELETE, id, row[1], flags);
 	}
