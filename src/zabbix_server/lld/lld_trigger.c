@@ -312,14 +312,16 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 	char				*errmsg = NULL;
 
 	result = DBselect(
-			"select distinct t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
+			"select t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
 				"t.url,t.recovery_expression,t.recovery_mode,t.correlation_mode,t.correlation_tag,"
 				"t.manual_close,t.opdata,t.discover,t.event_name"
-			" from triggers t,functions f,items i,item_discovery id"
-			" where t.triggerid=f.triggerid"
-				" and f.itemid=i.itemid"
-				" and i.itemid=id.itemid"
-				" and id.parent_itemid=" ZBX_FS_UI64,
+			" from triggers t"
+			" where t.triggerid in (select distinct tg.triggerid"
+				" from triggers tg,functions f,items i,item_discovery id"
+				" where tg.triggerid=f.triggerid"
+					" and f.itemid=i.itemid"
+					" and i.itemid=id.itemid"
+					" and id.parent_itemid=" ZBX_FS_UI64 ")",
 			lld_ruleid);
 
 	/* run through trigger prototypes */
@@ -2240,15 +2242,18 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
-				" from triggers t,functions f,items i"
-				" where t.triggerid=f.triggerid"
-					" and f.itemid=i.itemid"
-					" and i.hostid=" ZBX_FS_UI64
-					" and",
+				"select t.triggerid,t.description,t.expression,t.recovery_expression"
+				" from triggers t"
+				" where t.triggerid in (select distinct t.triggerid"
+					" from triggers tg,functions f,items i"
+					" where tg.triggerid=f.triggerid"
+						" and f.itemid=i.itemid"
+						" and i.hostid=" ZBX_FS_UI64
+						" and",
 				hostid);
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.description",
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "tg.description",
 				(const char **)descriptions.values, descriptions.values_num);
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
 		if (0 != triggerids.values_num)
 		{
