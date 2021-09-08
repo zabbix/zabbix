@@ -216,6 +216,7 @@ struct zbx_db_version_info_t
 	const char			*friendly_current_version;
 	const char			*friendly_min_version;
 	const char			*friendly_max_version;
+	const char			*friendly_min_supported_version;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);

@@ -1107,6 +1107,7 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_ERR, "");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix server due to unsupported " ZBX_DB_NAME_STR
 				" database server version (%s)", db_version_info.friendly_current_version);
+			zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s)", db_version_info.friendly_min_supported_version);
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDbVersions=1"
 				" in Zabbix server configuration file at your own risk.");
@@ -1117,7 +1118,8 @@ static void	zbx_check_db(void)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "");
 			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported " ZBX_DB_NAME_STR
-				" database server version (%s). ", db_version_info.friendly_current_version);
+				" database server version (%s)", db_version_info.friendly_current_version);
+			zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s)", db_version_info.friendly_min_supported_version);
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, "");
 			db_version_info.flag = DB_VERSION_NOT_SUPPORTED_WARNING;
