@@ -1028,13 +1028,13 @@ static void	zbx_check_db(void)
 
 	DBextract_version_info(&db_version_info);
 
-	if (DB_VERSION_LOWER_THAN_SUPPORTED == db_version_info.flag)
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
 	{
 		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix proxy due to unsupported " ZBX_DB_NAME_STR
-				" database server version (%u)", db_version_info.version);
+				" database server version (%s)", db_version_info.friendly_current_version);
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDbVersions=1"
 				" in Zabbix proxy configuration file at your own risk.");
@@ -1045,7 +1045,7 @@ static void	zbx_check_db(void)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "");
 			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported " ZBX_DB_NAME_STR
-				" database server version (%u). ", db_version_info.version);
+				" database server version (%s). ", db_version_info.friendly_current_version);
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, "");
 		}

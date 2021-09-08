@@ -1096,44 +1096,49 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 	struct zbx_json			db_version_json;
+	int				result = SUCCEED;
 
 	DBextract_version_info(&db_version_info);
 
-	if (DB_VERSION_LOWER_THAN_SUPPORTED == db_version_info.flag)
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
 	{
 		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix server due to unsupported " ZBX_DB_NAME_STR
-				" database server version (%u)", db_version_info.version);
+				" database server version (%s)", db_version_info.friendly_current_version);
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDbVersions=1"
 				" in Zabbix server configuration file at your own risk.");
 			zabbix_log(LOG_LEVEL_ERR, "");
-			zbx_json_free(&db_version_json);
-			exit(EXIT_FAILURE);
+			result = FAIL;
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_ERR, "");
 			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported " ZBX_DB_NAME_STR
-				" database server version (%u). ", db_version_info.version);
+				" database server version (%s). ", db_version_info.friendly_current_version);
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, "");
+			db_version_info.flag = DB_VERSION_NOT_SUPPORTED_WARNING;
 		}
 	}
 
-	if (SUCCEED != DBcheck_capabilities(db_version_info.version) || SUCCEED != DBcheck_version())
+	if (SUCCEED == result && (SUCCEED != DBcheck_capabilities(db_version_info.version) ||
+			SUCCEED != DBcheck_version()))
 	{
-		zbx_json_free(&db_version_json);
-		exit(EXIT_FAILURE);
+		result = FAIL;
 	}
 
 	zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_db_version_json_create(&db_version_json, &db_version_info);
-	zbx_history_check_version(&db_version_json);
+	if (SUCCEED == result)
+		zbx_history_check_version(&db_version_json);
 	DBflush_version_requirements(db_version_json.buffer);
 	zbx_json_free(&db_version_json);
+
+	if (SUCCEED != result)
+		exit(EXIT_FAILURE);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)

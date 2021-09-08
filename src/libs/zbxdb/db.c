@@ -2484,7 +2484,7 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
 	}
 	else if (min_supported_version > current_version && ZBX_DBVERSION_UNDEFINED != min_supported_version)
 	{
-		flag = DB_VERSION_LOWER_THAN_SUPPORTED;
+		flag = DB_VERSION_NOT_SUPPORTED_ERROR;
 		/* log message must be handled by server or proxy */
 	}
 	else
