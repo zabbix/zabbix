@@ -19,13 +19,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixsync
+package hw
 
-func getMetrics() []string {
-	return []string{
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs DNS query.",
-		"vfs.dir.count", "Directory entry count.",
-		"vfs.dir.size", "Directory size (in bytes).",
+import "testing"
+
+func Test_getDeviceCmd(t *testing.T) {
+	type args struct {
+		params []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{"no_params", args{}, pciCMD, false},
+		{"pci_param", args{[]string{"pci"}}, pciCMD, false},
+		{"usb_param", args{[]string{"usb"}}, usbCMD, false},
+		{"invalid_param", args{[]string{"foobar"}}, "", true},
+		{"too_many_params", args{[]string{"foo", "bar"}}, "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := getDeviceCmd(tt.args.params)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getDeviceCmd() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("getDeviceCmd() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }

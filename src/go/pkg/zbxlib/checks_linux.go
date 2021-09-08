@@ -88,12 +88,8 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_SWITCHES)
 	case "system.cpu.intr":
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_INTR)
-	case "system.hw.chassis":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_CHASSIS)
 	case "system.hw.cpu":
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_CPU)
-	case "system.hw.devices":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_DEVICES)
 	case "system.hw.macaddr":
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_MACADDR)
 	case "system.sw.os":
