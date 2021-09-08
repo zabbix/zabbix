@@ -1063,7 +1063,8 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set ");
 
-		zbx_audit_graph_create_entry(AUDIT_ACTION_UPDATE, found->graphid, found->name_orig);
+		zbx_audit_graph_create_entry(AUDIT_ACTION_UPDATE, found->graphid, found->name_orig,
+				(int)(found->flags));
 
 		if (0 != (found->update_flags & ZBX_FLAG_LINK_GRAPH_UPDATE_NAME))
 		{
@@ -1313,7 +1314,7 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 				graph_copy->ymin_itemid, graph_copy->ymax_itemid,
 				(int)(graph_copy->flags), (int)(graph_copy->discover));
 
-		zbx_audit_graph_create_entry(AUDIT_ACTION_ADD, graphid, graph_copy_name);
+		zbx_audit_graph_create_entry(AUDIT_ACTION_ADD, graphid, graph_copy_name, (int)(graph_copy->flags));
 		zbx_audit_graph_update_json_add_data(graphid, graph_copy_name, graph_copy->width,
 				graph_copy->height, graph_copy->yaxismin, graph_copy->yaxismax, graph_copy->templateid,
 				(int)graph_copy->show_work_period, (int)(graph_copy->show_triggers),

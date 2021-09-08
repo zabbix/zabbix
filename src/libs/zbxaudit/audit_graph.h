@@ -25,10 +25,7 @@
 
 #include "../zbxdbhigh/template.h"
 
-#define	PREPARE_AUDIT_GRAPH_H(funcname)										\
-void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t graphiid, const char *name);
-PREPARE_AUDIT_GRAPH_H(graph)
-PREPARE_AUDIT_GRAPH_H(graph_prototype)
+void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const char *name, int flags);
 
 void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *graph_copy_name, int width, int height,
 		double yaxismin, double yaxismax, zbx_uint64_t templateid, int show_work_period,  int show_triggers,
@@ -61,11 +58,9 @@ PREPARE_AUDIT_GRAPH_UPDATE(ymin_itemid, uint64_t)
 PREPARE_AUDIT_GRAPH_UPDATE(ymax_itemid, uint64_t)
 PREPARE_AUDIT_GRAPH_UPDATE(discover, int)
 PREPARE_AUDIT_GRAPH_UPDATE(templateid, uint64_t)
-
 #undef PREPARE_AUDIT_GRAPH_UPDATE
 
-void	zbx_audit_graph_update_json_update_gitem_create_entry(zbx_uint64_t graphid, int flags,
-		zbx_uint64_t gitemid);
+void	zbx_audit_graph_update_json_update_gitem_create_entry(zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid);
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1)								\
 void	zbx_audit_graph_update_json_update_gitem_update_##resource(zbx_uint64_t graphid, unsigned char flags,	\

@@ -22,45 +22,61 @@
 #include "log.h"
 #include "audit_graph.h"
 
-#define	PREPARE_AUDIT_GRAPH(funcname, auditentry, audit_resource_flag)						\
-void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t graphid, const char *name)		\
-{														\
-	zbx_audit_entry_t	local_audit_graph_entry, **found_audit_graph_entry;				\
-	zbx_audit_entry_t	*local_audit_graph_entry_x = &local_audit_graph_entry;				\
-														\
-	RETURN_IF_AUDIT_OFF();											\
-														\
-	local_audit_graph_entry.id = graphid;									\
-														\
-	found_audit_graph_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),		\
-			&(local_audit_graph_entry_x));								\
-	if (NULL == found_audit_graph_entry)									\
-	{													\
-		zbx_audit_entry_t	*local_audit_graph_entry_insert;					\
-														\
-		local_audit_graph_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL,				\
-				sizeof(zbx_audit_entry_t));							\
-		local_audit_graph_entry_insert->id = graphid;							\
-		local_audit_graph_entry_insert->name = zbx_strdup(NULL, name);					\
-		local_audit_graph_entry_insert->audit_action = audit_action;					\
-		local_audit_graph_entry_insert->resource_type = audit_resource_flag;				\
-		zbx_json_init(&(local_audit_graph_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);		\
-		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_graph_entry_insert,			\
-				sizeof(local_audit_graph_entry_insert));					\
-														\
-		if (AUDIT_ACTION_ADD == audit_action)								\
-		{												\
-			zbx_audit_update_json_append_uint64(graphid, AUDIT_DETAILS_ACTION_ADD,			\
-					#auditentry".graphid", graphid);					\
-		}												\
-	}													\
+static int	graph_flag_to_resource_type(int flag)
+{
+	if (ZBX_FLAG_DISCOVERY_NORMAL == flag || ZBX_FLAG_DISCOVERY_CREATED == flag)
+	{
+		return AUDIT_RESOURCE_GRAPH;
+	}
+	else if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flag)
+	{
+		return AUDIT_RESOURCE_GRAPH_PROTOTYPE;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected audit graph flag detected: ->%d<-", flag);
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+}
+#define GR_OR_GRP(s) (AUDIT_RESOURCE_GRAPH == resource_type) ? "graph."#s : "graphprototype."#s
+
+void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const char *name, int flags)
+{
+	int			resource_type;
+	zbx_audit_entry_t	local_audit_graph_entry, **found_audit_graph_entry;
+	zbx_audit_entry_t	*local_audit_graph_entry_x = &local_audit_graph_entry;
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = graph_flag_to_resource_type(flags);
+
+	local_audit_graph_entry.id = graphid;
+
+	found_audit_graph_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
+			&(local_audit_graph_entry_x));
+
+	if (NULL == found_audit_graph_entry)
+	{
+		zbx_audit_entry_t	*local_audit_graph_entry_insert;
+
+		local_audit_graph_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
+		local_audit_graph_entry_insert->id = graphid;
+		local_audit_graph_entry_insert->name = zbx_strdup(NULL, name);
+		local_audit_graph_entry_insert->audit_action = audit_action;
+		local_audit_graph_entry_insert->resource_type = resource_type;
+		zbx_json_init(&(local_audit_graph_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_graph_entry_insert,
+				sizeof(local_audit_graph_entry_insert));
+
+		if (AUDIT_ACTION_ADD == audit_action)
+		{
+			zbx_audit_update_json_append_uint64(graphid, AUDIT_DETAILS_ACTION_ADD, GR_OR_GRP(graphid),
+					graphid);
+		}
+	}
 }
 
-PREPARE_AUDIT_GRAPH(graph, graph, AUDIT_RESOURCE_GRAPH)
-PREPARE_AUDIT_GRAPH(graph_prototype, graphprototype, AUDIT_RESOURCE_GRAPH_PROTOTYPE)
-#undef PREPARE_AUDIT_GRAPH
-
-#define GR_OR_GRP(s) (ZBX_FLAG_DISCOVERY_NORMAL == flags) ? "graph."#s : "graphprototype."#s
 void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *graph_copy_name, int width, int height,
 		double yaxismin, double yaxismax, zbx_uint64_t templateid, int show_work_period,  int show_triggers,
 		int graphtype, int show_legend, int show_3d, double percent_left, double percent_right, int ymin_type,
@@ -76,16 +92,13 @@ void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *grap
 		audit_key_ymin_type[AUDIT_DETAILS_KEY_LEN], audit_key_ymax_type[AUDIT_DETAILS_KEY_LEN],
 		audit_key_ymin_itemid[AUDIT_DETAILS_KEY_LEN], audit_key_ymax_itemid[AUDIT_DETAILS_KEY_LEN],
 		audit_key_flags[AUDIT_DETAILS_KEY_LEN], audit_key_discover[AUDIT_DETAILS_KEY_LEN];
+	int	resource_type;
 
 	RETURN_IF_AUDIT_OFF();
 
-	if (ZBX_FLAG_DISCOVERY_NORMAL != flags && ZBX_FLAG_DISCOVERY_PROTOTYPE != flags)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return;
-	}
+	resource_type = graph_flag_to_resource_type(flags);
 
-	zbx_snprintf(audit_key, sizeof(audit_key), (ZBX_FLAG_DISCOVERY_NORMAL == flags) ? "graph" :
+	zbx_snprintf(audit_key, sizeof(audit_key), (AUDIT_RESOURCE_GRAPH == resource_type) ? "graph" :
 			"graphprototype");
 #define AUDIT_KEY_SNPRINTF(r) zbx_snprintf(audit_key_##r, sizeof(audit_key_##r), GR_OR_GRP(r));
 	AUDIT_KEY_SNPRINTF(graph_copy_name)
@@ -145,11 +158,14 @@ void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx
 		audit_key_sortorder[AUDIT_DETAILS_KEY_LEN],
 		audit_key_color[AUDIT_DETAILS_KEY_LEN], audit_key_yaxisside[AUDIT_DETAILS_KEY_LEN],
 		audit_key_calc_fnc[AUDIT_DETAILS_KEY_LEN], audit_key_type[AUDIT_DETAILS_KEY_LEN];
+	int	resource_type;
 
 	RETURN_IF_AUDIT_OFF();
 
+	resource_type = graph_flag_to_resource_type(flags);
+
 #define AUDIT_KEY_GITEMS_SNPRINTF(r, nested) zbx_snprintf(audit_key_##r, sizeof(audit_key_##r),			\
-		((ZBX_FLAG_DISCOVERY_NORMAL == flags) ? "graph.gitems[%lu]"#nested#r :				\
+		((AUDIT_RESOURCE_TRIGGER == resource_type) ? "graph.gitems[%lu]"#nested#r :			\
 		"graphprototype.gitems[%lu]"#nested#r), gitemid);
 	AUDIT_KEY_GITEMS_SNPRINTF(,)
 	AUDIT_KEY_GITEMS_SNPRINTF(drawtype, .)
@@ -177,8 +193,11 @@ void	zbx_audit_graph_update_json_update_##resource(zbx_uint64_t graphid, unsigne
 		type1 resource##_old, type1 resource##_new)							\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\
+	int	resource_type;											\
 														\
 	RETURN_IF_AUDIT_OFF();											\
+														\
+	resource_type = graph_flag_to_resource_type(flags);							\
 														\
 	zbx_snprintf(buf, sizeof(buf), GR_OR_GRP(resource));							\
 														\
@@ -207,12 +226,14 @@ PREPARE_AUDIT_GRAPH_UPDATE(templateid, uint64_t, uint64)
 #undef PREPARE_AUDIT_GRAPH_UPDATE
 #undef GR_OR_GRP
 
-void	zbx_audit_graph_update_json_update_gitem_create_entry(zbx_uint64_t graphid, int flags,
-		zbx_uint64_t gitemid)
+void	zbx_audit_graph_update_json_update_gitem_create_entry(zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid)
 {
 	char	audit_key_[AUDIT_DETAILS_KEY_LEN];
+	int	resource_type;
 
 	RETURN_IF_AUDIT_OFF();
+
+	resource_type = graph_flag_to_resource_type(flags);
 
 	AUDIT_KEY_GITEMS_SNPRINTF(,)
 
@@ -225,8 +246,11 @@ void	zbx_audit_graph_update_json_update_gitem_update_##resource(zbx_uint64_t gra
 		zbx_uint64_t gitemid, type1 resource##_old, type1 resource##_new)				\
 {														\
 	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
+	int	resource_type;											\
 														\
 	RETURN_IF_AUDIT_OFF();											\
+														\
+	resource_type = graph_flag_to_resource_type(flags);							\
 														\
 	AUDIT_KEY_GITEMS_SNPRINTF(resource, .)									\
 														\
@@ -256,10 +280,7 @@ void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *i
 		zbx_vector_uint64_append(ids, id);
 		ZBX_STR2UINT64(flags, row[2]);
 
-		if (ZBX_FLAG_DISCOVERY_NORMAL == flags)
-			zbx_audit_graph_create_entry(AUDIT_ACTION_DELETE, id, row[1]);
-		else if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
-			zbx_audit_graph_prototype_create_entry(AUDIT_ACTION_DELETE, id, row[1]);
+		zbx_audit_graph_create_entry(AUDIT_ACTION_DELETE, id, row[1], flags);
 	}
 
 	DBfree_result(result);
