@@ -985,7 +985,8 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char **tables_hk, int count)
+static void	DBadd_to_housekeeper(const zbx_vector_uint64_t *ids, const char *field, const char **tables_hk,
+		int count)
 {
 	int		i, j;
 	zbx_uint64_t	housekeeperid;

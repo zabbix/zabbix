@@ -34,7 +34,7 @@ static int	trigger_flag_to_resource_type(int flag)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unexpected audit trigger flag detected: ->%d<-", flag);
+		zabbix_log(LOG_LEVEL_CRIT, "unexpected audit trigger flag detected: ->%d<-", flag);
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
@@ -213,12 +213,13 @@ void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t 
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	id;
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_t	id;
+
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
 
@@ -286,7 +287,7 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, i
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unexpected audit trigger resource type detected: ->%d<-", resource_type);
+		zabbix_log(LOG_LEVEL_CRIT, "unexpected audit trigger resource type detected: ->%d<-", resource_type);
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}

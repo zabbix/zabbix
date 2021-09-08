@@ -36,7 +36,7 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 void	zbx_audit_trigger_update_json_add_expr(zbx_uint64_t triggerid, int flags, const char *expression);
 void	zbx_audit_trigger_update_json_add_rexpr(zbx_uint64_t triggerid, int flags, const char *recovery_expression);
 
-#define PREPARE_AUDIT_TRIGGER_UPDATE_H(resource, type1, type2)							\
+#define PREPARE_AUDIT_TRIGGER_UPDATE_H(resource, type1)								\
 void	zbx_audit_trigger_update_json_update_##resource(zbx_uint64_t triggerid, int flags,			\
 		type1 resource##_old, type1 resource##_new);
 PREPARE_AUDIT_TRIGGER_UPDATE_H(flags, int, int)
