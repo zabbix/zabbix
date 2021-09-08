@@ -1932,7 +1932,6 @@ class CUser extends CApiService {
 	 */
 	private static function createSession(array $db_user): array {
 		$db_user['sessionid'] = CEncryptHelper::generateKey();
-		self::$userData = $db_user;
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
@@ -1940,6 +1939,8 @@ class CUser extends CApiService {
 			'lastaccess' => time(),
 			'status' => ZBX_SESSION_ACTIVE
 		]], false);
+
+		self::$userData = $db_user;
 
 		if ($db_user['attempt_failed'] != 0) {
 			$upd_user = ['attempt_failed' => 0];
