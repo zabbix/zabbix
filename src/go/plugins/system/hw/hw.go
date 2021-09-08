@@ -22,6 +22,7 @@
 package hw
 
 import (
+	"os"
 	"time"
 
 	"zabbix.com/pkg/plugin"
@@ -79,7 +80,74 @@ func (p *Plugin) exportChassis(params []string) (result interface{}, err error) 
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
-	return
+	vendor := 1
+
+	s := "/sys/firmware/dmi/tables/DMI"
+
+	f, err := os.Open(s)
+	if err != nil {
+		return
+	}
+
+	lstat, err := os.Lstat(s)
+	if err != nil {
+		return
+	}
+
+	content := make([]byte, lstat.Size())
+
+	_, err = f.Read(content)
+	if err != nil {
+		return
+	}
+
+	l := len(content)
+
+	var out string
+	for i := 0; i+4 <= l; {
+		if content[i] == 1 {
+			if vendor == 1 {
+				out = getDmiString(content[i:], content[i+4])
+				return out, nil
+			}
+		}
+
+		i += int(content[1])
+		for {
+			if content[i] == 0 && content[i+1] == 0 {
+				break
+			}
+
+			i++
+		}
+
+		i += 2
+	}
+
+	return out, nil
+}
+
+func getDmiString(in []byte, num byte) (out string) {
+	if num == 0 {
+		return
+	}
+
+	c := in[in[1]:]
+	for num > 1 {
+		c = c[clen(c)+1:]
+		num--
+	}
+
+	return string(c[:clen(c)])
+}
+
+func clen(n []byte) int {
+	for i := 0; i < len(n); i++ {
+		if n[i] == 0 {
+			return i
+		}
+	}
+	return len(n)
 }
 
 func (p *Plugin) exportDevices(params []string) (result interface{}, err error) {
