@@ -320,8 +320,6 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 	}
 
 	append_str_json(&((*found_audit_entry)->details_json), audit_op, key, value);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BUFFER: ->%s<-\n ", (*found_audit_entry)->details_json.buffer);
 }
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audit_op, const char *key,

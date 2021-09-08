@@ -961,11 +961,11 @@ static void	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *s
 
 			d2 = "";
 
-			zbx_audit_graph_update_json_update_gitem_create_entry(graphid, graph_flags,
-					host_items_entry->gitemid);
-
 			if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE))
 			{
+				zbx_audit_graph_update_json_update_gitem_create_entry(graphid, graph_flags,
+						host_items_entry->gitemid);
+
 				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update graphs_items set ");
 
 				if (0 != (host_items_entry->update_flags & ZBX_FLAG_LINK_GRAPHITEM_UPDATE_DRAWTYPE))
