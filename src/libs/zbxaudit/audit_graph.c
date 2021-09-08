@@ -165,7 +165,7 @@ void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx
 	resource_type = graph_flag_to_resource_type(flags);
 
 #define AUDIT_KEY_GITEMS_SNPRINTF(r, nested) zbx_snprintf(audit_key_##r, sizeof(audit_key_##r),			\
-		((AUDIT_RESOURCE_TRIGGER == resource_type) ? "graph.gitems[%lu]"#nested#r :			\
+		((AUDIT_RESOURCE_GRAPH == resource_type) ? "graph.gitems[%lu]"#nested#r :			\
 		"graphprototype.gitems[%lu]"#nested#r), gitemid);
 	AUDIT_KEY_GITEMS_SNPRINTF(,)
 	AUDIT_KEY_GITEMS_SNPRINTF(drawtype, .)
@@ -239,7 +239,6 @@ void	zbx_audit_graph_update_json_update_gitem_create_entry(zbx_uint64_t graphid,
 
 	zbx_audit_update_json_append_no_value(graphid, AUDIT_DETAILS_ACTION_UPDATE, audit_key_);
 }
-
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1, type2)							\
 void	zbx_audit_graph_update_json_update_gitem_update_##resource(zbx_uint64_t graphid, int flags,		\

@@ -35,7 +35,6 @@ void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *grap
 void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid, int drawtype,
 		int sortorder, const char *color, int yaxisside, int calc_fnc, int type);
 
-
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1)								\
 void	zbx_audit_graph_update_json_update_##resource(zbx_uint64_t graphid, int flags,				\
 		type1 resource##_old, type1 resource##_new);							\
