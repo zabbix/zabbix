@@ -1028,7 +1028,7 @@ static void	zbx_check_db(void)
 
 	DBextract_version_info(&db_version_info, NULL);
 
-	if (DB_VERSION_LOWER_THAN_SUPPORTED == db_version_info.version_status)
+	if (DB_VERSION_LOWER_THAN_SUPPORTED == db_version_info.flag)
 	{
 		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
 		{

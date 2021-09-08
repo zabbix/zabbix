@@ -209,8 +209,12 @@ zbx_uint32_t	zbx_dbms_version_get(void);
 
 struct zbx_db_version_info_t
 {
-	zbx_uint32_t 		version;
-	zbx_db_version_status_t	version_status;
+	const char			*database;
+	zbx_uint32_t 			version;
+	zbx_db_version_status_t		flag;
+	const char			*friendly_current_version;
+	const char			*friendly_min_version;
+	const char			*friendly_max_version;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info, struct zbx_json *json);
@@ -221,7 +225,6 @@ int	zbx_dbms_mariadb_used(void);
 
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
 		zbx_uint32_t max_version, zbx_uint32_t min_supported_version);
-void	zbx_db_version_json_create(struct zbx_json *json, const char *database, const char *friendly_current_version,
-		const char *friendly_min_version, const char *friendly_max_version, int flag);
+void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_info_t *info);
 
 #endif

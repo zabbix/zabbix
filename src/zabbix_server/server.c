@@ -1100,7 +1100,7 @@ static void	zbx_check_db(void)
 	zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 	DBextract_version_info(&db_version_info, &db_version_json);
 
-	if (DB_VERSION_LOWER_THAN_SUPPORTED == db_version_info.version_status)
+	if (DB_VERSION_LOWER_THAN_SUPPORTED == db_version_info.flag)
 	{
 		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
 		{
