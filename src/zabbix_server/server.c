@@ -838,7 +838,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPort",			&CONFIG_DBPORT,				TYPE_INT,
 			PARM_OPT,	1024,			65535},
-		{"AllowUnsupportedDbVersions",	&CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS,	TYPE_INT,
+		{"AllowUnsupportedDBVersions",	&CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS,	TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"DBTLSConnect",		&CONFIG_DB_TLS_CONNECT,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1111,7 +1111,7 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s)",
 					db_version_info.friendly_min_supported_version);
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDbVersions=1"
+			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
 					" in Zabbix server configuration file at your own risk.");
 			zabbix_log(LOG_LEVEL_ERR, "");
 			result = FAIL;
