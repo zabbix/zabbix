@@ -590,7 +590,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	int			perm = PERM_DENY;
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
-	zbx_user_t	user = {.userid = userid};
+	zbx_user_t		user = {.userid = userid};
 	zbx_ipc_message_t	response;
 	zbx_vector_uint64_t	parent_ids;
 	zbx_service_role_t	role_local, *role;
@@ -616,6 +616,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	/* check if the target service has read permission */
 
 	/* check read/write rule rights */
+	/* service will never hold NULL value */
 	if (SUCCEED == zbx_vector_uint64_bsearch(&role->serviceids, service->serviceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		return PERM_READ;
 
@@ -632,7 +633,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 		goto out2;
 
 	zbx_ipc_message_init(&response);
-	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset, &response);
+	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, (zbx_uint32_t)data_offset, &response);
 	zbx_vector_uint64_create(&parent_ids);
 	zbx_service_deserialize_parentids(response.data, &parent_ids);
 	zbx_ipc_message_clean(&response);
@@ -2700,8 +2701,8 @@ static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceid
 		return;
 
 	zbx_ipc_message_init(&response);
-	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, data_offset, &response);
-	zbx_service_deserialize_rootcause(response.data, response.size, services);
+	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, (zbx_uint32_t)data_offset, &response);
+	zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
 	zbx_ipc_message_clean(&response);
 
 	zbx_free(data);
@@ -3080,6 +3081,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 		if (0 != escalation->servicealarmid)
 		{
+			/* service_alarm will never be NULL */
 			escalation_update(escalation, action, event, service_alarm, service, default_timezone, &service_roles);
 		}
 		else if (0 != escalation->acknowledgeid)

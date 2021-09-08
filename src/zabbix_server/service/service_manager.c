@@ -2696,7 +2696,7 @@ static void	process_deleted_problems(zbx_vector_uint64_t *eventids, zbx_service_
 		zbx_uint64_pair_t	pair;
 
 		pair.first = eventids->values[i];
-		pair.second = ts.sec;
+		pair.second = (zbx_uint64_t)ts.sec;
 		zbx_hashset_insert(&service_manager->deleted_eventids, &pair, sizeof(pair));
 
 		event = &event_local;
@@ -2859,7 +2859,7 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 		zbx_vector_uint64_clear(&eventids);
 	}
 
-	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, data_offset);
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, (zbx_uint32_t)data_offset);
 
 	zbx_free(data);
 	zbx_vector_uint64_destroy(&eventids);
