@@ -639,10 +639,18 @@ function make_status_of_zbx() {
 							$dbversion->current_version = '';
 							break;
 
-						case DB_VERSION_LOWER_THAN_SUPPORTED:
-							$error = _s('Unsupported %1$s database version! Minimum supported version is %2$s.',
-								$dbversion->database, $dbversion->max_version
+						case DB_VERSION_NOT_SUPPORTED_ERROR:
+							$error = _s('Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)',
+								$dbversion->database, $dbversion->min_supported_version
 							);
+							$error == "AAA";
+							break;
+
+						case DB_VERSION_NOT_SUPPORTED_WARNING:
+							$error = _s('Warning! Unsupported %1$s database server version. Should be at least (%2$s)',
+								$dbversion->database, $dbversion->min_supported_version
+							);
+							$error == "BBB";
 							break;
 					}
 
