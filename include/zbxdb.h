@@ -147,22 +147,6 @@ char		*zbx_db_dyn_escape_like_pattern(const char *src);
 
 int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
-#ifdef HAVE_SQLITE3
-#define ZBX_DB_NAME_STR "Sqlite3"
-#endif
-
-#ifdef HAVE_MYSQL
-#define ZBX_DB_NAME_STR "MySQL"
-#endif
-
-#ifdef HAVE_POSTGRESQL
-#define ZBX_DB_NAME_STR "PostgreSQL"
-#endif
-
-#ifdef HAVE_ORACLE
-#define ZBX_DB_NAME_STR "Oracle"
-#endif
-
 #define ZBX_MYSQL_MIN_VERSION				50728
 #define ZBX_MYSQL_MIN_VERSION_FRIENDLY			"5.07.28"
 #define ZBX_MYSQL_MIN_SUPPORTED_VERSION			80000
