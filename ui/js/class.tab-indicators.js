@@ -33,18 +33,14 @@ const TAB_INDICATOR_UPDATE_EVENT = 'tab-indicator-update';
  */
 class TabIndicators {
 
-	constructor() {
+	constructor(tabs_id = 'tabs') {
 		try {
-			this.tabs_id = 'tabs';
+			this.tabs_id = tabs_id;
 			this.form = this.getForm();
 			this.activateIndicators();
 		} catch (error) {
 			return false;
 		}
-	}
-
-	setTabsId(tabs_id) {
-		this.tabs_id = tabs_id;
 	}
 
 	/**
