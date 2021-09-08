@@ -137,12 +137,17 @@ static void	zbx_host_triggers_main_data_clean(zbx_hashset_t *h)
 		zbx_free(trigger_entry->expression);
 		zbx_free(trigger_entry->recovery_expression);
 		zbx_free(trigger_entry->correlation_tag_orig);
+
 		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG))
 			zbx_free(trigger_entry->correlation_tag);
+
 		zbx_free(trigger_entry->opdata_orig);
+
 		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA))
 			zbx_free(trigger_entry->opdata);
+
 		zbx_free(trigger_entry->event_name_orig);
+
 		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME))
 			zbx_free(trigger_entry->event_name);
 	}
@@ -254,7 +259,7 @@ static unsigned	triggers_flags_hash_func(const void *data)
 	const resolve_dependencies_triggers_flags_t	*trigger_entry =
 			(const resolve_dependencies_triggers_flags_t *)data;
 
-	return ZBX_DEFAULT_UINT64_HASH_ALGO(&((trigger_entry)->triggerid), sizeof((trigger_entry)->triggerid),
+	return ZBX_DEFAULT_UINT64_HASH_ALGO(&(trigger_entry->triggerid), sizeof(trigger_entry->triggerid),
 			ZBX_DEFAULT_HASH_SEED);
 }
 
@@ -277,10 +282,10 @@ static int	triggers_flags_compare_func(const void *d1, const void *d2)
  * Purpose: resolves trigger dependencies for the specified triggers based on    *
  *          host and linked templates                                            *
  *                                                                               *
- * Parameters: hostid        - [IN] host identificator from database             *
+ * Parameters: hostid        - [IN] host identifier from database                *
  *             trids         - [IN] array of trigger identifiers from database   *
  *             trids_num     - [IN] trigger count in trids array                 *
- *             links         - [OUT] pairs of trigger dependencies  (down,up)    *
+ *             links         - [OUT] pairs of trigger dependencies (down,up)     *
  *             trigger_flags - [OUT] map that lets audit know if trigger is      *
  *                                   a prototype or just trigger                 *
  *                                                                               *
@@ -290,15 +295,11 @@ static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const z
 {
 	DB_RESULT			result;
 	DB_ROW				row;
-	zbx_uint64_pair_t		map_id, dep_list_id;
 	char				*sql = NULL;
 	size_t				sql_alloc = 512, sql_offset;
 	zbx_vector_uint64_pair_t	dep_list_ids, map_ids;
 	zbx_vector_uint64_t		all_templ_ids;
-	zbx_uint64_t			templateid_down, templateid_up,
-					triggerid_down, triggerid_up,
-					hst_triggerid, tpl_triggerid;
-	int				i, j;
+	int				i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -318,6 +319,8 @@ static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const z
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_pair_t	dep_list_id;
+
 		ZBX_STR2UINT64(dep_list_id.first, row[0]);
 		ZBX_STR2UINT64(dep_list_id.second, row[1]);
 		zbx_vector_uint64_pair_append(&dep_list_ids, dep_list_id);
@@ -355,6 +358,7 @@ static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const z
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_pair_t			map_id;
 		resolve_dependencies_triggers_flags_t	*found, temp_t;
 
 		ZBX_STR2UINT64(temp_t.triggerid, row[0]);
@@ -381,6 +385,10 @@ static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const z
 
 	for (i = 0; i < dep_list_ids.values_num; i++)
 	{
+		int		j;
+		zbx_uint64_t	templateid_down, templateid_up, triggerid_down, triggerid_up, hst_triggerid,
+				tpl_triggerid;
+
 		templateid_down = dep_list_ids.values[i].first;
 		templateid_up = dep_list_ids.values[i].second;
 
@@ -423,7 +431,7 @@ out:
  *                                                                            *
  * Purpose: update trigger dependencies for specified host                    *
  *                                                                            *
- * Parameters: hostid    - [IN] host identificator from database              *
+ * Parameters: hostid    - [IN] host identifier from database                 *
  *             trids     - [IN] array of trigger identifiers from database    *
  *             trids_num - [IN] trigger count in trids array                  *
  *                                                                            *
@@ -1450,7 +1458,7 @@ static void	trigger_copies_free(zbx_trigger_copy_t *trigger_copy)
  *                                                                            *
  * Purpose: Copy template triggers to host                                    *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator from database            *
+ * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *             error       - [IN] the error message                           *
  *                                                                            *
