@@ -373,7 +373,7 @@ class testPageMonitoringServices extends CWebTest
 					'tags' => [
 						[
 							'name' => 'test',
-							'operator' => 'Exits',
+							'operator' => 'Exists',
 						],
 					],
 					'result' => [
@@ -496,5 +496,37 @@ class testPageMonitoringServices extends CWebTest
 			$filtering = $this->getTableResult('Name');
 			$this->assertTableDataColumn($filtering, 'Name');
 		}
+	}
+
+	public function testPageMonitoringServices_CheckBreadcrumbs()
+	{
+		$this->page->login()->open('zabbix.php?action=service.list');
+
+		// Check by switching childs and parents
+		$table = $this->query('class:list-table')->asTable()->one();
+		$table->getRow(0)->query('xpath://tbody/tr/td/a[text()="Server 3"]')->waitUntilClickable()->one()->click();
+
+		$this->page->waitUntilReady();
+
+		$this->assertEquals('Server 3', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
+
+		$table = $this->query('class:list-table')->asTable()->one();
+		$table->getRow(0)->query('xpath://tbody/tr/td/a[text()="Server 2"]')->waitUntilClickable()->one()->click();
+
+		$this->page->waitUntilReady();
+
+		$this->assertEquals('Server 2', $this->query('xpath://ul[@class="breadcrumbs"]/li[3]')->one()->getText());
+
+		// Return to services list
+		$this->query('xpath://ul[@class="breadcrumbs"]/li[1]')->one()->click();
+
+		// Check by filtered data
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$form->fill(['id:filter_evaltype' => 'And/Or']);
+		$this->setTags([['name' => 'test', 'operator' => 'Exists']]);
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		$this->assertEquals('Filter results', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
 	}
 }
