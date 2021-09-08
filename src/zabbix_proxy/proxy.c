@@ -1026,7 +1026,7 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 
-	DBextract_version_info(&db_version_info, NULL);
+	DBextract_version_info(&db_version_info);
 
 	if (DB_VERSION_LOWER_THAN_SUPPORTED == db_version_info.flag)
 	{

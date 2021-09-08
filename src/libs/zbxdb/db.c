@@ -2614,7 +2614,7 @@ char	version_friendly_str_buff[ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE];
  *          For "<anything else>"                                                       => DBVERSION_UNDEFINED *
  *                                                                                                             *
  **************************************************************************************************************/
-void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info, struct zbx_json *json)
+void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 {
 	int len;
 
@@ -2659,9 +2659,6 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info, s
 		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_FRIENDLY;
 		version_info->flag = zbx_db_version_check(version_info->database, ZBX_MYSQL_SVERSION,
 				ZBX_MARIA_MIN_VERSION, ZBX_DBVERSION_UNDEFINED, ZBX_MARIA_MIN_SUPPORTED_VERSION);
-
-		if (NULL != json)
-			zbx_db_version_json_create(json, version_info);
 	}
 	else
 	{
@@ -2670,9 +2667,6 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info, s
 		version_info->friendly_max_version = ZBX_MYSQL_MAX_VERSION_FRIENDLY;
 		version_info->flag = zbx_db_version_check(version_info->database, ZBX_MYSQL_SVERSION,
 				ZBX_MYSQL_MIN_VERSION, ZBX_MYSQL_MAX_VERSION, ZBX_MYSQL_MIN_SUPPORTED_VERSION);
-
-		if (NULL != json)
-			zbx_db_version_json_create(json, version_info);
 	}
 
 #elif defined(HAVE_POSTGRESQL)
@@ -2695,9 +2689,6 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info, s
 	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY;
 	version_info->flag = zbx_db_version_check(version_info->database, ZBX_PG_SVERSION, ZBX_POSTGRESQL_MIN_VERSION,
 			ZBX_POSTGRESQL_MAX_VERSION, ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION);
-
-	if (NULL != json)
-		zbx_db_version_json_create(json, version_info);
 
 #elif defined(HAVE_ORACLE)
 #	ifdef HAVE_OCI_SERVER_RELEASE2
@@ -2790,8 +2781,6 @@ out:
 	version_info->flag = zbx_db_version_check(version_info->database, ZBX_ORACLE_SVERSION, ZBX_ORACLE_MIN_VERSION,
 			ZBX_ORACLE_MAX_VERSION, ZBX_ORACLE_MIN_SUPPORTED_VERSION);
 
-	if (NULL != json)
-		zbx_db_version_json_create(json, version_info);
 #else
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 #endif

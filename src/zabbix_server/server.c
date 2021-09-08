@@ -1097,8 +1097,7 @@ static void	zbx_check_db(void)
 	struct zbx_db_version_info_t	db_version_info;
 	struct zbx_json			db_version_json;
 
-	zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
-	DBextract_version_info(&db_version_info, &db_version_json);
+	DBextract_version_info(&db_version_info);
 
 	if (DB_VERSION_LOWER_THAN_SUPPORTED == db_version_info.flag)
 	{
@@ -1130,6 +1129,8 @@ static void	zbx_check_db(void)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_db_version_json_create(&db_version_json, &db_version_info);
 	zbx_history_check_version(&db_version_json);
 	DBflush_version_requirements(db_version_json.buffer);
 	zbx_json_free(&db_version_json);

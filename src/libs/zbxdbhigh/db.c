@@ -868,10 +868,10 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	DBextract_version_info(struct zbx_db_version_info_t *version_info, struct zbx_json *json)
+zbx_uint32_t	DBextract_version_info(struct zbx_db_version_info_t *version_info)
 {
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	zbx_dbms_version_info_extract(version_info, json);
+	zbx_dbms_version_info_extract(version_info);
 	DBclose();
 }
 

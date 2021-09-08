@@ -217,7 +217,7 @@ struct zbx_db_version_info_t
 	const char			*friendly_max_version;
 };
 
-void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info, struct zbx_json *json);
+void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
 
 #ifdef HAVE_MYSQL
 int	zbx_dbms_mariadb_used(void);
