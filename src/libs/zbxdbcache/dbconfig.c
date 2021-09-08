@@ -1079,7 +1079,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #endif
 	DCstrpool_replace(found, &config->config->default_timezone, row[31]);
 
-	config->config->auditlog_enabled = atoi(row[32]);
+	config->config->auditlog_enabled = atoi(row[33]);
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
