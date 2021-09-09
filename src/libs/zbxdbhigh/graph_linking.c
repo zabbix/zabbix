@@ -288,15 +288,18 @@ static int	itemids_map_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
+static int	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
 		zbx_vector_graphs_copies_t *graphs_copies_templates, zbx_vector_uint64_t *templates_graphs_ids,
 		zbx_vector_str_t *templates_graphs_names)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset = 0;
+	int			res = SUCCEED;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_graph_copy_t	*graph_copy;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -313,9 +316,11 @@ static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
 
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
+	if (NULL == (result = DBselect("%s", sql)))
+	{
+		res = FAIL;
+		goto clean;
+	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -346,13 +351,18 @@ static void	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
 		zbx_vector_uint64_append(templates_graphs_ids, graph_copy->graphid);
 		zbx_vector_str_append(templates_graphs_names, DBdyn_escape_string(graph_copy->name));
 	}
-
+clean:
 	DBfree_result(result);
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+
+	return res;
 }
 
-static void	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t *graphs_copies_templates)
+static int	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t *graphs_copies_templates)
 {
-	int			i;
+	int			i, res = SUCCEED;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_hashset_t		y_data_map;
@@ -363,6 +373,7 @@ static void	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __func__, hostid);
 
 	zbx_vector_uint64_create(&y_data_ids);
+
 	for (i = 0; i < graphs_copies_templates->values_num; i++)
 	{
 		zbx_vector_uint64_append(&y_data_ids, graphs_copies_templates->values[i]->ymin_itemid);
@@ -386,7 +397,11 @@ static void	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t 
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.itemid", y_data_ids.values, y_data_ids.values_num);
 
-	result = DBselect("%s", sql);
+	if (NULL == (result = DBselect("%s", sql)))
+	{
+		res = FAIL;
+		goto clean;
+	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -396,8 +411,6 @@ static void	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t 
 		ZBX_STR2UINT64(itemids_map_entry.val_itemid, row[1]);
 		zbx_hashset_insert(&y_data_map, &itemids_map_entry, sizeof(itemids_map_entry));
 	}
-
-	DBfree_result(result);
 
 	for (i = 0; i < graphs_copies_templates->values_num; i++)
 	{
@@ -423,25 +436,32 @@ static void	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t 
 		graphs_copies_templates->values[i]->ymin_itemid = ymin_itemid_new;
 		graphs_copies_templates->values[i]->ymax_itemid = ymax_itemid_new;
 	}
-
+clean:
 	zbx_free(sql);
 	zbx_hashset_destroy(&y_data_map);
-	zbx_vector_uint64_destroy(&y_data_ids);
+	DBfree_result(result);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():", __func__);
+	zbx_vector_uint64_destroy(&y_data_ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+
+	return res;
 }
 
 /* hostid is necessary for template, for host hostid is 0 */
-static void	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *graphs_ids,
+static int	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *graphs_ids,
 		zbx_hashset_t *graphs_items)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset = 0;
+	int		res = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	if (0 == graphs_ids->values_num)
-		return;
+		goto out;
 
 	if (0 != hostid)
 	{
@@ -469,7 +489,11 @@ static void	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *gra
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "gi.graphid", graphs_ids->values, graphs_ids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by i.key_");
 
-	result = DBselect("%s", sql);
+	if (NULL == (result = DBselect("%s", sql)))
+	{
+		res = FAIL;
+		goto clean;
+	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -504,19 +528,26 @@ static void	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *gra
 			zbx_hashset_insert(graphs_items, &temp_t, sizeof(temp_t));
 		}
 	}
-
+clean:
 	zbx_free(sql);
 	DBfree_result(result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+
+	return res;
 }
 
-static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *templates_graphs_names,
+static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *templates_graphs_names,
 		zbx_vector_uint64_t *host_graphs_ids, zbx_hashset_t *host_graphs_main_data,
 		zbx_hashset_t *host_graphs_names)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
+	int		res = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __func__, hostid);
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -534,7 +565,11 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 	DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name",
 			(const char**)templates_graphs_names->values, templates_graphs_names->values_num);
 
-	result = DBselect("%s", sql);
+	if (NULL == (result = DBselect("%s", sql)))
+	{
+		res = FAIL;
+		goto clean;
+	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -585,9 +620,13 @@ static void	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *tem
 			zbx_hashset_insert(host_graphs_names, &local_temp_t, sizeof(local_temp_t));
 		}
 	}
-
+clean:
 	zbx_free(sql);
 	DBfree_result(result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+
+	return res;
 }
 
 static void	mark_updates_for_host_graph(zbx_graph_copy_t *template_graph_copy,
@@ -941,12 +980,14 @@ static void	process_graphs(zbx_graph_copy_t *template_graph_copy, zbx_hashset_t 
 	}
 }
 
-static void	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sql_offset,
+static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		zbx_uint64_t graphid, int graph_flags, zbx_hashset_t *host_graphs_items)
 {
-	int			j;
+	int			j, res = SUCCEED;
 	const char		*d2;
 	graphs_items_entry_t	*graphs_items_host_entry_found, graphs_items_host_entry_temp_t;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	graphs_items_host_entry_temp_t.graphid = graphid;
 
@@ -974,8 +1015,9 @@ static void	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *s
 							host_items_entry->drawtype_new);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_drawtype(graphid, (int)graph_flags,
-							host_items_entry->gitemid, host_items_entry->drawtype_orig,
+					zbx_audit_graph_update_json_update_gitem_update_drawtype(graphid,
+							(int)graph_flags, host_items_entry->gitemid,
+							host_items_entry->drawtype_orig,
 							host_items_entry->drawtype_new);
 				}
 
@@ -985,8 +1027,9 @@ static void	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *s
 							host_items_entry->sortorder_new);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_sortorder(graphid, (int)graph_flags,
-							host_items_entry->gitemid, host_items_entry->sortorder_orig,
+					zbx_audit_graph_update_json_update_gitem_update_sortorder(graphid,
+							(int)graph_flags, host_items_entry->gitemid,
+							host_items_entry->sortorder_orig,
 							host_items_entry->sortorder_new);
 				}
 
@@ -1010,8 +1053,9 @@ static void	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *s
 							host_items_entry->yaxisside_new);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_yaxisside(graphid, (int)graph_flags,
-							host_items_entry->gitemid, host_items_entry->yaxisside_orig,
+					zbx_audit_graph_update_json_update_gitem_update_yaxisside(graphid,
+							(int)graph_flags, host_items_entry->gitemid,
+							host_items_entry->yaxisside_orig,
 							host_items_entry->yaxisside_new);
 				}
 
@@ -1021,8 +1065,9 @@ static void	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *s
 							host_items_entry->calc_fnc_new);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_calc_fnc(graphid, (int)graph_flags,
-							host_items_entry->gitemid, host_items_entry->calc_fnc_orig,
+					zbx_audit_graph_update_json_update_gitem_update_calc_fnc(graphid,
+							(int)graph_flags, host_items_entry->gitemid,
+							host_items_entry->calc_fnc_orig,
 							host_items_entry->calc_fnc_new);
 				}
 
@@ -1038,10 +1083,16 @@ static void	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *s
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where gitemid=" ZBX_FS_UI64 ";\n",
 						host_items_entry->gitemid);
-				DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+				if (SUCCEED != (res = DBexecute_overflowed_sql(sql, sql_alloc, sql_offset)))
+					goto out;
 			}
 		}
 	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+
+	return res;
 }
 
 static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hashset_t *host_graphs_items)
@@ -1057,7 +1108,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	DBbegin_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
-	while (NULL != (found = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter1)))
+	while (SUCCEED == res && NULL != (found = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter1)))
 	{
 		d = "";
 
@@ -1241,21 +1292,21 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where graphid=" ZBX_FS_UI64 ";\n",
 				found->graphid);
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		res = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
-		update_graphs_items_updates(&sql2, &sql_alloc2, &sql_offset2, found->graphid, found->flags,
-				host_graphs_items);
+		if (SUCCEED == res)
+		{
+			res = update_graphs_items_updates(&sql2, &sql_alloc2, &sql_offset2, found->graphid,
+					found->flags, host_graphs_items);
+		}
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset)
+	if (SUCCEED == res && 16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs updates");
-			res = FAIL;
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs updates");
+		res = FAIL;
 	}
 
 	zbx_free(sql);
@@ -1264,13 +1315,10 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	{
 		DBend_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
-		if (16 < sql_offset2)
+		if (16 < sql_offset2 && (ZBX_DB_OK > DBexecute("%s", sql2)))
 		{
-			if (ZBX_DB_OK > DBexecute("%s", sql2))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
-				res = FAIL;
-			}
+			zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
+			res = FAIL;
 		}
 
 		zbx_free(sql2);
@@ -1285,6 +1333,8 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 	int		i, j, res;
 	zbx_db_insert_t	db_insert, db_insert_graphs_items;
 	zbx_uint64_t	graphid, graphs_itemsid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_db_insert_prepare(&db_insert, "graphs", "graphid", "name", "width", "height", "yaxismin",
 			"yaxismax", "templateid", "show_work_period", "show_triggers", "graphtype", "show_legend",
@@ -1363,9 +1413,11 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 	zbx_db_insert_clean(&db_insert);
 
 	if (SUCCEED == res)
-		zbx_db_insert_execute(&db_insert_graphs_items);
+		res = zbx_db_insert_execute(&db_insert_graphs_items);
 
 	zbx_db_insert_clean(&db_insert_graphs_items);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
 }
@@ -1414,29 +1466,40 @@ int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 #undef TRIGGER_GITEMS_HASHSET_DEF_SIZE
 	zbx_vector_graphs_copies_create(&graphs_copies_templates);
 	zbx_vector_graphs_copies_create(&graphs_copies_insert);
-	get_templates_graphs_data(templateids, &graphs_copies_templates, &templates_graphs_ids,
+
+	res = get_templates_graphs_data(templateids, &graphs_copies_templates, &templates_graphs_ids,
 			&templates_graphs_names);
 
 	if (0 == templates_graphs_names.values_num)
 		goto end;
 
-	get_graphs_items(hostid, &templates_graphs_ids, &templates_graphs_items);
+	if (SUCCEED == res)
+		res = get_graphs_items(hostid, &templates_graphs_ids, &templates_graphs_items);
 
-	update_same_itemids(hostid, &graphs_copies_templates);
-	get_target_host_main_data(hostid, &templates_graphs_names, &host_graphs_ids, &host_graphs_main_data,
-			&host_graphs_names);
+	if (SUCCEED == res)
+		res = update_same_itemids(hostid, &graphs_copies_templates);
 
-	get_graphs_items(0, &host_graphs_ids, &host_graphs_items);
-
-	for (i = 0; i < graphs_copies_templates.values_num; i++)
+	if (SUCCEED == res)
 	{
-		process_graphs(graphs_copies_templates.values[i], &host_graphs_main_data, &host_graphs_names,
-				&templates_graphs_items, &host_graphs_items, &upd_graphs_or_graphs_items,
-				&graphs_copies_insert, &total_insert_gitems_count);
+		res = get_target_host_main_data(hostid, &templates_graphs_names, &host_graphs_ids,
+				&host_graphs_main_data, &host_graphs_names);
 	}
 
-	if (0 < upd_graphs_or_graphs_items)
-		res = execute_graphs_updates(&host_graphs_main_data, &host_graphs_items);
+	if (SUCCEED == res)
+		res = get_graphs_items(0, &host_graphs_ids, &host_graphs_items);
+
+	if (SUCCEED == res)
+	{
+		for (i = 0; i < graphs_copies_templates.values_num; i++)
+		{
+			process_graphs(graphs_copies_templates.values[i], &host_graphs_main_data, &host_graphs_names,
+					&templates_graphs_items, &host_graphs_items, &upd_graphs_or_graphs_items,
+					&graphs_copies_insert, &total_insert_gitems_count);
+		}
+
+		if (0 < upd_graphs_or_graphs_items)
+			res = execute_graphs_updates(&host_graphs_main_data, &host_graphs_items);
+	}
 
 	if (SUCCEED == res && 0 < graphs_copies_insert.values_num)
 	{
@@ -1461,7 +1524,7 @@ end:
 	graphs_items_clean(&templates_graphs_items);
 	graphs_items_clean(&host_graphs_items);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
 }
