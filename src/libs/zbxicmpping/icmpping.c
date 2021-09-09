@@ -272,7 +272,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	size_t		tmp_size;
 	size_t		offset;
 	double		sec;
-	int 		i, ret = NOTSUPPORTED, index;
+	int 		i, ret = NOTSUPPORTED, index, rc;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -667,12 +667,17 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		for (i = 0; i < hosts_count; i++)
 			zbx_free(hosts[i].status);
 	}
-	pclose(f);
+	rc = pclose(f);
 
 	unlink(filename);
 
 	if (NOTSUPPORTED == ret)
-		zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
+	{
+		if (WIFSIGNALED(rc))
+			ret = DISCARDED;
+		else
+			zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
+	}
 out:
 	zbx_free(tmp);
 
