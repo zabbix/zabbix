@@ -2445,21 +2445,22 @@ int	zbx_db_strlen_n(const char *text_loc, size_t maxlen)
 	return zbx_strlen_utf8_nchars(text_loc, maxlen);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_db_version_check                                             *
- *                                                                            *
- * Purpose: determine if a vendor database(MySQL, MariaDB, PostgreSQL,        *
- *          Oracle, ElasticDB) version satisfies Zabbix requirements          *
- *                                                                            *
- * Parameters: database         - [IN] database name                          *
- *             current_version  - [IN] detected numeric version               *
- *             min_version      - [IN] minimum required numeric version       *
- *             max_version      - [IN] maximum required numeric version       *
- *                                                                            *
- * Return value: resulting status flag                                        *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Function: zbx_db_version_check                                                *
+ *                                                                               *
+ * Purpose: determine if a vendor database(MySQL, MariaDB, PostgreSQL,           *
+ *          Oracle, ElasticDB) version satisfies Zabbix requirements             *
+ *                                                                               *
+ * Parameters: database                - [IN] database name                      *
+ *             current_version         - [IN] detected numeric version           *
+ *             min_version             - [IN] minimum required numeric version   *
+ *             max_version             - [IN] maximum required numeric version   *
+ *             min_supported_version   - [IN] minimum supported numeric version  *
+ *                                                                               *
+ * Return value: resulting status flag                                           *
+ *                                                                               *
+ *********************************************************************************/
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
 		zbx_uint32_t max_version, zbx_uint32_t min_supported_version)
 {
@@ -2502,12 +2503,7 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
  *          satisfies the requirements                                        *
  *                                                                            *
  * Parameters:  json                     - [IN/OUT] json data                 *
- *              database                 - [IN] name of DB (MySQL/ElasticDB)  *
- *              friendly_current_version - [IN] string current version        *
- *              friendly_min_version     - [IN] string min version            *
- *              friendly_max_version     - [IN] string max version            *
- *              flag                     - [IN] status if DB satisfies the    *
- *                                         requirements                       *
+ *              info                     - [IN] info to serialize             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_info_t *info)
@@ -2537,7 +2533,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
  *                                                                            *
  * Example: if the original DB version was 1.2.34 then 10234 gets returned    *
  *                                                                            *
- * Purpose: For OracleDB:                                                      *
+ * Purpose: For OracleDB:                                                     *
  *          returns DBMS version as integer: MRruRRivUU                       *
  *          MR = major release version part                                   *
  *          ru = release update version part                                  *
@@ -2586,10 +2582,9 @@ char	version_friendly_str_buff[ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE];
 
 /***************************************************************************************************************
  *                                                                                                             *
- * Function: zbx_dbms_version_extract                                                                          *
+ * Function: zbx_dbms_version_info_extract                                                                     *
  *                                                                                                             *
- * Purpose: retrieves the DB version and makes sure it is stored in the numeric format, also fills the json    *
- *          to report to front-end                                                                             *
+ * Purpose: retrieves the DB version info, including numeric version value                                     *
  *                                                                                                             *
  *          For PostgreSQL:                                                                                    *
  *          numeric version is available from the API                                                          *
