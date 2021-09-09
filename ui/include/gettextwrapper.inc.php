@@ -243,7 +243,7 @@ function setupLocale(string $language, ?string &$error = ''): bool {
 	}
 
 	if (!$locale_set && strtolower($language) !== 'en_gb') {
-		setlocale(LC_ALL, $default_locales);
+		setlocale(LC_ALL, $numeric_locales);
 
 		$language = htmlspecialchars($language, ENT_QUOTES, 'UTF-8');
 		$locale_variants = array_map(function ($locale) {
