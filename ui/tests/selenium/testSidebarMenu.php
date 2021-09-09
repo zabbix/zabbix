@@ -364,8 +364,8 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Share',
-					'link' => 'https://share.zabbix.com/'
+					'section' => 'Integrations',
+					'link' => 'https://www.zabbix.com/integrations'
 				]
 			],
 			[
