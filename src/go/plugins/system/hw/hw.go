@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 /*
@@ -23,6 +24,7 @@ package hw
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"zabbix.com/pkg/plugin"
@@ -33,6 +35,16 @@ import (
 const (
 	pciCMD = "lspci"
 	usbCMD = "lsusb"
+
+	dmiTable = "/sys/firmware/dmi/tables/DMI"
+
+	chassisVendor = 1 << iota
+	chassisModel
+	chassisSerial
+	chassisType
+
+	maxChassisTypeLen = 36
+	minChassisTypelen = 1
 )
 
 // Plugin -
@@ -46,14 +58,47 @@ type Options struct {
 	Timeout int
 }
 
-type manager struct {
-	name    string
-	testCmd string
-	cmd     string
-	parser  func(in []string, regex string) ([]string, error)
-}
-
 var impl Plugin
+
+// from System Management BIOS (SMBIOS) Reference Specification v2.7.1
+var chassisTypes = []string{
+	"Other",
+	"Unknown",
+	"Desktop",
+	"Low Profile Desktop",
+	"Pizza Box",
+	"Mini Tower",
+	"Tower",
+	"Portable",
+	"LapTop",
+	"Notebook",
+	"Hand Held",
+	"Docking Station",
+	"All in One",
+	"Sub Notebook",
+	"Space-saving",
+	"Lunch Box",
+	"Main Server Chassis",
+	"Expansion Chassis",
+	"SubChassis",
+	"Bus Expansion Chassis",
+	"Peripheral Chassis",
+	"RAID Chassis",
+	"Rack Mount Chassis",
+	"Sealed-case PC",
+	"Multi-system chassis",
+	"Compact PCI",
+	"Advanced TCA",
+	"Blade",
+	"Blade Enclosure",
+	"Tablet",
+	"Convertible",
+	"Detachable",
+	"IoT Gateway",
+	"Embedded PC",
+	"Mini PC",
+	"Stick PC",
+}
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -76,59 +121,136 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func (p *Plugin) exportChassis(params []string) (result interface{}, err error) {
-	if len(params) > 1 {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
-
-	vendor := 1
-
-	s := "/sys/firmware/dmi/tables/DMI"
-
-	f, err := os.Open(s)
+	content, flags, length, err := getParams(params)
 	if err != nil {
 		return
 	}
-
-	lstat, err := os.Lstat(s)
-	if err != nil {
-		return
-	}
-
-	content := make([]byte, lstat.Size())
-
-	_, err = f.Read(content)
-	if err != nil {
-		return
-	}
-
-	l := len(content)
 
 	var out string
-	for i := 0; i+4 <= l; {
-		if content[i] == 1 {
-			if vendor == 1 {
-				out = getDmiString(content[i:], content[i+4])
-				return out, nil
-			}
+	for i := 0; i+4 <= length; {
+		var value string
+		value, flags = getChassisValues(content, flags, i)
+
+		out += value
+		if flags == 0 {
+			break
 		}
 
-		i += int(content[1])
-		for {
-			if content[i] == 0 && content[i+1] == 0 {
-				break
-			}
+		i = updateStartCounter(content, i)
+	}
 
-			i++
-		}
-
-		i += 2
+	out = strings.TrimSpace(out)
+	if out == "" {
+		return nil, zbxerr.New("cannot obtain hardware information")
 	}
 
 	return out, nil
 }
 
+func updateStartCounter(content []byte, start int) int {
+	start += int(content[1])
+	for {
+		if content[start] == 0 && content[start+1] == 0 {
+			break
+		}
+
+		start++
+	}
+
+	start += 2
+
+	return start
+}
+
+func getChassisValues(content []byte, flags, start int) (string, int) {
+	var value string
+
+	var magicNumbers = []int{4, 5, 7}
+	var types = []int{chassisVendor, chassisModel, chassisSerial}
+
+	if content[start] == 1 {
+		for i, nr := range magicNumbers {
+			var tmp string
+			tmp, flags = getChassisValue(content, start, nr, flags, types[i])
+			value += " " + tmp
+		}
+	} else if content[start] == 3 && flags&chassisType != 0 {
+		value = getChassisType(content[start+5])
+		if value != "" {
+			value = " " + value
+		}
+		flags -= chassisType
+	}
+
+	return value, flags
+}
+
+func getChassisValue(content []byte, start, magicNumber, flags, flag int) (string, int) {
+	var value string
+	if flags&flag != 0 {
+		value = getDmiString(content[start:], content[start+magicNumber])
+		flags -= flag
+	}
+
+	return value, flags
+}
+
+func getParams(params []string) (content []byte, flags, conLength int, err error) {
+	if len(params) > 1 {
+		err = zbxerr.ErrorTooManyParameters
+
+		return
+	}
+
+	if flags, err = getFlags(params); err != nil {
+		return
+	}
+
+	if content, err = os.ReadFile(dmiTable); err != nil {
+		return
+	}
+
+	return content, flags, len(content), nil
+}
+
+func getChassisType(num byte) (out string) {
+	if num < minChassisTypelen || num > maxChassisTypeLen {
+		return ""
+	}
+
+	return chassisTypes[num-1]
+}
+
+func getFlags(params []string) (int, error) {
+	var mode string
+
+	switch len(params) {
+	case 1:
+		mode = params[0]
+	case 0:
+		mode = "full"
+	default:
+		return 0, zbxerr.ErrorTooManyParameters
+	}
+
+	switch mode {
+	case "full", "":
+		return chassisVendor | chassisModel | chassisSerial | chassisType, nil
+	case "model":
+		return chassisModel, nil
+	case "serial":
+		return chassisSerial, nil
+	case "type":
+		return chassisType, nil
+	case "vendor":
+		return chassisVendor, nil
+	default:
+		return 0, zbxerr.New("incorrect first parameter")
+	}
+}
+
 func getDmiString(in []byte, num byte) (out string) {
-	if num == 0 {
+	if num == 0 || len(in) < 2 || int(in[1]) > len(in) {
 		return
 	}
 
@@ -147,6 +269,7 @@ func clen(n []byte) int {
 			return i
 		}
 	}
+
 	return len(n)
 }
 
