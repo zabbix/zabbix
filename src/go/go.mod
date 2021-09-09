@@ -1,6 +1,6 @@
 module zabbix.com
 
-go 1.13
+go 1.16
 
 require (
 	github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143
