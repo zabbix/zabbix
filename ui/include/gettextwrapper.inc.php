@@ -166,8 +166,9 @@ function _xs($message, $context) {
 }
 
 /**
- * Translates the string with respect to the given context and plural forms, also replaces placeholders with supplied arguments.
- * If no translation is found, the original string will be used. Unlimited number of parameters supplied.
+ * Translates the string with respect to the given context and plural forms, also replaces placeholders with supplied
+ * arguments. If no translation is found, the original string will be used. Unlimited number of parameters supplied.
+ *
  * Parameter placeholders must be defined as %1$s, %2$s etc.
  *
  * Example: _xn('%1$s message for arg1 "%2$s"', '%1$s messages for arg1 "%2$s"', 3, 'context', 'arg1Value');
@@ -198,4 +199,58 @@ function _xn($message, $messagePlural, $num, $context) {
  */
 function _params($format, array $arguments) {
 	return vsprintf($format, $arguments);
+}
+
+/**
+ * Initialize locale environment and gettext translations depending on language selected by user.
+ *
+ * Note: should be called before including file includes/translateDefines.inc.php.
+ *
+ * @param string $language    Locale language prefix like en_US, ru_RU etc.
+ * @param string $error       Message on failure.
+ *
+ * @return bool    Whether locale could be switched; always true for en_GB.
+ */
+function setupLocale(string $language, ?string &$error = ''): bool {
+	$numeric_locales = [
+		'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
+	];
+	$locale_variants = zbx_locale_variants($language);
+	$locale_set = false;
+	$error = '';
+
+	init_mbstrings();
+
+	// Since LC_MESSAGES may be unavailable on some systems, try to set all of the locales and then make adjustments.
+	foreach ($locale_variants as $locale) {
+		putenv('LC_ALL='.$locale);
+		putenv('LANG='.$locale);
+		putenv('LANGUAGE='.$locale);
+
+		if (setlocale(LC_ALL, $locale)) {
+			$locale_set = true;
+			break;
+		}
+	}
+
+	// Force PHP to always use a point instead of a comma for decimal numbers.
+	setlocale(LC_NUMERIC, $numeric_locales);
+
+	if (function_exists('bindtextdomain')) {
+		bindtextdomain('frontend', 'locale');
+		bind_textdomain_codeset('frontend', 'UTF-8');
+		textdomain('frontend');
+	}
+
+	if (!$locale_set && strtolower($language) !== 'en_gb') {
+		$language = htmlspecialchars($language, ENT_QUOTES, 'UTF-8');
+		$locale_variants = array_map(function ($locale) {
+			return htmlspecialchars($locale, ENT_QUOTES, 'UTF-8');
+		}, $locale_variants);
+
+		$error = 'Locale for language "'.$language.'" is not found on the web server. Tried to set: '.
+			implode(', ', $locale_variants).'. Unable to translate Zabbix interface.';
+	}
+
+	return ($error === '');
 }
