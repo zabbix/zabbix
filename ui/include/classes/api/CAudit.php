@@ -174,18 +174,27 @@ class CAudit {
 	];
 
 	/**
-	 * ID field names of nested objects.
+	 * ID field names for arrays of nested objects.
 	 * path => id field
 	 *
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
-		'proxy.interface' => 'interfaceid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
 		'usergroup.users' => 'id'
+	];
+
+	/**
+	 * ID field names for single nested objects.
+	 * path => id field
+	 *
+	 * @var array
+	 */
+	private const NESTED_SINGLE_OBJECTS_IDS = [
+		'proxy.interface' => 'interfaceid'
 	];
 
 	/**
@@ -314,15 +323,15 @@ class CAudit {
 		}
 
 		$api_name = self::API_NAMES[$resource];
-		$object = self::convertKeysToPaths($api_name, $object);
+		$details = self::convertKeysToPaths($api_name, $object);
 
 		switch ($action) {
 			case self::ACTION_ADD:
-				return self::handleAdd($resource, $object);
+				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
-				$db_object = self::convertKeysToPaths($api_name, $db_object);
-				return self::handleUpdate($resource, $object, $db_object);
+				$db_details = self::convertKeysToPaths($api_name, array_intersect_key($db_object, $object));
+				return self::handleUpdate($resource, $details, $db_details);
 		}
 	}
 
@@ -376,15 +385,20 @@ class CAudit {
 		$result = [];
 
 		foreach ($object as $key => $value) {
-			$index = '.'.$key;
-
-			if (is_array($value) && count($value) === 0) {
-				continue;
+			if (array_key_exists($prefix, self::NESTED_SINGLE_OBJECTS_IDS)) {
+				$pk = self::NESTED_SINGLE_OBJECTS_IDS[$prefix];
+				if ($key === $pk) {
+					continue;
+				}
+				$index = '['.$object[$pk].'].'.$key;
 			}
-
-			if (array_key_exists($prefix, self::NESTED_OBJECTS_IDS)) {
-				$index = '['.$value[self::NESTED_OBJECTS_IDS[$prefix]].']';
-				unset($value[self::NESTED_OBJECTS_IDS[$prefix]]);
+			elseif (array_key_exists($prefix, self::NESTED_OBJECTS_IDS)) {
+				$pk = self::NESTED_OBJECTS_IDS[$prefix];
+				$index = '['.$pk.']';
+				unset($value[$pk]);
+			}
+			else {
+				$index = '.'.$key;
 			}
 
 			$new_prefix = $prefix.$index;
@@ -394,10 +408,6 @@ class CAudit {
 			}
 
 			if (is_array($value)) {
-				if (array_key_exists($new_prefix, self::NESTED_OBJECTS_IDS) && !zbx_ctype_digit(key($value))) {
-					$value = [$value];
-				}
-
 				$result += self::convertKeysToPaths($new_prefix, $value);
 			}
 			else {
@@ -564,19 +574,16 @@ class CAudit {
 					$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 				}
 			}
-			else {
-				$is_value_to_mask = self::isValueToMask($resource, $path, $full_object);
-				if ($value != $db_value) {
-					if (self::isNestedObjectProperty($path)) {
-						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
-					}
+			elseif ($value != $db_value) {
+				if (self::isNestedObjectProperty($path)) {
+					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
+				}
 
-					if ($is_value_to_mask) {
-						$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
-					}
-					else {
-						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
-					}
+				if (self::isValueToMask($resource, $path, $full_object)) {
+					$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
+				}
+				else {
+					$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
 				}
 			}
 		}
