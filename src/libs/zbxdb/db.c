@@ -2637,7 +2637,7 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	else
 		ZBX_MYSQL_SVERSION = (zbx_uint32_t)mysql_get_server_version(conn);
 
-	len = zbx_snprintf(version_friendly_str_buff, ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE, "%d.%.2d.%.2d",
+	len = (int)zbx_snprintf(version_friendly_str_buff, ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE, "%d.%.2d.%.2d",
 			RIGHT2(ZBX_MYSQL_SVERSION/10000), RIGHT2(ZBX_MYSQL_SVERSION/100), RIGHT2(ZBX_MYSQL_SVERSION));
 
 	if (0 < len && ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE > len)
@@ -2671,7 +2671,7 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = PQserverVersion(conn);
 
-	len = zbx_snprintf(version_friendly_str_buff, ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE, "%d.%d.%d",
+	len = (int)zbx_snprintf(version_friendly_str_buff, ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE, "%d.%d.%d",
 			RIGHT2(ZBX_PG_SVERSION/10000), RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
 
 	if (0 < len && ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE > len)
