@@ -30,9 +30,10 @@ class testMaintenance extends CAPITest {
 		$def_options = [
 			'active_since' => '1514757600',
 			'active_till' => '1546207200',
-			'groupids' => ['2'],
+			'groups' => [['groupid' => '2']],
 			'timeperiods' => [
 				[
+					'timeperiod_type' => 3,
 					'every' => 1,
 					'dayofweek' => 64,
 					'start_time' => 3600,
@@ -77,6 +78,20 @@ class testMaintenance extends CAPITest {
 						[
 							'tag' => 'tag',
 							'operator' => 0
+						]
+					]
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Success. Created maintenance with one tag with empty value.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'operator' => 0,
+							'value' => ''
 						]
 					]
 				] + $def_options,
@@ -130,6 +145,30 @@ class testMaintenance extends CAPITest {
 						],
 						[
 							'tag' => 'tag',
+							'operator' => 2,
+							'value' => 'value'
+						]
+					]
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Success. Created maintenance with multiple tags.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag'
+						],
+						[
+							'tag' => 'tag1'
+						],
+						[
+							'tag' => 'tag2',
+							'value' => 'value'
+						],
+						[
+							'tag' => 'tag3',
 							'operator' => 2,
 							'value' => 'value'
 						]
@@ -368,6 +407,82 @@ class testMaintenance extends CAPITest {
 					]
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/tags/1/value": a character string is expected.'
+			],
+			// Fail. Tag value must be empty.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'maintenance_type' => 1,
+					'tags' => [
+						[
+							'tag' => 'tag'
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/tags": should be empty.'
+			],
+			// Fail. Active since bigger active till.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1546207200',
+					'active_till' => '1514757600'
+				] + $def_options,
+				'expected_error' => 'Maintenance "active_since" value cannot be bigger than "active_till".'
+			],
+			// Fail. Empty groups.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => []
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/groups": cannot be empty.'
+			],
+			// Fail. Empty groups.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'hosts' => []
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/hosts": cannot be empty.'
+			],
+			// Fail. Empty groups and hosts.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'every' => 1,
+							'dayofweek' => 64,
+							'start_time' => 3600,
+							'period' => 7200
+						]
+					]
+				],
+				'expected_error' => 'At least one host group or host must be selected.'
+			],
+			// Fail. Wrong group.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => [
+						['groupid' => 999]
+					],
+				] + $def_options,
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Fail. Same name.
+			[
+				'request_data' => [[
+					'name' => 'Same name',
+				] + $def_options,
+				[
+					'name' => 'Same name',
+				] + $def_options],
+				'expected_error' => 'Invalid parameter "/2": value (name)=(Same name) already exists.'
 			]
 		];
 	}
