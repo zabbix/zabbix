@@ -335,10 +335,11 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.second);
 	}
 
-	DBfree_result(result);
 
 	if (0 == dep_list_ids.values_num)	/* not all trigger templates have a dependency trigger */
 		goto clean;
+
+	DBfree_result(result);
 
 	zbx_vector_uint64_sort(&all_templ_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&all_templ_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
