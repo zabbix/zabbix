@@ -335,7 +335,6 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.second);
 	}
 
-
 	if (0 == dep_list_ids.values_num)	/* not all trigger templates have a dependency trigger */
 		goto clean;
 
