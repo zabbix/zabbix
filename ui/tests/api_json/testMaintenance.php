@@ -506,7 +506,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/tags/1": unexpected parameter "aaa".'
+				'expected_error' => 'Invalid parameter "/1/tags/1": unexpected parameter "aaa".'
 			]
 		];
 	}
