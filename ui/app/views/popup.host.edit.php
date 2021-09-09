@@ -50,7 +50,7 @@ else {
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'host_edit.submit(document.getElementById("'.$data['form_name'].'"));'
+			'action' => 'host_edit_popup.submit();'
 		],
 		[
 			'id' => 'host-clone',

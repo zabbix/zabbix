@@ -36,6 +36,7 @@
 
 			const overlay = PopUp('popup.host.edit', {hostid}, 'host_edit', document.activeElement);
 
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostUpdate);
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete);
 
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
@@ -44,6 +45,20 @@
 		},
 
 		events: {
+			hostUpdate: (e) => {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			},
+
 			hostDelete: (e) => {
 				const data = e.detail;
 

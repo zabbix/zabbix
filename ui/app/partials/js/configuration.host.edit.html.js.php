@@ -414,6 +414,29 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		/**
 		 * Posts hosts form to backend, triggers formSubmitted event on PopUp.
 		 *
+		 * @param {Object} fields  Fields from host form.
+		 *
+		 * @return {Object}  Processed fields from host form.
+		 */
+		formFieldsPreprocessing(fields) {
+			// Trim text fields.
+			fields.host = fields.host.trim();
+			fields.visiblename = fields.visiblename.trim();
+			fields.description = fields.description.trim();
+
+			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
+
+			if (document.querySelector('#change_psk')) {
+				delete fields.tls_psk_identity;
+				delete fields.tls_psk;
+			}
+
+			return fields;
+		},
+
+		/**
+		 * Posts hosts form to backend, triggers formSubmitted event on PopUp.
+		 *
 		 * @param {HTMLFormElement} form Host form.
 		 */
 		submit(form) {

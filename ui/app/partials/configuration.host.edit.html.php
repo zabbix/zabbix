@@ -37,7 +37,7 @@ $host_form = (new CForm())
 	->addVar('hostid', $data['hostid'])
 	->addVar('clone_hostid', $data['clone_hostid'])
 	->addVar('full_clone', $data['full_clone'])
-	->addItem((new CInput('submit'))->addStyle('display: none;'));
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 // Host tab.
 $discovered_by = null;

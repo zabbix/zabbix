@@ -39,6 +39,32 @@ window.host_edit_popup = {
 		host_edit.init();
 	},
 
+	submit() {
+		const fields = host_edit.formFieldsPreprocessing(getFormFields(this.form));
+		const curl = new Curl(this.form.getAttribute('action'));
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+			body: urlEncodeData(fields)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
+					detail: {
+						success: response.success
+					}
+				}));
+			})
+			.catch(this.ajaxExceptionHandler);
+	},
+
 	deleteHost(e, hostid) {
 		const button = e.target;
 		button.classList.add('is-loading');
@@ -65,25 +91,7 @@ window.host_edit_popup = {
 					}
 				}));
 			})
-			.catch((exception) => {
-				let title;
-				let messages = [];
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					title = <?= json_encode(_('Unexpected server error.')) ?>;
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-
-				clearMessages();
-				addMessage(message_box);
-			})
+			.catch(this.ajaxExceptionHandler)
 			.finally(() => {
 				button.classList.remove('is-loading');
 			});
@@ -91,5 +99,25 @@ window.host_edit_popup = {
 
 	closePopup() {
 		this.dialogue.dispatchEvent(new CustomEvent('dialogue.close'));
+	},
+
+	ajaxExceptionHandler: (exception) => {
+		let title;
+		let messages = [];
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			title = <?= json_encode(_('Unexpected server error.')) ?>;
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form.parentNode.insertBefore(message_box, this.form);
+
+		clearMessages();
+		addMessage(message_box);
 	}
 }
