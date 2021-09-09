@@ -623,7 +623,6 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 clean:
 	zbx_free(sql);
 	DBfree_result(result);
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
