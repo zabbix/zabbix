@@ -1180,7 +1180,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					found->percent_right);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_percent_left(found->graphid, (int)(found->flags),
+			zbx_audit_graph_update_json_update_percent_right(found->graphid, (int)(found->flags),
 					found->percent_right_orig, found->percent_right);
 		}
 
