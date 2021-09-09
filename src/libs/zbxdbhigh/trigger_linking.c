@@ -622,7 +622,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 		triggertagid = DBget_maxid_num("trigger_tag", trigger_tag_insert_temps.values_num);
 		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value", NULL);
 
-		for(i = 0; i < trigger_tag_insert_temps.values_num; i++)
+		for (i = 0; i < trigger_tag_insert_temps.values_num; i++)
 		{
 			zbx_db_insert_add_values(&db_insert, triggertagid,
 					trigger_tag_insert_temps.values[i]->triggerid,
@@ -638,9 +638,6 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 		}
 	}
 
-	zbx_vector_trigger_tag_insert_temps_clear_ext(&trigger_tag_insert_temps, trigger_tag_insert_temp_free);
-	zbx_vector_trigger_tag_insert_temps_destroy(&trigger_tag_insert_temps);
-
 	DBfree_result(result);
 
 	zbx_free(sql);
@@ -653,6 +650,8 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	}
 
 	zbx_vector_uint64_destroy(&triggerids);
+	zbx_vector_trigger_tag_insert_temps_clear_ext(&trigger_tag_insert_temps, trigger_tag_insert_temp_free);
+	zbx_vector_trigger_tag_insert_temps_destroy(&trigger_tag_insert_temps);
 
 	return SUCCEED;
 }
