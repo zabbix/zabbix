@@ -147,7 +147,6 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 #define	zbx_tcp_recv(s)				SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, 0))
 #define	zbx_tcp_recv_large(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, ZBX_TCP_LARGE))
 #define	zbx_tcp_recv_to(s, timeout)		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout, 0))
-#define	zbx_tcp_recv_to_large(s, timeout)	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout, ZBX_TCP_LARGE))
 #define	zbx_tcp_recv_raw(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
 
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);

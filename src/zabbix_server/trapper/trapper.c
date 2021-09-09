@@ -1110,7 +1110,7 @@ static void	active_passive_misconfig(zbx_socket_t *sock)
 	zbx_free(msg);
 }
 
-static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
+static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts)
 {
 	int	ret = SUCCEED;
 
@@ -1159,10 +1159,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 		}
 		else
 		{
-			if (0 != (ZBX_TCP_LARGE & sock->protocol))	/* ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
+			if (ZBX_GIBIBYTE < bytes_received)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "large message is not supported for request received from"
-						" \"%s\": [%s]", sock->peer, value);
+				zabbix_log(LOG_LEVEL_WARNING, "message size " ZBX_FS_I64 " exceeds the maximum size "
+						ZBX_FS_UI64 " for request \"%s\" received from \"%s\"", bytes_received,
+						(zbx_uint64_t)ZBX_GIBIBYTE, value, sock->peer);
 				return FAIL;
 			}
 
@@ -1256,10 +1257,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 		DC_ITEM			item;
 		int			errcode;
 
-		if (0 != (ZBX_TCP_LARGE & sock->protocol))	/* ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
+		if (ZBX_GIBIBYTE < bytes_received)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "large message is not supported for XML protocol received from"
-					" \"%s\"", sock->peer);
+			zabbix_log(LOG_LEVEL_WARNING, "message size " ZBX_FS_I64 " exceeds the maximum size "
+					ZBX_FS_UI64 " for XML protocol received from \"%s\"", bytes_received,
+					(zbx_uint64_t)ZBX_GIBIBYTE, sock->peer);
 			return FAIL;
 		}
 
@@ -1322,18 +1324,12 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-	{
-		if (SUCCEED != zbx_tcp_recv_to_large(sock, CONFIG_TRAPPER_TIMEOUT))
-			return;
-	}
-	else
-	{
-		if (SUCCEED != zbx_tcp_recv_to(sock, CONFIG_TRAPPER_TIMEOUT))
-			return;
-	}
+	ssize_t	bytes_received;
 
-	process_trap(sock, sock->buffer, ts);
+	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
+		return;
+
+	process_trap(sock, sock->buffer, bytes_received, ts);
 }
 
 static void	zbx_trapper_sigusr_handler(int flags)
