@@ -40,6 +40,13 @@ class CUser extends CApiService {
 	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
 
 	/**
+	 * The ID of non-existent user.
+	 *
+	 * @var int
+	 */
+	private const EMPTY_USERID = 0;
+
+	/**
 	 * Get users data.
 	 *
 	 * @param array  $options
@@ -1501,10 +1508,23 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_DISABLED => CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		];
 
-		$db_user = $this->findByUsername($user['username'],
+		$user_data = $this->findAccessibleUser($user['username'],
 			(CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), true
 		);
+
+		if (array_key_exists('error', $user_data)) {
+			$userid = array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : self::EMPTY_USERID;
+
+			self::addAuditLogByUser($userid, CWebUser::getIp(), $user['username'], CAudit::ACTION_LOGIN_FAILED,
+				CAudit::RESOURCE_USER
+			);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
+		}
+
+		$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
+		$this->setTimezone($db_user);
 
 		if ($db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
 			$sec_left = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))
@@ -1623,7 +1643,20 @@ class CUser extends CApiService {
 			);
 		}
 
-		$db_user = $this->findByUsername($username, $case_sensitive, $default_auth, false);
+		$user_data = $this->findAccessibleUser($username, $case_sensitive, $default_auth, false);
+
+		if (array_key_exists('error', $user_data)) {
+			$userid = array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : self::EMPTY_USERID;
+
+			self::addAuditLogByUser($userid, CWebUser::getIp(), $username, CAudit::ACTION_LOGIN_FAILED,
+				CAudit::RESOURCE_USER
+			);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
+		}
+
+		$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
+		$this->setTimezone($db_user);
 
 		unset($db_user['passwd']);
 		$db_user = self::createSession($db_user);
@@ -1685,30 +1718,18 @@ class CUser extends CApiService {
 		}
 
 		$db_user = $db_users[0];
-		$db_user['type'] = $this->getUserType($db_user['roleid']);
-
-		$usrgrps = $this->getUserGroupsData($db_user['userid']);
-
 		$db_user['sessionid'] = $sessionid;
-		$db_user['debug_mode'] = $usrgrps['debug_mode'];
-		$db_user['userip'] = $usrgrps['userip'];
-		$db_user['gui_access'] = $usrgrps['gui_access'];
 
-		if ($db_user['lang'] === LANG_DEFAULT) {
-			$db_user['lang'] = CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG);
-		}
-		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
-			$db_user['timezone'] = CSettingsHelper::get(CSettingsHelper::DEFAULT_TIMEZONE);
-		}
-		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
-			date_default_timezone_set($db_user['timezone']);
-		}
+		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
+
+		$db_user = $this->addExtraFields($db_user, $permissions);
+		$this->setTimezone($db_user);
 
 		$autologout = timeUnitToSeconds($db_user['autologout']);
 
 		// Check system permissions.
 		if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
-				|| $usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
+				|| $permissions['users_status'] == GROUP_STATUS_DISABLED) {
 			DB::delete('sessions', [
 				'status' => ZBX_SESSION_PASSIVE,
 				'userid' => $db_user['userid']
@@ -1786,10 +1807,16 @@ class CUser extends CApiService {
 		return ['userids' => $userids];
 	}
 
-	private function getUserGroupsData($userid) {
-		$usrgrps = [
+	/**
+	 * Returns user groups permissions of specific user.
+	 *
+	 * @param $userid
+	 *
+	 * @return array
+	 */
+	private function getUserGroupsPermissions(string $userid): array {
+		$permissions = [
 			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
-			'userip' => CWebUser::getIp(),
 			'users_status' => GROUP_STATUS_ENABLED,
 			'gui_access' => GROUP_GUI_ACCESS_SYSTEM
 		];
@@ -1803,17 +1830,17 @@ class CUser extends CApiService {
 
 		while ($db_usrgrp = DBfetch($db_usrgrps)) {
 			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-				$usrgrps['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
+				$permissions['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
 			}
 			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
-				$usrgrps['users_status'] = GROUP_STATUS_DISABLED;
+				$permissions['users_status'] = GROUP_STATUS_DISABLED;
 			}
-			if ($db_usrgrp['gui_access'] > $usrgrps['gui_access']) {
-				$usrgrps['gui_access'] = $db_usrgrp['gui_access'];
+			if ($db_usrgrp['gui_access'] > $permissions['gui_access']) {
+				$permissions['gui_access'] = $db_usrgrp['gui_access'];
 			}
 		}
 
-		return $usrgrps;
+		return $permissions;
 	}
 
 	/**
@@ -1963,7 +1990,7 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Find user by username. Return user data from database.
+	 * Find accessible user by username.
 	 *
 	 * @param string $username             User username to search for.
 	 * @param bool   $case_sensitive    Perform case sensitive search.
@@ -1972,9 +1999,13 @@ class CUser extends CApiService {
 	 *                                  user username string is case insensitive string even for groups with frontend
 	 *                                  access GROUP_GUI_ACCESS_INTERNAL.
 	 *
-	 * @return array
+	 * @return array The array with the following keys:
+	 *                       - 'error' - (optional) the error message;
+	 *                       - 'db_user' - (optional) contains user data from database;
+	 *                       - 'permissions' - (optional) contains user permissions data.
 	 */
-	private function findByUsername($username, $case_sensitive, $default_auth, $do_group_check) {
+	private function findAccessibleUser(string $username, bool $case_sensitive, int $default_auth,
+			bool $do_group_check): array {
 		$db_users = [];
 		$group_to_auth_map = [
 			GROUP_GUI_ACCESS_SYSTEM => $default_auth,
@@ -2002,7 +2033,7 @@ class CUser extends CApiService {
 			if ($do_group_check) {
 				// Users with ZBX_AUTH_INTERNAL access attribute 'username' is always case sensitive.
 				foreach($db_users_rows as $db_user_row) {
-					$permissions = $this->getUserGroupsData($db_user_row['userid']);
+					$permissions = $this->getUserGroupsPermissions($db_user_row['userid']);
 
 					if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
 							|| $db_user_row['username'] === $username) {
@@ -2016,40 +2047,57 @@ class CUser extends CApiService {
 		}
 
 		if (!$db_users) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect user name or password or account is temporarily blocked.')
-			);
+			return ['error' => _('Incorrect user name or password or account is temporarily blocked.')];
 		}
 		elseif (count($db_users) > 1) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Authentication failed: %1$s.', _('supplied credentials are not unique'))
-			);
+			return ['error' => _s('Authentication failed: %1$s.', _('supplied credentials are not unique'))];
 		}
 
 		$db_user = reset($db_users);
-		$db_user['type'] = $this->getUserType($db_user['roleid']);
+		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
 
-		$usrgrps = $this->getUserGroupsData($db_user['userid']);
-
-		if ($usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+		if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
+			return ['error' => _('No permissions for system access.'), 'db_user' => $db_user];
 		}
 
-		$db_user['debug_mode'] = $usrgrps['debug_mode'];
-		$db_user['userip'] = $usrgrps['userip'];
-		$db_user['gui_access'] = $usrgrps['gui_access'];
+		return ['db_user' => $db_user, 'permissions' => $permissions];
+	}
+
+	/**
+	 * Adds extra fields to database user data.
+	 *
+	 * @param array  $db_user
+	 * @param array  $permissions
+	 * @param string $permissions['debug_mode']
+	 * @param string $permissions['gui_access']
+	 */
+	private function addExtraFields(array $db_user, array $permissions): array {
+		$db_user['type'] = $this->getUserType($db_user['roleid']);
+		$db_user['userip'] = CWebUser::getIp();
+
+		$db_user['debug_mode'] = $permissions['debug_mode'];
+		$db_user['gui_access'] = $permissions['gui_access'];
 
 		if ($db_user['lang'] === LANG_DEFAULT) {
 			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);
 		}
+
 		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
 			$db_user['timezone'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_TIMEZONE);
 		}
+
+		return $db_user;
+	}
+
+	/**
+	 * Sets the timezone for system.
+	 *
+	 * @param $db_user
+	 */
+	private function setTimezone(array $db_user): void {
 		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
 			date_default_timezone_set($db_user['timezone']);
 		}
-
-		return $db_user;
 	}
 
 	/**
