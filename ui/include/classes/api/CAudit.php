@@ -156,8 +156,8 @@ class CAudit {
 	private const NESTED_OBJECTS_TABLE_NAMES = [
 		'maintenance.groups' => 'maintenances_groups',
 		'maintenance.hosts' => 'maintenances_hosts',
-		'maintenance.timeperiods' => 'timeperiods',
 		'maintenance.tags' => 'maintenance_tag',
+		'maintenance.timeperiods' => 'timeperiods',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
@@ -174,8 +174,8 @@ class CAudit {
 	private const NESTED_OBJECTS_IDS = [
 		'maintenance.groups' => 'maintenance_groupid',
 		'maintenance.hosts' => 'maintenance_hostid',
-		'maintenance.timeperiods' => 'timeperiodid',
 		'maintenance.tags' => 'maintenancetagid',
+		'maintenance.timeperiods' => 'timeperiodid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',

@@ -474,6 +474,27 @@ class testMaintenance extends CAPITest {
 				] + $def_options,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
+			// Fail. Wrong hosts.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'hosts' => [
+						['hostid' => 999]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'every' => 1,
+							'dayofweek' => 64,
+							'start_time' => 3600,
+							'period' => 7200
+						]
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
 			// Fail. Same name.
 			[
 				'request_data' => [[
@@ -483,7 +504,731 @@ class testMaintenance extends CAPITest {
 					'name' => 'Same name',
 				] + $def_options],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Same name) already exists.'
-			]
+			],
+			// Fail. Empty timeperiod.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods": cannot be empty.'
+			],
+			// Fail. Missing period type.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": the parameter "timeperiod_type" is missing.'
+			],
+			// Fail. Missing cannot be empty. period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": the parameter "period" is missing.'
+			],
+			// Fail. Wrong period type.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 1,
+							'period' => 7200
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/timeperiod_type": value must be one of 0, 2, 3, 4.'
+			],
+			// Success. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => '-1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 0-2147483647.'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'start_time' => '-5'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_time": value must be one of 0-86340.'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": an integer is expected.'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => '1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": value must be one of 0.'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'dayofweek' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": an integer is expected.'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'dayofweek' => '1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": value must be one of 0.'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'month' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": an integer is expected.'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'month' => '1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": value must be one of 0.'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'start_date' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": an integer is expected.'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'start_date' => '1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": value must be one of 0.'
+			],
+
+
+			// Success. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'period' => 7200,
+							'every' => 1,
+							'dayofweek' => '64',
+							'start_time' => '6492'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Fail. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": an integer is expected.'
+			],
+			// Fail. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => '1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": value must be one of 0.'
+			],
+			// Fail. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'dayofweek' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": an integer is expected.'
+			],
+			// Fail. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'dayofweek' => '128'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": value must be one of 0-127.'
+			],
+			// Fail. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'month' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": an integer is expected.'
+			],
+			// Fail. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'month' => '1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": value must be one of 0.'
+			],
+			// Fail. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'start_date' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": an integer is expected.'
+			],
+			// Fail. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'start_date' => '1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": value must be one of 0.'
+			],
+
+			// Success. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => 1,
+							'dayofweek' => 64,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => '-5'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_time": value must be one of 0-2147483647.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'start_time' => '-5'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_time": value must be one of 0-86340.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": an integer is expected.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => '32'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": value must be one of 0-31.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => '1',
+							'dayofweek' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": an integer is expected.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => '1',
+							'dayofweek' => '128'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": value must be one of 0-127.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => '1',
+							'dayofweek' => '127',
+							'month' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": an integer is expected.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => '1',
+							'dayofweek' => '127',
+							'month' => '4096'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": value must be one of 0-4095.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => '1',
+							'dayofweek' => '127',
+							'month' => '4095',
+							'start_date' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": an integer is expected.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'period' => 7200,
+							'every' => 1,
+							'start_time' => '6492',
+							'day' => '1',
+							'dayofweek' => '127',
+							'month' => '4095',
+							'start_date' => '1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": value must be one of 0.'
+			],
 		];
 	}
 

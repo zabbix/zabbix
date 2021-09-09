@@ -615,6 +615,7 @@ class CMaintenance extends CApiService {
 		self::checkGroups($maintenances);
 		self::checkHosts($maintenances);
 
+		// FIXME: Delete this code after ZBXNEXT-6889 merged to master.
 		foreach ($maintenances as $maintenance) {
 			if (!array_key_exists('groups', $maintenance)) {
 				unset($db_maintenances[$maintenance['maintenanceid']]['groups']);
