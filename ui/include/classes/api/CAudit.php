@@ -165,6 +165,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'proxy.hosts' => 'hosts',
 		'proxy.interface' => 'interface',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
@@ -180,6 +181,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'proxy.hosts' => 'hostid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
@@ -202,7 +204,7 @@ class CAudit {
 	 *
 	 * @var array
 	 */
-	private const SKIP_FIELDS = ['proxy.hosts', 'token.creator_userid', 'token.created_at'];
+	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
 
 	/**
 	 * Add audit records.
@@ -387,15 +389,11 @@ class CAudit {
 		foreach ($object as $key => $value) {
 			if (array_key_exists($prefix, self::NESTED_SINGLE_OBJECTS_IDS)) {
 				$pk = self::NESTED_SINGLE_OBJECTS_IDS[$prefix];
-				if ($key === $pk) {
-					continue;
-				}
 				$index = '['.$object[$pk].'].'.$key;
 			}
 			elseif (array_key_exists($prefix, self::NESTED_OBJECTS_IDS)) {
 				$pk = self::NESTED_OBJECTS_IDS[$prefix];
-				$index = '['.$pk.']';
-				unset($value[$pk]);
+				$index = '['.$value[$pk].']';
 			}
 			else {
 				$index = '.'.$key;
