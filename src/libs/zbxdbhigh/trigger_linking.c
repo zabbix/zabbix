@@ -1333,7 +1333,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	res = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	for (i = 0; i < trigger_copies_insert->values_num; i++)
+	for (i = 0; res == SUCCEED && i < trigger_copies_insert->values_num; i++)
 	{
 		zbx_eval_context_t	ctx, ctx_r;
 		zbx_trigger_copy_t	*trigger_copy_template = trigger_copies_insert->values[i];
@@ -1426,7 +1426,6 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 					&sql_update_triggers_expr_offset))
 			{
 				res = FAIL;
-				goto clean;
 			}
 		}
 
