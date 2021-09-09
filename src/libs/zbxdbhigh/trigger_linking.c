@@ -289,7 +289,7 @@ static int	triggers_flags_compare_func(const void *d1, const void *d2)
  *             trigger_flags - [OUT] map that lets audit know if trigger is      *
  *                                   a prototype or just trigger                 *
  *                                                                               *
- * Return value: upon successful completion return SUCCEED                       *
+ * Return value: upon successful completion return SUCCEED, or FAIL on DB error  *
  *                                                                               *
  *********************************************************************************/
 static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zbx_uint64_t *trids, int trids_num,
@@ -431,21 +431,21 @@ clean:
 	return res;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DBadd_template_dependencies_for_new_triggers                     *
- *                                                                            *
- * Purpose: update trigger dependencies for specified host                    *
- *                                                                            *
- * Parameters: hostid    - [IN] host identifier from database                 *
- *             trids     - [IN] array of trigger identifiers from database    *
- *             trids_num - [IN] trigger count in trids array                  *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Function: DBadd_template_dependencies_for_new_triggers                       *
+ *                                                                              *
+ * Purpose: update trigger dependencies for specified host                      *
+ *                                                                              *
+ * Parameters: hostid    - [IN] host identifier from database                   *
+ *             trids     - [IN] array of trigger identifiers from database      *
+ *             trids_num - [IN] trigger count in trids array                    *
+ *                                                                              *
+ * Return value: upon successful completion return SUCCEED, or FAIL on DB error *
+ *                                                                              *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                     *
+ *                                                                              *
+ ********************************************************************************/
 static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, zbx_uint64_t *trids, int trids_num)
 {
 	int				i, res = SUCCEED;
@@ -528,18 +528,18 @@ static void	trigger_tag_insert_temp_free(zbx_trigger_tag_insert_temp_t *trigger_
 	zbx_free(trigger_tag_insert_temp);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DBcopy_template_trigger_tags                                     *
- *                                                                            *
- * Purpose: copies tags from template triggers to created/linked triggers     *
- *                                                                            *
- * Parameters: new_triggerids - the created trigger ids                        *
- *             cur_triggerids - the linked trigfer ids                         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Function: DBcopy_template_trigger_tags                                       *
+ *                                                                              *
+ * Purpose: copies tags from template triggers to created/linked triggers       *
+ *                                                                              *
+ * Parameters: new_triggerids - the created trigger ids                         *
+ *             cur_triggerids - the linked trigfer ids                          *
+ *                                                                              *
+ * Return value: upon successful completion return SUCCEED, or FAIL on DB error *
+ *                                                                              *
+ ********************************************************************************/
 static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerids,
 		const zbx_vector_uint64_t *cur_triggerids)
 {
