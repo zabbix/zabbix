@@ -590,7 +590,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	int			perm = PERM_DENY;
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
-	zbx_user_t	user = {.userid = userid};
+	zbx_user_t		user = {.userid = userid};
 	zbx_ipc_message_t	response;
 	zbx_vector_uint64_t	parent_ids;
 	zbx_service_role_t	role_local, *role;
@@ -616,6 +616,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	/* check if the target service has read permission */
 
 	/* check read/write rule rights */
+	/* this function is called only when processing service event escalations, service will never hold NULL value */
 	if (SUCCEED == zbx_vector_uint64_bsearch(&role->serviceids, service->serviceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		return PERM_READ;
 
@@ -632,7 +633,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 		goto out2;
 
 	zbx_ipc_message_init(&response);
-	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, data_offset, &response);
+	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_PARENT_LIST, data, (zbx_uint32_t)data_offset, &response);
 	zbx_vector_uint64_create(&parent_ids);
 	zbx_service_deserialize_parentids(response.data, &parent_ids);
 	zbx_ipc_message_clean(&response);
@@ -1565,7 +1566,7 @@ static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event,
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_ALERT	alert = {.sendto = (char *)sendto, .subject = (char *)subject, .message = (char *)message};
+	DB_ALERT	alert = {.sendto = (char *)sendto, .subject = (char *)(uintptr_t)subject, .message = (char *)(uintptr_t)message};
 	struct zbx_json	json;
 	char		*name, *value;
 	int		message_type;
@@ -2180,10 +2181,10 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 				&functionids);
 	}
 
-	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
-	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
+	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * (size_t)functionids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)functionids.values_num);
 
-	DCconfig_get_functions_by_functionids(functions, functionids.values, errcodes, functionids.values_num);
+	DCconfig_get_functions_by_functionids(functions, functionids.values, errcodes, (size_t)functionids.values_num);
 
 	for (i = 0; i < functionids.values_num; i++)
 	{
@@ -2191,16 +2192,16 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 			zbx_vector_uint64_append(&itemids, functions[i].itemid);
 	}
 
-	DCconfig_clean_functions(functions, errcodes, functionids.values_num);
+	DCconfig_clean_functions(functions, errcodes, (size_t)functionids.values_num);
 	zbx_free(functions);
 
 	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * itemids.values_num);
-	errcodes = (int *)zbx_realloc(errcodes, sizeof(int) * itemids.values_num);
+	items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
+	errcodes = (int *)zbx_realloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, (size_t)itemids.values_num);
 
 	for (i = 0; i < itemids.values_num; i++)
 	{
@@ -2225,7 +2226,7 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 		}
 	}
 
-	DCconfig_clean_items(items, errcodes, itemids.values_num);
+	DCconfig_clean_items(items, errcodes, (size_t)itemids.values_num);
 	zbx_free(items);
 	zbx_free(errcodes);
 
@@ -2700,8 +2701,8 @@ static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceid
 		return;
 
 	zbx_ipc_message_init(&response);
-	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, data_offset, &response);
-	zbx_service_deserialize_rootcause(response.data, response.size, services);
+	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, (zbx_uint32_t)data_offset, &response);
+	zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
 	zbx_ipc_message_clean(&response);
 
 	zbx_free(data);
@@ -3080,6 +3081,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 		if (0 != escalation->servicealarmid)
 		{
+			/* service_alarm is either initialized when servicealarmid is set or */
+			/* the escalation is cancelled and this code will not be reached     */
 			escalation_update(escalation, action, event, service_alarm, service, default_timezone, &service_roles);
 		}
 		else if (0 != escalation->acknowledgeid)
