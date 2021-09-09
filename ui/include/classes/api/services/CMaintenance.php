@@ -1028,7 +1028,7 @@ class CMaintenance extends CApiService {
 		unset($maintenance);
 
 		if ($ins_tags) {
-			$maintenancetagids = DB::insertBatch('maintenance_tag', $ins_tags);
+			$maintenancetagids = DB::insert('maintenance_tag', $ins_tags);
 		}
 
 		if ($del_maintenancetagids) {

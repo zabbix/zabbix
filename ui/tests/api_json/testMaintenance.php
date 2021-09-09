@@ -189,7 +189,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 2, ) already exists.'
+				'expected_error' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(tag, 2, ) already exists.'
 			],
 			// Fail. Duplicate tags are not allowed.
 			[
@@ -206,7 +206,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 2, value) already exists.'
+				'expected_error' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(tag, 2, value) already exists.'
 			],
 			// Fail. Duplicate tags are not allowed.
 			[
@@ -225,7 +225,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 0, value) already exists.'
+				'expected_error' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(tag, 0, value) already exists.'
 			],
 			// Fail. Possible values for "tags_evaltype" are 0 (And/Or) and 2 (Or).
 			[
@@ -233,7 +233,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'tags_evaltype' => 1
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags_evaltype": value must be one of 0, 2.'
+				'expected_error' => 'Invalid parameter "/1/tags_evaltype": value must be one of 0, 2.'
 			],
 			// Fail. Parameter "tag" is mandatory.
 			[
@@ -243,7 +243,7 @@ class testMaintenance extends CAPITest {
 						[]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1": the parameter "tag" is missing.'
+				'expected_error' => 'Invalid parameter "/1/tags/1": the parameter "tag" is missing.'
 			],
 			// Fail. Parameter "tag" cannot be empty.
 			[
@@ -255,7 +255,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/tag": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 			],
 			// Fail. Parameter "tag" must be of type string.
 			[
@@ -267,7 +267,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/tag": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/tag": a character string is expected.'
 			],
 			// Fail. Parameter "tag" must be of type string.
 			[
@@ -279,7 +279,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/tag": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/tag": a character string is expected.'
 			],
 			// Fail. Parameter "tag" must be of type string.
 			[
@@ -291,7 +291,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/tag": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/tag": a character string is expected.'
 			],
 			// Fail. Unexpected parameter.
 			[
@@ -303,7 +303,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1": unexpected parameter "999".'
+				'expected_error' => 'Invalid parameter "/1/tags/1": unexpected parameter "999".'
 			],
 			// Fail. Unexpected parameter.
 			[
@@ -315,7 +315,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1": unexpected parameter "aaa".'
+				'expected_error' => 'Invalid parameter "/1/tags/1": unexpected parameter "aaa".'
 			],
 			// Fail. Condition operator must be of type integer.
 			[
@@ -328,7 +328,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/operator": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/operator": an integer is expected.'
 			],
 			// Fail. Condition operator must be of type integer.
 			[
@@ -341,7 +341,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/operator": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/operator": an integer is expected.'
 			],
 			// Fail. Possible values for "operator" are 0 (Equals) and 2 (Contains).
 			[
@@ -354,7 +354,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/operator": value must be one of 0, 2.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/operator": value must be one of 0, 2.'
 			],
 			// Fail. Condition operator must be of type integer.
 			[
@@ -367,7 +367,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/operator": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/operator": an integer is expected.'
 			],
 			// Fail. Tag value must be of type string.
 			[
@@ -380,7 +380,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/value": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/value": a character string is expected.'
 			],
 			// Fail. Tag value must be of type string.
 			[
@@ -393,7 +393,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/value": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/value": a character string is expected.'
 			],
 			// Fail. Tag value must be of type string.
 			[
@@ -406,7 +406,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/value": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/tags/1/value": a character string is expected.'
 			],
 			// Fail. Tag value must be empty.
 			[
