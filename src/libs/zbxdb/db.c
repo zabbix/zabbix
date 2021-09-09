@@ -2576,7 +2576,11 @@ int	zbx_dbms_mariadb_used(void)
 }
 #endif
 
+#ifdef HAVE_ORACLE
+#define ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE 128
+#else
 #define ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE 32
+#endif
 
 char	version_friendly_str_buff[ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE];
 
