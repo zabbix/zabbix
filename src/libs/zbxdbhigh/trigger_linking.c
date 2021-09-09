@@ -446,11 +446,10 @@ clean:
  * Comments: !!! Don't forget to sync the code with PHP !!!                     *
  *                                                                              *
  ********************************************************************************/
-static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, zbx_uint64_t *trids, int trids_num)
+static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, const zbx_uint64_t *trids,
+		int trids_num)
 {
-	int				i, res = SUCCEED;
-	zbx_uint64_t			triggerdepid;
-	zbx_db_insert_t			db_insert;
+	int				res = SUCCEED;
 	zbx_vector_uint64_pair_t	links;
 	zbx_hashset_t			triggers_flags;
 
@@ -467,6 +466,10 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, zbx
 
 	if (0 < links.values_num)
 	{
+		int		i;
+		zbx_uint64_t	triggerdepid;
+		zbx_db_insert_t	db_insert;
+
 		triggerdepid = DBget_maxid_num("trigger_depends", links.values_num);
 
 		zbx_db_insert_prepare(&db_insert, "trigger_depends", "triggerdepid", "triggerid_down", "triggerid_up",
