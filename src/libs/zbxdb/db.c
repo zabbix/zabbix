@@ -2612,11 +2612,9 @@ char	version_friendly_str_buff[ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE];
  **************************************************************************************************************/
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 {
-	int len;
-
 #define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 #if defined(HAVE_MYSQL)
-	int		client_major_version, client_minor_version, client_release_version, server_major_version,
+	int		len, client_major_version, client_minor_version, client_release_version, server_major_version,
 			server_minor_version, server_release_version;
 	const char	*info;
 
@@ -2668,7 +2666,7 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	}
 
 #elif defined(HAVE_POSTGRESQL)
-	int	flag;
+	int	len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = PQserverVersion(conn);
@@ -2696,7 +2694,7 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 #	endif
 	char	*start, *release_str = "Release ";
 	char	version_friendly[MAX_STRING_LEN / 8];
-	int	flag, major_release_version, release_update_version, release_update_version_revision,
+	int	len, major_release_version, release_update_version, release_update_version_revision,
 			increment_version, reserved_for_future_use, overall_status = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
