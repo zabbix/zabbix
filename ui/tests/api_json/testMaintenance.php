@@ -546,7 +546,7 @@ class testMaintenance extends CAPITest {
 					],
 					'timeperiods' => [
 						[
-							'timeperiod_type' => 1
+							'timeperiod_type' => 0
 						]
 					]
 				],
@@ -622,7 +622,7 @@ class testMaintenance extends CAPITest {
 						[
 							'timeperiod_type' => 2,
 							'period' => 7200,
-							'start_time' => '-5'
+							'start_time' => '-1'
 						]
 					]
 				],
@@ -1024,11 +1024,11 @@ class testMaintenance extends CAPITest {
 						[
 							'timeperiod_type' => 4,
 							'period' => 7200,
-							'every' => '-5'
+							'every' => '-1'
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_time": value must be one of 0-2147483647.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 0-2147483647.'
 			],
 			// Fail. Monthly period.
 			[
@@ -1043,7 +1043,7 @@ class testMaintenance extends CAPITest {
 						[
 							'timeperiod_type' => 4,
 							'period' => 7200,
-							'start_time' => '-5'
+							'start_time' => '-1'
 						]
 					]
 				],
@@ -1228,7 +1228,7 @@ class testMaintenance extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": value must be one of 0.'
-			],
+			]
 		];
 	}
 
