@@ -422,45 +422,12 @@ class ZBase {
 	 *
 	 * @param string $lang  Language.
 	 */
-	public function initLocales(string $lang): void {
-		init_mbstrings();
-
-		$default_locales = [
-			'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
-		];
-
-		if (function_exists('bindtextdomain')) {
-			// initializing gettext translations depending on language selected by user
-			$locales = zbx_locale_variants($lang);
-			$locale_found = false;
-			foreach ($locales as $locale) {
-				// since LC_MESSAGES may be unavailable on some systems, try to set all of the locales
-				// and then revert some of them back
-				putenv('LC_ALL='.$locale);
-				putenv('LANG='.$locale);
-				putenv('LANGUAGE='.$locale);
-				setlocale(LC_TIME, $locale);
-
-				if (setlocale(LC_ALL, $locale)) {
-					$locale_found = true;
-					break;
-				}
-			}
-
-			if (!$locale_found && $lang !== 'en_GB' && $lang !== 'en_gb') {
-				setlocale(LC_ALL, $default_locales);
-				error('Locale for language "'.$lang.'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
-			}
-			bindtextdomain('frontend', 'locale');
-			bind_textdomain_codeset('frontend', 'UTF-8');
-			textdomain('frontend');
+	protected function initLocales(string $language) {
+		if (!setupLocale($language, $error) && $error !== '') {
+			error($error);
 		}
 
-		// reset the LC_NUMERIC locale so that PHP would always use a point instead of a comma for decimal numbers
-		setlocale(LC_NUMERIC, $default_locales);
-
-		// should be after locale initialization
-		require_once 'include/translateDefines.inc.php';
+		require_once $this->getRootDir().'/include/translateDefines.inc.php';
 	}
 
 	/**
