@@ -307,7 +307,6 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 
 	zbx_vector_uint64_create(&all_templ_ids);
 	zbx_vector_uint64_pair_create(&dep_list_ids);
-	zbx_vector_uint64_pair_create(links);
 	zbx_vector_uint64_pair_create(&map_ids);
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -457,6 +456,8 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, con
 
 	if (0 == trids_num)
 		goto out;
+
+	zbx_vector_uint64_pair_create(&links);
 #define	TRIGGER_FUNCS_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&triggers_flags, TRIGGER_FUNCS_HASHSET_DEF_SIZE, triggers_flags_hash_func,
 			triggers_flags_compare_func);
@@ -1448,7 +1449,7 @@ func_out:
 		if (ZBX_DB_OK > DBexecute("%s", sql_update_triggers_expr))
 			res = FAIL;
 	}
-clean:
+
 	zbx_free(sql_update_triggers_expr);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
