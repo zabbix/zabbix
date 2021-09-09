@@ -26,7 +26,6 @@ class CControllerProxyUpdate extends CController {
 			'proxyid' =>		'fatal|required|db       hosts.hostid',
 			'host' =>			'db       hosts.host',
 			'status' =>			'db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interfaceid' =>    'db       interface.interfaceid',
 			'dns' =>			'db       interface.dns',
 			'ip' =>				'db       interface.ip',
 			'useip' =>			'db       interface.useip  |in 0,1',
@@ -89,7 +88,7 @@ class CControllerProxyUpdate extends CController {
 
 		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
 			$proxy['interface'] = [];
-			$this->getInputs($proxy['interface'], ['interfaceid', 'dns', 'ip', 'useip', 'port']);
+			$this->getInputs($proxy['interface'], ['dns', 'ip', 'useip', 'port']);
 		}
 		else {
 			$proxy['proxy_address'] = $this->getInput('proxy_address', '');

@@ -30,7 +30,6 @@ class CControllerProxyEdit extends CController {
 			'proxyid' =>		'db       hosts.hostid',
 			'host' =>			'db       hosts.host',
 			'status' =>			'db       hosts.status         |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interfaceid' =>	'db       interface.interfaceid',
 			'dns' =>			'db       interface.dns',
 			'ip' =>				'db       interface.ip',
 			'useip' =>			'db       interface.useip      |in 0,1',
@@ -110,7 +109,7 @@ class CControllerProxyEdit extends CController {
 				'output' => ['host', 'status', 'proxy_address', 'description', 'tls_connect', 'tls_accept',
 					'tls_issuer', 'tls_subject'
 				],
-				'selectInterface' => ['interfaceid', 'dns', 'ip', 'useip', 'port'],
+				'selectInterface' => ['dns', 'ip', 'useip', 'port'],
 				'proxyids' => $data['proxyid']
 			]);
 			$proxy = $proxies[0];
@@ -125,7 +124,6 @@ class CControllerProxyEdit extends CController {
 			$data['tls_subject'] = $proxy['tls_subject'];
 
 			if ($data['status'] == HOST_STATUS_PROXY_PASSIVE) {
-				$data['interfaceid'] = $proxy['interface']['interfaceid'];
 				$data['dns'] = $proxy['interface']['dns'];
 				$data['ip'] = $proxy['interface']['ip'];
 				$data['useip'] = $proxy['interface']['useip'];
@@ -154,10 +152,6 @@ class CControllerProxyEdit extends CController {
 		$data['tls_issuer'] = $this->getInput('tls_issuer', $data['tls_issuer']);
 		$data['tls_subject'] = $this->getInput('tls_subject', $data['tls_subject']);
 		$data['form_refresh'] = $this->getInput('form_refresh', $data['form_refresh']);
-
-		if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && $this->hasInput('interfaceid')) {
-			$data['interfaceid'] = $this->getInput('interfaceid');
-		}
 
 		if (!$data['proxyid'] && $this->hasInput('clone_proxyid')) {
 			$data['clone_proxyid'] = $this->getInput('clone_proxyid');
