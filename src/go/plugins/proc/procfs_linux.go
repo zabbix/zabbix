@@ -24,13 +24,13 @@ package proc
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
 	"syscall"
 
 	"zabbix.com/pkg/procfs"
-	"zabbix.com/pkg/zbxerr"
 )
 
 func read2k(filename string) (data []byte, err error) {
@@ -144,50 +144,49 @@ func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
 }
 
 func getProcesses(flags int) (processes []*procInfo, err error) {
-	var entries []os.FileInfo
+	var entries []os.DirEntry
 	f, err := os.Open("/proc")
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, err
 	}
+	defer f.Close()
 
-	entries, err = f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
-	}
+	for entries, err = f.ReadDir(1); err != io.EOF; entries, err = f.ReadDir(1) {
+		if err != nil {
+			return nil, err
+		}
 
-	for _, entry := range entries {
-		if !entry.IsDir() {
+		if len(entries) < 1 || !entries[0].IsDir() {
 			continue
 		}
 
 		var pid int64
 		var tmperr error
-		if pid, tmperr = strconv.ParseInt(entry.Name(), 10, 64); tmperr != nil {
+		if pid, tmperr = strconv.ParseInt(entries[0].Name(), 10, 64); tmperr != nil {
 			continue
 		}
 		info := &procInfo{pid: pid}
 		if flags&procInfoName != 0 {
-			if info.name, tmperr = getProcessName(entry.Name()); tmperr != nil {
-				impl.Debugf("cannot get process %s name: %s", entry.Name(), tmperr)
+			if info.name, tmperr = getProcessName(entries[0].Name()); tmperr != nil {
+				impl.Debugf("cannot get process %s name: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoUser != 0 {
-			if info.userid, tmperr = getProcessUserID(entry.Name()); tmperr != nil {
-				impl.Debugf("cannot get process %s user id: %s", entry.Name(), tmperr)
+			if info.userid, tmperr = getProcessUserID(entries[0].Name()); tmperr != nil {
+				impl.Debugf("cannot get process %s user id: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoCmdline != 0 {
-			if info.arg0, info.cmdline, tmperr = getProcessCmdline(entry.Name(), flags); tmperr != nil {
-				impl.Debugf("cannot get process %s command line: %s", entry.Name(), tmperr)
+			if info.arg0, info.cmdline, tmperr = getProcessCmdline(entries[0].Name(), flags); tmperr != nil {
+				impl.Debugf("cannot get process %s command line: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoState != 0 {
-			if info.state, tmperr = getProcessState(entry.Name()); tmperr != nil {
-				impl.Debugf("cannot get process %s state: %s", entry.Name(), tmperr)
+			if info.state, tmperr = getProcessState(entries[0].Name()); tmperr != nil {
+				impl.Debugf("cannot get process %s state: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
