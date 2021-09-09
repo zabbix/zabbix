@@ -43,7 +43,7 @@ static zbx_int64_t	json_parse_object(const char *start, char **error);
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static int	json_error(const char *message, const char *json_buffer, char **error)
+static zbx_int64_t	json_error(const char *message, const char *json_buffer, char **error)
 {
 	if (NULL != error)
 	{
