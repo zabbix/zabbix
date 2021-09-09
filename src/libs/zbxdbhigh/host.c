@@ -23,9 +23,9 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
-#include "template.h"
 #include "../../libs/zbxaudit/audit_host.h"
 #include "../../libs/zbxaudit/audit_item.h"
+#include "../../libs/zbxaudit/audit_trigger.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "../zbxalgo/vectorimpl.h"
@@ -985,7 +985,8 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char **tables_hk, int count)
+static void	DBadd_to_housekeeper(const zbx_vector_uint64_t *ids, const char *field, const char **tables_hk,
+		int count)
 {
 	int		i, j;
 	zbx_uint64_t	housekeeperid;
@@ -1084,18 +1085,21 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_vector_uint64_t	children_triggerids;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	if (0 == triggerids->values_num)
-		return;
+		goto out;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&children_triggerids);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct triggerid from trigger_discovery where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct td.triggerid,t.description,t.flags from "
+			"trigger_discovery td, triggers t where td.triggerid=t.triggerid and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid", triggerids->values,
 			triggerids->values_num);
 
-	DBselect_uint64(sql, &children_triggerids);
+	zbx_audit_DBselect_delete_for_trigger(sql, &children_triggerids);
 	zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	DBdelete_triggers(&children_triggerids);
@@ -1104,6 +1108,8 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
 	zbx_vector_uint64_destroy(&children_triggerids);
 
 	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1687,16 +1693,17 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
 	zbx_vector_uint64_create(&triggerids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct f.triggerid"
-			" from functions f,items i,items ti"
+			"select distinct f.triggerid,t.description,t.flags"
+			" from functions f,items i,items ti,triggers t"
 			" where f.itemid=i.itemid"
 				" and i.templateid=ti.itemid"
+				" and t.triggerid=f.triggerid"
 				" and i.hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	DBselect_uint64(sql, &triggerids);
+	zbx_audit_DBselect_delete_for_trigger(sql, &triggerids);
 
 	DBdelete_trigger_hierarchy(&triggerids);
 	zbx_vector_uint64_destroy(&triggerids);

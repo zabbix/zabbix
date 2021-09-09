@@ -8,4 +8,6 @@ libzbxaudit_a_SOURCES = \
 	audit_host.c \
 	audit_host.h \
 	audit_item.c \
-	audit_item.h
+	audit_item.h \
+	audit_trigger.c \
+	audit_trigger.h
