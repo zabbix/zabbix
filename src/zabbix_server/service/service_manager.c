@@ -949,8 +949,8 @@ static void	sync_actions(zbx_service_manager_t *service_manager, int revision)
 
 static int	condition_type_compare(const void *d1, const void *d2)
 {
-	zbx_service_action_condition_t	*c1 = *(zbx_service_action_condition_t **)d1;
-	zbx_service_action_condition_t	*c2 = *(zbx_service_action_condition_t **)d2;
+	const zbx_service_action_condition_t	*c1 = *(const zbx_service_action_condition_t * const *)d1;
+	const zbx_service_action_condition_t	*c2 = *(const zbx_service_action_condition_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(c1->conditiontype, c2->conditiontype);
 	return 0;
@@ -2030,7 +2030,7 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() updates:%d", __func__, updates->values_num);
 
-	actionids = zbx_malloc(NULL, sizeof(zbx_vector_uint64_t) * updates->values_num);
+	actionids = zbx_malloc(NULL, sizeof(zbx_vector_uint64_t) * (size_t)updates->values_num);
 
 	for (i = 0; i < updates->values_num; i++)
 	{
@@ -2329,8 +2329,8 @@ out:
 
 static int	compare_uint64_pair_second(const void *d1, const void *d2)
 {
-	const zbx_uint64_pair_t	*p1 = (zbx_uint64_pair_t *)d1;
-	const zbx_uint64_pair_t	*p2 = (zbx_uint64_pair_t *)d2;
+	const zbx_uint64_pair_t	*p1 = (const zbx_uint64_pair_t *)d1;
+	const zbx_uint64_pair_t	*p2 = (const zbx_uint64_pair_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->second, p2->second);
 	return SUCCEED;
@@ -2359,7 +2359,7 @@ static void	db_update_service_events(zbx_service_manager_t *manager, const zbx_v
 	zbx_vector_uint64_create(&serviceids);
 	zbx_vector_uint64_pair_create(&problem_service);
 
-	actionids = zbx_malloc(NULL, sizeof(zbx_vector_uint64_t) * updates->values_num);
+	actionids = zbx_malloc(NULL, sizeof(zbx_vector_uint64_t) * (size_t)updates->values_num);
 
 	/* Update actions should be processed on the original update that created event.   */
 	/* However service properties checked by action conditions (id, name, tags) either */
