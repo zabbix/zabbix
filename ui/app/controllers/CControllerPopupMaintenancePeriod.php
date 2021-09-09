@@ -143,7 +143,7 @@ class CControllerPopupMaintenancePeriod extends CController {
 			'update' =>				0,
 			'timeperiod_type' => 	TIMEPERIOD_TYPE_ONETIME,
 			'every' =>				1,
-			'day' =>				1,
+			'day' =>				0,
 			'dayofweek' =>			0,
 			'start_date' =>			date(ZBX_DATE_TIME),
 			'period' =>				SEC_PER_HOUR,
