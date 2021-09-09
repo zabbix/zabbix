@@ -1540,21 +1540,21 @@ static void	trigger_copies_free(zbx_trigger_copy_t *trigger_copy)
 	zbx_free(trigger_copy);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DBcopy_template_triggers                                         *
- *                                                                            *
- * Purpose: Copy template triggers to host                                    *
- *                                                                            *
- * Parameters: hostid      - [IN] host identifier from database               *
- *             templateids - [IN] array of template IDs                       *
- *             error       - [IN] the error message                           *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Function: DBcopy_template_triggers                                           *
+ *                                                                              *
+ * Purpose: Copy template triggers to host                                      *
+ *                                                                              *
+ * Parameters: hostid      - [IN] host identifier from database                 *
+ *             templateids - [IN] array of template IDs                         *
+ *             error       - [IN] the error message                             *
+ *                                                                              *
+ * Return value: upon successful completion return SUCCEED, or FAIL on DB error *
+ *                                                                              *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                     *
+ *                                                                              *
+ ********************************************************************************/
 int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, char **error)
 {
 	int					i, upd_triggers = 0, funcs_insert_count = 0, res = SUCCEED;
