@@ -36,13 +36,12 @@ zbx_hashset_t	*zbx_get_audit_hashset(void)
 	return &zbx_audit;
 }
 
-zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t triggerid, const char *name, int audit_action,
-		int resource_type)
+zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const char *name, int audit_action, int resource_type)
 {
 	zbx_audit_entry_t	*audit_entry;
 
 	audit_entry = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
-	audit_entry->id = triggerid;
+	audit_entry->id = id;
 	audit_entry->name = zbx_strdup(NULL, name);
 	audit_entry->audit_action = audit_action;
 	audit_entry->resource_type = resource_type;
