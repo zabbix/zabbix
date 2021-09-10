@@ -1255,7 +1255,7 @@ out:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
+static void	DBdelete_graphs_by_itemids(const zbx_vector_uint64_t *itemids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;

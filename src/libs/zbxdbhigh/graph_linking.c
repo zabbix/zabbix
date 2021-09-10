@@ -1022,7 +1022,6 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 		zbx_uint64_t graphid, int graph_flags, zbx_hashset_t *host_graphs_items)
 {
 	int			j, res = SUCCEED;
-	const char		*d2;
 	graphs_items_entry_t	*graphs_items_host_entry_found, graphs_items_host_entry_temp_t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1034,6 +1033,7 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 	{
 		for (j = 0; j < graphs_items_host_entry_found->gitems.values_num; j++)
 		{
+			const char		*d2;
 			graph_item_entry	*host_items_entry;
 
 			host_items_entry = graphs_items_host_entry_found->gitems.values[j];
@@ -1359,8 +1359,9 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			res = FAIL;
 		}
 
-		zbx_free(sql2);
 	}
+
+	zbx_free(sql2);
 
 	return res;
 }
