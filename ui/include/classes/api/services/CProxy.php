@@ -801,12 +801,12 @@ class CProxy extends CApiService {
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
-	 * @param array $proxies		proxies data array
-	 * @param array $db_proxies		db proxies data array
+	 * @param array      $proxies
+	 * @param array|null $db_proxies
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$proxies, array &$db_proxies = NULL) {
+	protected function validateUpdate(array &$proxies, array &$db_proxies = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['proxyid'], ['host']], 'fields' => [
 			'proxyid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
