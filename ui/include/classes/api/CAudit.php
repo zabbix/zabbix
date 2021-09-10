@@ -102,6 +102,7 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_MEDIA_TYPE => 'media_type',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
@@ -114,6 +115,7 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_MEDIA_TYPE => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
@@ -126,6 +128,7 @@ class CAudit {
 	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_MEDIA_TYPE => 'mediatype',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
@@ -141,6 +144,7 @@ class CAudit {
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		// ],
+		self::RESOURCE_MEDIA_TYPE => ['paths' => ['mediatype.passwd']],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
@@ -151,6 +155,8 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'mediatype.message_templates' => 'media_type_message',
+		'mediatype.parameters' => 'media_type_param',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
@@ -165,6 +171,8 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'mediatype.message_templates' => 'mediatype_messageid',
+		'mediatype.parameters' => 'mediatype_paramid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
@@ -546,7 +554,12 @@ class CAudit {
 					}
 
 					if ($is_value_to_mask) {
-						$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
+						$value = ($value === '') ? '' : ZBX_SECRET_MASK;
+						$db_value = ($db_value === '') ? '' : ZBX_SECRET_MASK;
+
+						if ($value !== $db_value || $value !== '') {
+							$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
+						}
 					}
 					else {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
