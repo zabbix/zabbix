@@ -65,7 +65,29 @@ window.host_edit_popup = {
 			.catch(this.ajaxExceptionHandler);
 	},
 
-	deleteHost(e, hostid) {
+	clone(e) {
+		const button = e.target;
+		button.classList.add('is-loading');
+
+		const options = host_edit.formFieldsPreprocessing(getFormFields(this.form));
+		delete options.sid;
+		options.clone = 1;
+
+		PopUp('popup.host.edit', options, 'host_edit');
+	},
+
+	fullClone(e) {
+		const button = e.target;
+		button.classList.add('is-loading');
+
+		const options = host_edit.formFieldsPreprocessing(getFormFields(this.form));
+		delete options.sid;
+		options.full_clone = 1;
+
+		PopUp('popup.host.edit', options, 'host_edit');
+	},
+
+	delete(e, hostid) {
 		const button = e.target;
 		button.classList.add('is-loading');
 

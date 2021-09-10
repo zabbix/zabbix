@@ -412,11 +412,11 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		},
 
 		/**
-		 * Posts hosts form to backend, triggers formSubmitted event on PopUp.
+		 * Normalize field values.
 		 *
 		 * @param {Object} fields  Fields from host form.
 		 *
-		 * @return {Object}  Processed fields from host form.
+		 * @return {Object}        Processed fields from host form.
 		 */
 		formFieldsPreprocessing(fields) {
 			// Trim text fields.
@@ -426,6 +426,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 
 			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
 
+			// TODO VM: check
 			if (document.querySelector('#change_psk')) {
 				delete fields.tls_psk_identity;
 				delete fields.tls_psk;

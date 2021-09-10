@@ -576,7 +576,3 @@ $host_form
 	->addItem($data['warning'])
 	->addItem($tabs)
 	->show();
-
-//(new CScriptTag('host_edit.init();'))
-//	->setOnDocumentReady()
-//	->show();

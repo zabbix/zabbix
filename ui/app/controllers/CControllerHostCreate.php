@@ -119,16 +119,23 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			DBend(false);
 		}
 
-		if ($result) {
-			$output = ['title' => _('Host added')];
+		$output = [];
 
-			if ($messages = CMessageHelper::getMessages()) {
-				$output['messages'] = array_column($messages, 'message');
+		if ($result) {
+			$success = ['title' => _('Host added')];
+
+			if ($messages = get_and_clear_messages()) {
+				$success['messages'] = array_column($messages, 'message');
 			}
+
+			$output['success'] = $success;
 		}
 		else {
-			$output = [
-				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), _('Cannot add host'))->toString()
+			CMessageHelper::setErrorTitle(_('Cannot add host'));
+
+			$output['error'] = [
+				'title' => CMessageHelper::getTitle(),
+				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
 

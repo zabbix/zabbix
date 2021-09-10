@@ -25,11 +25,26 @@
 
 $data['form_name'] = 'host-form';
 $data['popup_form'] = true;
+// TODO VM: move URL building to controller?
 $popup_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'host.edit');
 
 if ($data['hostid'] == 0) {
-	$popup_url->setArgument('groupids', $data['groupids']); // TODO VM: check
+	// TODO VM: currently not working
+	if (array_key_exists('groupids', $data) && $data['groupids']) {
+		$popup_url->setArgument('groupids', $data['groupids']);
+	}
+	elseif ($data['clone_hostid'] !== null) {
+		$popup_url->setArgument('hostid', $data['clone_hostid']);
+
+		if ($data['full_clone'] === 1) {
+			$popup_url->setArgument('full_clone', 1);
+		}
+		else {
+			$popup_url->setArgument('clone', 1);
+		}
+	}
+
 	$buttons = [
 		[
 			'id' => 'host-add',
@@ -37,15 +52,15 @@ if ($data['hostid'] == 0) {
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'host_edit.submit(document.getElementById("'.$data['form_name'].'"));'
+			'action' => 'host_edit_popup.submit();'
 		]
 	];
 }
 else {
 	$popup_url->setArgument('hostid', $data['hostid']);
+
 	$buttons = [
 		[
-			'id' => 'host-update',
 			'title' => _('Update'),
 			'class' => '',
 			'keepOpen' => true,
@@ -53,18 +68,18 @@ else {
 			'action' => 'host_edit_popup.submit();'
 		],
 		[
-			'id' => 'host-clone',
 			'title' => _('Clone'),
 			'class' => 'btn-alt',
 			'keepOpen' => true,
-			'isSubmit' => false
+			'isSubmit' => false,
+			'action' => 'host_edit_popup.clone(event);'
 		],
 		[
-			'id' => 'host-full_clone',
 			'title' => _('Full clone'),
 			'class' => 'btn-alt',
 			'keepOpen' => true,
-			'isSubmit' => false
+			'isSubmit' => false,
+			'action' => 'host_edit_popup.fullClone(event);'
 		],
 		[
 			'title' => _('Delete'),
@@ -72,7 +87,7 @@ else {
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'host_edit_popup.deleteHost(event, "'.$data['hostid'].'");'
+			'action' => 'host_edit_popup.delete(event, "'.$data['hostid'].'");'
 		]
 	];
 }
