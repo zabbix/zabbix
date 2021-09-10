@@ -36,7 +36,7 @@
  ******************************************************************************/
 #define ZBX_JSON_MAX_STRERROR	255
 
-static ZBX_THREAD_LOCAL char	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR];
+static ZBX_THREAD_LOCAL char	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR + 4];
 
 const char	*zbx_json_strerror(void)
 {
@@ -45,13 +45,24 @@ const char	*zbx_json_strerror(void)
 
 void	zbx_set_json_strerror(const char *fmt, ...)
 {
-	char	buffer[MAX_STRING_LEN];
+	size_t	sz;
 	va_list	args;
 
 	va_start(args, fmt);
 
-	zbx_vsnprintf(buffer, sizeof(buffer), fmt, args);
-	zbx_strlcpy_utf8(zbx_json_strerror_message, buffer, sizeof(ZBX_JSON_MAX_STRERROR));
+	sz = zbx_vsnprintf(zbx_json_strerror_message, sizeof(zbx_json_strerror_message), fmt, args);
+
+	if (sizeof(zbx_json_strerror_message) - 1 == sz)
+	{
+		/* ensure that the string is not cut in the middle of UTF-8 sequence */
+		size_t	idx = sz - 1;
+		while (0x80 == (0xc0 & zbx_json_strerror_message[idx]) && 0 < idx)
+			idx--;
+
+		/* latest symbol shouldn't be an ASCII symbol */
+		if (0 != (zbx_json_strerror_message[idx] & 0x80))
+			zbx_json_strerror_message[idx] = '\0';
+	}
 
 	va_end(args);
 }
