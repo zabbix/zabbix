@@ -1229,7 +1229,7 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 #define MAX_EXPRESSIONS	950
 
 	int	i, cnt = 0;
-	char	*value_esc;
+	char	*value_esc, tf_char[ZBX_FIELDNAME_LEN_MAX * 2];
 	int	values_num = 0, empty_num = 0;
 
 	if (0 == num)
@@ -1247,10 +1247,18 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 
 	if (MAX_EXPRESSIONS < values_num || (0 != values_num && 0 != empty_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
-
+#ifdef HAVE_ORACLE
+	/* TO_NCHAR is used to escape NCLOB fields. Don't use TO_NCHAR(SUBSTR(%s,1,4000)).         */
+	/* This will detect errors if the CLOB data length exceeds 4000 bytes.                     */
+	/* In this case, the size of nvarchar2 can be increased to 32767 bytes by upgrading DB via */
+	/* ALTER SYSTEM SET max_string_size=extended                                               */
+	zbx_snprintf(tf_char, sizeof(tf_char), "TO_NCHAR(%s)", fieldname);
+#else
+	zbx_strlcpy(tf_char, fieldname, sizeof(tf_char));
+#endif
 	if (0 != empty_num)
 	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_SQL_STRCMP, fieldname, ZBX_SQL_STRVAL_EQ(""));
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_SQL_STRCMP, tf_char, ZBX_SQL_STRVAL_EQ(""));
 
 		if (0 == values_num)
 			return;
@@ -1266,7 +1274,7 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 				continue;
 
 			value_esc = DBdyn_escape_string(values[i]);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", fieldname, value_esc);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", tf_char, value_esc);
 			zbx_free(value_esc);
 		}
 
@@ -1275,7 +1283,7 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 		return;
 	}
 
-	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, tf_char);
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
 
 	for (i = 0; i < num; i++)
@@ -1288,7 +1296,7 @@ void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset
 			cnt = 0;
 			(*sql_offset)--;
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or ");
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, tf_char);
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
 		}
 
