@@ -112,9 +112,9 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	}
 clean:
 	zbx_json_free(&j);
-	zbx_free(buffer);
 out:
 	zbx_free(error);
+	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
