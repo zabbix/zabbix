@@ -59,11 +59,20 @@ class CControllerRegExUpdate extends CController {
 	}
 
 	protected function doAction() {
+		$expressions = $this->getInput('expressions', []);
+
+		foreach ($expressions as &$expression) {
+			if (!array_key_exists('case_sensitive', $expression)) {
+				$expression['case_sensitive'] = 0;
+			}
+		}
+		unset($expression);
+
 		$result = API::Regexp()->update([
 			'regexpid' => $this->getInput('regexid'),
 			'name' => $this->getInput('name'),
 			'test_string' => $this->getInput('test_string', ''),
-			'expressions' => $this->getInput('expressions')
+			'expressions' => $expressions
 		]);
 
 		if ($result) {
