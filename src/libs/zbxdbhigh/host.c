@@ -5303,7 +5303,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 			zbx_db_insert_add_values(&db_insert_tfield, httptestfieldid, httptest->httptestid,
 					httpfield->type, httpfield->name, httpfield->value);
-			
+
 			zbx_audit_httptest_update_json_add_httptest_field(httptest->httptestid, httptestfieldid,
 						httpfield->type, httpfield->name, httpfield->value);
 
@@ -5333,7 +5333,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 				zbx_db_insert_add_values(&db_insert_sfield, httpstepfieldid, httpstep->hoststepid,
 						httpfield->type, httpfield->name, httpfield->value);
-				
+
 				zbx_audit_httptest_update_json_add_httptest_tag(httptest->httptestid, httptesttagid,
 						httptesttag->tag, httptesttag->value);
 
