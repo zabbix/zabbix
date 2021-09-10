@@ -186,7 +186,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 		if (NULL != ts)
 			zbx_timespec(ts);
 
-		if (0 != reserved)
+		if (0 != proxy->auto_compress)
 		{
 			ret = send_data_to_proxy(proxy, &s, buffer, buffer_size, reserved, flags);
 			zbx_free(buffer);
@@ -291,7 +291,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 	if (SUCCEED != (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 		goto out;
 
-	if (0 != reserved)
+	if (0 != proxy->auto_compress)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
 				ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy->host,
