@@ -2678,7 +2678,6 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	char	version_friendly[MAX_STRING_LEN / 8];
 	int	major_release_version, release_update_version, release_update_version_revision,
 			increment_version, reserved_for_future_use, overall_status = SUCCEED;
-	size_t	alloc_len = 0, offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 #	ifdef HAVE_OCI_SERVER_RELEASE2
@@ -2743,9 +2742,7 @@ out:
 #	endif
 	}
 
-	version_info->friendly_current_version = NULL;
-	zbx_strcpy_alloc(&version_info->friendly_current_version, &alloc_len, &offset, version_friendly);
-
+	version_info->friendly_current_version = zbx_strdup(NULL, version_friendly);
 	version_info->database = "Oracle";
 	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_FRIENDLY;
 	version_info->friendly_max_version = ZBX_ORACLE_MAX_VERSION_FRIENDLY;
