@@ -839,6 +839,15 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 			goto cleanup;
 		}
 
+		if (ZBX_MAX_RECV_LARGE_DATA_SIZE < reserved)
+		{
+			zbx_set_socket_strerror("cannot send data: uncompressed message size " ZBX_FS_UI64
+					" exceeds the maximum size " ZBX_FS_UI64 " bytes.", reserved,
+					ZBX_MAX_RECV_LARGE_DATA_SIZE);
+			ret = FAIL;
+			goto cleanup;
+		}
+
 		if (0 != (flags & ZBX_TCP_COMPRESS))
 		{
 			/* compress if not compressed yet */
@@ -859,7 +868,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 		memcpy(header_buf, ZBX_TCP_HEADER_DATA, ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA));
 		offset = ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA);
 
-		if (max_uint32 <= len)
+		if (max_uint32 <= len || max_uint32 <= reserved)
 			flags |= ZBX_TCP_LARGE;
 
 		header_buf[offset++] = flags;
