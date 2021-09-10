@@ -54,7 +54,7 @@ static int	send_heartbeat(void)
 	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
 		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
-		return FAIL;
+		goto clean;
 	}
 
 	reserved = j.buffer_size;
