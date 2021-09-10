@@ -4563,7 +4563,6 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 			httpfield = (httpfield_t *)zbx_malloc(NULL, sizeof(httpfield_t));
 
-			//////httpfield->upd_flags = ZBX_FLAG_HTTPFIELD_RESET_FLAG;
 			httpfield->type = atoi(row[1]);
 			httpfield->name = zbx_strdup(NULL, row[2]);
 			httpfield->value = zbx_strdup(NULL, row[3]);
@@ -4708,7 +4707,6 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 			httpfield = (httpfield_t *)zbx_malloc(NULL, sizeof(httpfield_t));
 
-			//////httpfield->upd_flags = ZBX_FLAG_HTTPFIELD_RESET_FLAG;
 			httpfield->type = atoi(row[2]);
 			httpfield->name = zbx_strdup(NULL, row[3]);
 			httpfield->value = zbx_strdup(NULL, row[4]);
