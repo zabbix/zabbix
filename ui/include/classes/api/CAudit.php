@@ -102,6 +102,7 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
@@ -114,6 +115,7 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_SCHEDULED_REPORT => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
@@ -126,6 +128,7 @@ class CAudit {
 	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
@@ -151,6 +154,8 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'report.users' => 'report_user',
+		'report.user_groups' => 'report_usrgrp',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
@@ -165,6 +170,8 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'report.users' => 'reportuserid',
+		'report.user_groups' => 'reportusrgrpid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
