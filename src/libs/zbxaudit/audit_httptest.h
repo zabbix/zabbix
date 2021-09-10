@@ -38,7 +38,7 @@ void	zbx_audit_httptest_update_json_update_##resource(zbx_uint64_t httptestid, t
 
 PREPARE_AUDIT_HTTPTEST_UPDATE_H(templateid, zbx_uint64_t)
 
-void	DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids);
+void	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids);
 
 void	zbx_audit_httptest_update_json_add_httptest_tag(zbx_uint64_t httptestid, zbx_uint64_t tagid, const char *tag,
 		const char *value);

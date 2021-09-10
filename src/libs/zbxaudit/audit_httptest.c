@@ -119,7 +119,7 @@ PREPARE_AUDIT_HTTPTEST_UPDATE(templateid, zbx_uint64_t, uint64)
 
 #undef PREPARE_AUDIT_HTTPTEST_UPDATE
 
-void	DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids)
+void	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
