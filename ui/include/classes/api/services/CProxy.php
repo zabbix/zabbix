@@ -710,12 +710,14 @@ class CProxy extends CApiService {
 	/**
 	 * Validate connections from/to proxy and PSK fields.
 	 *
+	 * @static
+	 *
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
 	 * @throws APIException	if incorrect encryption options.
 	 */
-	protected function checkEncryption(array &$proxies, array $db_proxies = null) {
+	protected static function checkEncryption(array &$proxies, array $db_proxies = null) {
 		foreach ($proxies as $i => &$proxy) {
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
 				$proxy += [
