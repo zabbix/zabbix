@@ -27,6 +27,7 @@
 #include "proxyconfig.h"
 #include "../servercomms.h"
 #include "zbxcrypto.h"
+#include "zbxcompress.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
@@ -56,17 +57,33 @@ static void	process_configuration_sync(size_t *data_size)
 {
 	zbx_socket_t	sock;
 	struct		zbx_json_parse jp;
-	char		value[16], *error = NULL;
+	char		value[16], *error = NULL, *buffer = NULL;
+	size_t		buffer_size, reserved;
+	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* reset the performance metric */
 	*data_size = 0;
 
+	zbx_json_init(&j, 128);
+	zbx_json_addstring(&j, "request", ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+
+	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+	{
+		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+		goto out;
+	}
+
+	reserved = j.buffer_size;
+	zbx_json_free(&j);
+
 	if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
 		goto out;
 
-	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &error))
+	if (SUCCEED != get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
 				sock.peer, error);
@@ -112,9 +129,11 @@ static void	process_configuration_sync(size_t *data_size)
 	process_proxyconfig(&jp);
 error:
 	disconnect_server(&sock);
-
-	zbx_free(error);
 out:
+	zbx_free(error);
+	zbx_free(buffer);
+	zbx_json_free(&j);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

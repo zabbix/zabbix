@@ -71,6 +71,7 @@ static int	send_heartbeat(void)
 	zbx_free(error);
 clean:
 	zbx_free(buffer);
+	zbx_json_free(&j);
 
 	return ret;
 }
