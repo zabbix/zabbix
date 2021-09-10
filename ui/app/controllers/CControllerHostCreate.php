@@ -28,12 +28,14 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 		$ret = $this->validateInput(self::getValidationFields());
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => CMessageHelper::getTitle(),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;

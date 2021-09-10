@@ -72,14 +72,14 @@ else {
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'host_edit_popup.clone(event);'
+			'action' => 'host_edit_popup.clone();'
 		],
 		[
 			'title' => _('Full clone'),
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'host_edit_popup.fullClone(event);'
+			'action' => 'host_edit_popup.fullClone();'
 		],
 		[
 			'title' => _('Delete'),
@@ -87,7 +87,7 @@ else {
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'host_edit_popup.delete(event, "'.$data['hostid'].'");'
+			'action' => 'host_edit_popup.delete('.json_encode($data['hostid']).');'
 		]
 	];
 }

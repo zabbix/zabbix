@@ -30,12 +30,12 @@ class CControllerHostMassDelete extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				new CControllerResponseData([
-					'main_block' => json_encode(['error' => [
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
 						'title' => CMessageHelper::getTitle(),
 						'messages' => array_column(get_and_clear_messages(), 'message')
-					]])
-				])
+					]
+				])])
 			);
 		}
 

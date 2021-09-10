@@ -40,6 +40,9 @@ window.host_edit_popup = {
 	},
 
 	submit() {
+		this.removePopupMessages();
+		this.overlay.setLoading();
+
 		const fields = host_edit.preprocessFormFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'));
 
@@ -71,13 +74,13 @@ window.host_edit_popup = {
 					}));
 				}
 			})
-			.catch(this.ajaxExceptionHandler);
+			.catch(this.ajaxExceptionHandler)
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
 	},
 
-	clone(e) {
-		const button = e.target;
-		button.classList.add('is-loading');
-
+	clone() {
 		const options = host_edit.preprocessFormFields(getFormFields(this.form));
 		delete options.sid;
 		options.clone = 1;
@@ -85,10 +88,7 @@ window.host_edit_popup = {
 		PopUp('popup.host.edit', options, 'host_edit');
 	},
 
-	fullClone(e) {
-		const button = e.target;
-		button.classList.add('is-loading');
-
+	fullClone() {
 		const options = host_edit.preprocessFormFields(getFormFields(this.form));
 		delete options.sid;
 		options.full_clone = 1;
@@ -96,9 +96,9 @@ window.host_edit_popup = {
 		PopUp('popup.host.edit', options, 'host_edit');
 	},
 
-	delete(e, hostid) {
-		const button = e.target;
-		button.classList.add('is-loading');
+	delete(hostid) {
+		this.removePopupMessages();
+		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'host.massdelete');
@@ -124,7 +124,7 @@ window.host_edit_popup = {
 			})
 			.catch(this.ajaxExceptionHandler)
 			.finally(() => {
-				button.classList.remove('is-loading');
+				this.overlay.unsetLoading();
 			});
 	},
 
@@ -132,7 +132,16 @@ window.host_edit_popup = {
 		this.dialogue.dispatchEvent(new CustomEvent('dialogue.close'));
 	},
 
+	removePopupMessages() {
+		for (const el of this.form.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	},
+
 	ajaxExceptionHandler: (exception) => {
+		const form = host_edit_popup.form;
 		let title;
 		let messages = [];
 
@@ -146,9 +155,6 @@ window.host_edit_popup = {
 
 		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		this.form.parentNode.insertBefore(message_box, this.form);
-
-		clearMessages();
-		addMessage(message_box);
+		form.parentNode.insertBefore(message_box, form);
 	}
 }
