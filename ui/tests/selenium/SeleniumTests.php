@@ -75,6 +75,7 @@ require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testPageUsers.php';
+require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormAction.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
@@ -249,6 +250,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
 		$suite->addTestSuite('testPasswordComplexity');
+		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
 		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');

@@ -170,6 +170,7 @@ class testGraphAxis extends CWebTest {
 		$this->query('id:to')->one()->fill($data['end_period']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
+		// TODO: This sleep is added here because of DEV-1908.
 		sleep(1);
 		$this->assertScreenshot($this->waitUntilGraphIsLoaded(), $data['name']);
 	}
@@ -188,3 +189,4 @@ class testGraphAxis extends CWebTest {
 		return $this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()->one();
 	}
 }
+
