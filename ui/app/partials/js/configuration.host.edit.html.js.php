@@ -418,7 +418,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		 *
 		 * @return {Object}        Processed fields from host form.
 		 */
-		formFieldsPreprocessing(fields) {
+		preprocessFormFields(fields) {
 			// Trim text fields.
 			fields.host = fields.host.trim();
 			fields.visiblename = fields.visiblename.trim();

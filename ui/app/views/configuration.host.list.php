@@ -35,7 +35,8 @@ $widget = (new CWidget())
 	->setControls((new CTag('nav', true, (new CList())
 			->addItem(
 				(new CSimpleButton(_('Create host')))
-					->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPCREATE)
+//					->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPCREATE)
+					->onClick('view.createHost(this)')
 					->setAttribute('data-hostgroups', json_encode(array_keys($data['filter']['groups'])))
 			)
 			->addItem(
@@ -240,7 +241,8 @@ foreach ($data['hosts'] as $host) {
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $host['hostid'])
 	))
-		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT);
+		->onClick('view.editHost(event, '.json_encode($host['hostid']).')');
+//		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT);
 
 	$maintenance_icon = false;
 	$status_toggle_url = (new CUrl('zabbix.php'))

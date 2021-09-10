@@ -60,6 +60,34 @@
 			});
 		},
 
+		createHost(button) {
+			const host_data = (typeof button.dataset.hostgroups !== 'undefined')
+				? {groupids: JSON.parse(button.dataset.hostgroups)}
+				: {};
+
+			this.openHostPopup(host_data);
+		},
+
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
 		massDeleteHosts(button) {
 			const confirm_text = button.getAttribute('confirm');
 			if (!confirm(confirm_text)) {
@@ -105,6 +133,22 @@
 				.finally(() => {
 					button.classList.remove('is-loading');
 				});
+		},
+
+		events: {
+			hostSuccess: (e) => {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			}
 		}
 	}
 </script>

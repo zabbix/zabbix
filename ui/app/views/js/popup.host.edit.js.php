@@ -40,7 +40,7 @@ window.host_edit_popup = {
 	},
 
 	submit() {
-		const fields = host_edit.formFieldsPreprocessing(getFormFields(this.form));
+		const fields = host_edit.preprocessFormFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'));
 
 		fetch(curl.getUrl(), {
@@ -56,11 +56,20 @@ window.host_edit_popup = {
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
-					detail: {
-						success: response.success
-					}
-				}));
+				if ('hostid' in fields) {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
+						detail: {
+							success: response.success
+						}
+					}));
+				}
+				else {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.create', {
+						detail: {
+							success: response.success
+						}
+					}));
+				}
 			})
 			.catch(this.ajaxExceptionHandler);
 	},
@@ -69,7 +78,7 @@ window.host_edit_popup = {
 		const button = e.target;
 		button.classList.add('is-loading');
 
-		const options = host_edit.formFieldsPreprocessing(getFormFields(this.form));
+		const options = host_edit.preprocessFormFields(getFormFields(this.form));
 		delete options.sid;
 		options.clone = 1;
 
@@ -80,7 +89,7 @@ window.host_edit_popup = {
 		const button = e.target;
 		button.classList.add('is-loading');
 
-		const options = host_edit.formFieldsPreprocessing(getFormFields(this.form));
+		const options = host_edit.preprocessFormFields(getFormFields(this.form));
 		delete options.sid;
 		options.full_clone = 1;
 

@@ -178,7 +178,7 @@ $overviewFormList->addRow(_('Monitoring'),
 // configuration
 if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 	$hostLink = (new CLink(_('Host')))
-		->onClick('view.hostEdit({hostid:\''.$data['host']['hostid'].'\'})');
+		->onClick('view.editHost({hostid:\''.$data['host']['hostid'].'\'})');
 //		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT);
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('items.php'))
