@@ -849,16 +849,19 @@ static void	prepare_graph_for_insert(graphs_items_entry_t *graphs_items_template
 		zbx_vector_graphs_copies_t *graphs_copies_insert, zbx_graph_copy_t *template_graph_copy)
 {
 	zbx_graph_copy_t	*graph_copy;
+	const char		*esc_name;
 
-	graph_copy = zbx_graph_copy_init_new(0, DBdyn_escape_string(template_graph_copy->name),
-			template_graph_copy->width, template_graph_copy->height, template_graph_copy->yaxismin,
-			template_graph_copy->yaxismax, template_graph_copy->show_work_period,
-			template_graph_copy->show_triggers, template_graph_copy->graphtype,
-			template_graph_copy->show_legend, template_graph_copy->show_3d,
+	esc_name = DBdyn_escape_string(template_graph_copy->name);
+	graph_copy = zbx_graph_copy_init_new(0, esc_name, template_graph_copy->width, template_graph_copy->height,
+			template_graph_copy->yaxismin, template_graph_copy->yaxismax,
+			template_graph_copy->show_work_period, template_graph_copy->show_triggers,
+			template_graph_copy->graphtype, template_graph_copy->show_legend, template_graph_copy->show_3d,
 			template_graph_copy->percent_left, template_graph_copy->percent_right,
 			template_graph_copy->ymin_type, template_graph_copy->ymax_type,
 			template_graph_copy->ymin_itemid, template_graph_copy->ymax_itemid, template_graph_copy->flags,
-			template_graph_copy->discover,  graphs_items_template_entry_temp->graphid);
+			template_graph_copy->discover, graphs_items_template_entry_temp->graphid);
+
+	zbx_free(esc_name);
 
 	zbx_vector_graphs_copies_append(graphs_copies_insert, graph_copy);
 }
@@ -1358,7 +1361,6 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 			zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
 			res = FAIL;
 		}
-
 	}
 
 	zbx_free(sql2);
