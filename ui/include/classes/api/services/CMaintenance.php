@@ -309,10 +309,10 @@ class CMaintenance extends CApiService {
 	protected function validateCreate(array &$maintenances): void {
 		$api_input_rules =		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenances', 'name')],
+			'active_since' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
+			'active_till' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
 			'maintenance_type' =>	['type' => API_INT32, 'default' => DB::getDefault('maintenances', 'maintenance_type'), 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenances', 'description')],
-			'active_since' =>		['type' => API_INT32, 'in' => '0:2147464800'],
-			'active_till' =>		['type' => API_INT32, 'in' => '0:2147464800'],
 			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
 			'groupids' =>			['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
 			'hostids' =>			['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
