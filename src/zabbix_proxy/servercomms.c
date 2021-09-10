@@ -19,10 +19,7 @@
 
 #include "common.h"
 
-#include "cfg.h"
-#include "db.h"
 #include "log.h"
-#include "zbxjson.h"
 
 #include "comms.h"
 #include "servercomms.h"
