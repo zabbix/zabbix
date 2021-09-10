@@ -331,19 +331,20 @@ class CMenuHelper {
 		$menu = new CMenu();
 
 		if (!CBrandHelper::isRebranded()) {
+			$lang = CWebUser::getLang();
 			$menu
 				->add(
 					(new CMenuItem(_('Support')))
 						->setIcon('icon-support')
-						->setUrl(new CUrl(getSupportUrl(CWebUser::getLang())))
+						->setUrl(new CUrl(getSupportUrl($lang)))
 						->setTitle(_('Zabbix Technical Support'))
 						->setTarget('_blank')
 				)
 				->add(
-					(new CMenuItem(_('Share')))
-						->setIcon('icon-share')
-						->setUrl(new Curl('https://share.zabbix.com/'))
-						->setTitle(_('Zabbix Share'))
+					(new CMenuItem(_('Integrations')))
+						->setIcon('icon-integrations')
+						->setUrl(new CUrl(getIntegrationsUrl($lang)))
+						->setTitle(_('Zabbix Integrations'))
 						->setTarget('_blank')
 				);
 		}
