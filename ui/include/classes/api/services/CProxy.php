@@ -508,6 +508,8 @@ class CProxy extends CApiService {
 	}
 
 	/**
+	 * Validates the input parameters for the create() method.
+	 *
 	 * @param array $proxies
 	 *
 	 * @throws APIException if the input is invalid.
@@ -676,7 +678,7 @@ class CProxy extends CApiService {
 				}
 			}
 			else {
-				if ($method == 'create' && !array_key_exists('interface', $proxy)) {
+				if ($method === 'create' && !array_key_exists('interface', $proxy)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
 						_s('the parameter "%1$s" is missing', 'interface')
 					));
