@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-06 16:28+0300\n"
+"POT-Creation-Date: 2021-09-10 20:00+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -92,7 +92,7 @@ msgid "%1$d day"
 msgid_plural "%1$d days"
 msgstr[0] ""
 
-#: jsLoader.php:328
+#: jsLoader.php:323
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -170,7 +170,7 @@ msgstr[0] ""
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
 #: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
-#: jsLoader.php:173 jsLoader.php:174 jsLoader.php:175 jsLoader.php:176
+#: jsLoader.php:168 jsLoader.php:169 jsLoader.php:170 jsLoader.php:171
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -182,7 +182,7 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 
-#: jsLoader.php:329
+#: jsLoader.php:324
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -212,13 +212,13 @@ msgstr[0] ""
 #: app/views/administration.user.edit.php:673
 #: include/classes/widgets/CWidgetConfig.php:283
 #: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
-#: jsLoader.php:171 jsLoader.php:172
+#: jsLoader.php:166 jsLoader.php:167
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
 msgstr[0] ""
 
-#: jsLoader.php:310
+#: jsLoader.php:305
 #, c-format
 msgid "%1$s symbols remaining"
 msgstr ""
@@ -237,13 +237,13 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr ""
 
-#: jsLoader.php:323
+#: jsLoader.php:318
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr ""
 
-#: jsLoader.php:366
+#: jsLoader.php:361
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -420,7 +420,7 @@ msgstr ""
 #: app/views/administration.user.token.list.php:67
 #: app/views/administration.user.token.view.php:27
 #: include/classes/helpers/CMenuHelper.php:257
-#: include/classes/helpers/CMenuHelper.php:379 include/html.inc.php:817
+#: include/classes/helpers/CMenuHelper.php:380 include/html.inc.php:817
 #: include/html.inc.php:892
 msgid "API tokens"
 msgstr ""
@@ -475,7 +475,7 @@ msgstr ""
 msgid "Ack"
 msgstr "Ack"
 
-#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:333
+#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:328
 msgid "Acknowledge"
 msgstr "Pemberitahuan"
 
@@ -639,7 +639,7 @@ msgstr "Aksi diperbarui"
 #: include/classes/screens/CScreenProblem.php:1224 include/events.inc.php:291
 #: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:69 jsLoader.php:144
-#: jsLoader.php:177 jsLoader.php:192 jsLoader.php:206 jsLoader.php:332
+#: jsLoader.php:172 jsLoader.php:187 jsLoader.php:201 jsLoader.php:327
 #: tr_events.php:182
 msgid "Actions"
 msgstr "Aksi"
@@ -812,7 +812,7 @@ msgstr "Aktif sampai"
 #: include/views/monitoring.sysmap.edit.php:304
 #: include/views/monitoring.sysmap.edit.php:325
 #: include/views/monitoring.sysmap.edit.php:362
-#: include/views/monitoring.sysmap.edit.php:430 jsLoader.php:196
+#: include/views/monitoring.sysmap.edit.php:430 jsLoader.php:191
 msgid "Add"
 msgstr "Tambah"
 
@@ -820,11 +820,11 @@ msgstr "Tambah"
 msgid "Add (message type limit reached)"
 msgstr ""
 
-#: jsLoader.php:166
+#: jsLoader.php:161
 msgid "Add a new widget"
 msgstr ""
 
-#: jsLoader.php:197
+#: jsLoader.php:192
 msgid "Add child element"
 msgstr ""
 
@@ -849,7 +849,7 @@ msgstr "Tambah host"
 msgid "Add missing"
 msgstr ""
 
-#: jsLoader.php:198
+#: jsLoader.php:193
 msgid "Add multiple maps"
 msgstr ""
 
@@ -866,11 +866,12 @@ msgstr ""
 msgid "Add new override"
 msgstr ""
 
-#: jsLoader.php:145
+#: app/views/js/configuration.dashboard.edit.js.php:202
+#: app/views/js/monitoring.dashboard.view.js.php:268
 msgid "Add page"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:325 jsLoader.php:397
+#: app/views/js/popup.service.edit.js.php:325 jsLoader.php:392
 msgid "Add parent services"
 msgstr ""
 
@@ -916,7 +917,9 @@ msgstr ""
 msgid "Add user group"
 msgstr ""
 
-#: app/views/monitoring.dashboard.widget.edit.php:34 jsLoader.php:146
+#: app/views/js/configuration.dashboard.edit.js.php:198
+#: app/views/js/monitoring.dashboard.view.js.php:264
+#: app/views/monitoring.dashboard.widget.edit.php:34
 msgid "Add widget"
 msgstr ""
 
@@ -925,7 +928,7 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
-#: jsLoader.php:321
+#: jsLoader.php:316
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -1042,7 +1045,7 @@ msgstr ""
 #: app/views/reports.scheduledreport.list.php:56
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:389
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:384
 msgid "All"
 msgstr "Semua"
 
@@ -1060,7 +1063,7 @@ msgstr ""
 msgid "All hosts"
 msgstr ""
 
-#: jsLoader.php:277
+#: jsLoader.php:272
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Semua tautan harus memiliki \"Nama\" dan \"URL\""
 
@@ -1198,8 +1201,8 @@ msgstr "Aplikasi bermasalah."
 #: include/views/js/monitoring.sysmaps.js.php:480
 #: include/views/js/monitoring.sysmaps.js.php:604
 #: include/views/js/monitoring.sysmaps.js.php:709
-#: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:199
-#: jsLoader.php:312
+#: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:194
+#: jsLoader.php:307
 msgid "Apply"
 msgstr "Terapkan"
 
@@ -1217,7 +1220,7 @@ msgstr "Menjelang"
 msgid "Apr"
 msgstr "Apr"
 
-#: include/func.inc.php:103 include/func.inc.php:240 jsLoader.php:229
+#: include/func.inc.php:103 include/func.inc.php:240 jsLoader.php:224
 msgid "April"
 msgstr "April"
 
@@ -1380,7 +1383,7 @@ msgstr ""
 msgid "Aug"
 msgstr "Agu"
 
-#: include/func.inc.php:107 include/func.inc.php:244 jsLoader.php:233
+#: include/func.inc.php:107 include/func.inc.php:244 jsLoader.php:228
 msgid "August"
 msgstr "Agustus"
 
@@ -1654,11 +1657,11 @@ msgstr ""
 msgid "Bottom"
 msgstr "Bawah"
 
-#: jsLoader.php:269
+#: jsLoader.php:264
 msgid "Bring forward"
 msgstr ""
 
-#: jsLoader.php:268
+#: jsLoader.php:263
 msgid "Bring to front"
 msgstr ""
 
@@ -1739,7 +1742,7 @@ msgstr ""
 msgid "Calculated"
 msgstr "Dihitung"
 
-#: jsLoader.php:225
+#: jsLoader.php:220
 msgid "Calendar"
 msgstr ""
 
@@ -1777,8 +1780,8 @@ msgstr "Callback"
 #: app/views/monitoring.dashboard.view.php:143
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:200
-#: jsLoader.php:210 jsLoader.php:313 jsLoader.php:385
+#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:195
+#: jsLoader.php:205 jsLoader.php:308 jsLoader.php:380
 msgid "Cancel"
 msgstr "Batal"
 
@@ -1808,7 +1811,7 @@ msgstr "Tidak dapat menambah aksi"
 msgid "Cannot add correlation"
 msgstr ""
 
-#: jsLoader.php:147
+#: jsLoader.php:145
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
 msgstr ""
@@ -1945,11 +1948,11 @@ msgstr ""
 msgid "Cannot add web scenario"
 msgstr ""
 
-#: jsLoader.php:148
+#: jsLoader.php:146
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr ""
 
-#: jsLoader.php:324
+#: jsLoader.php:319
 msgctxt "screen reader"
 msgid "Cannot be removed"
 msgstr ""
@@ -2483,7 +2486,7 @@ msgstr ""
 msgid "Cannot execute script."
 msgstr ""
 
-#: jsLoader.php:280
+#: jsLoader.php:275
 msgid "Cannot expand macros."
 msgstr ""
 
@@ -2791,7 +2794,7 @@ msgstr ""
 msgid "Cannot specify \"propagation_rule\" parameter without specifying \"propagation_value\" parameter for service \"%1$s\"."
 msgstr ""
 
-#: jsLoader.php:288
+#: jsLoader.php:283
 msgid "Cannot support notification audio for this device."
 msgstr ""
 
@@ -3399,11 +3402,11 @@ msgstr "Bersihkan riwayat dan tren"
 msgid "Clear when unlinking"
 msgstr "Bersihkan ketika membatalkan penautan"
 
-#: jsLoader.php:167
+#: jsLoader.php:162
 msgid "Click and drag to desired size."
 msgstr ""
 
-#: jsLoader.php:311
+#: jsLoader.php:306
 msgid "Click to view or edit"
 msgstr ""
 
@@ -3433,7 +3436,7 @@ msgstr "Jam"
 #: include/views/configuration.template.edit.php:237
 #: include/views/configuration.trigger.prototype.edit.php:654
 #: include/views/configuration.triggers.edit.php:647
-#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:335
+#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:330
 msgid "Clone"
 msgstr "Klon"
 
@@ -3444,8 +3447,8 @@ msgstr "Klon"
 #: include/views/js/monitoring.sysmaps.js.php:487
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
-#: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:211
-#: jsLoader.php:290 jsLoader.php:307 jsLoader.php:378
+#: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:206
+#: jsLoader.php:285 jsLoader.php:302 jsLoader.php:373
 msgid "Close"
 msgstr "Tutup"
 
@@ -3475,8 +3478,8 @@ msgid "Close problems"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:301
-#: jsLoader.php:306
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:296
+#: jsLoader.php:301
 msgid "Collapse"
 msgstr ""
 
@@ -3493,7 +3496,7 @@ msgstr ""
 msgid "Color"
 msgstr ""
 
-#: include/classes/validators/CColorValidator.php:32 jsLoader.php:282
+#: include/classes/validators/CColorValidator.php:32 jsLoader.php:277
 #, c-format
 msgid "Color \"%1$s\" is not correct: expecting hexadecimal color code (6 symbols)."
 msgstr ""
@@ -3616,7 +3619,7 @@ msgstr "Kondisi"
 #: app/views/search.php:37 app/views/search.php:195 app/views/search.php:275
 #: include/classes/helpers/CMenuHelper.php:221
 #: include/classes/helpers/CRoleHelper.php:283
-#: include/views/inventory.host.view.php:222 jsLoader.php:334
+#: include/views/inventory.host.view.php:222 jsLoader.php:329
 msgid "Configuration"
 msgstr "Konfigurasi"
 
@@ -3978,8 +3981,8 @@ msgstr "Koordinat"
 #: include/views/configuration.copy.elements.php:77
 #: include/views/configuration.graph.list.php:238
 #: include/views/configuration.item.list.php:307
-#: include/views/configuration.triggers.list.php:343 jsLoader.php:149
-#: jsLoader.php:178 jsLoader.php:274
+#: include/views/configuration.triggers.list.php:343 jsLoader.php:147
+#: jsLoader.php:173 jsLoader.php:269
 msgid "Copy"
 msgstr "Salin"
 
@@ -4106,11 +4109,11 @@ msgstr ""
 msgid "Create dashboard"
 msgstr ""
 
-#: jsLoader.php:339
+#: jsLoader.php:334
 msgid "Create dependent discovery rule"
 msgstr ""
 
-#: jsLoader.php:338
+#: jsLoader.php:333
 msgid "Create dependent item"
 msgstr ""
 
@@ -4227,7 +4230,7 @@ msgstr "Buat peta"
 msgid "Create media type"
 msgstr "Buat tipe media"
 
-#: app/views/popup.import.php:130 jsLoader.php:336
+#: app/views/popup.import.php:130 jsLoader.php:331
 msgid "Create new"
 msgstr ""
 
@@ -4251,7 +4254,7 @@ msgstr ""
 msgid "Create template"
 msgstr "Buat template"
 
-#: include/views/configuration.triggers.list.php:149 jsLoader.php:337
+#: include/views/configuration.triggers.list.php:149 jsLoader.php:332
 msgid "Create trigger"
 msgstr "Buat trigger"
 
@@ -4500,7 +4503,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172 jsLoader.php:340
+#: include/views/inventory.host.view.php:172 jsLoader.php:335
 msgid "Dashboards"
 msgstr ""
 
@@ -4670,7 +4673,7 @@ msgstr "Hari minggu"
 msgid "Days"
 msgstr "Hari"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:369
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:364
 msgid "Debug"
 msgstr "Debug"
 
@@ -4684,7 +4687,7 @@ msgstr "Mode debug"
 msgid "Dec"
 msgstr "Des"
 
-#: include/func.inc.php:111 include/func.inc.php:248 jsLoader.php:237
+#: include/func.inc.php:111 include/func.inc.php:248 jsLoader.php:232
 msgid "December"
 msgstr "Desember"
 
@@ -4703,7 +4706,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:263
-#: include/views/js/monitoring.sysmaps.js.php:659 jsLoader.php:263
+#: include/views/js/monitoring.sysmaps.js.php:659 jsLoader.php:258
 msgid "Default"
 msgstr "Standar"
 
@@ -4820,8 +4823,8 @@ msgstr "Delay oleh"
 #: include/views/configuration.template.list.php:283
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:350
-#: include/views/monitoring.sysmap.list.php:110 jsLoader.php:150
-#: jsLoader.php:179 jsLoader.php:341
+#: include/views/monitoring.sysmap.list.php:110 jsLoader.php:148
+#: jsLoader.php:174 jsLoader.php:336
 msgid "Delete"
 msgstr "Hapus"
 
@@ -4850,7 +4853,7 @@ msgstr "Hapus aksi yang berlaku?"
 msgid "Delete current correlation?"
 msgstr ""
 
-#: jsLoader.php:342
+#: jsLoader.php:337
 msgid "Delete dashboard?"
 msgstr ""
 
@@ -4894,7 +4897,7 @@ msgstr ""
 msgid "Delete item?"
 msgstr "Hapus item?"
 
-#: jsLoader.php:279
+#: jsLoader.php:274
 msgid "Delete links between selected elements?"
 msgstr "Hapus tautan antara elemen yang dipilih?"
 
@@ -4950,7 +4953,7 @@ msgstr ""
 msgid "Delete selected discovery rules?"
 msgstr "Hapus aturan discovery yang dipilih?"
 
-#: jsLoader.php:266
+#: jsLoader.php:261
 msgid "Delete selected elements?"
 msgstr "Hapus elemen yang dipilih?"
 
@@ -5055,7 +5058,7 @@ msgstr ""
 msgid "Delete selected services?"
 msgstr ""
 
-#: jsLoader.php:267
+#: jsLoader.php:262
 msgid "Delete selected shapes?"
 msgstr ""
 
@@ -5607,7 +5610,7 @@ msgstr ""
 #: app/views/administration.queue.details.php:85 app/views/search.php:184
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1724 include/actions.inc.php:1796
-#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:381
+#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:376
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Menampilkan %1$s dari %2$s yang ditemukan"
@@ -5639,7 +5642,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:219 jsLoader.php:343
+#: jsLoader.php:214 jsLoader.php:338
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Apakah Anda ingin mengganti ekspresi kondisional?"
 
@@ -5695,7 +5698,7 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Mati"
 
-#: jsLoader.php:193 jsLoader.php:207
+#: jsLoader.php:188 jsLoader.php:202
 msgid "Download image"
 msgstr ""
 
@@ -5802,7 +5805,7 @@ msgstr "Item dinamis"
 msgid "Dynamic items"
 msgstr ""
 
-#: jsLoader.php:278
+#: jsLoader.php:273
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Setiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL bernama"
 
@@ -5829,8 +5832,8 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:350
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:118
 #: include/views/js/monitoring.sysmaps.js.php:836
-#: include/views/js/monitoring.sysmaps.js.php:851 jsLoader.php:180
-#: jsLoader.php:201
+#: include/views/js/monitoring.sysmaps.js.php:851 jsLoader.php:175
+#: jsLoader.php:196
 msgid "Edit"
 msgstr "Ubah"
 
@@ -5846,11 +5849,11 @@ msgstr ""
 msgid "Edit operation"
 msgstr ""
 
-#: jsLoader.php:202
+#: jsLoader.php:197
 msgid "Edit tree element"
 msgstr ""
 
-#: jsLoader.php:344
+#: jsLoader.php:339
 msgid "Edit trigger"
 msgstr "Ubah trigger"
 
@@ -6235,7 +6238,7 @@ msgstr "Error"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Error pada permintaan pencarian untuk label \"%1$s\"."
 
-#: include/func.inc.php:1642 jsLoader.php:221
+#: include/func.inc.php:1642 jsLoader.php:216
 msgid "Error message"
 msgstr ""
 
@@ -6349,7 +6352,7 @@ msgstr "Kecuali"
 msgid "Exclude host groups"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:196 jsLoader.php:212
+#: app/controllers/CControllerAuditLogList.php:196 jsLoader.php:207
 msgid "Execute"
 msgstr "Jalankan"
 
@@ -6395,7 +6398,7 @@ msgstr ""
 msgid "Executed script"
 msgstr "Skrip yang dijalankan"
 
-#: jsLoader.php:213
+#: jsLoader.php:208
 msgid "Execution confirmation"
 msgstr "Konfirmasi eksekusi"
 
@@ -6411,8 +6414,8 @@ msgid "Exists"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:302
-#: jsLoader.php:305
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:297
+#: jsLoader.php:300
 msgid "Expand"
 msgstr ""
 
@@ -6533,7 +6536,7 @@ msgstr "Ekspresi"
 msgid "External check"
 msgstr "Periksa eksternal"
 
-#: jsLoader.php:249
+#: jsLoader.php:244
 msgctxt "Friday short"
 msgid "F"
 msgstr "F"
@@ -6557,7 +6560,9 @@ msgid "Failed"
 msgstr "Gagal"
 
 #: app/controllers/CControllerDashboardUpdate.php:142
-#: app/controllers/CControllerTemplateDashboardUpdate.php:136 jsLoader.php:151
+#: app/controllers/CControllerTemplateDashboardUpdate.php:136
+#: app/views/js/configuration.dashboard.edit.js.php:155
+#: app/views/js/monitoring.dashboard.view.js.php:219
 msgid "Failed to create dashboard"
 msgstr ""
 
@@ -6566,24 +6571,26 @@ msgstr ""
 msgid "Failed to parse URL."
 msgstr ""
 
-#: jsLoader.php:152
+#: jsLoader.php:149
 msgid "Failed to paste dashboard page."
 msgstr ""
 
-#: jsLoader.php:153
+#: jsLoader.php:150
 msgid "Failed to paste widget."
 msgstr ""
 
 #: app/controllers/CControllerDashboardUpdate.php:137
-#: app/controllers/CControllerTemplateDashboardUpdate.php:131 jsLoader.php:154
+#: app/controllers/CControllerTemplateDashboardUpdate.php:131
+#: app/views/js/configuration.dashboard.edit.js.php:156
+#: app/views/js/monitoring.dashboard.view.js.php:220
 msgid "Failed to update dashboard"
 msgstr ""
 
-#: jsLoader.php:155
+#: jsLoader.php:151
 msgid "Failed to update dashboard page properties."
 msgstr ""
 
-#: jsLoader.php:156
+#: jsLoader.php:152
 msgid "Failed to update dashboard properties."
 msgstr ""
 
@@ -6591,7 +6598,7 @@ msgstr ""
 msgid "Failed to update template."
 msgstr ""
 
-#: jsLoader.php:157
+#: jsLoader.php:153
 msgid "Failed to update widget properties."
 msgstr ""
 
@@ -6615,7 +6622,7 @@ msgstr ""
 msgid "Feb"
 msgstr "Feb"
 
-#: include/func.inc.php:101 include/func.inc.php:238 jsLoader.php:227
+#: include/func.inc.php:101 include/func.inc.php:238 jsLoader.php:222
 msgid "February"
 msgstr "Februari"
 
@@ -6909,7 +6916,7 @@ msgstr "French (fr_FR)"
 msgid "Fri"
 msgstr "Jum"
 
-#: include/func.inc.php:123 include/func.inc.php:213 jsLoader.php:242
+#: include/func.inc.php:123 include/func.inc.php:213 jsLoader.php:237
 msgid "Friday"
 msgstr "Jumat"
 
@@ -7034,7 +7041,7 @@ msgstr ""
 msgid "Go back to %1$s"
 msgstr ""
 
-#: jsLoader.php:349
+#: jsLoader.php:344
 msgid "Go to"
 msgstr "Lanjut ke"
 
@@ -7243,7 +7250,7 @@ msgstr "Grafik dengan nama \"%1$s\" sudah ada dalam grafik atau prototipe grafik
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:350
+#: include/views/inventory.host.view.php:217 jsLoader.php:345
 msgid "Graphs"
 msgstr "Grafik"
 
@@ -7330,7 +7337,7 @@ msgstr "Grup berdasarkan"
 msgid "Groups"
 msgstr "Grup"
 
-#: include/classes/helpers/CMenuHelper.php:366
+#: include/classes/helpers/CMenuHelper.php:367
 msgid "Guest user"
 msgstr ""
 
@@ -7433,8 +7440,8 @@ msgstr ""
 msgid "Height"
 msgstr "Tinggi"
 
-#: include/classes/helpers/CMenuHelper.php:352
-#: include/classes/helpers/CMenuHelper.php:355
+#: include/classes/helpers/CMenuHelper.php:353
+#: include/classes/helpers/CMenuHelper.php:356
 #: include/views/general.login.php:87
 msgid "Help"
 msgstr "Bantuan"
@@ -7443,11 +7450,11 @@ msgstr "Bantuan"
 msgid "Hexadecimal to decimal"
 msgstr ""
 
-#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:256
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:251
 msgid "Hidden"
 msgstr "Tersembunyi"
 
-#: jsLoader.php:370
+#: jsLoader.php:365
 msgid "Hide debug"
 msgstr ""
 
@@ -7499,7 +7506,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:351
+#: jsLoader.php:346
 msgid "History"
 msgstr "Riwayat"
 
@@ -7583,7 +7590,7 @@ msgstr "Luruskan horisontal"
 #: include/views/inventory.host.view.php:214
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
-#: include/views/reports.toptriggers.php:83 jsLoader.php:258 jsLoader.php:352
+#: include/views/reports.toptriggers.php:83 jsLoader.php:253 jsLoader.php:347
 #: report2.php:507
 msgid "Host"
 msgid_plural "Hosts"
@@ -7621,7 +7628,7 @@ msgstr "Akses host"
 msgid "Host added"
 msgstr "Host ditambah"
 
-#: app/controllers/CControllerPopupItemTest.php:1292
+#: app/controllers/CControllerPopupItemTest.php:1303
 #: app/views/popup.itemtestedit.view.php:100
 msgid "Host address"
 msgstr ""
@@ -7668,7 +7675,7 @@ msgstr[0] ""
 #: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
 #: include/views/js/monitoring.sysmaps.js.php:102
-#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:261
+#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:256
 #: report2.php:398
 msgid "Host group"
 msgstr "Host grup"
@@ -8209,7 +8216,7 @@ msgstr ""
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:227 include/maps.inc.php:28
 #: include/maps.inc.php:307 include/views/js/monitoring.sysmaps.js.php:96
-#: jsLoader.php:262
+#: jsLoader.php:257
 msgid "Image"
 msgstr "Gambar"
 
@@ -9136,9 +9143,9 @@ msgstr ""
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:91
 #: app/controllers/CControllerPopupItemTestGetValue.php:104
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupItemTestSend.php:143
 #: app/controllers/CControllerPopupItemTestSend.php:172
 #: app/controllers/CControllerPopupItemTestSend.php:181
@@ -9500,7 +9507,7 @@ msgid "Insert"
 msgstr "Sisipkan"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:345
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:340
 msgid "Insert expression"
 msgstr ""
 
@@ -9516,6 +9523,10 @@ msgstr "Instalasi"
 #: include/hosts.inc.php:259
 msgid "Installer name"
 msgstr "Nama installer"
+
+#: include/classes/helpers/CMenuHelper.php:344
+msgid "Integrations"
+msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:30
 #: app/views/administration.proxy.edit.php:81 disc_prototypes.php:42
@@ -9964,7 +9975,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:278
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:353
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:348
 msgid "Inventory"
 msgstr "Inventaris"
 
@@ -10150,7 +10161,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:375
+#: jsLoader.php:370
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10311,7 +10322,7 @@ msgstr ""
 msgid "Jan"
 msgstr "Jan"
 
-#: include/func.inc.php:100 include/func.inc.php:237 jsLoader.php:226
+#: include/func.inc.php:100 include/func.inc.php:237 jsLoader.php:221
 msgid "January"
 msgstr "Januari"
 
@@ -10333,7 +10344,7 @@ msgstr ""
 msgid "Jul"
 msgstr "Jul"
 
-#: include/func.inc.php:106 include/func.inc.php:243 jsLoader.php:232
+#: include/func.inc.php:106 include/func.inc.php:243 jsLoader.php:227
 msgid "July"
 msgstr "Juli"
 
@@ -10341,7 +10352,7 @@ msgstr "Juli"
 msgid "Jun"
 msgstr "Jun"
 
-#: include/func.inc.php:105 include/func.inc.php:242 jsLoader.php:231
+#: include/func.inc.php:105 include/func.inc.php:242 jsLoader.php:226
 msgid "June"
 msgstr "Juni"
 
@@ -10518,11 +10529,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Permeriksaan terakhir"
 
-#: jsLoader.php:356
+#: jsLoader.php:351
 msgid "Last hour graph"
 msgstr "Grafik jam terakhir"
 
-#: jsLoader.php:357
+#: jsLoader.php:352
 msgid "Last month graph"
 msgstr "Grafik bulan terakhir"
 
@@ -10560,7 +10571,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Nilai terakhir"
 
-#: jsLoader.php:358
+#: jsLoader.php:353
 msgid "Last week graph"
 msgstr "Grafik minggu terakhir"
 
@@ -10573,11 +10584,11 @@ msgstr "Grafik minggu terakhir"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:311
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:354
+#: include/views/inventory.host.view.php:149 jsLoader.php:349
 msgid "Latest data"
 msgstr "Data terbaru"
 
-#: jsLoader.php:355
+#: jsLoader.php:350
 msgid "Latest values"
 msgstr ""
 
@@ -10899,7 +10910,7 @@ msgstr ""
 msgid "M"
 msgstr ""
 
-#: jsLoader.php:245
+#: jsLoader.php:240
 msgctxt "Monday short"
 msgid "M"
 msgstr "M"
@@ -11084,7 +11095,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
 #: include/views/js/monitoring.sysmaps.js.php:93
 #: include/views/js/monitoring.sysmaps.js.php:208
-#: include/views/monitoring.sysmap.edit.php:317 jsLoader.php:259 map.php:25
+#: include/views/monitoring.sysmap.edit.php:317 jsLoader.php:254 map.php:25
 msgid "Map"
 msgstr "Peta"
 
@@ -11185,7 +11196,7 @@ msgstr "Peta"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/func.inc.php:102 include/func.inc.php:239 jsLoader.php:228
+#: include/func.inc.php:102 include/func.inc.php:239 jsLoader.php:223
 msgid "March"
 msgstr "Maret"
 
@@ -11302,7 +11313,7 @@ msgstr[0] ""
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr ""
 
-#: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:230
+#: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:225
 msgid "May"
 msgstr "Mei"
 
@@ -11653,7 +11664,7 @@ msgstr ""
 msgid "Mon"
 msgstr "Sen"
 
-#: include/func.inc.php:119 include/func.inc.php:209 jsLoader.php:238
+#: include/func.inc.php:119 include/func.inc.php:209 jsLoader.php:233
 msgid "Monday"
 msgstr "Senin"
 
@@ -11693,11 +11704,11 @@ msgstr "Bulan"
 msgid "Monthly"
 msgstr "Bulanan"
 
-#: include/classes/html/CMultiSelect.php:83 jsLoader.php:317
+#: include/classes/html/CMultiSelect.php:83 jsLoader.php:312
 msgid "More matches found..."
 msgstr ""
 
-#: jsLoader.php:327
+#: jsLoader.php:322
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -11734,7 +11745,7 @@ msgstr ""
 msgid "Multiple PROBLEM events"
 msgstr "Beberapa MASALAH event"
 
-#: jsLoader.php:287
+#: jsLoader.php:282
 msgid "Mute"
 msgstr "Bisu"
 
@@ -12025,7 +12036,7 @@ msgstr "Kondisi baru"
 msgid "New dashboard"
 msgstr ""
 
-#: jsLoader.php:273
+#: jsLoader.php:268
 msgid "New element"
 msgstr "Element baru"
 
@@ -12066,7 +12077,7 @@ msgid "New triggers"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:175
-#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:186
+#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:181
 msgid "Next page"
 msgstr ""
 
@@ -12292,7 +12303,7 @@ msgstr "Tidak ada gambar"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:374
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:369
 msgid "No interface found"
 msgstr "Tidak ada interface yang ditemukan"
 
@@ -12332,7 +12343,7 @@ msgstr ""
 msgid "No maps added."
 msgstr ""
 
-#: include/classes/html/CMultiSelect.php:82 jsLoader.php:316
+#: include/classes/html/CMultiSelect.php:82 jsLoader.php:311
 msgid "No matches found"
 msgstr ""
 
@@ -12479,7 +12490,7 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:740
 #: include/classes/api/services/CProxy.php:774
 #: include/classes/api/services/CProxy.php:864
-#: include/classes/api/services/CReport.php:925
+#: include/classes/api/services/CReport.php:903
 #: include/classes/api/services/CRole.php:314
 #: include/classes/api/services/CRole.php:345
 #: include/classes/api/services/CScript.php:540
@@ -12543,7 +12554,7 @@ msgstr "Tidak file kunci publik yang dispesifikasikan."
 msgid "No recipients for action operation message."
 msgstr "Tidak ada penerima untuk aksi operasi pesan."
 
-#: include/classes/widgets/CWidgetConfig.php:282 jsLoader.php:181
+#: include/classes/widgets/CWidgetConfig.php:282 jsLoader.php:176
 msgid "No refresh"
 msgstr ""
 
@@ -12713,7 +12724,7 @@ msgstr ""
 msgid "Nov"
 msgstr "Nov"
 
-#: include/func.inc.php:110 include/func.inc.php:247 jsLoader.php:236
+#: include/func.inc.php:110 include/func.inc.php:247 jsLoader.php:231
 msgid "November"
 msgstr "November"
 
@@ -12961,13 +12972,13 @@ msgstr "Okt"
 msgid "Octal to decimal"
 msgstr ""
 
-#: include/func.inc.php:109 include/func.inc.php:246 jsLoader.php:235
+#: include/func.inc.php:109 include/func.inc.php:246 jsLoader.php:230
 msgid "October"
 msgstr "Oktober"
 
 #: app/views/administration.proxy.list.php:156
 #: include/views/monitoring.sysmap.constructor.php:51
-#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:255
+#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:250
 msgid "Off"
 msgstr "Mati"
 
@@ -12979,7 +12990,7 @@ msgstr "Mati"
 #: app/views/monitoring.widget.web.view.php:30
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:386
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:381
 #: report2.php:507
 msgid "Ok"
 msgstr "Ok"
@@ -12998,7 +13009,7 @@ msgstr ""
 
 #: app/views/administration.proxy.list.php:155
 #: include/views/monitoring.sysmap.constructor.php:51
-#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:254
+#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:249
 msgid "On"
 msgstr "Nyala"
 
@@ -13580,7 +13591,7 @@ msgstr ""
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr ""
 
-#: jsLoader.php:158
+#: jsLoader.php:154
 #, c-format
 msgid "Page %1$d"
 msgstr ""
@@ -13736,19 +13747,21 @@ msgstr ""
 msgid "Password requirements:"
 msgstr ""
 
-#: jsLoader.php:182 jsLoader.php:275
+#: jsLoader.php:177 jsLoader.php:270
 msgid "Paste"
 msgstr ""
 
-#: jsLoader.php:159
+#: app/views/js/configuration.dashboard.edit.js.php:217
+#: app/views/js/monitoring.dashboard.view.js.php:283
 msgid "Paste page"
 msgstr ""
 
-#: jsLoader.php:160
+#: app/views/js/configuration.dashboard.edit.js.php:210
+#: app/views/js/monitoring.dashboard.view.js.php:276 jsLoader.php:155
 msgid "Paste widget"
 msgstr ""
 
-#: jsLoader.php:276
+#: jsLoader.php:271
 msgid "Paste without external links"
 msgstr ""
 
@@ -13892,7 +13905,7 @@ msgstr ""
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr ""
 
-#: jsLoader.php:264
+#: jsLoader.php:259
 msgid "Please select two elements"
 msgstr "Silahkan pilih dua elemen"
 
@@ -13926,7 +13939,7 @@ msgstr "Polish (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Mengisi field inventaris host"
 
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/partials/monitoring.host.filter.php:113
 #: app/views/administration.authentication.edit.php:170
 #: app/views/administration.proxy.edit.php:54
@@ -14021,7 +14034,7 @@ msgid "Previous month"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:157
-#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:187
+#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:182
 msgid "Previous page"
 msgstr ""
 
@@ -14152,7 +14165,7 @@ msgstr ""
 msgid "Problem is suppressed"
 msgstr ""
 
-#: jsLoader.php:285
+#: jsLoader.php:280
 msgid "Problem on"
 msgstr "Masalah pada"
 
@@ -14195,7 +14208,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:359 report2.php:507
+#: include/views/inventory.host.view.php:156 jsLoader.php:354 report2.php:507
 msgid "Problems"
 msgstr "Masalah"
 
@@ -14212,7 +14225,7 @@ msgstr ""
 msgid "Process tags"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:377
+#: include/classes/helpers/CMenuHelper.php:378
 msgid "Profile"
 msgstr ""
 
@@ -14229,7 +14242,7 @@ msgid "Prometheus to JSON"
 msgstr ""
 
 #: include/views/monitoring.sysmap.list.php:77
-#: include/views/monitoring.sysmap.list.php:78 jsLoader.php:161
+#: include/views/monitoring.sysmap.list.php:78 jsLoader.php:156
 msgid "Properties"
 msgstr ""
 
@@ -14542,7 +14555,7 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:183
+#: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:178
 msgid "Refresh interval"
 msgstr ""
 
@@ -14602,7 +14615,7 @@ msgstr "Ekspresi reguler"
 msgid "Related reports"
 msgstr ""
 
-#: jsLoader.php:168
+#: jsLoader.php:163
 msgid "Release to create a widget."
 msgstr ""
 
@@ -14746,8 +14759,8 @@ msgstr "Perintah jarak jauh"
 #: include/views/monitoring.sysmap.constructor.php:34
 #: include/views/monitoring.sysmap.constructor.php:40
 #: include/views/monitoring.sysmap.constructor.php:46
-#: include/views/monitoring.sysmap.edit.php:292 jsLoader.php:203
-#: jsLoader.php:272
+#: include/views/monitoring.sysmap.edit.php:292 jsLoader.php:198
+#: jsLoader.php:267
 msgid "Remove"
 msgstr "Hapus"
 
@@ -14787,7 +14800,7 @@ msgstr ""
 msgid "Removed"
 msgstr ""
 
-#: jsLoader.php:322
+#: jsLoader.php:317
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -14965,7 +14978,7 @@ msgstr "Konfirmasi reset"
 msgid "Reset defaults"
 msgstr "Reset standar"
 
-#: jsLoader.php:286
+#: jsLoader.php:281
 msgid "Resolved"
 msgstr "Terselesaikan"
 
@@ -15218,12 +15231,12 @@ msgstr ""
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
-#: jsLoader.php:250
+#: jsLoader.php:245
 msgctxt "Saturday short"
 msgid "S"
 msgstr "S"
 
-#: jsLoader.php:251
+#: jsLoader.php:246
 msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
@@ -15292,7 +15305,7 @@ msgstr "OID SNMP"
 msgid "SNMP agent"
 msgstr ""
 
-#: app/controllers/CControllerPopupItemTest.php:1284
+#: app/controllers/CControllerPopupItemTest.php:1295
 #: app/views/popup.discovery.check.php:68
 #: app/views/popup.itemtestedit.view.php:142
 #: include/views/js/configuration.host.edit.js.php:89
@@ -15448,7 +15461,7 @@ msgstr ""
 msgid "Sat"
 msgstr "Sab"
 
-#: include/func.inc.php:124 include/func.inc.php:214 jsLoader.php:243
+#: include/func.inc.php:124 include/func.inc.php:214 jsLoader.php:238
 msgid "Saturday"
 msgstr "Sabtu"
 
@@ -15617,7 +15630,7 @@ msgstr "Skrip diperbarui"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:295
-#: include/classes/helpers/CRoleHelper.php:388 jsLoader.php:360
+#: include/classes/helpers/CRoleHelper.php:388 jsLoader.php:355
 msgid "Scripts"
 msgstr "Skrip"
 
@@ -15696,7 +15709,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:101
 #: include/views/configuration.item.prototype.edit.php:83
 #: include/views/configuration.item.prototype.edit.php:479
-#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:320
+#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:315
 msgid "Select"
 msgstr "Pilih"
 
@@ -15732,19 +15745,19 @@ msgstr "Elemen yang dipilih"
 msgid "Selected items only"
 msgstr ""
 
-#: jsLoader.php:325
+#: jsLoader.php:320
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:326
+#: jsLoader.php:321
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:270
+#: jsLoader.php:265
 msgid "Send backward"
 msgstr ""
 
@@ -15769,7 +15782,7 @@ msgstr "Hanya kirim ke"
 msgid "Send to"
 msgstr "Kirim ke"
 
-#: jsLoader.php:271
+#: jsLoader.php:266
 msgid "Send to back"
 msgstr ""
 
@@ -15802,7 +15815,7 @@ msgstr "Dipisahkan"
 msgid "Separately"
 msgstr ""
 
-#: include/func.inc.php:108 include/func.inc.php:245 jsLoader.php:234
+#: include/func.inc.php:108 include/func.inc.php:245 jsLoader.php:229
 msgid "September"
 msgstr "September"
 
@@ -15987,7 +16000,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr ""
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:392
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:387
 msgid "Set new value"
 msgstr ""
 
@@ -16077,15 +16090,11 @@ msgstr ""
 msgid "Shape"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:343
-msgid "Share"
-msgstr ""
-
 #: app/views/monitoring.dashboard.list.php:99
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:346
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:341
 msgid "Sharing"
 msgstr ""
 
@@ -16227,7 +16236,7 @@ msgstr "Tampilkan peringatan jika server Zabbix mati"
 msgid "Show working time"
 msgstr "Tampilkan waktu kerja"
 
-#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:257
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:252
 msgid "Shown"
 msgstr "Ditampilkan"
 
@@ -16251,8 +16260,8 @@ msgstr ""
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:395
-#: include/classes/helpers/CMenuHelper.php:398
+#: include/classes/helpers/CMenuHelper.php:396
+#: include/classes/helpers/CMenuHelper.php:399
 msgid "Sign out"
 msgstr ""
 
@@ -16336,7 +16345,7 @@ msgstr "Abaikan menyalin grafik \"%1$s\" ke host \"%2$s\"."
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
-#: jsLoader.php:291
+#: jsLoader.php:286
 msgid "Snooze"
 msgstr "Tidur"
 
@@ -16456,7 +16465,7 @@ msgstr "Memulai"
 #: app/views/monitoring.dashboard.view.php:164
 #: app/views/monitoring.dashboard.view.php:232
 #: app/views/monitoring.host.dashboard.view.php:101
-#: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:162
+#: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:157
 msgid "Start slideshow"
 msgstr ""
 
@@ -16645,7 +16654,7 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:163
 #: app/views/monitoring.dashboard.view.php:233
 #: app/views/monitoring.host.dashboard.view.php:100
-#: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:163
+#: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:158
 msgid "Stop slideshow"
 msgstr ""
 
@@ -16710,7 +16719,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr ""
 
-#: jsLoader.php:361
+#: jsLoader.php:356
 msgid "Submap"
 msgstr "Submap"
 
@@ -16726,7 +16735,7 @@ msgstr ""
 msgid "Success Audit"
 msgstr "Audit sukses"
 
-#: include/func.inc.php:1641 jsLoader.php:220
+#: include/func.inc.php:1641 jsLoader.php:215
 msgid "Success message"
 msgstr ""
 
@@ -16739,7 +16748,7 @@ msgstr ""
 msgid "Sun"
 msgstr "Sen"
 
-#: include/func.inc.php:126 include/func.inc.php:208 jsLoader.php:244
+#: include/func.inc.php:126 include/func.inc.php:208 jsLoader.php:239
 msgid "Sunday"
 msgstr "Senin"
 
@@ -16747,7 +16756,7 @@ msgstr "Senin"
 msgid "Super admin"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:336
+#: include/classes/helpers/CMenuHelper.php:337
 #: include/views/general.login.php:94
 msgid "Support"
 msgstr "Dukungan"
@@ -16831,12 +16840,12 @@ msgstr ""
 msgid "System uptime in seconds. Returns integer"
 msgstr ""
 
-#: jsLoader.php:248
+#: jsLoader.php:243
 msgctxt "Thursday short"
 msgid "T"
 msgstr "T"
 
-#: jsLoader.php:246
+#: jsLoader.php:241
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "T"
@@ -17372,7 +17381,7 @@ msgstr ""
 msgid "Thu"
 msgstr "Kam"
 
-#: include/func.inc.php:122 include/func.inc.php:212 jsLoader.php:241
+#: include/func.inc.php:122 include/func.inc.php:212 jsLoader.php:236
 msgid "Thursday"
 msgstr "Kamis"
 
@@ -17474,7 +17483,7 @@ msgstr "Timestamp"
 msgid "To"
 msgstr "Ke"
 
-#: jsLoader.php:373
+#: jsLoader.php:368
 msgid "To set a host interface select a single item type for all items"
 msgstr "Untuk mengatur interface host pilih satu tipe item untuk semua item"
 
@@ -17602,7 +17611,7 @@ msgstr "Tren"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:260 jsLoader.php:362
+#: include/views/reports.toptriggers.php:83 jsLoader.php:255 jsLoader.php:357
 msgid "Trigger"
 msgstr "Trigger"
 
@@ -17772,11 +17781,11 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "Trigger keparahan"
 
-#: jsLoader.php:347
+#: jsLoader.php:342
 msgid "Trigger status \"OK\""
 msgstr ""
 
-#: jsLoader.php:348
+#: jsLoader.php:343
 msgid "Trigger status \"Problem\""
 msgstr ""
 
@@ -17828,7 +17837,7 @@ msgstr ""
 msgid "Tue"
 msgstr "Sel"
 
-#: include/func.inc.php:120 include/func.inc.php:210 jsLoader.php:239
+#: include/func.inc.php:120 include/func.inc.php:210 jsLoader.php:234
 msgid "Tuesday"
 msgstr "Selasa"
 
@@ -17841,7 +17850,7 @@ msgstr ""
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Dua item (\"%1$s\" dan \"%2$s\") tidak dapat mengisi satu field inventori host \"%3$s\", ini akan mengakibatkan konflik."
 
-#: jsLoader.php:265
+#: jsLoader.php:260
 msgid "Two map elements should be selected"
 msgstr ""
 
@@ -17942,7 +17951,7 @@ msgstr "TIDAK DIKENAL"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:363
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:358
 msgid "URL"
 msgstr "URL"
 
@@ -17988,7 +17997,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:364
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:359
 msgid "URLs"
 msgstr "URL"
 
@@ -18188,7 +18197,7 @@ msgstr "Putuskan dari template"
 msgid "Unlink from templates"
 msgstr "Putuskan dari template"
 
-#: jsLoader.php:289
+#: jsLoader.php:284
 msgid "Unmute"
 msgstr "Nyalakan suara"
 
@@ -18623,8 +18632,8 @@ msgstr ""
 msgid "User sessions"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:373
-#: include/classes/helpers/CMenuHelper.php:387
+#: include/classes/helpers/CMenuHelper.php:374
+#: include/classes/helpers/CMenuHelper.php:388
 msgid "User settings"
 msgstr ""
 
@@ -19227,7 +19236,7 @@ msgstr "Nama terlihat tidak boleh kosong jika nama hostnya hilang."
 msgid "W"
 msgstr ""
 
-#: jsLoader.php:247
+#: jsLoader.php:242
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "W"
@@ -19244,11 +19253,11 @@ msgctxt "setup"
 msgid "Warning"
 msgstr ""
 
-#: include/func.inc.php:1643 jsLoader.php:222
+#: include/func.inc.php:1643 jsLoader.php:217
 msgid "Warning message"
 msgstr ""
 
-#: jsLoader.php:294
+#: jsLoader.php:289
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu diingat telah tercapai."
 
@@ -19264,7 +19273,7 @@ msgstr "Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu dii
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:365
+#: include/views/inventory.host.view.php:219 jsLoader.php:360
 msgid "Web"
 msgstr "Web"
 
@@ -19331,7 +19340,7 @@ msgstr ""
 msgid "Wed"
 msgstr "Rab"
 
-#: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:240
+#: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:235
 msgid "Wednesday"
 msgstr "Rabu"
 
@@ -19363,7 +19372,7 @@ msgstr "Ketidak aktif"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr ""
 
-#: jsLoader.php:189
+#: jsLoader.php:184
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
 
@@ -19728,11 +19737,11 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr "Zabbix"
 
-#: include/classes/helpers/CMenuHelper.php:346
-msgid "Zabbix Share"
+#: include/classes/helpers/CMenuHelper.php:347
+msgid "Zabbix Integrations"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:339
+#: include/classes/helpers/CMenuHelper.php:340
 msgid "Zabbix Technical Support"
 msgstr ""
 
@@ -20171,9 +20180,9 @@ msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:143
 #: app/controllers/CControllerAuthenticationUpdate.php:215
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupLldOperation.php:131
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/controllers/CControllerPopupLldOperation.php:143
@@ -20324,7 +20333,7 @@ msgstr ""
 msgid "circular item dependency is not allowed"
 msgstr ""
 
-#: jsLoader.php:297
+#: jsLoader.php:292
 msgid "color"
 msgstr ""
 
@@ -20371,7 +20380,7 @@ msgstr ""
 msgid "countunique() - The number of unique values"
 msgstr ""
 
-#: include/func.inc.php:579 jsLoader.php:216
+#: include/func.inc.php:579 jsLoader.php:211
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -20570,7 +20579,7 @@ msgstr ""
 msgid "graph pattern"
 msgstr ""
 
-#: include/func.inc.php:580 jsLoader.php:217
+#: include/func.inc.php:580 jsLoader.php:212
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -20850,12 +20859,12 @@ msgstr ""
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:138 jsLoader.php:218 jsLoader.php:382
+#: include/func.inc.php:581 jsLoader.php:138 jsLoader.php:213 jsLoader.php:377
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:578 jsLoader.php:215
+#: include/func.inc.php:578 jsLoader.php:210
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -21055,7 +21064,7 @@ msgstr ""
 msgid "name"
 msgstr ""
 
-#: include/classes/html/CMultiSelect.php:85 jsLoader.php:319
+#: include/classes/html/CMultiSelect.php:85 jsLoader.php:314
 msgid "new"
 msgstr ""
 
@@ -21190,7 +21199,7 @@ msgstr ""
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:393
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:388
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21517,7 +21526,7 @@ msgstr ""
 msgid "time filter default period exceeds the max period"
 msgstr ""
 
-#: jsLoader.php:298
+#: jsLoader.php:293
 msgid "time shift"
 msgstr ""
 
@@ -21580,7 +21589,7 @@ msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:74
-#: include/classes/html/CMultiSelect.php:84 jsLoader.php:318
+#: include/classes/html/CMultiSelect.php:84 jsLoader.php:313
 msgid "type here to search"
 msgstr ""
 
@@ -21723,7 +21732,7 @@ msgstr ""
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:394
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:389
 msgid "value"
 msgstr "nilai"
 
@@ -21870,7 +21879,7 @@ msgstr ""
 msgid "wrong item type"
 msgstr ""
 
-#: include/func.inc.php:577 jsLoader.php:214
+#: include/func.inc.php:577 jsLoader.php:209
 msgctxt "year short"
 msgid "y"
 msgstr "y"
