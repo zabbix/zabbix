@@ -131,6 +131,84 @@ typedef struct
 }
 zbx_graph_copy_t;
 
+static zbx_graph_copy_t	*zbx_graph_copy_init_new(zbx_uint64_t graphid, const char *name, int width, int height,
+		double yaxismin, double yaxismax, unsigned char show_work_period, unsigned char show_triggers,
+		unsigned char graphtype, unsigned char show_legend, unsigned char show_3d, double percent_left,
+		double percent_right, unsigned char ymin_type, unsigned char ymax_type, zbx_uint64_t ymin_itemid,
+		zbx_uint64_t ymax_itemid, unsigned char flags, unsigned char discover, zbx_uint64_t templateid)
+{
+	zbx_graph_copy_t	*graph_copy;
+
+	graph_copy = (zbx_graph_copy_t*)zbx_malloc(NULL, sizeof(zbx_graph_copy_t));
+	graph_copy->graphid = graphid;
+#define INIT_STR_N(r) graph_copy->r = zbx_strdup(NULL, r); \
+	graph_copy->r##_orig = NULL;
+#define INIT_INT_OR_DBL_N(r) graph_copy->r = r; \
+	graph_copy->r##_orig = 0;
+	INIT_STR_N(name);
+	INIT_INT_OR_DBL_N(width);
+	INIT_INT_OR_DBL_N(height);
+	INIT_INT_OR_DBL_N(yaxismin);
+	INIT_INT_OR_DBL_N(yaxismax);
+	INIT_INT_OR_DBL_N(show_work_period);
+	INIT_INT_OR_DBL_N(show_triggers);
+	INIT_INT_OR_DBL_N(graphtype);
+	INIT_INT_OR_DBL_N(show_legend);
+	INIT_INT_OR_DBL_N(show_3d);
+	INIT_INT_OR_DBL_N(percent_left);
+	INIT_INT_OR_DBL_N(percent_right);
+	INIT_INT_OR_DBL_N(ymin_type);
+	INIT_INT_OR_DBL_N(ymax_type);
+	INIT_INT_OR_DBL_N(ymin_itemid);
+	INIT_INT_OR_DBL_N(ymax_itemid);
+	graph_copy->flags = flags;
+	INIT_INT_OR_DBL_N(discover);
+#undef INIT_STR_N
+#undef INIT_INT_OR_DBL_N
+	graph_copy->update_flags = ZBX_FLAG_LINK_GRAPH_UNSET;
+	graph_copy->templateid = templateid;
+	graph_copy->templateid_orig = 0;
+
+	return graph_copy;
+}
+
+static void	zbx_graph_copy_init_orig(zbx_graph_copy_t *graph_copy, zbx_uint64_t graphid, const char *name,
+		int width, int height, double yaxismin, double yaxismax, unsigned char show_work_period,
+		unsigned char show_triggers, unsigned char graphtype, unsigned char show_legend, unsigned char show_3d,
+		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type,
+		zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid, unsigned char flags, unsigned char discover,
+		zbx_uint64_t templateid_orig)
+{
+	graph_copy->graphid = graphid;
+#define INIT_STR_ORIG(r) graph_copy->r = NULL; \
+	graph_copy->r##_orig = zbx_strdup(NULL, r);
+#define INIT_INT_OR_DBL_ORIG(r) graph_copy->r = 0; \
+	graph_copy->r##_orig = r;
+	INIT_STR_ORIG(name);
+	INIT_INT_OR_DBL_ORIG(width);
+	INIT_INT_OR_DBL_ORIG(height);
+	INIT_INT_OR_DBL_ORIG(yaxismin);
+	INIT_INT_OR_DBL_ORIG(yaxismax);
+	INIT_INT_OR_DBL_ORIG(show_work_period);
+	INIT_INT_OR_DBL_ORIG(show_triggers);
+	INIT_INT_OR_DBL_ORIG(graphtype);
+	INIT_INT_OR_DBL_ORIG(show_legend);
+	INIT_INT_OR_DBL_ORIG(show_3d);
+	INIT_INT_OR_DBL_ORIG(percent_left);
+	INIT_INT_OR_DBL_ORIG(percent_right);
+	INIT_INT_OR_DBL_ORIG(ymin_type);
+	INIT_INT_OR_DBL_ORIG(ymax_type);
+	INIT_INT_OR_DBL_ORIG(ymin_itemid);
+	INIT_INT_OR_DBL_ORIG(ymax_itemid);
+	graph_copy->flags = flags;
+	INIT_INT_OR_DBL_ORIG(discover);
+#undef INIT_STR_ORIG
+#undef INIT_INT_OR_DBL_ORIG
+	graph_copy->update_flags = ZBX_FLAG_LINK_GRAPH_UNSET;
+	graph_copy->templateid = 0;
+	graph_copy->templateid_orig = templateid_orig;
+}
+
 static zbx_hash_t	graphs_copies_hash_func(const void *data)
 {
 	const zbx_graph_copy_t	*graph_copy = (const zbx_graph_copy_t *)data;
@@ -324,28 +402,18 @@ static int	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		graph_copy = (zbx_graph_copy_t *)zbx_malloc(NULL, sizeof(zbx_graph_copy_t));
+		zbx_uint64_t	graphid, ymin_itemid, ymax_itemid;
 
-		graph_copy->update_flags = ZBX_FLAG_LINK_GRAPH_UNSET;
-		ZBX_STR2UINT64(graph_copy->graphid, row[0]);
-		graph_copy->name = zbx_strdup(NULL, row[1]);
-		graph_copy->width = atoi(row[2]);
-		graph_copy->height = atoi(row[3]);
-		graph_copy->yaxismin = atof(row[4]);
-		graph_copy->yaxismax = atof(row[5]);
-		graph_copy->show_work_period = (unsigned char)atoi(row[6]);
-		graph_copy->show_triggers = (unsigned char)atoi(row[7]);
-		graph_copy->graphtype = (unsigned char)atoi(row[8]);
-		graph_copy->show_legend = (unsigned char)atoi(row[9]);
-		graph_copy->show_3d = (unsigned char)atoi(row[10]);
-		graph_copy->percent_left = atof(row[11]);
-		graph_copy->percent_right = atof(row[12]);
-		graph_copy->ymin_type = (unsigned char)atoi(row[13]);
-		graph_copy->ymax_type = (unsigned char)atoi(row[14]);
-		ZBX_DBROW2UINT64(graph_copy->ymin_itemid, row[15]);
-		ZBX_DBROW2UINT64(graph_copy->ymax_itemid, row[16]);
-		graph_copy->flags = (unsigned char)atoi(row[17]);
-		graph_copy->discover = (unsigned char)atoi(row[18]);
+		ZBX_STR2UINT64(graphid, row[0]);
+		ZBX_DBROW2UINT64(ymin_itemid, row[15]);
+		ZBX_DBROW2UINT64(ymax_itemid, row[16]);
+
+		graph_copy = zbx_graph_copy_init_new(graphid, row[1], atoi(row[2]), atoi(row[3]), atof(row[4]),
+				atof(row[5]), (unsigned char)atoi(row[6]), (unsigned char)atoi(row[7]),
+				(unsigned char)atoi(row[8]), (unsigned char)atoi(row[9]), (unsigned char)atoi(row[10]),
+				atof(row[11]), atof(row[12]), (unsigned char)atoi(row[13]),
+				(unsigned char)atoi(row[14]), ymin_itemid, ymax_itemid, (unsigned char)atoi(row[17]),
+				(unsigned char)atoi(row[18]), 0);
 
 		zbx_vector_graphs_copies_append(graphs_copies_templates, graph_copy);
 		zbx_vector_uint64_append(templates_graphs_ids, graph_copy->graphid);
@@ -502,17 +570,23 @@ static int	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *grap
 
 		gitem = (graph_item_entry*)zbx_malloc(NULL, sizeof(graph_item_entry));
 
-		gitem->update_flags = ZBX_FLAG_LINK_GRAPHITEM_UNSET;
-		ZBX_STR2UINT64(gitem->gitemid, row[0]);
 		ZBX_STR2UINT64(gitem->itemid, row[1]);
+		ZBX_STR2UINT64(gitem->gitemid, row[0]);
 		zbx_strlcpy(gitem->key, row[2], sizeof(gitem->key));
 		gitem->drawtype_orig = atoi(row[3]);
+		gitem->drawtype_new = 0;
 		gitem->sortorder_orig = atoi(row[4]);
+		gitem->sortorder_new = 0;
 		zbx_strlcpy(gitem->color_orig, row[5], sizeof(gitem->color_orig));
 		gitem->yaxisside_orig = atoi(row[6]);
+		gitem->yaxisside_new = 0;
 		gitem->calc_fnc_orig = atoi(row[7]);
+		gitem->calc_fnc_new = 0;
 		gitem->type_orig = atoi(row[8]);
+		gitem->type_new = 0;
 		gitem->flags = (unsigned char)atoi(row[9]);
+		gitem->update_flags = ZBX_FLAG_LINK_GRAPHITEM_UNSET;
+
 		ZBX_STR2UINT64(temp_t.graphid, row[10]);
 
 		if (NULL != (found = (graphs_items_entry_t*)zbx_hashset_search(graphs_items, &temp_t)))
@@ -573,7 +647,7 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t		graphid;
+		zbx_uint64_t		graphid, ymin_itemid, ymax_itemid, templateid_orig;
 		zbx_graph_copy_t	graph_copy;
 		zbx_graph_names_entry_t	temp_t, *found;
 
@@ -581,26 +655,16 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 		ZBX_STR2UINT64(graphid, row[0]);
 		zbx_vector_uint64_append(host_graphs_ids, graphid);
 
-		graph_copy.graphid = graphid;
-		graph_copy.name_orig = zbx_strdup(NULL, row[1]);
-		graph_copy.width_orig = atoi(row[2]);
-		graph_copy.height_orig = atoi(row[3]);
-		graph_copy.yaxismin_orig = atof(row[4]);
-		graph_copy.yaxismax_orig = atof(row[5]);
-		graph_copy.show_work_period_orig = (unsigned char)atoi(row[6]);
-		graph_copy.show_triggers_orig = (unsigned char)atoi(row[7]);
-		graph_copy.graphtype_orig = (unsigned char)atoi(row[8]);
-		graph_copy.show_legend_orig = (unsigned char)atoi(row[9]);
-		graph_copy.show_3d_orig = (unsigned char)atoi(row[10]);
-		graph_copy.percent_left_orig = atof(row[11]);
-		graph_copy.percent_right_orig = atof(row[12]);
-		graph_copy.ymin_type_orig = (unsigned char)atoi(row[13]);
-		graph_copy.ymax_type_orig = (unsigned char)atoi(row[14]);
-		ZBX_DBROW2UINT64(graph_copy.ymin_itemid_orig, row[15]);
-		ZBX_DBROW2UINT64(graph_copy.ymax_itemid_orig, row[16]);
-		graph_copy.discover_orig = (unsigned char)atoi(row[17]);
-		ZBX_DBROW2UINT64(graph_copy.templateid_orig, row[18]);
-		graph_copy.flags = (unsigned char)atoi(row[19]);
+		ZBX_DBROW2UINT64(ymin_itemid, row[15]);
+		ZBX_DBROW2UINT64(ymax_itemid, row[16]);
+		ZBX_DBROW2UINT64(templateid_orig, row[18]);
+
+		zbx_graph_copy_init_orig(&graph_copy, graphid, row[1], atoi(row[2]), atoi(row[3]), atof(row[4]),
+				atof(row[5]), (unsigned char)atoi(row[6]), (unsigned char)atoi(row[7]),
+				(unsigned char)atoi(row[8]), (unsigned char)atoi(row[9]), (unsigned char)atoi(row[10]),
+				atof(row[11]), atof(row[12]), (unsigned char)atoi(row[13]),
+				(unsigned char)atoi(row[14]), ymin_itemid, ymax_itemid, (unsigned char)atoi(row[19]),
+				(unsigned char)atoi(row[17]), templateid_orig);
 
 		zbx_hashset_insert(host_graphs_main_data, &graph_copy, sizeof(graph_copy));
 
@@ -799,27 +863,15 @@ static void	prepare_graph_for_insert(graphs_items_entry_t *graphs_items_template
 {
 	zbx_graph_copy_t	*graph_copy;
 
-	graph_copy = (zbx_graph_copy_t*)zbx_malloc(NULL, sizeof(zbx_graph_copy_t));
-
-	graph_copy->templateid = graphs_items_template_entry_temp->graphid;
-	graph_copy->name = DBdyn_escape_string(template_graph_copy->name);
-	graph_copy->width = template_graph_copy->width;
-	graph_copy->height = template_graph_copy->height;
-	graph_copy->yaxismin = template_graph_copy->yaxismin;
-	graph_copy->yaxismax = template_graph_copy->yaxismax;
-	graph_copy->show_work_period = template_graph_copy->show_work_period;
-	graph_copy->show_triggers = template_graph_copy->show_triggers;
-	graph_copy->graphtype = template_graph_copy->graphtype;
-	graph_copy->show_legend = template_graph_copy->show_legend;
-	graph_copy->show_3d = template_graph_copy->show_3d;
-	graph_copy->percent_left = template_graph_copy->percent_left;
-	graph_copy->percent_right = template_graph_copy->percent_right;
-	graph_copy->ymin_type = template_graph_copy->ymin_type;
-	graph_copy->ymax_type = template_graph_copy->ymax_type;
-	graph_copy->ymin_itemid = template_graph_copy->ymin_itemid;
-	graph_copy->ymax_itemid = template_graph_copy->ymax_itemid;
-	graph_copy->flags = template_graph_copy->flags;
-	graph_copy->discover = template_graph_copy->discover;
+	graph_copy = zbx_graph_copy_init_new(0, DBdyn_escape_string(template_graph_copy->name),
+			template_graph_copy->width, template_graph_copy->height, template_graph_copy->yaxismin,
+			template_graph_copy->yaxismax, template_graph_copy->show_work_period,
+			template_graph_copy->show_triggers, template_graph_copy->graphtype,
+			template_graph_copy->show_legend, template_graph_copy->show_3d,
+			template_graph_copy->percent_left, template_graph_copy->percent_right,
+			template_graph_copy->ymin_type, template_graph_copy->ymax_type,
+			template_graph_copy->ymin_itemid, template_graph_copy->ymax_itemid, template_graph_copy->flags,
+			template_graph_copy->discover,  graphs_items_template_entry_temp->graphid);
 
 	zbx_vector_graphs_copies_append(graphs_copies_insert, graph_copy);
 }
