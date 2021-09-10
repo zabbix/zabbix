@@ -1,9 +1,17 @@
 Changes for 5.0.16rc1
 
 New features:
+..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
 ........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
 
 Bug fixes:
+........S. [ZBX-19440] added utf-8 support to zbx_set_json_strerror (dgoloscapov)
+.........T [ZBX-19864] fixed preprocessing of "Checkpoint sync time" item, fixed the regex in preprocessing in the "Ping time" item, fixed SQL request in the "Get transactions" item in "DB PostgreSQL" template (mchudinov)
+...G...... [ZBX-19614] fixed proc.num,proc.cpu.utilization,proc.mem metrics not working properly when compiled with unsupported Go version and improved performance by using functions introduced in Go 1.16 (esneiders, vso)
+..F....... [ZBX-19120] fixed escaping values in resolved macros in item test form for HTTP items when Request body type is JSON or XML (Ivo)
+..F....... [ZBX-19580] fixed date format mismatch in UI elements that are loaded via JavaScript (jfreibergs)
+..F....... [ZBX-19817] fixed module config not being stored in database when module is discovered (gcalenko)
+...G...... [ZBX-19675] fixed Zabbix agent 2 -R windows service crash (esneiders)
 .........T [ZBX-19865] fixed typos in "F5 Big-IP SNMP" template (abakaldin)
 .........T [ZBX-19849] fixed a trigger name typo in the "MSSQL by ODBC" template (mchudinov)
 ...G...... [ZBX-19613] fixed Zabbix agent 2 redis plugin to closer match redis-cli connection (esneiders)
