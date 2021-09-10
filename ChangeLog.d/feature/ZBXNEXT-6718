@@ -1,0 +1,1 @@
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6718] resumed the audit logging of user login/logout actions; implemented logging of failed login attempts by non-existing users; added new API method user.unblock (agriscenko, vmaksimovs)
