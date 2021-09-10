@@ -810,12 +810,13 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 #define ZBX_TCP_HEADER_DATA	"ZBXD"
 #define ZBX_TCP_HEADER_LEN	ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA)
 
-int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout)
+int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reserved, unsigned char flags,
+		int timeout)
 {
 #define ZBX_TLS_MAX_REC_LEN	16384
 
 	ssize_t			bytes_sent, written = 0;
-	size_t			send_bytes, offset, send_len = len, reserved = 0;
+	size_t			send_bytes, offset, send_len = len;
 	int			ret = SUCCEED;
 	char			*compressed_data = NULL;
 	const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)0;
@@ -840,15 +841,19 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 
 		if (0 != (flags & ZBX_TCP_COMPRESS))
 		{
-			if (SUCCEED != zbx_compress(data, len, &compressed_data, &send_len))
+			/* compress if not compressed yet */
+			if (0 == reserved)
 			{
-				zbx_set_socket_strerror("cannot compress data: %s", zbx_compress_strerror());
-				ret = FAIL;
-				goto cleanup;
-			}
+				if (SUCCEED != zbx_compress(data, len, &compressed_data, &send_len))
+				{
+					zbx_set_socket_strerror("cannot compress data: %s", zbx_compress_strerror());
+					ret = FAIL;
+					goto cleanup;
+				}
 
-			data = compressed_data;
-			reserved = len;
+				data = compressed_data;
+				reserved = len;
+			}
 		}
 
 		memcpy(header_buf, ZBX_TCP_HEADER_DATA, ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA));

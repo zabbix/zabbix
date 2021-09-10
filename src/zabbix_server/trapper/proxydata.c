@@ -76,7 +76,7 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
 	if (0 != proxy->auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
 
-	if (SUCCEED == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), flags, 0)))
+	if (SUCCEED == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), 0, flags, 0)))
 	{
 		if (0 != tasks.values_num)
 			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_INPROGRESS);
@@ -194,7 +194,7 @@ out:
  ******************************************************************************/
 static int	send_data_to_server(zbx_socket_t *sock, const char *data, char **error)
 {
-	if (SUCCEED != zbx_tcp_send_ext(sock, data, strlen(data), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_tcp_send_ext(sock, data, strlen(data), 0, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, CONFIG_TIMEOUT))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		return FAIL;
