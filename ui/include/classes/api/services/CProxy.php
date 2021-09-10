@@ -278,7 +278,7 @@ class CProxy extends CApiService {
 		unset($proxy);
 
 		if ($ins_interfaces) {
-			$interfaceids = DB::insertBatch('interface', $ins_interfaces);
+			$interfaceids = DB::insert('interface', $ins_interfaces);
 		}
 
 		if ($upd_interfaces) {
