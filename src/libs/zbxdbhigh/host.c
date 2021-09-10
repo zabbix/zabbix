@@ -700,6 +700,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 	{
 		t_flags = (unsigned char)atoi(trow[2]);
 		h_flags = (unsigned char)atoi(trow[4]);
+
 		if (t_flags != h_flags)
 		{
 			ret = FAIL;
@@ -790,7 +791,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			break;
 	}
 
-	if (FAIL == ret)
+	if (FAIL == ret && 0 < graphs.values_num)
 	{
 		graph = (zbx_template_graph_valid_t *)graphs.values[i];
 
@@ -985,7 +986,8 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char **tables_hk, int count)
+static void	DBadd_to_housekeeper(const zbx_vector_uint64_t *ids, const char *field, const char **tables_hk,
+		int count)
 {
 	int		i, j;
 	zbx_uint64_t	housekeeperid;
@@ -1098,7 +1100,7 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid", triggerids->values,
 			triggerids->values_num);
 
-	DBselect_delete_for_trigger(sql, &children_triggerids);
+	zbx_audit_DBselect_delete_for_trigger(sql, &children_triggerids);
 	zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	DBdelete_triggers(&children_triggerids);
@@ -1702,7 +1704,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	DBselect_delete_for_trigger(sql, &triggerids);
+	zbx_audit_DBselect_delete_for_trigger(sql, &triggerids);
 
 	DBdelete_trigger_hierarchy(&triggerids);
 	zbx_vector_uint64_destroy(&triggerids);
@@ -3124,7 +3126,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 						break;
 				}
 
-				if (host_prototype->hostid != hostid)
+				if (NULL != host_prototype && host_prototype->hostid != hostid)
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;

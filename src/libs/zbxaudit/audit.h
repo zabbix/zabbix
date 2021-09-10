@@ -63,6 +63,8 @@ typedef struct zbx_audit_entry
 	int		resource_type;
 } zbx_audit_entry_t;
 
+zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const char *name, int audit_action, int resource_type);
+
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
 		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,

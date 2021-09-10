@@ -134,8 +134,8 @@ exit:
  *                                                                            *
  * Purpose: add group to host if not added already                            *
  *                                                                            *
- * Parameters: hostid         - [IN]  host identificator                      *
- *             groupids       - [IN]  array of group identificators           *
+ * Parameters: hostid         - [IN]  host identifier                         *
+ *             groupids       - [IN]  array of group identifiers              *
  *                                                                            *
  ******************************************************************************/
 static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)

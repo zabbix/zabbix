@@ -1574,6 +1574,7 @@ zbx_token_t;
 #define ZBX_TOKEN_SEARCH_REFERENCES		0x01
 #define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
 #define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
+#define ZBX_TOKEN_SEARCH_SIMPLE_MACRO		0x08	/* used by the upgrade patches only */
 
 typedef int zbx_token_search_t;
 
@@ -1583,7 +1584,8 @@ int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_to
 int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token);
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
+		zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
@@ -1735,4 +1737,14 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 /* UTF-8 trimming */
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
+
+typedef struct
+{
+	char	*tag;
+	char	*value;
+}
+zbx_tag_t;
+
+void	zbx_free_tag(zbx_tag_t *tag);
+
 #endif

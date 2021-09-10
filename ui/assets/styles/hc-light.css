@@ -755,6 +755,14 @@ footer {
 .btn-remove:not(:first-child) {
   margin-left: 5px; }
 
+.btn-add[disabled], .btn-add[disabled]:hover,
+.btn-edit[disabled],
+.btn-edit[disabled]:hover,
+.btn-remove[disabled],
+.btn-remove[disabled]:hover {
+  background-color: transparent;
+  opacity: .25; }
+
 .overlay-close-btn {
   position: absolute;
   top: 1px;
@@ -1588,7 +1596,7 @@ footer {
   .menu-main .submenu .has-submenu:not(.is-expanded) .submenu {
     left: -9999px !important; }
 
-.icon-support::before, .icon-share::before, .icon-help::before, .icon-guest::before, .icon-profile::before, .icon-signout::before {
+.icon-support::before, .icon-integrations::before, .icon-help::before, .icon-guest::before, .icon-profile::before, .icon-signout::before {
   content: '';
   width: 12px;
   height: 12px;
@@ -1597,7 +1605,7 @@ footer {
 .icon-support::before {
   background-position: -247px -48px; }
 
-.icon-share::before {
+.icon-integrations::before {
   background-position: -90px -84px; }
 
 .icon-help::before {
@@ -1615,7 +1623,7 @@ footer {
 .is-expanded .icon-support::before {
   background-position: -247px -84px; }
 
-.is-expanded .icon-share::before {
+.is-expanded .icon-integrations::before {
   background-position: -168px -84px; }
 
 .is-expanded .icon-help::before {

@@ -270,7 +270,7 @@ class testEscalations extends CIntegrationTest {
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid],
@@ -326,7 +326,7 @@ class testEscalations extends CIntegrationTest {
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 4);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -413,7 +413,7 @@ class testEscalations extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In zbx_dc_update_maintenances()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_update_maintenances()', true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -572,11 +572,11 @@ class testEscalations extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 7);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 200);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 200);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 				'output' => 'extend',
@@ -703,8 +703,8 @@ HEREDOC;
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 8);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 200);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => $actionid

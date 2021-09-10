@@ -1,0 +1,1 @@
+....I..... [ZBX-19635] fixed build failure when DES is disabled in Net-SNMP or when LTO is used (vso)

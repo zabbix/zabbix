@@ -188,7 +188,8 @@ void	zbx_mock_test_entry(void **state)
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
 	zbx_mock_assert_result_eq("zbx_token_find() return code", expected_ret,
-			zbx_token_find(expression, 0, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO));
+			zbx_token_find(expression, 0, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO |
+			ZBX_TOKEN_SEARCH_SIMPLE_MACRO));
 
 	if (SUCCEED == expected_ret)
 	{

@@ -81,7 +81,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					'name' => 'Admin in group with disabled GUI access',
 					'gui_access' => GROUP_GUI_ACCESS_DISABLED,
-					'userids' => 1
+					'users' => ['userid' => 1]
 				],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
@@ -89,7 +89,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					'name' => 'Admin in disabled group',
 					'users_status' => 1,
-					'userids' => 1
+					'users' => ['userid' => 1]
 				],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
@@ -216,7 +216,7 @@ class testUserGroup extends CAPITest {
 					'usrgrpid' => '14',
 					'name' => 'Admin in group with disabled GUI access',
 					'gui_access' => GROUP_GUI_ACCESS_DISABLED,
-					'userids' => 1
+					'users' => ['userid' => 1]
 				]],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
@@ -225,7 +225,7 @@ class testUserGroup extends CAPITest {
 					'usrgrpid' => '14',
 					'name' => 'Admin in disabled group',
 					'users_status' => 1,
-					'userids' => 1
+					'users' => ['userid' => 1]
 				]],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
@@ -233,7 +233,7 @@ class testUserGroup extends CAPITest {
 				'group' => [[
 					'usrgrpid' => '15',
 					'name' => 'User without user group',
-					'userids' => 1
+					'users' => ['userid' => 1]
 				]],
 				'expected_error' => 'User "user-in-one-group" cannot be without user group.'
 			],
@@ -405,30 +405,25 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					'name' => 'Empty user id',
-					'userids' => ''
+					'users' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/userids": an array is expected.'
+				'expected_error' => 'Invalid parameter "/1/users": an array is expected.'
 			],
 			[
 				'group' => [
 					'name' => 'Empty user id',
-					'userids' => ['']
+					'users' => ['']
 				],
-				'expected_error' => 'Invalid parameter "/1/userids/1": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/users/1": an array is expected.'
 			],
 			[
 				'group' => [
 					'name' => 'Non existent user',
-					'userids' => '123456'
+					'users' => [
+						'userid' => '123456'
+					]
 				],
 				'expected_error' => 'User with ID "123456" is not available.'
-			],
-			[
-				'group' => [
-					'name' => 'Non existent user, string',
-					'userids' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/userids": an array is expected.'
 			],
 			// Check user group permissions, host group id.
 			[
@@ -552,7 +547,10 @@ class testUserGroup extends CAPITest {
 						'id' => '50012',
 						'permission' => '3'
 					],
-					'userids' => ['2', '8']
+					'users' => [
+						['userid' => 2],
+						['userid' => '8']
+					]
 				],
 				'expected_error' => null
 			]
@@ -562,41 +560,42 @@ class testUserGroup extends CAPITest {
 	/**
 	* @dataProvider usergroup_properties
 	*/
-	public function testUserGroups_Properties($groups, $expected_error) {
+	public function testUserGroups_Properties($group, $expected_error) {
 		$methods = ['usergroup.create', 'usergroup.update'];
 
 		foreach ($methods as $method) {
 			if ($method == 'usergroup.update') {
-				$groups['usrgrpid'] = '13';
-				$groups['name'] = 'Updated '.$groups['name'];
+				$group['usrgrpid'] = '13';
+				$group['name'] = 'Updated '.$group['name'];
 			}
-			$result = $this->call($method, $groups, $expected_error);
+			$result = $this->call($method, $group, $expected_error);
 
 			if ($expected_error === null) {
-				$dbResult = DBSelect('select * from usrgrp where usrgrpid='.
-						zbx_dbstr($result['result']['usrgrpids'][0])
+				$db_group = CDBHelper::getRow(
+					'SELECT * FROM usrgrp WHERE usrgrpid='.zbx_dbstr($result['result']['usrgrpids'][0])
 				);
-				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $groups['name']);
-				$this->assertEquals($dbRow['gui_access'], $groups['gui_access']);
-				$this->assertEquals($dbRow['users_status'], $groups['users_status']);
-				$this->assertEquals($dbRow['debug_mode'], $groups['debug_mode']);
+				$this->assertSame($group['name'], $db_group['name']);
+				$this->assertEquals($group['gui_access'], $db_group['gui_access']);
+				$this->assertEquals($group['users_status'], $db_group['users_status']);
+				$this->assertEquals($group['debug_mode'], $db_group['debug_mode']);
 
-				foreach ($groups['userids'] as $user) {
-					$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.zbx_dbstr($user).
-							' and usrgrpid='.zbx_dbstr($result['result']['usrgrpids'][0])
-					));
-				}
+				$this->assertEquals(count($group['users']), CDBHelper::getCount(
+					'SELECT NULL'.
+					' FROM users_groups'.
+					' WHERE usrgrpid='.zbx_dbstr($result['result']['usrgrpids'][0])
+				));
 
-				$dbRight = DBSelect('select * from rights where groupid='.$result['result']['usrgrpids'][0]);
-				$dbRowRight = DBFetch($dbRight);
-				$this->assertEquals($dbRowRight['id'], $groups['rights']['id']);
-				$this->assertEquals($dbRowRight['permission'], $groups['rights']['permission']);
+				$db_right = CDBHelper::getRow('SELECT * FROM rights WHERE groupid='.$result['result']['usrgrpids'][0]);
+				$this->assertEquals($group['rights']['id'], $db_right['id']);
+				$this->assertEquals($group['rights']['permission'], $db_right['permission']);
 			}
 			else {
-				if (array_key_exists('name', $groups) && array_key_exists('usrgrpid', $groups)){
-					$this->assertEquals(0, CDBHelper::getCount('select * from usrgrp where usrgrpid='.
-							zbx_dbstr($groups['usrgrpid']).' and name='.zbx_dbstr($groups['name'])
+				if (array_key_exists('name', $group) && array_key_exists('usrgrpid', $group)) {
+					$this->assertEquals(0, CDBHelper::getCount(
+						'SELECT NULL'.
+						' FROM usrgrp'.
+						' WHERE usrgrpid='.zbx_dbstr($group['usrgrpid']).
+							' AND name='.zbx_dbstr($group['name'])
 					));
 				}
 			}

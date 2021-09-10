@@ -32,7 +32,6 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 
 int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
-int	zbx_trends_eval_delta(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
