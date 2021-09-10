@@ -34,18 +34,20 @@
 		running: false,
 		timeout: null,
 		deferred: null,
+		applied_filter_groupids: [],
+		_refresh_message_box: null,
+		_popup_message_box: null,
 
-		init({filter_options, refresh_url, refresh_interval}) {
+		init({filter_options, refresh_url, refresh_interval, applied_filter_groupids}) {
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
+			this.applied_filter_groupids = applied_filter_groupids;
 
 			this.initTabFilter(filter_options);
 
 			this.host_view_form = $('form[name=host_view]');
 			this.running = true;
 			this.refresh();
-
-			host_popup.init();
 		},
 
 		initTabFilter(filter_options) {
@@ -53,26 +55,7 @@
 				this.refresh_counters = this.createCountersRefresh(1);
 				this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
 				this.filter.on(TABFILTER_EVENT_URLSET, () => {
-					const url = new Curl('', false);
-					url.setArgument('action', 'host.view.refresh');
-					this.refresh_url = url.getUrl();
-
-					this.unscheduleRefresh();
-					this.refresh();
-
-					const filter_item = this.filter._active_item;
-
-					if (this.filter._active_item.hasCounter()) {
-						$.post('zabbix.php', {
-							action: 'host.view.refresh',
-							filter_counters: 1,
-							counter_index: filter_item._index
-						}).done((json) => {
-							if (json.filter_counters) {
-								filter_item.updateCounter(json.filter_counters.pop());
-							}
-						});
-					}
+					this.reloadPartialAndTabCounters();
 				});
 			}
 		},
@@ -103,12 +86,55 @@
 			});
 		},
 
-		addMessages(messages) {
-			$('.wrapper main').before(messages);
+		reloadPartialAndTabCounters() {
+			const url = new Curl('', false);
+			url.setArgument('action', 'host.view.refresh');
+			this.refresh_url = url.getUrl();
+
+			this.unscheduleRefresh();
+			this.refresh();
+
+			const filter_item = this.filter._active_item;
+
+			if (this.filter._active_item.hasCounter()) {
+				$.post('zabbix.php', {
+					action: 'host.view.refresh',
+					filter_counters: 1,
+					counter_index: filter_item._index
+				}).done((json) => {
+					if (json.filter_counters) {
+						filter_item.updateCounter(json.filter_counters.pop());
+					}
+				});
+			}
 		},
 
-		removeMessages() {
-			$('.wrapper .msg-bad').remove();
+		_addRefreshMessage(messages) {
+			this._removeRefreshMessage();
+
+			this._refresh_message_box = $($.parseHTML(messages));
+			addMessage(this._refresh_message_box);
+		},
+
+		_removeRefreshMessage() {
+			if (this._refresh_message_box !== null) {
+				this._refresh_message_box.remove();
+				this._refresh_message_box = null;
+			}
+		},
+
+		_addPopupMessage(message_box) {
+			this._removePopupMessage();
+
+			this._popup_message_box = message_box;
+			addMessage(this._popup_message_box);
+		},
+
+		_removePopupMessage() {
+			if (this._popup_message_box !== null) {
+				this._popup_message_box.remove();
+				this._popup_message_box = null;
+			}
 		},
 
 		refresh() {
@@ -127,15 +153,6 @@
 			this.host_view_form.removeClass('is-loading is-loading-fadein delayed-15s');
 		},
 
-		/**
-		 * Popuplates data-attribute used to prefill new host.
-		 *
-		 * @param {array} groupids Filtered host group IDs.
-		 */
-		updateCreateHostButton(groupids) {
-			$('.'+host_popup.ZBX_STYLE_ZABBIX_HOST_POPUPCREATE).attr('data-hostgroups', JSON.stringify(groupids));
-		},
-
 		bindDataEvents(deferred) {
 			deferred
 				.done((response) => {
@@ -151,16 +168,16 @@
 
 		onDataDone(response) {
 			this.clearLoading();
-			this.removeMessages();
+			this._removeRefreshMessage();
 			this.host_view_form.replaceWith(response.body);
 			this.host_view_form = $('form[name=host_view]');
 
 			if ('groupids' in response) {
-				this.updateCreateHostButton(response.groupids);
+				this.applied_filter_groupids = response.groupids;
 			}
 
 			if ('messages' in response) {
-				this.addMessages(response.messages);
+				this._addRefreshMessage(response.messages);
 			}
 		},
 
@@ -208,6 +225,50 @@
 
 			if (this.deferred) {
 				this.deferred.abort();
+			}
+		},
+
+		createHost() {
+			const host_data = this.applied_filter_groupids
+				? {groupids: this.applied_filter_groupids}
+				: {};
+
+			this.openHostPopup(host_data);
+		},
+
+		editHost(hostid) {
+			this.openHostPopup({hostid});
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		events: {
+			hostSuccess: (e) => {
+				const data = e.detail;
+
+				if ('success' in data) {
+					const title = data.success.title;
+					let messages = [];
+
+					if ('messages' in data.success) {
+						messages = data.success.messages;
+					}
+
+					view._addPopupMessage(makeMessageBox('good', messages, title));
+				}
+
+				view.reloadPartialAndTabCounters();
 			}
 		}
 	};

@@ -35,9 +35,7 @@ $widget = (new CWidget())
 	->setControls((new CTag('nav', true, (new CList())
 			->addItem(
 				(new CSimpleButton(_('Create host')))
-//					->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPCREATE)
-					->onClick('view.createHost(this)')
-					->setAttribute('data-hostgroups', json_encode(array_keys($data['filter']['groups'])))
+					->onClick('view.createHost()')
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
@@ -533,6 +531,8 @@ $widget
 	->addItem($form)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('view.init('.json_encode([
+		'applied_filter_groupids' => array_keys($data['filter']['groups'])
+	]).');'))
 	->setOnDocumentReady()
 	->show();

@@ -30,9 +30,12 @@
 
 <script>
 	const view = {
-		init() {
+		applied_filter_groupids: [],
+
+		init({applied_filter_groupids}) {
+			this.applied_filter_groupids = applied_filter_groupids;
+
 			this.initFilter();
-			host_popup.init();
 		},
 
 		initFilter() {
@@ -60,9 +63,9 @@
 			});
 		},
 
-		createHost(button) {
-			const host_data = (typeof button.dataset.hostgroups !== 'undefined')
-				? {groupids: JSON.parse(button.dataset.hostgroups)}
+		createHost() {
+			const host_data = this.applied_filter_groupids
+				? {groupids: this.applied_filter_groupids}
 				: {};
 
 			this.openHostPopup(host_data);
