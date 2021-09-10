@@ -196,12 +196,8 @@ void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t hostid, 
 	{													\
 		zbx_audit_entry_t	*local_audit_host_entry_insert;						\
 														\
-		local_audit_host_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));\
-		local_audit_host_entry_insert->id = hostid;							\
-		local_audit_host_entry_insert->name = zbx_strdup(NULL, name);					\
-		local_audit_host_entry_insert->audit_action = audit_action;					\
-		local_audit_host_entry_insert->resource_type = audit_resource_flag;				\
-		zbx_json_init(&(local_audit_host_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);		\
+		local_audit_host_entry_insert = zbx_audit_entry_init(hostid, name, audit_action,		\
+				audit_resource_flag);								\
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_host_entry_insert,			\
 				sizeof(local_audit_host_entry_insert));						\
 														\
@@ -814,12 +810,8 @@ void	zbx_audit_host_group_create_entry(int audit_action, zbx_uint64_t groupid, c
 	{
 		zbx_audit_entry_t	*local_audit_group_entry_insert;
 
-		local_audit_group_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
-		local_audit_group_entry_insert->id = groupid;
-		local_audit_group_entry_insert->name = zbx_strdup(NULL, name);
-		local_audit_group_entry_insert->audit_action = audit_action;
-		local_audit_group_entry_insert->resource_type =  AUDIT_RESOURCE_HOST_GROUP;
-		zbx_json_init(&(local_audit_group_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		local_audit_group_entry_insert = zbx_audit_entry_init(groupid, name, audit_action,
+				AUDIT_RESOURCE_HOST_GROUP);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_group_entry_insert,
 				sizeof(local_audit_group_entry_insert));
 	}

@@ -35,14 +35,16 @@
 
 #define	AUDIT_DETAILS_KEY_LEN		100
 
-#define AUDIT_RESOURCE_HOST		4
-#define AUDIT_RESOURCE_HOST_GROUP	14
-#define AUDIT_RESOURCE_ITEM		15
-#define AUDIT_RESOURCE_DISCOVERY_RULE	23
-#define AUDIT_RESOURCE_SCRIPT		25
+#define AUDIT_RESOURCE_HOST			4
+#define AUDIT_RESOURCE_TRIGGER			13
+#define AUDIT_RESOURCE_HOST_GROUP		14
+#define AUDIT_RESOURCE_ITEM			15
+#define AUDIT_RESOURCE_DISCOVERY_RULE		23
+#define AUDIT_RESOURCE_SCRIPT			25
 
-#define AUDIT_RESOURCE_ITEM_PROTOTYPE	36
-#define AUDIT_RESOURCE_HOST_PROTOTYPE	37
+#define AUDIT_RESOURCE_TRIGGER_PROTOTYPE	31
+#define AUDIT_RESOURCE_ITEM_PROTOTYPE		36
+#define AUDIT_RESOURCE_HOST_PROTOTYPE		37
 
 #define RETURN_IF_AUDIT_OFF()					\
 	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())	\
@@ -59,6 +61,8 @@ typedef struct zbx_audit_entry
 	int		audit_action;
 	int		resource_type;
 } zbx_audit_entry_t;
+
+zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const char *name, int audit_action, int resource_type);
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
