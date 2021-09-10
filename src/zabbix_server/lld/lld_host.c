@@ -2544,7 +2544,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
  *                                                                            *
  * Purpose: prepare sql for update record of interface_snmp table             *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator                          *
+ * Parameters: hostid      - [IN] host identifier                             *
  *             interfaceid - [IN] snmp interface id;                          *
  *             snmp        - [IN] snmp values for update                      *
  *             sql         - [IN/OUT] sql string                              *
