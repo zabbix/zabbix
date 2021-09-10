@@ -81,11 +81,11 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(mode, "pfree"))
 	{
-		SET_DBL_RESULT(result, total ? ((double)(total - used) * 100.0 / (double)total) : 100.0);
+		SET_DBL_RESULT(result, 0 != total ? ((double)(total - used) * 100.0 / (double)total) : 100.0);
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
-		SET_DBL_RESULT(result, total ? ((double)used * 100.0 / (double)total) : 0.0);
+		SET_DBL_RESULT(result, 0 != total ? ((double)used * 100.0 / (double)total) : 0.0);
 	}
 	else
 	{

@@ -50,9 +50,9 @@ static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *
 	if (NULL != used)
 		*used = (zbx_uint64_t)v.swpginuse * v.pagesize;
 	if (NULL != pfree)
-		*pfree = v.swpages ? (double)(100.0 * (v.swpages - v.swpginuse)) / v.swpages : 100;
+		*pfree = 0 != v.swpages ? (double)(100.0 * (v.swpages - v.swpginuse)) / v.swpages : 100;
 	if (NULL != pused)
-		*pused = v.swpages ? (double)(100.0 * v.swpginuse) / v.swpages : 0;
+		*pused = 0 != v.swpages ? (double)(100.0 * v.swpginuse) / v.swpages : 0;
 
 	return SYSINFO_RET_OK;
 }

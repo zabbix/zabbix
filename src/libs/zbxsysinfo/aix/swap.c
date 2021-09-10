@@ -64,11 +64,11 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(mode, "pfree"))
 	{
-		SET_DBL_RESULT(result, mem.pgsp_total ? 100.0 * (mem.pgsp_free / (double)mem.pgsp_total) : 100.0);
+		SET_DBL_RESULT(result, 0 != mem.pgsp_total ? 100.0 * (mem.pgsp_free / (double)mem.pgsp_total) : 100.0);
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
-		SET_DBL_RESULT(result, mem.pgsp_total ? 100.0 - 100.0 * (mem.pgsp_free / (double)mem.pgsp_total) : 0.0);
+		SET_DBL_RESULT(result, 0 != mem.pgsp_total ? 100.0 - 100.0 * (mem.pgsp_free / (double)mem.pgsp_total) : 0.0);
 	}
 	else
 	{
