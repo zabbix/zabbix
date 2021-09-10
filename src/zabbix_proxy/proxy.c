@@ -1055,6 +1055,8 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_ERR, " ");
 		}
 	}
+
+	zbx_free(db_version_info.friendly_current_version);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)

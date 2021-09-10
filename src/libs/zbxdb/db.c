@@ -2576,14 +2576,6 @@ int	zbx_dbms_mariadb_used(void)
 }
 #endif
 
-#ifdef HAVE_ORACLE
-#define ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE 128
-#else
-#define ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE 32
-#endif
-
-char	version_friendly_str_buff[ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE];
-
 /***************************************************************************************************************
  *                                                                                                             *
  * Function: zbx_dbms_version_info_extract                                                                     *
@@ -2618,7 +2610,7 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 {
 #define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 #if defined(HAVE_MYSQL)
-	int		len, client_major_version, client_minor_version, client_release_version, server_major_version,
+	int		client_major_version, client_minor_version, client_release_version, server_major_version,
 			server_minor_version, server_release_version;
 	const char	*info;
 
@@ -2641,14 +2633,8 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	else
 		ZBX_MYSQL_SVERSION = (zbx_uint32_t)mysql_get_server_version(conn);
 
-	len = (int)zbx_snprintf(version_friendly_str_buff, ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE, "%d.%.2d.%.2d",
-			RIGHT2(ZBX_MYSQL_SVERSION/10000), RIGHT2(ZBX_MYSQL_SVERSION/100), RIGHT2(ZBX_MYSQL_SVERSION));
-
-	if (0 < len && ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE > len)
-	{
-		version_friendly_str_buff[len] = 0;
-		version_info->friendly_current_version = version_friendly_str_buff;
-	}
+	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%.2d.%.2d", RIGHT2(ZBX_MYSQL_SVERSION/10000),
+			RIGHT2(ZBX_MYSQL_SVERSION/100), RIGHT2(ZBX_MYSQL_SVERSION));
 
 	if (ON == ZBX_MARIADB_SFORK)
 	{
@@ -2670,19 +2656,11 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	}
 
 #elif defined(HAVE_POSTGRESQL)
-	int	len;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = PQserverVersion(conn);
 
-	len = (int)zbx_snprintf(version_friendly_str_buff, ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE, "%d.%d.%d",
-			RIGHT2(ZBX_PG_SVERSION/10000), RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
-
-	if (0 < len && ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE > len)
-	{
-		version_friendly_str_buff[len] = 0;
-		version_info->friendly_current_version = version_friendly_str_buff;
-	}
+	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", RIGHT2(ZBX_PG_SVERSION/10000),
+			RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
 
 	version_info->database = "PostgreSQL";
 	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY;
@@ -2698,8 +2676,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 #	endif
 	char	*start, *release_str = "Release ";
 	char	version_friendly[MAX_STRING_LEN / 8];
-	int	len, major_release_version, release_update_version, release_update_version_revision,
+	int	major_release_version, release_update_version, release_update_version_revision,
 			increment_version, reserved_for_future_use, overall_status = SUCCEED;
+	size_t	alloc_len = 0, offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 #	ifdef HAVE_OCI_SERVER_RELEASE2
@@ -2764,17 +2743,8 @@ out:
 #	endif
 	}
 
-	len = strlen(version_friendly);
-
-	if (0 < len && ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE > len)
-	{
-		zbx_strlcpy(version_friendly_str_buff, version_friendly, ZBX_VERSION_FRIENDLY_STR_BUFF_SIZE);
-		version_info->friendly_current_version = version_friendly_str_buff;
-	}
-	else
-	{
-		version_info->friendly_current_version = "";
-	}
+	version_info->friendly_current_version = NULL;
+	zbx_strcpy_alloc(&version_info->friendly_current_version, &alloc_len, &offset, version_friendly);
 
 	version_info->database = "Oracle";
 	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_FRIENDLY;
