@@ -1524,7 +1524,7 @@ class CUser extends CApiService {
 		}
 
 		$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
-		$this->setTimezone($db_user);
+		$this->setTimezone($db_user['timezone']);
 
 		if ($db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
 			$sec_left = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))
@@ -1656,7 +1656,7 @@ class CUser extends CApiService {
 		}
 
 		$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
-		$this->setTimezone($db_user);
+		$this->setTimezone($db_user['timezone']);
 
 		unset($db_user['passwd']);
 		$db_user = self::createSession($db_user);
@@ -1723,7 +1723,7 @@ class CUser extends CApiService {
 		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
 
 		$db_user = $this->addExtraFields($db_user, $permissions);
-		$this->setTimezone($db_user);
+		$this->setTimezone($db_user['timezone']);
 
 		$autologout = timeUnitToSeconds($db_user['autologout']);
 
@@ -1810,7 +1810,7 @@ class CUser extends CApiService {
 	/**
 	 * Returns user groups permissions of specific user.
 	 *
-	 * @param $userid
+	 * @param string $userid
 	 *
 	 * @return array
 	 */
@@ -2049,7 +2049,8 @@ class CUser extends CApiService {
 		if (!$db_users) {
 			return ['error' => _('Incorrect user name or password or account is temporarily blocked.')];
 		}
-		elseif (count($db_users) > 1) {
+
+		if (count($db_users) > 1) {
 			return ['error' => _s('Authentication failed: %1$s.', _('supplied credentials are not unique'))];
 		}
 
@@ -2090,13 +2091,13 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Sets the timezone for system.
+	 * Sets the default user timezone used by all date/time functions.
 	 *
-	 * @param $db_user
+	 * @param string $timezone
 	 */
-	private function setTimezone(array $db_user): void {
-		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
-			date_default_timezone_set($db_user['timezone']);
+	private function setTimezone(string $timezone): void {
+		if ($timezone !== ZBX_DEFAULT_TIMEZONE) {
+			date_default_timezone_set($timezone);
 		}
 	}
 
