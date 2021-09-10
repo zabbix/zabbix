@@ -36,7 +36,7 @@
  ******************************************************************************/
 #define ZBX_JSON_MAX_STRERROR	255
 
-static ZBX_THREAD_LOCAL char	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR + 4];
+static ZBX_THREAD_LOCAL char	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR];
 
 const char	*zbx_json_strerror(void)
 {
@@ -59,8 +59,7 @@ void	zbx_set_json_strerror(const char *fmt, ...)
 		while (0x80 == (0xc0 & zbx_json_strerror_message[idx]) && 0 < idx)
 			idx--;
 
-		/* latest symbol shouldn't be an ASCII symbol */
-		if (0 != (zbx_json_strerror_message[idx] & 0x80))
+		if (zbx_utf8_char_len(zbx_json_strerror_message + idx) != sz - idx)
 			zbx_json_strerror_message[idx] = '\0';
 	}
 
