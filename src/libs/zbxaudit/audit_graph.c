@@ -34,7 +34,7 @@ static int	graph_flag_to_resource_type(int flag)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unexpected audit graph flag detected: ->%d<-", flag);
+		zabbix_log(LOG_LEVEL_CRIT, "unexpected audit graph flag detected: ->%d<-", flag);
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
@@ -60,12 +60,8 @@ void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const 
 	{
 		zbx_audit_entry_t	*local_audit_graph_entry_insert;
 
-		local_audit_graph_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
-		local_audit_graph_entry_insert->id = graphid;
-		local_audit_graph_entry_insert->name = zbx_strdup(NULL, name);
-		local_audit_graph_entry_insert->audit_action = audit_action;
-		local_audit_graph_entry_insert->resource_type = resource_type;
-		zbx_json_init(&(local_audit_graph_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		local_audit_graph_entry_insert = zbx_audit_entry_init(graphid, name, audit_action, resource_type);
+
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_graph_entry_insert,
 				sizeof(local_audit_graph_entry_insert));
 
@@ -78,7 +74,7 @@ void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const 
 }
 
 void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *graph_copy_name, int width, int height,
-		double yaxismin, double yaxismax, zbx_uint64_t templateid, int show_work_period,  int show_triggers,
+		double yaxismin, double yaxismax, zbx_uint64_t templateid, int show_work_period, int show_triggers,
 		int graphtype, int show_legend, int show_3d, double percent_left, double percent_right, int ymin_type,
 		int ymax_type, zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid, int flags, int discover)
 {
@@ -165,8 +161,8 @@ void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx
 	resource_type = graph_flag_to_resource_type(flags);
 
 #define AUDIT_KEY_GITEMS_SNPRINTF(r, nested) zbx_snprintf(audit_key_##r, sizeof(audit_key_##r),			\
-		((AUDIT_RESOURCE_GRAPH == resource_type) ? "graph.gitems[%lu]"#nested#r :			\
-		"graphprototype.gitems[%lu]"#nested#r), gitemid);
+		((AUDIT_RESOURCE_GRAPH == resource_type) ? "graph.gitems[" ZBX_FS_UI64 "]"#nested#r :		\
+		"graphprototype.gitems[" ZBX_FS_UI64 "]"#nested#r), gitemid);
 	AUDIT_KEY_GITEMS_SNPRINTF(,)
 	AUDIT_KEY_GITEMS_SNPRINTF(drawtype, .)
 	AUDIT_KEY_GITEMS_SNPRINTF(sortorder, .)
@@ -269,13 +265,14 @@ void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *i
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	id;
-	int		flags;
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		int		flags;
+		zbx_uint64_t	id;
+
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
 		flags = atoi(row[2]);

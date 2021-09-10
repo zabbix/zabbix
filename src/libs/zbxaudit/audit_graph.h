@@ -28,7 +28,7 @@
 void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const char *name, int flags);
 
 void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *graph_copy_name, int width, int height,
-		double yaxismin, double yaxismax, zbx_uint64_t templateid, int show_work_period,  int show_triggers,
+		double yaxismin, double yaxismax, zbx_uint64_t templateid, int show_work_period, int show_triggers,
 		int graphtype, int show_legend, int show_3d, double percent_left, double percent_right, int ymin_type,
 		int ymax_type, zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid, int flags, int discover);
 
