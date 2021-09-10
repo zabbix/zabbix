@@ -108,7 +108,7 @@ $menu-main-icons: (
 
 $menu-user-icons: (
 	support: -247px -84px,
-	share: -168px -84px,
+	integrations: -168px -84px,
 	help: -168px -48px,
 	guest: -247px -192px,
 	profile: -168px -120px,
@@ -232,6 +232,9 @@ $toc-title-color: #000000;
 $toc-title-bg-color: #dddddd;
 $diff-added-bg-color: transparent;
 $diff-removed-bg-color: transparent;
+
+// Text
+$text-placeholder-color: #000000;
 
 // Important! @import string should come after variables.
 @import 'screen.scss';
@@ -655,6 +658,7 @@ button {
 }
 
 .radio-list-control {
+	.normal-bg,
 	.average-bg,
 	.disaster-bg,
 	.high-bg,

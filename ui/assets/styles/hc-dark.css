@@ -127,6 +127,12 @@ svg a {
 .float-left {
   float: left; }
 
+.text-placeholder {
+  padding: 1px 4px;
+  border-radius: 2px;
+  background-color: #dddddd;
+  color: #000000; }
+
 [data-indicator="count"][data-indicator-value]:not([data-indicator-value="0"])::after {
   content: attr(data-indicator-value);
   margin-left: .4em;
@@ -677,6 +683,7 @@ footer {
     grid-column-start: initial;
     grid-column-end: span 1; }
   .form-grid .table-forms-separator {
+    display: inline-flex;
     line-height: 1.4; }
     .form-grid .table-forms-separator td {
       padding: 5px 5px 5px 0; }
@@ -747,6 +754,14 @@ footer {
 
 .btn-remove:not(:first-child) {
   margin-left: 5px; }
+
+.btn-add[disabled], .btn-add[disabled]:hover,
+.btn-edit[disabled],
+.btn-edit[disabled]:hover,
+.btn-remove[disabled],
+.btn-remove[disabled]:hover {
+  background-color: transparent;
+  opacity: .25; }
 
 .overlay-close-btn {
   position: absolute;
@@ -1581,7 +1596,7 @@ footer {
   .menu-main .submenu .has-submenu:not(.is-expanded) .submenu {
     left: -9999px !important; }
 
-.icon-support::before, .icon-share::before, .icon-help::before, .icon-guest::before, .icon-profile::before, .icon-signout::before {
+.icon-support::before, .icon-integrations::before, .icon-help::before, .icon-guest::before, .icon-profile::before, .icon-signout::before {
   content: '';
   width: 12px;
   height: 12px;
@@ -1590,7 +1605,7 @@ footer {
 .icon-support::before {
   background-position: -247px -84px; }
 
-.icon-share::before {
+.icon-integrations::before {
   background-position: -168px -84px; }
 
 .icon-help::before {
@@ -1608,7 +1623,7 @@ footer {
 .is-expanded .icon-support::before {
   background-position: -247px -48px; }
 
-.is-expanded .icon-share::before {
+.is-expanded .icon-integrations::before {
   background-position: -90px -84px; }
 
 .is-expanded .icon-help::before {
@@ -1964,23 +1979,23 @@ footer {
     margin-left: 5px; }
 
 .service-info {
-  display: grid;
-  grid-template-columns: min-content auto min-content;
-  row-gap: 10px;
-  column-gap: 10px;
   margin: -10px 0;
-  padding: 10px 10px;
   border-left: 4px solid #23d545; }
+  .service-info .service-info-grid {
+    display: grid;
+    grid-template-columns: max-content auto;
+    row-gap: 10px;
+    column-gap: 10px;
+    padding: 10px 10px 0; }
+    .service-info .service-info-grid:last-of-type {
+      padding-bottom: 10px; }
   .service-info .service-info-label::after {
     content: ':'; }
-  .service-info .service-info-value {
-    grid-column: 2 / -1; }
   .service-info .service-name {
-    grid-column: 1 / 3;
-    margin: 5px 0;
+    padding-bottom: 5px;
     font-size: 1.5em; }
   .service-info .service-actions {
-    align-items: end; }
+    justify-self: end; }
   .service-info .service-status {
     display: inline-block;
     padding: 0 4px;
@@ -4933,6 +4948,9 @@ a.link-action {
   color: #4b0c0c;
   background-color: #e45959; }
 
+.normal-bg input[type="radio"]:checked + label {
+  background-color: #209450; }
+
 .na-bg a,
 .normal-bg a,
 .info-bg a,
@@ -5785,6 +5803,17 @@ svg {
     background-image: url("../img/icon-sprite.svg?20200407");
     background-repeat: no-repeat; }
 
+button.icon-action-command, button.icon-action-close, button.icon-action-msg, button.icon-action-msgs, button.icon-action-severity-up, button.icon-action-severity-down, button.icon-action-severity-changed, button.icon-action-message, button.icon-action-ack, button.icon-invisible, button.icon-problem-generated, button.icon-problem-recovery, button.icon-actions-number-gray, button.icon-actions-number-yellow, button.icon-actions-number-red {
+  background: none;
+  border: none;
+  padding: 0px;
+  margin: 0px;
+  margin-right: 5px;
+  min-height: 0px; }
+  button.icon-action-command::after, button.icon-action-close::after, button.icon-action-msg::after, button.icon-action-msgs::after, button.icon-action-severity-up::after, button.icon-action-severity-down::after, button.icon-action-severity-changed::after, button.icon-action-message::after, button.icon-action-ack::after, button.icon-invisible::after, button.icon-problem-generated::after, button.icon-problem-recovery::after, button.icon-actions-number-gray::after, button.icon-actions-number-yellow::after, button.icon-actions-number-red::after {
+    left: 0px;
+    top: 4px; }
+
 [data-count][class*='icon-']::after,
 .icon-description::after {
   position: absolute;
@@ -6421,6 +6450,18 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     float: left;
     margin-left: -1em; }
 
+.audit-details-popup-wrapper {
+  margin: 5px 10px; }
+  .audit-details-popup-wrapper .audit-details-popup-textarea {
+    width: 100%;
+    height: 135px; }
+
+.audit-details-wrapper {
+  display: flex;
+  justify-content: space-between; }
+  .audit-details-wrapper .audit-show-details-btn-wrapper {
+    margin: 0 5px 0 5px; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
 .sidebar button:focus {
@@ -6648,7 +6689,9 @@ button:focus {
 .btn-alt:focus {
   box-shadow: 0 0 0 2px #ffffff; }
 
-.radio-list-control .average-bg::before, .radio-list-control .average-bg::after,
+.radio-list-control .normal-bg::before, .radio-list-control .normal-bg::after,
+.radio-list-control .average-bg::before,
+.radio-list-control .average-bg::after,
 .radio-list-control .disaster-bg::before,
 .radio-list-control .disaster-bg::after,
 .radio-list-control .high-bg::before,

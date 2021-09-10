@@ -228,10 +228,8 @@ $operations_popup_form_list
 			->setChecked(array_key_exists('opseverity', $options))
 			->setReadonly($options['templated']),
 		(new CDiv(
-			(new CSeverity([
-				'name' => 'opseverity[severity]',
-				'value' => (int) $field_values['opseverity']['severity']
-			]))->setReadonly($options['templated'])
+			(new CSeverity('opseverity[severity]', (int) $field_values['opseverity']['severity']))
+				->setReadonly($options['templated'])
 		))->setId('opseverity_div'),
 		'opseverity_row'
 	)

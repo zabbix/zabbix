@@ -67,11 +67,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => ['user'],
 			'method' => 'resolveTexts'
 		],
-		'graphName' => [
-			'types' => ['graphFunctionalItem'],
-			'source' => 'name',
-			'method' => 'resolveGraph'
-		],
 		'widgetURL' => [
 			'types' => ['host', 'hostId', 'interfaceWithoutPort', 'user'],
 			'source' => 'url',
@@ -307,7 +302,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				' FROM interface i'.
 				' WHERE i.main='.INTERFACE_PRIMARY.
 					' AND '.dbConditionInt('i.hostid', array_keys($interface_hostids)).
-					' AND '.dbConditionInt('i.type', $this->interfacePriorities)
+					' AND '.dbConditionInt('i.type', self::interfacePriorities)
 			));
 
 			$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
@@ -315,10 +310,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			// Items with no interfaces must collect interface data from host.
 			foreach ($interfaces as $interface) {
 				$hostid = $interface['hostid'];
-				$priority = $this->interfacePriorities[$interface['type']];
+				$priority = self::interfacePriorities[$interface['type']];
 
 				if (!array_key_exists($hostid, $interfaces_by_priority)
-						|| $priority > $this->interfacePriorities[$interfaces_by_priority[$hostid]['type']]) {
+						|| $priority > self::interfacePriorities[$interfaces_by_priority[$hostid]['type']]) {
 					$interfaces_by_priority[$hostid] = $interface;
 				}
 			}
@@ -1243,256 +1238,95 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
+	 * Resolve {HOST.HOST<1-9} and empty plaseholders in the expression macros.
+	 *   For example:
+	 *     {$last(/ /key)} => {$last(/Zabbix server/key)}
+	 *     {$last(/MySQL server/key)} => {$last(/MySQL server/key)}
+	 *     {$last(/{HOST.HOST}/key)} => {$last(/host/key)}
 	 *
-	 * @param array  $graphs							list or hashmap of graphs
-	 * @param string $graphs[]['name']				string in which macros should be resolved
-	 * @param array  $graphs[]['items']				list of graph items
-	 * @param int    $graphs[]['items'][n]['hostid']	graph n-th item corresponding host Id
-	 * @param string $graphs[]['items'][n]['host']	graph n-th item corresponding host name
+	 * @param string	$macro            [IN]     Original macro.
+	 * @param array		$data             [IN/OUT] Data, returned by CHistFunctionParser.
+	 * @param string	$data['host']
+	 * @param array		$items            [IN]    The list of graph items.
+	 * @param string	$items[]['host']
 	 *
-	 * @return string	inputted data with resolved source field
+	 * @return string
 	 */
-	private function resolveGraph($graphs) {
-		if ($this->isTypeAvailable('graphFunctionalItem')) {
-			$sourceKeyName = $this->getSource();
-
-			$sourceStringList = [];
-			$itemsList = [];
-
-			foreach ($graphs as $graph) {
-				$sourceStringList[] = $graph[$sourceKeyName];
-				$itemsList[] = $graph['items'];
+	private static function resolveGraphNameExpressionMacroHost(string $macro, array &$data, array $items): string {
+		if ($data['host'] === '' || $data['host'][0] == '{') {
+			if ($data['host'] === '') {
+				$reference = 0;
+				$pattern = '#//#';
+			}
+			else {
+				$macro_parser = new CMacroParser([
+					'macros' => ['{HOST.HOST}'],
+					'ref_type' => CMacroParser::REFERENCE_NUMERIC
+				]);
+				$macro_parser->parse($data['host']);
+				$reference = $macro_parser->getReference();
+				$reference = ($reference == 0) ? 0 : $reference - 1;
+				$pattern = '#/\{HOST\.HOST[1-9]?\}/#';
 			}
 
-			$resolvedStringList = $this->resolveGraphsFunctionalItemMacros($sourceStringList, $itemsList);
-			$resolvedString = reset($resolvedStringList);
-
-			foreach ($graphs as &$graph) {
-				$graph[$sourceKeyName] = $resolvedString;
-				$resolvedString = next($resolvedStringList);
+			if (!array_key_exists($reference, $items)) {
+				return $macro;
 			}
-			unset($graph);
+
+			$data['host'] = $items[$reference]['host'];
+
+			// Replace {HOST.HOST<1-9>} macro with real host name.
+			return preg_replace($pattern, '/'.$data['host'].'/', $macro, 1);
 		}
+
+		return $macro;
+	}
+
+	/**
+	 * Resolve expression macros. For example, {?func(/host/key, param)} or {?func(/{HOST.HOST1}/key, param)}.
+	 *
+	 * @param array  $graphs
+	 * @param string $graphs[]['name']
+	 * @param array  $graphs[]['items']
+	 * @param string $graphs[]['items'][]['host']
+	 *
+	 * @return array	Inputted data with resolved graph name.
+	 */
+	public static function resolveGraphNames(array $graphs): array {
+		$types = ['expr_macros_host_n' => true];
+		$macros = ['expr_macros' => []];
+		$macro_values = [];
+
+		foreach ($graphs as $key => $graph) {
+			$matched_macros = self::extractMacros([$graph['name']], $types);
+
+			foreach ($matched_macros['expr_macros_host_n'] as $macro => $data) {
+				$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+
+				$_macro = self::resolveGraphNameExpressionMacroHost($macro, $data, $graph['items']);
+				if (!array_key_exists($_macro, $macros['expr_macros'])) {
+					$macros['expr_macros'][$_macro] = $data;
+				}
+				$macros['expr_macros'][$_macro]['links'][$macro][] = $key;
+			}
+		}
+
+		foreach (self::getExpressionMacros($macros['expr_macros'], []) as $_macro => $value) {
+			foreach ($macros['expr_macros'][$_macro]['links'] as $macro => $keys) {
+				foreach ($keys as $key) {
+					$macro_values[$key][$macro] = $value;
+				}
+			}
+		}
+
+		foreach ($graphs as $key => &$graph) {
+			if (array_key_exists($key, $macro_values)) {
+				$graph['name'] = strtr($graph['name'], $macro_values[$key]);
+			}
+		}
+		unset($graph);
 
 		return $graphs;
-	}
-
-	/**
-	 * Resolve functional macros, like {hostname:key.function(param)}.
-	 * If macro can not be resolved it is replaced with UNRESOLVED_MACRO_STRING string i.e. "*UNKNOWN*".
-	 *
-	 * Supports function "last", "min", "max" and "avg".
-	 * Supports seconds as parameters, except "last" function.
-	 * Second parameter like {hostname:key.last(0,86400) and offsets like {hostname:key.last(#1)} are not supported.
-	 * Supports postfixes s,m,h,d and w for parameter.
-	 *
-	 * @param array  $sourceStringList			list of strings from graphs in which macros should be resolved
-	 * @param array  $itemsList					list of lists of graph items used in graphs
-	 * @param int    $itemsList[n][m]['hostid']	n-th graph m-th item corresponding host ID
-	 * @param string $itemsList[n][m]['host']	n-th graph m-th item corresponding host name
-	 *
-	 * @return array	list of strings, possibly with macros in them replaced with resolved values
-	 */
-	private function resolveGraphsFunctionalItemMacros(array $sourceStringList, array $itemsList) {
-		$hostKeyPairs = [];
-		$matchesList = [];
-
-		$items = reset($itemsList);
-		foreach ($sourceStringList as $sourceString) {
-
-			/*
-			 * Extract all macros into $matches - keys: macros, hosts, keys, functions and parameters are used
-			 * searches for macros, for example, "{somehost:somekey["param[123]"].min(10m)}"
-			 */
-			preg_match_all('/(?P<macros>{'.
-				'(?P<hosts>('.ZBX_PREG_HOST_FORMAT.'|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'}))):'.
-				'(?P<keys>'.ZBX_PREG_ITEM_KEY_FORMAT.')\.'.
-				'(?P<functions>(last|max|min|avg))\('.
-				'(?P<parameters>([0-9]+['.ZBX_TIME_SUFFIXES.']?)?)'.
-				'\)}{1})/Uux', $sourceString, $matches, PREG_OFFSET_CAPTURE);
-
-			foreach ($matches['hosts'] as $i => &$host) {
-				$host[0] = $this->resolveGraphPositionalMacros($host[0], $items);
-
-				if ($host[0] !== UNRESOLVED_MACRO_STRING) {
-					// Take note that resolved host has a such key (and it is used in a macro).
-					if (!isset($hostKeyPairs[$host[0]])) {
-						$hostKeyPairs[$host[0]] = [];
-					}
-					$hostKeyPairs[$host[0]][$matches['keys'][$i][0]] = true;
-				}
-			}
-			unset($host);
-
-			// Remember match for later use.
-			$matchesList[] = $matches;
-
-			$items = next($itemsList);
-		}
-
-		/*
-		 * If no host/key pairs found in macro-like parts of source string then there is nothing to do but return
-		 * source strings as they are.
-		 */
-		if (!$hostKeyPairs) {
-			return $sourceStringList;
-		}
-
-		// Build item retrieval query from host-key pairs and get all necessary items for all source strings.
-		$queryParts = [];
-		foreach ($hostKeyPairs as $host => $keys) {
-			$queryParts[] = '(h.host='.zbx_dbstr($host).' AND '.dbConditionString('i.key_', array_keys($keys)).')';
-		}
-		$items = DBfetchArrayAssoc(DBselect(
-			'SELECT h.host,i.key_,i.itemid,i.value_type,i.units,i.valuemapid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND ('.join(' OR ', $queryParts).')'
-		), 'itemid');
-
-		foreach ($matches['functions'] as $function) {
-			if ($function[0] === 'last') {
-				$items = self::getItemsValueMaps($items);
-				break;
-			}
-		}
-
-		// Get items for which user has permission.
-		$allowedItems = API::Item()->get([
-			'itemids' => array_keys($items),
-			'webitems' => true,
-			'output' => ['itemid', 'value_type', 'lastvalue', 'lastclock'],
-			'preservekeys' => true
-		]);
-
-		// Get map item data only for those allowed items and set "value_type" for allowed items.
-		foreach ($items as $item) {
-			if (isset($allowedItems[$item['itemid']])) {
-				$item['lastvalue'] = $allowedItems[$item['itemid']]['lastvalue'];
-				$item['lastclock'] = $allowedItems[$item['itemid']]['lastclock'];
-				$hostKeyPairs[$item['host']][$item['key_']] = $item;
-			}
-		}
-
-		/*
-		 * Replace macros with their corresponding values in graph strings and replace macros with their resolved
-		 * values in source strings.
-		 */
-		$matches = reset($matchesList);
-		foreach ($sourceStringList as &$sourceString) {
-
-			/*
-			 * We iterate array backwards so that replacing unresolved macro string (see lower) with actual value
-			 * does not mess up originally captured offsets.
-			 */
-			$i = count($matches['macros']);
-
-			while ($i--) {
-				$host = $matches['hosts'][$i][0];
-				$key = $matches['keys'][$i][0];
-				$function = $matches['functions'][$i][0];
-				$parameter = $matches['parameters'][$i][0];
-
-				// If host is real and item exists and has permissions.
-				if ($host !== UNRESOLVED_MACRO_STRING && is_array($hostKeyPairs[$host][$key])) {
-					$item = $hostKeyPairs[$host][$key];
-
-					// Macro function is "last".
-					if ($function == 'last') {
-						$value = ($item['lastclock'] > 0)
-							? formatHistoryValue($item['lastvalue'], $item)
-							: UNRESOLVED_MACRO_STRING;
-					}
-					// For other macro functions ("max", "min" or "avg") get item value.
-					else {
-						$value = getItemFunctionalValue($item, $function, $parameter);
-					}
-				}
-				// Or if there is no item with given key in given host, or there is no permissions to that item.
-				else {
-					$value = UNRESOLVED_MACRO_STRING;
-				}
-
-				/*
-				 * Replace macro string with actual, resolved string value. This is safe because we start from far
-				 * end of $sourceString.
-				 */
-				$sourceString = substr_replace($sourceString, $value, $matches['macros'][$i][1],
-					strlen($matches['macros'][$i][0])
-				);
-			}
-
-			// Advance to next matches for next $sourceString.
-			$matches = next($matchesList);
-		}
-		unset($sourceString);
-
-		return $sourceStringList;
-	}
-
-	/**
-	 * Resolve positional macros, like {HOST.HOST2}.
-	 * If macro can not be resolved it is replaced with UNRESOLVED_MACRO_STRING string i.e. "*UNKNOWN*"
-	 * Supports HOST.HOST<1..9> macros.
-	 *
-	 * @param string	$str				string in which macros should be resolved
-	 * @param array		$items				list of graph items
-	 * @param int 		$items[n]['hostid'] graph n-th item corresponding host Id
-	 * @param string	$items[n]['host']   graph n-th item corresponding host name
-	 *
-	 * @return string	string with macros replaces with corresponding values
-	 */
-	private function resolveGraphPositionalMacros($str, $items) {
-		// Extract all macros into $matches.
-		preg_match_all('/{(('.self::PATTERN_HOST_INTERNAL.')('.self::PATTERN_MACRO_PARAM.'))\}/', $str, $matches);
-
-		// Match found groups if ever regexp should change.
-		$matches['macroType'] = $matches[2];
-		$matches['position'] = $matches[3];
-
-		// Build structure of macros: $macroList['HOST.HOST'][2] = 'host name';
-		$macroList = [];
-
-		// $matches[3] contains positions, e.g., '',1,2,2,3,...
-		foreach ($matches['position'] as $i => $position) {
-			// Take care of macro without positional index.
-			$posInItemList = ($position === '') ? 0 : $position - 1;
-
-			// Init array.
-			if (!isset($macroList[$matches['macroType'][$i]])) {
-				$macroList[$matches['macroType'][$i]] = [];
-			}
-
-			// Skip computing for duplicate macros.
-			if (isset($macroList[$matches['macroType'][$i]][$position])) {
-				continue;
-			}
-
-			// Positional index larger than item count, resolve to UNKNOWN.
-			if (!isset($items[$posInItemList])) {
-				$macroList[$matches['macroType'][$i]][$position] = UNRESOLVED_MACRO_STRING;
-
-				continue;
-			}
-
-			// Retrieve macro replacement data.
-			switch ($matches['macroType'][$i]) {
-				case 'HOSTNAME':
-				case 'HOST.HOST':
-					$macroList[$matches['macroType'][$i]][$position] = $items[$posInItemList]['host'];
-					break;
-			}
-		}
-
-		// Replace macros with values in $str.
-		foreach ($macroList as $macroType => $positions) {
-			foreach ($positions as $position => $replacement) {
-				$str = str_replace('{'.$macroType.$position.'}', $replacement, $str);
-			}
-		}
-
-		return $str;
 	}
 
 	/**
@@ -1682,7 +1516,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						'SELECT i.hostid,i.interfaceid,i.ip,i.dns,i.useip,i.port,i.type,i.main'.
 						' FROM interface i'.
 						' WHERE '.dbConditionInt('i.hostid', array_keys($hostids)).
-							' AND '.dbConditionInt('i.type', $this->interfacePriorities)
+							' AND '.dbConditionInt('i.type', self::interfacePriorities)
 					));
 
 					$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
@@ -1691,10 +1525,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					// Items with no interfaces must collect interface data from host.
 					foreach ($interfaces as $interface) {
 						$hostid = $interface['hostid'];
-						$priority = $this->interfacePriorities[$interface['type']];
+						$priority = self::interfacePriorities[$interface['type']];
 
 						if ($interface['main'] == INTERFACE_PRIMARY && (!array_key_exists($hostid, $interfaces_by_priority)
-								|| $priority > $this->interfacePriorities[$interfaces_by_priority[$hostid]['type']])) {
+								|| $priority > self::interfacePriorities[$interfaces_by_priority[$hostid]['type']])) {
 							$interfaces_by_priority[$hostid] = $interface;
 						}
 					}
@@ -1917,844 +1751,396 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Expand functional macros in given map label.
+	 * Expand functional macros in given map link labels.
 	 *
-	 * @param string $label			label to expand
-	 * @param array  $replaceHosts	list of hosts in order which they appear in trigger expression if trigger label is given,
-	 * or single host when host label is given
+	 * @param array  $links
+	 * @param string $links[]['label']
+	 * @param array  $fields            A mapping between source and destination fields.
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public function resolveMapLabelMacros($label, array $replaceHosts = []) {
-		$pattern = '/(?P<macros>{'.
-				'('.ZBX_PREG_HOST_FORMAT.($replaceHosts
-						? '|({('.self::PATTERN_HOST_INTERNAL.')'.self::PATTERN_MACRO_PARAM.'})' : '').'):'.
-				ZBX_PREG_ITEM_KEY_FORMAT.'\.'.
-				'(last|max|min|avg)\('.
-				'([0-9]+['.ZBX_TIME_SUFFIXES.']?)?'.
-				'\)}{1})/Uux';
+	public function resolveMapLinkLabelMacros(array $links, array $fields): array {
+		$types = ['expr_macros' => true];
+		$macros = ['expr_macros' => []];
+		$macro_values = [];
 
-		if (preg_match_all($pattern, $label, $matches) !== false && array_key_exists('macros', $matches)) {
-			// $replaceHosts with key '0' is used for macros without reference.
-			if (array_key_exists(0, $replaceHosts)) {
-				$replaceHosts[''] = $replaceHosts[0];
-				unset($replaceHosts[0]);
+		foreach ($links as $link) {
+			$matched_macros = self::extractMacros(array_intersect_key($link, $fields), $types);
+
+			foreach ($matched_macros['expr_macros'] as $macro => $data) {
+				$macro_values[$macro] = UNRESOLVED_MACRO_STRING;
 			}
-
-			// For each functional macro.
-			foreach ($matches['macros'] as $expr) {
-				$macro = $expr;
-
-				// Search for macros with all possible indexes.
-				foreach ($replaceHosts as $i => $host) {
-					$macroTmp = $macro;
-
-					// Replace only macro in first position.
-					$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U',
-							'{'.$host['host'].':$2}', $macro
-					);
-
-					// Only one simple macro possible inside functional macro.
-					if ($macro !== $macroTmp) {
-						break;
-					}
-				}
-
-				// Try to create valid expression.
-				$expressionData = new C10TriggerExpression();
-
-				if (!$expressionData->parse($macro) || !isset($expressionData->expressions[0])) {
-					continue;
-				}
-
-				// Look in DB for corresponding item.
-				$itemHost = $expressionData->expressions[0]['host'];
-				$key = $expressionData->expressions[0]['item'];
-				$function = $expressionData->expressions[0]['functionName'];
-				$options = [
-					'output' => ['itemid', 'value_type', 'units', 'lastvalue', 'lastclock'],
-					'webitems' => true,
-					'filter' => [
-						'host' => $itemHost,
-						'key_' => $key
-					]
-				];
-
-				if ($function === 'last') {
-					$options['selectValueMap'] = ['mappings'];
-				}
-
-				$item = API::Item()->get($options);
-
-				$item = reset($item);
-
-				// If no corresponding item found with functional macro key and host.
-				if (!$item) {
-					$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
-
-					continue;
-				}
-
-				// Do function type (last, min, max, avg) related actions.
-				if ($function === 'last') {
-					$value = $item['lastclock']
-						? formatHistoryValue($item['lastvalue'], $item)
-						: UNRESOLVED_MACRO_STRING;
-				}
-				else {
-					$value = getItemFunctionalValue($item, $function,
-						$expressionData->expressions[0]['functionParamList'][0]
-					);
-				}
-
-				if (isset($value)) {
-					$label = str_replace($expr, $value, $label);
-				}
-			}
+			$macros['expr_macros'] += $matched_macros['expr_macros'];
 		}
 
-		return $label;
+		$macro_values = self::getExpressionMacros($macros['expr_macros'], $macro_values);
+
+		foreach ($links as &$link) {
+			foreach ($fields as $from => $to) {
+				$link[$to] = strtr($link[$from], $macro_values);
+			}
+		}
+		unset($link);
+
+		return $links;
+	}
+
+	/**
+	 * Expand functional macros in given map shape labels.
+	 *
+	 * @param string $map_name
+	 * @param array  $shapes
+	 * @param string $shapes[]['text']
+	 * @param array  $fields            A mapping between source and destination fields.
+	 *
+	 * @return array
+	 */
+	public function resolveMapShapeLabelMacros(string $map_name, array $shapes, array $fields): array {
+		$types = [
+			'macros' => [
+				'map' => ['{MAP.NAME}']
+			],
+			'expr_macros' => true
+		];
+		$macros = ['expr_macros' => []];
+		$macro_values = [];
+
+		foreach ($shapes as $shape) {
+			$matched_macros = self::extractMacros(array_intersect_key($shape, $fields), $types);
+
+			foreach ($matched_macros['macros']['map'] as $macro) {
+				$macro_values[$macro] = $map_name;
+			}
+
+			foreach ($matched_macros['expr_macros'] as $macro => $data) {
+				$macro_values[$macro] = UNRESOLVED_MACRO_STRING;
+			}
+			$macros['expr_macros'] += $matched_macros['expr_macros'];
+		}
+
+		$macro_values = self::getExpressionMacros($macros['expr_macros'], $macro_values);
+
+		foreach ($shapes as &$shape) {
+			foreach ($fields as $from => $to) {
+				$shape[$to] = strtr($shape[$from], $macro_values);
+			}
+		}
+		unset($shape);
+
+		return $shapes;
 	}
 
 	/**
 	 * Resolve supported macros used in map element label as well as in URL names and values.
 	 *
 	 * @param array        $selements[]
-	 * @param int          $selements[]['elementtype']          Map element type.
-	 * @param int          $selements[]['elementsubtype']       Map element subtype.
-	 * @param string       $selements[]['label']                Map element label.
-	 * @param array        $selements[]['urls']                 Map element urls.
-	 * @param string       $selements[]['urls'][]['name']       Map element url name.
-	 * @param string       $selements[]['urls'][]['url']        Map element url value.
-	 * @param int | array  $selements[]['elementid']            Element id linked to map element.
+	 * @param int          $selements[]['elementtype']
+	 * @param int          $selements[]['elementsubtype']
+	 * @param string       $selements[]['label']
+	 * @param array        $selements[]['urls']
+	 * @param string       $selements[]['urls'][]['name']
+	 * @param string       $selements[]['urls'][]['url']
+	 * @param int | array  $selements[]['elementid']
 	 * @param array        $options
-	 * @param bool         $options[resolve_element_label]      Resolve macros in map element label.
-	 * @param bool         $options[resolve_element_urls]       Resolve macros in map element url name and value.
+	 * @param bool         $options[resolve_element_label]  Resolve macros in map element label.
+	 * @param bool         $options[resolve_element_urls]   Resolve macros in map element url name and value.
 	 *
 	 * @return array
 	 */
 	public function resolveMacrosInMapElements(array $selements, array $options) {
 		$options += ['resolve_element_label' => false, 'resolve_element_urls' => false];
 
-		$supported_inventory_macros = $this->getSupportedHostInventoryMacrosMap();
+		$field_types = [];
+		if ($options['resolve_element_label']) {
+			$field_types[] = 'label';
+		}
+		if ($options['resolve_element_urls']) {
+			$field_types[] = 'urls';
+		}
 
-		// Macros supported by location.
-		$supported_macros = [
-			'host' => [
-				'label' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-				'urls' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}']
-			],
-			'map' => [
-				'label' => ['{MAP.ID}', '{MAP.NAME}'],
-				'urls' => ['{MAP.ID}', '{MAP.NAME}']
-			],
-			'trigger' => [
-				'label' => ['{TRIGGER.ID}'],
-				'urls' => ['{TRIGGER.ID}']
-			],
-			'triggers' => [
-				'label' => [
-					'{TRIGGER.EVENTS.ACK}', '{TRIGGER.EVENTS.PROBLEM.ACK}', '{TRIGGER.EVENTS.PROBLEM.UNACK}',
-					'{TRIGGER.EVENTS.UNACK}', '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}',
-					'{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}', '{TRIGGERS.UNACK}',
-					'{TRIGGERS.PROBLEM.UNACK}', '{TRIGGERS.ACK}', '{TRIGGERS.PROBLEM.ACK}'
-				]
-			],
-			'hostgroup' => [
-				'label' => ['{HOSTGROUP.ID}'],
-				'urls' => ['{HOSTGROUP.ID}']
-			],
-			'interface' => [
-				'label' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
-				'urls' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}']
-			],
-			'inventory' => [
-				'label' => array_keys($supported_inventory_macros),
-				'urls' => array_keys($supported_inventory_macros)
-			]
+		$macro_values = [];
+		$macros = ['map' => [], 'triggers' => [], 'host' => [], 'interface' => [], 'inventory' => [], 'host_n' => [],
+			'interface_n' => [], 'inventory_n' => [], 'expr_macros' => [], 'expr_macros_host' => [],
+			'expr_macros_host_n' => []
 		];
 
-		// Define what macros are supported for each type of map elements.
-		$types_by_selement_type = [
-			SYSMAP_ELEMENT_TYPE_MAP => [
-				'macros' => [
-					'map' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['map']['label'] : [],
-						'urls' => $options['resolve_element_urls'] ? $supported_macros['map']['urls'] : []
-					],
-					'triggers' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['triggers']['label'] : []
-					]
-				]
-			],
-			SYSMAP_ELEMENT_TYPE_HOST_GROUP => [
-				'macros' => [
-					'hostgroup' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['hostgroup']['label'] : [],
-						'urls' => $options['resolve_element_urls'] ? $supported_macros['hostgroup']['urls'] : []
-					],
-					'triggers' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['triggers']['label'] : []
-					]
-				]
-			],
-			SYSMAP_ELEMENT_TYPE_HOST => [
-				'macros' => [
-					'host' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['host']['label'] : [],
-						'urls' => $options['resolve_element_urls'] ? $supported_macros['host']['urls'] : []
-					],
-					'triggers' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['triggers']['label'] : []
-					],
-					'interface' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['interface']['label'] : [],
-						'urls' => $options['resolve_element_urls'] ? $supported_macros['interface']['urls'] : []
-					],
-					'inventory' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['inventory']['label'] : [],
-						'urls' => $options['resolve_element_urls'] ? $supported_macros['inventory']['urls'] : []
-					]
-				]
-			],
-			SYSMAP_ELEMENT_TYPE_TRIGGER => [
-				'macros' => [
-					'trigger' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['trigger']['label'] : [],
-						'urls' => $options['resolve_element_urls'] ? $supported_macros['trigger']['urls'] : []
-					],
-					'triggers' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['triggers']['label'] : []
+		$inventory_macros = self::getSupportedHostInventoryMacrosMap();
+
+		$types_by_elementtype = [
+			'label' => [
+				SYSMAP_ELEMENT_TYPE_IMAGE => [
+					'expr_macros' => true
+				],
+				SYSMAP_ELEMENT_TYPE_MAP => [
+					'expr_macros' => true,
+					'macros' => [
+						'map' => ['{MAP.ID}', '{MAP.NAME}'],
+						'triggers' => self::aggr_triggers_macros
 					]
 				],
-				'macros_n' => [
-					'host' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['host']['label'] : [],
-						'urls' => $options['resolve_element_urls'] ? $supported_macros['host']['urls'] : []
+				SYSMAP_ELEMENT_TYPE_HOST_GROUP => [
+					'expr_macros' => true,
+					'macros' => [
+						'hostgroup' => ['{HOSTGROUP.ID}'],
+						'triggers' => self::aggr_triggers_macros
+					]
+				],
+				SYSMAP_ELEMENT_TYPE_HOST => [
+					'expr_macros_host' => true,
+					'macros' => [
+						'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+						'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+						'inventory' => array_keys($inventory_macros),
+						'triggers' => self::aggr_triggers_macros
+					]
+				],
+				SYSMAP_ELEMENT_TYPE_TRIGGER => [
+					'expr_macros_host_n' => true,
+					'macros' => [
+						'trigger' => ['{TRIGGER.ID}'],
+						'triggers' => self::aggr_triggers_macros
 					],
-					'interface' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['interface']['label'] : [],
-						'urls' => $options['resolve_element_urls'] ? $supported_macros['interface']['urls'] : []
+					'macros_n' => [
+						'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+						'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+						'inventory' => array_keys($inventory_macros)
+					]
+				]
+			],
+			'urls' => [
+				SYSMAP_ELEMENT_TYPE_MAP => [
+					'macros' => [
+						'map' => ['{MAP.ID}', '{MAP.NAME}']
+					]
+				],
+				SYSMAP_ELEMENT_TYPE_HOST_GROUP => [
+					'macros' => [
+						'hostgroup' => ['{HOSTGROUP.ID}']
+					]
+				],
+				SYSMAP_ELEMENT_TYPE_HOST => [
+					'macros' => [
+						'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
+						'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+						'inventory' => array_keys($inventory_macros)
+					]
+				],
+				SYSMAP_ELEMENT_TYPE_TRIGGER => [
+					'macros' => [
+						'trigger' => ['{TRIGGER.ID}']
 					],
-					'inventory' => [
-						'label' => $options['resolve_element_label'] ? $supported_macros['inventory']['label'] : [],
-						'urls' => $options['resolve_element_urls'] ? $supported_macros['inventory']['urls'] : []
+					'macros_n' => [
+						'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
+						'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+						'inventory' => array_keys($inventory_macros)
 					]
 				]
 			]
 		];
 
-		$selements_to_resolve = [
-			SYSMAP_ELEMENT_TYPE_HOST => [],
-			SYSMAP_ELEMENT_TYPE_MAP => [],
-			SYSMAP_ELEMENT_TYPE_TRIGGER => []
-		];
-
-		$elementid_field_by_type = [
-			SYSMAP_ELEMENT_TYPE_HOST => 'hostid',
-			SYSMAP_ELEMENT_TYPE_MAP => 'sysmapid',
-			SYSMAP_ELEMENT_TYPE_TRIGGER => 'triggerid',
-			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'groupid'
-		];
-
-		$supported_label_macros = [];
-		$supported_urls_macros = [];
-		$itemids_by_functionids = [];
-		$hosts_by_itemids = [];
-		$query_interfaces = false;
-		$query_inventories = false;
-		$query_trigger_hosts = false;
-		$triggers = [];
-		$maps = [];
-		$hosts = [];
-		$macros_by_selementid = [];
-
-		foreach ($types_by_selement_type as $selement_type => &$types) {
-			$supported_label_macros[$selement_type] = [];
-			$supported_urls_macros[$selement_type] = [];
-
-			foreach ($types as $macros_type_key => $supported_macros_types) {
-				if (!array_key_exists($macros_type_key, $supported_label_macros[$selement_type])) {
-					$supported_label_macros[$selement_type][$macros_type_key] = [];
-				}
-				if (!array_key_exists($macros_type_key, $supported_urls_macros[$selement_type])) {
-					$supported_urls_macros[$selement_type][$macros_type_key] = [];
-				}
-
-				foreach ($supported_macros_types as $macros_supported) {
-					if (array_key_exists('label', $macros_supported)) {
-						$supported_label_macros[$selement_type][$macros_type_key] = array_merge(
-							$supported_label_macros[$selement_type][$macros_type_key], $macros_supported['label']
-						);
-					}
-
-					if (array_key_exists('urls', $macros_supported)) {
-						$supported_urls_macros[$selement_type][$macros_type_key] = array_merge(
-							$supported_urls_macros[$selement_type][$macros_type_key], $macros_supported['urls']
-						);
-					}
-				}
-			}
-
-			foreach ($types as &$macro_types) {
-				$macro_types = array_map(function($macros_by_location) {
-					return array_keys(array_flip(call_user_func_array('array_merge', $macros_by_location)));
-				}, $macro_types);
-			}
-			unset($macro_types);
-		}
-		unset($types);
-
-		foreach ($selements as $selid => $sel) {
-			$selement_type = ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
-					&& $sel['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
+		foreach ($selements as $key => $selement) {
+			$elementtype = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
 				? SYSMAP_ELEMENT_TYPE_HOST
-				: $sel['elementtype'];
+				: $selement['elementtype'];
 
-			if (!array_key_exists($selement_type, $types_by_selement_type)) {
-				continue;
-			}
-
-			// Collect strings to test for macros.
-			$texts = $options['resolve_element_label'] ? [$sel['label']] : [];
-			if ($options['resolve_element_urls']) {
-				foreach ($sel['urls'] as $url) {
-					$texts[] = $url['name'];
-					$texts[] = $url['url'];
+			foreach ($field_types as $field_type) {
+				if (!array_key_exists($elementtype, $types_by_elementtype[$field_type])) {
+					continue;
 				}
-			}
 
-			if (!$texts) {
-				continue;
-			}
-
-			// Extract macros from collected strings.
-			$matched_macros = self::extractMacros($texts, $types_by_selement_type[$selement_type]);
-
-			// Map extracted macros to map elements.
-			if (array_key_exists('macros', $matched_macros)) {
-				// Check if inventory or interface details was requested.
-				if ($selement_type == SYSMAP_ELEMENT_TYPE_HOST) {
-					if ($matched_macros['macros']['interface']) {
-						$query_interfaces = true;
-					}
-
-					if ($matched_macros['macros']['inventory']) {
-						$query_inventories = true;
+				$texts = [];
+				if ($field_type === 'label') {
+					$texts[] = $selement['label'];
+				}
+				if ($field_type === 'urls') {
+					foreach ($selement['urls'] as $url) {
+						$texts[] = $url['name'];
+						$texts[] = $url['url'];
 					}
 				}
 
-				foreach ($matched_macros['macros'] as $macros) {
-					foreach ($macros as $macro) {
-						$macros_by_selementid[$selid][$macro] = [
-							'macro' => substr($macro, 1, -1), // strip curly braces
-							'f_num' => 0
-						];
-					}
-				}
-			}
+				// Extract macros from collected strings.
+				$matched_macros = self::extractMacros($texts, $types_by_elementtype[$field_type][$elementtype]);
 
-			// Do the same with indexed macros.
-			if (array_key_exists('macros_n', $matched_macros)) {
-				if (!array_key_exists($selid, $macros_by_selementid)) {
-					$macros_by_selementid[$selid] = [];
-				}
+				if (array_key_exists('macros', $matched_macros)) {
+					if (array_key_exists('map', $matched_macros['macros'])) {
+						foreach ($matched_macros['macros']['map'] as $macro) {
+							switch ($macro) {
+								case '{MAP.ID}':
+									$macro_values[$key][$macro] = $selement['elements'][0]['sysmapid'];
+									break;
 
-				foreach ($matched_macros['macros_n'] as $macro) {
-					$macros_by_selementid[$selid] += $macro;
-				}
-
-				// Check if inventory or interface details was requested.
-				if ($selement_type == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-					if ($matched_macros['macros_n']['interface']) {
-						$query_trigger_hosts = true;
-						$query_interfaces = true;
-					}
-
-					if ($matched_macros['macros_n']['inventory']) {
-						$query_trigger_hosts = true;
-						$query_inventories = true;
-					}
-
-					if ($matched_macros['macros_n']['host']) {
-						$query_trigger_hosts = true;
-					}
-				}
-			}
-
-			/*
-			 * If macros are found, put elementid to list of elements to fetch API.
-			 * Since only supported host-group macro is {HOSTGROUP.ID}, it's useless to collect host group id-s in order
-			 * to fetch additional details from database.
-			 */
-			if ($sel['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP && array_key_exists($selid, $macros_by_selementid)
-					&& $macros_by_selementid[$selid]) {
-				if (array_key_exists('elementid', $sel)) {
-					$selements_to_resolve[$sel['elementtype']][$sel['elementid']] = $sel['elementid'];
-				}
-				elseif (($element = reset($sel['elements'])) !== false) {
-					$elementid = $element[$elementid_field_by_type[$sel['elementtype']]];
-					$selements_to_resolve[$sel['elementtype']][$elementid] = $elementid;
-				}
-			}
-		}
-
-		// Query details about resolvable maps.
-		if ($selements_to_resolve[SYSMAP_ELEMENT_TYPE_MAP]) {
-			$maps = API::Map()->get([
-				'output' => ['sysmapid', 'name'],
-				'sysmapids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_MAP],
-				'preservekeys' => true
-			]);
-		}
-
-		// Get details about resolvable triggers.
-		if ($selements_to_resolve[SYSMAP_ELEMENT_TYPE_TRIGGER]) {
-			$triggers = API::Trigger()->get([
-				'output' => ['expression'],
-				'triggerids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_TRIGGER],
-				'selectFunctions' => ['functionid', 'itemid'],
-				'selectItems' => ['itemid', 'hostid'],
-				'preservekeys' => true
-			]);
-
-			foreach ($triggers as $trigger) {
-				foreach ($trigger['items'] as $item) {
-					$hosts_by_itemids[$item['itemid']] = $item['hostid'];
-
-					if ($query_trigger_hosts) {
-						$selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST][$item['hostid']] = $item['hostid'];
-					}
-				}
-				foreach ($trigger['functions'] as $fn) {
-					$itemids_by_functionids[$fn['functionid']] = $fn['itemid'];
-				}
-			}
-		}
-
-		// Query details about resolvable hosts.
-		if ($selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST]) {
-			$hosts = API::Host()->get([
-				'output' => $query_inventories
-					? ['host', 'name', 'description', 'inventory_mode']
-					: ['host', 'name', 'description'],
-				'hostids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST],
-				'selectInterfaces' => $query_interfaces ? ['main', 'type', 'useip', 'ip', 'dns'] : null,
-				'selectInventory' => $query_inventories ? API_OUTPUT_EXTEND : null,
-				'preservekeys' => true
-			]);
-
-			// Find highest priority interface from available.
-			if ($query_interfaces) {
-				foreach ($hosts as &$host) {
-					$top_priority_interface = null;
-					$tmp_priority = 0;
-
-					foreach ($host['interfaces'] as $interface) {
-						if ($interface['main'] == INTERFACE_PRIMARY
-								&& $this->interfacePriorities[$interface['type']] > $tmp_priority) {
-							$tmp_priority = $this->interfacePriorities[$interface['type']];
-							$top_priority_interface = [
-								'conn' => $interface['useip'] ? $interface['ip'] : $interface['dns'],
-								'ip' => $interface['ip'],
-								'dns' => $interface['dns']
-							];
-						}
-					}
-
-					$host['interface'] = $top_priority_interface;
-					unset($host['interfaces']);
-				}
-				unset($host);
-			}
-		}
-
-		foreach ($types_by_selement_type as &$types) {
-			$types = $this->transformToPositionTypes($types);
-		}
-		unset($types);
-
-		// Find value for each extracted macro.
-		foreach ($selements as $selid => &$sel) {
-			if (!array_key_exists($selid, $macros_by_selementid) || !$macros_by_selementid[$selid]) {
-				// Resolve functional macros like: {sampleHostName:log[{HOST.HOST}.log].last(0)}, if no host provided.
-				if ($options['resolve_element_label']) {
-					$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
-				}
-
-				// Continue since there is nothing more to resolve.
-				continue;
-			}
-
-			$selement_type = ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
-					&& $sel['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
-				? SYSMAP_ELEMENT_TYPE_HOST
-				: $sel['elementtype'];
-
-			// Get element id.
-			if (array_key_exists('elementid', $sel)) {
-				$elementid = $sel['elementid'];
-			}
-			elseif (($element = reset($sel['elements'])) !== false) {
-				$elementid = $element[$elementid_field_by_type[$sel['elementtype']]];
-			}
-			else {
-				continue;
-			}
-
-			$matched_macros = $macros_by_selementid[$selid];
-			$hosts_by_nr = [];
-			$trigger = null;
-			$host = null;
-			$map = null;
-			$hostgroup = null;
-
-			switch ($sel['elementtype']) {
-				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$hostgroup = [
-						'hostgroupid' => $elementid
-					];
-					break;
-
-				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					if (array_key_exists($elementid, $triggers)) {
-						$trigger = $triggers[$elementid];
-
-						/**
-						 * Get all function ids from expression and link host data against position in expression.
-						 *
-						 * Warning: although 'usermacros' and 'macros' are not used, they still are mandatory here to
-						 * ensure correct result parsing 'functionids'.
-						 *
-						 * For example, having a trigger like: '{host:item.change()}=1 or {$MACRO: "{1234} ..."}' gives
-						 * incorrect result of 'functionids' without requesting to parse macros and user macros as well.
-						 */
-						$matched_functionids = self::extractMacros([$trigger['expression']], [
-							'macros' => [
-								'trigger' => ['{TRIGGER.VALUE}']
-							],
-							'functionids' => true,
-							'usermacros' => true
-						]);
-
-						foreach (array_keys($matched_functionids['functionids']) as $functionid) {
-							$functionid = substr($functionid, 1, -1); // strip curly braces
-							$itemid = $itemids_by_functionids[$functionid];
-							$hostid = $hosts_by_itemids[$itemid];
-
-							if (array_key_exists($hostid, $hosts)) {
-								$hosts_by_nr[count($hosts_by_nr) + 1] = $hosts[$hostid];
+								default:
+									$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+									$macros['map'][$selement['elements'][0]['sysmapid']][$key] = true;
 							}
 						}
+					}
 
-						// Add host reference for macro without numeric index.
-						if (array_key_exists(1, $hosts_by_nr)) {
-							$hosts_by_nr[0] = $hosts_by_nr[1];
+					if (array_key_exists('triggers', $matched_macros['macros'])) {
+						foreach ($matched_macros['macros']['triggers'] as $macro) {
+							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+							$macros['triggers'][$key] = true;
 						}
 					}
-					break;
 
-				case SYSMAP_ELEMENT_TYPE_MAP:
-					if (array_key_exists($elementid, $maps)) {
-						$map = $maps[$elementid];
+					if (array_key_exists('hostgroup', $matched_macros['macros'])) {
+						foreach ($matched_macros['macros']['hostgroup'] as $macro) {
+							$macro_values[$key][$macro] = $selement['elements'][0]['groupid'];
+						}
 					}
-					break;
 
-				case SYSMAP_ELEMENT_TYPE_HOST:
-					if (array_key_exists($elementid, $hosts)) {
-						$host = $hosts[$elementid];
-						$hosts_by_nr = [0 => $host];
+					if (array_key_exists('host', $matched_macros['macros'])) {
+						foreach ($matched_macros['macros']['host'] as $macro) {
+							if (array_key_exists('hostid', $selement['elements'][0])) {
+								switch ($macro) {
+									case '{HOST.ID}':
+										$macro_values[$key][$macro] = $selement['elements'][0]['hostid'];
+										break;
+
+									default:
+										$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+										$macros['host'][$selement['elements'][0]['hostid']][$key] = true;
+								}
+							}
+							else {
+								$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+							}
+						}
 					}
-					break;
-			}
 
-			foreach ($matched_macros as &$matched_macro) {
-				// Since trigger elements support indexed macros, $host must be rewritten with n-th host.
-				if ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-					$host = array_key_exists($matched_macro['f_num'], $hosts_by_nr)
-						? $hosts_by_nr[$matched_macro['f_num']]
-						: null;
-				}
-
-				switch ($matched_macro['macro']) {
-					case 'HOSTNAME': // deprecated
-					case 'HOST.NAME':
-						if ($host) {
-							$matched_macro['value'] = $host['name'];
+					if (array_key_exists('interface', $matched_macros['macros'])) {
+						foreach ($matched_macros['macros']['interface'] as $macro) {
+							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+							if (array_key_exists('hostid', $selement['elements'][0])) {
+								$macros['interface'][$selement['elements'][0]['hostid']][$key] = true;
+							}
 						}
-						break;
+					}
 
-					case 'HOST.ID':
-						if ($host) {
-							$matched_macro['value'] = $host['hostid'];
+					if (array_key_exists('inventory', $matched_macros['macros'])) {
+						foreach ($matched_macros['macros']['inventory'] as $macro) {
+							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+							if (array_key_exists('hostid', $selement['elements'][0])) {
+								$macros['inventory'][$selement['elements'][0]['hostid']][$key] = true;
+							}
 						}
-						break;
+					}
 
-					case 'HOST.HOST':
-						if ($host) {
-							$matched_macro['value'] = $host['host'];
-						}
-						break;
-
-					case 'HOST.DESCRIPTION':
-						if ($host) {
-							$matched_macro['value'] = $host['description'];
-						}
-						break;
-
-					case 'MAP.ID':
-						if ($map) {
-							$matched_macro['value'] = $map['sysmapid'];
-						}
-						break;
-
-					case 'MAP.NAME':
-						if ($map) {
-							$matched_macro['value'] = $map['name'];
-						}
-						break;
-
-					case 'HOSTGROUP.ID':
-						if ($hostgroup) {
-							$matched_macro['value'] = $hostgroup['hostgroupid'];
-						}
-						break;
-
-					case 'HOST.IP':
-					case 'IPADDRESS': // deprecated
-						if ($host && $host['interface']) {
-							$matched_macro['value'] = $host['interface']['ip'];
-						}
-						break;
-
-					case 'HOST.DNS':
-						if ($host && $host['interface']) {
-							$matched_macro['value'] = $host['interface']['dns'];
-						}
-						break;
-
-					case 'HOST.CONN':
-						if ($host && $host['interface']) {
-							$matched_macro['value'] = $host['interface']['conn'];
-						}
-						break;
-
-					case 'TRIGGER.EVENTS.ACK':
-						$matched_macro['value'] = get_events_unacknowledged($sel, null, null, true);
-						break;
-
-					case 'TRIGGER.EVENTS.PROBLEM.ACK':
-						$matched_macro['value'] = get_events_unacknowledged($sel, null, TRIGGER_VALUE_TRUE, true);
-						break;
-
-					case 'TRIGGER.EVENTS.PROBLEM.UNACK':
-						$matched_macro['value'] = get_events_unacknowledged($sel, null, TRIGGER_VALUE_TRUE);
-						break;
-
-					case 'TRIGGER.EVENTS.UNACK':
-						$matched_macro['value'] = get_events_unacknowledged($sel);
-						break;
-
-					case 'TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK':
-						$matched_macro['value'] = get_events_unacknowledged($sel, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true);
-						break;
-
-					case 'TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK':
-						$matched_macro['value'] = get_events_unacknowledged($sel, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE);
-						break;
-
-					case 'TRIGGER.ID':
-						if ($trigger) {
-							$matched_macro['value'] = $trigger['triggerid'];
-						}
-						break;
-
-					case 'TRIGGERS.UNACK':
-						$matched_macro['value'] = get_triggers_unacknowledged($sel);
-						break;
-
-					case 'TRIGGERS.PROBLEM.UNACK':
-						$matched_macro['value'] = get_triggers_unacknowledged($sel, true);
-						break;
-
-					case 'TRIGGERS.ACK':
-						$matched_macro['value'] = get_triggers_unacknowledged($sel, null, true);
-						break;
-
-					case 'TRIGGERS.PROBLEM.ACK':
-						$matched_macro['value'] = get_triggers_unacknowledged($sel, true, true);
-						break;
-
-					default:
-						// Inventories:
-						if (array_key_exists('{'.$matched_macro['macro'].'}', $supported_inventory_macros) && $host
-								&& $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-							$matched_macro['value']
-								= $host['inventory'][$supported_inventory_macros['{'.$matched_macro['macro'].'}']];
-						}
-						break;
-				}
-			}
-			unset($matched_macro);
-
-			// Replace macros in selement label.
-			if ($options['resolve_element_label']) {
-				// Subtract unsupported macros from $types.
-				$types = $types_by_selement_type[$selement_type];
-				foreach (['macros', 'macros_n'] as $macros_type_key) {
-					if (array_key_exists($macros_type_key, $types)
-							&& array_key_exists($macros_type_key, $supported_label_macros[$selement_type])) {
-						$types[$macros_type_key] = array_intersect($types[$macros_type_key],
-							$supported_label_macros[$selement_type][$macros_type_key]
-						);
-
-						if (!$types[$macros_type_key]) {
-							unset($types[$macros_type_key]);
+					if (array_key_exists('trigger', $matched_macros['macros'])) {
+						foreach ($matched_macros['macros']['trigger'] as $macro) {
+							$macro_values[$key][$macro] = $selement['elements'][0]['triggerid'];
 						}
 					}
 				}
 
-				// Resolve functional macros like: {{HOST.HOST}:log[{HOST.HOST}.log].last(0)}.
-				$sel['label'] = $this->resolveMapLabelMacros($sel['label'], $hosts_by_nr);
+				if (array_key_exists('macros_n', $matched_macros)) {
+					if (array_key_exists('host', $matched_macros['macros_n'])) {
+						foreach ($matched_macros['macros_n']['host'] as $macro => $data) {
+							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+							$macros['host_n'][$selement['elements'][0]['triggerid']][$key][$macro] = $data;
+						}
+					}
 
-				// Replace macros by resolved values in selement label.
-				$macros_position = $this->getMacroPositions($sel['label'], $types);
-				foreach (array_reverse($macros_position, true) as $pos => $macro) {
-					$value = array_key_exists('value', $matched_macros[$macro])
-						? $matched_macros[$macro]['value']
-						: UNRESOLVED_MACRO_STRING;
-					$sel['label'] = substr_replace($sel['label'], $value, $pos, strlen($macro));
-				}
-			}
+					if (array_key_exists('interface', $matched_macros['macros_n'])) {
+						foreach ($matched_macros['macros_n']['interface'] as $macro => $data) {
+							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+							$macros['interface_n'][$selement['elements'][0]['triggerid']][$key][$macro] = $data;
+						}
+					}
 
-			// Replace macros in selement URLs.
-			if ($options['resolve_element_urls']) {
-				// Subtract unsupported macros from $types.
-				$types = $types_by_selement_type[$selement_type];
-				foreach (['macros', 'macros_n'] as $macros_type_key) {
-					if (array_key_exists($macros_type_key, $types)
-							&& array_key_exists($macros_type_key, $supported_urls_macros[$selement_type])) {
-						$types[$macros_type_key] = array_intersect($types[$macros_type_key],
-							$supported_urls_macros[$selement_type][$macros_type_key]
-						);
-
-						if (!$types[$macros_type_key]) {
-							unset($types[$macros_type_key]);
+					if (array_key_exists('inventory', $matched_macros['macros_n'])) {
+						foreach ($matched_macros['macros_n']['inventory'] as $macro => $data) {
+							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+							$macros['inventory_n'][$selement['elements'][0]['triggerid']][$key][$macro] = $data;
 						}
 					}
 				}
 
-				foreach ($sel['urls'] as &$url) {
-					foreach (['name', 'url'] as $url_field) {
-						$macros_position = $this->getMacroPositions($url[$url_field], $types);
-						foreach (array_reverse($macros_position, true) as $pos => $macro) {
-							$value = array_key_exists('value', $matched_macros[$macro])
-								? $matched_macros[$macro]['value']
-								: UNRESOLVED_MACRO_STRING;
+				if (array_key_exists('expr_macros', $matched_macros)) {
+					foreach ($matched_macros['expr_macros'] as $macro => $data) {
+						$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
 
-							$url[$url_field] = substr_replace($url[$url_field], $value, $pos, strlen($macro));
+						if (!array_key_exists($macro, $macros['expr_macros'])) {
+							$macros['expr_macros'][$macro] = $data;
+						}
+						$macros['expr_macros'][$macro]['links'][$macro][] = $key;
+					}
+				}
+
+				if (array_key_exists('expr_macros_host', $matched_macros)) {
+					foreach ($matched_macros['expr_macros_host'] as $macro => $data) {
+						$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+						if ($data['host'] === '' || $data['host'][0] === '{') {
+							if (array_key_exists('hostid', $selement['elements'][0])) {
+								$macros['expr_macros_host'][$selement['elements'][0]['hostid']][$key][$macro] = $data;
+							}
+						}
+						else {
+							if (!array_key_exists($macro, $macros['expr_macros'])) {
+								$macros['expr_macros'][$macro] = $data;
+							}
+							$macros['expr_macros'][$macro]['links'][$macro][] = $key;
 						}
 					}
 				}
-				unset($url);
+
+				if (array_key_exists('expr_macros_host_n', $matched_macros)) {
+					foreach ($matched_macros['expr_macros_host_n'] as $macro => $data) {
+						$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+						if ($data['host'] === '' || $data['host'][0] === '{') {
+							$macros['expr_macros_host_n'][$selement['elements'][0]['triggerid']][$key][$macro] = $data;
+						}
+						else {
+							if (!array_key_exists($macro, $macros['expr_macros'])) {
+								$macros['expr_macros'][$macro] = $data;
+							}
+							$macros['expr_macros'][$macro]['links'][$macro][] = $key;
+						}
+					}
+				}
 			}
 		}
-		unset($sel);
+
+		$macro_values = self::getMapMacros($macros['map'], $macro_values);
+		$macro_values = self::getAggrTriggerMacros($macros['triggers'], $macro_values, $selements);
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
+		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
+
+		$trigger_hosts_by_f_num = self::getExpressionHosts(
+			array_keys($macros['host_n'] + $macros['interface_n'] + $macros['inventory_n'])
+		);
+		$macro_values = self::getHostNMacros($macros['host_n'], $macro_values, $trigger_hosts_by_f_num);
+		$macro_values = self::getInterfaceNMacros($macros['interface_n'], $macro_values, $trigger_hosts_by_f_num);
+		$macro_values = self::getInventoryNMacros($macros['inventory_n'], $macro_values, $trigger_hosts_by_f_num);
+
+		$macro_values = self::getExpressionNMacros($macros['expr_macros_host_n'], $macros['expr_macros_host'],
+			$macros['expr_macros'], $macro_values
+		);
+
+		foreach ($selements as $key => &$selement) {
+			if (!array_key_exists($key, $macro_values)) {
+				continue;
+			}
+
+			foreach ($field_types as $field_type) {
+				if ($field_type === 'label') {
+					$selement['label'] = strtr($selement['label'], $macro_values[$key]);
+				}
+				else {
+					foreach ($selement['urls'] as &$url) {
+						$url['name'] = strtr($url['name'], $macro_values[$key]);
+						$url['url'] = strtr($url['url'], $macro_values[$key]);
+					}
+					unset($url);
+				}
+			}
+		}
+		unset($selement);
 
 		return $selements;
-	}
-
-	/**
-	 * Function returns array holding of inventory macros as a keys and corresponding database fields as value.
-	 *
-	 * @static
-	 *
-	 * @return array
-	 */
-	private static function getSupportedHostInventoryMacrosMap() {
-		return [
-			'{INVENTORY.ALIAS}' => 'alias',
-			'{INVENTORY.ASSET.TAG}' => 'asset_tag',
-			'{INVENTORY.CHASSIS}' => 'chassis',
-			'{INVENTORY.CONTACT}' => 'contact',
-			'{PROFILE.CONTACT}' => 'contact', // deprecated
-			'{INVENTORY.CONTRACT.NUMBER}' => 'contract_number',
-			'{INVENTORY.DEPLOYMENT.STATUS}' => 'deployment_status',
-			'{INVENTORY.HARDWARE}' => 'hardware',
-			'{PROFILE.HARDWARE}' => 'hardware', // deprecated
-			'{INVENTORY.HARDWARE.FULL}' => 'hardware_full',
-			'{INVENTORY.HOST.NETMASK}' => 'host_netmask',
-			'{INVENTORY.HOST.NETWORKS}' => 'host_networks',
-			'{INVENTORY.HOST.ROUTER}' => 'host_router',
-			'{INVENTORY.HW.ARCH}' => 'hw_arch',
-			'{INVENTORY.HW.DATE.DECOMM}' => 'date_hw_decomm',
-			'{INVENTORY.HW.DATE.EXPIRY}' => 'date_hw_expiry',
-			'{INVENTORY.HW.DATE.INSTALL}' => 'date_hw_install',
-			'{INVENTORY.HW.DATE.PURCHASE}' => 'date_hw_purchase',
-			'{INVENTORY.INSTALLER.NAME}' => 'installer_name',
-			'{INVENTORY.LOCATION}' => 'location',
-			'{PROFILE.LOCATION}' => 'location', // deprecated
-			'{INVENTORY.LOCATION.LAT}' => 'location_lat',
-			'{INVENTORY.LOCATION.LON}' => 'location_lon',
-			'{INVENTORY.MACADDRESS.A}' => 'macaddress_a',
-			'{PROFILE.MACADDRESS}' => 'macaddress_a', // deprecated
-			'{INVENTORY.MACADDRESS.B}' => 'macaddress_b',
-			'{INVENTORY.MODEL}' => 'model',
-			'{INVENTORY.NAME}' => 'name',
-			'{PROFILE.NAME}' => 'name', // deprecated
-			'{INVENTORY.NOTES}' => 'notes',
-			'{PROFILE.NOTES}' => 'notes', // deprecated
-			'{INVENTORY.OOB.IP}' => 'oob_ip',
-			'{INVENTORY.OOB.NETMASK}' => 'oob_netmask',
-			'{INVENTORY.OOB.ROUTER}' => 'oob_router',
-			'{INVENTORY.OS}' => 'os',
-			'{PROFILE.OS}' => 'os', // deprecated
-			'{INVENTORY.OS.FULL}' => 'os_full',
-			'{INVENTORY.OS.SHORT}' => 'os_short',
-			'{INVENTORY.POC.PRIMARY.CELL}' => 'poc_1_cell',
-			'{INVENTORY.POC.PRIMARY.EMAIL}' => 'poc_1_email',
-			'{INVENTORY.POC.PRIMARY.NAME}' => 'poc_1_name',
-			'{INVENTORY.POC.PRIMARY.NOTES}' => 'poc_1_notes',
-			'{INVENTORY.POC.PRIMARY.PHONE.A}' => 'poc_1_phone_a',
-			'{INVENTORY.POC.PRIMARY.PHONE.B}' => 'poc_1_phone_b',
-			'{INVENTORY.POC.PRIMARY.SCREEN}' => 'poc_1_screen',
-			'{INVENTORY.POC.SECONDARY.CELL}' => 'poc_2_cell',
-			'{INVENTORY.POC.SECONDARY.EMAIL}' => 'poc_2_email',
-			'{INVENTORY.POC.SECONDARY.NAME}' => 'poc_2_name',
-			'{INVENTORY.POC.SECONDARY.NOTES}' => 'poc_2_notes',
-			'{INVENTORY.POC.SECONDARY.PHONE.A}' => 'poc_2_phone_a',
-			'{INVENTORY.POC.SECONDARY.PHONE.B}' => 'poc_2_phone_b',
-			'{INVENTORY.POC.SECONDARY.SCREEN}' => 'poc_2_screen',
-			'{INVENTORY.SERIALNO.A}' => 'serialno_a',
-			'{PROFILE.SERIALNO}' => 'serialno_a', // deprecated
-			'{INVENTORY.SERIALNO.B}' => 'serialno_b',
-			'{INVENTORY.SITE.ADDRESS.A}' => 'site_address_a',
-			'{INVENTORY.SITE.ADDRESS.B}' => 'site_address_b',
-			'{INVENTORY.SITE.ADDRESS.C}' => 'site_address_c',
-			'{INVENTORY.SITE.CITY}' => 'site_city',
-			'{INVENTORY.SITE.COUNTRY}' => 'site_country',
-			'{INVENTORY.SITE.NOTES}' => 'site_notes',
-			'{INVENTORY.SITE.RACK}' => 'site_rack',
-			'{INVENTORY.SITE.STATE}' => 'site_state',
-			'{INVENTORY.SITE.ZIP}' => 'site_zip',
-			'{INVENTORY.SOFTWARE}' => 'software',
-			'{PROFILE.SOFTWARE}' => 'software', // deprecated
-			'{INVENTORY.SOFTWARE.APP.A}' => 'software_app_a',
-			'{INVENTORY.SOFTWARE.APP.B}' => 'software_app_b',
-			'{INVENTORY.SOFTWARE.APP.C}' => 'software_app_c',
-			'{INVENTORY.SOFTWARE.APP.D}' => 'software_app_d',
-			'{INVENTORY.SOFTWARE.APP.E}' => 'software_app_e',
-			'{INVENTORY.SOFTWARE.FULL}' => 'software_full',
-			'{INVENTORY.TAG}' => 'tag',
-			'{PROFILE.TAG}' => 'tag', // deprecated
-			'{INVENTORY.TYPE}' => 'type',
-			'{PROFILE.DEVICETYPE}' => 'type', // deprecated
-			'{INVENTORY.TYPE.FULL}' => 'type_full',
-			'{INVENTORY.URL.A}' => 'url_a',
-			'{INVENTORY.URL.B}' => 'url_b',
-			'{INVENTORY.URL.C}' => 'url_c',
-			'{INVENTORY.VENDOR}' => 'vendor'
-		];
 	}
 
 	/**

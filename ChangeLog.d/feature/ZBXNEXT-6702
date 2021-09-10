@@ -1,1 +1,0 @@
-.........T [ZBXNEXT-6702] added {#FSLABEL} macro in item names of the "Windows filesystems by Zabbix agent/agent active" templates, changed vfs.file.cksum[/etc/passwd] key to vfs.file.cksum[/etc/passwd,sha256] in Unix templates (mchudinov)

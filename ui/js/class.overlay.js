@@ -269,7 +269,14 @@ Overlay.prototype.mount = function() {
 	this.$backdrop.appendTo($wrapper);
 	this.$dialogue.appendTo($wrapper);
 
-	this.body_mutation_observer.observe(this.$dialogue[0], {childList: true, subtree: true});
+	for (const dialog_part of ['$header', '$controls', '$body', '$footer']) {
+		this.body_mutation_observer.observe(this.$dialogue[dialog_part][0], {
+			childList: true,
+			subtree: true,
+			attributeFilter: ['style']
+		});
+	}
+
 	this.centerDialog();
 
 	jQuery.subscribe('debug.click', this.center_dialog_function);

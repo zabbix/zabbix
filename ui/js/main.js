@@ -358,19 +358,26 @@ var hintBox = {
 		}
 	},
 
+	getHintboxAction: function(hint_type) {
+		switch (hint_type) {
+			case 'eventlist':
+				return 'hintbox.eventlist';
+
+			case 'eventactions':
+				return 'hintbox.actionlist';
+		}
+	},
+
 	preloadHint: function(e, $target) {
 		var url = new Curl('zabbix.php'),
 			data = $target.data('hintbox-preload');
 
-		url.setArgument('action', 'hint.box');
-		url.setArgument('type', data.type);
+		url.setArgument('action', hintBox.getHintboxAction(data.type));
 
 		var xhr = jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
-			data: {
-				data: data.data
-			},
+			data: data.data,
 			dataType: 'json'
 		});
 

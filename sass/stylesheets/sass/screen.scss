@@ -4161,6 +4161,10 @@ a.link-action {
 	}
 }
 
+.normal-bg input[type="radio"]:checked + label {
+	background-color: darken($alt-green, 25%);
+}
+
 .na-bg,
 .normal-bg,
 .info-bg,
@@ -5289,6 +5293,35 @@ svg {
 	}
 }
 
+button {
+	&.icon-action-command,
+	&.icon-action-close,
+	&.icon-action-msg,
+	&.icon-action-msgs,
+	&.icon-action-severity-up,
+	&.icon-action-severity-down,
+	&.icon-action-severity-changed,
+	&.icon-action-message,
+	&.icon-action-ack,
+	&.icon-invisible,
+	&.icon-problem-generated,
+	&.icon-problem-recovery,
+	&.icon-actions-number-gray,
+	&.icon-actions-number-yellow,
+	&.icon-actions-number-red {
+		background: none;
+		border: none;
+		padding: 0px;
+		margin: 0px;
+		margin-right: 5px;
+		min-height: 0px;
+		&::after {
+			left: 0px;
+			top: 4px;
+		}
+	}
+}
+
 [data-count][class*='icon-']::after,
 .icon-description::after {
 	position: absolute;
@@ -6325,5 +6358,25 @@ z-select,
 			float: left;
 			margin-left: -1em;
 		}
+	}
+}
+
+// Report -> Audit details styles.
+
+.audit-details-popup-wrapper {
+	margin: 5px 10px;
+
+	.audit-details-popup-textarea {
+		width: 100%;
+		height: 135px;
+	}
+}
+
+.audit-details-wrapper {
+	display: flex;
+	justify-content: space-between;
+
+	.audit-show-details-btn-wrapper {
+		margin: 0 5px 0 5px;
 	}
 }

@@ -264,7 +264,7 @@ class CProxy extends CApiService {
 
 		DB::update('hosts', $hostUpdate);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_PROXY, $proxies);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_PROXY, $proxies);
 
 		return ['proxyids' => $proxyids];
 	}
@@ -410,7 +410,7 @@ class CProxy extends CApiService {
 		DB::update('hosts', $proxyUpdate);
 		DB::update('hosts', $hostUpdate);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_PROXY, $proxies, $db_proxies);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
 		return ['proxyids' => $proxyids];
 	}
@@ -426,7 +426,7 @@ class CProxy extends CApiService {
 		DB::delete('interface', ['hostid' => $proxyids]);
 		DB::delete('hosts', ['hostid' => $proxyids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, $db_proxies);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_PROXY, $db_proxies);
 
 		return ['proxyids' => $proxyids];
 	}

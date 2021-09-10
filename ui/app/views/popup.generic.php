@@ -316,7 +316,7 @@ switch ($data['popup_type']) {
 			$table->addRow([
 				$check_box,
 				$description,
-				getSeverityCell($trigger['priority']),
+				CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 				(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 					->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 			]);

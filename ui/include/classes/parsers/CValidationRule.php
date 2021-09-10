@@ -74,7 +74,8 @@ class CValidationRule {
 									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
 									&& !$this->parseArrayDB($buffer, $pos, $rule)		// array_db
 									&& !$this->parseArray($buffer, $pos, $rule)			// array
-									&& !$this->parseFlags($buffer, $pos, $rule)) {		// flags
+									&& !$this->parseFlags($buffer, $pos, $rule) 		// flags
+									&& !$this->parseCuid($buffer, $pos, $rule)) {		// cuid
 								// incorrect validation rule
 								break 3;
 							}
@@ -629,6 +630,22 @@ class CValidationRule {
 
 		$value = substr($buffer, $pos, $i - $pos);
 		$pos = $i;
+
+		return true;
+	}
+
+	/**
+	 * cuid
+	 *
+	 * 'cuid' => true
+	 */
+	private function parseCuid($buffer, &$pos, &$rules) {
+		if (strncmp(substr($buffer, $pos), 'cuid', 4) != 0) {
+			return false;
+		}
+
+		$pos += 4;
+		$rules['cuid'] = true;
 
 		return true;
 	}

@@ -44,12 +44,10 @@ class testFormScheduledReport extends CWebTest {
 	}
 
 	public static function getHash() {
-		return CDBHelper::getHash('SELECT * FROM report r '.
-				'LEFT JOIN report_param rp ON r.reportid=rp.reportid '.
-				'LEFT JOIN report_user ru ON r.reportid=ru.reportid '.
-				'LEFT JOIN report_usrgrp rg ON r.reportid=rg.reportid '.
-				'ORDER BY r.reportid, rp.reportparamid, ru.reportuserid, rg.reportusrgrpid'
-		);
+		return CDBHelper::getHash('SELECT * FROM report r ORDER by r.reportid').
+				CDBHelper::getHash('SELECT * FROM report_param rp ORDER by rp.reportparamid').
+				CDBHelper::getHash('SELECT * FROM report_user ru ORDER by ru.reportuserid').
+				CDBHelper::getHash('SELECT * FROM report_usrgrp rg ORDER by rg.reportusrgrpid');
 	}
 
 	/**

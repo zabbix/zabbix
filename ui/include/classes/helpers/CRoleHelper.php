@@ -57,16 +57,7 @@ class CRoleHelper {
 	public const UI_ADMINISTRATION_MEDIA_TYPES = 'ui.administration.media_types';
 	public const UI_ADMINISTRATION_SCRIPTS = 'ui.administration.scripts';
 	public const UI_ADMINISTRATION_QUEUE = 'ui.administration.queue';
-	public const UI_DEFAULT_ACCESS = 'ui.default_access';
-	public const MODULES_MODULE = 'modules.module.';
-	public const MODULES_DEFAULT_ACCESS = 'modules.default_access';
-	public const API_ACCESS = 'api.access';
-	public const API_ACCESS_DISABLED = 0;
-	public const API_ACCESS_ENABLED = 1;
-	public const API_MODE = 'api.mode';
-	public const API_MODE_DENY = 0;
-	public const API_MODE_ALLOW = 1;
-	public const API_METHOD = 'api.method.';
+
 	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit_dashboards';
 	public const ACTIONS_EDIT_MAPS = 'actions.edit_maps';
 	public const ACTIONS_EDIT_MAINTENANCE = 'actions.edit_maintenance';
@@ -77,15 +68,6 @@ class CRoleHelper {
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_MANAGE_API_TOKENS = 'actions.manage_api_tokens';
 	public const ACTIONS_MANAGE_SCHEDULED_REPORTS = 'actions.manage_scheduled_reports';
-	public const ACTIONS_MANAGE_SERVICES = 'actions.manage_services';
-	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
-	public const DEFAULT_ACCESS_DISABLED = 0;
-	public const DEFAULT_ACCESS_ENABLED = 1;
-
-	public const SECTION_UI = 'ui';
-	public const SECTION_MODULES = 'modules';
-	public const SECTION_API = 'api';
-	public const SECTION_ACTIONS = 'actions';
 
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
 	public const UI_SECTION_INVENTORY = 'ui.inventory';
@@ -93,10 +75,12 @@ class CRoleHelper {
 	public const UI_SECTION_CONFIGURATION = 'ui.configuration';
 	public const UI_SECTION_ADMINISTRATION = 'ui.administration';
 
-	public const API_WILDCARD = '*';
-	public const API_WILDCARD_ALIAS = '*.*';
 	public const API_ANY_METHOD = '.*';
 	public const API_ANY_SERVICE = '*.';
+
+	public const SERVICES_ACCESS_NONE = 0;
+	public const SERVICES_ACCESS_ALL = 1;
+	public const SERVICES_ACCESS_LIST = 2;
 
 	/**
 	 * Array for storing roles data (including rules) loaded from Role API object and converted to one format. The data
@@ -127,15 +111,17 @@ class CRoleHelper {
 	 *
 	 * @static
 	 *
-	 * @param string  $rule_name  Name of the rule to check access for.
-	 * @param integer $roleid     ID of the role where check of access is necessary to perform.
+	 * @param string $rule_name  Name of the rule to check access for.
+	 * @param string $roleid     ID of the role where check of access is necessary to perform.
 	 *
 	 * @return bool  Returns true if role have access to specified rule, false - otherwise.
+	 *
+	 * @throws Exception
 	 */
-	public static function checkAccess(string $rule_name, $roleid): bool {
+	public static function checkAccess(string $rule_name, string $roleid): bool {
 		self::loadRoleRules($roleid);
 
-		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === self::SECTION_API) {
+		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === 'api') {
 			return false;
 		}
 
@@ -143,70 +129,33 @@ class CRoleHelper {
 	}
 
 	/**
-	 * Check rule can be defined for specific role type.
-	 *
-	 * @param string $rule_name  Rule full name, with section prefix.
-	 * @param int    $role_type  Role access type.
-	 *
-	 * @return bool
-	 */
-	public static function checkRuleAllowedByType($rule_name, int $role_type): bool {
-		$allowed = [
-			self::UI_DEFAULT_ACCESS, self::API_ACCESS, self::API_MODE, self::MODULES_DEFAULT_ACCESS,
-			self::ACTIONS_DEFAULT_ACCESS
-		];
-
-		if (in_array($rule_name, $allowed)) {
-			return true;
-		}
-
-		switch (self::getRuleSection($rule_name)) {
-			case self::SECTION_UI:
-				$allowed = self::getAllUiElements($role_type);
-				break;
-
-			case self::SECTION_API:
-				$allowed = self::getApiMethods($role_type);
-				break;
-
-			case self::SECTION_MODULES:
-				$allowed = [$rule_name];
-				break;
-
-			case self::SECTION_ACTIONS:
-				$allowed = self::getAllActions($role_type);
-				break;
-		}
-
-		return in_array($rule_name, $allowed);
-	}
-
-	/**
-	 * Gets list of API methods (with wildcards if that exists) that are considered allowed or denied (depending from
+	 * Gets list of API methods (with wildcards if that exists) that are considered allowed or denied (depending on
 	 * API access mode) for specific role.
 	 *
 	 * @static
 	 *
-	 * @param integer $roleid  Role ID.
+	 * @param string $roleid  Role ID.
 	 *
 	 * @return array  Returns the array of API methods.
+	 *
+	 * @throws Exception
 	 */
-	public static function getRoleApiMethods(int $roleid): array {
+	public static function getRoleApiMethods(string $roleid): array {
 		self::loadRoleRules($roleid);
 
-		return self::$roles[$roleid]['rules'][self::SECTION_API];
+		return self::$roles[$roleid]['rules']['api'];
 	}
 
 	/**
-	 * Loads once all rules of specified Role API object by ID and converts rule data to one format.
+	 * Loads once all rules of specified Role API objects by ID and converts rule data to one format.
 	 *
 	 * @static
 	 *
-	 * @throws Exception
+	 * @param string $roleid  Role ID.
 	 *
-	 * @param integer $roleid  Role ID.
+	 * @throws Exception
 	 */
-	private static function loadRoleRules($roleid): void {
+	private static function loadRoleRules(string $roleid): void {
 		if (array_key_exists($roleid, self::$roles)) {
 			return;
 		}
@@ -219,57 +168,37 @@ class CRoleHelper {
 			'roleids' => $roleid
 		]);
 
-		if ($roles === false) {
+		if (!$roles) {
 			throw new Exception(_('Specified role was not found.'));
 		}
 
 		$role = $roles[0];
 
 		$rules = [
-			self::UI_DEFAULT_ACCESS => (bool) $role['rules'][self::UI_DEFAULT_ACCESS],
-			self::MODULES_DEFAULT_ACCESS => (bool) $role['rules'][self::MODULES_DEFAULT_ACCESS],
-			self::API_ACCESS => (bool) $role['rules'][self::API_ACCESS],
-			self::API_MODE => (bool) $role['rules'][self::API_MODE],
-			self::SECTION_API => $role['rules'][self::SECTION_API],
-			self::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][self::ACTIONS_DEFAULT_ACCESS]
+			'ui.default_access' => (bool) $role['rules']['ui.default_access'],
+			'modules.default_access' => (bool) $role['rules']['modules.default_access'],
+			'api.access' => (bool) $role['rules']['api.access'],
+			'api.mode' => (bool) $role['rules']['api.mode'],
+			'api' => $role['rules']['api'],
+			'actions.default_access' => (bool) $role['rules']['actions.default_access']
 		];
 
-		foreach ($role['rules'][self::SECTION_UI] as $rule) {
-			$rules[self::SECTION_UI.'.'.$rule['name']] = (bool) $rule['status'];
+		foreach ($role['rules']['ui'] as $rule) {
+			$rules['ui.'.$rule['name']] = (bool) $rule['status'];
 		}
 
-		foreach ($role['rules'][self::SECTION_MODULES] as $module) {
-			$rules[self::MODULES_MODULE.$module['moduleid']] = (bool) $module['status'];
+		foreach ($role['rules']['modules'] as $module) {
+			$rules['modules.module.'.$module['moduleid']] = (bool) $module['status'];
 		}
 
-		foreach ($role['rules'][self::SECTION_ACTIONS] as $rule) {
-			$rules[self::SECTION_ACTIONS.'.'.$rule['name']] = (bool) $rule['status'];
+		foreach ($role['rules']['actions'] as $rule) {
+			$rules['actions.'.$rule['name']] = (bool) $rule['status'];
 		}
 
 		$role['type'] = (int) $role['type'];
 		$role['rules'] = $rules;
 
 		self::$roles[$roleid] = $role;
-	}
-
-	/**
-	 * Gets the section name of specific rule name.
-	 *
-	 * @static
-	 *
-	 * @throws Exception
-	 *
-	 * @param string $rule_name  Rule name.
-	 *
-	 * @return array Returns name of rules section.
-	 */
-	public static function getRuleSection(string $rule_name): string {
-		$section = explode('.', $rule_name, 2)[0];
-		if (in_array($section, [self::SECTION_UI, self::SECTION_MODULES, self::SECTION_API, self::SECTION_ACTIONS])) {
-			return $section;
-		}
-
-		throw new Exception(_('Rule section was not found.'));
 	}
 
 	/**
@@ -281,7 +210,7 @@ class CRoleHelper {
 	 *
 	 * @return array  Returns the array of rule names for specified user type.
 	 */
-	public static function getAllUiElements(int $user_type): array {
+	public static function getUiElementsByUserType(int $user_type): array {
 		$rules = [
 			self::UI_MONITORING_DASHBOARD, self::UI_MONITORING_PROBLEMS, self::UI_MONITORING_HOSTS,
 			self::UI_MONITORING_OVERVIEW, self::UI_MONITORING_LATEST_DATA, self::UI_MONITORING_MAPS,
@@ -319,7 +248,7 @@ class CRoleHelper {
 	 *
 	 * @return array  Returns the array of rule names for specified user type.
 	 */
-	public static function getAllActions(int $user_type): array {
+	public static function getActionsByUserType(int $user_type): array {
 		$rules = [
 			self::ACTIONS_EDIT_DASHBOARDS, self::ACTIONS_EDIT_MAPS, self::ACTIONS_ACKNOWLEDGE_PROBLEMS,
 			self::ACTIONS_CLOSE_PROBLEMS, self::ACTIONS_CHANGE_SEVERITY, self::ACTIONS_ADD_PROBLEM_COMMENTS,
@@ -329,7 +258,6 @@ class CRoleHelper {
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
 			$rules[] = self::ACTIONS_MANAGE_SCHEDULED_REPORTS;
-			$rules[] = self::ACTIONS_MANAGE_SERVICES;
 		}
 
 		return $rules;
@@ -490,7 +418,7 @@ class CRoleHelper {
 
 		$labels += [
 			self::ACTIONS_ADD_PROBLEM_COMMENTS => _('Add problem comments'),
-			self::ACTIONS_CHANGE_SEVERITY => ('Change severity'),
+			self::ACTIONS_CHANGE_SEVERITY => _('Change severity'),
 			self::ACTIONS_ACKNOWLEDGE_PROBLEMS => _('Acknowledge problems'),
 			self::ACTIONS_CLOSE_PROBLEMS => _('Close problems'),
 			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts'),
@@ -498,10 +426,7 @@ class CRoleHelper {
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
-			$labels += [
-				self::ACTIONS_MANAGE_SCHEDULED_REPORTS => _('Manage scheduled reports'),
-				self::ACTIONS_MANAGE_SERVICES => _('Manage services')
-			];
+			$labels += [self::ACTIONS_MANAGE_SCHEDULED_REPORTS => _('Manage scheduled reports')];
 		}
 
 		return $labels;
@@ -552,14 +477,13 @@ class CRoleHelper {
 	 */
 	public static function getApiMaskMethods(int $user_type): array {
 		$api_methods = self::getApiMethods($user_type);
-		$result = [self::API_WILDCARD => $api_methods, self::API_WILDCARD_ALIAS => $api_methods];
+		$result = [ZBX_ROLE_RULE_API_WILDCARD => $api_methods, ZBX_ROLE_RULE_API_WILDCARD_ALIAS => $api_methods];
 
-		foreach ($api_methods as &$api_method) {
+		foreach ($api_methods as $api_method) {
 			[$service, $method] = explode('.', $api_method, 2);
 			$result[$service.self::API_ANY_METHOD][] = $api_method;
 			$result[self::API_ANY_SERVICE.$method][] = $api_method;
 		}
-		unset($api_method);
 
 		return $result;
 	}
@@ -605,7 +529,7 @@ class CRoleHelper {
 		}
 
 		foreach ($api_method_masks as $user_type => $masks) {
-			$api_method_masks[$user_type] = array_merge([self::API_WILDCARD, self::API_WILDCARD_ALIAS],
+			$api_method_masks[$user_type] = array_merge([ZBX_ROLE_RULE_API_WILDCARD, ZBX_ROLE_RULE_API_WILDCARD_ALIAS],
 				array_keys($masks)
 			);
 		}

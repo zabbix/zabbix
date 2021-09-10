@@ -91,9 +91,7 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 			op = (zbx_lld_override_operation_t *)ops->values[index];
 		}
 
-		tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
-		tag->tag = zbx_strdup(NULL, row[1]);
-		tag->value = zbx_strdup(NULL, row[2]);
+		tag = zbx_db_tag_create(row[1], row[2]);
 		zbx_vector_db_tag_ptr_append(&op->tags, tag);
 	}
 	DBfree_result(result);

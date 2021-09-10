@@ -205,7 +205,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		(new CLinkAction($problem['name']))
 			->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']))
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
-				$problem['name'], getSeverityName($problem['severity'])
+				$problem['name'], CSeverityHelper::getName((int) $problem['severity'])
 			))
 	];
 
@@ -215,7 +215,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$description = (new CCol($problem_link));
 
-	$description_style = getSeverityStyle($problem['severity']);
+	$description_style = CSeverityHelper::getStyle((int) $problem['severity']);
 
 	if ($value == TRIGGER_VALUE_TRUE) {
 		$description->addClass($description_style);
@@ -284,9 +284,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				))
 		))->addClass(ZBX_STYLE_NOWRAP),
 		$problem_update_link,
-		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
-			$data['data']['users']
-		),
+		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['users']),
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));
 }

@@ -61,8 +61,6 @@
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
-int	evaluate_function(char **value, DC_ITEM *item, const char *function, const char *parameter,
-		const zbx_timespec_t *ts, char **error);
 int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error);
 
@@ -125,7 +123,6 @@ int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
 #define ZBX_MACRO_XML		(ZBX_MACRO_ANY | ZBX_TOKEN_XML)
-#define ZBX_MACRO_SIMPLE	(ZBX_MACRO_ANY | ZBX_TOKEN_SIMPLE_MACRO)
 #define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
 
 int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,

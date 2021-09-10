@@ -2699,7 +2699,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 28ecf3f03cad44bda0e6243bb02e2ae4
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Current connections'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Current connections'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.12.{#SNMPINDEX}'
               key: 'bigip.vserver.net.conn[{#VSERVER.NAME}]'
@@ -2718,7 +2718,7 @@ zabbix_export:
                   value: 'Virtual server [{#VSERVER.NAME}]'
             -
               uuid: 206503cc777a4156a29f0687d8fb5a7c
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Incoming traffic, rate'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Incoming traffic, rate'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7.{#SNMPINDEX}'
               key: 'bigip.vserver.net.in.bytes.rate[{#VSERVER.NAME}]'
@@ -2742,7 +2742,7 @@ zabbix_export:
                   value: 'Virtual server [{#VSERVER.NAME}]'
             -
               uuid: d8a36a30d99c44ca9b7172a5b66e74d6
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Incoming packet, rate'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Incoming packet, rate'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.6.{#SNMPINDEX}'
               key: 'bigip.vserver.net.in.pkts.rate[{#VSERVER.NAME}]'
@@ -2766,7 +2766,7 @@ zabbix_export:
                   value: 'Virtual server [{#VSERVER.NAME}]'
             -
               uuid: efeb720fb7e44d068572d59eff947bc6
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Outgoing traffic, rate'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Outgoing traffic, rate'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9.{#SNMPINDEX}'
               key: 'bigip.vserver.net.out.bytes.rate[{#VSERVER.NAME}]'
@@ -2790,7 +2790,7 @@ zabbix_export:
                   value: 'Virtual server [{#VSERVER.NAME}]'
             -
               uuid: bd588ea58eb4420085691046fa0a1e3b
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Outgoing packet, rate'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Outgoing packet, rate'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.8.{#SNMPINDEX}'
               key: 'bigip.vserver.net.out.pkts.rate[{#VSERVER.NAME}]'
@@ -2814,7 +2814,7 @@ zabbix_export:
                   value: 'Virtual server [{#VSERVER.NAME}]'
             -
               uuid: 01352ac9b6c24f13a6ceebac666026cb
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Connections hit a rate limit'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Connections hit a rate limit'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.34.{#SNMPINDEX}'
               key: 'bigip.vserver.overlimit[{#VSERVER.NAME}]'
@@ -2834,7 +2834,7 @@ zabbix_export:
                   value: 'Virtual server [{#VSERVER.NAME}]'
             -
               uuid: baa7718513a54ae4a7bd669f9b652521
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Duration of exceeding rate limit'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Duration of exceeding rate limit'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.35.{#SNMPINDEX}'
               key: 'bigip.vserver.overtime[{#VSERVER.NAME}]'
@@ -2854,7 +2854,7 @@ zabbix_export:
                   value: 'Virtual server [{#VSERVER.NAME}]'
             -
               uuid: 3e97e22368b84674a9720c3f076503c5
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Usage ratio, avg 1m'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 1m'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.32.{#SNMPINDEX}'
               key: 'bigip.vserver.usage.1m[{#VSERVER.NAME}]'
@@ -2874,7 +2874,7 @@ zabbix_export:
                   value: 'Virtual server [{#VSERVER.NAME}]'
             -
               uuid: 2c8c5e0e53e34e4ebc84ed9e5a8c4bd9
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Usage ratio, avg 5m'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 5m'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.33.{#SNMPINDEX}'
               key: 'bigip.vserver.usage.5m[{#VSERVER.NAME}]'
@@ -2894,7 +2894,7 @@ zabbix_export:
                   value: 'Virtual server [{#VSERVER.NAME}]'
             -
               uuid: d6079ebaebbb40d09386e2b1abcbe987
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}]: Usage ratio, avg 5s'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 5s'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.31.{#SNMPINDEX}'
               key: 'bigip.vserver.usage.5s[{#VSERVER.NAME}]'
@@ -2915,7 +2915,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: b49ee8a27f634c238317663d7cc9d426
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}] network'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}] network'
               graph_items:
                 -
                   color: 1A7C11
@@ -2944,7 +2944,7 @@ zabbix_export:
                     key: 'bigip.vserver.net.out.bytes.rate[{#VSERVER.NAME}]'
             -
               uuid: 17d18d4117f943d18873972584f3374e
-              name: 'F5 BIG-IP: Virtual sever [{#VSERVER.NAME}] usage ratio'
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}] usage ratio'
               graph_items:
                 -
                   color: 1A7C11
