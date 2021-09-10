@@ -40,7 +40,8 @@ static int	send_heartbeat(void)
 	zbx_socket_t	sock;
 	struct zbx_json	j;
 	int		ret = SUCCEED;
-	char		*error = NULL;
+	char		*error = NULL, *buffer = NULL;
+	size_t		buffer_size, reserved;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 
@@ -49,18 +50,27 @@ static int	send_heartbeat(void)
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
-	if (FAIL == connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY, 0)) /* do not retry */
-		return FAIL;
-
-	if (SUCCEED != put_data_to_server(&sock, &j, &error))
+	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send heartbeat message to server at \"%s\": %s",
-				sock.peer, error);
-		ret = FAIL;
+		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+		return FAIL;
 	}
 
-	zbx_free(error);
+	reserved = j.buffer_size;
+
+	if (FAIL == (ret = connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY, 0))) /* do not retry */
+		goto clean;
+
+	if (SUCCEED != (ret = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send heartbeat message to server at \"%s\": %s", sock.peer,
+				error);
+	}
+
 	disconnect_server(&sock);
+	zbx_free(error);
+clean:
+	zbx_free(buffer);
 
 	return ret;
 }

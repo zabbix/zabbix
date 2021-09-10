@@ -164,17 +164,19 @@ exit:
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	put_data_to_server(zbx_socket_t *sock, struct zbx_json *j, char **error)
+int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
 {
 	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)j->buffer_size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)buffer_size);
 
-	if (SUCCEED != zbx_tcp_send_ext(sock, j->buffer, strlen(j->buffer), 0, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto out;
 	}
+
+	zbx_free(*buffer);
 
 	if (SUCCEED != zbx_recv_response(sock, 0, error))
 		goto out;
