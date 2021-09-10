@@ -164,6 +164,10 @@ class CRegexp extends CApiService {
 		$names = [];
 
 		foreach ($regexs as $regex) {
+			if (!array_key_exists('name', $regex)) {
+				continue;
+			}
+
 			if ($db_regexs === null || $regex['name'] !== $db_regexs[$regex['regexpid']]['name']) {
 				$names[] = $regex['name'];
 			}
