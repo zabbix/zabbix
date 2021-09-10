@@ -849,7 +849,7 @@ static void	prepare_graph_for_insert(graphs_items_entry_t *graphs_items_template
 		zbx_vector_graphs_copies_t *graphs_copies_insert, zbx_graph_copy_t *template_graph_copy)
 {
 	zbx_graph_copy_t	*graph_copy;
-	const char		*esc_name;
+	char			*esc_name;
 
 	esc_name = DBdyn_escape_string(template_graph_copy->name);
 	graph_copy = zbx_graph_copy_init_new(0, esc_name, template_graph_copy->width, template_graph_copy->height,
