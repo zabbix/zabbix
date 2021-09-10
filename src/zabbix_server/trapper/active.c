@@ -775,17 +775,19 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		reserved = json.buffer_size;
 		zbx_json_free(&json);	/* json buffer can be large, free as fast as possible */
 
-		if (SUCCEED != zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, sock->protocol, CONFIG_TIMEOUT))
+		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, sock->protocol,
+				CONFIG_TIMEOUT)))
+		{
 			strscpy(error, zbx_socket_strerror());
-		else
-			ret = SUCCEED;
+		}
 	}
 	else
 	{
-		if (SUCCEED != zbx_tcp_send_ext(sock, json.buffer, json.buffer_size, 0, sock->protocol, CONFIG_TIMEOUT))
+		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, json.buffer, json.buffer_size, 0, sock->protocol,
+				CONFIG_TIMEOUT)))
+		{
 			strscpy(error, zbx_socket_strerror());
-		else
-			ret = SUCCEED;
+		}
 	}
 
 	zbx_json_free(&json);
