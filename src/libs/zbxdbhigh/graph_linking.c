@@ -132,24 +132,24 @@ static zbx_graph_copy_t	*zbx_graph_copy_init_new(zbx_uint64_t graphid, const cha
 	graph_copy->r##_orig = NULL;
 #define INIT_INT_OR_DBL_N(r) graph_copy->r = r; \
 	graph_copy->r##_orig = 0;
-	INIT_STR_N(name);
-	INIT_INT_OR_DBL_N(width);
-	INIT_INT_OR_DBL_N(height);
-	INIT_INT_OR_DBL_N(yaxismin);
-	INIT_INT_OR_DBL_N(yaxismax);
-	INIT_INT_OR_DBL_N(show_work_period);
-	INIT_INT_OR_DBL_N(show_triggers);
-	INIT_INT_OR_DBL_N(graphtype);
-	INIT_INT_OR_DBL_N(show_legend);
-	INIT_INT_OR_DBL_N(show_3d);
-	INIT_INT_OR_DBL_N(percent_left);
-	INIT_INT_OR_DBL_N(percent_right);
-	INIT_INT_OR_DBL_N(ymin_type);
-	INIT_INT_OR_DBL_N(ymax_type);
-	INIT_INT_OR_DBL_N(ymin_itemid);
-	INIT_INT_OR_DBL_N(ymax_itemid);
+	INIT_STR_N(name)
+	INIT_INT_OR_DBL_N(width)
+	INIT_INT_OR_DBL_N(height)
+	INIT_INT_OR_DBL_N(yaxismin)
+	INIT_INT_OR_DBL_N(yaxismax)
+	INIT_INT_OR_DBL_N(show_work_period)
+	INIT_INT_OR_DBL_N(show_triggers)
+	INIT_INT_OR_DBL_N(graphtype)
+	INIT_INT_OR_DBL_N(show_legend)
+	INIT_INT_OR_DBL_N(show_3d)
+	INIT_INT_OR_DBL_N(percent_left)
+	INIT_INT_OR_DBL_N(percent_right)
+	INIT_INT_OR_DBL_N(ymin_type)
+	INIT_INT_OR_DBL_N(ymax_type)
+	INIT_INT_OR_DBL_N(ymin_itemid)
+	INIT_INT_OR_DBL_N(ymax_itemid)
 	graph_copy->flags = flags;
-	INIT_INT_OR_DBL_N(discover);
+	INIT_INT_OR_DBL_N(discover)
 #undef INIT_STR_N
 #undef INIT_INT_OR_DBL_N
 	graph_copy->update_flags = ZBX_FLAG_LINK_GRAPH_UNSET;
@@ -171,24 +171,24 @@ static void	zbx_graph_copy_init_orig(zbx_graph_copy_t *graph_copy, zbx_uint64_t 
 	graph_copy->r##_orig = zbx_strdup(NULL, r);
 #define INIT_INT_OR_DBL_ORIG(r) graph_copy->r = 0; \
 	graph_copy->r##_orig = r;
-	INIT_STR_ORIG(name);
-	INIT_INT_OR_DBL_ORIG(width);
-	INIT_INT_OR_DBL_ORIG(height);
-	INIT_INT_OR_DBL_ORIG(yaxismin);
-	INIT_INT_OR_DBL_ORIG(yaxismax);
-	INIT_INT_OR_DBL_ORIG(show_work_period);
-	INIT_INT_OR_DBL_ORIG(show_triggers);
-	INIT_INT_OR_DBL_ORIG(graphtype);
-	INIT_INT_OR_DBL_ORIG(show_legend);
-	INIT_INT_OR_DBL_ORIG(show_3d);
-	INIT_INT_OR_DBL_ORIG(percent_left);
-	INIT_INT_OR_DBL_ORIG(percent_right);
-	INIT_INT_OR_DBL_ORIG(ymin_type);
-	INIT_INT_OR_DBL_ORIG(ymax_type);
-	INIT_INT_OR_DBL_ORIG(ymin_itemid);
-	INIT_INT_OR_DBL_ORIG(ymax_itemid);
+	INIT_STR_ORIG(name)
+	INIT_INT_OR_DBL_ORIG(width)
+	INIT_INT_OR_DBL_ORIG(height)
+	INIT_INT_OR_DBL_ORIG(yaxismin)
+	INIT_INT_OR_DBL_ORIG(yaxismax)
+	INIT_INT_OR_DBL_ORIG(show_work_period)
+	INIT_INT_OR_DBL_ORIG(show_triggers)
+	INIT_INT_OR_DBL_ORIG(graphtype)
+	INIT_INT_OR_DBL_ORIG(show_legend)
+	INIT_INT_OR_DBL_ORIG(show_3d)
+	INIT_INT_OR_DBL_ORIG(percent_left)
+	INIT_INT_OR_DBL_ORIG(percent_right)
+	INIT_INT_OR_DBL_ORIG(ymin_type)
+	INIT_INT_OR_DBL_ORIG(ymax_type)
+	INIT_INT_OR_DBL_ORIG(ymin_itemid)
+	INIT_INT_OR_DBL_ORIG(ymax_itemid)
 	graph_copy->flags = flags;
-	INIT_INT_OR_DBL_ORIG(discover);
+	INIT_INT_OR_DBL_ORIG(discover)
 #undef INIT_STR_ORIG
 #undef INIT_INT_OR_DBL_ORIG
 	graph_copy->update_flags = ZBX_FLAG_LINK_GRAPH_UNSET;
