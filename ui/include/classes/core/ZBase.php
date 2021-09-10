@@ -183,12 +183,7 @@ class ZBase {
 
 				$this->loadConfigFile();
 				$this->initDB();
-				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
 				$this->authenticateUser();
-
-				if (CWebUser::$data['lang'] !== CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG)) {
-					$this->initLocales(CWebUser::$data['lang']);
-				}
 
 				$this->initMessages();
 				$this->setLayoutModeByUrl();
@@ -226,7 +221,6 @@ class ZBase {
 					$this->loadConfigFile();
 					$this->initDB();
 					$this->authenticateUser();
-					$this->initLocales(CWebUser::$data['lang']);
 					$this->initComponents();
 				}
 				catch (ConfigFileException $e) {
@@ -418,11 +412,11 @@ class ZBase {
 	}
 
 	/**
-	 * Initialize translations.
+	 * Initialize translations, set up translated date and time constants.
 	 *
-	 * @param string $lang  Language.
+	 * @param string $lang  Locale variant prefix like en_US, ru_RU etc.
 	 */
-	protected function initLocales(string $language) {
+	protected function initLocales(string $language): void {
 		if (!setupLocale($language, $error) && $error !== '') {
 			error($error);
 		}
@@ -459,7 +453,7 @@ class ZBase {
 	}
 
 	/**
-	 * Authenticate user.
+	 * Authenticate user, apply some user-specific settings.
 	 *
 	 * @throws Exception
 	 */
@@ -469,6 +463,8 @@ class ZBase {
 		if (!CWebUser::checkAuthentication($session->extractSessionId() ?: '')) {
 			CWebUser::setDefault();
 		}
+
+		$this->initLocales(CWebUser::$data['lang']);
 
 		if (!$session->session_start(CWebUser::$data['sessionid'])) {
 			throw new Exception(_('Session initialization error.'));

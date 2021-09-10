@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 
 setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : 'en_GB');
 
-require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
