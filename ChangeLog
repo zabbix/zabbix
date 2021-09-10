@@ -3229,8 +3229,11 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.34rc1
 
 New features:
+..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-19580] fixed date format mismatch in UI elements that are loaded via JavaScript (jfreibergs)
+........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
 A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
