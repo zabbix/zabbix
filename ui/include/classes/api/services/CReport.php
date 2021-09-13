@@ -734,18 +734,15 @@ class CReport extends CApiService {
 				continue;
 			}
 
-			$db_report_users = ($method === 'update') ? $db_reports[$report['reportid']]['users'] : [];
+			$db_report_users = ($method === 'update')
+				? array_column($db_reports[$report['reportid']]['users'], null, 'userid')
+				: [];
 
 			foreach ($report['users'] as &$report_user) {
-				$db_report_user = current(
-					array_filter($db_report_users, static function(array $db_report_user) use ($report_user): bool {
-						return bccomp($report_user['userid'], $db_report_user['userid']) == 0;
-					})
-				);
-
-				if ($db_report_user) {
+				if (array_key_exists($report_user['userid'], $db_report_users)) {
+					$db_report_user = $db_report_users[$report_user['userid']];
 					$report_user['reportuserid'] = $db_report_user['reportuserid'];
-					unset($db_report_users[$db_report_user['reportuserid']]);
+					unset($db_report_users[$report_user['userid']]);
 
 					$upd_report_user = DB::getUpdatedValues('report_user', $report_user, $db_report_user);
 
@@ -762,7 +759,7 @@ class CReport extends CApiService {
 			}
 			unset($report_user);
 
-			$del_reportuserids = array_merge($del_reportuserids, array_keys($db_report_users));
+			$del_reportuserids = array_merge($del_reportuserids, array_column($db_report_users, 'reportuserid'));
 		}
 		unset($report);
 
@@ -810,18 +807,15 @@ class CReport extends CApiService {
 				continue;
 			}
 
-			$db_report_usrgrps = ($method === 'update') ? $db_reports[$report['reportid']]['user_groups'] : [];
+			$db_report_usrgrps = ($method === 'update')
+				? array_column($db_reports[$report['reportid']]['user_groups'], null, 'usrgrpid')
+				: [];
 
 			foreach ($report['user_groups'] as &$report_usrgrp) {
-				$db_report_usrgrp = current(
-					array_filter($db_report_usrgrps, static function(array $db_report_usrgrp) use ($report_usrgrp): bool {
-						return bccomp($report_usrgrp['usrgrpid'], $db_report_usrgrp['usrgrpid']) == 0;
-					})
-				);
-
-				if ($db_report_usrgrp) {
+				if (array_key_exists($report_usrgrp['usrgrpid'], $db_report_usrgrps)) {
+					$db_report_usrgrp = $db_report_usrgrps[$report_usrgrp['usrgrpid']];;
 					$report_usrgrp['reportusrgrpid'] = $db_report_usrgrp['reportusrgrpid'];
-					unset($db_report_usrgrps[$db_report_usrgrp['reportusrgrpid']]);
+					unset($db_report_usrgrps[$report_usrgrp['usrgrpid']]);
 
 					$upd_report_usrgrp = DB::getUpdatedValues('report_user', $report_usrgrp, $db_report_usrgrp);
 
@@ -838,7 +832,9 @@ class CReport extends CApiService {
 			}
 			unset($report_usrgrp);
 
-			$del_reportusrgrpids = array_merge($del_reportusrgrpids, array_keys($db_report_usrgrps));
+			$del_reportusrgrpids = array_merge($del_reportusrgrpids,
+				array_column($db_report_usrgrps, 'reportusrgrpid')
+			);
 		}
 		unset($report);
 
