@@ -235,7 +235,7 @@ class CRouter {
 		'service.list.refresh'						=> ['CControllerServiceListRefresh',					'layout.json',			'monitoring.service.list.refresh'],
 		'service.list.edit'							=> ['CControllerServiceListEdit',						'layout.htmlpage',		'monitoring.service.list.edit'],
 		'service.list.edit.refresh'					=> ['CControllerServiceListEditRefresh',				'layout.json',			'monitoring.service.list.edit.refresh'],
-		'service.statusrule.validate'				=> ['CControllerServiceStatusRuleValidate',				'layout.json',			'service.statusrule.validate'],
+		'service.statusrule.validate'				=> ['CControllerServiceStatusRuleValidate',				'layout.json',			null],
 		'service.time.validate'						=> ['CControllerServiceTimeValidate',					'layout.json',			'service.time.validate'],
 		'service.update'							=> ['CControllerServiceUpdate',							'layout.json',			null],
 		'system.warning'							=> ['CControllerSystemWarning',							'layout.warning',		'system.warning'],

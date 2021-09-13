@@ -134,10 +134,6 @@ $additional_rules = (new CTable())
 		(new CRowHeader([_('Name'), _('Action')]))->addClass(ZBX_STYLE_GREY)
 	);
 
-foreach ($data['form']['status_rules'] as $row_index => $rule) {
-	$additional_rules->addItem(new CPartial('service.statusrule.row', ['row_index' => $row_index] + $rule));
-}
-
 $additional_rules->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
@@ -326,7 +322,8 @@ $form
 				'serviceid' => $data['serviceid'],
 				'children' => $data['form']['children'],
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
-				'problem_tags' => $data['form']['problem_tags']
+				'problem_tags' => $data['form']['problem_tags'],
+				'status_rules' => $data['form']['status_rules']
 			]).');
 		'))->setOnDocumentReady()
 	);

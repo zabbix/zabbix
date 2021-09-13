@@ -142,6 +142,17 @@ class CControllerPopupServiceEdit extends CController {
 		$defaults = DB::getDefaults('services');
 
 		if ($this->service !== null) {
+			foreach ($this->service['status_rules'] as $index => &$status_rule) {
+				$status_rule += [
+					'row_index' => $index,
+					'name' => CServiceHelper::formatStatusRuleType((int) $status_rule['type'],
+						(int) $status_rule['new_status'], (int) $status_rule['limit_value'],
+						(int) $status_rule['limit_status']
+					)
+				];
+			}
+			unset($status_rule);
+
 			$data = [
 				'title' => _('Service'),
 				'serviceid' => $this->service['serviceid'],

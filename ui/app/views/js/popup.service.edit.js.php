@@ -33,44 +33,18 @@ window.service_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init({serviceid, children, children_problem_tags_html, problem_tags}) {
-		this.child_template = new Template(`
-			<tr>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
-					#{name}
-					<input name="child_serviceids[#{serviceid}]" type="hidden" value="#{serviceid}">
-				</td>
-				<td>#{algorithm}</td>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-				</td>
-			</tr>
-		`);
+	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules}) {
+		this.initTemplates();
 
 		this.serviceid = serviceid;
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		// Setup Tabs.
+		for (const status_rule of status_rules) {
+			this.addStatusRule(status_rule);
+		}
 
-		const $tabs = $('#tabs');
-
-		$tabs.tabs();
-		$tabs.on('tabsactivate', () => {
-			$tabs.resize();
-		});
-
-		// Add custom Select button for Parent services.
-
-		jQuery('#parent_serviceids_')
-			.multiSelect('getSelectButton')
-			.addEventListener('click', () => {
-				this.selectParents();
-			});
-
-		// Fill-in current Child services.
 		for (const service of children) {
 			this.addChild({
 				serviceid: service.serviceid,
@@ -80,7 +54,11 @@ window.service_edit_popup = {
 			});
 		}
 
-		// Setup Tags.
+		jQuery('#parent_serviceids_')
+			.multiSelect('getSelectButton')
+			.addEventListener('click', () => {
+				this.selectParents();
+			});
 
 		const $tags = jQuery(document.getElementById('tags-table'));
 
@@ -150,6 +128,44 @@ window.service_edit_popup = {
 			});
 	},
 
+	initTemplates() {
+		this.child_template = new Template(`
+			<tr>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
+					#{name}
+					<input name="child_serviceids[#{serviceid}]" type="hidden" value="#{serviceid}">
+				</td>
+				<td>#{algorithm}</td>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
+				<td>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+				</td>
+			</tr>
+		`);
+
+		this.status_rule_template = new Template(`
+			<tr data-row_index="#{row_index}">
+				<td>
+					#{*name}
+					<input type="hidden" id="status_rules_#{row_index}_new_status" name="status_rules[#{row_index}][new_status]" value="#{new_status}">
+					<input type="hidden" id="status_rules_#{row_index}_type" name="status_rules[#{row_index}][type]" value="#{type}">
+					<input type="hidden" id="status_rules_#{row_index}_limit_value" name="status_rules[#{row_index}][limit_value]" value="#{limit_value}">
+					<input type="hidden" id="status_rules_#{row_index}_limit_status" name="status_rules[#{row_index}][limit_status]" value="#{limit_status}">
+				</td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+	},
+
 	update() {
 		const advanced_configuration = document.getElementById('advanced_configuration').checked;
 		const propagation_rule = document.getElementById('propagation_rule').value;
@@ -216,16 +232,11 @@ window.service_edit_popup = {
 		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			const new_row = e.detail;
-
 			if (row !== null) {
-				row.insertAdjacentHTML('afterend', new_row);
-				row.remove();
+				this.updateStatusRule(row, e.detail)
 			}
 			else {
-				document
-					.querySelector('#status_rules tbody')
-					.insertAdjacentHTML('beforeend', new_row);
+				this.addStatusRule(e.detail);
 			}
 		});
 	},
@@ -270,6 +281,17 @@ window.service_edit_popup = {
 					.insertAdjacentHTML('beforeend', new_row);
 			}
 		});
+	},
+
+	addStatusRule(status_rule) {
+		document
+			.querySelector('#status_rules tbody')
+			.insertAdjacentHTML('beforeend', this.status_rule_template.evaluate(status_rule));
+	},
+
+	updateStatusRule(row, status_rule) {
+		row.insertAdjacentHTML('afterend', this.status_rule_template.evaluate(status_rule));
+		row.remove();
 	},
 
 	addChild(service) {

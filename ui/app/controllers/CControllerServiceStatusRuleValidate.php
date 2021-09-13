@@ -85,18 +85,24 @@ class CControllerServiceStatusRuleValidate extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'row_index' => $this->getInput('row_index'),
-			'form' => [
+			'body' => [
+				'row_index' => $this->getInput('row_index'),
+				'name' => CServiceHelper::formatStatusRuleType((int) $this->getInput('type'),
+					(int) $this->getInput('new_status'), (int) $this->getInput('limit_value'),
+					(int) $this->getInput('limit_status')
+				),
 				'type' => $this->getInput('type'),
 				'limit_value' => $this->getInput('limit_value'),
 				'limit_status' => $this->getInput('limit_status'),
 				'new_status' => $this->getInput('new_status')
-			],
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		$this->setResponse(new CControllerResponseData($data));
+		if ($this->getDebugMode() == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$data['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 }
