@@ -23,6 +23,7 @@
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
+#include "zbxcompress.h"
 
 #include "active.h"
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
@@ -551,12 +552,13 @@ out:
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	char			host[HOST_HOST_LEN_MAX], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
-				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL;
+				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, i, version;
 	zbx_uint64_t		hostid;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	size_t			interface_alloc = 1;		/* for at least NUL-termination char */
+	size_t			buffer_size, reserved = 0;
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
 	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
@@ -733,7 +735,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	if (0 < regexps.values_num)
 	{
-		char	buffer[32];
+		char	str[32];
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_REGEXP);
 
@@ -745,14 +747,14 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			zbx_json_addstring(&json, "name", regexp->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json, "expression", regexp->expression, ZBX_JSON_TYPE_STRING);
 
-			zbx_snprintf(buffer, sizeof(buffer), "%d", regexp->expression_type);
-			zbx_json_addstring(&json, "expression_type", buffer, ZBX_JSON_TYPE_INT);
+			zbx_snprintf(str, sizeof(str), "%d", regexp->expression_type);
+			zbx_json_addstring(&json, "expression_type", str, ZBX_JSON_TYPE_INT);
 
-			zbx_snprintf(buffer, sizeof(buffer), "%c", regexp->exp_delimiter);
-			zbx_json_addstring(&json, "exp_delimiter", buffer, ZBX_JSON_TYPE_STRING);
+			zbx_snprintf(str, sizeof(str), "%c", regexp->exp_delimiter);
+			zbx_json_addstring(&json, "exp_delimiter", str, ZBX_JSON_TYPE_STRING);
 
-			zbx_snprintf(buffer, sizeof(buffer), "%d", regexp->case_sensitive);
-			zbx_json_addstring(&json, "case_sensitive", buffer, ZBX_JSON_TYPE_INT);
+			zbx_snprintf(str, sizeof(str), "%d", regexp->case_sensitive);
+			zbx_json_addstring(&json, "case_sensitive", str, ZBX_JSON_TYPE_INT);
 
 			zbx_json_close(&json);
 		}
@@ -762,10 +764,31 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, json.buffer);
 
-	if (SUCCEED != zbx_tcp_send_ext(sock, json.buffer, json.buffer_size, sock->protocol, CONFIG_TIMEOUT))
-		strscpy(error, zbx_socket_strerror());
+	if (0 != (ZBX_TCP_COMPRESS & sock->protocol))
+	{
+		if (SUCCEED != zbx_compress(json.buffer, json.buffer_size, &buffer, &buffer_size))
+		{
+			zbx_snprintf(error, MAX_STRING_LEN, "cannot compress data: %s", zbx_compress_strerror());
+			goto error;
+		}
+
+		reserved = json.buffer_size;
+		zbx_json_free(&json);	/* json buffer can be large, free as fast as possible */
+
+		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, sock->protocol,
+				CONFIG_TIMEOUT)))
+		{
+			strscpy(error, zbx_socket_strerror());
+		}
+	}
 	else
-		ret = SUCCEED;
+	{
+		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, json.buffer, json.buffer_size, 0, sock->protocol,
+				CONFIG_TIMEOUT)))
+		{
+			strscpy(error, zbx_socket_strerror());
+		}
+	}
 
 	zbx_json_free(&json);
 
@@ -793,6 +816,7 @@ out:
 
 	zbx_free(host_metadata);
 	zbx_free(interface);
+	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

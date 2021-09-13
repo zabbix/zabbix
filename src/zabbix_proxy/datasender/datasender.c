@@ -32,6 +32,7 @@
 #include "datasender.h"
 #include "../servercomms.h"
 #include "zbxcrypto.h"
+#include "zbxcompress.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -96,7 +97,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
-	char			*error = NULL;
+	char			*error = NULL, *buffer = NULL;
 	zbx_vector_ptr_t	tasks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -155,6 +156,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 	if (0 != flags)
 	{
+		size_t	buffer_size, reserved;
+
 		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 				ZBX_PROXY_DATA_MORE == more_areg)
 		{
@@ -164,10 +167,6 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
-		/* retry till have a connection */
-		if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY))
-			goto clean;
-
 		zbx_timespec(&ts);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts.sec);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts.ns);
@@ -175,7 +174,20 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
-		upload_state = put_data_to_server(&sock, &j, &error);
+		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+		{
+			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+			goto clean;
+		}
+
+		reserved = j.buffer_size;
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+
+		/* retry till have a connection */
+		if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY))
+			goto clean;
+
+		upload_state = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
 		get_hist_upload_state(sock.buffer, hist_upload_state);
 
 		if (SUCCEED != upload_state)
@@ -235,6 +247,7 @@ clean:
 	zbx_vector_ptr_destroy(&tasks);
 
 	zbx_json_free(&j);
+	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:0x" ZBX_FS_UX64, __func__,
 			zbx_result_string(upload_state), *more, flags);

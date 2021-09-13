@@ -1110,7 +1110,7 @@ static void	active_passive_misconfig(zbx_socket_t *sock)
 	zbx_free(msg);
 }
 
-static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
+static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts)
 {
 	int	ret = SUCCEED;
 
@@ -1131,32 +1131,43 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			return FAIL;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
+		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
+			return FAIL;
+
+		if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
 		{
-			if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-				{
-					send_proxyconfig(sock, &jp);
-				}
-				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server"
-							" at \"%s\", datalen " ZBX_FS_SIZE_T,
-							sock->peer, (zbx_fs_size_t)(jp.end - jp.start + 1));
-					recv_proxyconfig(sock, &jp);
-				}
-				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
-				{
-					/* This is a misconfiguration: the proxy is configured in active mode */
-					/* but server sends requests to it as to a proxy in passive mode. To  */
-					/* prevent logging of this problem for every request we report it     */
-					/* only when the server sends configuration to the proxy and ignore   */
-					/* it for other requests.                                             */
-					active_passive_misconfig(sock);
-				}
+				send_proxyconfig(sock, &jp);
 			}
-			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
+			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server"
+						" at \"%s\", datalen " ZBX_FS_SIZE_T,
+						sock->peer, (zbx_fs_size_t)(jp.end - jp.start + 1));
+				recv_proxyconfig(sock, &jp);
+			}
+			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
+			{
+				/* This is a misconfiguration: the proxy is configured in active mode */
+				/* but server sends requests to it as to a proxy in passive mode. To  */
+				/* prevent logging of this problem for every request we report it     */
+				/* only when the server sends configuration to the proxy and ignore   */
+				/* it for other requests.                                             */
+				active_passive_misconfig(sock);
+			}
+		}
+		else
+		{
+			if (ZBX_GIBIBYTE < bytes_received)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "message size " ZBX_FS_I64 " exceeds the maximum size "
+						ZBX_FS_UI64 " for request \"%s\" received from \"%s\"", bytes_received,
+						(zbx_uint64_t)ZBX_GIBIBYTE, value, sock->peer);
+				return FAIL;
+			}
+
+			if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 			{
 				recv_agenthistory(sock, &jp, ts);
 			}
@@ -1225,7 +1236,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 					zbx_trapper_item_test(sock, &jp);
 			}
 			else
-				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer, value);
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
+						value);
+			}
 		}
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
@@ -1242,6 +1256,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 		zbx_host_key_t		hk = {host, key};
 		DC_ITEM			item;
 		int			errcode;
+
+		if (ZBX_GIBIBYTE < bytes_received)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "message size " ZBX_FS_I64 " exceeds the maximum size "
+					ZBX_FS_UI64 " for XML protocol received from \"%s\"", bytes_received,
+					(zbx_uint64_t)ZBX_GIBIBYTE, sock->peer);
+			return FAIL;
+		}
 
 		memset(&av, 0, sizeof(zbx_agent_value_t));
 
@@ -1302,10 +1324,12 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
-	if (SUCCEED != zbx_tcp_recv_to(sock, CONFIG_TRAPPER_TIMEOUT))
+	ssize_t	bytes_received;
+
+	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
 		return;
 
-	process_trap(sock, sock->buffer, ts);
+	process_trap(sock, sock->buffer, bytes_received, ts);
 }
 
 static void	zbx_trapper_sigusr_handler(int flags)
