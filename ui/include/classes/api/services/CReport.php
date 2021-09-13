@@ -1025,46 +1025,43 @@ class CReport extends CApiService {
 	 * @param array $db_reports
 	 */
 	private function addAffectedObjects(array $reports, array &$db_reports): void {
-		$reportids = ['users' => [], 'user_groups' => []];
+		$reportids = [];
 
 		foreach ($reports as $report) {
+			$reportids[] = $report['reportid'];
+
 			foreach (['users', 'user_groups'] as $param) {
-				$reportids[$param][] = $report['reportid'];
 				$db_reports[$report['reportid']][$param] = [];
 			}
 		}
 
-		if ($reportids['users']) {
-			$options = [
-				'output' => ['reportuserid', 'reportid', 'userid', 'exclude', 'access_userid'],
-				'filter' => ['reportid' => $reportids['users']]
-			];
-			$db_report_users = DBselect(DB::makeSql('report_user', $options));
+		$options = [
+			'output' => ['reportuserid', 'reportid', 'userid', 'exclude', 'access_userid'],
+			'filter' => ['reportid' => $reportids]
+		];
+		$db_report_users = DBselect(DB::makeSql('report_user', $options));
 
-			while ($db_report_user = DBfetch($db_report_users)) {
-				$db_reports[$db_report_user['reportid']]['users'][$db_report_user['reportuserid']] = [
-					'reportuserid' => $db_report_user['reportuserid'],
-					'userid' => $db_report_user['userid'],
-					'exclude' => $db_report_user['exclude'],
-					'access_userid' => $db_report_user['access_userid']
-				];
-			}
+		while ($db_report_user = DBfetch($db_report_users)) {
+			$db_reports[$db_report_user['reportid']]['users'][$db_report_user['reportuserid']] = [
+				'reportuserid' => $db_report_user['reportuserid'],
+				'userid' => $db_report_user['userid'],
+				'exclude' => $db_report_user['exclude'],
+				'access_userid' => $db_report_user['access_userid']
+			];
 		}
 
-		if ($reportids['user_groups']) {
-			$options = [
-				'output' => ['reportusrgrpid', 'reportid', 'usrgrpid', 'access_userid'],
-				'filter' => ['reportid' => $reportids['user_groups']]
-			];
-			$db_report_usrgrps = DBselect(DB::makeSql('report_usrgrp', $options));
+		$options = [
+			'output' => ['reportusrgrpid', 'reportid', 'usrgrpid', 'access_userid'],
+			'filter' => ['reportid' => $reportids]
+		];
+		$db_report_usrgrps = DBselect(DB::makeSql('report_usrgrp', $options));
 
-			while ($db_report_usrgrp = DBfetch($db_report_usrgrps)) {
-				$db_reports[$db_report_usrgrp['reportid']]['user_groups'][$db_report_usrgrp['reportusrgrpid']] = [
-					'reportusrgrpid' => $db_report_usrgrp['reportusrgrpid'],
-					'usrgrpid' => $db_report_usrgrp['usrgrpid'],
-					'access_userid' => $db_report_usrgrp['access_userid']
-				];
-			}
+		while ($db_report_usrgrp = DBfetch($db_report_usrgrps)) {
+			$db_reports[$db_report_usrgrp['reportid']]['user_groups'][$db_report_usrgrp['reportusrgrpid']] = [
+				'reportusrgrpid' => $db_report_usrgrp['reportusrgrpid'],
+				'usrgrpid' => $db_report_usrgrp['usrgrpid'],
+				'access_userid' => $db_report_usrgrp['access_userid']
+			];
 		}
 	}
 }
