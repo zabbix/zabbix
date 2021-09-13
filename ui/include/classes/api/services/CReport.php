@@ -816,7 +816,7 @@ class CReport extends CApiService {
 
 			foreach ($report['user_groups'] as &$report_usrgrp) {
 				if (array_key_exists($report_usrgrp['usrgrpid'], $db_report_usrgrps)) {
-					$db_report_usrgrp = $db_report_usrgrps[$report_usrgrp['usrgrpid']];;
+					$db_report_usrgrp = $db_report_usrgrps[$report_usrgrp['usrgrpid']];
 					$report_usrgrp['reportusrgrpid'] = $db_report_usrgrp['reportusrgrpid'];
 					unset($db_report_usrgrps[$report_usrgrp['usrgrpid']]);
 
