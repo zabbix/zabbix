@@ -195,13 +195,21 @@ zbx_uint32_t	zbx_dbms_version_get(void);
 
 struct zbx_db_version_info_t
 {
+	/* information about database server */
+
 	const char		*database;
-	zbx_uint32_t 		version;
-	zbx_db_version_status_t	flag;
+
+	zbx_uint32_t		current_version;
+	zbx_uint32_t		min_version;
+	zbx_uint32_t		max_version;
+	zbx_uint32_t		min_supported_version;
+
 	char			*friendly_current_version;
 	const char		*friendly_min_version;
 	const char		*friendly_max_version;
 	const char		*friendly_min_supported_version;
+
+	zbx_db_version_status_t	flag;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);

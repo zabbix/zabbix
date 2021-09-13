@@ -2633,41 +2633,57 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	else
 		ZBX_MYSQL_SVERSION = (zbx_uint32_t)mysql_get_server_version(conn);
 
+	version_info->current_version = ZBX_MYSQL_SVERSION;
 	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%.2d.%.2d", RIGHT2(ZBX_MYSQL_SVERSION/10000),
 			RIGHT2(ZBX_MYSQL_SVERSION/100), RIGHT2(ZBX_MYSQL_SVERSION));
 
 	if (ON == ZBX_MARIADB_SFORK)
 	{
 		version_info->database = "MariaDB";
+
+		version_info->min_version = ZBX_MARIA_MIN_VERSION;
+		version_info->max_version = ZBX_MARIA_MAX_VERSION;
+		version_info->min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION;
+
 		version_info->friendly_min_version = ZBX_MARIA_MIN_VERSION_FRIENDLY;
 		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_FRIENDLY;
 		version_info->friendly_min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION_FRIENDLY;
-		version_info->flag = zbx_db_version_check(version_info->database, ZBX_MYSQL_SVERSION,
-				ZBX_MARIA_MIN_VERSION, ZBX_DBVERSION_UNDEFINED, ZBX_MARIA_MIN_SUPPORTED_VERSION);
 	}
 	else
 	{
 		version_info->database = "MySQL";
+
+		version_info->min_version = ZBX_MYSQL_MIN_VERSION;
+		version_info->max_version = ZBX_MYSQL_MAX_VERSION;
+		version_info->min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION;
+
 		version_info->friendly_min_version = ZBX_MYSQL_MIN_VERSION_FRIENDLY;
 		version_info->friendly_max_version = ZBX_MYSQL_MAX_VERSION_FRIENDLY;
 		version_info->friendly_min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION_FRIENDLY;
-		version_info->flag = zbx_db_version_check(version_info->database, ZBX_MYSQL_SVERSION,
-				ZBX_MYSQL_MIN_VERSION, ZBX_MYSQL_MAX_VERSION, ZBX_MYSQL_MIN_SUPPORTED_VERSION);
 	}
+
+	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
+			version_info->min_version, version_info->max_version, version_info->min_supported_version);
 
 #elif defined(HAVE_POSTGRESQL)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = PQserverVersion(conn);
 
+	version_info->database = "PostgreSQL";
+
+	version_info->current_version = ZBX_PG_SVERSION;
+	version_info->min_version = ZBX_POSTGRESQL_MIN_VERSION;
+	version_info->max_version = ZBX_POSTGRESQL_MAX_VERSION;
+	version_info->min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION;
+
 	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", RIGHT2(ZBX_PG_SVERSION/10000),
 			RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
-
-	version_info->database = "PostgreSQL";
 	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY;
 	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY;
 	version_info->friendly_min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_FRIENDLY;
-	version_info->flag = zbx_db_version_check(version_info->database, ZBX_PG_SVERSION, ZBX_POSTGRESQL_MIN_VERSION,
-			ZBX_POSTGRESQL_MAX_VERSION, ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION);
+
+	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
+			version_info->min_version, version_info->max_version, version_info->min_supported_version);
 
 #elif defined(HAVE_ORACLE)
 #	ifdef HAVE_OCI_SERVER_RELEASE2
@@ -2742,20 +2758,25 @@ out:
 #	endif
 	}
 
-	version_info->friendly_current_version = zbx_strdup(NULL, version_friendly);
 	version_info->database = "Oracle";
+
+	version_info->current_version = ZBX_ORACLE_SVERSION;
+	version_info->min_version = ZBX_ORACLE_MIN_VERSION;
+	version_info->max_version = ZBX_ORACLE_MAX_VERSION;
+	version_info->min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION;
+
+	version_info->friendly_current_version = zbx_strdup(NULL, version_friendly);
 	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_FRIENDLY;
 	version_info->friendly_max_version = ZBX_ORACLE_MAX_VERSION_FRIENDLY;
 	version_info->friendly_min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION_FRIENDLY;
-	version_info->flag = zbx_db_version_check(version_info->database, ZBX_ORACLE_SVERSION, ZBX_ORACLE_MIN_VERSION,
-			ZBX_ORACLE_MAX_VERSION, ZBX_ORACLE_MIN_SUPPORTED_VERSION);
+
+	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
+			version_info->min_version, version_info->max_version, version_info->min_supported_version);
 
 #else
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)zbx_dbms_version_get());
-
-	version_info->version = zbx_dbms_version_get();
 }
 
 #if defined(HAVE_POSTGRESQL)

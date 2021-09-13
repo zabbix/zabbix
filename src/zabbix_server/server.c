@@ -1100,6 +1100,14 @@ static void	zbx_check_db(void)
 
 	DBextract_version_info(&db_version_info);
 
+	if (db_version_info.current_version < db_version_info.min_version)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Error! Current %s database server version is too old (%s)",
+				db_version_info.database, db_version_info.friendly_current_version);
+		zabbix_log(LOG_LEVEL_ERR, "Must be a least %s", db_version_info.friendly_min_version);
+		exit(EXIT_FAILURE);
+	}
+
 	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
 	{
 		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
@@ -1144,7 +1152,7 @@ static void	zbx_check_db(void)
 
 	if (SUCCEED == result)
 	{
-		if(SUCCEED != DBcheck_capabilities(db_version_info.version) || SUCCEED != DBcheck_version())
+		if(SUCCEED != DBcheck_capabilities(db_version_info.current_version) || SUCCEED != DBcheck_version())
 			exit(EXIT_FAILURE);
 	}
 	else
