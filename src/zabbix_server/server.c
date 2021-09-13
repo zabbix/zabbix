@@ -1147,8 +1147,9 @@ static void	zbx_check_db(void)
 
 		DBflush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
-		zbx_free(db_version_info.friendly_current_version);
 	}
+
+	zbx_free(db_version_info.friendly_current_version);
 
 	if(SUCCEED != result || SUCCEED != DBcheck_capabilities(db_version_info.current_version) ||
 			SUCCEED != DBcheck_version())
