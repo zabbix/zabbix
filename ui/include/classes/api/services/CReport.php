@@ -822,7 +822,7 @@ class CReport extends CApiService {
 					if ($upd_report_usrgrp) {
 						$upd_report_usrgrps[] = [
 							'values' => $upd_report_usrgrp,
-							'where' => ['reportusrgrpid' => $upd_report_usrgrp['reportusrgrpid']]
+							'where' => ['reportusrgrpid' => $db_report_usrgrp['reportusrgrpid']]
 						];
 					}
 				}
