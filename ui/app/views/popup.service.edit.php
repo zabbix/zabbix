@@ -215,10 +215,6 @@ $times = (new CTable())
 		(new CRowHeader([_('Type'), _('Interval'), _('Note'), _('Action')]))->addClass(ZBX_STYLE_GREY)
 	);
 
-foreach ($data['form']['times'] as $row_index => $time) {
-	$times->addItem(new CPartial('service.time.row', ['row_index' => $row_index] + $time));
-}
-
 $times->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
@@ -323,7 +319,8 @@ $form
 				'children' => $data['form']['children'],
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
 				'problem_tags' => $data['form']['problem_tags'],
-				'status_rules' => $data['form']['status_rules']
+				'status_rules' => $data['form']['status_rules'],
+				'service_times' => $data['form']['times']
 			]).');
 		'))->setOnDocumentReady()
 	);

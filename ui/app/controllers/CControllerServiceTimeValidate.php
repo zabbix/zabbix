@@ -109,19 +109,36 @@ class CControllerServiceTimeValidate extends CController {
 	}
 
 	protected function doAction(): void {
+		switch ($this->getInput('type')) {
+			case SERVICE_TIME_TYPE_UPTIME:
+			case SERVICE_TIME_TYPE_DOWNTIME:
+				$from = dowHrMinToStr($this->ts_from);
+				$till = dowHrMinToStr($this->ts_to, true);
+				break;
+
+			case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
+				$from = zbx_date2str(DATE_TIME_FORMAT, $this->ts_from);
+				$till = zbx_date2str(DATE_TIME_FORMAT, $this->ts_to);
+				break;
+		}
+
 		$data = [
-			'row_index' => $this->getInput('row_index'),
-			'form' => [
+			'body' => [
+				'row_index' => $this->getInput('row_index'),
 				'type' => $this->getInput('type'),
 				'ts_from' => $this->ts_from,
+				'from' => $from,
 				'ts_to' => $this->ts_to,
+				'till' => $till,
 				'note' => $this->getInput('note', '')
-			],
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		$this->setResponse(new CControllerResponseData($data));
+		if ($this->getDebugMode() == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$data['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 }

@@ -33,7 +33,7 @@ window.service_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules}) {
+	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, service_times}) {
 		this.initTemplates();
 
 		this.serviceid = serviceid;
@@ -43,6 +43,10 @@ window.service_edit_popup = {
 
 		for (const status_rule of status_rules) {
 			this.addStatusRule(status_rule);
+		}
+
+		for (const service_time of service_times) {
+			this.addTime(service_time);
 		}
 
 		for (const service of children) {
@@ -129,20 +133,6 @@ window.service_edit_popup = {
 	},
 
 	initTemplates() {
-		this.child_template = new Template(`
-			<tr>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
-					#{name}
-					<input name="child_serviceids[#{serviceid}]" type="hidden" value="#{serviceid}">
-				</td>
-				<td>#{algorithm}</td>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-				</td>
-			</tr>
-		`);
-
 		this.status_rule_template = new Template(`
 			<tr data-row_index="#{row_index}">
 				<td>
@@ -161,6 +151,50 @@ window.service_edit_popup = {
 							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
 						</li>
 					</ul>
+				</td>
+			</tr>
+		`);
+
+		this.time_template = new Template(`
+			<tr data-row_index="#{row_index}">
+				<td>
+					#{*time_type}
+					<input type="hidden" id="times_#{row_index}_type" name="times[#{row_index}][type]" value="#{type}">
+					<input type="hidden" id="times_#{row_index}_ts_from" name="times[#{row_index}][ts_from]" value="#{ts_from}">
+					<input type="hidden" id="times_#{row_index}_ts_to" name="times[#{row_index}][ts_to]" value="#{ts_to}">
+					<input type="hidden" id="times_#{row_index}_note" name="times[#{row_index}][note]" value="#{note}">
+				</td>
+				<td>#{from} - #{till}</td>
+				<td class="wordwrap" style="max-width: 540px;"></td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+
+		this.uptime_template = `<span class="enabled"><?= _('Uptime') ?></span>`;
+
+		this.downtime_template = `<span class="disabled"><?= _('Downtime') ?></span>`;
+
+		this.onetime_downtime_template = `<span class="disabled"><?= _('One-time downtime') ?></span>`;
+
+		this.child_template = new Template(`
+			<tr>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
+					#{name}
+					<input name="child_serviceids[#{serviceid}]" type="hidden" value="#{serviceid}">
+				</td>
+				<td>#{algorithm}</td>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
+				<td>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
 				</td>
 			</tr>
 		`);
@@ -269,16 +303,11 @@ window.service_edit_popup = {
 		const overlay = PopUp('popup.service.time.edit', popup_params, 'service_time_edit', document.activeElement);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			const new_row = e.detail;
-
 			if (row !== null) {
-				row.insertAdjacentHTML('afterend', new_row);
-				row.remove();
+				this.updateTime(row, e.detail)
 			}
 			else {
-				document
-					.querySelector('#times tbody')
-					.insertAdjacentHTML('beforeend', new_row);
+				this.addTime(e.detail);
 			}
 		});
 	},
@@ -292,6 +321,34 @@ window.service_edit_popup = {
 	updateStatusRule(row, status_rule) {
 		row.insertAdjacentHTML('afterend', this.status_rule_template.evaluate(status_rule));
 		row.remove();
+	},
+
+	addTime(time) {
+		document
+			.querySelector('#times tbody')
+			.insertAdjacentHTML('beforeend', this.time_template.evaluate({
+				...time,
+				time_type: this.makeServiceTimeType(parseInt(time.type))
+			}));
+	},
+
+	updateTime(row, time) {
+		row.insertAdjacentHTML('afterend', this.time_template.evaluate({
+			...time,
+			time_type: this.makeServiceTimeType(parseInt(time.type))
+		}));
+		row.remove();
+	},
+
+	makeServiceTimeType(type) {
+		switch (type) {
+			case <?= SERVICE_TIME_TYPE_UPTIME ?>:
+				return this.uptime_template;
+			case <?= SERVICE_TIME_TYPE_DOWNTIME ?>:
+				return this.downtime_template;
+			case <?= SERVICE_TIME_TYPE_ONETIME_DOWNTIME ?>:
+				return this.onetime_downtime_template;
+		}
 	},
 
 	addChild(service) {

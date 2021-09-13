@@ -153,6 +153,28 @@ class CControllerPopupServiceEdit extends CController {
 			}
 			unset($status_rule);
 
+			foreach ($this->service['times'] as $index => &$service_time) {
+				switch ($service_time['type']) {
+					case SERVICE_TIME_TYPE_UPTIME:
+					case SERVICE_TIME_TYPE_DOWNTIME:
+						$from = dowHrMinToStr($service_time['ts_from']);
+						$till = dowHrMinToStr($service_time['ts_to'], true);
+						break;
+
+					case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
+						$from = zbx_date2str(DATE_TIME_FORMAT, $service_time['ts_from']);
+						$till = zbx_date2str(DATE_TIME_FORMAT, $service_time['ts_to']);
+						break;
+				}
+
+				$service_time += [
+					'row_index' => $index,
+					'from' => $from,
+					'till' => $till
+				];
+			}
+			unset($service_time);
+
 			$data = [
 				'title' => _('Service'),
 				'serviceid' => $this->service['serviceid'],
