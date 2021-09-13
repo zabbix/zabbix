@@ -1289,8 +1289,6 @@ class testFormAction extends CLegacyWebTest {
 						'A' => 'Tag name does not contain Does not contain Tag',
 						'B' => 'Trigger severity equals Warning',
 						'C' => 'Trigger name contains trigger'
-
-
 					],
 					'operations' => [
 						[
@@ -1494,7 +1492,7 @@ class testFormAction extends CLegacyWebTest {
 					'eventsource' => EVENT_SOURCE_SERVICE,
 					'name' => '',
 					'esc_period' => '666',
-						'errors' => [
+					'errors' => [
 						'Incorrect value for field "Name": cannot be empty.'
 					]
 				]
@@ -1767,7 +1765,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->query('button:Clone')->waitUntilClickable()->one()->click();
 
 		$form = $this->query('id:action-form')->asForm()->one();
-		$form ->getField('Name')->fill(self::$action_name.' Clone');
+		$form->getField('Name')->fill(self::$action_name.' Clone');
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Action added');
 
