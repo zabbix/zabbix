@@ -1510,12 +1510,12 @@ class CRole extends CApiService {
 	 */
 	private static function getEnabledModuleIds(): array {
 		$modules = API::Module()->get([
-			'output' => 'moduleid',
+			'output' => [],
 			'filter' => [
 				'status' => MODULE_STATUS_ENABLED
 			],
 			'preservekeys' => true
-		], false);
+		]);
 
 		return array_keys($modules);
 	}

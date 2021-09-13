@@ -102,6 +102,7 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
@@ -114,6 +115,7 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
@@ -126,6 +128,7 @@ class CAudit {
 	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];

@@ -678,7 +678,7 @@ class ZBase {
 			'output' => ['moduleid', 'id', 'relative_path', 'config'],
 			'filter' => ['status' => MODULE_STATUS_ENABLED],
 			'sortfield' => 'relative_path'
-		], false);
+		]);
 
 		$modules_missing = [];
 
