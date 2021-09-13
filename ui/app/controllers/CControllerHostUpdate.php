@@ -31,7 +31,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => CMessageHelper::getTitle(),
+						'title' => _('Cannot update host'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -145,7 +145,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 		}
 		else {
 			$output['error'] = [
-				'title' => CMessageHelper::getTitle(),
+				'title' => _('Cannot update host'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

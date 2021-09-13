@@ -153,7 +153,7 @@ window.host_edit_popup = {
 			title = <?= json_encode(_('Unexpected server error.')) ?>;
 		}
 
-		const message_box = makeMessageBox('bad', messages, title)[0];
+		const message_box = makeMessageBox('bad', messages, title, true, true)[0];
 
 		form.parentNode.insertBefore(message_box, form);
 	}

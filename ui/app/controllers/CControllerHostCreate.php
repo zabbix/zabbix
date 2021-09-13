@@ -31,7 +31,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => CMessageHelper::getTitle(),
+						'title' => _('Cannot add host'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -133,10 +133,8 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			$output['success'] = $success;
 		}
 		else {
-			CMessageHelper::setErrorTitle(_('Cannot add host'));
-
 			$output['error'] = [
-				'title' => CMessageHelper::getTitle(),
+				'title' => _('Cannot add host'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

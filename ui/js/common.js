@@ -812,6 +812,62 @@ function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
 	return false;
 }
 
+/**
+ *
+ * @param {string} url
+ * @param {Object} params
+ * @param {boolean} allow_empty
+ *
+ * @return {boolean}
+ */
+function post(url, params) {
+	function addVars(postForm, name, value) {
+		if (Array.isArray(value)) {
+			for (let i = 0; i < value.length; i++) {
+				addVars(postForm, `${name}[]`, value[i]);
+			}
+		}
+		else if (typeof value === 'object' && value !== null) {
+			for (const [key, _value] of Object.entries(value)) {
+				addVars(postForm, `${name}[${key}]`, _value);
+			}
+		}
+		else {
+			addVar(postForm, name, value);
+		}
+	}
+
+	function addVar(postForm, name, value) {
+		const is_multiline = /\r|\n/.exec(value);
+		let input;
+
+		if (is_multiline) {
+			input = document.createElement('textarea');
+			input.style.display = 'none';
+		}
+		else {
+			input = document.createElement('input');
+			input.type = 'hidden';
+		}
+
+		input.name = name;
+		input.value = value;
+		postForm.appendChild(input);
+	}
+
+	const domBody = document.getElementsByTagName('body')[0];
+	const postForm = document.createElement('form');
+	domBody.appendChild(postForm);
+	postForm.setAttribute('method', 'post');
+
+	for (const [key, value] of Object.entries(params)) {
+		addVars(postForm, key, value);
+	}
+
+	postForm.setAttribute('action', url);
+	postForm.submit();
+}
+
 function showHide(obj) {
 	if (jQuery(obj).is(':hidden')) {
 		jQuery(obj).css('display', 'block');

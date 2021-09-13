@@ -21,10 +21,12 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')))
-	->setAttribute('id', 'host-cancel');
+$this->includeJsFile('configuration.host.edit.js.php');
+
+$cancel_button = new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list'));
 
 $data += [
 	'form_name' => 'host-form',
@@ -34,19 +36,19 @@ $data += [
 			$cancel_button
 		]
 		: [
-			(new CSubmit('update', _('Update')))->setAttribute('id', 'host-update'),
-			(new CButton('clone', _('Clone')))->setAttribute('id', 'host-clone'),
-			(new CButton('full_clone', _('Full clone')))->setAttribute('id', 'host-full_clone'),
-			(new CButton('delete', _('Delete')))
-				->onClick('return confirm('.json_encode(_('Delete selected host?')).')
-					? host_edit.deleteHost()
-					: false')
-				->setAttribute('data-redirect', (new CUrl('zabbix.php'))
-					->setArgument('action', 'host.massdelete')
-					->setArgument('hostids[]', $data['hostid'])
-					->setArgumentSID()
-					->getUrl()
-				),
+			(new CSubmit('update', _('Update')))
+				->onClick('view.submit(event, this);')
+				->removeAttribute('id'),
+			(new CSimpleButton(_('Clone')))
+				->onClick('view.clone();')
+				->removeAttribute('id'),
+			(new CSimpleButton(_('Full clone')))
+				->onClick('view.fullClone();')
+				->removeAttribute('id'),
+			(new CSimpleButton(_('Delete')))
+				->setAttribute('confirm', _('Delete selected host?'))
+				->onClick('view.delete('.json_encode($data['hostid']).', this);')
+				->removeAttribute('id'),
 			$cancel_button
 		]
 ];
@@ -61,4 +63,8 @@ if ($data['warning']) {
 (new CWidget())
 	->setTitle(($data['hostid'] == 0) ? _('New host') : _('Host'))
 	->addItem(new CPartial('configuration.host.edit.html', $data))
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();
