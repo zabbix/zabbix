@@ -91,6 +91,7 @@ class CReport extends CApiService {
 			// flags
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -182,6 +183,7 @@ class CReport extends CApiService {
 				'access_userid' =>		['type' => API_ID]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $reports, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -530,6 +532,7 @@ class CReport extends CApiService {
 				'access_userid' =>		['type' => API_ID]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $reports, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -872,6 +875,7 @@ class CReport extends CApiService {
 	 */
 	public function delete(array $reportids): array {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $reportids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
