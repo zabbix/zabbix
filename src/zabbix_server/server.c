@@ -1150,12 +1150,8 @@ static void	zbx_check_db(void)
 		zbx_free(db_version_info.friendly_current_version);
 	}
 
-	if (SUCCEED == result)
-	{
-		if(SUCCEED != DBcheck_capabilities(db_version_info.current_version) || SUCCEED != DBcheck_version())
-			exit(EXIT_FAILURE);
-	}
-	else
+	if(SUCCEED != result || SUCCEED != DBcheck_capabilities(db_version_info.current_version) ||
+			SUCCEED != DBcheck_version())
 	{
 		exit(EXIT_FAILURE);
 	}
