@@ -58,6 +58,8 @@ $fields = [
 ];
 check_fields($fields);
 
+
+SDII(API::Regexp()->update(['regexpid' => 1]));
 /*
  * Form actions
  */

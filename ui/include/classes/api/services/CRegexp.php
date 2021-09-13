@@ -311,7 +311,7 @@ class CRegexp extends CApiService {
 			'regexpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('regexps', 'name')],
 			'test_string' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('regexps', 'test_string')],
-			'expressions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['expression_type', 'expression']], 'fields' => [
+			'expressions' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['expression_type', 'expression']], 'fields' => [
 				'expression_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED, EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])],
 				'expression' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 											['if' => ['field' => 'expression_type', 'in' => implode(',', [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE])], 'type' => API_REGEX, 'length' => DB::getFieldLength('expressions', 'expression')],
