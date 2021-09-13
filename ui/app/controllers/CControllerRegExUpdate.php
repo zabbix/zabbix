@@ -59,7 +59,7 @@ class CControllerRegExUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$expressions = $this->getInput('expressions', []);
+		$expressions = $this->getInput('expressions');
 
 		foreach ($expressions as &$expression) {
 			if (!array_key_exists('case_sensitive', $expression)) {
