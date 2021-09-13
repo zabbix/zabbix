@@ -26,30 +26,56 @@ ZBX_METRIC	parameter_hostname =
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	DWORD	dwSize = 256;
-	wchar_t	computerName[256];
-	char	*type, buffer[256];
-	int	netbios;
+	DWORD		dwSize = 256;
+	wchar_t		computerName[256];
+	char		*tmp, buffer[256];
+	unsigned char	param_type, param_transform;
+	int		netbios;
 
-	if (1 < request->nparam)
+	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	type = get_rparam(request, 0);
+	tmp = get_rparam(request, 0);
 
-	if (NULL == type || '\0' == *type || 0 == strcmp(type, "netbios"))
-		netbios = 1;
-	else if (0 == strcmp(type, "host"))
-		netbios = 0;
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "host"))
+	{
+		param_type = ZBX_SYSTEM_HOSTNAME_TYPE_HOST;
+	}
+	else if (0 == strcmp(tmp, "shorthost"))
+	{
+		param_type = ZBX_SYSTEM_HOSTNAME_TYPE_SHORTHOST;
+	}
+	else if (0 == strcmp(tmp, "netbios"))
+	{
+		param_type = ZBX_SYSTEM_HOSTNAME_TYPE_NETBIOS;
+		return SYSINFO_RET_FAIL;
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (1 == netbios)
+	tmp = get_rparam(request, 1);
+
+	if (NULL == tmp || '\0' == *tmp)
+	{
+		param_transform = ZBX_SYSTEM_HOSTNAME_TRANSFORM_NONE;
+	}
+	else if (0 == strcmp(tmp, "lower"))
+	{
+		param_transform = ZBX_SYSTEM_HOSTNAME_TRANSFORM_LOWER;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (param_type == ZBX_SYSTEM_HOSTNAME_TYPE_NETBIOS)
 	{
 		/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
 		/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
@@ -74,7 +100,25 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 			return SYSINFO_RET_FAIL;
 		}
 
+		if (param_type == ZBX_SYSTEM_HOSTNAME_TYPE_SHORTHOST)
+		{
+			char	*dot;
+
+			if (NULL != (dot = strchr(buffer, '.')))
+				*dot = '\0';
+		}
+
 		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
+	}
+
+	if (ZBX_SYSTEM_HOSTNAME_TRANSFORM_LOWER == param_transform)
+	{
+		int	i;
+
+		for (i = 0; result->str[i] != '\0'; i++)
+		{
+			result->str[i] = tolower(result->str[i]);
+		}
 	}
 
 	return SYSINFO_RET_OK;
