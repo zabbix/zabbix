@@ -1100,6 +1100,11 @@ static void	zbx_check_db(void)
 
 	DBextract_version_info(&db_version_info);
 
+	if (SUCCEED != DBcheck_capabilities(db_version_info.version) || SUCCEED != DBcheck_version())
+	{
+		exit(EXIT_FAILURE);
+	}
+
 	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
 	{
 		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
@@ -1129,16 +1134,13 @@ static void	zbx_check_db(void)
 		}
 	}
 
-	if (SUCCEED == result && (SUCCEED != DBcheck_capabilities(db_version_info.version) ||
-			SUCCEED != DBcheck_version()))
-	{
-		result = FAIL;
-	}
 
 	zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_db_version_json_create(&db_version_json, &db_version_info);
+
 	if (SUCCEED == result)
 		zbx_history_check_version(&db_version_json);
+
 	DBflush_version_requirements(db_version_json.buffer);
 	zbx_json_free(&db_version_json);
 	zbx_free(db_version_info.friendly_current_version);
