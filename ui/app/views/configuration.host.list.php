@@ -530,8 +530,10 @@ $widget
 	->addItem($form)
 	->show();
 
-(new CScriptTag('view.init('.json_encode([
+(new CScriptTag('
+	view.init('.json_encode([
 		'applied_filter_groupids' => array_keys($data['filter']['groups'])
-	]).');'))
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

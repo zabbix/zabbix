@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->includeJsFile('monitoring.overview.triggers.js.php');
 zbx_add_post_js('jqBlink.blink();');
 
 // hint table
@@ -153,13 +154,10 @@ else {
 	$table = new CPartial('trigoverview.table.left', $data);
 }
 
-$widget->addItem($table);
+$widget
+	->addItem($table)
+	->show();
 
-$widget->addItem((new CScriptTag(
-	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
-		'postMessageOk(response.message);'.
-		'location.href = location.href;'.
-	'});'
-))->setOnDocumentReady());
-
-$widget->show();
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();
