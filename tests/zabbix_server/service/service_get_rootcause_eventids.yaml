@@ -142,4 +142,80 @@ in:
   service: S27
 out:
   events: [19]
+---
+test case: Accounting for propagation rules with default status calculation
+in:
+  services: 
+  - name: S1
+    status: 2
+    children: [S2]
+    algorithm: MIN
+  - name: S2
+    status: 3
+    children: [S3, S4]
+    algorithm: MIN
+    propagation: {"action": DECREASE, "value": 1}
+  - name: S3
+    status: 2
+    events: 
+    - {"id":3, "severity":2}
+  - name: S4
+    status: 3
+    events: 
+    - {"id":4, "severity":3}
+  service: S1
+out:
+  events: [3, 4]
+---
+test case: Accounting for propagation rules with additional rules (1)
+in:
+  services: 
+  - name: S1
+    status: 2
+    children: [S2]
+    algorithm: OK
+    rules:
+    - {"type": N_GE, "limit":2, "value":1, "status":3}
+  - name: S2
+    status: 3
+    children: [S3, S4]
+    algorithm: MIN
+    propagation: {"action": DECREASE, "value": 1}
+  - name: S3
+    status: 2
+    events: 
+    - {"id":3, "severity":2}
+  - name: S4
+    status: 3
+    events: 
+    - {"id":4, "severity":3}
+  service: S1
+out:
+  events: [4]
+---
+test case: Accounting for propagation rules with additional rules (2)
+in:
+  services: 
+  - name: S1
+    status: 2
+    children: [S2]
+    algorithm: OK
+    rules:
+    - {"type": N_GE, "limit":3, "value":1, "status":3}
+  - name: S2
+    status: 2
+    children: [S3, S4]
+    algorithm: MIN
+    propagation: {"action": SET, "value": 3}
+  - name: S3
+    status: 1
+    events: 
+    - {"id":3, "severity":1}
+  - name: S4
+    status: 2
+    events: 
+    - {"id":4, "severity":2}
+  service: S1
+out:
+  events: [3, 4]
 ...

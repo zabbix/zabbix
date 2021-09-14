@@ -1745,14 +1745,40 @@ out:
  ******************************************************************************/
 static void	service_get_causes(const zbx_service_t *service, int severity, zbx_vector_ptr_t *services)
 {
-	int			status, child_status, i, index;
+	int			status, child_status, i, index, severity_actual;
 	zbx_vector_ptr_t	children, causes;
 	zbx_service_rule_t	*n_rule = NULL, *w_rule = NULL;
 
 	zbx_vector_ptr_create(&children);
 	zbx_vector_ptr_create(&causes);
 
-	if ((status = service_get_main_status(service)) >= severity)
+	if (ZBX_SERVICE_STATUS_OK != severity)
+	{
+		switch (service->propagation_rule)
+		{
+			case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+				severity_actual = severity - service->propagation_value;
+				if (ZBX_SERVICE_STATUS_OK >= severity_actual)
+					severity_actual = ZBX_SERVICE_STATUS_OK + 1;
+				break;
+			case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+				severity_actual = severity + service->propagation_value;
+				if (TRIGGER_SEVERITY_COUNT <= severity_actual)
+					severity_actual = TRIGGER_SEVERITY_COUNT - 1;
+				break;
+			case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+				severity_actual = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+				break;
+			default:
+				severity_actual = severity;
+		}
+
+		severity = severity_actual;
+	}
+	else
+		severity_actual = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+
+	if ((status = service_get_main_status(service)) >= severity_actual)
 	{
 		for (i = 0; i < service->children.values_num; i++)
 		{
@@ -1765,7 +1791,7 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 			}
 
 			if ((ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE == service->algorithm &&
-					child_status >= severity) ||
+					child_status >= severity_actual) ||
 					ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL == service->algorithm)
 			{
 				zbx_vector_ptr_append(&causes, child);
@@ -1793,7 +1819,7 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 		zbx_service_rule_t	*rule = (zbx_service_rule_t *)service->status_rules.values[i];
 
 		/* check if the rule can return status of acceptable severity */
-		if (rule->new_status < severity)
+		if (rule->new_status < severity_actual)
 			continue;
 
 		zbx_vector_ptr_clear(&causes);
@@ -1904,7 +1930,7 @@ void	service_get_rootcause_eventids(const zbx_service_t *parent, zbx_vector_uint
 
 	zbx_vector_ptr_create(&services);
 
-	service_get_causes(parent, TRIGGER_SEVERITY_NOT_CLASSIFIED, &services);
+	service_get_causes(parent, ZBX_SERVICE_STATUS_OK, &services);
 
 	for (i = 0; i < services.values_num; i++)
 	{
