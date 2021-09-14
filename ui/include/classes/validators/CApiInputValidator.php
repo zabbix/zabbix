@@ -981,7 +981,8 @@ class CApiInputValidator {
 	 * @param array  $rul
 	 * @param int    $rule['flags']                                   (optional) API_ALLOW_NULL
 	 * @param array  $rule['fields']
-	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED
+	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED,
+	 *                                                                           API_ALLOW_UNEXPECTED
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
 	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
 	 * @param mixed  $data
@@ -1003,10 +1004,14 @@ class CApiInputValidator {
 		}
 
 		// unexpected parameter validation
-		foreach ($data as $field_name => $value) {
-			if (!array_key_exists($field_name, $rule['fields'])) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('unexpected parameter "%1$s"', $field_name));
-				return false;
+		if (!($flags & API_ALLOW_UNEXPECTED)) {
+			foreach ($data as $field_name => $value) {
+				if (!array_key_exists($field_name, $rule['fields'])) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+						_s('unexpected parameter "%1$s"', $field_name)
+					);
+					return false;
+				}
 			}
 		}
 
@@ -1218,7 +1223,8 @@ class CApiInputValidator {
 	 * Array of objects validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS,
+	 *                                           API_ALLOW_UNEXPECTED
 	 * @param array  $rule['fields']
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
@@ -1263,7 +1269,8 @@ class CApiInputValidator {
 
 		foreach ($data as $index => &$value) {
 			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-			if (!self::validateObject(['fields' => $rule['fields']], $value, $subpath, $error)) {
+			if (!self::validateObject(['flags' => ($flags & API_ALLOW_UNEXPECTED), 'fields' => $rule['fields']], $value,
+					$subpath, $error)) {
 				return false;
 			}
 		}

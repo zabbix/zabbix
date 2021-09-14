@@ -1231,6 +1231,20 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/": unexpected parameter "name".'
 			],
 			[
+				['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'host' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				],
+			],
+			[
 				['type' => API_OBJECT, 'fields' => [
 					'host' => ['type' => API_STRING_UTF8],
 					'name' => ['type' => API_STRING_UTF8]
@@ -1423,6 +1437,12 @@ class CApiInputValidatorTest extends TestCase {
 				[['host' => 'Zabbix server']],
 				'/',
 				'Invalid parameter "/1": unexpected parameter "host".'
+			],
+			[
+				['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
+				[['host' => 'Zabbix server']],
+				'/',
+				[['host' => 'Zabbix server']]
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
