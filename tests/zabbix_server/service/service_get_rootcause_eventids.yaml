@@ -218,4 +218,44 @@ in:
   service: S1
 out:
   events: [3, 4]
+---
+test case: Overriding min-status of default rules with additional rules
+in:
+  services: 
+  - name: S1
+    status: 3
+    children: [S2]
+    algorithm: OK
+    rules:
+    - {"type": N_GE, "limit":2, "value":1, "status":3}
+  - name: S2
+    status: 3
+    children: [S3, S4, S5]
+    algorithm: MIN
+    rules:
+    - {"type": N_GE, "limit":1, "value":1, "status":2}
+  - name: S3
+    status: 1
+    events: 
+    - {"id":3, "severity":1}
+  - name: S4
+    status: 2
+    children: [S6, S7]
+    algorithm: MIN
+  - name: S5
+    status: 3
+    algorithm: MIN
+    events: 
+    - {"id":5, "severity":3}
+  - name: S6
+    status: 1
+    events: 
+    - {"id":6, "severity":1}
+  - name: S7
+    status: 2
+    events: 
+    - {"id":7, "severity":2}
+  service: S1
+out:
+  events: [3, 5, 6, 7]
 ...
