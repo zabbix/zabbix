@@ -66,7 +66,6 @@ $available_js_cripts = [
 	'class.widget.trigerover.js' => 'widgets/',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
-	'host-common.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -314,9 +313,6 @@ $translate_strings = [
 		'S_CHANGE' => _x('Change', 'verb'),
 		'S_REMOVE' => _('Remove')
 	],
-	'host-common.js' => [
-		'S_UNEXPECTED_SERVER_ERROR' => _('Unexpected server error.')
-	],
 	'multilineinput.js' => [
 		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
 		'S_CLICK_TO_VIEW_OR_EDIT' => _('Click to view or edit'),
@@ -443,7 +439,6 @@ if (empty($_GET['files'])) {
 		'class.tab-indicators.js',
 		'hostinterfacemanager.js',
 		'hostmacrosmanager.js',
-		'host-common.js',
 		'textareaflexible.js',
 		'init.js'
 	];

@@ -4697,8 +4697,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 3px 0 7px; }
 
 .overlay-descr {
-  background: linear-gradient(#ffffff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #ffffff 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
-  background: linear-gradient(#ffffff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #ffffff 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
+  background: linear-gradient(#ffffff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #ffffff 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), transparent), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), transparent) 0 100%;
+  background: linear-gradient(#ffffff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #ffffff 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), transparent), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), transparent) 0 100%;
   background-repeat: no-repeat;
   background-color: #ffffff;
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
@@ -5425,8 +5425,8 @@ svg {
   .columns-wrapper.columns-3 > div,
   .columns-wrapper.columns-3 > li {
     display: block;
-    flex: 0 0 33.3333333333%;
-    max-width: 33.3333333333%; }
+    flex: 0 0 33.33333%;
+    max-width: 33.33333%; }
   .columns-wrapper .column-5 {
     flex: 0 0 5%;
     max-width: 5%; }
@@ -5976,8 +5976,8 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     border-radius: 50%;
     background: #555555; }
   .range-control.range-control-focus .range-control-thumb {
-    margin-top: -6.6666666667px;
-    margin-left: -6.6666666667px;
+    margin-top: -6.66667px;
+    margin-left: -6.66667px;
     background: #555555;
     border: 2px solid #6f6f6f; }
   .range-control.range-control-focus .range-control-progress {
@@ -6442,9 +6442,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     float: left;
     margin-left: -1em; }
 
-.js-edit-host b, .js-edit-host strong {
-  pointer-events: none; }
-
 #host-form #macrosFormList .table-forms-td-left {
   display: none; }
 #host-form #macrosFormList .table-forms-td-right {
@@ -6806,7 +6803,7 @@ z-select button.focusable:focus,
 .log-warning-bg,
 .log-high-bg,
 .log-disaster-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
   .na-bg::before,
   .normal-bg::before,
   .info-bg::before,
@@ -6951,7 +6948,7 @@ td.inactive-bg {
   color: #000000; }
 
 .inactive-bg, td.inactive-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .inactive-bg::before {
   content: '';
