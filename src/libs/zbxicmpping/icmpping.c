@@ -532,6 +532,14 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", tmp);
 
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set sigprocmask to block the user signal");
+
+
 	if (NULL == (f = popen(tmp, "r")))
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", tmp, zbx_strerror(errno));
@@ -540,13 +548,6 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		goto out;
 	}
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGINT);
-	sigaddset(&mask, SIGQUIT);
-
-	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-		zbx_error("cannot set sigprocmask to block the user signal");
 
 	if (NULL == zbx_fgets(tmp, (int)tmp_size, f))
 	{
