@@ -116,8 +116,8 @@ class CAutoregistration extends CApiService {
 	}
 
 	/**
-	 * @param array $autoreg
-	 * @param array $db_autoreg
+	 * @param array      $autoreg
+	 * @param array|null $db_autoreg
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
