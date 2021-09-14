@@ -1197,8 +1197,7 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->page->waitUntilReady();
 
 			if ($check !== 'dashboard action') {
-				$reopened_form = CDashboardElement::find()->asDashboard()->one()->waitUntilVisible()->getWidget($name)
-						->waitUntilPresent()->edit();
+				$reopened_form = CDashboardElement::find()->asDashboard()->one()->waitUntilVisible()->getWidget($name)->edit();
 			}
 			else {
 				$this->query('id:dashboard-config')->one()->click();
