@@ -1242,7 +1242,7 @@ class CApiInputValidatorTest extends TestCase {
 				[
 					'host' => 'Zabbix server',
 					'name' => 'Zabbix server'
-				],
+				]
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
