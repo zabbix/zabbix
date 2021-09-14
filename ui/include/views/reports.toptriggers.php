@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('reports.toptriggers.js.php');
 
 $filterForm = (new CFilter())->setResetUrl(new CUrl('toptriggers.php'));
 
