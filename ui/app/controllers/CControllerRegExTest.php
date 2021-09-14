@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/regexp.inc.php';
-
 class CControllerRegExTest extends CController {
 
 	protected function checkInput() {
@@ -54,7 +52,7 @@ class CControllerRegExTest extends CController {
 		if (array_key_exists('expressions', $data)) {
 			foreach ($data['expressions'] as $id => $expression) {
 				try {
-					validateRegexp([$expression]);
+					self::validateRegex($expression);
 					$result['expressions'][$id] = CGlobalRegexp::matchExpression($expression, $data['testString']);
 					$result['final'] = $result['final'] && $result['expressions'][$id];
 				}
@@ -67,5 +65,26 @@ class CControllerRegExTest extends CController {
 
 		$response->success($result);
 		$response->send();
+	}
+
+	private static function validateRegex(array $expression): void {
+		$validator = new CRegexValidator([
+			'messageInvalid' => _('Regular expression must be a string'),
+			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
+		]);
+
+		switch ($expression['expression_type']) {
+			case EXPRESSION_TYPE_TRUE:
+			case EXPRESSION_TYPE_FALSE:
+				if (!$validator->validate($expression['expression'])) {
+					throw new Exception($validator->getError());
+				}
+				break;
+
+			default:
+				if ($expression['expression'] === '') {
+					throw new Exception(_('Expression cannot be empty'));
+				}
+		}
 	}
 }
