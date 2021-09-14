@@ -36,14 +36,7 @@ class CModule extends CApiService {
 	protected $sortColumns = ['moduleid', 'relative_path'];
 
 	/**
-	 * Get module data.
-	 *
 	 * @param array  $options
-	 * @param int    $options['moduleid']
-	 * @param string $options['id']             Module unique identifier as defined in manifest.json file.
-	 * @param string $options['relative_path']  Relative path to module directory.
-	 * @param bool   $options['status']         Module status.
-	 * @param array  $options['config']         Module configuration data.
 	 *
 	 * @throws APIException
 	 *
@@ -56,21 +49,21 @@ class CModule extends CApiService {
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'moduleid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'id' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'relative_path' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])]
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'config' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'relative_path' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>			['type' => API_BOOLEAN, 'default' => false],
-			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['moduleid', 'id', 'relative_path', 'status', 'config']), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
-			'groupCount' =>				['type' => API_BOOLEAN, 'default' => false],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
-			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['moduleid', 'relative_path']), 'uniq' => true, 'default' => []],
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
@@ -84,8 +77,7 @@ class CModule extends CApiService {
 
 		$db_modules = [];
 
-		$sql = $this->createSelectQuery('module', $options);
-		$result = DBselect($sql, $options['limit']);
+		$result = DBselect($this->createSelectQuery('module', $options), $options['limit']);
 
 		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
@@ -93,8 +85,7 @@ class CModule extends CApiService {
 			}
 
 			if ($this->outputIsRequested('config', $options['output'])) {
-				$config = json_decode($row['config'], true);
-				$row['config'] = $config === null ? [] : $config;
+				$row['config'] = json_decode($row['config'], true);
 			}
 
 			$db_modules[$row['moduleid']] = $row;
@@ -159,12 +150,7 @@ class CModule extends CApiService {
 	}
 
 	/**
-	 * Update module data.
-	 *
 	 * @param array  $modules
-	 * @param string $modules[]['moduleid']
-	 * @param bool   $modules[]['status']    Module status, true - enabled.
-	 * @param array  $modules[]['config']    Module configuration data.
 	 *
 	 * @throws APIException
 	 *
@@ -233,8 +219,6 @@ class CModule extends CApiService {
 	}
 
 	/**
-	 * Delete modules.
-	 *
 	 * @param array $moduleids  Array of module IDs to be deleted.
 	 *
 	 * @throws APIException
