@@ -61,6 +61,7 @@ class CHousekeeping extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -83,49 +84,27 @@ class CHousekeeping extends CApiService {
 	/**
 	 * Update housekeeping parameters.
 	 *
-	 * @param array  $hk
+	 * @param array $hk
+	 *
+	 * @throws APIException if the input is invalid.
 	 *
 	 * @return array
 	 */
 	public function update(array $hk): array {
 		$db_hk = $this->validateUpdate($hk);
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return [];
-		}
-
-		$upd_config = [];
-
-		// strings
-		$field_names = ['hk_events_trigger', 'hk_events_service', 'hk_events_internal', 'hk_events_discovery',
-			'hk_events_autoreg', 'hk_services', 'hk_audit', 'hk_sessions', 'hk_history', 'hk_trends', 'compress_older'
-		];
-		foreach ($field_names as $field_name) {
-			if (array_key_exists($field_name, $hk) && $hk[$field_name] !== $db_hk[$field_name]) {
-				$upd_config[$field_name] = $hk[$field_name];
-			}
-		}
-
-		// integers
-		$field_names = ['hk_events_mode', 'hk_services_mode', 'hk_audit_mode', 'hk_sessions_mode', 'hk_history_mode',
-			'hk_history_global', 'hk_trends_mode', 'hk_trends_global', 'compression_status'
-		];
-		foreach ($field_names as $field_name) {
-			if (array_key_exists($field_name, $hk) && $hk[$field_name] != $db_hk[$field_name]) {
-				$upd_config[$field_name] = $hk[$field_name];
-			}
-		}
+		$upd_config = DB::getUpdatedValues('config', $hk, $db_hk);
 
 		if ($upd_config) {
 			DB::update('config', [
 				'values' => $upd_config,
 				'where' => ['configid' => $db_hk['configid']]
 			]);
-		}
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOUSEKEEPING,
-			[['configid' => $db_hk['configid']] + $hk], [$db_hk['configid'] => $db_hk]
-		);
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOUSEKEEPING,
+				[['configid' => $db_hk['configid']] + $hk], [$db_hk['configid'] => $db_hk]
+			);
+		}
 
 		return array_keys($hk);
 	}
@@ -133,7 +112,7 @@ class CHousekeeping extends CApiService {
 	/**
 	 * Validate updated housekeeping parameters.
 	 *
-	 * @param array  $hk
+	 * @param array $hk
 	 *
 	 * @throws APIException if the input is invalid.
 	 *
@@ -162,13 +141,9 @@ class CHousekeeping extends CApiService {
 			'compression_status' =>		['type' => API_INT32, 'in' => '0,1'],
 			'compress_older' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $hk, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		// Check permissions.
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$output_fields = array_diff($this->output_fields, ['db_extension']);

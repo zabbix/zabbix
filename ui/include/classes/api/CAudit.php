@@ -101,8 +101,11 @@ class CAudit {
 	 * @var array
 	 */
 	private const TABLE_NAMES = [
+		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_REGEXP => 'regexps',
+		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
@@ -114,8 +117,11 @@ class CAudit {
 	 * @var array
 	 */
 	private const FIELD_NAMES = [
+		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_REGEXP => 'name',
+		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
@@ -127,8 +133,11 @@ class CAudit {
 	 * @var array
 	 */
 	private const API_NAMES = [
+		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_REGEXP => 'regexp',
+		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
@@ -139,6 +148,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const MASKED_PATHS = [
+		self::RESOURCE_AUTHENTICATION => ['paths' => ['authentication.ldap_bind_password']],
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
 		// self::RESOURCE_MACRO => [
 		// 	'paths' => ['usermacro.value'],

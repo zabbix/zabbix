@@ -62,9 +62,9 @@ class CAuthentication extends CApiService {
 	 */
 	public function get(array $options): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields),
-				'default' => API_OUTPUT_EXTEND]
+			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -87,49 +87,27 @@ class CAuthentication extends CApiService {
 	/**
 	 * Update authentication parameters.
 	 *
-	 * @param array  $auth
+	 * @param array $auth
+	 *
+	 * @throws APIException if the input is invalid.
 	 *
 	 * @return array
 	 */
 	public function update(array $auth): array {
 		$db_auth = $this->validateUpdate($auth);
 
-		$upd_config = [];
-
-		// strings
-		$field_names = ['http_strip_domains', 'ldap_host', 'ldap_base_dn', 'ldap_search_attribute', 'ldap_bind_dn',
-			'ldap_bind_password'
-		];
-		foreach ($field_names as $field_name) {
-			if (array_key_exists($field_name, $auth) && $auth[$field_name] !== $db_auth[$field_name]) {
-				$upd_config[$field_name] = $auth[$field_name];
-			}
-		}
-
-		// integers
-		$field_names = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_case_sensitive',
-			'ldap_configured', 'ldap_port', 'ldap_case_sensitive', 'saml_auth_enabled', 'saml_idp_entityid',
-			'saml_sso_url', 'saml_slo_url', 'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format',
-			'saml_sign_messages', 'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
-			'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive',
-			'passwd_min_length', 'passwd_check_rules'
-		];
-		foreach ($field_names as $field_name) {
-			if (array_key_exists($field_name, $auth) && $auth[$field_name] != $db_auth[$field_name]) {
-				$upd_config[$field_name] = $auth[$field_name];
-			}
-		}
+		$upd_config = DB::getUpdatedValues('config', $auth, $db_auth);
 
 		if ($upd_config) {
 			DB::update('config', [
 				'values' => $upd_config,
 				'where' => ['configid' => $db_auth['configid']]
 			]);
-		}
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION,
-			[['configid' => $db_auth['configid']] + $auth], [$db_auth['configid'] => $db_auth]
-		);
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION,
+				[['configid' => $db_auth['configid']] + $auth], [$db_auth['configid'] => $db_auth]
+			);
+		}
 
 		return array_keys($auth);
 	}
@@ -176,13 +154,9 @@ class CAuthentication extends CApiService {
 			'passwd_min_length' =>			['type' => API_INT32, 'in' => '1:70', 'default' => DB::getDefault('config', 'passwd_min_length')],
 			'passwd_check_rules' =>			['type' => API_INT32, 'in' => '0:'.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE), 'default' => DB::getDefault('config', 'passwd_check_rules')]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $auth, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		// Check permissions.
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$output_fields = $this->output_fields;
