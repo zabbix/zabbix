@@ -175,7 +175,7 @@ class CModule extends CApiService {
 
 		$upd_modules = [];
 
-		foreach ($modules as &$module) {
+		foreach ($modules as $module) {
 			$upd_module = DB::getUpdatedValues('module', $module, $db_modules[$module['moduleid']]);
 
 			if ($upd_module) {
@@ -185,7 +185,6 @@ class CModule extends CApiService {
 				];
 			}
 		}
-		unset($module);
 
 		if ($upd_modules) {
 			DB::update('module', $upd_modules);
