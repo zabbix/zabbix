@@ -30,6 +30,8 @@ window.host_edit_popup = {
 	form: null,
 
 	init({popup_url}) {
+		this.enableNavigationWarning();
+
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -58,6 +60,7 @@ window.host_edit_popup = {
 				}
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
+				this.disableNavigationWarning();
 
 				if ('hostid' in fields) {
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
@@ -85,6 +88,7 @@ window.host_edit_popup = {
 		delete options.sid;
 		options.clone = 1;
 
+		this.disableNavigationWarning();
 		PopUp('popup.host.edit', options, 'host_edit');
 	},
 
@@ -93,6 +97,7 @@ window.host_edit_popup = {
 		delete options.sid;
 		options.full_clone = 1;
 
+		this.disableNavigationWarning();
 		PopUp('popup.host.edit', options, 'host_edit');
 	},
 
@@ -115,6 +120,7 @@ window.host_edit_popup = {
 				}
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
+				this.disableNavigationWarning();
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
 					detail: {
@@ -129,6 +135,7 @@ window.host_edit_popup = {
 	},
 
 	closePopup() {
+		this.disableNavigationWarning();
 		this.dialogue.dispatchEvent(new CustomEvent('dialogue.close'));
 	},
 
@@ -138,6 +145,14 @@ window.host_edit_popup = {
 				el.parentNode.removeChild(el);
 			}
 		}
+	},
+
+	enableNavigationWarning() {
+		window.addEventListener('beforeunload', this.events.beforeUnload, {passive: false});
+	},
+
+	disableNavigationWarning() {
+		window.removeEventListener('beforeunload', this.events.beforeUnload);
 	},
 
 	ajaxExceptionHandler: (exception) => {
@@ -156,5 +171,13 @@ window.host_edit_popup = {
 		const message_box = makeMessageBox('bad', messages, title, true, true)[0];
 
 		form.parentNode.insertBefore(message_box, form);
+	},
+
+	events: {
+		beforeUnload(e) {
+			// Display confirmation message.
+			e.preventDefault();
+			e.returnValue = '';
+		},
 	}
 }
