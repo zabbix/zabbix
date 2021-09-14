@@ -545,6 +545,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		unlink(filename);
 
+		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+			zbx_error("cannot restore sigprocmask");
+
 		goto out;
 	}
 
