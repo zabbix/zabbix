@@ -271,7 +271,3 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 		->addItem($hostInventoriesTab)
 	)
 	->show();
-
-(new CScriptTag('view.init();'))
-	->setOnDocumentReady()
-	->show();

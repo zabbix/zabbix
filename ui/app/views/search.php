@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('search.js.php');
 
 $widgets = [];
 
@@ -51,7 +54,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $hostid)
 		))
-			->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)
+			->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
 		: new CSpan($visible_name);
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -372,8 +375,4 @@ if ($data['admin']) {
 (new CWidget())
 	->setTitle(_('Search').': '.$data['search'])
 	->addItem(new CDiv($widgets))
-	->show();
-
-(new CScriptTag('host_popup.init();'))
-	->setOnDocumentReady()
 	->show();
