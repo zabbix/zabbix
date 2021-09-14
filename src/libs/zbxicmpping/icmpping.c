@@ -686,13 +686,10 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	unlink(filename);
 
-	if (NOTSUPPORTED == ret)
-	{
-		if (WIFSIGNALED(rc))
-			ret = FAIL;
-		else
-			zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
-	}
+	if (WIFSIGNALED(rc))
+		ret = FAIL;
+	else
+		zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
 out:
 	zbx_free(tmp);
 
