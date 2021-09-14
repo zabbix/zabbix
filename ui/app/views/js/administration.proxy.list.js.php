@@ -38,6 +38,7 @@
 
 			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {

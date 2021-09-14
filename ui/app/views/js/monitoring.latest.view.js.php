@@ -28,152 +28,216 @@
 	<?= CTagFilterFieldHelper::getTemplate(); ?>
 </script>
 
-<script type="text/javascript">
-	function latestPage() {
-		this.refresh_url = '<?= $data['refresh_url'] ?>';
-		this.refresh_interval = <?= $data['refresh_interval'] ?>;
-		this.running = false;
-		this.timeout = null;
-	}
+<script>
+	const view = {
+		refresh_url: null,
+		refresh_interval: null,
+		running: false,
+		timeout: null,
+		_refresh_message_box: null,
+		_popup_message_box: null,
 
-	latestPage.prototype.getCurrentForm = function() {
-		return $('form[name=items]');
-	};
+		init({refresh_url, refresh_interval}) {
+			this.refresh_url = refresh_url;
+			this.refresh_interval = refresh_interval;
 
-	latestPage.prototype.addMessages = function(messages) {
-		$('.wrapper main').before(messages);
-	};
+			this.liveFilter();
+			this.start();
+		},
 
-	latestPage.prototype.removeMessages = function() {
-		$('.wrapper .msg-bad').remove();
-	};
+		getCurrentForm() {
+			return $('form[name=items]');
+		},
 
-	latestPage.prototype.refresh = function() {
-		this.setLoading();
+		_addRefreshMessage(messages) {
+			this._removeRefreshMessage();
 
-		var deferred = $.getJSON(this.refresh_url);
+			this._refresh_message_box = $($.parseHTML(messages));
+			addMessage(this._refresh_message_box);
+		},
 
-		return this.bindDataEvents(deferred);
-	};
+		_removeRefreshMessage() {
+			if (this._refresh_message_box !== null) {
+				this._refresh_message_box.remove();
+				this._refresh_message_box = null;
+			}
+		},
 
-	latestPage.prototype.setLoading = function() {
-		this.getCurrentForm().addClass('is-loading is-loading-fadein delayed-15s');
-	};
+		_addPopupMessage(message_box) {
+			this._removePopupMessage();
 
-	latestPage.prototype.clearLoading = function() {
-		this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
-	};
+			this._popup_message_box = message_box;
+			addMessage(this._popup_message_box);
+		},
 
-	latestPage.prototype.doRefresh = function(body) {
-		this.getCurrentForm().replaceWith(body);
-		chkbxRange.init();
-	};
+		_removePopupMessage() {
+			if (this._popup_message_box !== null) {
+				this._popup_message_box.remove();
+				this._popup_message_box = null;
+			}
+		},
 
-	latestPage.prototype.bindDataEvents = function(deferred) {
-		var that = this;
+		refresh() {
+			this.setLoading();
 
-		deferred
-			.done(function(response) {
-				that.onDataDone.call(that, response);
-			})
-			.fail(function(jqXHR) {
-				that.onDataFail.call(that, jqXHR);
-			})
-			.always(this.onDataAlways.bind(this));
+			var deferred = $.getJSON(this.refresh_url);
 
-		return deferred;
-	};
+			return this.bindDataEvents(deferred);
+		},
 
-	latestPage.prototype.onDataDone = function(response) {
-		this.clearLoading();
-		this.removeMessages();
-		this.doRefresh(response.body);
+		setLoading() {
+			this.getCurrentForm().addClass('is-loading is-loading-fadein delayed-15s');
+		},
 
-		if ('messages' in response) {
-			this.addMessages(response.messages);
-		}
-	};
+		clearLoading() {
+			this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
+		},
 
-	latestPage.prototype.onDataFail = function(jqXHR) {
-		// Ignore failures caused by page unload.
-		if (jqXHR.status == 0) {
-			return;
-		}
+		doRefresh(body) {
+			this.getCurrentForm().replaceWith(body);
+			chkbxRange.init();
+		},
 
-		this.clearLoading();
+		bindDataEvents(deferred) {
+			var that = this;
 
-		var messages = $(jqXHR.responseText).find('.msg-global');
+			deferred
+				.done(function(response) {
+					that.onDataDone.call(that, response);
+				})
+				.fail(function(jqXHR) {
+					that.onDataFail.call(that, jqXHR);
+				})
+				.always(this.onDataAlways.bind(this));
 
-		if (messages.length) {
-			this.getCurrentForm().html(messages);
-		}
-		else {
-			this.getCurrentForm().html(jqXHR.responseText);
-		}
-	};
+			return deferred;
+		},
 
-	latestPage.prototype.onDataAlways = function() {
-		if (this.running) {
-			this.scheduleRefresh();
-		}
-	};
+		onDataDone(response) {
+			this.clearLoading();
+			this._removeRefreshMessage();
+			this.doRefresh(response.body);
 
-	latestPage.prototype.scheduleRefresh = function() {
-		this.unscheduleRefresh();
-		this.timeout = setTimeout((function() {
-			this.timeout = null;
-			this.refresh();
-		}).bind(this), this.refresh_interval);
-	};
+			if ('messages' in response) {
+				this._addRefreshMessage(response.messages);
+			}
+		},
 
-	latestPage.prototype.unscheduleRefresh = function() {
-		if (this.timeout !== null) {
-			clearTimeout(this.timeout);
-			this.timeout = null;
-		}
-	};
-
-	latestPage.prototype.start = function() {
-		if (this.refresh_interval != 0) {
-			this.running = true;
-			this.scheduleRefresh();
-		}
-	};
-
-	latestPage.prototype.stop = function() {
-		this.running = false;
-		this.unscheduleRefresh();
-	};
-
-	latestPage.prototype.liveFilter = function() {
-		var $filter_hostids = $('#filter_hostids_'),
-			$filter_show_without_data = $('#filter_show_without_data');
-
-		$filter_hostids.on('change', function() {
-			var no_hosts_selected = !$(this).multiSelect('getData').length;
-
-			if (no_hosts_selected) {
-				$filter_show_without_data.prop('checked', true);
+		onDataFail(jqXHR) {
+			// Ignore failures caused by page unload.
+			if (jqXHR.status == 0) {
+				return;
 			}
 
-			$filter_show_without_data.prop('disabled', no_hosts_selected);
-		});
+			this.clearLoading();
 
-		$('#filter-tags')
-			.dynamicRows({template: '#filter-tag-row-tmpl'})
-			.on('afteradd.dynamicRows', function() {
-				var rows = this.querySelectorAll('.form_row');
-				new CTagFilterItem(rows[rows.length - 1]);
+			var messages = $(jqXHR.responseText).find('.msg-global');
+
+			if (messages.length) {
+				this.getCurrentForm().html(messages);
+			}
+			else {
+				this.getCurrentForm().html(jqXHR.responseText);
+			}
+		},
+
+		onDataAlways() {
+			if (this.running) {
+				this.scheduleRefresh();
+			}
+		},
+
+		scheduleRefresh() {
+			this.unscheduleRefresh();
+			this.timeout = setTimeout((function() {
+				this.timeout = null;
+				this.refresh();
+			}).bind(this), this.refresh_interval);
+		},
+
+		unscheduleRefresh() {
+			if (this.timeout !== null) {
+				clearTimeout(this.timeout);
+				this.timeout = null;
+			}
+		},
+
+		start() {
+			if (this.refresh_interval != 0) {
+				this.running = true;
+				this.scheduleRefresh();
+			}
+		},
+
+		stop() {
+			this.running = false;
+			this.unscheduleRefresh();
+		},
+
+		liveFilter() {
+			var $filter_hostids = $('#filter_hostids_'),
+				$filter_show_without_data = $('#filter_show_without_data');
+
+			$filter_hostids.on('change', function() {
+				var no_hosts_selected = !$(this).multiSelect('getData').length;
+
+				if (no_hosts_selected) {
+					$filter_show_without_data.prop('checked', true);
+				}
+
+				$filter_show_without_data.prop('disabled', no_hosts_selected);
 			});
 
-		// Init existing fields once loaded.
-		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
-			new CTagFilterItem(row);
-		});
-	};
+			$('#filter-tags')
+				.dynamicRows({template: '#filter-tag-row-tmpl'})
+				.on('afteradd.dynamicRows', function() {
+					var rows = this.querySelectorAll('.form_row');
+					new CTagFilterItem(rows[rows.length - 1]);
+				});
 
-	$(function() {
-		window.latest_page = new latestPage();
-		window.latest_page.liveFilter();
-	});
+			// Init existing fields once loaded.
+			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+				new CTagFilterItem(row);
+			});
+		},
+
+		editHost(hostid) {
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			this._removePopupMessage();
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		events: {
+			hostSuccess: (e) => {
+				const data = e.detail;
+
+				if ('success' in data) {
+					const title = data.success.title;
+					let messages = [];
+
+					if ('messages' in data.success) {
+						messages = data.success.messages;
+					}
+
+					view._addPopupMessage(makeMessageBox('good', messages, title));
+				}
+
+				view.refresh();
+			}
+		}
+	}
 </script>
