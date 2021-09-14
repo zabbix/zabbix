@@ -22,6 +22,7 @@
 #include "comms.h"
 #include "zbxexec.h"
 #include "log.h"
+#include <signal.h>
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_FPING_LOCATION;
@@ -273,6 +274,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	size_t		offset;
 	double		sec;
 	int 		i, ret = NOTSUPPORTED, index, rc;
+	sigset_t	mask, orig_mask;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -539,6 +541,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		goto out;
 	}
 
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set sigprocmask to block the user signal");
+
 	if (NULL == zbx_fgets(tmp, (int)tmp_size, f))
 	{
 		zbx_snprintf(tmp, tmp_size, "no output");
@@ -668,6 +677,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			zbx_free(hosts[i].status);
 	}
 	rc = pclose(f);
+
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore sigprocmask");
 
 	unlink(filename);
 
