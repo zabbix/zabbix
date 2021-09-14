@@ -103,6 +103,7 @@ class CAudit {
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'config',
 		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SETTINGS => 'config',
@@ -119,6 +120,7 @@ class CAudit {
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_AUTOREGISTRATION => null,
 		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SETTINGS => null,
@@ -135,6 +137,7 @@ class CAudit {
 	private const API_NAMES = [
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_SETTINGS => 'settings',
@@ -150,6 +153,7 @@ class CAudit {
 	private const MASKED_PATHS = [
 		self::RESOURCE_AUTHENTICATION => ['paths' => ['authentication.ldap_bind_password']],
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
+		self::RESOURCE_AUTOREGISTRATION => ['paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']],
 		// self::RESOURCE_MACRO => [
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]

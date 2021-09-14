@@ -113,6 +113,7 @@ class CSettings extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -244,6 +245,7 @@ class CSettings extends CApiService {
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 				'editable' => true
 			]);
+
 			if (!$db_hstgrp_exists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host group with ID "%1$s" is not available.', $settings['discovery_groupid'])
@@ -256,6 +258,7 @@ class CSettings extends CApiService {
 				'countOutput' => true,
 				'usrgrpids' => $settings['alert_usrgrpid']
 			]);
+
 			if (!$db_usrgrp_exists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('User group with ID "%1$s" is not available.', $settings['alert_usrgrpid'])
@@ -277,6 +280,7 @@ class CSettings extends CApiService {
 			if ($period_default > $max_period) {
 				$field = 'period_default';
 				$message = _('time filter default period exceeds the max period');
+
 				if (!$period_default_updated) {
 					$field = 'max_period';
 					$message = _('max period is less than time filter default period');
