@@ -167,6 +167,8 @@ $allowed = [
 /*
  * Display
  */
+require_once dirname(__FILE__).'/include/views/js/tr_events.js.php';
+
 $event_tab = (new CDiv([
 	new CDiv([
 		(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger, $event['eventid'])))
@@ -190,13 +192,6 @@ $event_tab = (new CDiv([
 	->addClass(ZBX_STYLE_COLUMNS)
 	->addClass(ZBX_STYLE_COLUMNS_2);
 
-$script = (new CScriptTag(
-	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
-		'postMessageOk(response.message);'.
-		'location.href = location.href;'.
-	'});'
-))->setOnDocumentReady();
-
 (new CWidget())
 	->setTitle(_('Event details'))
 	->setWebLayoutMode($page['web_layout_mode'])
@@ -207,7 +202,10 @@ $script = (new CScriptTag(
 		->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($event_tab)
-	->addItem($script)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
