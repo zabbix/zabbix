@@ -140,7 +140,7 @@ class CModule extends CApiService {
 			'id' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('module', 'id')],
 			'relative_path' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('module', 'relative_path')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])],
-			'config' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'default' => '[]', 'fields' => []]
+			'config' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'default' => [], 'fields' => []]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $modules, '/', $error)) {
