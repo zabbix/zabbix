@@ -112,43 +112,14 @@ class CModule extends CApiService {
 	}
 
 	/**
-	 * Create modules.
-	 *
 	 * @param array  $modules
-	 * @param string $modules[]['moduleid']
-	 * @param string $modules[]['id']             Module unique identifier as defined in manifest.json file.
-	 * @param string $modules[]['relative_path']  Relative path to module directory.
-	 * @param bool   $modules[]['status']         (optional) Module status.
-	 * @param array  $modules[]['config']         (optional) Module configuration data.
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
 	public function create(array $modules): array {
-		$modules = zbx_toArray($modules);
-
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'id' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('module', 'id')],
-			'relative_path' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('module', 'relative_path')],
-			'status' =>			['type' => API_INT32, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])]
-		]];
-
-		$this->validate($api_input_rules, $modules);
-
-		$defaults = [
-			'status' => MODULE_STATUS_DISABLED,
-			'config' => '[]'
-		];
-
-		foreach ($modules as &$module) {
-			if (array_key_exists('config', $module)) {
-				$module['config'] = json_encode($module['config']);
-			}
-
-			$module += $defaults;
-		}
-		unset($module);
+		self::validateCreate($modules);
 
 		$moduleids = DB::insert('module', $modules);
 
@@ -160,6 +131,31 @@ class CModule extends CApiService {
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MODULE, $modules);
 
 		return ['moduleids' => $moduleids];
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array $modules
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private static function validateCreate(array &$modules): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'id' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('module', 'id')],
+			'relative_path' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('module', 'relative_path')],
+			'status' =>			['type' => API_INT32, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])],
+			'config' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'default' => '[]', 'fields' => []]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $modules, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		foreach ($modules as &$module) {
+			$module['config'] = json_encode($module['config']);
+		}
+		unset($module);
 	}
 
 	/**
@@ -175,32 +171,11 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function update(array $modules): array {
-		$modules = zbx_toArray($modules);
-
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'moduleid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'status' =>		['type' => API_INT32, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])]
-		]];
-
-		$this->validate($api_input_rules, $modules);
-
-		$db_modules = DB::select('module', [
-			'output' => ['moduleid', 'id', 'status', 'config'],
-			'filter' => ['moduleid' => array_column($modules, 'moduleid')],
-			'preservekeys' => true
-		]);
-
-		if (count($db_modules) != count($modules)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+		self::validateUpdate($modules, $db_modules);
 
 		$upd_modules = [];
 
 		foreach ($modules as &$module) {
-			if (array_key_exists('config', $module)) {
-				$module['config'] = json_encode($module['config']);
-			}
-
 			$upd_module = DB::getUpdatedValues('module', $module, $db_modules[$module['moduleid']]);
 
 			if ($upd_module) {
@@ -219,6 +194,42 @@ class CModule extends CApiService {
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MODULE, $modules, $db_modules);
 
 		return ['moduleids' => array_column($modules, 'moduleid')];
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array $modules
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private static function validateUpdate(array &$modules): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['moduleid']], 'fields' => [
+			'moduleid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'status' =>		['type' => API_INT32, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])],
+			'config' =>		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $modules, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_modules = DB::select('module', [
+			'output' => ['moduleid', 'id', 'status', 'config'],
+			'filter' => ['moduleid' => array_column($modules, 'moduleid')],
+			'preservekeys' => true
+		]);
+
+		if (count($db_modules) != count($modules)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		foreach ($modules as &$module) {
+			if (array_key_exists('config', $module)) {
+				$module['config'] = json_encode($module['config']);
+			}
+		}
+		unset($module);
 	}
 
 	/**
@@ -252,29 +263,5 @@ class CModule extends CApiService {
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MODULE, $db_modules);
 
 		return ['moduleids' => $moduleids];
-	}
-
-	/**
-	 * Validate module data.
-	 *
-	 * @param array $rules    API validation rules for module object.
-	 * @param array $modules  Array of modules data to be validated.
-	 *
-	 * @throws APIException
-	 */
-	protected function validate(array $rules, array $modules): void {
-		foreach ($modules as $module) {
-			if (array_key_exists('config', $module) && !is_array($module['config'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', 'config', _('an array is expected'))
-				);
-			}
-
-			unset($module['config']);
-
-			if (!CApiInputValidator::validate($rules, $module, '', $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
 	}
 }
