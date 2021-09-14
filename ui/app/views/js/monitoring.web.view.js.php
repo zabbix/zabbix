@@ -28,18 +28,55 @@
 	<?= CTagFilterFieldHelper::getTemplate(); ?>
 </script>
 
-<script type="text/javascript">
-	$(function() {
-		$('#filter-tags')
-			.dynamicRows({template: '#filter-tag-row-tmpl'})
-			.on('afteradd.dynamicRows', function() {
-				var rows = this.querySelectorAll('.form_row');
-				new CTagFilterItem(rows[rows.length - 1]);
-			});
+<script>
+	const view = {
+		init() {
+			$('#filter-tags')
+				.dynamicRows({template: '#filter-tag-row-tmpl'})
+				.on('afteradd.dynamicRows', function() {
+					var rows = this.querySelectorAll('.form_row');
+					new CTagFilterItem(rows[rows.length - 1]);
+				});
 
-		// Init existing fields once loaded.
-		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
-			new CTagFilterItem(row);
-		});
-	});
+			// Init existing fields once loaded.
+			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+				new CTagFilterItem(row);
+			});
+		},
+
+		editHost(hostid) {
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		events: {
+			hostSuccess: (e) => {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			}
+		}
+	}
 </script>
