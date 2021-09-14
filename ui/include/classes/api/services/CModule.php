@@ -36,14 +36,14 @@ class CModule extends CApiService {
 	protected $sortColumns = ['moduleid', 'relative_path'];
 
 	/**
-	 * @param array  $options
-	 * @param bool   $api_call  Check is method called via API call or from local php file.
+	 * @param array $options
+	 * @param bool  $api_call  Flag indicating whether this method called via an API call or from a local PHP file.
 	 *
 	 * @throws APIException
 	 *
 	 * @return array|string
 	 */
-	public function get(array $options = [], $api_call = true) {
+	public function get(array $options = [], bool $api_call = true) {
 		if ($api_call && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -72,7 +72,6 @@ class CModule extends CApiService {
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
-			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
 
@@ -108,7 +107,7 @@ class CModule extends CApiService {
 	}
 
 	/**
-	 * @param array  $modules
+	 * @param array $modules
 	 *
 	 * @throws APIException
 	 *
@@ -155,7 +154,7 @@ class CModule extends CApiService {
 	}
 
 	/**
-	 * @param array  $modules
+	 * @param array $modules
 	 *
 	 * @throws APIException
 	 *
@@ -189,8 +188,8 @@ class CModule extends CApiService {
 	/**
 	 * @static
 	 *
-	 * @param array $modules
-	 * @param array $db_modules
+	 * @param array      $modules
+	 * @param array|null $db_modules
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -224,7 +223,7 @@ class CModule extends CApiService {
 	}
 
 	/**
-	 * @param array $moduleids  Array of module IDs to be deleted.
+	 * @param array $moduleids
 	 *
 	 * @throws APIException
 	 *
