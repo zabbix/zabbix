@@ -255,7 +255,7 @@
 		},
 
 		events: {
-			hostSuccess: (e) => {
+			hostSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {
