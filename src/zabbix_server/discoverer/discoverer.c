@@ -316,10 +316,8 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 				host.addr = strdup(ip);
 				ping_rc = zbx_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error));
 
-				if ((DISCARDED != ping_rc && SUCCEED != ping_rc) || 0 == host.rcv)
-				{
+				if (SUCCEED != zbx_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
 					ret = FAIL;
-				}
 
 				zbx_free(host.addr);
 				break;
