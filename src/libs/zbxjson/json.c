@@ -45,11 +45,23 @@ const char	*zbx_json_strerror(void)
 
 void	zbx_set_json_strerror(const char *fmt, ...)
 {
+	size_t	sz;
 	va_list	args;
 
 	va_start(args, fmt);
 
-	zbx_vsnprintf(zbx_json_strerror_message, sizeof(zbx_json_strerror_message), fmt, args);
+	sz = zbx_vsnprintf(zbx_json_strerror_message, sizeof(zbx_json_strerror_message), fmt, args);
+
+	if (sizeof(zbx_json_strerror_message) - 1 == sz)
+	{
+		/* ensure that the string is not cut in the middle of UTF-8 sequence */
+		size_t	idx = sz - 1;
+		while (0x80 == (0xc0 & zbx_json_strerror_message[idx]) && 0 < idx)
+			idx--;
+
+		if (zbx_utf8_char_len(zbx_json_strerror_message + idx) != sz - idx)
+			zbx_json_strerror_message[idx] = '\0';
+	}
 
 	va_end(args);
 }
@@ -583,8 +595,8 @@ static const char	*__zbx_json_rbracket(const char *p)
  ******************************************************************************/
 int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 {
-	char	*error = NULL;
-	int	len;
+	char		*error = NULL;
+	zbx_int64_t	len;
 
 	SKIP_WHITESPACE(buffer);
 
