@@ -99,7 +99,6 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
 #define	CONFIG_ERROR	-7
-#define	DISCARDED	-8
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);

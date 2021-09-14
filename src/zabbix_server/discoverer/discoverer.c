@@ -171,7 +171,6 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 		ZBX_FPING_HOST	host;
 		DC_ITEM		item;
 		char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
-		int		ping_rc;
 
 		zbx_alarm_on(CONFIG_TIMEOUT);
 
@@ -314,7 +313,6 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 			case SVC_ICMPPING:
 				memset(&host, 0, sizeof(host));
 				host.addr = strdup(ip);
-				ping_rc = zbx_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error));
 
 				if (SUCCEED != zbx_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
 					ret = FAIL;

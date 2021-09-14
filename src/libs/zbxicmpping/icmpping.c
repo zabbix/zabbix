@@ -539,7 +539,6 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
 
-
 	if (NULL == (f = popen(tmp, "r")))
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", tmp, zbx_strerror(errno));
@@ -687,7 +686,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (NOTSUPPORTED == ret)
 	{
 		if (WIFSIGNALED(rc))
-			ret = DISCARDED;
+			ret = FAIL;
 		else
 			zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
 	}
