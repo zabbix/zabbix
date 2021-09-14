@@ -29,14 +29,7 @@ class CAuthentication extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	/**
-	 * @var string
-	 */
 	protected $tableName = 'config';
-
-	/**
-	 * @var string
-	 */
 	protected $tableAlias = 'c';
 
 	/**
@@ -52,8 +45,6 @@ class CAuthentication extends CApiService {
 	];
 
 	/**
-	 * Get authentication parameters.
-	 *
 	 * @param array $options
 	 *
 	 * @throws APIException if the input is invalid.
@@ -85,8 +76,6 @@ class CAuthentication extends CApiService {
 	}
 
 	/**
-	 * Update authentication parameters.
-	 *
 	 * @param array $auth
 	 *
 	 * @throws APIException if the input is invalid.
@@ -103,18 +92,16 @@ class CAuthentication extends CApiService {
 				'values' => $upd_config,
 				'where' => ['configid' => $db_auth['configid']]
 			]);
-
-			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION,
-				[['configid' => $db_auth['configid']] + $auth], [$db_auth['configid'] => $db_auth]
-			);
 		}
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION,
+			[['configid' => $db_auth['configid']] + $auth], [$db_auth['configid'] => $db_auth]
+		);
 
 		return array_keys($auth);
 	}
 
 	/**
-	 * Validate updated authentication parameters.
-	 *
 	 * @param array  $auth
 	 *
 	 * @throws APIException if the input is invalid.

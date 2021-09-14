@@ -29,14 +29,7 @@ class CSettings extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	/**
-	 * @var string
-	 */
 	protected $tableName = 'config';
-
-	/**
-	 * @var string
-	 */
 	protected $tableAlias = 'c';
 
 	/**
@@ -56,8 +49,6 @@ class CSettings extends CApiService {
 	];
 
 	/**
-	 * Get settings parameters.
-	 *
 	 * @param array $options
 	 *
 	 * @throws APIException if the input is invalid.
@@ -89,10 +80,8 @@ class CSettings extends CApiService {
 	}
 
 	/**
-	 * Get global settings parameters.
-	 *
 	 * @param array $options
-	 * @param bool  $api_call
+	 * @param bool  $api_call  Flag indicating whether this method called via an API call or from a local PHP file.
 	 *
 	 * @throws APIException if the input is invalid.
 	 *
@@ -134,8 +123,6 @@ class CSettings extends CApiService {
 	}
 
 	/**
-	 * Update settings parameters.
-	 *
 	 * @param array $settings
 	 *
 	 * @throws APIException if the input is invalid.
@@ -158,18 +145,16 @@ class CSettings extends CApiService {
 				$this->setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
 				$this->setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
 			}
-
-			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SETTINGS,
-				[['configid' => $db_settings['configid']] + $settings], [$db_settings['configid'] => $db_settings]
-			);
 		}
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SETTINGS,
+			[['configid' => $db_settings['configid']] + $settings], [$db_settings['configid'] => $db_settings]
+		);
 
 		return array_keys($settings);
 	}
 
 	/**
-	 * Validate updated settings parameters.
-	 *
 	 * @param array $settings
 	 *
 	 * @throws APIException if the input is invalid.

@@ -29,14 +29,7 @@ class CHousekeeping extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	/**
-	 * @var string
-	 */
 	protected $tableName = 'config';
-
-	/**
-	 * @var string
-	 */
 	protected $tableAlias = 'c';
 
 	/**
@@ -49,8 +42,6 @@ class CHousekeeping extends CApiService {
 	];
 
 	/**
-	 * Get housekeeping parameters.
-	 *
 	 * @param array $options
 	 *
 	 * @throws APIException if the input is invalid.
@@ -82,8 +73,6 @@ class CHousekeeping extends CApiService {
 	}
 
 	/**
-	 * Update housekeeping parameters.
-	 *
 	 * @param array $hk
 	 *
 	 * @throws APIException if the input is invalid.
@@ -100,18 +89,16 @@ class CHousekeeping extends CApiService {
 				'values' => $upd_config,
 				'where' => ['configid' => $db_hk['configid']]
 			]);
-
-			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOUSEKEEPING,
-				[['configid' => $db_hk['configid']] + $hk], [$db_hk['configid'] => $db_hk]
-			);
 		}
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOUSEKEEPING,
+			[['configid' => $db_hk['configid']] + $hk], [$db_hk['configid'] => $db_hk]
+		);
 
 		return array_keys($hk);
 	}
 
 	/**
-	 * Validate updated housekeeping parameters.
-	 *
 	 * @param array $hk
 	 *
 	 * @throws APIException if the input is invalid.
