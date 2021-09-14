@@ -1515,7 +1515,7 @@ class CRole extends CApiService {
 				'status' => MODULE_STATUS_ENABLED
 			],
 			'preservekeys' => true
-		]);
+		], false);
 
 		return array_keys($modules);
 	}

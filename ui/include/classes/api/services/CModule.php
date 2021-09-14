@@ -37,12 +37,17 @@ class CModule extends CApiService {
 
 	/**
 	 * @param array  $options
+	 * @param bool   $api_call  Check is method called via API call or from local php file.
 	 *
 	 * @throws APIException
 	 *
 	 * @return array|string
 	 */
-	public function get(array $options = []) {
+	public function get(array $options = [], $api_call = true) {
+		if ($api_call && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'moduleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
