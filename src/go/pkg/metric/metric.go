@@ -52,7 +52,6 @@ type Param struct {
 	required     bool
 	validator    Validator
 	defaultValue *string
-	sessionOnly  bool
 }
 
 func ucFirst(str string) string {
@@ -127,12 +126,6 @@ func (p *Param) WithDefault(value string) *Param {
 	}
 
 	p.defaultValue = &value
-
-	return p
-}
-
-func (p *Param) SessionOnly() *Param {
-	p.sessionOnly = true
 
 	return p
 }
