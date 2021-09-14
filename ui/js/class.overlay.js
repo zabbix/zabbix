@@ -207,7 +207,7 @@ Overlay.prototype.unsetLoading = function() {
 	this.buttons_disabled_for_loading.forEach(($button) => {
 		$button.removeClass('is-loading').prop('disabled', false);
 	});
-	delete this.buttons_disabled_for_loading;
+	this.buttons_disabled_for_loading = [];
 };
 
 /**
@@ -349,6 +349,7 @@ Overlay.prototype.makeButtons = function(arr) {
 	this.$btn_submit = null;
 	this.$btn_focus = null;
 	this.action_buttons = [];
+	this.buttons_disabled_for_loading = [];
 
 	arr.forEach(function(obj) {
 		if (typeof obj.action === 'string') {
