@@ -36,6 +36,7 @@ const (
 	kindSession paramKind = iota
 	kindConn
 	kindGeneral
+	kindSessionOnly
 )
 
 const (
@@ -97,6 +98,12 @@ func NewParam(name, description string) *Param {
 // Returns a pointer.
 func NewConnParam(name, description string) *Param {
 	return newParam(name, description, kindConn, optional, nil)
+}
+
+// NewSessionParam creates a new connection parameter with given name and validator.
+// Returns a pointer.
+func NewSessionOnlyParam(name, description string) *Param {
+	return newParam(name, description, kindSessionOnly, optional, nil)
 }
 
 // WithSession transforms a connection typed parameter to a dual purpose parameter which can be either
@@ -369,7 +376,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 				val = p.defaultValue
 			}
 		} else {
-			if p.sessionOnly {
+			if p.kind == kindSessionOnly {
 				return nil, zbxerr.ErrorInvalidParams.Wrap(
 					fmt.Errorf("%q cannot be passed as a key parameter", p.name))
 			}

@@ -73,10 +73,10 @@ var (
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
 	paramUsername    = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
 	paramPassword    = metric.NewConnParam("Password", "User's password.").WithDefault("")
-	paramTLSConnect  = metric.NewConnParam("TLSConnect", "DB connection encryption type.").WithDefault("").SessionOnly()
-	paramTLSCaFile   = metric.NewConnParam("TLSCAFile", "TLS ca file path.").WithDefault("").SessionOnly()
-	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("").SessionOnly()
-	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("").SessionOnly()
+	paramTLSConnect  = metric.NewSessionOnlyParam("TLSConnect", "DB connection encryption type.").WithDefault("")
+	paramTLSCaFile   = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
+	paramTLSCertFile = metric.NewSessionOnlyParam("TLSCertFile", "TLS cert file path.").WithDefault("")
+	paramTLSKeyFile  = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
 )
 
 var metrics = metric.MetricSet{
@@ -85,8 +85,8 @@ var metrics = metric.MetricSet{
 			paramTLSKeyFile}, false),
 
 	keyDatabaseSize: metric.New("Returns size of given database in bytes.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-			paramTLSKeyFile, metric.NewParam("Database", "Database name.").SetRequired()}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, metric.NewParam("Database", "Database name.").SetRequired(),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyPing: metric.New("Tests if connection is alive or not.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
@@ -97,8 +97,8 @@ var metrics = metric.MetricSet{
 			paramTLSKeyFile}, false),
 
 	keyReplicationSlaveStatus: metric.New("Returns replication status.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-			paramTLSKeyFile, metric.NewParam("Master", "Master host.")}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, metric.NewParam("Master", "Master host."), paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+			paramTLSKeyFile}, false),
 
 	keyStatusVars: metric.New("Returns values of global status variables.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
