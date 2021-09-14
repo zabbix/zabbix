@@ -200,10 +200,11 @@ class CModule extends CApiService {
 	 * @static
 	 *
 	 * @param array $modules
+	 * @param array $db_modules
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private static function validateUpdate(array &$modules): void {
+	private static function validateUpdate(array &$modules, array &$db_modules = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['moduleid']], 'fields' => [
 			'moduleid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'status' =>		['type' => API_INT32, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])],
