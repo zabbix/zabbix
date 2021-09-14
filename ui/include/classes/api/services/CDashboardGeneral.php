@@ -115,20 +115,21 @@ abstract class CDashboardGeneral extends CApiService {
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);
 
 		$resource = ($this instanceof CDashboard) ? CAudit::RESOURCE_DASHBOARD : CAudit::RESOURCE_TEMPLATE_DASHBOARD;
-		$this->addAuditBulk(CAudit::ACTION_DELETE, $resource, $db_dashboards);
+		self::addAuditLog(CAudit::ACTION_DELETE, $resource, $db_dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}
 
 	/**
-	 * Add the existing pages, widgets and widget fields to $db_dashboards whether these are affected by the update.
+	 * Add the existing users, user groups, pages, widgets and widget fields to $db_dashboards whether
+	 * these are affected by the update.
 	 *
 	 * @param array $dashboards
 	 * @param array $db_dashboards
 	 */
 	protected function addAffectedObjects(array $dashboards, array &$db_dashboards): void {
-		// Select pages of these dashboards.
-		$dashboardids = [];
+		// Select pages, useres and user groups of these dashboards.
+		$dashboardids = ['pages' => [], 'users' => [], 'userGroups' => []];
 
 		// Select widgets of these pages.
 		$dashboard_pageids = [];
@@ -137,8 +138,19 @@ abstract class CDashboardGeneral extends CApiService {
 		$widgetids = [];
 
 		foreach ($dashboards as $dashboard) {
+			if (array_key_exists('users', $dashboard)) {
+				$dashboardids['users'][$dashboard['dashboardid']] = true;
+				$db_dashboards[$dashboard['dashboardid']]['users'] = [];
+			}
+
+			if (array_key_exists('userGroups', $dashboard)) {
+				$dashboardids['userGroups'][$dashboard['dashboardid']] = true;
+				$db_dashboards[$dashboard['dashboardid']]['userGroups'] = [];
+			}
+
 			if (array_key_exists('pages', $dashboard)) {
-				$dashboardids[$dashboard['dashboardid']] = true;
+				$dashboardids['pages'][$dashboard['dashboardid']] = true;
+				$db_dashboards[$dashboard['dashboardid']]['pages'] = [];
 
 				foreach ($dashboard['pages'] as $dashboard_page) {
 					if (array_key_exists('dashboard_pageid', $dashboard_page)) {
@@ -158,15 +170,40 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		foreach ($db_dashboards as &$db_dashboard) {
-			$db_dashboard['pages'] = [];
+		if ($dashboardids['users']) {
+			$options = [
+				'output' => array_keys(DB::getSchema('dashboard_user')['fields']),
+				'filter' => ['dashboardid' => array_keys($dashboardids['users'])]
+			];
+			$db_users = DBselect(DB::makeSql('dashboard_user', $options));
+			while ($db_user = DBfetch($db_users)) {
+				$db_dashboards[$db_user['dashboardid']]['users'][$db_user['dashboard_userid']] = [
+					'dashboard_userid' => $db_user['dashboard_userid'],
+					'userid' => $db_user['userid'],
+					'permission' => $db_user['permission']
+				];
+			}
 		}
-		unset($db_dashboard);
 
-		if ($dashboardids) {
+		if ($dashboardids['userGroups']) {
+			$options = [
+				'output' => array_keys(DB::getSchema('dashboard_usrgrp')['fields']),
+				'filter' => ['dashboardid' => array_keys($dashboardids['userGroups'])]
+			];
+			$db_groups = DBselect(DB::makeSql('dashboard_usrgrp', $options));
+			while ($db_group = DBfetch($db_groups)) {
+				$db_dashboards[$db_group['dashboardid']]['userGroups'][$db_group['dashboard_usrgrpid']] = [
+					'dashboard_usrgrpid' => $db_group['dashboard_usrgrpid'],
+					'usrgrpid' => $db_group['usrgrpid'],
+					'permission' => $db_group['permission']
+				];
+			}
+		}
+
+		if ($dashboardids['pages']) {
 			$db_dashboard_pages = DB::select('dashboard_page', [
 				'output' => array_keys(DB::getSchema('dashboard_page')['fields']),
-				'filter' => ['dashboardid' => array_keys($dashboardids)],
+				'filter' => ['dashboardid' => array_keys($dashboardids['pages'])],
 				'preservekeys' => true
 			]);
 
@@ -561,7 +598,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
-	protected function updatePages(array $dashboards, array $db_dashboards = null): void {
+	protected function updatePages(array &$dashboards, array $db_dashboards = null): void {
 		$db_dashboard_pages = [];
 
 		if ($db_dashboards !== null) {
@@ -606,23 +643,25 @@ abstract class CDashboardGeneral extends CApiService {
 
 		if ($ins_dashboard_pages) {
 			$dashboard_pageids = DB::insert('dashboard_page', $ins_dashboard_pages);
-
-			foreach ($dashboards as &$dashboard) {
-				if (array_key_exists('pages', $dashboard)) {
-					foreach ($dashboard['pages'] as &$dashboard_page) {
-						if (!array_key_exists('dashboard_pageid', $dashboard_page)) {
-							$dashboard_page['dashboard_pageid'] = array_shift($dashboard_pageids);
-						}
-					}
-					unset($dashboard_page);
-				}
-			}
-			unset($dashboard);
 		}
 
 		if ($upd_dashboard_pages) {
 			DB::update('dashboard_page', $upd_dashboard_pages);
 		}
+
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('pages', $dashboard)) {
+				continue;
+			}
+
+			foreach ($dashboard['pages'] as &$dashboard_page) {
+				if (!array_key_exists('dashboard_pageid', $dashboard_page)) {
+					$dashboard_page['dashboard_pageid'] = array_shift($dashboard_pageids);
+				}
+			}
+			unset($dashboard_page);
+		}
+		unset($dashboard);
 
 		$this->updateWidgets($dashboards, $db_dashboards);
 
@@ -639,7 +678,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
-	protected function updateWidgets(array $dashboards, array $db_dashboards = null): void {
+	protected function updateWidgets(array &$dashboards, array $db_dashboards = null): void {
 		$db_widgets = [];
 
 		if ($db_dashboards !== null) {
@@ -697,23 +736,6 @@ abstract class CDashboardGeneral extends CApiService {
 
 		if ($ins_widgets) {
 			$widgetids = DB::insert('widget', $ins_widgets);
-
-			foreach ($dashboards as &$dashboard) {
-				if (array_key_exists('pages', $dashboard)) {
-					foreach ($dashboard['pages'] as &$dashboard_page) {
-						if (array_key_exists('widgets', $dashboard_page)) {
-							foreach ($dashboard_page['widgets'] as &$widget) {
-								if (!array_key_exists('widgetid', $widget)) {
-									$widget['widgetid'] = array_shift($widgetids);
-								}
-							}
-							unset($widget);
-						}
-					}
-					unset($dashboard_page);
-				}
-			}
-			unset($dashboard);
 		}
 
 		if ($upd_widgets) {
@@ -723,6 +745,27 @@ abstract class CDashboardGeneral extends CApiService {
 		if ($db_widgets) {
 			self::deleteWidgets(array_keys($db_widgets));
 		}
+
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('pages', $dashboard)) {
+				continue;
+			}
+
+			foreach ($dashboard['pages'] as &$dashboard_page) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
+					continue;
+				}
+
+				foreach ($dashboard_page['widgets'] as &$widget) {
+					if (!array_key_exists('widgetid', $widget)) {
+						$widget['widgetid'] = array_shift($widgetids);
+					}
+				}
+				unset($widget);
+			}
+			unset($dashboard_page);
+		}
+		unset($dashboard);
 
 		$this->updateWidgetFields($dashboards, $db_dashboards);
 	}
@@ -735,19 +778,20 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
-	protected function updateWidgetFields(array $dashboards, array $db_dashboards = null): void {
+	protected function updateWidgetFields(array &$dashboards, array $db_dashboards = null): void {
 		$ins_widget_fields = [];
 		$upd_widget_fields = [];
 		$del_widget_fieldids = [];
+		$widget_fieldids = [];
 
-		foreach ($dashboards as $dashboard) {
+		foreach ($dashboards as &$dashboard) {
 			if (!array_key_exists('pages', $dashboard)) {
 				continue;
 			}
 
 			$db_dashboard_pages = ($db_dashboards !== null) ? $db_dashboards[$dashboard['dashboardid']]['pages'] : [];
 
-			foreach ($dashboard['pages'] as $dashboard_page) {
+			foreach ($dashboard['pages'] as &$dashboard_page) {
 				if (!array_key_exists('widgets', $dashboard_page)) {
 					continue;
 				}
@@ -756,7 +800,7 @@ abstract class CDashboardGeneral extends CApiService {
 					? $db_dashboard_pages[$dashboard_page['dashboard_pageid']]['widgets']
 					: [];
 
-				foreach ($dashboard_page['widgets'] as $widget) {
+				foreach ($dashboard_page['widgets'] as &$widget) {
 					if (!array_key_exists('fields', $widget)) {
 						continue;
 					}
@@ -767,18 +811,21 @@ abstract class CDashboardGeneral extends CApiService {
 
 					$widget_fields = [];
 
-					foreach ($widget['fields'] as $widget_field) {
-						$widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']]] = $widget_field['value'];
-						$widget_fields[$widget_field['type']][$widget_field['name']][] = $widget_field;
+					foreach ($db_widget_fields as $db_widget_field) {
+						$widget_fields[$db_widget_field['type']][$db_widget_field['name']][] = $db_widget_field['widget_fieldid'];
 					}
 
-					foreach ($db_widget_fields as $db_widget_field) {
-						if (array_key_exists($db_widget_field['type'], $widget_fields)
-								&& array_key_exists($db_widget_field['name'], $widget_fields[$db_widget_field['type']])
-								&& $widget_fields[$db_widget_field['type']][$db_widget_field['name']]) {
-							$widget_field = array_shift(
-								$widget_fields[$db_widget_field['type']][$db_widget_field['name']]
-							);
+					foreach ($widget['fields'] as &$widget_field) {
+						$widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']]] = $widget_field['value'];
+						unset($widget_field['value']);
+
+						if (array_key_exists($widget_field['type'], $widget_fields)
+								&& array_key_exists($widget_field['name'], $widget_fields[$widget_field['type']])
+								&& $widget_fields[$widget_field['type']][$widget_field['name']]) {
+							$db_widget_fieldid = array_shift($widget_fields[$widget_field['type']][$widget_field['name']]);
+							$db_widget_field = $db_widget_fields[$db_widget_fieldid];
+
+							$widget_field['widget_fieldid'] = $db_widget_fieldid;
 
 							$upd_widget_field = DB::getUpdatedValues('widget_field', $widget_field, $db_widget_field);
 
@@ -788,25 +835,25 @@ abstract class CDashboardGeneral extends CApiService {
 									'where' => ['widget_fieldid' => $db_widget_field['widget_fieldid']]
 								];
 							}
+
+							unset($db_widget_fields[$db_widget_fieldid]);
 						}
 						else {
-							$del_widget_fieldids[] = $db_widget_field['widget_fieldid'];
+							$ins_widget_fields[] = ['widgetid' => $widget['widgetid']] + $widget_field;
 						}
 					}
+					unset($widget_field);
 
-					foreach ($widget_fields as $widget_fields) {
-						foreach ($widget_fields as $widget_fields) {
-							foreach ($widget_fields as $widget_field) {
-								$ins_widget_fields[] = ['widgetid' => $widget['widgetid']] + $widget_field;
-							}
-						}
-					}
+					$del_widget_fieldids = array_merge($del_widget_fieldids, array_keys($db_widget_fields));
 				}
+				unset($widget);
 			}
+			unset($dashboard_page);
 		}
+		unset($dashboard);
 
 		if ($ins_widget_fields) {
-			DB::insert('widget_field', $ins_widget_fields);
+			$widget_fieldids = DB::insert('widget_field', $ins_widget_fields);
 		}
 
 		if ($upd_widget_fields) {
@@ -816,6 +863,34 @@ abstract class CDashboardGeneral extends CApiService {
 		if ($del_widget_fieldids) {
 			DB::delete('widget_field', ['widget_fieldid' => $del_widget_fieldids]);
 		}
+
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('pages', $dashboard)) {
+				continue;
+			}
+
+			foreach ($dashboard['pages'] as &$dashboard_page) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
+					continue;
+				}
+
+				foreach ($dashboard_page['widgets'] as &$widget) {
+					if (!array_key_exists('fields', $widget)) {
+						continue;
+					}
+
+					foreach ($widget['fields'] as &$widget_field) {
+						if (!array_key_exists('widget_fieldid', $widget_field)) {
+							$widget_field['widget_fieldid'] = array_shift($widget_fieldids);
+						}
+					}
+					unset($widget_field);
+				}
+				unset($widget);
+			}
+			unset($dashboard_page);
+		}
+		unset($dashboard);
 	}
 
 	/**

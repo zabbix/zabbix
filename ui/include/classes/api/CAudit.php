@@ -102,6 +102,8 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
@@ -114,6 +116,8 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_DASHBOARD => 'name',
+		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
@@ -126,6 +130,8 @@ class CAudit {
 	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
@@ -151,6 +157,14 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'dashboard.users' => 'dashboard_user',
+		'dashboard.userGroups' => 'dashboard_usrgrp',
+		'dashboard.pages' => 'dashboard_page',
+		'dashboard.pages.widgets' => 'widget',
+		'dashboard.pages.widgets.fields' => 'widget_field',
+		'templatedashboard.pages' => 'dashboard_page',
+		'templatedashboard.pages.widgets' => 'widget',
+		'templatedashboard.pages.widgets.fields' => 'widget_field',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
@@ -165,6 +179,14 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'dashboard.users' => 'dashboard_userid',
+		'dashboard.userGroups' => 'dashboard_usrgrpid',
+		'dashboard.pages' => 'dashboard_pageid',
+		'dashboard.pages.widgets' => 'widgetid',
+		'dashboard.pages.widgets.fields' => 'widget_fieldid',
+		'templatedashboard.pages' => 'dashboard_pageid',
+		'templatedashboard.pages.widgets' => 'widgetid',
+		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
@@ -360,9 +382,14 @@ class CAudit {
 		foreach ($object as $key => $value) {
 			$index = '.'.$key;
 
-			if (array_key_exists($prefix, self::NESTED_OBJECTS_IDS)) {
-				$index = '['.$value[self::NESTED_OBJECTS_IDS[$prefix]].']';
-				unset($value[self::NESTED_OBJECTS_IDS[$prefix]]);
+			$is_prefix_has_last_id = preg_match('/\[[0-9]+\]$/', $prefix);
+			if (!$is_prefix_has_last_id) {
+				$object_prefix = preg_replace('/\[[0-9]+\]/', '', $prefix);
+
+				if (array_key_exists($object_prefix, self::NESTED_OBJECTS_IDS)) {
+					$index = '['.$value[self::NESTED_OBJECTS_IDS[$object_prefix]].']';
+					unset($value[self::NESTED_OBJECTS_IDS[$object_prefix]]);
+				}
 			}
 
 			$new_prefix = $prefix.$index;
