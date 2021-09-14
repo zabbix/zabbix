@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-13T17:55:07Z'
+  date: '2021-09-14T14:35:21Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -46,7 +46,8 @@ zabbix_export:
                 version = [],
                 apps = [],
                 appsLinks = [],
-                edgeSDWan = [];
+                edgeSDWan = [],
+                edgeSDWanPath = [];
             
             function getHttpData(url, body) {
                 response = request.post(url, body);
@@ -86,11 +87,19 @@ zabbix_export:
                     responseEdgeSDWan = getHttpData('https://' + params.url + '/portal/rest/edge/getEdgeSDWANPeers', '{ "enterpriseId":' + edges[i].enterpriseId + ',"edgeId":' + edges[i].id + '}');
             
                     for (var e in responseEdgeSDWan) {
-                        responseEdgeSDWan[e].edgeId = edges[i].id
-                        responseEdgeSDWan[e].edgeName = edges[i].name
-                        responseEdgeSDWan[e].enterpriseId = edges[i].enterpriseId
+                        data = {
+                            "enterpriseId": edges[i].enterpriseId,
+                            "edgeId": edges[i].id,
+                            "peerLogicalId": responseEdgeSDWan[e].deviceLogicalId
+                        }
+                        responseEdgeSDWanPath = getHttpData('https://' + params.url + '/portal/rest/metrics/getEdgeSDWANPeerPathMetrics', JSON.stringify(data));
+                        edgeSDWanPath = edgeSDWanPath.concat(responseEdgeSDWanPath);
+            
+                        responseEdgeSDWan[e].edgeId = edges[i].id;
+                        responseEdgeSDWan[e].edgeName = edges[i].name;
+                        responseEdgeSDWan[e].enterpriseId = edges[i].enterpriseId;
                     }
-                    edgeSDWan = edgeSDWan.concat(responseEdgeSDWan)
+                    edgeSDWan = edgeSDWan.concat(responseEdgeSDWan);
                 }
             
             } catch (error) {
@@ -103,6 +112,7 @@ zabbix_export:
                 'links': links,
                 'gateways': gateways,
                 'edgeSDWan': edgeSDWan,
+                'edgeSDWanPath': edgeSDWanPath,
                 'version': version,
                 'error': error_msg.toString()
             };
@@ -1332,7 +1342,7 @@ zabbix_export:
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])<>1'
                   name: 'Edge {#NAME}: HA state is not "READY"'
                   priority: WARNING
-                  description: 'HA state is not "READY"'
+                  description: 'HA state is not "READY".'
             -
               uuid: fdb55947147249109da453009d6bd443
               name: 'Edge {#NAME}: Model number'
@@ -2509,7 +2519,7 @@ zabbix_export:
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.link.state[{#ID}])<>1'
                   name: 'Link {#IP}({#NAME}): Link state is not "STABLE"'
                   priority: WARNING
-                  description: 'Link state is not "STABLE"'
+                  description: 'Link state is not "STABLE".'
             -
               uuid: 43deb16e85644937a182b01eadb875d0
               name: 'Link {#IP}({#NAME}): Total bytes'
@@ -2649,6 +2659,293 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.links
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          uuid: 23ae8832dee54e7087b8c4d3c970a9ea
+          name: 'SDWAN peers path metrics discovery'
+          type: DEPENDENT
+          key: velocloud.sdwanpath.discovery
+          delay: '0'
+          description: 'Metrics for SDWAN peers path.'
+          item_prototypes:
+            -
+              uuid: 2fafb7d1b4c1429381f2f46c60dafa28
+              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Bytes Rx'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.bytes_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Bytes Rx of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.bytesRx.first()'
+              master_item:
+                key: velocloud.get
+              tags:
+                -
+                  tag: Name
+                  value: '{#NAME}'
+                -
+                  tag: Resource
+                  value: SDWANpath
+                -
+                  tag: Target
+                  value: Velocloud
+                -
+                  tag: Transport
+                  value: Dependent
+                -
+                  tag: Type
+                  value: Gauge
+            -
+              uuid: 2fa176affa6b46ffae3682ea7cb96866
+              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Bytes Tx'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.bytes_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Bytes Tx of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.bytesTx.first()'
+              master_item:
+                key: velocloud.get
+              tags:
+                -
+                  tag: Name
+                  value: '{#NAME}'
+                -
+                  tag: Resource
+                  value: SDWANpath
+                -
+                  tag: Target
+                  value: Velocloud
+                -
+                  tag: Transport
+                  value: Dependent
+                -
+                  tag: Type
+                  value: Gauge
+            -
+              uuid: cf8f3d0c61994e49b493d79160da27bf
+              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Packets Rx'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.packets_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: '!packets'
+              description: 'Packets Rx of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetsRx.first()'
+              master_item:
+                key: velocloud.get
+              tags:
+                -
+                  tag: Name
+                  value: '{#NAME}'
+                -
+                  tag: Resource
+                  value: SDWANpath
+                -
+                  tag: Target
+                  value: Velocloud
+                -
+                  tag: Transport
+                  value: Dependent
+                -
+                  tag: Type
+                  value: Gauge
+            -
+              uuid: 49fc4e85c5a5415793fc89f2c3cdec8f
+              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Packets Tx'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.packets_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: '!packets'
+              description: 'Packets Tx of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetsTx.first()'
+              master_item:
+                key: velocloud.get
+              tags:
+                -
+                  tag: Name
+                  value: '{#NAME}'
+                -
+                  tag: Resource
+                  value: SDWANpath
+                -
+                  tag: Target
+                  value: Velocloud
+                -
+                  tag: Transport
+                  value: Dependent
+                -
+                  tag: Type
+                  value: Gauge
+            -
+              uuid: 98a0c2c3a3be47e9bd32cf719069cad2
+              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Packet Loss Rx'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.packet_loss_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Packet Loss Rx of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetLossRx.first()'
+              master_item:
+                key: velocloud.get
+              tags:
+                -
+                  tag: Name
+                  value: '{#NAME}'
+                -
+                  tag: Resource
+                  value: SDWANpath
+                -
+                  tag: Target
+                  value: Velocloud
+                -
+                  tag: Transport
+                  value: Dependent
+                -
+                  tag: Type
+                  value: Gauge
+            -
+              uuid: 0f2ef8113a3644feae7b827675362485
+              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Packet Loss Tx'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.packet_loss_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Packet Loss Tx of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetLossTx.first()'
+              master_item:
+                key: velocloud.get
+              tags:
+                -
+                  tag: Name
+                  value: '{#NAME}'
+                -
+                  tag: Resource
+                  value: SDWANpath
+                -
+                  tag: Target
+                  value: Velocloud
+                -
+                  tag: Transport
+                  value: Dependent
+                -
+                  tag: Type
+                  value: Gauge
+            -
+              uuid: 3a7ed14c13874c3088f28253a25a0c10
+              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Bytes total'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.total_bytes[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total Bytes of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.totalBytes.first()'
+              master_item:
+                key: velocloud.get
+              tags:
+                -
+                  tag: Name
+                  value: '{#NAME}'
+                -
+                  tag: Resource
+                  value: SDWANpath
+                -
+                  tag: Target
+                  value: Velocloud
+                -
+                  tag: Transport
+                  value: Dependent
+                -
+                  tag: Type
+                  value: Gauge
+            -
+              uuid: 1f7bbdd7c1e24429878538b3b6bbddc4
+              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Total packets'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.total_packets[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: '!packets'
+              description: 'Total packets of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.totalPackets.first()'
+              master_item:
+                key: velocloud.get
+              tags:
+                -
+                  tag: Name
+                  value: '{#NAME}'
+                -
+                  tag: Resource
+                  value: SDWANpath
+                -
+                  tag: Target
+                  value: Velocloud
+                -
+                  tag: Transport
+                  value: Dependent
+                -
+                  tag: Type
+                  value: Gauge
+          master_item:
+            key: velocloud.get
+          lld_macro_paths:
+            -
+              lld_macro: '{#DESTINATION}'
+              path: $.destination.deviceName
+            -
+              lld_macro: '{#NAME}'
+              path: $.source.linkName
+            -
+              lld_macro: '{#SOURCE}'
+              path: $.source.deviceName
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.edgeSDWanPath
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
