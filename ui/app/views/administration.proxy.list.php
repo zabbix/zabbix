@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('administration.proxy.list.js.php');
 
 if ($data['uncheck']) {
 	uncheckTableRows('proxy');
@@ -113,7 +116,7 @@ foreach ($data['proxies'] as $proxy) {
 				->setArgument('hostid', $host['hostid'])
 			))
 				->addClass($style)
-				->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)
+				->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
 			: (new CSpan($host['name']))->addClass($style);
 	}
 
@@ -189,7 +192,3 @@ $proxyForm->addItem([
 
 // append form to widget
 $widget->addItem($proxyForm)->show();
-
-(new CScriptTag('host_popup.init();'))
-	->setOnDocumentReady()
-	->show();

@@ -240,7 +240,6 @@ foreach ($data['hosts'] as $host) {
 			->setArgument('hostid', $host['hostid'])
 	))
 		->onClick('view.editHost(event, '.json_encode($host['hostid']).')');
-//		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT);
 
 	$maintenance_icon = false;
 	$status_toggle_url = (new CUrl('zabbix.php'))
