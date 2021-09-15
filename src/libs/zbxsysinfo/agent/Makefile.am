@@ -4,4 +4,9 @@ noinst_LIBRARIES = libagentsysinfo.a
 
 libagentsysinfo_a_SOURCES = \
 	agent.c \
-	agent.h
+	agent.h \
+	modbus.c
+
+if HAVE_LIBMODBUS
+libagentsysinfo_a_CFLAGS = @LIBMODBUS_CFLAGS@
+endif
