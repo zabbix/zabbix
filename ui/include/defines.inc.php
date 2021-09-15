@@ -1339,6 +1339,7 @@ define('API_NUMERIC_RANGES',		41);
 define('API_UUID',					42);
 define('API_VAULT_SECRET',			43);
 define('API_CUID',					45);
+define('API_IMAGE',					46);
 
 // flags
 define('API_REQUIRED',					0x0001);
