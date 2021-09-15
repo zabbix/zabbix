@@ -102,6 +102,7 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_ICON_MAP => 'icon_map',
 		self::RESOURCE_IMAGE => 'images',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_USER => 'users',
@@ -116,6 +117,7 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_ICON_MAP => 'name',
 		self::RESOURCE_IMAGE => 'name',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_USER => 'username',
@@ -130,6 +132,7 @@ class CAudit {
 	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_ICON_MAP => 'iconmap',
 		self::RESOURCE_IMAGE => 'image',
 		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_USER => 'user',
@@ -157,6 +160,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'iconmap.mappings' => 'icon_mapping',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'regexp.expressions' => 'expressions',
@@ -172,6 +176,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'iconmap.mappings' => 'iconmappingid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'regexp.expressions' => 'expressionid',
