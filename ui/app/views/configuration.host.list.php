@@ -116,7 +116,7 @@ $filter = (new CFilter())
 			->addItem([
 				new CLabel(_('Port'), 'filter_port'),
 				new CFormField(
-					(new CTextBox('', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				)
 			]),
 		(new CFormGrid())
