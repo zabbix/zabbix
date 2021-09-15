@@ -1165,15 +1165,15 @@ class CApiService {
 	/**
 	 * Add audit log records on behalf of the given user.
 	 *
-	 * @param string $userid
-	 * @param string $ip
-	 * @param string $username
-	 * @param int    $action       CAudit::ACTION_*
-	 * @param int    $resource     CAudit::RESOURCE_*
-	 * @param array  $objects      (optional)
-	 * @param array  $objects_old  (optional)
+	 * @param string|null $userid
+	 * @param string      $ip
+	 * @param string      $username
+	 * @param int         $action       CAudit::ACTION_*
+	 * @param int         $resource     CAudit::RESOURCE_*
+	 * @param array       $objects      (optional)
+	 * @param array       $objects_old  (optional)
 	 */
-	protected static function addAuditLogByUser(string $userid, string $ip, string $username, int $action,
+	protected static function addAuditLogByUser(?string $userid, string $ip, string $username, int $action,
 			int $resource, array $objects = [], array $objects_old = []): void {
 		CAudit::log($userid, $ip, $username, $action, $resource, $objects, $objects_old);
 	}

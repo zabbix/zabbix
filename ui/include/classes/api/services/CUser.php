@@ -40,13 +40,6 @@ class CUser extends CApiService {
 	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
 
 	/**
-	 * The ID of non-existent user.
-	 *
-	 * @var int
-	 */
-	private const EMPTY_USERID = 0;
-
-	/**
 	 * Get users data.
 	 *
 	 * @param array  $options
@@ -1514,10 +1507,8 @@ class CUser extends CApiService {
 		);
 
 		if (array_key_exists('error', $user_data)) {
-			$userid = array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : self::EMPTY_USERID;
-
-			self::addAuditLogByUser($userid, CWebUser::getIp(), $user['username'], CAudit::ACTION_LOGIN_FAILED,
-				CAudit::RESOURCE_USER
+			self::addAuditLogByUser(array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : null,
+				CWebUser::getIp(), $user['username'], CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
 			);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
@@ -1646,10 +1637,8 @@ class CUser extends CApiService {
 		$user_data = $this->findAccessibleUser($username, $case_sensitive, $default_auth, false);
 
 		if (array_key_exists('error', $user_data)) {
-			$userid = array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : self::EMPTY_USERID;
-
-			self::addAuditLogByUser($userid, CWebUser::getIp(), $username, CAudit::ACTION_LOGIN_FAILED,
-				CAudit::RESOURCE_USER
+			self::addAuditLogByUser(array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : null,
+				CWebUser::getIp(), $username, CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
 			);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
