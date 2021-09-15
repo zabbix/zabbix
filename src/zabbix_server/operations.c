@@ -44,7 +44,7 @@ zbx_dcheck_source_t;
  * Purpose: select hostid of discovered host                                  *
  *                                                                            *
  * Parameters: event          - [IN] source event data                        *
- *             hostname       - [OUT] hostname where event occured            *
+ *             hostname       - [OUT] hostname where event occurred           *
  *                                                                            *
  * Return value: hostid - existing hostid, 0 - if not found                   *
  *                                                                            *

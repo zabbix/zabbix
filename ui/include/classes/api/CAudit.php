@@ -102,6 +102,7 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
@@ -115,6 +116,7 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
@@ -128,6 +130,7 @@ class CAudit {
 	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -158,6 +161,7 @@ class CAudit {
 		'report.user_groups' => 'report_usrgrp',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
+		'regexp.expressions' => 'expressions',
 		'usergroup.rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
 		'usergroup.users' => 'users_groups'
@@ -174,6 +178,7 @@ class CAudit {
 		'report.user_groups' => 'reportusrgrpid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
+		'regexp.expressions' => 'expressionid',
 		'usergroup.rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
 		'usergroup.users' => 'id'

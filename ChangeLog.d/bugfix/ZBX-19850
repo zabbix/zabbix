@@ -1,1 +1,0 @@
-A......... [ZBX-19850] fixed unnecessary updates of database records in the report.update() method (Sasha)
