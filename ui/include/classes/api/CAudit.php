@@ -102,6 +102,7 @@ class CAudit {
 	 */
 	private const TABLE_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_IMAGE => 'images',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
@@ -115,6 +116,7 @@ class CAudit {
 	 */
 	private const FIELD_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_IMAGE => 'name',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
@@ -128,6 +130,7 @@ class CAudit {
 	 */
 	private const API_NAMES = [
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_IMAGE => 'image',
 		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -183,6 +186,13 @@ class CAudit {
 	 * @var array
 	 */
 	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
+
+	/**
+	 * Array of paths that contain blob fields.
+	 *
+	 * @var array
+	 */
+	private const BLOB_FIELDS = ['image.image'];
 
 	/**
 	 * Add audit records.
@@ -492,6 +502,9 @@ class CAudit {
 			if (self::isValueToMask($resource, $path, $object)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
 			}
+			elseif (in_array($path, self::BLOB_FIELDS)) {
+				$result[$path] = [self::DETAILS_ACTION_ADD];
+			}
 			else {
 				$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 			}
@@ -539,6 +552,9 @@ class CAudit {
 				if (self::isValueToMask($resource, $path, $object)) {
 					$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
 				}
+				elseif (in_array($path, self::BLOB_FIELDS)) {
+					$result[$path] = [self::DETAILS_ACTION_ADD];
+				}
 				else {
 					$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 				}
@@ -552,6 +568,9 @@ class CAudit {
 
 					if ($is_value_to_mask) {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
+					}
+					elseif (in_array($path, self::BLOB_FIELDS)) {
+						$result[$path] = [self::DETAILS_ACTION_UPDATE];
 					}
 					else {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
