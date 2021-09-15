@@ -1792,20 +1792,21 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 				severity_actual = severity - service->propagation_value;
 				if (ZBX_SERVICE_STATUS_OK >= severity_actual)
 					severity_actual = ZBX_SERVICE_STATUS_OK + 1;
+				severity = severity_actual;
 				break;
 			case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
 				severity_actual = severity + service->propagation_value;
 				if (TRIGGER_SEVERITY_COUNT <= severity_actual)
 					severity_actual = TRIGGER_SEVERITY_COUNT - 1;
+				severity = severity_actual;
 				break;
 			case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
 				severity_actual = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+				severity = ZBX_SERVICE_STATUS_OK;
 				break;
 			default:
 				severity_actual = severity;
 		}
-
-		severity = severity_actual;
 	}
 	else
 		severity_actual = TRIGGER_SEVERITY_NOT_CLASSIFIED;
