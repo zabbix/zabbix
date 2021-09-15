@@ -1949,7 +1949,7 @@ typedef struct
 {
 	zbx_uint64_t	group_prototypeid;
 	zbx_uint64_t	groupid;
-	zbx_uint64_t	templateid_orig;	/* for audit update */
+	zbx_uint64_t	templateid_host;	/* for audit update */
 	zbx_uint64_t	templateid;		/* reference to parent group_prototypeid */
 	char		*name;
 }
@@ -2099,7 +2099,7 @@ typedef struct
 	unsigned char		discover;
 	unsigned char		custom_interfaces_orig;
 	unsigned char		custom_interfaces;
-	zbx_uint64_t		templateid_orig;
+	zbx_uint64_t		templateid_host;
 }
 zbx_host_prototype_t;
 
@@ -2269,7 +2269,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		host_prototype->name_orig = NULL;
 		host_prototype->status_orig = 0;
 		host_prototype->discover_orig = 0;
-		host_prototype->templateid_orig = 0;
+		host_prototype->templateid_host = 0;
 		host_prototype->custom_interfaces_orig = 0;
 		zbx_vector_ptr_append(host_prototypes, host_prototype);
 		zbx_vector_uint64_append(&itemids, host_prototype->itemid);
@@ -2337,7 +2337,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 						host_prototype->custom_interfaces_orig = (unsigned char)atoi(row[6]);
 					}
 
-					ZBX_DBROW2UINT64(host_prototype->templateid_orig, row[7]);
+					ZBX_DBROW2UINT64(host_prototype->templateid_host, row[7]);
 
 					break;
 				}
@@ -2553,7 +2553,7 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 		group_prototype->name = zbx_strdup(NULL, row[1]);
 		ZBX_DBROW2UINT64(group_prototype->groupid, row[2]);
 		ZBX_STR2UINT64(group_prototype->templateid, row[3]);
-		group_prototype->templateid_orig = 0;
+		group_prototype->templateid_host = 0;
 
 		zbx_vector_ptr_append(&host_prototype->group_prototypes, group_prototype);
 	}
@@ -2614,7 +2614,7 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 							zbx_uint64_t	templateid_orig;
 
 							ZBX_DBROW2UINT64(templateid_orig, row[4]);
-							group_prototype->templateid_orig = templateid_orig;
+							group_prototype->templateid_host = templateid_orig;
 							group_prototype->group_prototypeid = group_prototypeid;
 							break;
 						}
@@ -3795,7 +3795,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					host_prototype->templateid);
 
 			zbx_audit_host_prototype_update_json_update_templateid(host_prototype->hostid,
-					host_prototype->templateid_orig, host_prototype->templateid);
+					host_prototype->templateid_host, host_prototype->templateid);
 
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_NAME))
 			{
@@ -3871,7 +3871,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 				zbx_audit_host_prototype_update_json_update_group_details(host_prototype->hostid,
 						group_prototype->group_prototypeid, group_prototype->name,
-						group_prototype->groupid, group_prototype->templateid_orig,
+						group_prototype->groupid, group_prototype->templateid_host,
 						group_prototype->templateid);
 			}
 		}
@@ -4266,38 +4266,38 @@ typedef struct
 	zbx_uint64_t		httpstepid;
 	zbx_uint64_t		hoststepid;
 	char			*name;
-	char			*url;
 	char			*url_orig;
-	char			*posts;
+	char			*url;
 	char			*posts_orig;
-	char			*required;
+	char			*posts;
 	char			*required_orig;
-	char			*status_codes;
+	char			*required;
 	char			*status_codes_orig;
+	char			*status_codes;
 	zbx_vector_ptr_t	httpstepitems;
 	zbx_vector_ptr_t	fields;
-	char			*timeout;
 	char			*timeout_orig;
+	char			*timeout;
 	int			no;
-	int			follow_redirects;
 	int			follow_redirects_orig;
-	int			retrieve_mode;
+	int			follow_redirects;
 	int			retrieve_mode_orig;
-	int			post_type;
+	int			retrieve_mode;
 	int			post_type_orig;
+	int			post_type;
 #define ZBX_FLAG_HTTPSTEP_RESET_FLAG			__UINT64_C(0x000000000000)
 #define ZBX_FLAG_HTTPSTEP_UPDATE_URL			__UINT64_C(0x000000000001)
 #define ZBX_FLAG_HTTPSTEP_UPDATE_POSTS			__UINT64_C(0x000000000002)
-#define ZBX_FLAG_HTTPSTEP_UPDATE_REQUIIRED		__UINT64_C(0x000000000004)
+#define ZBX_FLAG_HTTPSTEP_UPDATE_REQUIRED		__UINT64_C(0x000000000004)
 #define ZBX_FLAG_HTTPSTEP_UPDATE_STATUS_CODES		__UINT64_C(0x000000000008)
 #define ZBX_FLAG_HTTPSTEP_UPDATE_TIMEOUT		__UINT64_C(0x000000000010)
-#define ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECT	__UINT64_C(0x000000000020)
+#define ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECTS	__UINT64_C(0x000000000020)
 #define ZBX_FLAG_HTTPSTEP_UPDATE_RETRIEVE_MODE		__UINT64_C(0x000000000040)
 #define ZBX_FLAG_HTTPSTEP_UPDATE_POST_TYPE		__UINT64_C(0x000000000080)
 #define ZBX_FLAG_HTTPSTEP_UPDATE									\
 		(ZBX_FLAG_HTTPSTEP_UPDATE_URL | ZBX_FLAG_HTTPSTEP_UPDATE_POSTS |			\
-		ZBX_FLAG_HTTPSTEP_UPDATE_REQUIIRED | ZBX_FLAG_HTTPSTEP_UPDATE_STATUS_CODES |		\
-		ZBX_FLAG_HTTPSTEP_UPDATE_TIMEOUT | ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECT |		\
+		ZBX_FLAG_HTTPSTEP_UPDATE_REQUIRED | ZBX_FLAG_HTTPSTEP_UPDATE_STATUS_CODES |		\
+		ZBX_FLAG_HTTPSTEP_UPDATE_TIMEOUT | ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECTS |		\
 		ZBX_FLAG_HTTPSTEP_UPDATE_RETRIEVE_MODE | ZBX_FLAG_HTTPSTEP_UPDATE_POST_TYPE		\
 		)
 	zbx_uint64_t		upd_flags;
@@ -4323,39 +4323,39 @@ httptestitem_t;
 typedef struct
 {
 	zbx_uint64_t		templateid;
-	zbx_uint64_t		templateid_orig;
+	zbx_uint64_t		templateid_host;
 	zbx_uint64_t		httptestid;
 	char			*name;
-	char			*delay;
 	char			*delay_orig;
+	char			*delay;
 	zbx_vector_ptr_t	fields;
-	char			*agent;
 	char			*agent_orig;
-	char			*http_user;
+	char			*agent;
 	char			*http_user_orig;
-	char			*http_password;
+	char			*http_user;
 	char			*http_password_orig;
-	char			*http_proxy;
+	char			*http_password;
 	char			*http_proxy_orig;
+	char			*http_proxy;
 	zbx_vector_ptr_t	httpsteps;
 	zbx_vector_ptr_t	httptestitems;
 	zbx_vector_ptr_t	httptesttags;
-	int			retries;
 	int			retries_orig;
-	unsigned char		status;
+	int			retries;
 	unsigned char		status_orig;
-	unsigned char		authentication;
+	unsigned char		status;
 	unsigned char		authentication_orig;
-	char			*ssl_cert_file;
+	unsigned char		authentication;
 	char			*ssl_cert_file_orig;
-	char			*ssl_key_file;
+	char			*ssl_cert_file;
 	char			*ssl_key_file_orig;
-	char			*ssl_key_password;
+	char			*ssl_key_file;
 	char			*ssl_key_password_orig;
-	int			verify_peer;
+	char			*ssl_key_password;
 	int			verify_peer_orig;
-	int			verify_host;
+	int			verify_peer;
 	int			verify_host_orig;
+	int			verify_host;
 #define ZBX_FLAG_HTTPTEST_RESET_FLAG			__UINT64_C(0x000000000000)
 #define ZBX_FLAG_HTTPTEST_UPDATE_DELAY			__UINT64_C(0x000000000001)
 #define ZBX_FLAG_HTTPTEST_UPDATE_AGENT			__UINT64_C(0x000000000002)
@@ -4395,25 +4395,23 @@ httpfield_t;
  *                                                                            *
  * Function: DBget_httptests                                                  *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
-static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, zbx_vector_ptr_t *httptests)
+static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
+		zbx_vector_ptr_t *httptests)
 {
 	int			i, j, k, int_orig;
 	char			*sql = NULL;
-	unsigned char		uchar_orig;
 	size_t			sql_alloc = 512, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	httptest_t		*httptest;
 	httpstep_t		*httpstep;
-	httptesttag_t		*httptesttag;
 	httpfield_t		*httpfield;
 	httptestitem_t		*httptestitem;
 	httpstepitem_t		*httpstepitem;
 	zbx_vector_uint64_t	httptestids;	/* the list of web scenarios which should be added to a host */
 	zbx_vector_uint64_t	items;
-	zbx_uint64_t		httptestid, httpstepid, itemid;
+	zbx_uint64_t		httptestid, httpstepid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4445,7 +4443,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		httptest->upd_flags = ZBX_FLAG_HTTPTEST_RESET_FLAG;
 
 		ZBX_STR2UINT64(httptest->templateid, row[0]);
-		ZBX_DBROW2UINT64(httptest->templateid_orig, row[11]);
+		ZBX_DBROW2UINT64(httptest->templateid_host, row[11]);
 		ZBX_DBROW2UINT64(httptest->httptestid, row[10]);
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
@@ -4484,6 +4482,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 		if (0 != httptest->httptestid)
 		{
+			unsigned char		uchar_orig;
 
 #define SET_FLAG_STR(r, i, f, s)		\
 {						\
@@ -4495,7 +4494,6 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 }
 
 #define SET_FLAG_UCHAR(r, i, f, s)		\
-						\
 {						\
 	ZBX_STR2UCHAR(uchar_orig, (r));		\
 	if (uchar_orig != (i))			\
@@ -4506,7 +4504,6 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 }
 
 #define SET_FLAG_INT(r, i, f, s)		\
-						\
 {						\
 	int_orig = atoi(r);			\
 	if (int_orig != (i))			\
@@ -4533,8 +4530,10 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			SET_FLAG_INT(row[28], httptest->verify_peer, ZBX_FLAG_HTTPTEST_UPDATE_VERIFY_PEER, httptest);
 			SET_FLAG_INT(row[29], httptest->verify_host, ZBX_FLAG_HTTPTEST_UPDATE_VERIFY_HOST, httptest);
 		}
+
 		zbx_vector_uint64_append(&httptestids, httptest->templateid);
 	}
+
 	DBfree_result(result);
 
 	if (0 != httptestids.values_num)
@@ -4615,7 +4614,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 				httptest = (httptest_t *)httptests->values[i];
 			}
 
-			httpstep = (httpstep_t *)zbx_malloc(NULL, sizeof(httptest_t));
+			httpstep = (httpstep_t *)zbx_malloc(NULL, sizeof(httpstep_t));
 
 			ZBX_STR2UINT64(httpstep->httpstepid, row[0]);
 			httpstep->name = zbx_strdup(NULL, row[2]);
@@ -4640,24 +4639,27 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			zbx_vector_ptr_create(&httpstep->httpstepitems);
 			zbx_vector_ptr_create(&httpstep->fields);
 
-			zbx_vector_ptr_append(&httptest->httpsteps, httpstep);
 			ZBX_DBROW2UINT64(httpstep->hoststepid, row[12]);
+
 			if (0 != httpstep->hoststepid)
 			{
 				SET_FLAG_STR(row[13], httpstep->url, ZBX_FLAG_HTTPSTEP_UPDATE_URL, httpstep);
 				SET_FLAG_STR(row[14], httpstep->timeout, ZBX_FLAG_HTTPSTEP_UPDATE_TIMEOUT, httpstep);
 				SET_FLAG_STR(row[15], httpstep->posts, ZBX_FLAG_HTTPSTEP_UPDATE_POSTS, httpstep);
-				SET_FLAG_STR(row[16], httpstep->required, ZBX_FLAG_HTTPSTEP_UPDATE_REQUIIRED, httpstep);
+				SET_FLAG_STR(row[16], httpstep->required, ZBX_FLAG_HTTPSTEP_UPDATE_REQUIRED, httpstep);
 				SET_FLAG_STR(row[17], httpstep->status_codes, ZBX_FLAG_HTTPSTEP_UPDATE_STATUS_CODES,
 						httpstep);
 				SET_FLAG_INT(row[18], httpstep->follow_redirects,
-						ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECT, httpstep);
+						ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECTS, httpstep);
 				SET_FLAG_INT(row[19], httpstep->retrieve_mode, ZBX_FLAG_HTTPSTEP_UPDATE_RETRIEVE_MODE,
 						httpstep);
 				SET_FLAG_INT(row[20], httpstep->post_type, ZBX_FLAG_HTTPSTEP_UPDATE_POST_TYPE,
 						httpstep);
 			}
+
+			zbx_vector_ptr_append(&httptest->httpsteps, httpstep);
 		}
+
 		DBfree_result(result);
 
 		for (i = 0; i < httptests->values_num; i++)
@@ -4739,6 +4741,8 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			httptesttag_t	*httptesttag;
+
 			ZBX_STR2UINT64(httptestid, row[1]);
 
 			if (NULL == httptest || httptest->templateid != httptestid)
@@ -4895,6 +4899,8 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			zbx_uint64_t	itemid;
+
 			ZBX_STR2UINT64(itemid, row[0]);
 
 			for (i = 0; i < httptests->values_num; i++)
@@ -4947,9 +4953,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	httptest_t		*httptest;
 	httpfield_t		*httpfield;
 	httpstep_t		*httpstep;
-	httptestitem_t		*httptestitem;
-	httpstepitem_t		*httpstepitem;
-	httptesttag_t		*httptesttag;
 	zbx_uint64_t		httptestid = 0, httpstepid = 0, httptestitemid = 0, httpstepitemid = 0,
 				httptestfieldid = 0, httpstepfieldid = 0, httptesttagid = 0;
 	int			i, j, k, num_httpsteps = 0, num_httptestitems = 0, num_httpstepitems = 0,
@@ -5014,6 +5017,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 				httpupdtestids.values_num);
 
 		result = DBselect("%s", sql);
+
 		while (NULL != (row = DBfetch(result)))
 		{
 			zbx_uint64_t httpfieldid;
@@ -5021,6 +5025,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			ZBX_STR2UINT64(httpfieldid, row[0]);
 			zbx_vector_uint64_append(&deletefieldsids, httpfieldid);
 		}
+
 		DBfree_result(result);
 
 		sql_offset = 0;
@@ -5029,6 +5034,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 				httpupdtestids.values_num);
 
 		result = DBselect("%s", sql);
+
 		while (NULL != (row = DBfetch(result)))
 		{
 			zbx_uint64_t httptagid;
@@ -5036,6 +5042,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			ZBX_STR2UINT64(httptagid, row[0]);
 			zbx_vector_uint64_append(&deletetagids, httptagid);
 		}
+
 		DBfree_result(result);
 	}
 
@@ -5047,6 +5054,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 						httpupdstepids.values_num);
 
 		result = DBselect("%s", sql);
+
 		while (NULL != (row = DBfetch(result)))
 		{
 			zbx_uint64_t stepfieldid;
@@ -5054,6 +5062,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			ZBX_STR2UINT64(stepfieldid, row[0]);
 			zbx_vector_uint64_append(&deletestepfieldsids, stepfieldid);
 		}
+
 		DBfree_result(result);
 	}
 
@@ -5176,6 +5185,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 				for (k = 0; k < httpstep->httpstepitems.values_num; k++)
 				{
+					httpstepitem_t	*httpstepitem;
+
 					httpstepitem = (httpstepitem_t *)httpstep->httpstepitems.values[k];
 
 					zbx_db_insert_add_values(&db_insert_hsitem,  httpstepitemid, httpstepid,
@@ -5189,6 +5200,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 			for (j = 0; j < httptest->httptestitems.values_num; j++)
 			{
+				httptestitem_t	*httptestitem;
+
 				httptestitem = (httptestitem_t *)httptest->httptestitems.values[j];
 
 				zbx_db_insert_add_values(&db_insert_htitem, httptestitemid, httptest->httptestid,
@@ -5261,11 +5274,11 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_URL, url, httpstep);
 					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_POSTS, posts, httpstep);
-					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_REQUIIRED, required, httpstep);
+					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_REQUIRED, required, httpstep);
 					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_STATUS_CODES, status_codes,
 							httpstep);
 					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_TIMEOUT, timeout, httpstep);
-					PREPARE_UPDATE_INT(ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECT, follow_redirects,
+					PREPARE_UPDATE_INT(ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECTS, follow_redirects,
 							httpstep);
 					PREPARE_UPDATE_INT(ZBX_FLAG_HTTPSTEP_UPDATE_RETRIEVE_MODE, retrieve_mode,
 							httpstep);
@@ -5290,6 +5303,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 		for (j = 0; j < httptest->httptesttags.values_num; j++)
 		{
+			httptesttag_t	*httptesttag;
+
 			httptesttag = (httptesttag_t *)httptest->httptesttags.values[j];
 
 			zbx_db_insert_add_values(&db_insert_httag, httptesttagid, httptest->httptestid,
@@ -5372,7 +5387,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 /******************************************************************************
  *                                                                            *
  * Function: clean_httptests                                                  *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	clean_httptests(zbx_vector_ptr_t *httptests)
