@@ -255,6 +255,25 @@
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
 		},
 
+		editHost(hostid) {
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
 		events: {
 			addClick: (e) => {
 				const menu = [
@@ -358,6 +377,20 @@
 			idle() {
 				view.is_busy = false;
 				view.updateBusy();
+			},
+
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
 			}
 		}
 	}

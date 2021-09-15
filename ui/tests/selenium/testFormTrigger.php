@@ -204,7 +204,7 @@ class testFormTrigger extends CLegacyWebTest {
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($data['host']);
 		}
 
@@ -409,7 +409,7 @@ class testFormTrigger extends CLegacyWebTest {
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 		$oldHashFunctions = CDBHelper::getHash($sqlFunctions);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
 		$this->zbxTestClickLinkTextWait($data['description']);
@@ -780,7 +780,7 @@ class testFormTrigger extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormTrigger_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
 		$this->zbxTestCheckTitle('Configuration of triggers');

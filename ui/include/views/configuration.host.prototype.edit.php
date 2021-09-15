@@ -27,7 +27,6 @@ $discoveryRule = $data['discovery_rule'];
 $hostPrototype = $data['host_prototype'];
 $parentHost = $data['parent_host'];
 
-require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 require_once dirname(__FILE__).'/js/configuration.host.prototype.edit.js.php';
 require_once dirname(__FILE__).'/js/common.template.edit.js.php';
 
@@ -329,7 +328,8 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 $divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 		'source' => 'host_prototype',
 		'tags' => $data['tags'],
-		'readonly' => $data['readonly']
+		'readonly' => $data['readonly'],
+		'tabs_id' => 'tabs'
 	]), TAB_INDICATOR_TAGS
 );
 

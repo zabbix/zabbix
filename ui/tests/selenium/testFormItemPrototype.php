@@ -2192,7 +2192,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Discovery rules');
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
@@ -2266,7 +2266,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$itemId = $row['itemid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Discovery rules');
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);

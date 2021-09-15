@@ -343,7 +343,8 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			],
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
-				'popup.mediatype.message', 'popup.scriptexec', 'popup.scheduledreport.test', 'popup.service.edit'
+				'popup.mediatype.message', 'popup.host.edit', 'popup.scriptexec', 'popup.scheduledreport.test',
+				'popup.service.edit'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
 				'popup.massupdate.triggerprototype', 'popup.massupdate.service'
@@ -811,6 +812,62 @@ function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
 	return false;
 }
 
+/**
+ *
+ * @param {string} url
+ * @param {Object} params
+ * @param {boolean} allow_empty
+ *
+ * @return {boolean}
+ */
+function post(url, params) {
+	function addVars(postForm, name, value) {
+		if (Array.isArray(value)) {
+			for (let i = 0; i < value.length; i++) {
+				addVars(postForm, `${name}[]`, value[i]);
+			}
+		}
+		else if (typeof value === 'object' && value !== null) {
+			for (const [key, _value] of Object.entries(value)) {
+				addVars(postForm, `${name}[${key}]`, _value);
+			}
+		}
+		else {
+			addVar(postForm, name, value);
+		}
+	}
+
+	function addVar(postForm, name, value) {
+		const is_multiline = /\r|\n/.exec(value);
+		let input;
+
+		if (is_multiline) {
+			input = document.createElement('textarea');
+			input.style.display = 'none';
+		}
+		else {
+			input = document.createElement('input');
+			input.type = 'hidden';
+		}
+
+		input.name = name;
+		input.value = value;
+		postForm.appendChild(input);
+	}
+
+	const domBody = document.getElementsByTagName('body')[0];
+	const postForm = document.createElement('form');
+	domBody.appendChild(postForm);
+	postForm.setAttribute('method', 'post');
+
+	for (const [key, value] of Object.entries(params)) {
+		addVars(postForm, key, value);
+	}
+
+	postForm.setAttribute('action', url);
+	postForm.submit();
+}
+
 function showHide(obj) {
 	if (jQuery(obj).is(':hidden')) {
 		jQuery(obj).css('display', 'block');
@@ -990,4 +1047,29 @@ function openMassupdatePopup(elem, popup_name, data = {}) {
 	}
 
 	return PopUp(popup_name, data, null, elem);
+}
+
+/**
+ * Clears session storage from markers of checked table rows.
+ * Or keeps only accessible IDs in the list of checked rows.
+ *
+ * @param {string}       page
+ * @param {array|Object} keepids
+ */
+function uncheckTableRows(page, keepids = []) {
+	// This key only works for new MVC pages.
+	const key = 'cb_zabbix_'+page;
+
+	if (keepids) {
+		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
+		let keepids_formatted = {};
+		for(const id of Object.values(keepids)) {
+			keepids_formatted[id] = id;
+		}
+
+		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));
+	}
+	else {
+		sessionStorage.removeItem(key);
+	}
 }

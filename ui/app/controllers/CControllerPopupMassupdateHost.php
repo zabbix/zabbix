@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'ids' => 'required|array',
 			'update' => 'in 1',
@@ -64,7 +64,8 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			'tls_connect' => 'in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
 			'tls_accept' => 'ge 0|le '.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
 			'ipmi_authtype' => 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2, IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM, IPMI_AUTHTYPE_RMCP_PLUS]),
-			'ipmi_privilege' => 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER, IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM])
+			'ipmi_privilege' => 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER, IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM]),
+			'backurl' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -83,7 +84,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		$hosts = API::Host()->get([
 			'output' => [],
 			'hostids' => $this->getInput('ids'),
@@ -93,7 +94,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 		return count($hosts) > 0;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		if ($this->hasInput('update')) {
 			$output = [];
 			$hostids = $this->getInput('ids');
@@ -420,26 +421,50 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			catch (Exception $e) {
 				DBend(false);
 
-				CMessageHelper::setErrorTitle(_('Cannot update hosts'));
-
 				$result = false;
 			}
 
-			if ($result) {
-				$messages = CMessageHelper::getMessages();
-				$output = ['title' => _('Hosts updated')];
-				if (count($messages)) {
-					$output['messages'] = array_column($messages, 'message');
+			if ($this->hasInput('backurl')) {
+				$upd_status = ($this->getInput('status', HOST_STATUS_NOT_MONITORED) == HOST_STATUS_MONITORED);
+				$backurl = new CUrl($this->getInput('backurl'));
+				$cnt = count($hostids);
+
+				if ($result) {
+					$backurl->setArgument('uncheck', 1);
+
+					CMessageHelper::setSuccessTitle($upd_status
+						? _n('Host enabled', 'Hosts enabled', $cnt)
+						: _n('Host disabled', 'Hosts disabled', $cnt)
+					);
 				}
+				else {
+					CMessageHelper::setErrorTitle($upd_status
+						? _n('Cannot enable host', 'Cannot enable hosts', $cnt)
+						: _n('Cannot disable host', 'Cannot disable hosts', $cnt)
+					);
+				}
+
+				$this->setResponse(new CControllerResponseRedirect($backurl->getUrl()));
 			}
 			else {
-				$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-					->toString();
-			}
+				if ($result) {
+					ob_start();
+					uncheckTableRows('hosts');
 
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			);
+					$output = ['title' => _('Hosts updated'), 'script_inline' => ob_get_clean()];
+
+					if ($messages = CMessageHelper::getMessages()) {
+						$output['messages'] = array_column($messages, 'message');
+					}
+				}
+				else {
+					$output = ['errors' => getMessages(false, _('Cannot update hosts'))->toString()];
+				}
+
+				$this->setResponse(
+					(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				);
+			}
 		}
 		else {
 			$data = [
@@ -449,7 +474,10 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				],
 				'ids' => $this->getInput('ids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
-				'location_url' => 'hosts.php'
+				'location_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'host.list')
+					->setArgument('page', CPagerHelper::loadPage('host.list'))
+					->getUrl()
 			];
 
 			$data['proxies'] = API::Proxy()->get([

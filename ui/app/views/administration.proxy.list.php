@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('administration.proxy.list.js.php');
 
 if ($data['uncheck']) {
 	uncheckTableRows('proxy');
@@ -108,11 +111,19 @@ foreach ($data['proxies'] as $proxy) {
 		}
 
 		$hosts[] = $data['allowed_ui_conf_hosts']
-			? (new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid']))->addClass($style)
+			? (new CLink($host['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'host.edit')
+				->setArgument('hostid', $host['hostid'])
+			))
+				->addClass($style)
+				->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
 			: (new CSpan($host['name']))->addClass($style);
 	}
 
-	$name = new CLink($proxy['host'], 'zabbix.php?action=proxy.edit&proxyid='.$proxy['proxyid']);
+	$name = (new CLink($proxy['host'], (new CUrl('zabbix.php'))
+		->setArgument('action', 'proxy.edit')
+		->setArgument('proxyid', $proxy['proxyid'])
+	));
 
 	// encryption
 	$in_encryption = '';

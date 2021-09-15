@@ -65,7 +65,7 @@ class testGeneric extends CLegacyWebTest {
 			// configuration
 			['hostgroups.php',					'Configuration of host groups'],
 			['templates.php',					'Configuration of templates'],
-			['hosts.php',						'Configuration of hosts'],
+			[self::HOST_LIST_PAGE,				'Configuration of hosts'],
 			['maintenance.php',				'Configuration of maintenance periods'],
 			['httpconf.php',					'Configuration of web monitoring'],
 

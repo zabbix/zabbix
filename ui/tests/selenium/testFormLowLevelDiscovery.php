@@ -187,7 +187,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($data['host']);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
@@ -533,7 +533,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($name);
@@ -1491,7 +1491,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormLowLevelDiscovery_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 
@@ -1624,7 +1624,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Discovery rules');
 
@@ -1702,7 +1702,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$itemId = $row['itemid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Discovery rules');
 

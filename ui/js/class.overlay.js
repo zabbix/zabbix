@@ -188,9 +188,15 @@ Overlay.prototype.containFocus = function() {
  * Sets dialogue in loading sate.
  */
 Overlay.prototype.setLoading = function() {
+	this.buttons_disabled_for_loading = [];
 	this.$dialogue.$body.addClass('is-loading');
 	this.$dialogue.$controls.find('z-select, button').prop('disabled', true);
-	this.$btn_submit && this.$btn_submit.prop('disabled', true);
+	this.action_buttons.forEach(($button) => {
+		if ($button.prop('disabled') !== true) {
+			this.buttons_disabled_for_loading.push($button);
+			$button.prop('disabled', true);
+		}
+	});
 };
 
 /**
@@ -198,7 +204,10 @@ Overlay.prototype.setLoading = function() {
  */
 Overlay.prototype.unsetLoading = function() {
 	this.$dialogue.$body.removeClass('is-loading');
-	this.$btn_submit && this.$btn_submit.removeClass('is-loading').prop('disabled', false);
+	this.buttons_disabled_for_loading.forEach(($button) => {
+		$button.removeClass('is-loading').prop('disabled', false);
+	});
+	this.buttons_disabled_for_loading = [];
 };
 
 /**
@@ -293,14 +302,18 @@ Overlay.prototype.makeButton = function(obj) {
 			text: obj.title
 		});
 
+	if ('id' in obj) {
+		$button.attr('id', obj.id);
+	}
+
 	$button.on('click', function(e) {
 		if (('confirmation' in obj) && !confirm(obj.confirmation)) {
 			e.preventDefault();
 			return;
 		}
 
-		if (obj.isSubmit && this.$btn_submit) {
-			this.$btn_submit.blur().addClass('is-loading');
+		if (!('cancel' in obj) || !obj.cancel) {
+			$(e.target).blur().addClass('is-loading');
 		}
 
 		if (obj.action && obj.action(this) !== false) {
@@ -335,6 +348,8 @@ Overlay.prototype.makeButtons = function(arr) {
 
 	this.$btn_submit = null;
 	this.$btn_focus = null;
+	this.action_buttons = [];
+	this.buttons_disabled_for_loading = [];
 
 	arr.forEach(function(obj) {
 		if (typeof obj.action === 'string') {
@@ -345,6 +360,10 @@ Overlay.prototype.makeButtons = function(arr) {
 
 		if (obj.cancel) {
 			this.cancel_action = obj.action;
+		}
+
+		if (!obj.cancel) {
+			this.action_buttons.push($button);
 		}
 
 		if (obj.isSubmit) {

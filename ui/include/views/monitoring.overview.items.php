@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('monitoring.overview.items.js.php');
+
 // hint table
 $help_hint = (new CList())
 	->addClass(ZBX_STYLE_NOTIF_BODY)

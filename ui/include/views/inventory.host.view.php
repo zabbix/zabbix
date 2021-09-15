@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('inventory.host.view.js.php');
+
 // Overview tab.
 $overviewFormList = new CFormList();
 
@@ -175,10 +177,8 @@ $overviewFormList->addRow(_('Monitoring'),
 
 // configuration
 if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
-	$hostLink = new CLink(_('Host'), (new CUrl('hosts.php'))
-		->setArgument('form', 'update')
-		->setArgument('hostid', $data['host']['hostid'])
-	);
+	$hostLink = (new CLink(_('Host')))
+		->onClick('view.editHost({hostid:\''.$data['host']['hostid'].'\'})');
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('items.php'))
 			->setArgument('filter_set', '1')

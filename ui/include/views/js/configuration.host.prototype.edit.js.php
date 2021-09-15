@@ -72,19 +72,23 @@
 		}
 
 		initInherit() {
-			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces);
+			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces,
+				JSON.parse(this._data.interface_manager_options)
+			);
 			hostInterfaceManagerInherit.setAllowEmptyMessage(!this._data.parent_is_template);
 			hostInterfaceManagerInherit.render();
-			HostInterfaceManager.makeReadonly();
+			hostInterfaceManagerInherit.makeReadonly();
 		}
 
 		initCustom() {
 			// This is in global space, as Add functions uses it.
-			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces);
+			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces,
+				JSON.parse(this._data.interface_manager_options)
+			);
 			hostInterfaceManager.render();
 
 			if (this._data.is_templated) {
-				HostInterfaceManager.makeReadonly();
+				hostInterfaceManager.makeReadonly();
 			}
 		}
 
@@ -154,6 +158,8 @@
 	}
 
 	jQuery(function() {
+		'use strict';
+
 		const interface_source_switcher = new InterfaceSourceSwitcher(
 			document.getElementById('interfaces-table'),
 			document.getElementById('custom_interfaces'),
@@ -162,7 +168,49 @@
 				'parent_is_template' => $parentHost['status'] == HOST_STATUS_TEMPLATE,
 				'is_templated' => $hostPrototype['templateid'] != 0,
 				'inherited_interfaces' => array_values($parentHost['interfaces']),
-				'custom_interfaces' => array_values($hostPrototype['interfaces'])
+				'custom_interfaces' => array_values($hostPrototype['interfaces']),
+				'interface_manager_options' => json_encode([
+					'interface_types' => [
+						'AGENT' => INTERFACE_TYPE_AGENT,
+						'SNMP' => INTERFACE_TYPE_SNMP,
+						'JMX' => INTERFACE_TYPE_JMX,
+						'IPMI' => INTERFACE_TYPE_IPMI
+					],
+					'interface_properties' => [
+						'SNMP_V1' => SNMP_V1,
+						'SNMP_V2C' => SNMP_V2C,
+						'SNMP_V3' => SNMP_V3,
+						'BULK_ENABLED' => SNMP_BULK_ENABLED,
+						'INTERFACE_PRIMARY' => INTERFACE_PRIMARY,
+						'INTERFACE_SECONDARY' => INTERFACE_SECONDARY,
+						'INTERFACE_USE_IP' => INTERFACE_USE_IP,
+						'SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
+						'SNMPV3_SECURITYLEVEL_AUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+						'SNMPV3_SECURITYLEVEL_AUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,
+						'SNMPV3_AUTHPROTOCOL_MD5' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
+						'SNMPV3_PRIVPROTOCOL_DES' => ITEM_SNMPV3_PRIVPROTOCOL_DES
+					],
+					'styles' => [
+						'ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE' => ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE,
+						'ZBX_STYLE_HOST_INTERFACE_CONTAINER' => ZBX_STYLE_HOST_INTERFACE_CONTAINER,
+						'ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER' => ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER,
+						'ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS' => ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS,
+						'ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE' => ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE,
+						'ZBX_STYLE_HOST_INTERFACE_CELL_USEIP' => ZBX_STYLE_HOST_INTERFACE_CELL_USEIP,
+						'ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE' => ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE,
+						'ZBX_STYLE_LIST_ACCORDION_ITEM' => ZBX_STYLE_LIST_ACCORDION_ITEM,
+						'ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED' => ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED,
+						'ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND' => ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND,
+						'ZBX_STYLE_HOST_INTERFACE_ROW' => ZBX_STYLE_HOST_INTERFACE_ROW,
+						'ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE' => ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE,
+					],
+					'templates' => [
+						'interface_row' => (new CPartial('configuration.host.interface.row'))->getOutput(),
+						'no_interface_msg' => (new CDiv(_('No interfaces are defined.')))
+							->addClass(ZBX_STYLE_GREY)
+							->toString()
+					]
+				])
 			]) ?>
 		);
 
@@ -190,5 +238,49 @@
 			jQuery('#tbl_group_prototypes').find('input').prop('readonly', true);
 			jQuery('#tbl_group_prototypes').find('button').prop('disabled', true);
 		<?php endif ?>
+
+		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+			jQuery('#tls_issuer, #tls_subject').closest('li').toggle(jQuery('#tls_in_cert').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>);
+
+			jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').toggle(jQuery('#tls_in_psk').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>);
+		});
+
+		jQuery('input[name=inventory_mode]').click(function() {
+			// Action depending on which button was clicked.
+			var inventoryFields = jQuery('#inventorylist :input:gt(2)');
+
+			switch (this.value) {
+				case '<?= HOST_INVENTORY_DISABLED ?>':
+					inventoryFields.prop('disabled', true);
+					jQuery('.populating_item').hide();
+					break;
+				case '<?= HOST_INVENTORY_MANUAL ?>':
+					inventoryFields.prop('disabled', false);
+					jQuery('.populating_item').hide();
+					break;
+				case '<?= HOST_INVENTORY_AUTOMATIC ?>':
+					inventoryFields.prop('disabled', false);
+					inventoryFields.filter('.linked_to_item').prop('disabled', true);
+					jQuery('.populating_item').show();
+					break;
+			}
+		});
+
+		// Refresh field visibility on document load.
+		let tls_accept = jQuery('#tls_accept').val();
+
+		if ((tls_accept & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
+			jQuery('#tls_in_none').prop('checked', true);
+		}
+		if ((tls_accept & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
+			jQuery('#tls_in_psk').prop('checked', true);
+		}
+		if ((tls_accept & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
+			jQuery('#tls_in_cert').prop('checked', true);
+		}
+
+		jQuery('input[name=tls_connect]').trigger('change');
 	});
 </script>

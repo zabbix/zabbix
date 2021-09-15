@@ -162,12 +162,12 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				? (new CMenuItem(_('Hosts')))
-					->setUrl(new CUrl('hosts.php'), 'hosts.php')
+					->setAction('host.list')
 					->setAliases([
 						'items.php?context=host', 'triggers.php?context=host', 'graphs.php?context=host',
 						'host_discovery.php?context=host', 'disc_prototypes.php?context=host',
 						'trigger_prototypes.php?context=host', 'host_prototypes.php?context=host',
-						'httpconf.php?context=host'
+						'httpconf.php?context=host', 'host.edit'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)

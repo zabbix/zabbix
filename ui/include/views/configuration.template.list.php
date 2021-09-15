@@ -195,7 +195,8 @@ foreach ($data['templates'] as $template) {
 		[
 			$data['allowed_ui_conf_hosts']
 				? new CLink(_('Hosts'),
-					(new CUrl('hosts.php'))
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'host.list')
 						->setArgument('filter_set', '1')
 						->setArgument('filter_templates', [$template['templateid']])
 				)

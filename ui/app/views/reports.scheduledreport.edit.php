@@ -23,7 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
 $this->addJsFile('class.calendar.js');
 $this->includeJsFile('reports.scheduledreport.edit.js.php', [
 	'old_dashboardid' => $data['old_dashboardid'],

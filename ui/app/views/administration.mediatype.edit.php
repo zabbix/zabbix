@@ -24,7 +24,6 @@
  */
 
 $this->addJsFile('multilineinput.js');
-$this->addJsFile('class.tab-indicators.js');
 
 $this->includeJsFile('administration.mediatype.edit.js.php');
 

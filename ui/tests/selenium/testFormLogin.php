@@ -165,7 +165,7 @@ class testFormLogin extends CLegacyWebTest {
 		return [
 			[
 				[
-					'url' => 'index.php?request=hosts.php',
+					'url' => 'index.php?request='.urlencode(self::HOST_LIST_PAGE),
 					'login' => 'Admin',
 					'password' => 'zabbix',
 					'header' => 'Hosts'

@@ -23,7 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
 $this->includeJsFile('administration.user.list.js.php');
 
 if ($data['uncheck']) {

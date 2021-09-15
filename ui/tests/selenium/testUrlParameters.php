@@ -131,18 +131,27 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'hosts.php?form=update&hostid=10084',
+						'url' => (new CUrl('zabbix.php'))
+							->setArgument('action', 'host.edit')
+							->setArgument('hostid', 10084)
+							->getUrl(),
 						'text_present' => 'Hosts'
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=9999999',
+						'url' => (new CUrl('zabbix.php'))
+							->setArgument('action', 'host.edit')
+							->setArgument('hostid', 9999999)
+							->getUrl(),
 						'text_not_present' => 'Hosts',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=abc',
+						'url' => (new CUrl('zabbix.php'))
+							->setArgument('action', 'host.edit')
+							->setArgument('hostid', 'abc')
+							->getUrl(),
 						'text_not_present' => 'Hosts',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
@@ -150,7 +159,10 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=',
+						'url' => (new CUrl('zabbix.php'))
+							->setArgument('action', 'host.edit')
+							->setArgument('hostid', '')
+							->getUrl(),
 						'text_not_present' => 'Hosts',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
@@ -158,7 +170,10 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=-1',
+						'url' => (new CUrl('zabbix.php'))
+							->setArgument('action', 'host.edit')
+							->setArgument('hostid', -1)
+							->getUrl(),
 						'text_not_present' => 'Hosts',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
@@ -166,7 +181,9 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update',
+						'url' => (new CUrl('zabbix.php'))
+							->setArgument('action', 'host.edit')
+							->getUrl(),
 						'text_not_present' => 'Hosts',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',

@@ -93,13 +93,13 @@ class CControllerPopupMassupdateTrigger extends CController {
 			);
 
 			foreach ($tags as $key => $tag) {
-				// remove empty new tag lines
+				// Remove empty new tag lines.
 				if ($tag['tag'] === '' && $tag['value'] === '') {
 					unset($tags[$key]);
 					continue;
 				}
 
-				// remove inherited tags
+				// Remove inherited tags.
 				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
 					unset($tags[$key]);
 				}

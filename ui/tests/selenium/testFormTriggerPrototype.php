@@ -240,7 +240,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($data['host']);
 			if (!isset($data['templatedHost'])) {
 				$discoveryRule = $this->discoveryRule;
@@ -453,7 +453,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$sqlTriggers = "select * from triggers ORDER BY triggerid";
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($this->discoveryRule);
@@ -785,7 +785,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	 */
 	public function testFormTriggerPrototype_SimpleCreate($data) {
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($this->discoveryRule);
@@ -913,7 +913,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Discovery rules');
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
@@ -938,7 +938,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				$triggerId = $row['triggerid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Discovery rules');
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);

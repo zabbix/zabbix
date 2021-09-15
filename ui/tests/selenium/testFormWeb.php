@@ -192,7 +192,7 @@ class testFormWeb extends CLegacyWebTest {
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->zbxTestClickLinkTextWait($data['host']);
 		}
 
@@ -391,7 +391,7 @@ class testFormWeb extends CLegacyWebTest {
 		$sqlItems = "select * from items ORDER BY itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickLinkTextWait('Web scenarios');
 		$this->zbxTestClickLinkTextWait($name);
@@ -1370,7 +1370,7 @@ class testFormWeb extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormWeb_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickLinkTextWait('Web scenarios');
 

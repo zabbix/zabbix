@@ -23,7 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
 $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('administration.script.edit.js.php');

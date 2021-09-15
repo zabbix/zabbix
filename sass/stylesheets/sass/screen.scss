@@ -6361,6 +6361,16 @@ z-select,
 	}
 }
 
+#host-form #macrosFormList {
+	.table-forms-td-left {
+		display:none;
+	}
+
+	.table-forms-td-right {
+		width: 100%;
+	}
+}
+
 // Report -> Audit details styles.
 
 .audit-details-popup-wrapper {

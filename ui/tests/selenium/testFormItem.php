@@ -966,7 +966,7 @@ class testFormItem extends CLegacyWebTest {
 		$sqlItems = "SELECT * FROM items ORDER BY itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 		$this->zbxTestClickLinkTextWait($name);
@@ -1872,7 +1872,7 @@ class testFormItem extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItem_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 
@@ -2115,7 +2115,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestClickWait('update');
 
-		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 		$this->zbxTestClickLinkTextWait($this->item);
@@ -2134,7 +2134,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestClickWait('update');
 
-		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 		$this->zbxTestClickLinkTextWait($this->item);
@@ -2155,7 +2155,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestClickWait('update');
 
-		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 		$this->zbxTestClickLinkTextWait($this->item);

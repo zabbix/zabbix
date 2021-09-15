@@ -226,17 +226,22 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 		if (options.allowed_ui_conf_hosts) {
 			var config = {
-				label: t('Configuration')
+				label: t('Configuration'),
+				disabled: !options.isWriteable
 			};
 
 			if (options.isWriteable) {
-				var config_url = new Curl('hosts.php', false);
-				config_url.setArgument('form', 'update');
+				const config_url = new Curl('zabbix.php', false);
+				config_url.setArgument('action', 'host.edit');
 				config_url.setArgument('hostid', options.hostid);
 				config.url = config_url.getUrl();
-			}
-			else {
-				config.disabled = true;
+
+				config.clickCallback = function (e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					view.editHost(options.hostid);
+				};
 			}
 
 			items.push(config);

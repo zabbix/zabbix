@@ -23,24 +23,33 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('menupopup.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
 $this->addJsFile('class.tagfilteritem.js');
 
+$this->includeJsFile('monitoring.host.view.js.php');
+
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
+$nav_items = new CList();
+
+if ($data['can_create_hosts']) {
+	$nav_items->addItem(
+		(new CSimpleButton(_('Create host')))
+			->onClick('view.createHost()')
+	);
+}
+
+$nav_items->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls(
-		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
-			->setAttribute('aria-label', _('Content controls'))
+	->setControls((new CTag('nav', true, $nav_items))
+		->setAttribute('aria-label', _('Content controls'))
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
@@ -62,10 +71,20 @@ else {
 	$data['filter_options'] = null;
 }
 
-$widget->addItem((new CForm())->setName('host_view')->addClass('is-loading'));
-$widget->show();
-$this->includeJsFile('monitoring.host.view.js.php', $data);
+$widget->addItem((new CForm())
+	->setName('host_view')
+	->addClass('is-loading')
+);
 
-(new CScriptTag('host_page.start();'))
+$widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'filter_options' => $data['filter_options'],
+		'refresh_url' => $data['refresh_url'],
+		'refresh_interval' => $data['refresh_interval'],
+		'applied_filter_groupids' => $data['filter_groupids']
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();
