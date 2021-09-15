@@ -1774,7 +1774,7 @@ static void	service_add_cause(zbx_vector_ptr_t *causes, zbx_service_t *service, 
  ******************************************************************************/
 static void	service_get_causes(const zbx_service_t *service, int severity, zbx_vector_ptr_t *services)
 {
-	int			status, child_status, i, severity_actual;
+	int			i, severity_actual;
 	zbx_vector_ptr_t	children, causes;
 	zbx_service_rule_t	*n_rule = NULL, *w_rule = NULL;
 
@@ -1808,11 +1808,12 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 	else
 		severity_actual = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 
-	if ((status = service_get_main_status(service)) >= severity_actual)
+	if (service_get_main_status(service) >= severity_actual)
 	{
 		for (i = 0; i < service->children.values_num; i++)
 		{
 			zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
+			int		child_status;
 
 			if (SUCCEED != service_get_status(child, &child_status) ||
 					ZBX_SERVICE_STATUS_OK == child_status)
