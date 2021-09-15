@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-14T14:35:21Z'
+  date: '2021-09-15T16:56:34Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -118,7 +118,7 @@ zabbix_export:
             };
             
             return JSON.stringify(output);
-          description: 'The JSON with result of Velocloud API request.'
+          description: 'The JSON with result of Velocloud API requests.'
           timeout: 10s
           parameters:
             -
@@ -395,14 +395,14 @@ zabbix_export:
               value: Script
         -
           uuid: 3f589e2191c5419fb89cc33639595ae9
-          name: 'Velocloud: Orchestrator api version'
+          name: 'Velocloud: Orchestrator API version'
           type: DEPENDENT
           key: velocloud.orchestrator.api_version
           delay: '0'
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'Version of VMware SD-WAN Orchestrator API.'
+          description: 'API Version of VMware SD-WAN Orchestrator API.'
           preprocessing:
             -
               type: JSONPATH
@@ -440,7 +440,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'Version of VMware SD-WAN Orchestrator API.'
+          description: 'Build of VMware SD-WAN Orchestrator API.'
           preprocessing:
             -
               type: JSONPATH
@@ -544,7 +544,7 @@ zabbix_export:
           type: DEPENDENT
           key: velocloud.app.discovery
           delay: '0'
-          description: 'Metrics for App statistics.'
+          description: 'Metrics for app statistics.'
           item_prototypes:
             -
               uuid: 051087f2c8174188b932a859015ebeae
@@ -554,7 +554,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'App bytes Rx.'
+              description: 'App received bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -589,7 +589,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'App bytes Tx.'
+              description: 'App transmitted bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -658,7 +658,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!packets'
-              description: 'App Packets Rx.'
+              description: 'App received packets.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -693,7 +693,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!packets'
-              description: 'App Packets Tx.'
+              description: 'App transmitted packets.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -728,7 +728,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'App Total bytes.'
+              description: 'App total bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -856,6 +856,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.apps
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         -
           uuid: 898616f76894487b8c01fcdbdc4e14d0
           name: 'App links metrics discovery'
@@ -867,20 +871,24 @@ zabbix_export:
             conditions:
               -
                 macro: '{#ID}'
-                value: '-1'
+                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''AppLinks''}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
-          description: 'Metrics for App links statistics.'
+              -
+                macro: '{#ID}'
+                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''AppLinks''}'
+                formulaid: B
+          description: 'Metrics for app links statistics.'
           item_prototypes:
             -
               uuid: e123902b3b6c43cfaba3035797000468
-              name: 'App Link {#EDGE}:{#NAME}:{#LINK.ID}: Bytes Rx'
+              name: 'App link {#EDGE}:{#NAME}:{#LINK.ID}: Bytes Rx'
               type: DEPENDENT
               key: 'velocloud.app_link.bytes_rx[{{#ID}]'
               delay: '0'
               history: 7d
               units: B
-              description: 'App link bytes Rx.'
+              description: 'App link received bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -909,13 +917,13 @@ zabbix_export:
                   value: Gauge
             -
               uuid: 00c1cd5c67d64ba6a94451e419bfc60a
-              name: 'App Link {#EDGE}:{#NAME}:{#LINK.ID}: Bytes Tx'
+              name: 'App link {#EDGE}:{#NAME}:{#LINK.ID}: Bytes Tx'
               type: DEPENDENT
               key: 'velocloud.app_link.bytes_tx[{{#ID}]'
               delay: '0'
               history: 7d
               units: B
-              description: 'App link bytes Tx.'
+              description: 'App link transmit bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -944,7 +952,7 @@ zabbix_export:
                   value: Gauge
             -
               uuid: bb8a947968b64a809329f84f8c9d2325
-              name: 'App Link {#EDGE}:{#NAME}:{#LINK.ID}: Flow count'
+              name: 'App link {#EDGE}:{#NAME}:{#LINK.ID}: Flow count'
               type: DEPENDENT
               key: 'velocloud.app_link.flow_count[{{#ID}]'
               delay: '0'
@@ -978,13 +986,13 @@ zabbix_export:
                   value: Gauge
             -
               uuid: 625f8a63838f4ff58bbcd68b5e294a16
-              name: 'App Link {#EDGE}:{#NAME}:{#LINK.ID}: Packets Rx'
+              name: 'App link {#EDGE}:{#NAME}:{#LINK.ID}: Packets Rx'
               type: DEPENDENT
               key: 'velocloud.app_link.packets_rx[{{#ID}]'
               delay: '0'
               history: 7d
               units: '!packets'
-              description: 'App link Packets Rx.'
+              description: 'App link received packets.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1013,13 +1021,13 @@ zabbix_export:
                   value: Gauge
             -
               uuid: 2c9471333c6d421cbe5743ccdf2e61c8
-              name: 'App Link {#EDGE}:{#NAME}:{#LINK.ID}: Packets Tx'
+              name: 'App link {#EDGE}:{#NAME}:{#LINK.ID}: Packets Tx'
               type: DEPENDENT
               key: 'velocloud.app_link.packets_tx[{{#ID}]'
               delay: '0'
               history: 7d
               units: '!packets'
-              description: 'App link Packets Tx.'
+              description: 'App link transmitted Packets.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1048,13 +1056,13 @@ zabbix_export:
                   value: Gauge
             -
               uuid: c705c574d9254672b5910e1925b3d1f0
-              name: 'App Link {#EDGE}:{#NAME}:{#LINK.ID}: Total bytes'
+              name: 'App link {#EDGE}:{#NAME}:{#LINK.ID}: Total bytes'
               type: DEPENDENT
               key: 'velocloud.app_link.total_bytes[{{#ID}]'
               delay: '0'
               history: 7d
               units: B
-              description: 'App link Total bytes.'
+              description: 'App link total bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1083,7 +1091,7 @@ zabbix_export:
                   value: Gauge
             -
               uuid: 337b90269c6349e89cfe198457de01b5
-              name: 'App Link {#EDGE}:{#NAME}:{#LINK.ID}: Total packets'
+              name: 'App link {#EDGE}:{#NAME}:{#LINK.ID}: Total packets'
               type: DEPENDENT
               key: 'velocloud.app_link.total_packets[{{#ID}]'
               delay: '0'
@@ -1119,7 +1127,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 5bebd75b630048fa8ef5ccd006eb8d17
-              name: 'App Link {#EDGE}:{#NAME}:{#LINK.ID}: Bytes summary'
+              name: 'App link {#EDGE}:{#NAME}:{#LINK.ID}: Bytes summary'
               graph_items:
                 -
                   color: 1A7C11
@@ -1140,7 +1148,7 @@ zabbix_export:
                     key: 'velocloud.app_link.total_bytes[{{#ID}]'
             -
               uuid: ec272ce67eab4e6bb3948a8d66daafc1
-              name: 'App Link {#EDGE}:{#NAME}:{#LINK.ID}: Packets summary'
+              name: 'App link {#EDGE}:{#NAME}:{#LINK.ID}: Packets summary'
               graph_items:
                 -
                   color: 1A7C11
@@ -1189,6 +1197,18 @@ zabbix_export:
           type: DEPENDENT
           key: velocloud.edges.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''Edges''}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''Edges''}'
+                formulaid: B
           description: 'Metrics for edges statistics.'
           item_prototypes:
             -
@@ -1288,7 +1308,7 @@ zabbix_export:
               key: 'velocloud.edge.ha_state[{#ID}]'
               delay: '0'
               history: 7d
-              description: 'Edge HA state.'
+              description: 'Edge high availability state.'
               valuemap:
                 name: 'Edge HA status'
               preprocessing:
@@ -1342,7 +1362,7 @@ zabbix_export:
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])<>1'
                   name: 'Edge {#NAME}: HA state is not "READY"'
                   priority: WARNING
-                  description: 'HA state is not "READY".'
+                  description: 'High availability state is not "READY".'
             -
               uuid: fdb55947147249109da453009d6bd443
               name: 'Edge {#NAME}: Model number'
@@ -1521,7 +1541,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 962d2d0c6f124424b2e5a7aca89d293f
-                  expression: 'change(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=1'
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])<>1'
                   name: 'Edge {#NAME}: Edge is not in "CONNECTED" state'
                   priority: AVERAGE
                   description: 'Edge state is different from "CONNECTED".'
@@ -1575,7 +1595,7 @@ zabbix_export:
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600'
                   name: 'Edge {#NAME}: Edge uptime is less than 10m'
                   priority: WARNING
-                  description: 'Edge uptime is less that 10m.'
+                  description: 'Edge was restarted.'
           master_item:
             key: velocloud.get
           lld_macro_paths:
@@ -1606,6 +1626,18 @@ zabbix_export:
           type: DEPENDENT
           key: velocloud.enterprises.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''Enterprises''}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''Enterprises''}'
+                formulaid: B
           description: 'Metrics for enterprises.'
           item_prototypes:
             -
@@ -1640,7 +1672,40 @@ zabbix_export:
                   value: Dependent
                 -
                   tag: Type
-                  value: Test
+                  value: Text
+            -
+              uuid: fdc7f897ca29439f98c53cb3ab55d5e2
+              name: 'Enterprise {#NAME}: Firewall logs'
+              type: DEPENDENT
+              key: 'velocloud.enterprise.firewall_logs[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Firewall logs of enterprise.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.firewallLogs.{#ID}'
+              master_item:
+                key: velocloud.get_logs
+              tags:
+                -
+                  tag: Name
+                  value: '{#NAME}'
+                -
+                  tag: Resource
+                  value: Enterprise
+                -
+                  tag: Target
+                  value: Velocloud
+                -
+                  tag: Transport
+                  value: Dependent
+                -
+                  tag: Type
+                  value: Text
             -
               uuid: 45178d5c91b847529a934914f1fa4a9c
               name: 'Enterprise {#NAME}: Operator events'
@@ -1650,7 +1715,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'Operator Events of enterprise.'
+              description: 'Operator events of enterprise.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1673,7 +1738,7 @@ zabbix_export:
                   value: Dependent
                 -
                   tag: Type
-                  value: Test
+                  value: Text
           master_item:
             key: velocloud.get
           lld_macro_paths:
@@ -1698,6 +1763,18 @@ zabbix_export:
           type: DEPENDENT
           key: velocloud.gateways.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''Gateways''}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''Gateways''}'
+                formulaid: B
           description: 'Metrics for gateways statistics.'
           item_prototypes:
             -
@@ -1956,7 +2033,7 @@ zabbix_export:
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600'
                   name: 'Gateway {#NAME}: Gateway uptime is less that 10m'
                   priority: WARNING
-                  description: 'Gateway uptime is less that 10m.'
+                  description: 'Gateway was restarted.'
             -
               uuid: 66c8fe8095724fb38966b05ef5d77a37
               name: 'Gateway {#NAME}: Utilization CPU'
@@ -2188,6 +2265,18 @@ zabbix_export:
           type: DEPENDENT
           key: velocloud.links.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ID}'
+                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''Links''}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#ID}'
+                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''Links''}'
+                formulaid: B
           description: 'Metrics for links statistics.'
           item_prototypes:
             -
@@ -2198,7 +2287,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Link best loss rx.'
+              description: 'Link receive best loss.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2236,7 +2325,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Link best loss tx.'
+              description: 'Link transmit best loss.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2274,7 +2363,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Link bytes Rx.'
+              description: 'Link received bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2312,7 +2401,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Link bytes Tx.'
+              description: 'Link transmitted bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2392,7 +2481,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!packets'
-              description: 'Link Packets Rx.'
+              description: 'Link received packets.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2430,7 +2519,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!packets'
-              description: 'Link Packets Tx.'
+              description: 'Link transmitted packets.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2679,7 +2768,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Bytes Rx of SDWAN peer path.'
+              description: 'Bytes received of SDWAN peer path.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2711,7 +2800,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Bytes Tx of SDWAN peer path.'
+              description: 'Bytes transmitted of SDWAN peer path.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2743,7 +2832,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!packets'
-              description: 'Packets Rx of SDWAN peer path.'
+              description: 'Packets received of SDWAN peer path.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2775,7 +2864,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!packets'
-              description: 'Packets Tx of SDWAN peer path.'
+              description: 'Packets transmitted of SDWAN peer path.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2808,7 +2897,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Packet Loss Rx of SDWAN peer path.'
+              description: 'Received packet loss of SDWAN peer path.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2841,7 +2930,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Packet Loss Tx of SDWAN peer path.'
+              description: 'Transmitted packet loss of SDWAN peer path.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2873,7 +2962,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Total Bytes of SDWAN peer path.'
+              description: 'Total bytes of SDWAN peer path.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3264,6 +3353,17 @@ zabbix_export:
           macro: '{$VELOCLOUD.APPS.GATHER.INTERVAL}'
           value: '600'
           description: 'Interval of gathering apps data in seconds.'
+        -
+          macro: '{$VELOCLOUD.LLD.FILTER.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable objects. Can be used with following contexts: ''Edges'', ''Gateways'', ''Links'', ''Enterprises'', ''AppLinks'''
+        -
+          macro: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES}'
+          value: '.*'
+          description: 'Filter to exclude discovered objects. Can be used with following contexts: ''Edges'', ''Gateways'', ''Links'', ''Enterprises'', ''AppLinks'''
+        -
+          macro: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:"AppLinks"}'
+          value: '-1'
         -
           macro: '{$VELOCLOUD.LOGS.GATHER.INTERVAL}'
           value: '1200'
