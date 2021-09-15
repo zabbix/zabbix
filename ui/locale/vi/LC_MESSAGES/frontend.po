@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-06 16:28+0300\n"
+"POT-Creation-Date: 2021-09-10 20:00+0300\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -93,7 +93,7 @@ msgid "%1$d day"
 msgid_plural "%1$d days"
 msgstr[0] "%1$d ngày"
 
-#: jsLoader.php:328
+#: jsLoader.php:323
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -171,7 +171,7 @@ msgstr[0] "%1$s tin nhắn "
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
 #: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
-#: jsLoader.php:173 jsLoader.php:174 jsLoader.php:175 jsLoader.php:176
+#: jsLoader.php:168 jsLoader.php:169 jsLoader.php:170 jsLoader.php:171
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -183,7 +183,7 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "Trạng thái phần tử %1$s của %2$s gặp vấn đề"
 
-#: jsLoader.php:329
+#: jsLoader.php:324
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -213,13 +213,13 @@ msgstr[0] "%1$s thử lại "
 #: app/views/administration.user.edit.php:673
 #: include/classes/widgets/CWidgetConfig.php:283
 #: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
-#: jsLoader.php:171 jsLoader.php:172
+#: jsLoader.php:166 jsLoader.php:167
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
 msgstr[0] "%1$s giây"
 
-#: jsLoader.php:310
+#: jsLoader.php:305
 #, c-format
 msgid "%1$s symbols remaining"
 msgstr ""
@@ -238,13 +238,13 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr "%1$s, Chặt chẽ, %2$s"
 
-#: jsLoader.php:323
+#: jsLoader.php:318
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, chỉ đọc"
 
-#: jsLoader.php:366
+#: jsLoader.php:361
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -421,7 +421,7 @@ msgstr ""
 #: app/views/administration.user.token.list.php:67
 #: app/views/administration.user.token.view.php:27
 #: include/classes/helpers/CMenuHelper.php:257
-#: include/classes/helpers/CMenuHelper.php:379 include/html.inc.php:817
+#: include/classes/helpers/CMenuHelper.php:380 include/html.inc.php:817
 #: include/html.inc.php:892
 msgid "API tokens"
 msgstr ""
@@ -476,7 +476,7 @@ msgstr ""
 msgid "Ack"
 msgstr "Ghi nhận"
 
-#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:333
+#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:328
 msgid "Acknowledge"
 msgstr "Ghi nhận"
 
@@ -640,7 +640,7 @@ msgstr "Hành động đã cập nhật"
 #: include/classes/screens/CScreenProblem.php:1224 include/events.inc.php:291
 #: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:69 jsLoader.php:144
-#: jsLoader.php:177 jsLoader.php:192 jsLoader.php:206 jsLoader.php:332
+#: jsLoader.php:172 jsLoader.php:187 jsLoader.php:201 jsLoader.php:327
 #: tr_events.php:182
 msgid "Actions"
 msgstr "Hành động"
@@ -813,7 +813,7 @@ msgstr "Kích hoạt"
 #: include/views/monitoring.sysmap.edit.php:304
 #: include/views/monitoring.sysmap.edit.php:325
 #: include/views/monitoring.sysmap.edit.php:362
-#: include/views/monitoring.sysmap.edit.php:430 jsLoader.php:196
+#: include/views/monitoring.sysmap.edit.php:430 jsLoader.php:191
 msgid "Add"
 msgstr "Add"
 
@@ -821,11 +821,11 @@ msgstr "Add"
 msgid "Add (message type limit reached)"
 msgstr ""
 
-#: jsLoader.php:166
+#: jsLoader.php:161
 msgid "Add a new widget"
 msgstr "Thêm một ô điều khiển mới"
 
-#: jsLoader.php:197
+#: jsLoader.php:192
 msgid "Add child element"
 msgstr "Thêm phần tử con"
 
@@ -850,7 +850,7 @@ msgstr "Thêm host"
 msgid "Add missing"
 msgstr ""
 
-#: jsLoader.php:198
+#: jsLoader.php:193
 msgid "Add multiple maps"
 msgstr "Thêm nhiều sơ đồ "
 
@@ -867,11 +867,12 @@ msgstr ""
 msgid "Add new override"
 msgstr "Ghi đè"
 
-#: jsLoader.php:145
+#: app/views/js/configuration.dashboard.edit.js.php:202
+#: app/views/js/monitoring.dashboard.view.js.php:268
 msgid "Add page"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:325 jsLoader.php:397
+#: app/views/js/popup.service.edit.js.php:325 jsLoader.php:392
 msgid "Add parent services"
 msgstr ""
 
@@ -917,7 +918,9 @@ msgstr ""
 msgid "Add user group"
 msgstr ""
 
-#: app/views/monitoring.dashboard.widget.edit.php:34 jsLoader.php:146
+#: app/views/js/configuration.dashboard.edit.js.php:198
+#: app/views/js/monitoring.dashboard.view.js.php:264
+#: app/views/monitoring.dashboard.widget.edit.php:34
 msgid "Add widget"
 msgstr "Thêm ô điều khiển"
 
@@ -926,7 +929,7 @@ msgstr "Thêm ô điều khiển"
 msgid "Added"
 msgstr ""
 
-#: jsLoader.php:321
+#: jsLoader.php:316
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -1043,7 +1046,7 @@ msgstr "Sắp xếp phần tử sơ đồ"
 #: app/views/reports.scheduledreport.list.php:56
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:389
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:384
 msgid "All"
 msgstr "Tất cả"
 
@@ -1061,7 +1064,7 @@ msgstr "Tất cả nhóm"
 msgid "All hosts"
 msgstr "Tất cả máy chủ"
 
-#: jsLoader.php:277
+#: jsLoader.php:272
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Tất cả các đường dẫn phải có \"Tên\" và \"URL\""
 
@@ -1199,8 +1202,8 @@ msgstr "Lỗi ứng dụng."
 #: include/views/js/monitoring.sysmaps.js.php:480
 #: include/views/js/monitoring.sysmaps.js.php:604
 #: include/views/js/monitoring.sysmaps.js.php:709
-#: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:199
-#: jsLoader.php:312
+#: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:194
+#: jsLoader.php:307
 msgid "Apply"
 msgstr "Áp dụng"
 
@@ -1218,7 +1221,7 @@ msgstr "Đang tiếp cận"
 msgid "Apr"
 msgstr "Tháng Tư"
 
-#: include/func.inc.php:103 include/func.inc.php:240 jsLoader.php:229
+#: include/func.inc.php:103 include/func.inc.php:240 jsLoader.php:224
 msgid "April"
 msgstr "Tháng tư"
 
@@ -1385,7 +1388,7 @@ msgstr ""
 msgid "Aug"
 msgstr "Th8"
 
-#: include/func.inc.php:107 include/func.inc.php:244 jsLoader.php:233
+#: include/func.inc.php:107 include/func.inc.php:244 jsLoader.php:228
 msgid "August"
 msgstr "Tháng 8"
 
@@ -1659,11 +1662,11 @@ msgstr ""
 msgid "Bottom"
 msgstr "Dưới"
 
-#: jsLoader.php:269
+#: jsLoader.php:264
 msgid "Bring forward"
 msgstr "Đưa ra phía trước"
 
-#: jsLoader.php:268
+#: jsLoader.php:263
 msgid "Bring to front"
 msgstr "Đặt phía trước"
 
@@ -1744,7 +1747,7 @@ msgstr ""
 msgid "Calculated"
 msgstr "Tính toán"
 
-#: jsLoader.php:225
+#: jsLoader.php:220
 msgid "Calendar"
 msgstr "Lịch"
 
@@ -1782,8 +1785,8 @@ msgstr "Gọi lại"
 #: app/views/monitoring.dashboard.view.php:143
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:200
-#: jsLoader.php:210 jsLoader.php:313 jsLoader.php:385
+#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:195
+#: jsLoader.php:205 jsLoader.php:308 jsLoader.php:380
 msgid "Cancel"
 msgstr "Hủy bỏ"
 
@@ -1813,7 +1816,7 @@ msgstr "Không thể thêm hành động"
 msgid "Cannot add correlation"
 msgstr "Không thể thêm liên kết"
 
-#: jsLoader.php:147
+#: jsLoader.php:145
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
 msgstr ""
@@ -1950,11 +1953,11 @@ msgstr ""
 msgid "Cannot add web scenario"
 msgstr "Không thể thêm web scenario"
 
-#: jsLoader.php:148
+#: jsLoader.php:146
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr ""
 
-#: jsLoader.php:324
+#: jsLoader.php:319
 msgctxt "screen reader"
 msgid "Cannot be removed"
 msgstr ""
@@ -2490,7 +2493,7 @@ msgstr ""
 msgid "Cannot execute script."
 msgstr ""
 
-#: jsLoader.php:280
+#: jsLoader.php:275
 msgid "Cannot expand macros."
 msgstr "Không thể mở rộng bộ lệnh."
 
@@ -2798,7 +2801,7 @@ msgstr ""
 msgid "Cannot specify \"propagation_rule\" parameter without specifying \"propagation_value\" parameter for service \"%1$s\"."
 msgstr ""
 
-#: jsLoader.php:288
+#: jsLoader.php:283
 msgid "Cannot support notification audio for this device."
 msgstr ""
 
@@ -3406,11 +3409,11 @@ msgstr "Xóa lịch sử và phương hướng."
 msgid "Clear when unlinking"
 msgstr "Xóa khi không liên kết"
 
-#: jsLoader.php:167
+#: jsLoader.php:162
 msgid "Click and drag to desired size."
 msgstr "Nhấp và kéo đến kích thước mong muốn."
 
-#: jsLoader.php:311
+#: jsLoader.php:306
 msgid "Click to view or edit"
 msgstr ""
 
@@ -3440,7 +3443,7 @@ msgstr "Đồng hồ"
 #: include/views/configuration.template.edit.php:237
 #: include/views/configuration.trigger.prototype.edit.php:654
 #: include/views/configuration.triggers.edit.php:647
-#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:335
+#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:330
 msgid "Clone"
 msgstr "Tạo bản sao"
 
@@ -3451,8 +3454,8 @@ msgstr "Tạo bản sao"
 #: include/views/js/monitoring.sysmaps.js.php:487
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
-#: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:211
-#: jsLoader.php:290 jsLoader.php:307 jsLoader.php:378
+#: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:206
+#: jsLoader.php:285 jsLoader.php:302 jsLoader.php:373
 msgid "Close"
 msgstr "Đóng"
 
@@ -3482,8 +3485,8 @@ msgid "Close problems"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:301
-#: jsLoader.php:306
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:296
+#: jsLoader.php:301
 msgid "Collapse"
 msgstr "Thu hẹp"
 
@@ -3500,7 +3503,7 @@ msgstr ""
 msgid "Color"
 msgstr ""
 
-#: include/classes/validators/CColorValidator.php:32 jsLoader.php:282
+#: include/classes/validators/CColorValidator.php:32 jsLoader.php:277
 #, c-format
 msgid "Color \"%1$s\" is not correct: expecting hexadecimal color code (6 symbols)."
 msgstr ""
@@ -3623,7 +3626,7 @@ msgstr "Các điều kiện"
 #: app/views/search.php:37 app/views/search.php:195 app/views/search.php:275
 #: include/classes/helpers/CMenuHelper.php:221
 #: include/classes/helpers/CRoleHelper.php:283
-#: include/views/inventory.host.view.php:222 jsLoader.php:334
+#: include/views/inventory.host.view.php:222 jsLoader.php:329
 msgid "Configuration"
 msgstr "Cấu hình"
 
@@ -3985,8 +3988,8 @@ msgstr "Tọa độ"
 #: include/views/configuration.copy.elements.php:77
 #: include/views/configuration.graph.list.php:238
 #: include/views/configuration.item.list.php:307
-#: include/views/configuration.triggers.list.php:343 jsLoader.php:149
-#: jsLoader.php:178 jsLoader.php:274
+#: include/views/configuration.triggers.list.php:343 jsLoader.php:147
+#: jsLoader.php:173 jsLoader.php:269
 msgid "Copy"
 msgstr "Sao chép"
 
@@ -4114,11 +4117,11 @@ msgstr "Tạo liên kết"
 msgid "Create dashboard"
 msgstr "Tạo bảng điều khiển"
 
-#: jsLoader.php:339
+#: jsLoader.php:334
 msgid "Create dependent discovery rule"
 msgstr ""
 
-#: jsLoader.php:338
+#: jsLoader.php:333
 msgid "Create dependent item"
 msgstr "Tạo item phụ thuộc"
 
@@ -4235,7 +4238,7 @@ msgstr "Tạo bản đồ"
 msgid "Create media type"
 msgstr "Tạo media type"
 
-#: app/views/popup.import.php:130 jsLoader.php:336
+#: app/views/popup.import.php:130 jsLoader.php:331
 msgid "Create new"
 msgstr "Tạo mới"
 
@@ -4259,7 +4262,7 @@ msgstr ""
 msgid "Create template"
 msgstr "Tạo template"
 
-#: include/views/configuration.triggers.list.php:149 jsLoader.php:337
+#: include/views/configuration.triggers.list.php:149 jsLoader.php:332
 msgid "Create trigger"
 msgstr "Tạo trigger"
 
@@ -4508,7 +4511,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172 jsLoader.php:340
+#: include/views/inventory.host.view.php:172 jsLoader.php:335
 msgid "Dashboards"
 msgstr "Bảng điều khiển"
 
@@ -4678,7 +4681,7 @@ msgstr "Ngày trong tuần "
 msgid "Days"
 msgstr "Các ngày"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:369
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:364
 msgid "Debug"
 msgstr "Gỡ lỗi"
 
@@ -4692,7 +4695,7 @@ msgstr "Chế độ gỡ lỗi"
 msgid "Dec"
 msgstr "Dec"
 
-#: include/func.inc.php:111 include/func.inc.php:248 jsLoader.php:237
+#: include/func.inc.php:111 include/func.inc.php:248 jsLoader.php:232
 msgid "December"
 msgstr "Tháng 12"
 
@@ -4711,7 +4714,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:263
-#: include/views/js/monitoring.sysmaps.js.php:659 jsLoader.php:263
+#: include/views/js/monitoring.sysmaps.js.php:659 jsLoader.php:258
 msgid "Default"
 msgstr "Mặc định"
 
@@ -4828,8 +4831,8 @@ msgstr "Trễ bởi"
 #: include/views/configuration.template.list.php:283
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:350
-#: include/views/monitoring.sysmap.list.php:110 jsLoader.php:150
-#: jsLoader.php:179 jsLoader.php:341
+#: include/views/monitoring.sysmap.list.php:110 jsLoader.php:148
+#: jsLoader.php:174 jsLoader.php:336
 msgid "Delete"
 msgstr "Xóa"
 
@@ -4858,7 +4861,7 @@ msgstr "Xóa hành động hiện tại?"
 msgid "Delete current correlation?"
 msgstr "Xóa sự liên kết hiện tại?"
 
-#: jsLoader.php:342
+#: jsLoader.php:337
 msgid "Delete dashboard?"
 msgstr "Xóa bảng điều khiển?"
 
@@ -4902,7 +4905,7 @@ msgstr "Xóa kiểu item?"
 msgid "Delete item?"
 msgstr "Xóa item?"
 
-#: jsLoader.php:279
+#: jsLoader.php:274
 msgid "Delete links between selected elements?"
 msgstr "Xóa liên kết giữa các phần tử được chọn?"
 
@@ -4958,7 +4961,7 @@ msgstr "Xóa bảng điều khiển đã chọn"
 msgid "Delete selected discovery rules?"
 msgstr "Xóa các quy tắc phát hiện được chọn?"
 
-#: jsLoader.php:266
+#: jsLoader.php:261
 msgid "Delete selected elements?"
 msgstr "Xóa các phần tử được chọn?"
 
@@ -5063,7 +5066,7 @@ msgstr ""
 msgid "Delete selected services?"
 msgstr ""
 
-#: jsLoader.php:267
+#: jsLoader.php:262
 msgid "Delete selected shapes?"
 msgstr "Xóa hình đã chọn?"
 
@@ -5615,7 +5618,7 @@ msgstr "Hiển thị sơ đồ xếp chồng"
 #: app/views/administration.queue.details.php:85 app/views/search.php:184
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1724 include/actions.inc.php:1796
-#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:381
+#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:376
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Hiển thị %1$s của %2$s đã tìm được"
@@ -5647,7 +5650,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:219 jsLoader.php:343
+#: jsLoader.php:214 jsLoader.php:338
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Bạn có muốn thay thế biểu thức điều kiện không?"
 
@@ -5703,7 +5706,7 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Down"
 
-#: jsLoader.php:193 jsLoader.php:207
+#: jsLoader.php:188 jsLoader.php:202
 msgid "Download image"
 msgstr ""
 
@@ -5810,7 +5813,7 @@ msgstr "Item động"
 msgid "Dynamic items"
 msgstr "Item động"
 
-#: jsLoader.php:278
+#: jsLoader.php:273
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Mỗi URL cần có một tên duy nhất. Xin chắc chắn chỉ có một URl có tên"
 
@@ -5837,8 +5840,8 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:350
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:118
 #: include/views/js/monitoring.sysmaps.js.php:836
-#: include/views/js/monitoring.sysmaps.js.php:851 jsLoader.php:180
-#: jsLoader.php:201
+#: include/views/js/monitoring.sysmaps.js.php:851 jsLoader.php:175
+#: jsLoader.php:196
 msgid "Edit"
 msgstr "Chỉnh sửa"
 
@@ -5854,11 +5857,11 @@ msgstr "Chỉnh sửa sơ đồ"
 msgid "Edit operation"
 msgstr ""
 
-#: jsLoader.php:202
+#: jsLoader.php:197
 msgid "Edit tree element"
 msgstr "Chỉnh sửa phần tử cây"
 
-#: jsLoader.php:344
+#: jsLoader.php:339
 msgid "Edit trigger"
 msgstr "Chỉnh sửa trigger"
 
@@ -6243,7 +6246,7 @@ msgstr "Lỗi"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Lỗi trong yêu cầu tìm kiếm cho bảng \"%1$s\"."
 
-#: include/func.inc.php:1642 jsLoader.php:221
+#: include/func.inc.php:1642 jsLoader.php:216
 msgid "Error message"
 msgstr "Tin nhắn lỗi"
 
@@ -6356,7 +6359,7 @@ msgstr "Loại trừ"
 msgid "Exclude host groups"
 msgstr "Loại trừ các nhóm máy chủ"
 
-#: app/controllers/CControllerAuditLogList.php:196 jsLoader.php:212
+#: app/controllers/CControllerAuditLogList.php:196 jsLoader.php:207
 msgid "Execute"
 msgstr "Thực hiện"
 
@@ -6402,7 +6405,7 @@ msgstr "Thực thi"
 msgid "Executed script"
 msgstr "Câu lệnh đã thực hiện"
 
-#: jsLoader.php:213
+#: jsLoader.php:208
 msgid "Execution confirmation"
 msgstr "Thực hiện xá nhận"
 
@@ -6418,8 +6421,8 @@ msgid "Exists"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:302
-#: jsLoader.php:305
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:297
+#: jsLoader.php:300
 msgid "Expand"
 msgstr "Mở rộng"
 
@@ -6540,7 +6543,7 @@ msgstr "Các biểu thức"
 msgid "External check"
 msgstr "Kiểm tra bên ngoài"
 
-#: jsLoader.php:249
+#: jsLoader.php:244
 msgctxt "Friday short"
 msgid "F"
 msgstr "F"
@@ -6564,7 +6567,9 @@ msgid "Failed"
 msgstr "Đã thất bại"
 
 #: app/controllers/CControllerDashboardUpdate.php:142
-#: app/controllers/CControllerTemplateDashboardUpdate.php:136 jsLoader.php:151
+#: app/controllers/CControllerTemplateDashboardUpdate.php:136
+#: app/views/js/configuration.dashboard.edit.js.php:155
+#: app/views/js/monitoring.dashboard.view.js.php:219
 msgid "Failed to create dashboard"
 msgstr "Không thể tạo bảng điều khiển"
 
@@ -6573,24 +6578,26 @@ msgstr "Không thể tạo bảng điều khiển"
 msgid "Failed to parse URL."
 msgstr "Không thể phân tích cú pháp URL."
 
-#: jsLoader.php:152
+#: jsLoader.php:149
 msgid "Failed to paste dashboard page."
 msgstr ""
 
-#: jsLoader.php:153
+#: jsLoader.php:150
 msgid "Failed to paste widget."
 msgstr ""
 
 #: app/controllers/CControllerDashboardUpdate.php:137
-#: app/controllers/CControllerTemplateDashboardUpdate.php:131 jsLoader.php:154
+#: app/controllers/CControllerTemplateDashboardUpdate.php:131
+#: app/views/js/configuration.dashboard.edit.js.php:156
+#: app/views/js/monitoring.dashboard.view.js.php:220
 msgid "Failed to update dashboard"
 msgstr "Không thể cập nhật bảng điều khiển"
 
-#: jsLoader.php:155
+#: jsLoader.php:151
 msgid "Failed to update dashboard page properties."
 msgstr ""
 
-#: jsLoader.php:156
+#: jsLoader.php:152
 msgid "Failed to update dashboard properties."
 msgstr ""
 
@@ -6598,7 +6605,7 @@ msgstr ""
 msgid "Failed to update template."
 msgstr "Không thể cập nhật mẫu."
 
-#: jsLoader.php:157
+#: jsLoader.php:153
 msgid "Failed to update widget properties."
 msgstr ""
 
@@ -6622,7 +6629,7 @@ msgstr ""
 msgid "Feb"
 msgstr "Tháng 2"
 
-#: include/func.inc.php:101 include/func.inc.php:238 jsLoader.php:227
+#: include/func.inc.php:101 include/func.inc.php:238 jsLoader.php:222
 msgid "February"
 msgstr "Tháng 2"
 
@@ -6916,7 +6923,7 @@ msgstr "Pháp(fr_FR)"
 msgid "Fri"
 msgstr "Thứ sáu"
 
-#: include/func.inc.php:123 include/func.inc.php:213 jsLoader.php:242
+#: include/func.inc.php:123 include/func.inc.php:213 jsLoader.php:237
 msgid "Friday"
 msgstr "Thứ sáu"
 
@@ -7041,7 +7048,7 @@ msgstr "Giá trị toàn cục"
 msgid "Go back to %1$s"
 msgstr "Quay trở về %1$s"
 
-#: jsLoader.php:349
+#: jsLoader.php:344
 msgid "Go to"
 msgstr "Đi tới"
 
@@ -7250,7 +7257,7 @@ msgstr "Đồ thị với tên \"%1$s\" đã tồn tại trong số các �
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:350
+#: include/views/inventory.host.view.php:217 jsLoader.php:345
 msgid "Graphs"
 msgstr "Đồ thị"
 
@@ -7336,7 +7343,7 @@ msgstr "Gộp nhóm theo"
 msgid "Groups"
 msgstr "Các nhóm"
 
-#: include/classes/helpers/CMenuHelper.php:366
+#: include/classes/helpers/CMenuHelper.php:367
 msgid "Guest user"
 msgstr ""
 
@@ -7439,8 +7446,8 @@ msgstr "Hebrew (he_IL)"
 msgid "Height"
 msgstr "Độ cao"
 
-#: include/classes/helpers/CMenuHelper.php:352
-#: include/classes/helpers/CMenuHelper.php:355
+#: include/classes/helpers/CMenuHelper.php:353
+#: include/classes/helpers/CMenuHelper.php:356
 #: include/views/general.login.php:87
 msgid "Help"
 msgstr "Trợ giúp"
@@ -7449,11 +7456,11 @@ msgstr "Trợ giúp"
 msgid "Hexadecimal to decimal"
 msgstr "Thập lục phân đến thập phân"
 
-#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:256
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:251
 msgid "Hidden"
 msgstr "Ẩn"
 
-#: jsLoader.php:370
+#: jsLoader.php:365
 msgid "Hide debug"
 msgstr "Ẩn gỡ lỗi"
 
@@ -7505,7 +7512,7 @@ msgstr "Làm nổi bật toàn bộ hàng"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:351
+#: jsLoader.php:346
 msgid "History"
 msgstr "Lịch sử"
 
@@ -7589,7 +7596,7 @@ msgstr "Sắp xếp theo chiều ngang"
 #: include/views/inventory.host.view.php:214
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
-#: include/views/reports.toptriggers.php:83 jsLoader.php:258 jsLoader.php:352
+#: include/views/reports.toptriggers.php:83 jsLoader.php:253 jsLoader.php:347
 #: report2.php:507
 msgid "Host"
 msgid_plural "Hosts"
@@ -7627,7 +7634,7 @@ msgstr "Kết nối host"
 msgid "Host added"
 msgstr "Host được thêm vào"
 
-#: app/controllers/CControllerPopupItemTest.php:1292
+#: app/controllers/CControllerPopupItemTest.php:1303
 #: app/views/popup.itemtestedit.view.php:100
 msgid "Host address"
 msgstr ""
@@ -7674,7 +7681,7 @@ msgstr[0] "Host được kích hoạtCác host được kích hoạt"
 #: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
 #: include/views/js/monitoring.sysmaps.js.php:102
-#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:261
+#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:256
 #: report2.php:398
 msgid "Host group"
 msgstr "Nhóm host"
@@ -8215,7 +8222,7 @@ msgstr ""
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:227 include/maps.inc.php:28
 #: include/maps.inc.php:307 include/views/js/monitoring.sysmaps.js.php:96
-#: jsLoader.php:262
+#: jsLoader.php:257
 msgid "Image"
 msgstr "Hình ảnh"
 
@@ -9142,9 +9149,9 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:91
 #: app/controllers/CControllerPopupItemTestGetValue.php:104
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupItemTestSend.php:143
 #: app/controllers/CControllerPopupItemTestSend.php:172
 #: app/controllers/CControllerPopupItemTestSend.php:181
@@ -9506,7 +9513,7 @@ msgid "Insert"
 msgstr "Chèn"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:345
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:340
 msgid "Insert expression"
 msgstr "Chèn biểu thức"
 
@@ -9522,6 +9529,10 @@ msgstr "Cài đặt"
 #: include/hosts.inc.php:259
 msgid "Installer name"
 msgstr "Tên người cài đặt"
+
+#: include/classes/helpers/CMenuHelper.php:344
+msgid "Integrations"
+msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:30
 #: app/views/administration.proxy.edit.php:81 disc_prototypes.php:42
@@ -9970,7 +9981,7 @@ msgstr "Khoảng thời gian không hợp lệ."
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:278
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:353
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:348
 msgid "Inventory"
 msgstr "Kiểm kê"
 
@@ -10156,7 +10167,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:375
+#: jsLoader.php:370
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10317,7 +10328,7 @@ msgstr ""
 msgid "Jan"
 msgstr "Tháng 1"
 
-#: include/func.inc.php:100 include/func.inc.php:237 jsLoader.php:226
+#: include/func.inc.php:100 include/func.inc.php:237 jsLoader.php:221
 msgid "January"
 msgstr "Tháng 1"
 
@@ -10339,7 +10350,7 @@ msgstr ""
 msgid "Jul"
 msgstr "Tháng 7"
 
-#: include/func.inc.php:106 include/func.inc.php:243 jsLoader.php:232
+#: include/func.inc.php:106 include/func.inc.php:243 jsLoader.php:227
 msgid "July"
 msgstr "Tháng 7"
 
@@ -10347,7 +10358,7 @@ msgstr "Tháng 7"
 msgid "Jun"
 msgstr "Tháng 6"
 
-#: include/func.inc.php:105 include/func.inc.php:242 jsLoader.php:231
+#: include/func.inc.php:105 include/func.inc.php:242 jsLoader.php:226
 msgid "June"
 msgstr "Tháng 6"
 
@@ -10524,11 +10535,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Lần kiểm tra cuối cùng"
 
-#: jsLoader.php:356
+#: jsLoader.php:351
 msgid "Last hour graph"
 msgstr "Đồ thị giờ cuối cuối cùng"
 
-#: jsLoader.php:357
+#: jsLoader.php:352
 msgid "Last month graph"
 msgstr "Đồ thị tháng cuối cùng"
 
@@ -10566,7 +10577,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Giá trị cuối cùng"
 
-#: jsLoader.php:358
+#: jsLoader.php:353
 msgid "Last week graph"
 msgstr "Đồ thị tuần cuối cùng"
 
@@ -10579,11 +10590,11 @@ msgstr "Đồ thị tuần cuối cùng"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:311
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:354
+#: include/views/inventory.host.view.php:149 jsLoader.php:349
 msgid "Latest data"
 msgstr "Dữ liệu gần đây nhất"
 
-#: jsLoader.php:355
+#: jsLoader.php:350
 msgid "Latest values"
 msgstr "Các giá trị gần đây nhất"
 
@@ -10905,7 +10916,7 @@ msgstr "Quy tắc phát hiện mức độ thấp ở trạng thái \"kh
 msgid "M"
 msgstr "M"
 
-#: jsLoader.php:245
+#: jsLoader.php:240
 msgctxt "Monday short"
 msgid "M"
 msgstr "M"
@@ -11090,7 +11101,7 @@ msgstr "Hướng dẫn bị đóng"
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
 #: include/views/js/monitoring.sysmaps.js.php:93
 #: include/views/js/monitoring.sysmaps.js.php:208
-#: include/views/monitoring.sysmap.edit.php:317 jsLoader.php:259 map.php:25
+#: include/views/monitoring.sysmap.edit.php:317 jsLoader.php:254 map.php:25
 msgid "Map"
 msgstr "Bản đồ"
 
@@ -11191,7 +11202,7 @@ msgstr "Các bản đồ"
 msgid "Mar"
 msgstr "Tháng 3"
 
-#: include/func.inc.php:102 include/func.inc.php:239 jsLoader.php:228
+#: include/func.inc.php:102 include/func.inc.php:239 jsLoader.php:223
 msgid "March"
 msgstr "Tháng 3"
 
@@ -11308,7 +11319,7 @@ msgstr[0] "Chu kỳ thời gian tối đa để hiển thị là %1$s ngà
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "Tổng chiều dài tối đa của địa chỉ email vượt quá đối với loại phương tiện có ID \"%1$s\"."
 
-#: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:230
+#: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:225
 msgid "May"
 msgstr "Tháng 5"
 
@@ -11657,7 +11668,7 @@ msgstr ""
 msgid "Mon"
 msgstr "Thứ 2"
 
-#: include/func.inc.php:119 include/func.inc.php:209 jsLoader.php:238
+#: include/func.inc.php:119 include/func.inc.php:209 jsLoader.php:233
 msgid "Monday"
 msgstr "Thứ 2"
 
@@ -11697,11 +11708,11 @@ msgstr "Tháng"
 msgid "Monthly"
 msgstr "Hàng tháng"
 
-#: include/classes/html/CMultiSelect.php:83 jsLoader.php:317
+#: include/classes/html/CMultiSelect.php:83 jsLoader.php:312
 msgid "More matches found..."
 msgstr "Tìm thấy nhiều kết quả phù hợp hơn..."
 
-#: jsLoader.php:327
+#: jsLoader.php:322
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -11738,7 +11749,7 @@ msgstr "Nhiều"
 msgid "Multiple PROBLEM events"
 msgstr "Nhiều sự kiện có vấn đề"
 
-#: jsLoader.php:287
+#: jsLoader.php:282
 msgid "Mute"
 msgstr "Tắt tiếng"
 
@@ -12029,7 +12040,7 @@ msgstr "Điều kiện mới"
 msgid "New dashboard"
 msgstr "Bảng điều khiển mới"
 
-#: jsLoader.php:273
+#: jsLoader.php:268
 msgid "New element"
 msgstr "Phần tử mới"
 
@@ -12070,7 +12081,7 @@ msgid "New triggers"
 msgstr "Trigger mới"
 
 #: app/views/monitoring.dashboard.view.php:175
-#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:186
+#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:181
 msgid "Next page"
 msgstr ""
 
@@ -12296,7 +12307,7 @@ msgstr "Không có hình ảnh"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:374
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:369
 msgid "No interface found"
 msgstr "Không tìm thấy interface "
 
@@ -12336,7 +12347,7 @@ msgstr "Không tìm thấy macro nào."
 msgid "No maps added."
 msgstr "Bản đồ không được thêm vào."
 
-#: include/classes/html/CMultiSelect.php:82 jsLoader.php:316
+#: include/classes/html/CMultiSelect.php:82 jsLoader.php:311
 msgid "No matches found"
 msgstr "Không khớp với kết quả nào "
 
@@ -12483,7 +12494,7 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:740
 #: include/classes/api/services/CProxy.php:774
 #: include/classes/api/services/CProxy.php:864
-#: include/classes/api/services/CReport.php:925
+#: include/classes/api/services/CReport.php:903
 #: include/classes/api/services/CRole.php:314
 #: include/classes/api/services/CRole.php:345
 #: include/classes/api/services/CScript.php:540
@@ -12547,7 +12558,7 @@ msgstr "Không quy định được khóa tập tin công khai."
 msgid "No recipients for action operation message."
 msgstr "Không có người nhận khi gửi nhắn tin."
 
-#: include/classes/widgets/CWidgetConfig.php:282 jsLoader.php:181
+#: include/classes/widgets/CWidgetConfig.php:282 jsLoader.php:176
 msgid "No refresh"
 msgstr "Không làm mới"
 
@@ -12717,7 +12728,7 @@ msgstr "Thống báo tất cả các vấn đề"
 msgid "Nov"
 msgstr "Tháng 11"
 
-#: include/func.inc.php:110 include/func.inc.php:247 jsLoader.php:236
+#: include/func.inc.php:110 include/func.inc.php:247 jsLoader.php:231
 msgid "November"
 msgstr "Tháng 11"
 
@@ -12965,13 +12976,13 @@ msgstr "Tháng 10"
 msgid "Octal to decimal"
 msgstr "Bát phân đến thập phân"
 
-#: include/func.inc.php:109 include/func.inc.php:246 jsLoader.php:235
+#: include/func.inc.php:109 include/func.inc.php:246 jsLoader.php:230
 msgid "October"
 msgstr "Tháng 10"
 
 #: app/views/administration.proxy.list.php:156
 #: include/views/monitoring.sysmap.constructor.php:51
-#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:255
+#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:250
 msgid "Off"
 msgstr "Off"
 
@@ -12983,7 +12994,7 @@ msgstr "Off"
 #: app/views/monitoring.widget.web.view.php:30
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:386
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:381
 #: report2.php:507
 msgid "Ok"
 msgstr "Ok"
@@ -13002,7 +13013,7 @@ msgstr ""
 
 #: app/views/administration.proxy.list.php:155
 #: include/views/monitoring.sysmap.constructor.php:51
-#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:254
+#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:249
 msgid "On"
 msgstr "On"
 
@@ -13584,7 +13595,7 @@ msgstr "Danh tính PSK"
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr "PSK quá ngắn. Tối thiểu là %1$s hex-digits."
 
-#: jsLoader.php:158
+#: jsLoader.php:154
 #, c-format
 msgid "Page %1$d"
 msgstr ""
@@ -13740,19 +13751,21 @@ msgstr ""
 msgid "Password requirements:"
 msgstr ""
 
-#: jsLoader.php:182 jsLoader.php:275
+#: jsLoader.php:177 jsLoader.php:270
 msgid "Paste"
 msgstr "Dán"
 
-#: jsLoader.php:159
+#: app/views/js/configuration.dashboard.edit.js.php:217
+#: app/views/js/monitoring.dashboard.view.js.php:283
 msgid "Paste page"
 msgstr ""
 
-#: jsLoader.php:160
+#: app/views/js/configuration.dashboard.edit.js.php:210
+#: app/views/js/monitoring.dashboard.view.js.php:276 jsLoader.php:155
 msgid "Paste widget"
 msgstr ""
 
-#: jsLoader.php:276
+#: jsLoader.php:271
 msgid "Paste without external links"
 msgstr "Dán mà không cần liên kết bên ngoài"
 
@@ -13896,7 +13909,7 @@ msgstr ""
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Vui lòng nhập tên máy chủ hoặc địa chỉ IP máy chủ và số cổng của máy chủ Zabbix, cũng như tên cài đặt (tùy chọn)."
 
-#: jsLoader.php:264
+#: jsLoader.php:259
 msgid "Please select two elements"
 msgstr "Xin vui lòng lựa chọn 2 phần tử"
 
@@ -13930,7 +13943,7 @@ msgstr "Polish (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Gắn linh kiện vào trường host còn lại"
 
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/partials/monitoring.host.filter.php:113
 #: app/views/administration.authentication.edit.php:170
 #: app/views/administration.proxy.edit.php:54
@@ -14025,7 +14038,7 @@ msgid "Previous month"
 msgstr "quay lại tháng trước"
 
 #: app/views/monitoring.dashboard.view.php:157
-#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:187
+#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:182
 msgid "Previous page"
 msgstr ""
 
@@ -14156,7 +14169,7 @@ msgstr "Vấn đề không được triệt tiêu"
 msgid "Problem is suppressed"
 msgstr "Vấn đề được triệt tiêu"
 
-#: jsLoader.php:285
+#: jsLoader.php:280
 msgid "Problem on"
 msgstr "Vấn đề"
 
@@ -14199,7 +14212,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:359 report2.php:507
+#: include/views/inventory.host.view.php:156 jsLoader.php:354 report2.php:507
 msgid "Problems"
 msgstr "Các vấn đề"
 
@@ -14216,7 +14229,7 @@ msgstr ""
 msgid "Process tags"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:377
+#: include/classes/helpers/CMenuHelper.php:378
 msgid "Profile"
 msgstr ""
 
@@ -14233,7 +14246,7 @@ msgid "Prometheus to JSON"
 msgstr ""
 
 #: include/views/monitoring.sysmap.list.php:77
-#: include/views/monitoring.sysmap.list.php:78 jsLoader.php:161
+#: include/views/monitoring.sysmap.list.php:78 jsLoader.php:156
 msgid "Properties"
 msgstr "Thuộc tính"
 
@@ -14546,7 +14559,7 @@ msgstr "Hình chữ nhật"
 msgid "Refresh"
 msgstr "làm mới"
 
-#: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:183
+#: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:178
 msgid "Refresh interval"
 msgstr "Làm mới thời gian"
 
@@ -14606,7 +14619,7 @@ msgstr "Các biểu thức chính quy"
 msgid "Related reports"
 msgstr ""
 
-#: jsLoader.php:168
+#: jsLoader.php:163
 msgid "Release to create a widget."
 msgstr ""
 
@@ -14750,8 +14763,8 @@ msgstr "Lệnh từ xa"
 #: include/views/monitoring.sysmap.constructor.php:34
 #: include/views/monitoring.sysmap.constructor.php:40
 #: include/views/monitoring.sysmap.constructor.php:46
-#: include/views/monitoring.sysmap.edit.php:292 jsLoader.php:203
-#: jsLoader.php:272
+#: include/views/monitoring.sysmap.edit.php:292 jsLoader.php:198
+#: jsLoader.php:267
 msgid "Remove"
 msgstr "Gỡ bỏ"
 
@@ -14791,7 +14804,7 @@ msgstr "Xóa, %1$s"
 msgid "Removed"
 msgstr ""
 
-#: jsLoader.php:322
+#: jsLoader.php:317
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -14969,7 +14982,7 @@ msgstr "Phục hồi xác nhận"
 msgid "Reset defaults"
 msgstr "Phục hồi mặc định"
 
-#: jsLoader.php:286
+#: jsLoader.php:281
 msgid "Resolved"
 msgstr "Đã giải quyết"
 
@@ -15222,12 +15235,12 @@ msgstr "Chạy lệnh được chỉ định trên máy chủ. Trả về kết 
 msgid "Russian (ru_RU)"
 msgstr "Russian (ru_RU)"
 
-#: jsLoader.php:250
+#: jsLoader.php:245
 msgctxt "Saturday short"
 msgid "S"
 msgstr "S"
 
-#: jsLoader.php:251
+#: jsLoader.php:246
 msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
@@ -15296,7 +15309,7 @@ msgstr "SNMP OID"
 msgid "SNMP agent"
 msgstr ""
 
-#: app/controllers/CControllerPopupItemTest.php:1284
+#: app/controllers/CControllerPopupItemTest.php:1295
 #: app/views/popup.discovery.check.php:68
 #: app/views/popup.itemtestedit.view.php:142
 #: include/views/js/configuration.host.edit.js.php:89
@@ -15452,7 +15465,7 @@ msgstr "Sans-Serif"
 msgid "Sat"
 msgstr "Thứ bảy"
 
-#: include/func.inc.php:124 include/func.inc.php:214 jsLoader.php:243
+#: include/func.inc.php:124 include/func.inc.php:214 jsLoader.php:238
 msgid "Saturday"
 msgstr "Thứ bảy"
 
@@ -15621,7 +15634,7 @@ msgstr "Script đã được cập nhật"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:295
-#: include/classes/helpers/CRoleHelper.php:388 jsLoader.php:360
+#: include/classes/helpers/CRoleHelper.php:388 jsLoader.php:355
 msgid "Scripts"
 msgstr "Các Script"
 
@@ -15700,7 +15713,7 @@ msgstr "Tên bảo mật"
 #: include/views/configuration.item.edit.php:101
 #: include/views/configuration.item.prototype.edit.php:83
 #: include/views/configuration.item.prototype.edit.php:479
-#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:320
+#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:315
 msgid "Select"
 msgstr "Lựa chọn"
 
@@ -15736,19 +15749,19 @@ msgstr "Các phần tử đã chọn"
 msgid "Selected items only"
 msgstr "Chỉ item được chọn"
 
-#: jsLoader.php:325
+#: jsLoader.php:320
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr "Đã chọn, %1$s ở vị trí %2$d của %3$d"
 
-#: jsLoader.php:326
+#: jsLoader.php:321
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "Đã chọn, %1$s, chỉ đọc, ở vị trí %2$d của %3$d"
 
-#: jsLoader.php:270
+#: jsLoader.php:265
 msgid "Send backward"
 msgstr "Gửi trở lại"
 
@@ -15773,7 +15786,7 @@ msgstr "Chỉ gửi đến"
 msgid "Send to"
 msgstr "Gửi tới"
 
-#: jsLoader.php:271
+#: jsLoader.php:266
 msgid "Send to back"
 msgstr "Gửi lại"
 
@@ -15806,7 +15819,7 @@ msgstr "Bị ngăn cách"
 msgid "Separately"
 msgstr ""
 
-#: include/func.inc.php:108 include/func.inc.php:245 jsLoader.php:234
+#: include/func.inc.php:108 include/func.inc.php:245 jsLoader.php:229
 msgid "September"
 msgstr "Tháng 9"
 
@@ -15991,7 +16004,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Đặt chế độ kiểm kê máy chủ"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:392
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:387
 msgid "Set new value"
 msgstr ""
 
@@ -16081,15 +16094,11 @@ msgstr "Mức độ nghiêm trọng đã tăng"
 msgid "Shape"
 msgstr "Hình dạng"
 
-#: include/classes/helpers/CMenuHelper.php:343
-msgid "Share"
-msgstr ""
-
 #: app/views/monitoring.dashboard.list.php:99
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:346
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:341
 msgid "Sharing"
 msgstr "Chia sẻ"
 
@@ -16231,7 +16240,7 @@ msgstr "Hiển thị cảnh báo nếu máy chủ Zabbix không hoạt đô�
 msgid "Show working time"
 msgstr "Hiển thị thời gian làm việc"
 
-#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:257
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:252
 msgid "Shown"
 msgstr "Đã hiển thị"
 
@@ -16255,8 +16264,8 @@ msgstr "Đăng nhập với HTTP"
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:395
-#: include/classes/helpers/CMenuHelper.php:398
+#: include/classes/helpers/CMenuHelper.php:396
+#: include/classes/helpers/CMenuHelper.php:399
 msgid "Sign out"
 msgstr "Đăng xuất"
 
@@ -16340,7 +16349,7 @@ msgstr "Sao chép đồ thị \"%1$s\" đến host \"%2$s\" được bỏ qu
 msgid "Slovak (sk_SK)"
 msgstr "Slovak (sk_SK)"
 
-#: jsLoader.php:291
+#: jsLoader.php:286
 msgid "Snooze"
 msgstr "Snooze"
 
@@ -16460,7 +16469,7 @@ msgstr "Bắt đầu"
 #: app/views/monitoring.dashboard.view.php:164
 #: app/views/monitoring.dashboard.view.php:232
 #: app/views/monitoring.host.dashboard.view.php:101
-#: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:162
+#: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:157
 msgid "Start slideshow"
 msgstr ""
 
@@ -16649,7 +16658,7 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:163
 #: app/views/monitoring.dashboard.view.php:233
 #: app/views/monitoring.host.dashboard.view.php:100
-#: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:163
+#: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:158
 msgid "Stop slideshow"
 msgstr ""
 
@@ -16714,7 +16723,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Chủ đề"
 
-#: jsLoader.php:361
+#: jsLoader.php:356
 msgid "Submap"
 msgstr "Submap"
 
@@ -16730,7 +16739,7 @@ msgstr ""
 msgid "Success Audit"
 msgstr "Kiểm nghiệm thành công"
 
-#: include/func.inc.php:1641 jsLoader.php:220
+#: include/func.inc.php:1641 jsLoader.php:215
 msgid "Success message"
 msgstr "Tin chắn thành công"
 
@@ -16743,7 +16752,7 @@ msgstr "Tổng số thống kê lưu lượng đến và đi trên interface. Tr
 msgid "Sun"
 msgstr "Chủ nhật"
 
-#: include/func.inc.php:126 include/func.inc.php:208 jsLoader.php:244
+#: include/func.inc.php:126 include/func.inc.php:208 jsLoader.php:239
 msgid "Sunday"
 msgstr "Chủ nhật"
 
@@ -16751,7 +16760,7 @@ msgstr "Chủ nhật"
 msgid "Super admin"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:336
+#: include/classes/helpers/CMenuHelper.php:337
 #: include/views/general.login.php:94
 msgid "Support"
 msgstr "Hỗ trợ"
@@ -16835,12 +16844,12 @@ msgstr ""
 msgid "System uptime in seconds. Returns integer"
 msgstr "Thời gian chạy hệ thống tính bằng giây. Trả về kiểu integer"
 
-#: jsLoader.php:248
+#: jsLoader.php:243
 msgctxt "Thursday short"
 msgid "T"
 msgstr "T"
 
-#: jsLoader.php:246
+#: jsLoader.php:241
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "T"
@@ -17376,7 +17385,7 @@ msgstr ""
 msgid "Thu"
 msgstr "Thứ 5"
 
-#: include/func.inc.php:122 include/func.inc.php:212 jsLoader.php:241
+#: include/func.inc.php:122 include/func.inc.php:212 jsLoader.php:236
 msgid "Thursday"
 msgstr "Thứ năm"
 
@@ -17478,7 +17487,7 @@ msgstr "Nhãn thời gian"
 msgid "To"
 msgstr "To"
 
-#: jsLoader.php:373
+#: jsLoader.php:368
 msgid "To set a host interface select a single item type for all items"
 msgstr "Để thiết lập một host interface chọn một kiểu item duy nhất cho tất cả các item"
 
@@ -17606,7 +17615,7 @@ msgstr "Các khuynh hướng "
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:260 jsLoader.php:362
+#: include/views/reports.toptriggers.php:83 jsLoader.php:255 jsLoader.php:357
 msgid "Trigger"
 msgstr "Trigger"
 
@@ -17776,11 +17785,11 @@ msgstr "Các kiểu trigger đã được cập nhật"
 msgid "Trigger severity"
 msgstr "Mức độ quan trọng của trigger"
 
-#: jsLoader.php:347
+#: jsLoader.php:342
 msgid "Trigger status \"OK\""
 msgstr "Trạng thái trigger \"OK\""
 
-#: jsLoader.php:348
+#: jsLoader.php:343
 msgid "Trigger status \"Problem\""
 msgstr "Trạng thái Trigger \"Problem\""
 
@@ -17832,7 +17841,7 @@ msgstr "Cắt"
 msgid "Tue"
 msgstr "Thứ ba"
 
-#: include/func.inc.php:120 include/func.inc.php:210 jsLoader.php:239
+#: include/func.inc.php:120 include/func.inc.php:210 jsLoader.php:234
 msgid "Tuesday"
 msgstr "Thứ ba"
 
@@ -17845,7 +17854,7 @@ msgstr "Turkish (tr_TR)"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Hai item (\"%1$s\" và \"%2$s\") không thể gắn vào một trường host còn lại \"%3$s\", điều này sẽ dẫn đến một cuộc xung đột."
 
-#: jsLoader.php:265
+#: jsLoader.php:260
 msgid "Two map elements should be selected"
 msgstr "Hai phần tử sơ đồ nên được chọn"
 
@@ -17946,7 +17955,7 @@ msgstr "UNKNOWN"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:363
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:358
 msgid "URL"
 msgstr "URL"
 
@@ -17992,7 +18001,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL phải có cả trường \"tên\" và \"url\" cho sơ đồ \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:364
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:359
 msgid "URLs"
 msgstr "URLs"
 
@@ -18192,7 +18201,7 @@ msgstr "Hủy liên kết từ template"
 msgid "Unlink from templates"
 msgstr "Hủy liên kết từ các template"
 
-#: jsLoader.php:289
+#: jsLoader.php:284
 msgid "Unmute"
 msgstr "Bật tiếng"
 
@@ -18627,8 +18636,8 @@ msgstr ""
 msgid "User sessions"
 msgstr "Các phiên làm việc của người dùng"
 
-#: include/classes/helpers/CMenuHelper.php:373
-#: include/classes/helpers/CMenuHelper.php:387
+#: include/classes/helpers/CMenuHelper.php:374
+#: include/classes/helpers/CMenuHelper.php:388
 msgid "User settings"
 msgstr ""
 
@@ -19231,7 +19240,7 @@ msgstr "Tên hiển thị không thể bị trống nếu tên host bị lô
 msgid "W"
 msgstr ""
 
-#: jsLoader.php:247
+#: jsLoader.php:242
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "W"
@@ -19248,11 +19257,11 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Cảnh báo"
 
-#: include/func.inc.php:1643 jsLoader.php:222
+#: include/func.inc.php:1643 jsLoader.php:217
 msgid "Warning message"
 msgstr ""
 
-#: jsLoader.php:294
+#: jsLoader.php:289
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Chúng tôi xin lỗi, số lượng tối đa có thể của các phần tử để ghi nhớ đã đạt tới giới hạn."
 
@@ -19268,7 +19277,7 @@ msgstr "Chúng tôi xin lỗi, số lượng tối đa có thể của ca
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:365
+#: include/views/inventory.host.view.php:219 jsLoader.php:360
 msgid "Web"
 msgstr "Web"
 
@@ -19335,7 +19344,7 @@ msgstr ""
 msgid "Wed"
 msgstr "Thứ 4"
 
-#: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:240
+#: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:235
 msgid "Wednesday"
 msgstr "Thứ tư"
 
@@ -19367,7 +19376,7 @@ msgstr "Khi hoạt động"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr ""
 
-#: jsLoader.php:189
+#: jsLoader.php:184
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
 
@@ -19732,11 +19741,11 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr "Zabbix"
 
-#: include/classes/helpers/CMenuHelper.php:346
-msgid "Zabbix Share"
-msgstr "Chia sẻ zabbix"
+#: include/classes/helpers/CMenuHelper.php:347
+msgid "Zabbix Integrations"
+msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:339
+#: include/classes/helpers/CMenuHelper.php:340
 msgid "Zabbix Technical Support"
 msgstr "Hỗ trợ kỹ thuật zabbix"
 
@@ -20175,9 +20184,9 @@ msgstr "Không thể thay đổi"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:143
 #: app/controllers/CControllerAuthenticationUpdate.php:215
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupLldOperation.php:131
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/controllers/CControllerPopupLldOperation.php:143
@@ -20328,7 +20337,7 @@ msgstr ""
 msgid "circular item dependency is not allowed"
 msgstr "phụ thuộc item không được phép"
 
-#: jsLoader.php:297
+#: jsLoader.php:292
 msgid "color"
 msgstr ""
 
@@ -20375,7 +20384,7 @@ msgstr "Count () - Số lượng giá trị được truy xuất thành công V 
 msgid "countunique() - The number of unique values"
 msgstr ""
 
-#: include/func.inc.php:579 jsLoader.php:216
+#: include/func.inc.php:579 jsLoader.php:211
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -20574,7 +20583,7 @@ msgstr "Cài đặt global housekeeping"
 msgid "graph pattern"
 msgstr ""
 
-#: include/func.inc.php:580 jsLoader.php:217
+#: include/func.inc.php:580 jsLoader.php:212
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -20854,12 +20863,12 @@ msgstr "Quy tắc phát hiện low-level"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:138 jsLoader.php:218 jsLoader.php:382
+#: include/func.inc.php:581 jsLoader.php:138 jsLoader.php:213 jsLoader.php:377
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:578 jsLoader.php:215
+#: include/func.inc.php:578 jsLoader.php:210
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -21059,7 +21068,7 @@ msgstr ""
 msgid "name"
 msgstr "tên"
 
-#: include/classes/html/CMultiSelect.php:85 jsLoader.php:319
+#: include/classes/html/CMultiSelect.php:85 jsLoader.php:314
 msgid "new"
 msgstr "new"
 
@@ -21194,7 +21203,7 @@ msgstr "đầu ra"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:393
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:388
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21521,7 +21530,7 @@ msgstr ""
 msgid "time filter default period exceeds the max period"
 msgstr ""
 
-#: jsLoader.php:298
+#: jsLoader.php:293
 msgid "time shift"
 msgstr "thay đổi thời gian"
 
@@ -21584,7 +21593,7 @@ msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:74
-#: include/classes/html/CMultiSelect.php:84 jsLoader.php:318
+#: include/classes/html/CMultiSelect.php:84 jsLoader.php:313
 msgid "type here to search"
 msgstr "Kiểu cần tìm kiếm"
 
@@ -21727,7 +21736,7 @@ msgstr "Số phiên bản không được hỗ trợ"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:394
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:389
 msgid "value"
 msgstr "Giá trị"
 
@@ -21874,7 +21883,7 @@ msgstr "phát hiện sai loại quy tắc"
 msgid "wrong item type"
 msgstr "Loại item sai"
 
-#: include/func.inc.php:577 jsLoader.php:214
+#: include/func.inc.php:577 jsLoader.php:209
 msgctxt "year short"
 msgid "y"
 msgstr "y"

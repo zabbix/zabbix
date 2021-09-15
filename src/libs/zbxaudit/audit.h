@@ -36,6 +36,7 @@
 #define	AUDIT_DETAILS_KEY_LEN		100
 
 #define AUDIT_RESOURCE_HOST			4
+#define	AUDIT_RESOURCE_GRAPH			6
 #define AUDIT_RESOURCE_TRIGGER			13
 #define AUDIT_RESOURCE_HOST_GROUP		14
 #define AUDIT_RESOURCE_ITEM			15
@@ -44,6 +45,7 @@
 #define AUDIT_RESOURCE_SCRIPT			25
 
 #define AUDIT_RESOURCE_TRIGGER_PROTOTYPE	31
+#define AUDIT_RESOURCE_GRAPH_PROTOTYPE		35
 #define AUDIT_RESOURCE_ITEM_PROTOTYPE		36
 #define AUDIT_RESOURCE_HOST_PROTOTYPE		37
 
@@ -78,10 +80,12 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 		uint64_t value);
 void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const char *audit_op, const char *key);
 void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value);
+void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const char *audit_op, const char *key, double value);
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
 		const char *value_new);
 void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, uint64_t value_old,
 		uint64_t value_new);
 void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const char *key, int value_old, int value_new);
+void	zbx_audit_update_json_update_double(const zbx_uint64_t id, const char *key, double value_old, double value_new);
 void	zbx_audit_update_json_delete(const zbx_uint64_t id, const char *audit_op, const char *key);
 #endif	/* ZABBIX_AUDIT_H */

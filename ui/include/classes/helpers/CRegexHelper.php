@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,38 +19,29 @@
 **/
 
 
-class CControllerRegExList extends CController {
+class CRegexHelper {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkInput() {
-		$fields = [
-			'uncheck' => 'in 1'
+	public static function expression_type2str(int $type = null) {
+		$types = [
+			EXPRESSION_TYPE_INCLUDED => _('Character string included'),
+			EXPRESSION_TYPE_ANY_INCLUDED => _('Any character string included'),
+			EXPRESSION_TYPE_NOT_INCLUDED => _('Character string not included'),
+			EXPRESSION_TYPE_TRUE => _('Result is TRUE'),
+			EXPRESSION_TYPE_FALSE => _('Result is FALSE')
 		];
 
-		return $this->validateInput($fields);
+		if ($type === null) {
+			return $types;
+		}
+
+		return array_key_exists($type, $types) ? $types[$type] : _('Unknown');
 	}
 
-	protected function checkPermissions() {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
-	}
-
-	protected function doAction() {
-		$data = [
-			'regexs' => API::Regexp()->get([
-				'output' => ['regexpid', 'name'],
-				'selectExpressions' => ['expression', 'expression_type'],
-				'preservekeys' => true
-			]),
-			'uncheck' => $this->hasInput('uncheck')
+	public static function expressionDelimiters(): array {
+		return [
+			',' => ',',
+			'.' => '.',
+			'/' => '/'
 		];
-
-		order_result($data['regexs'], 'name');
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of regular expressions'));
-		$this->setResponse($response);
 	}
 }

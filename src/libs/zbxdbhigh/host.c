@@ -27,6 +27,7 @@
 #include "../../libs/zbxaudit/audit_item.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
 #include "../../libs/zbxaudit/audit_httptest.h"
+#include "../../libs/zbxaudit/audit_graph.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "../zbxalgo/vectorimpl.h"
@@ -1219,18 +1220,21 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_vector_uint64_t	children_graphids;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	if (0 == graphids->values_num)
-		return;
+		goto out;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&children_graphids);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct graphid from graph_discovery where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct gd.graphid,g.name,g.flags from"
+			" graph_discovery gd,graphs g where g.graphid=gd.graphid and ");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid", graphids->values,
 			graphids->values_num);
 
-	DBselect_uint64(sql, &children_graphids);
+	zbx_audit_DBselect_delete_for_graph(sql, &children_graphids);
 	zbx_vector_uint64_setdiff(graphids, &children_graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	DBdelete_graphs(&children_graphids);
@@ -1239,6 +1243,8 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
 	zbx_vector_uint64_destroy(&children_graphids);
 
 	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -1250,7 +1256,7 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
+static void	DBdelete_graphs_by_itemids(const zbx_vector_uint64_t *itemids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
@@ -1270,10 +1276,11 @@ static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
 
 	/* select all graphs with items */
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select distinct graphid from graphs_items where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select distinct gi.graphid,g.name,g.flags from "
+			"graphs_items gi,graphs g where gi.graphid=g.graphid and ");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "gi.itemid", itemids->values, itemids->values_num);
 
-	DBselect_uint64(sql, &graphids);
+	zbx_audit_DBselect_delete_for_graph(sql, &graphids);
 
 	if (0 == graphids.values_num)
 		goto clean;
@@ -1651,16 +1658,17 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint6
 	zbx_vector_uint64_create(&graphids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct gi.graphid"
-			" from graphs_items gi,items i,items ti"
+			"select distinct gi.graphid,g.name,g.flags"
+			" from graphs_items gi,items i,items ti, graphs g"
 			" where gi.itemid=i.itemid"
 				" and i.templateid=ti.itemid"
+				" and g.graphid=gi.graphid"
 				" and i.hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	DBselect_uint64(sql, &graphids);
+	zbx_audit_DBselect_delete_for_graph(sql, &graphids);
 
 	DBdelete_graph_hierarchy(&graphids);
 
@@ -2613,10 +2621,10 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 						if (group_prototype->groupid == groupid &&
 								0 == strcmp(group_prototype->name, row[3]))
 						{
-							zbx_uint64_t	templateid_orig;
+							zbx_uint64_t	templateid_host;
 
-							ZBX_DBROW2UINT64(templateid_orig, row[4]);
-							group_prototype->templateid_host = templateid_orig;
+							ZBX_DBROW2UINT64(templateid_host, row[4]);
+							group_prototype->templateid_host = templateid_host;
 							group_prototype->group_prototypeid = group_prototypeid;
 							break;
 						}
