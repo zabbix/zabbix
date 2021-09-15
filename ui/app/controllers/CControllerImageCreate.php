@@ -23,8 +23,8 @@ class CControllerImageCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'      => 'required | not_empty | db images.name',
-			'imagetype' => 'required | fatal | db images.imagetype'
+			'name'      => 'required|not_empty|db images.name',
+			'imagetype' => 'required|fatal|db images.imagetype'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,12 +55,6 @@ class CControllerImageCreate extends CController {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
-
-		$this->image = [
-			'imageid'   => 0,
-			'imagetype' => $this->getInput('imagetype'),
-			'name'      => $this->getInput('name', '')
-		];
 
 		return true;
 	}
@@ -111,21 +105,23 @@ class CControllerImageCreate extends CController {
 
 		$result = API::Image()->create([
 			'imagetype' => $this->getInput('imagetype'),
-			'name'      => $this->getInput('name'),
-			'image'     => $image
+			'name' => $this->getInput('name'),
+			'image' => $image
 		]);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'image.list')
-				->setArgument('imagetype', $this->getInput('imagetype'))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'image.list')
+					->setArgument('imagetype', $this->getInput('imagetype'))
 			);
 			CMessageHelper::setSuccessTitle(_('Image added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'image.edit')
-				->setArgument('imagetype', $this->getInput('imagetype'))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'image.edit')
+					->setArgument('imagetype', $this->getInput('imagetype'))
 			);
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot add image'));

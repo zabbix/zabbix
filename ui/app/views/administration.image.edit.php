@@ -49,7 +49,7 @@ $form_list = (new CFormList('imageFormList'))
 			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Upload'), 'image'))->setAsteriskMark(),
+		(new CLabel(_('Upload'), 'image'))->setAsteriskMark(($data['imageid'] == 0)),
 		(new CFile('image'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()

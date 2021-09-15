@@ -28,7 +28,7 @@ class CControllerImageEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'imageid'   => 'db images.imageid',
-			'imagetype' => 'db images.imagetype | in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND,
+			'imagetype' => 'db images.imagetype|in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND,
 			'name'      => 'db images.name'
 		];
 
@@ -60,7 +60,7 @@ class CControllerImageEdit extends CController {
 			return true;
 		}
 
-		$images = API::Image()->get(['imageids' => (array) $this->getInput('imageid')]);
+		$images = API::Image()->get(['imageids' => [$this->getInput('imageid')]]);
 		if (!$images) {
 			return false;
 		}
