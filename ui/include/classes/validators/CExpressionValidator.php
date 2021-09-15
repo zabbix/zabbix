@@ -211,7 +211,7 @@ class CExpressionValidator extends CValidator {
 						}
 					}
 
-					if ($options['calculated'] && CHistFunctionData::isAggregatableBucket($token['data']['function'])) {
+					if (CHistFunctionData::isAggregatableBucket($token['data']['function'])) {
 						if ($parent_token === null
 								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
 								|| !CMathFunctionData::isAggregatingBucket($parent_token['data']['function'])
