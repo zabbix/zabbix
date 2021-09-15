@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$form_name = 'host-form';
+$data['form_name'] = 'host-form';
 $popup_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'host.edit');
 
@@ -102,7 +102,7 @@ $output = [
 		$this->readJsFile('popup.host.edit.js.php').
 		'host_edit_popup.init('.json_encode([
 			'popup_url' => $popup_url->getUrl(),
-			'form_name' => $form_name
+			'form_name' => $data['form_name']
 		]).');',
 	'buttons' => $buttons,
 	'cancel_action' => 'host_edit_popup.closePopup();'

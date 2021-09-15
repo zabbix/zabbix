@@ -228,7 +228,9 @@ class CControllerHostEdit extends CController {
 		}
 
 		// Extend data for view.
-		$this->extendHostGroups($data['groups_ms']);
+		$data['groups_ms'] = $this->hostGroupsForMultiselect($data['host']['groups']);
+		unset($data['groups']);
+
 		$this->extendLinkedTemplates($data['editable_templates']);
 		$this->extendDiscoveryRule($data['editable_discovery_rules']);
 		$this->extendProxies($data['proxies']);
@@ -242,12 +244,19 @@ class CControllerHostEdit extends CController {
 	/**
 	 * Function to prepare data for host group multiselect.
 	 *
-	 * @param array $groups_ms
+	 * @param array $groups
 	 *
-	 * @return void
+	 * @return array
 	 */
-	protected function extendHostGroups(?array &$groups_ms): void {
-		$groupids = array_column($this->host['groups'], 'groupid');
+	protected function hostGroupsForMultiselect(array $groups): array {
+		$groupids = [];
+		foreach ($groups as $group) {
+			if (array_key_exists('new', $group)) {
+				continue;
+			}
+
+			$groupids[] = $group['groupid'];
+		}
 
 		// Select all accessible host groups.
 		$groups_all = $groupids
@@ -269,15 +278,26 @@ class CControllerHostEdit extends CController {
 			: [];
 
 		$groups_ms = [];
-		foreach ($groupids as $groupid) {
-			$groups_ms[] = [
-				'id' => $groupid,
-				'name' => $groups_all[$groupid]['name'],
-				'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($groupid, $groups_rw)
-			];
+		foreach ($groups as $group) {
+			if (array_key_exists('new', $group)) {
+				$groups_ms[] = [
+					'id' => $group['new'],
+					'name' => $group['new'].' ('._x('new', 'new element in multiselect').')',
+					'isNew' => true
+				];
+			}
+			elseif (array_key_exists($group['groupid'], $groups_all)) {
+				$groups_ms[] = [
+					'id' => $group['groupid'],
+					'name' => $groups_all[$group['groupid']]['name'],
+					'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw)
+				];
+			}
 		}
 
 		CArrayHelper::sort($groups_ms, ['name']);
+
+		return $groups_ms;
 	}
 
 	/**
@@ -386,7 +406,15 @@ class CControllerHostEdit extends CController {
 		$inputs = [];
 
 		if ($this->hasInput('clone') || $this->hasInput('full_clone')) {
-			$inputs['groups'] = zbx_toObject($this->getInput('groups', []), 'groupid');
+			$inputs['groups'] = [];
+			foreach ($this->getInput('groups', []) as $group) {
+				if (is_array($group) && array_key_exists('new', $group)) {
+					$inputs['groups'][$group['new']] = $group;
+				}
+				else {
+					$inputs['groups'][$group] = ['groupid' => $group];
+				}
+			}
 
 			$inputs['name'] = $this->getInput('visiblename', '');
 			$inputs['inventory'] = $this->getInput('host_inventory', []);

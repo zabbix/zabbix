@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $this->includeJsFile('configuration.host.edit.html.js.php');
