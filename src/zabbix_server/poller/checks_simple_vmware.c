@@ -288,10 +288,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 
 	if (0 != coeff)
 	{
-		zbx_uint64_t	value;
-
-		value = perfvalue->value * coeff;
-		SET_UI64_RESULT(result, value);
+		SET_UI64_RESULT(result, perfvalue->value * coeff);
 	}
 	else
 	{

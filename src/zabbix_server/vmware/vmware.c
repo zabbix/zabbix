@@ -6443,7 +6443,7 @@ out:
  *                                                                            *
  * Function: zbx_vmware_service_get_counterid                                 *
  *                                                                            *
- * Purpose: gets vmware performance counter id by the path                    *
+ * Purpose: gets vmware performance counter id and unit info by the path      *
  *                                                                            *
  * Parameters: service   - [IN] the vmware service                            *
  *             path      - [IN] the path of counter to retrieve in format     *
