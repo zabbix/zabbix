@@ -52,7 +52,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 == strcmp(ptype, "shorthost"))
 		{
-			retrieve_hostname(&buffer, sizeof(buffer), &error);
+			retrieve_hostname(buffer, sizeof(buffer), &error);
 			if (NULL != error)
 			{
 				SET_MSG_RESULT(result, error);
@@ -68,8 +68,18 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		else if (0 == strcmp(ptype, "netbios"))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "NetBIOS is not supported on the current platform."));
-			return SYSINFO_RET_FAIL;
+			if (0 == GetComputerName(computerName, &dwSize))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s",
+						strerror_from_system(GetLastError()));
+
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain computer name: %s",
+						strerror_from_system(GetLastError())));
+
+				return SYSINFO_RET_FAIL;
+			}
+
+			name = zbx_unicode_to_utf8(computerName);
 		}
 		else
 		{

@@ -30,50 +30,12 @@ ZBX_METRIC	parameter_hostname =
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*tmp;
-	unsigned char	param_type, param_transform;
+	char		*ptype, *ptransform;
 	struct utsname	name;
 
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	tmp = get_rparam(request, 0);
-
-	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "host"))
-	{
-		param_type = ZBX_SYSTEM_HOSTNAME_TYPE_HOST;
-	}
-	else if (0 == strcmp(tmp, "shorthost"))
-	{
-		param_type = ZBX_SYSTEM_HOSTNAME_TYPE_SHORTHOST;
-	}
-	else if (0 == strcmp(tmp, "netbios"))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "NetBIOS is not supported on the current platform."));
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	tmp = get_rparam(request, 1);
-
-	if (NULL == tmp || '\0' == *tmp)
-	{
-		param_transform = ZBX_SYSTEM_HOSTNAME_TRANSFORM_NONE;
-	}
-	else if (0 == strcmp(tmp, "lower"))
-	{
-		param_transform = ZBX_SYSTEM_HOSTNAME_TRANSFORM_LOWER;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -83,21 +45,40 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (ZBX_SYSTEM_HOSTNAME_TYPE_SHORTHOST == param_type)
-	{
-		char	*dot;
+	ptype = get_rparam(request, 0);
+	ptransform = get_rparam(request, 1);
 
-		if (NULL != (dot = strchr(name.nodename, '.')))
-			*dot = '\0';
+	if (NULL != ptype && '\0' != *ptype && 0 != strcmp(ptype, "host"))
+	{
+		if (0 == strcmp(ptype, "shorthost"))
+		{
+			char	*dot;
+
+			if (NULL != (dot = strchr(name.nodename, '.')))
+				*dot = '\0';
+		}
+		else if (0 == strcmp(ptype, "netbios"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "NetBIOS is not supported on the current platform."));
+			return SYSINFO_RET_FAIL;
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
 	}
 
-	if (ZBX_SYSTEM_HOSTNAME_TRANSFORM_LOWER == param_transform)
+	if (NULL != ptransform && '\0' != *ptransform && 0 != strcmp(ptransform, "none"))
 	{
-		int	i;
-
-		for (i = 0; name.nodename[i] != '\0'; i++)
+		if (0 == strcmp(ptransform, "lower"))
 		{
-			name.nodename[i] = tolower((unsigned char)name.nodename[i]);
+			zbx_strlower(name.nodename);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return SYSINFO_RET_FAIL;
 		}
 	}
 
