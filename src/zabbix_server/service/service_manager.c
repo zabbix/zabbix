@@ -1778,6 +1778,9 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 	zbx_vector_ptr_t	causes;
 	zbx_service_rule_t	*n_rule = NULL, *w_rule = NULL;
 
+	if (0 == service->children.values_num)
+		return;
+
 	zbx_vector_ptr_create(&causes);
 
 	/* calculate the minimum severity by reversing propagation rule */
@@ -1829,9 +1832,6 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 		}
 	}
 
-	if (0 == service->children.values_num)
-		goto out;
-
 	for (i = 0; i < service->status_rules.values_num; i++)
 	{
 		zbx_service_rule_t	*rule = (zbx_service_rule_t *)service->status_rules.values[i];
@@ -1872,12 +1872,9 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 			service_add_cause(&causes, (zbx_service_t *)children.values[i], n_rule->limit_status);
 
 		zbx_vector_ptr_destroy(&children);
-
-		/* check if weight based rule is not covered by the count based rule */
-		if (NULL != w_rule && w_rule->limit_status >= n_rule->limit_status)
-			goto out;
 	}
 
+	/* cause is only added once, even if weight based rule is covered by the count based rule */
 	if (NULL != w_rule)
 	{
 		int			total_weight, total_num;
@@ -1909,7 +1906,7 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 
 		service_get_causes(cause->service, cause->severity, services);
 	}
-out:
+
 	zbx_vector_ptr_clear_ext(&causes, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&causes);
 }
