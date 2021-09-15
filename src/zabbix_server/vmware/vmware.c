@@ -2422,7 +2422,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		unit = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
 				"*[local-name()='unitInfo']/*[local-name()='key']");
 
-		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid)
+		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s]", group, key, rollup);
@@ -2441,7 +2441,8 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 					counter->id);
 		}
 
-		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != stats)
+		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != stats &&
+				NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s,%s]", group, key, rollup, stats);
