@@ -2674,6 +2674,156 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_RATE                                                    *
+ *                                                                            *
+ * Purpose: evaluate functions 'rate' for the item                            *
+ *                                                                            *
+ * Parameters: value      - [OUT] the function return value                   *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] seconds, time shift (optional)               *
+ *             ts         - [IN] the function execution time                  *
+ *             error      - [OUT] the error message if function failed        *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
+{
+#	define HVT(v) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? v.dbl : v.ui64)
+#	define HVT_SET(v,r) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? (v.dbl = r) : (v.ui64 = r))
+#	define TS2NS(t) (t.sec * 1000000000 + t.ns)
+
+	int				arg1, time_shift, ret = FAIL, seconds = 0, nvalues = 0;
+	zbx_value_type_t		arg1_type;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			ts_end = *ts;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+	{
+		*error = zbx_strdup(*error, "invalid value type");
+		goto out;
+	}
+
+	if (1 != num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
+			ZBX_VALUE_NONE == arg1_type)
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	switch (arg1_type)
+	{
+		case ZBX_VALUE_SECONDS:
+			seconds = arg1;
+			break;
+		case ZBX_VALUE_NVALUES:
+			nvalues = arg1;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	ts_end.sec -= time_shift;
+
+	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto out;
+	}
+
+	if (0 < values.values_num)
+	{
+		history_value_t	rate, delta, last = {0};
+		int		i;
+		double		start, end, sampled_interval, average_duration_between_samples,
+				threshold, interval;
+		zbx_uint64_t	range_start, range_end;
+
+		/* Reset detection */
+
+		HVT_SET(delta, HVT(values.values[values.values_num - 1].value) - HVT(values.values[0].value));
+
+		for (i = 0; i < values.values_num; i++)
+		{
+			if (HVT(values.values[i].value) < HVT(last))
+				HVT_SET(delta, HVT(delta) + HVT(values.values[i].value));
+
+			HVT_SET(last, HVT(values.values[i].value));
+		}
+
+		/* Extrapolation */
+
+		if (ZBX_VALUE_NVALUES == arg1_type)
+		{
+			range_start = TS2NS(ts_end) - (TS2NS(values.values[values.values_num - 1].timestamp) -
+					TS2NS(values.values[0].timestamp));
+		}
+		else
+		{
+			range_start = TS2NS(ts_end) - seconds * 1000000000;
+		}
+
+
+		range_end = TS2NS(ts_end);
+		start = (double)(TS2NS(values.values[0].timestamp) - range_start) / 1000000000;
+		end = (double)(range_end - TS2NS(values.values[values.values_num - 1].timestamp)) / 1000000000;
+		sampled_interval = (double)(TS2NS(ts_end) - (TS2NS(values.values[values.values_num - 1].timestamp) -
+				TS2NS(values.values[0].timestamp))) / 1000000000;
+		average_duration_between_samples = sampled_interval / (values.values_num - 1);
+
+		if (HVT(delta) > 0 && HVT(values.values[0].value) >= 0)
+		{
+			double	dt_zero = sampled_interval * (HVT(values.values[0].value) / HVT(delta));
+
+			if (dt_zero < start)
+				start = dt_zero;
+		}
+
+		threshold = average_duration_between_samples * 1.1;
+		interval = sampled_interval;
+
+		if (start < threshold)
+			interval += start;
+		else
+			interval += average_duration_between_samples / 2;
+
+		if (end < threshold)
+			interval += end;
+		else
+			interval += average_duration_between_samples / 2;
+
+		rate.dbl = (double)HVT(delta) / (interval / sampled_interval);
+		zbx_history_value2variant(&rate, ITEM_VALUE_TYPE_FLOAT, value);
+
+		ret = SUCCEED;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "result for RATE is empty");
+		*error = zbx_strdup(*error, "not enough data");
+	}
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
 		zbx_vector_dbl_t *values)
 {
@@ -2890,6 +3040,10 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	else if (0 == strcmp(function, "monodec"))
 	{
 		ret = evaluate_MONO(value, item, parameter, ts, MONODEC, error);
+	}
+	else if (0 == strcmp(function, "rate"))
+	{
+		ret = evaluate_RATE(value, item, parameter, ts, error);
 	}
 	else
 	{
