@@ -374,6 +374,10 @@ class CImage extends CApiService {
 			'preservekeys' => true
 		]);
 
+		if (count($db_images) != count($images)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		self::checkDuplicates($images, $db_images);
 	}
 
@@ -422,8 +426,8 @@ class CImage extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::usedIconMaps($imageids);
-		self::usedSysMaps($imageids);
+		self::checkUsedIconMaps($imageids);
+		self::checkUsedSysMaps($imageids);
 	}
 
 	/**
@@ -517,7 +521,7 @@ class CImage extends CApiService {
 	 *
 	 * @throws APIException if image used in icon mapping.
 	 */
-	private static function usedIconMaps(array $imageids): void {
+	private static function checkUsedIconMaps(array $imageids): void {
 		$used = [];
 
 		$db_iconmaps = DBselect(
@@ -549,7 +553,7 @@ class CImage extends CApiService {
 	 *
 	 * @throws APIException if image used in map.
 	 */
-	private static function usedSysMaps(array $imageids): void {
+	private static function checkUsedSysMaps(array $imageids): void {
 		$used = [];
 
 		$db_sysmaps = DBselect(
