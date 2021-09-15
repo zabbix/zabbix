@@ -2611,10 +2611,10 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 						if (group_prototype->groupid == groupid &&
 								0 == strcmp(group_prototype->name, row[3]))
 						{
-							zbx_uint64_t	templateid_orig;
+							zbx_uint64_t	templateid_host;
 
-							ZBX_DBROW2UINT64(templateid_orig, row[4]);
-							group_prototype->templateid_host = templateid_orig;
+							ZBX_DBROW2UINT64(templateid_host, row[4]);
+							group_prototype->templateid_host = templateid_host;
 							group_prototype->group_prototypeid = group_prototypeid;
 							break;
 						}
