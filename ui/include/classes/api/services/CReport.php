@@ -505,7 +505,7 @@ class CReport extends CApiService {
 	 *
 	 * @throws APIException if no permissions or the input is invalid.
 	 */
-	protected function validateUpdate(array &$reports, ?array &$db_reports = null): void {
+	protected function validateUpdate(array &$reports, array &$db_reports = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'reportid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'userid' =>				['type' => API_ID],
@@ -550,14 +550,15 @@ class CReport extends CApiService {
 		}
 
 		// Get raw values of "active_*" fields.
-		$db_reports_active_fields = DB::select('report', [
-			'output' => ['active_since', 'active_till'],
-			'reportids' => array_keys($db_reports),
-			'preservekeys' => true
-		]);
+		$options = [
+			'output' => ['reportid', 'active_since', 'active_till'],
+			'reportids' => array_keys($db_reports)
+		];
+		$db_reports_active_fields = DBselect(DB::makeSql('report', $options));
 
-		foreach ($db_reports_active_fields as $reportid => $active_fields) {
-			$db_reports[$reportid] += $active_fields;
+		while ($db_report_active_fields = DBfetch($db_reports_active_fields)) {
+			$db_reports[$db_report_active_fields['reportid']] +=
+				array_diff_key($db_report_active_fields, ['reportid' => true]);
 		}
 
 		$names = [];
