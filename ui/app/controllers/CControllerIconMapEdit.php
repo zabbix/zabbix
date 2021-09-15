@@ -27,8 +27,8 @@ class CControllerIconMapEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'iconmapid'      => 'db icon_map.iconmapid',
-			'iconmap'        => 'array'
+			'iconmapid' => 'db icon_map.iconmapid',
+			'iconmap'   => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -45,32 +45,11 @@ class CControllerIconMapEdit extends CController {
 			return false;
 		}
 
-		$this->inventory_list = [];
-		$inventory_list = getHostInventories();
-		foreach ($inventory_list as $field) {
-			$this->inventory_list[$field['nr']] = $field['title'];
-		}
-
-		$this->images = [];
-		$images = API::Image()->get([
-			'output' => ['imageid', 'name'],
-			'filter' => ['imagetype' => IMAGE_TYPE_ICON]
-		]);
-
-		order_result($images, 'name');
-
-		foreach ($images as $icon) {
-			$this->images[$icon['imageid']] = $icon['name'];
-		}
-
-		reset($this->images);
-		$this->default_imageid = key($this->images);
-
 		if ($this->hasInput('iconmapid')) {
 			$iconmaps = API::IconMap()->get([
 				'output' => ['iconmapid', 'name', 'default_iconid'],
 				'selectMappings' => ['inventory_link', 'expression', 'iconid', 'sortorder'],
-				'iconmapids' => (array) $this->getInput('iconmapid')
+				'iconmapids' => [$this->getInput('iconmapid')]
 			]);
 
 			if (!$iconmaps) {
@@ -82,7 +61,7 @@ class CControllerIconMapEdit extends CController {
 		else {
 			$this->iconmap = $this->getInput('iconmap', []) + [
 				'name' => '',
-				'default_iconid' => $this->default_imageid,
+				'default_iconid' => 0,
 				'mappings' => []
 			];
 		}
@@ -93,14 +72,40 @@ class CControllerIconMapEdit extends CController {
 	protected function doAction() {
 		order_result($this->iconmap['mappings'], 'sortorder');
 
+		$inventory_list = getHostInventories();
+		foreach ($inventory_list as &$field) {
+			$field = $field['title'];
+		}
+		unset($field);
+
+		$images = API::Image()->get([
+			'output' => ['name'],
+			'filter' => ['imagetype' => IMAGE_TYPE_ICON],
+			'sortfield' => ['name'],
+			'preservekeys' => true
+		]);
+
+		order_result($images, 'name');
+
+		foreach ($images as &$icon) {
+			$icon = $icon['name'];
+		}
+		unset($icon);
+
+		$default_imageid = key($images);
+
+		if (!$this->hasInput('iconmapid')) {
+			$this->iconmap['default_iconid'] = $default_imageid;
+		}
+
 		$data = [
 			'iconmapid' => $this->getInput('iconmapid', 0),
-			'icon_list' => $this->images,
+			'icon_list' => $images,
 			'iconmap' => $this->iconmap,
-			'inventory_list' => $this->inventory_list
+			'inventory_list' => $inventory_list
 		];
 
-		$data['default_imageid'] = $this->default_imageid;
+		$data['default_imageid'] = $default_imageid;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of icon mapping'));
