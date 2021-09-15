@@ -281,7 +281,6 @@ final class CHistFunctionData {
 	private const VALUE_TYPES = [
 		'avg' => self::ITEM_VALUE_TYPES_NUM,
 		'avg_foreach' => self::ITEM_VALUE_TYPES_NUM,
-		'bucket_rate_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
@@ -400,7 +399,6 @@ final class CHistFunctionData {
 	public static function isAggregating(string $function): bool {
 		switch ($function) {
 			case 'avg_foreach':
-			case 'bucket_rate_foreach':
 			case 'count_foreach':
 			case 'exists_foreach':
 			case 'item_count':

@@ -120,7 +120,7 @@ class CExpressionValidator extends CValidator {
 				case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
 					if (!$this->math_function_data->isKnownFunction($token['data']['function'])
 							&& $this->hist_function_data->isKnownFunction($token['data']['function'])) {
-						$this->setError(_s('1incorrect usage of function "%1$s"', $token['data']['function']));
+						$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
 						return false;
 					}
@@ -144,7 +144,7 @@ class CExpressionValidator extends CValidator {
 								|| !CHistFunctionData::isAggregatable(
 									$token['data']['parameters'][0]['data']['tokens'][0]['data']['function']
 								)) {
-							$this->setError(_s('2incorrect usage of function "%1$s"', $token['data']['function']));
+							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
 							return false;
 						}
@@ -155,12 +155,11 @@ class CExpressionValidator extends CValidator {
 							&& count($token['data']['parameters']) == 2) {
 
 						if ($token['data']['parameters'][1]['data']['tokens'][0]['type']
-								!= CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
-							|| !CHistFunctionData::isAggregatableBucket(
-								$token['data']['parameters'][1]['data']['tokens'][0]['data']['function']
-							)
-						) {
-							$this->setError(_s('3incorrect usage of function "%1$s"', $token['data']['function']));
+									!= CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
+								|| !CHistFunctionData::isAggregatableBucket(
+									$token['data']['parameters'][1]['data']['tokens'][0]['data']['function']
+								)) {
+							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
 							return false;
 						}
@@ -207,7 +206,18 @@ class CExpressionValidator extends CValidator {
 								|| !CMathFunctionData::isAggregating($parent_token['data']['function'])
 								|| count($parent_token['data']['parameters']) != 1
 								|| count($parent_token['data']['parameters'][0]['data']['tokens']) != 1) {
-							$this->setError(_s('4incorrect usage of function "%1$s"', $token['data']['function']));
+							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
+
+							return false;
+						}
+					}
+
+					if ($options['calculated'] && CHistFunctionData::isAggregatableBucket($token['data']['function'])) {
+						if ($parent_token === null
+								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
+								|| !CMathFunctionData::isAggregatingBucket($parent_token['data']['function'])
+								|| count($parent_token['data']['parameters']) != 2) {
+							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
 							return false;
 						}
