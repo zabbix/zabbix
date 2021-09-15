@@ -538,21 +538,32 @@ class CReport extends CApiService {
 		}
 
 		$db_reports = $this->get([
-			'output' => $this->output_fields,
+			'output' => ['reportid', 'userid', 'name', 'description', 'status', 'dashboardid', 'period', 'cycle',
+				'weekdays', 'start_time', 'subject', 'message'
+			],
 			'reportids' => array_column($reports, 'reportid'),
 			'preservekeys' => true
 		]);
+
+		if (count($reports) != count($db_reports)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		// Get raw values of "active_*" fields.
+		$db_reports_active_fields = DB::select('report', [
+			'output' => ['active_since', 'active_till'],
+			'reportids' => array_keys($db_reports),
+			'preservekeys' => true
+		]);
+
+		foreach ($db_reports_active_fields as $reportid => $active_fields) {
+			$db_reports[$reportid] += $active_fields;
+		}
 
 		$names = [];
 		$dashboardids = [];
 
 		foreach ($reports as $i => &$report) {
-			if (!array_key_exists($report['reportid'], $db_reports)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Report with ID "%1$s" is not available.', $report['reportid'])
-				);
-			}
-
 			$db_report = $db_reports[$report['reportid']];
 
 			if (array_key_exists('name', $report) && $report['name'] !== $db_report['name']) {
