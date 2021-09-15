@@ -28,10 +28,10 @@
 	const view = {
 		form: null,
 
-		init() {
-			this.form = document.getElementById('host-form');
+		init({form_name}) {
+			this.form = document.getElementById(form_name);
 
-			host_edit.init();
+			host_edit.init(form_name);
 		},
 
 		submit(e, button) {

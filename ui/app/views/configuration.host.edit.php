@@ -65,6 +65,8 @@ if ($data['warning']) {
 	->addItem(new CPartial('configuration.host.edit.html', $data))
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('view.init('.json_encode([
+		'form_name' => $data['form_name']
+	]).');'))
 	->setOnDocumentReady()
 	->show();

@@ -29,7 +29,7 @@ window.host_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init({popup_url}) {
+	init({popup_url, form_name}) {
 		this.enableNavigationWarning();
 
 		this.overlay = overlays_stack.getById('host_edit');
@@ -38,7 +38,7 @@ window.host_edit_popup = {
 
 		history.replaceState({}, '', popup_url);
 
-		host_edit.init();
+		host_edit.init({form_name});
 	},
 
 	submit() {

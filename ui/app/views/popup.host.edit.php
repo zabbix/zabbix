@@ -21,11 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$data['form_name'] = 'host-form';
-$data['popup_form'] = true;
-// TODO VM: move URL building to controller?
+$form_name = 'host-form';
 $popup_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'host.edit');
 
@@ -102,7 +101,8 @@ $output = [
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.host.edit.js.php').
 		'host_edit_popup.init('.json_encode([
-			'popup_url' => $popup_url->getUrl()
+			'popup_url' => $popup_url->getUrl(),
+			'form_name' => $form_name
 		]).');',
 	'buttons' => $buttons,
 	'cancel_action' => 'host_edit_popup.closePopup();'

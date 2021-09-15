@@ -109,12 +109,13 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 
 	window.host_edit = {
 		form: null,
+		form_name: null,
 
 		/**
 		 * Host form setup.
 		 */
-		init() {
-			this.form = document.getElementById('host-form');
+		init({form_name}) {
+			this.form = document.getElementById(this.form_name);
 
 			this.initHostTab();
 			this.initTemplatesTab();
@@ -198,7 +199,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 						parameters: {
 							srctbl: 'templates',
 							srcfld1: 'hostid',
-							dstfrm: '<?= $data['form_name'] ?>',
+							dstfrm: this.form_name,
 							dstfld1: 'add_templates_',
 							multiselect: '1',
 							disableids: this.getAssignedTemplates()
@@ -489,50 +490,6 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 
 		<?php if ($host_is_discovered): ?>
 			hostInterfaceManager.makeReadonly();
-		<?php endif; ?>
-
-		<?php if (!array_key_exists('popup_form', $data)): ?>
-			const form = document.getElementById('<?= $data['form_name'] ?>');
-
-			form.addEventListener('formSubmitted', (e) => handle_hostaction_response(e.detail, e.target));
-			form.addEventListener('submit', (e) => {
-				e.preventDefault();
-				host_edit.submit(e.target);
-			});
-
-			var clone_button = document.getElementById('host-clone'),
-				full_clone_button = document.getElementById('host-full_clone');
-
-			/**
-			* Supplies a handler for in-page clone button click with according action.
-			*
-			* @param {string} operation_type Either 'clone' or 'full_clone'.
-			*
-			* @return {callable}             Click handler.
-			*/
-			function inlineCloneHandler(operation_type) {
-				return function() {
-					var curl = new Curl('zabbix.php', false),
-						fields = host_edit.getCloneData(form);
-
-					curl.setArgument('action', 'host.edit');
-					curl.setArgument(operation_type, 1);
-
-					for (const [k, v] of Object.entries(fields)) {
-						curl.setArgument(k, v);
-					}
-
-					redirect(curl.getUrl(), 'post');
-				};
-			}
-
-			if (clone_button) {
-				clone_button.addEventListener('click', inlineCloneHandler('clone'));
-			}
-
-			if (full_clone_button) {
-				full_clone_button.addEventListener('click', inlineCloneHandler('full_clone'));
-			}
 		<?php endif; ?>
 	});
 </script>
