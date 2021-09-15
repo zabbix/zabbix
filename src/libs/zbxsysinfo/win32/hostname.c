@@ -24,13 +24,20 @@ ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 	{"system.hostname",     CF_HAVEPARAMS,  SYSTEM_HOSTNAME,        NULL};
 
+static void	retrieve_hostname(char *buffer, int len, char **error)
+{
+	if (SUCCEED != gethostname(buffer, len))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
+		*error = zbx_dsprintf(NULL, "Cannot obtain host name: %s", strerror_from_system(WSAGetLastError()));
+	}
+}
+
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize = 256;
 	wchar_t		computerName[256];
-	char		*tmp, buffer[256];
-	unsigned char	param_type, param_transform;
-	int		netbios;
+	char		*ptype, *ptransform, buffer[256], *name, *error = NULL;
 
 	if (2 < request->nparam)
 	{
@@ -38,88 +45,64 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	tmp = get_rparam(request, 0);
+	ptype = get_rparam(request, 0);
+	ptransform = get_rparam(request, 1);
 
-	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "host"))
+	if (NULL != ptype && '\0' != *ptype && 0 != strcmp(ptype, "host"))
 	{
-		param_type = ZBX_SYSTEM_HOSTNAME_TYPE_HOST;
-	}
-	else if (0 == strcmp(tmp, "shorthost"))
-	{
-		param_type = ZBX_SYSTEM_HOSTNAME_TYPE_SHORTHOST;
-	}
-	else if (0 == strcmp(tmp, "netbios"))
-	{
-		param_type = ZBX_SYSTEM_HOSTNAME_TYPE_NETBIOS;
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	tmp = get_rparam(request, 1);
-
-	if (NULL == tmp || '\0' == *tmp)
-	{
-		param_transform = ZBX_SYSTEM_HOSTNAME_TRANSFORM_NONE;
-	}
-	else if (0 == strcmp(tmp, "lower"))
-	{
-		param_transform = ZBX_SYSTEM_HOSTNAME_TRANSFORM_LOWER;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (param_type == ZBX_SYSTEM_HOSTNAME_TYPE_NETBIOS)
-	{
-		/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
-		/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
-		/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
-		if (0 == GetComputerName(computerName, &dwSize))
+		if (0 == strcmp(ptype, "shorthost"))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s", strerror_from_system(GetLastError()));
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain computer name: %s",
-					strerror_from_system(GetLastError())));
-			return SYSINFO_RET_FAIL;
-		}
+			retrieve_hostname(&buffer, sizeof(buffer), &error);
+			if (NULL != error)
+			{
+				SET_MSG_RESULT(result, error);
+				return SYSINFO_RET_FAIL;
+			}
 
-		SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName));
-	}
-	else
-	{
-		if (SUCCEED != gethostname(buffer, sizeof(buffer)))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain host name: %s",
-					strerror_from_system(WSAGetLastError())));
-			return SYSINFO_RET_FAIL;
-		}
-
-		if (param_type == ZBX_SYSTEM_HOSTNAME_TYPE_SHORTHOST)
-		{
 			char	*dot;
 
 			if (NULL != (dot = strchr(buffer, '.')))
 				*dot = '\0';
+
+			name = buffer;
 		}
-
-		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
-	}
-
-	if (ZBX_SYSTEM_HOSTNAME_TRANSFORM_LOWER == param_transform)
-	{
-		int	i;
-
-		for (i = 0; result->str[i] != '\0'; i++)
+		else if (0 == strcmp(ptype, "netbios"))
 		{
-			result->str[i] = tolower(result->str[i]);
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "NetBIOS is not supported on the current platform."));
+			return SYSINFO_RET_FAIL;
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
 		}
 	}
+	else
+	{
+		retrieve_hostname(&buffer, sizeof(buffer), &error);
+		if (NULL != error)
+		{
+			SET_MSG_RESULT(result, error);
+			return SYSINFO_RET_FAIL;
+		}
+
+		name = buffer;
+	}
+
+	if (NULL != ptransform && '\0' != *ptransform && 0 != strcmp(ptransform, "none"))
+	{
+		if (0 == strcmp(ptransform, "lower"))
+		{
+			zbx_strlower(name);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, name));
 
 	return SYSINFO_RET_OK;
 }
