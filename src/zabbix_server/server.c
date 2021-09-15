@@ -1143,6 +1143,8 @@ static void	zbx_check_db(void)
 		result = FAIL;
 	}
 
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
 	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
@@ -1155,6 +1157,7 @@ static void	zbx_check_db(void)
 		zbx_json_free(&db_version_json);
 	}
 
+	DBclose();
 	zbx_free(db_version_info.friendly_current_version);
 
 	if(SUCCEED != result)

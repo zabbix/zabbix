@@ -888,12 +888,8 @@ void	DBflush_version_requirements(const char *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", version))
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
-
-	DBclose();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
