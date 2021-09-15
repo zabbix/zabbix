@@ -150,8 +150,7 @@ class CExpressionValidator extends CValidator {
 						}
 					}
 
-					if ($this->options['calculated']
-							&& CMathFunctionData::isAggregatingBucket($token['data']['function'])
+					if (CMathFunctionData::isAggregatingBucket($token['data']['function'])
 							&& count($token['data']['parameters']) == 2) {
 
 						if ($token['data']['parameters'][1]['data']['tokens'][0]['type']

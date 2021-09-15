@@ -228,7 +228,8 @@ final class CMathFunctionData {
 	 * @var array
 	 */
 	private const CALCULATED_ONLY = [
-		'count'
+		'count',
+		'histogram_quantile'
 	];
 
 	/**
@@ -275,7 +276,11 @@ final class CMathFunctionData {
 	 * @return array
 	 */
 	public function getParameters(): array {
-		return self::PARAMETERS;
+		if ($this->options['calculated']) {
+			return self::PARAMETERS;
+		}
+
+		return array_diff_key(self::PARAMETERS, array_flip(self::CALCULATED_ONLY));
 	}
 
 	/**
