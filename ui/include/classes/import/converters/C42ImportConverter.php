@@ -158,7 +158,11 @@ class C42ImportConverter extends CConverter {
 	 */
 	protected function convertValueToConstant($data, array $rules) {
 		if ($rules['type'] & XML_STRING) {
-			if (!array_key_exists('in', $rules)) {
+			/*
+			 * Second condition may occur when, for example, item types are no longer supported, but previous validator
+			 * only checked the syntax, not the data.
+			 */
+			if (!array_key_exists('in', $rules) || !array_key_exists($data, $rules['in'])) {
 				return $data;
 			}
 

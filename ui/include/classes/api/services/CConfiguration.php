@@ -169,7 +169,7 @@ class CConfiguration extends CApiService {
 				->convert($data);
 
 			$data = $validator
-				// Must not use XML_INDEXED_ARRAY key validaiton for the converted data.
+				// Must not use XML_INDEXED_ARRAY key validation for the converted data.
 				->setStrict(false)
 				->validate($data, '/');
 		}
