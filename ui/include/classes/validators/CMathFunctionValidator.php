@@ -57,21 +57,38 @@ class CMathFunctionValidator extends CValidator {
 			return false;
 		}
 
-		$num_required_parameters = $this->options['parameters'][$token['data']['function']];
 		$num_parameters = count($token['data']['parameters']);
 
-		if (is_array($num_required_parameters)) {
-			$is_valid = ($num_required_parameters[0] === null || $num_parameters >= $num_required_parameters[0])
-				&& ($num_required_parameters[1] === null || $num_parameters <= $num_required_parameters[1]);
-		}
-		else {
-			$is_valid = ($num_parameters == $num_required_parameters);
+		foreach ($this->options['parameters'][$token['data']['function']] as $num_required_parameters) {
+			$is_valid = true;
+
+			if (array_key_exists('count', $num_required_parameters)) {
+				$is_valid &= ($num_parameters == $num_required_parameters['count']);
+			}
+			else {
+				if (array_key_exists('min', $num_required_parameters)) {
+					$is_valid &= ($num_parameters >= $num_required_parameters['min']);
+
+					if (array_key_exists('step', $num_required_parameters)) {
+						['step' => $step, 'min' => $min] = $num_required_parameters;
+						$is_valid &= (($num_parameters - $min) % $step == 0);
+					}
+				}
+
+				if (array_key_exists('max', $num_required_parameters)) {
+					$is_valid &= ($num_parameters <= $num_required_parameters['max']);
+				}
+			}
+
+			if ($is_valid) {
+				break;
+			}
 		}
 
 		if (!$is_valid) {
 			$this->setError(_s('invalid number of parameters in function "%1$s"', $token['data']['function']));
 		}
 
-		return $is_valid;
+		return (bool) $is_valid;
 	}
 }

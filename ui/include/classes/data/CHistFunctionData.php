@@ -44,6 +44,22 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
 		],
+		'bucket_percentile' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
+				['type' => 'number', 'min' => 0, 'max' => 100]
+			]]
+		],
+		'bucket_rate_foreach' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^\d+$/'],
+				['type' => 'number', 'min' => 1]
+			], 'required' => false]
+		],
 		'change' => [
 			['rules' => [['type' => 'query']]]
 		],
@@ -167,6 +183,10 @@ final class CHistFunctionData {
 				['type' => 'number', 'min' => 0, 'max' => 100]
 			]]
 		],
+		'rate' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]]
+		],
 		'skewness' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]]
@@ -236,6 +256,8 @@ final class CHistFunctionData {
 	 */
 	private const CALCULATED_ONLY = [
 		'avg_foreach',
+		'bucket_percentile',
+		'bucket_rate_foreach',
 		'count_foreach',
 		'exists_foreach',
 		'item_count',
@@ -259,6 +281,7 @@ final class CHistFunctionData {
 	private const VALUE_TYPES = [
 		'avg' => self::ITEM_VALUE_TYPES_NUM,
 		'avg_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'bucket_rate_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
@@ -284,6 +307,7 @@ final class CHistFunctionData {
 		'monoinc' =>  self::ITEM_VALUE_TYPES_NUM,
 		'nodata' => self::ITEM_VALUE_TYPES_ALL,
 		'percentile' => self::ITEM_VALUE_TYPES_NUM,
+		'rate' => self::ITEM_VALUE_TYPES_NUM,
 		'skewness' => self::ITEM_VALUE_TYPES_NUM,
 		'stddevpop' => self::ITEM_VALUE_TYPES_NUM,
 		'stddevsamp' => self::ITEM_VALUE_TYPES_NUM,
@@ -376,6 +400,7 @@ final class CHistFunctionData {
 	public static function isAggregating(string $function): bool {
 		switch ($function) {
 			case 'avg_foreach':
+			case 'bucket_rate_foreach':
 			case 'count_foreach':
 			case 'exists_foreach':
 			case 'item_count':
@@ -408,6 +433,27 @@ final class CHistFunctionData {
 			case 'max_foreach':
 			case 'min_foreach':
 			case 'sum_foreach':
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Check if the result of aggregating function is further aggregatible by bucket aggregation function.
+	 *
+	 * @See CMathFunctionData::isAggregatingBucket().
+	 *
+	 * @static
+	 *
+	 * @param string $function
+	 *
+	 * @return bool
+	 */
+	public static function isAggregatableBucket(string $function): bool {
+		switch ($function) {
+			case 'bucket_rate_foreach':
 				return true;
 
 			default:

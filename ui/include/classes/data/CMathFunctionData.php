@@ -30,68 +30,196 @@ final class CMathFunctionData {
 	 * @var array
 	 */
 	private const PARAMETERS = [
-		'abs' => 1,
-		'acos' => 1,
-		'ascii' => 1,
-		'asin' => 1,
-		'atan' => 1,
-		'atan2' => 2,
-		'avg' => [1, null],
-		'between' => 3,
-		'bitand' => 2,
-		'bitlength' => 1,
-		'bitlshift' => 2,
-		'bitnot' => 1,
-		'bitor' => 2,
-		'bitrshift' => 2,
-		'bitxor' => 2,
-		'bytelength' => 1,
-		'cbrt' => 1,
-		'ceil' => 1,
-		'char' => 1,
-		'concat' => 2,
-		'cos' => 1,
-		'cosh' => 1,
-		'cot' => 1,
-		'count' => 1,
-		'date' => 0,
-		'dayofmonth' => 0,
-		'dayofweek' => 0,
-		'degrees' => 1,
-		'e' => 0,
-		'exp' => 1,
-		'expm1' => 1,
-		'floor' => 1,
-		'in' => [2, null],
-		'insert' => 4,
-		'left' => 2,
-		'length' => 1,
-		'log' => 1,
-		'log10' => 1,
-		'ltrim' => [1, 2],
-		'max' => [1, null],
-		'mid' => 3,
-		'min' => [1, null],
-		'mod' => 2,
-		'now' => 0,
-		'pi' => 0,
-		'power' => 2,
-		'radians' => 1,
-		'rand' => 0,
-		'repeat' => 2,
-		'replace' => 3,
-		'right' => 2,
-		'round' => 2,
-		'rtrim' => [1, 2],
-		'signum' => 1,
-		'sin' => 1,
-		'sinh' => 1,
-		'sqrt' => 1,
-		'sum' => [1, null],
-		'tan' => 1,
-		'time' => 0,
-		'trim' => [1, 2],
-		'truncate' => 2
+		'abs' => [
+			['count' => 1]
+		],
+		'acos' => [
+			['count' => 1]
+		],
+		'ascii' => [
+			['count' => 1]
+		],
+		'asin' => [
+			['count' => 1]
+		],
+		'atan' => [
+			['count' => 1]
+		],
+		'atan2' => [
+			['count' => 2]
+		],
+		'avg' => [
+			['min' => 1]
+		],
+		'between' => [
+			['count' => 3]
+		],
+		'bitand' => [
+			['count' => 2]
+		],
+		'bitlength' => [
+			['count' => 1]
+		],
+		'bitlshift' => [
+			['count' => 2]
+		],
+		'bitnot' => [
+			['count' => 1]
+		],
+		'bitor' => [
+			['count' => 2]
+		],
+		'bitrshift' => [
+			['count' => 2]
+		],
+		'bitxor' => [
+			['count' => 2]
+		],
+		'bytelength' => [
+			['count' => 1]
+		],
+		'cbrt' => [
+			['count' => 1]
+		],
+		'ceil' => [
+			['count' => 1]
+		],
+		'char' => [
+			['count' => 1]
+		],
+		'concat' => [
+			['count' => 2]
+		],
+		'cos' => [
+			['count' => 1]
+		],
+		'cosh' => [
+			['count' => 1]
+		],
+		'cot' => [
+			['count' => 1]
+		],
+		'count' => [
+			['count' => 1]
+		],
+		'date' => [
+			['count' => 0]
+		],
+		'dayofmonth' => [
+			['count' => 0]
+		],
+		'dayofweek' => [
+			['count' => 0]
+		],
+		'degrees' => [
+			['count' => 1]
+		],
+		'e' => [
+			['count' => 0]
+		],
+		'exp' => [
+			['count' => 1]
+		],
+		'expm1' => [
+			['count' => 1]
+		],
+		'floor' => [
+			['count' => 1]
+		],
+		'histogram_quantile' => [
+			['min' => 5, 'step' => 2],
+			['count' => 2]
+		],
+		'in' => [
+			['min' => 2]
+		],
+		'insert' => [
+			['count' => 4]
+		],
+		'left' => [
+			['count' => 2]
+		],
+		'length' => [
+			['count' => 1]
+		],
+		'log' => [
+			['count' => 1]
+		],
+		'log10' => [
+			['count' => 1]
+		],
+		'ltrim' => [
+			['min' => 1, 'max' => 2]
+		],
+		'max' => [
+			['min' => 1]
+		],
+		'mid' => [
+			['count' => 3]
+		],
+		'min' => [
+			['min' => 1]
+		],
+		'mod' => [
+			['count' => 2]
+		],
+		'now' => [
+			['count' => 0]
+		],
+		'pi' => [
+			['count' => 0]
+		],
+		'power' => [
+			['count' => 2]
+		],
+		'radians' => [
+			['count' => 1]
+		],
+		'rand' => [
+			['count' => 0]
+		],
+		'repeat' => [
+			['count' => 2]
+		],
+		'replace' => [
+			['count' => 3]
+		],
+		'right' => [
+			['count' => 2]
+		],
+		'round' => [
+			['count' => 2]
+		],
+		'rtrim' => [
+			['min' => 1, 'max' => 2]
+		],
+		'signum' => [
+			['count' => 1]
+		],
+		'sin' => [
+			['count' => 1]
+		],
+		'sinh' => [
+			['count' => 1]
+		],
+		'sqrt' => [
+			['count' => 1]
+		],
+		'sum' => [
+			['min' => 1]
+		],
+		'tan' => [
+			['count' => 1]
+		],
+		'time' => [
+			['count' => 0]
+		],
+		'trim' => [
+			['min' => 1, 'max' => 2]
+		],
+		'truncate' => [
+			['count' => 2]
+		]
 	];
 
 	/**
@@ -185,6 +313,28 @@ final class CMathFunctionData {
 	public static function isAggregatingHistOnly(string $function): bool {
 		switch ($function) {
 			case 'count':
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Check if function is supports aggregation of history bucket aggregation functions. It uses 2nd parameter as
+	 * aggregating history functions.
+	 *
+	 * @See CHistFunctionData::isAggregatableBucket().
+	 *
+	 * @static
+	 *
+	 * @param string $function
+	 *
+	 * @return bool
+	 */
+	public static function isAggregatingBucket(string $function): bool {
+		switch ($function) {
+			case 'histogram_quantile':
 				return true;
 
 			default:
