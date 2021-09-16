@@ -493,8 +493,6 @@ class CMediatype extends CApiService {
 							&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
 						$mediatype += ['event_menu_url' => '', 'event_menu_name' => ''];
 					}
-
-					self::validateEventMenu($mediatype, $db_mediatype);
 					break;
 			}
 
@@ -522,9 +520,9 @@ class CMediatype extends CApiService {
 		switch ($type) {
 			case MEDIA_TYPE_EMAIL:
 				$api_input_rules['fields'] = [
-					'smtp_server' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-					'smtp_helo' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-					'smtp_email' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+					'smtp_server' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+					'smtp_helo' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+					'smtp_email' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
 				];
 
 				if ($type !== $db_type) {
@@ -537,7 +535,7 @@ class CMediatype extends CApiService {
 
 			case MEDIA_TYPE_EXEC:
 				$api_input_rules['fields'] = [
-					'exec_path' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+					'exec_path' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
 				];
 
 				if ($type !== $db_type) {
@@ -547,7 +545,7 @@ class CMediatype extends CApiService {
 
 			case MEDIA_TYPE_SMS:
 				$api_input_rules['fields'] = [
-					'gsm_modem' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+					'gsm_modem' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
 				];
 
 				if ($type !== $db_type) {
@@ -557,10 +555,19 @@ class CMediatype extends CApiService {
 
 			case MEDIA_TYPE_WEBHOOK:
 				$api_input_rules['fields'] = [
-					'script' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-					'parameters' =>		['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-						'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-						'value' =>			['type' => API_STRING_UTF8]
+					'script' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+					'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
+					'event_menu_url' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'show_event_menu', 'in' => ZBX_EVENT_MENU_HIDE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'event_menu_url')],
+												['if' => ['field' => 'show_event_menu', 'in' => ZBX_EVENT_MENU_SHOW], 'type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO | API_NOT_EMPTY]
+					]],
+					'event_menu_name' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'show_event_menu', 'in' => ZBX_EVENT_MENU_HIDE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'event_menu_name')],
+												['if' => ['field' => 'show_event_menu', 'in' => ZBX_EVENT_MENU_SHOW], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+					]],
+					'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+						'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+						'value' =>				['type' => API_STRING_UTF8]
 					]]
 				];
 
@@ -571,43 +578,6 @@ class CMediatype extends CApiService {
 		}
 
 		return $api_input_rules;
-	}
-
-	/**
-	 * Validates the event_menu_* input parameters.
-	 *
-	 * @static
-	 *
-	 * @param array      $mediatype
-	 * @param array|null $db_mediatype
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	private static function validateEventMenu(array $mediatype, ?array $db_mediatype): void {
-		if ($db_mediatype === null) {
-			$db_mediatype = DB::getDefaults('media_type');
-		}
-
-		foreach (['show_event_menu', 'event_menu_url', 'event_menu_name'] as $field_name) {
-			if (!array_key_exists($field_name, $mediatype)) {
-				$mediatype[$field_name] = $db_mediatype[$field_name];
-			}
-		}
-
-		foreach (['event_menu_url', 'event_menu_name'] as $field_name) {
-			if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
-				if ($mediatype[$field_name] !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
-					);
-				}
-			}
-			elseif ($mediatype[$field_name] === '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty'))
-				);
-			}
-		}
 	}
 
 	/**
