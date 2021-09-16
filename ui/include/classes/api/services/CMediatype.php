@@ -463,22 +463,26 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
-			$mediatype = $data + $mediatype;
-
 			switch ($type) {
 				case MEDIA_TYPE_EMAIL:
-					if ($db_mediatypes === null) {
+					if ($method === 'create') {
 						break;
 					}
 
 					if (array_key_exists('smtp_security', $mediatype)
 							&& $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE) {
-						$mediatype += ['smtp_verify_peer' => 0, 'smtp_verify_host' => 0];
+						$mediatype = [
+							'smtp_verify_peer' => DB::getDefault('media_type', 'smtp_verify_peer'),
+							'smtp_verify_host' => DB::getDefault('media_type', 'smtp_verify_host')
+						] + $mediatype;
 					}
 
 					if (array_key_exists('smtp_authentication', $mediatype)
 							&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NONE) {
-						$mediatype += ['username' => '', 'passwd' => ''];
+						$mediatype = [
+							'username' => DB::getDefault('media_type', 'username'),
+							'passwd' => DB::getDefault('media_type', 'passwd')
+						] + $mediatype;
 					}
 					break;
 
@@ -497,11 +501,20 @@ class CMediatype extends CApiService {
 					break;
 
 				case MEDIA_TYPE_WEBHOOK:
-					if ($db_mediatypes !== null && array_key_exists('show_event_menu', $mediatype)
+					if ($method === 'update' && array_key_exists('show_event_menu', $mediatype)
 							&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
-						$mediatype += ['event_menu_url' => '', 'event_menu_name' => ''];
+						$mediatype = [
+							'event_menu_url' => DB::getDefault('media_type', 'event_menu_url'),
+							'event_menu_name' => DB::getDefault('media_type', 'event_menu_name')
+						] + $mediatype;
 					}
 					break;
+			}
+
+			if ($type != MEDIA_TYPE_WEBHOOK && array_key_exists('parameters', $mediatype) && $mediatype['parameters']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/parameters', _('value must be empty'))
+				);
 			}
 
 			if ($type_changed) {
