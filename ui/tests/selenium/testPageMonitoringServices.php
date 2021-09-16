@@ -22,21 +22,19 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/traits/FilterTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup services
  *
  * @onBefore prepareServicesData
  */
-class testPageMonitoringServices extends CWebTest
-{
+class testPageMonitoringServices extends CWebTest {
 
 	use FilterTrait;
 	use TableTrait;
 
 	public static function prepareServicesData() {
-		$response = CDataHelper::call('service.create', [
+		CDataHelper::call('service.create', [
 			[
 				'name' => 'Server 1',
 				'algorithm' => 1,
@@ -57,8 +55,7 @@ class testPageMonitoringServices extends CWebTest
 				'showsla' => 0,
 				'goodsla' => 99.99,
 				'sortorder' => 3,
-				'tags' =>
-				[
+				'tags' => [
 					[
 						'tag' => 'test',
 						'value' => 'test123'
@@ -71,8 +68,7 @@ class testPageMonitoringServices extends CWebTest
 				'showsla' => 0,
 				'goodsla' => 99.99,
 				'sortorder' => 4,
-				'tags' =>
-				[
+				'tags' => [
 					[
 						'tag' => 'test123',
 						'value' => 'test456'
@@ -89,8 +85,7 @@ class testPageMonitoringServices extends CWebTest
 				'showsla' => 1,
 				'goodsla' => 99.99,
 				'sortorder' => 5,
-				'problem_tags' =>
-				[
+				'problem_tags' => [
 					[
 						'tag' => 'problem',
 						'operator' => 0,
@@ -100,32 +95,29 @@ class testPageMonitoringServices extends CWebTest
 			]
 		]);
 
-		$serviceid_first = (int)$response['serviceids'][0];
-		$serviceid_second = (int)$response['serviceids'][1];
-		$serviceid_third = (int)$response['serviceids'][2];
+		$services = CDataHelper::getIds('name');
 
 		CDataHelper::call('service.update', [
 			[
-				'serviceid' =>  $serviceid_first ,
+				'serviceid' =>  $services['Server 1'],
 				'parents' => [
 					[
-						'serviceid' => $serviceid_second
+						'serviceid' => $services['Server 2']
 					]
 				]
 			],
 			[
-				'serviceid' => $serviceid_second,
+				'serviceid' => $services['Server 2'],
 				'parents' => [
 					[
-						'serviceid' => $serviceid_third
+						'serviceid' => $services['Server 3']
 					]
 				]
 			]
 		]);
 	}
 
-	public function testPageMonitoringServices_CheckLayout()
-	{
+	public function testPageMonitoringServices_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=service.list');
 		$this->page->assertTitle('Services');
 		$this->page->assertHeader('Services');
@@ -158,25 +150,20 @@ class testPageMonitoringServices extends CWebTest
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertSame(['Name', 'Status', 'Root cause', 'SLA', 'Tags'], $table->getHeadersText());
 
-
-
 		$expectedViewMode = [
-			'Server 3 1' =>
-			[
+			'Server 3 1' => [
 				'Status' => 'OK',
 				'Root cause' => '',
 				'SLA' => '',
 				'Tags' => 'test: test123'
 			],
-			'Server 4' =>
-			[
+			'Server 4' => [
 				'Status' => 'OK',
 				'Root cause' => '',
 				'SLA' => '',
 				'Tags' => 'test: test789test123: test456'
 			],
-			'Server 5' =>
-			[
+			'Server 5' => [
 				'Status' => 'OK',
 				'Root cause' => '',
 				'SLA' => '99.9900',
@@ -226,8 +213,7 @@ class testPageMonitoringServices extends CWebTest
 		$this->assertSame(['', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', ''], $table->getHeadersText());
 
 		$expectedEditMode = [
-			'Server 3 1' =>
-			[
+			'Server 3 1' => [
 				'' => '',
 				'Status' => 'OK',
 				'Root cause' => '',
@@ -235,8 +221,7 @@ class testPageMonitoringServices extends CWebTest
 				'Tags' => 'test: test123',
 				'' => ''
 			],
-			'Server 4' =>
-			[
+			'Server 4' => [
 				'' => '',
 				'Status' => 'OK',
 				'Root cause' => '',
@@ -244,8 +229,7 @@ class testPageMonitoringServices extends CWebTest
 				'Tags' => 'test: test789test123: test456',
 				'' => ''
 			],
-			'Server 5' =>
-			[
+			'Server 5' => [
 				'' => '',
 				'Status' => 'OK',
 				'Root cause' => '',
@@ -254,13 +238,9 @@ class testPageMonitoringServices extends CWebTest
 				'' => ''
 			]
 		];
-
-
-
 	}
 
-	public static function getFilterByTagsData()
-	{
+	public static function getFilterByTagsData() {
 		return [
 			// "And/Or" and "Or" checks.
 			[
@@ -424,14 +404,12 @@ class testPageMonitoringServices extends CWebTest
 		];
 	}
 
-
 	/**
 	 * Test filtering services by tags.
 	 *
 	 * @dataProvider getFilterByTagsData
 	 */
-	public function testPageMonitoringServices_CheckFiltringByTags($data)
-	{
+	public function testPageMonitoringServices_CheckFiltringByTags($data) {
 		$this->page->login()->open('zabbix.php?action=service.list');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
@@ -440,8 +418,7 @@ class testPageMonitoringServices extends CWebTest
 		$this->page->waitUntilReady();
 
 		// Check filtered result.
-		foreach ($data['result'] as $result)
-		{
+		foreach ($data['result'] as $result) {
 			$filtering = $this->getTableResult('Name');
 			$this->assertTableDataColumn($filtering, 'Name');
 		}
@@ -453,8 +430,7 @@ class testPageMonitoringServices extends CWebTest
 	/**
 	 * Test filtering services by checkboxes
 	 */
-	public function testPageMonitoringServices_CheckFiltringByCheckboxes()
-	{
+	public function testPageMonitoringServices_CheckFiltringByCheckboxes() {
 		$this->page->login()->open('zabbix.php?action=service.list');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
@@ -471,8 +447,7 @@ class testPageMonitoringServices extends CWebTest
 		];
 
 		// Check filtered result.
-		foreach ($data as $result)
-		{
+		foreach ($data as $result) {
 			$filtering = $this->getTableResult('Name');
 			$this->assertTableDataColumn($filtering, 'Name');
 		}
@@ -491,15 +466,13 @@ class testPageMonitoringServices extends CWebTest
 		];
 
 		// Check filtered result.
-		foreach ($data as $result)
-		{
+		foreach ($data as $result) {
 			$filtering = $this->getTableResult('Name');
 			$this->assertTableDataColumn($filtering, 'Name');
 		}
 	}
 
-	public function testPageMonitoringServices_CheckBreadcrumbs()
-	{
+	public function testPageMonitoringServices_CheckBreadcrumbs() {
 		$this->page->login()->open('zabbix.php?action=service.list');
 
 		// Check by switching childs and parents
