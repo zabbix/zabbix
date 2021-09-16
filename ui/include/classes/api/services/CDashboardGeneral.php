@@ -139,28 +139,28 @@ abstract class CDashboardGeneral extends CApiService {
 
 		foreach ($dashboards as $dashboard) {
 			if (array_key_exists('users', $dashboard)) {
-				$dashboardids['users'][$dashboard['dashboardid']] = true;
+				$dashboardids['users'][] = $dashboard['dashboardid'];
 				$db_dashboards[$dashboard['dashboardid']]['users'] = [];
 			}
 
 			if (array_key_exists('userGroups', $dashboard)) {
-				$dashboardids['userGroups'][$dashboard['dashboardid']] = true;
+				$dashboardids['userGroups'][] = $dashboard['dashboardid'];
 				$db_dashboards[$dashboard['dashboardid']]['userGroups'] = [];
 			}
 
 			if (array_key_exists('pages', $dashboard)) {
-				$dashboardids['pages'][$dashboard['dashboardid']] = true;
+				$dashboardids['pages'][] = $dashboard['dashboardid'];
 				$db_dashboards[$dashboard['dashboardid']]['pages'] = [];
 
 				foreach ($dashboard['pages'] as $dashboard_page) {
 					if (array_key_exists('dashboard_pageid', $dashboard_page)) {
 						if (array_key_exists('widgets', $dashboard_page)) {
-							$dashboard_pageids[$dashboard_page['dashboard_pageid']] = true;
+							$dashboard_pageids[] = $dashboard_page['dashboard_pageid'];
 
 							foreach ($dashboard_page['widgets'] as $widget) {
 								if (array_key_exists('widgetid', $widget)) {
 									if (array_key_exists('fields', $widget)) {
-										$widgetids[$widget['widgetid']] = true;
+										$widgetids[] = $widget['widgetid'];
 									}
 								}
 							}
@@ -172,38 +172,34 @@ abstract class CDashboardGeneral extends CApiService {
 
 		if ($dashboardids['users']) {
 			$options = [
-				'output' => array_keys(DB::getSchema('dashboard_user')['fields']),
-				'filter' => ['dashboardid' => array_keys($dashboardids['users'])]
+				'output' => ['dashboard_userid', 'dashboardid', 'userid', 'permission'],
+				'filter' => ['dashboardid' => $dashboardids['users']]
 			];
 			$db_users = DBselect(DB::makeSql('dashboard_user', $options));
+
 			while ($db_user = DBfetch($db_users)) {
-				$db_dashboards[$db_user['dashboardid']]['users'][$db_user['dashboard_userid']] = [
-					'dashboard_userid' => $db_user['dashboard_userid'],
-					'userid' => $db_user['userid'],
-					'permission' => $db_user['permission']
-				];
+				$db_dashboards[$db_user['dashboardid']]['users'][$db_user['dashboard_userid']] =
+					array_diff_key($db_user, array_flip(['dashboardid']));
 			}
 		}
 
 		if ($dashboardids['userGroups']) {
 			$options = [
-				'output' => array_keys(DB::getSchema('dashboard_usrgrp')['fields']),
-				'filter' => ['dashboardid' => array_keys($dashboardids['userGroups'])]
+				'output' => ['dashboard_usrgrpid', 'dashboardid', 'usrgrpid', 'permission'],
+				'filter' => ['dashboardid' => $dashboardids['userGroups']]
 			];
 			$db_groups = DBselect(DB::makeSql('dashboard_usrgrp', $options));
+
 			while ($db_group = DBfetch($db_groups)) {
-				$db_dashboards[$db_group['dashboardid']]['userGroups'][$db_group['dashboard_usrgrpid']] = [
-					'dashboard_usrgrpid' => $db_group['dashboard_usrgrpid'],
-					'usrgrpid' => $db_group['usrgrpid'],
-					'permission' => $db_group['permission']
-				];
+				$db_dashboards[$db_group['dashboardid']]['userGroups'][$db_group['dashboard_usrgrpid']] =
+					array_filter($db_group, array_flip(['dashboardid']));
 			}
 		}
 
 		if ($dashboardids['pages']) {
 			$db_dashboard_pages = DB::select('dashboard_page', [
-				'output' => array_keys(DB::getSchema('dashboard_page')['fields']),
-				'filter' => ['dashboardid' => array_keys($dashboardids['pages'])],
+				'output' => ['dashboard_pageid', 'dashboardid', 'name', 'display_period', 'sortorder'],
+				'filter' => ['dashboardid' => $dashboardids['pages']],
 				'preservekeys' => true
 			]);
 
@@ -214,8 +210,10 @@ abstract class CDashboardGeneral extends CApiService {
 
 			if ($dashboard_pageids) {
 				$db_widgets = DB::select('widget', [
-					'output' => array_keys(DB::getSchema('widget')['fields']),
-					'filter' => ['dashboard_pageid' => array_keys($dashboard_pageids)],
+					'output' => ['widgetid', 'dashboard_pageid', 'type', 'name', 'x', 'y', 'width', 'height',
+						'view_mode'
+					],
+					'filter' => ['dashboard_pageid' => $dashboard_pageids],
 					'preservekeys' => true
 				]);
 
@@ -226,8 +224,10 @@ abstract class CDashboardGeneral extends CApiService {
 
 				if ($widgetids) {
 					$db_widget_fields = DB::select('widget_field', [
-						'output' => array_keys(DB::getSchema('widget_field')['fields']),
-						'filter' => ['widgetid' => array_keys($widgetids)],
+						'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
+							'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid'
+						],
+						'filter' => ['widgetid' => $widgetids],
 						'preservekeys' => true
 					]);
 
