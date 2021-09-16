@@ -61,48 +61,27 @@ if ($host_is_discovered) {
 	}
 
 	$discovered_by = [new CLabel(_('Discovered by')), new CFormField($discovery_rule)];
-
-	$agent_interfaces = (new CDiv())
-		->setId('agentInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'agent');
-
-	$snmp_interfaces = (new CDiv())
-		->setId('SNMPInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
-		->setAttribute('data-type', 'snmp');
-
-	$jmx_interfaces = (new CDiv())
-		->setId('JMXInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'jmx');
-
-	$ipmi_interfaces = (new CDiv())
-		->setId('IPMIInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'ipmi');
 }
-else {
-	$agent_interfaces = (new CDiv())
-		->setId('agentInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'agent');
 
-	$snmp_interfaces = (new CDiv())
-		->setId('SNMPInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
-		->setAttribute('data-type', 'snmp');
+$agent_interfaces = (new CDiv())
+	->setId('agentInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'agent');
 
-	$jmx_interfaces = (new CDiv())
-		->setId('JMXInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'jmx');
+$snmp_interfaces = (new CDiv())
+	->setId('SNMPInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
+	->setAttribute('data-type', 'snmp');
 
-	$ipmi_interfaces = (new CDiv())
-		->setId('IPMIInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'ipmi');
-}
+$jmx_interfaces = (new CDiv())
+	->setId('JMXInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'jmx');
+
+$ipmi_interfaces = (new CDiv())
+	->setId('IPMIInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'ipmi');
 
 $host_tab = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
@@ -184,7 +163,7 @@ $host_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		_('Enabled'),
+		new CLabel(_('Enabled'), 'status'),
 		new CFormField(
 			(new CCheckBox('status', HOST_STATUS_MONITORED))
 				->setChecked($data['host']['status'] == HOST_STATUS_MONITORED)
