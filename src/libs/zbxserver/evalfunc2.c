@@ -2696,6 +2696,8 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 #	define HVT(v) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? v.dbl : v.ui64)
 #	define HVT_SET(v,r) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? (v.dbl = r) : (v.ui64 = r))
 #	define TS2NS(t) (t.sec * 1000000000 + t.ns)
+#	define LAST(v) v.values[v.values_num - 1]
+#	define FIRST(v) v.values[0]
 
 	int				arg1, time_shift, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_value_type_t		arg1_type;
@@ -2755,7 +2757,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 		/* Reset detection */
 
-		HVT_SET(delta, HVT(values.values[values.values_num - 1].value) - HVT(values.values[0].value));
+		HVT_SET(delta, HVT(LAST(values).value) - HVT(FIRST(values).value));
 
 		for (i = 0; i < values.values_num; i++)
 		{
@@ -2769,8 +2771,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 		if (ZBX_VALUE_NVALUES == arg1_type)
 		{
-			range_start = TS2NS(ts_end) - (TS2NS(values.values[values.values_num - 1].timestamp) -
-					TS2NS(values.values[0].timestamp));
+			range_start = TS2NS(ts_end) - (TS2NS(LAST(values).timestamp) - TS2NS(FIRST(values).timestamp));
 		}
 		else
 		{
@@ -2779,15 +2780,15 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 
 		range_end = TS2NS(ts_end);
-		start = (double)(TS2NS(values.values[0].timestamp) - range_start) / 1000000000;
-		end = (double)(range_end - TS2NS(values.values[values.values_num - 1].timestamp)) / 1000000000;
-		sampled_interval = (double)(TS2NS(ts_end) - (TS2NS(values.values[values.values_num - 1].timestamp) -
-				TS2NS(values.values[0].timestamp))) / 1000000000;
+		start = (double)(TS2NS(FIRST(values).timestamp) - range_start) / 1000000000;
+		end = (double)(range_end - TS2NS(LAST(values).timestamp)) / 1000000000;
+		sampled_interval = (double)(TS2NS(ts_end) - (TS2NS(LAST(values).timestamp) -
+				TS2NS(FIRST(values).timestamp))) / 1000000000;
 		average_duration_between_samples = sampled_interval / (values.values_num - 1);
 
-		if (HVT(delta) > 0 && HVT(values.values[0].value) >= 0)
+		if (HVT(delta) > 0 && HVT(FIRST(values).value) >= 0)
 		{
-			double	dt_zero = sampled_interval * (HVT(values.values[0].value) / HVT(delta));
+			double	dt_zero = sampled_interval * (HVT(FIRST(values).value) / HVT(delta));
 
 			if (dt_zero < start)
 				start = dt_zero;
