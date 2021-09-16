@@ -108,14 +108,13 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 	'use strict';
 
 	window.host_edit = {
-		form: null,
 		form_name: null,
 
 		/**
 		 * Host form setup.
 		 */
 		init({form_name}) {
-			this.form = document.getElementById(this.form_name);
+			this.form_name = form_name;
 
 			this.initHostTab();
 			this.initTemplatesTab();
