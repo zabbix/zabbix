@@ -381,9 +381,11 @@ class CMediatype extends CApiService {
 		$names = [];
 
 		foreach ($mediatypes as $mediatype) {
-			if ($db_mediatypes === null
-					|| (array_key_exists('name', $mediatype)
-						&& $mediatype['name'] !== $db_mediatypes[$mediatype['mediatypeid']]['name'])) {
+			if (!array_key_exists('name', $mediatype)) {
+				continue;
+			}
+
+			if ($db_mediatypes === null || $mediatype['name'] !== $db_mediatypes[$mediatype['mediatypeid']]['name']) {
 				$names[] = $mediatype['name'];
 			}
 		}
@@ -497,7 +499,7 @@ class CMediatype extends CApiService {
 			}
 
 			if ($type_changed) {
-				$mediatype = array_intersect_key($default_values, array_fill_keys($type_switch_fields[$db_type], ''))
+				$mediatype = array_intersect_key($default_values, array_flip($type_switch_fields[$db_type]))
 					+ $mediatype;
 			}
 		}
