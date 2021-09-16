@@ -20,7 +20,7 @@
 
 
 /**
- * Class containing methods for operations module.
+ * Class containing methods for operations with modules.
  */
 class CModule extends CApiService {
 
@@ -36,273 +36,220 @@ class CModule extends CApiService {
 	protected $sortColumns = ['moduleid', 'relative_path'];
 
 	/**
-	 * Get module data.
-	 *
-	 * @param array  $options
-	 * @param int    $options['moduleid']
-	 * @param string $options['id']             Module unique identifier as defined in manifest.json file.
-	 * @param string $options['relative_path']  Relative path to module directory.
-	 * @param bool   $options['status']         Module status.
-	 * @param array  $options['config']         Module configuration data.
-	 * @param bool   $api_call                  Check is method called via API call or from local php file.
-	 *
-	 * @return array|int
+	 * @param array $options
+	 * @param bool  $api_call  Flag indicating whether this method called via an API call or from a local PHP file.
 	 *
 	 * @throws APIException
+	 *
+	 * @return array|string
 	 */
-	public function get(array $options = [], $api_call = true) {
+	public function get(array $options = [], bool $api_call = true) {
 		if ($api_call && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$result = [];
-
-		$sqlParts = [
-			'select'	=> ['module' => 'md.moduleid'],
-			'from'		=> ['module' => 'module md'],
-			'where'		=> [],
-			'group'		=> [],
-			'order'		=> [],
-			'limit'		=> null
-		];
-
-		$options += [
-			'moduleids'					=> null,
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
+			'moduleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'moduleid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'id' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'relative_path' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])]
+			]],
+			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'relative_path' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'countOutput'				=> false,
-			'groupCount'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
-		];
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['moduleid', 'id', 'relative_path', 'status', 'config']), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
+		]];
 
-		// moduleids
-		if ($options['moduleids']) {
-			zbx_value2array($options['moduleids']);
-			$sqlParts['where'][] = dbConditionInt('md.moduleid', $options['moduleids']);
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// filter
-		if (is_array($options['filter'])) {
-			$this->dbFilter('module md', $options, $sqlParts);
-		}
+		$db_modules = [];
 
-		// search
-		if (is_array($options['search'])) {
-			zbx_db_search('module md', $options, $sqlParts);
-		}
+		$result = DBselect($this->createSelectQuery('module', $options), $options['limit']);
 
-		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
-		}
-
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($module = DBfetch($res)) {
+		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
-				return $module['rowscount'];
+				return $row['rowscount'];
 			}
 
-			if (array_key_exists('config', $module)) {
-				$config = json_decode($module['config'], true);
-				$module['config'] = is_null($config) ? [] : $config;
+			if ($this->outputIsRequested('config', $options['output'])) {
+				$row['config'] = json_decode($row['config'], true);
 			}
 
-			if ($options['preservekeys']) {
-				$result[$module['moduleid']] = $module;
-			}
-			else {
-				$result[] = $module;
+			$db_modules[$row['moduleid']] = $row;
+		}
+
+		if ($db_modules) {
+			$db_modules = $this->unsetExtraFields($db_modules, ['moduleid'], $options['output']);
+
+			if (!$options['preservekeys']) {
+				$db_modules = array_values($db_modules);
 			}
 		}
 
-		return $result;
+		return $db_modules;
 	}
 
 	/**
-	 * Create module.
-	 *
-	 * @param array  $modules
-	 * @param int    $modules[]['moduleid']
-	 * @param string $modules[]['id']             Module unique identifier as defined in manifest.json file.
-	 * @param string $modules[]['relative_path']  Relative path to module directory.
-	 * @param bool   $modules[]['status']         Module status. (optional)
-	 * @param array  $modules[]['config']         Module configuration data. (optional)
-	 *
-	 * @return array
+	 * @param array $modules
 	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	public function create(array $modules): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		self::validateCreate($modules);
+
+		$moduleids = DB::insert('module', $modules);
+
+		foreach ($modules as $index => &$module) {
+			$module['moduleid'] = $moduleids[$index];
+		}
+		unset($module);
+
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MODULE, $modules);
+
+		return ['moduleids' => $moduleids];
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array $modules
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private static function validateCreate(array &$modules): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'id' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('module', 'id')],
+			'relative_path' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('module', 'relative_path')],
+			'status' =>			['type' => API_INT32, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])],
+			'config' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'default' => [], 'fields' => []]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $modules, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$modules = zbx_toArray($modules);
-		$rules = [
-			'type' => API_OBJECT,
-			'fields' => [
-				'id' => [
-					'type' => API_STRING_UTF8,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength($this->tableName, 'id')
-				],
-				'relative_path' => [
-					'type' => API_STRING_UTF8,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength($this->tableName, 'relative_path')
-				],
-				'status' => ['type' => API_INT32, 'in' => MODULE_STATUS_DISABLED.','.MODULE_STATUS_ENABLED]
-			]
-		];
-		$this->validate($rules, $modules);
+		foreach ($modules as &$module) {
+			$module['config'] = json_encode($module['config']);
+		}
+		unset($module);
+	}
 
-		$defaults = [
-			'status' => MODULE_STATUS_DISABLED,
-			'config' => '[]'
-		];
+	/**
+	 * @param array $modules
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	public function update(array $modules): array {
+		self::validateUpdate($modules, $db_modules);
+
+		$upd_modules = [];
+
+		foreach ($modules as $module) {
+			$upd_module = DB::getUpdatedValues('module', $module, $db_modules[$module['moduleid']]);
+
+			if ($upd_module) {
+				$upd_modules[] = [
+					'values' => $upd_module,
+					'where' => ['moduleid' => $module['moduleid']]
+				];
+			}
+		}
+
+		if ($upd_modules) {
+			DB::update('module', $upd_modules);
+		}
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MODULE, $modules, $db_modules);
+
+		return ['moduleids' => array_column($modules, 'moduleid')];
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array      $modules
+	 * @param array|null $db_modules
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private static function validateUpdate(array &$modules, array &$db_modules = null): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['moduleid']], 'fields' => [
+			'moduleid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'status' =>		['type' => API_INT32, 'in' => implode(',', [MODULE_STATUS_DISABLED, MODULE_STATUS_ENABLED])],
+			'config' =>		['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $modules, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_modules = DB::select('module', [
+			'output' => ['moduleid', 'id', 'status', 'config'],
+			'filter' => ['moduleid' => array_column($modules, 'moduleid')],
+			'preservekeys' => true
+		]);
+
+		if (count($db_modules) != count($modules)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
 		foreach ($modules as &$module) {
 			if (array_key_exists('config', $module)) {
 				$module['config'] = json_encode($module['config']);
 			}
-
-			$module += $defaults;
 		}
 		unset($module);
-
-		$moduleids = DB::insert($this->tableName, $modules);
-
-		foreach ($moduleids as $index => $moduleid) {
-			$modules[$index]['moduleid'] = $moduleid;
-		}
-
-		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MODULE, $modules);
-
-		return ['moduleids' => $moduleids];
 	}
 
 	/**
-	 * Update module data
-	 *
-	 * @param array $modules
-	 * @param int   $modules[]['moduleid']
-	 * @param bool  $modules[]['status']    Module status, true - enabled.
-	 * @param array $modules[]['config']    Module configuration data.
-	 *
-	 * @return array
+	 * @param array $moduleids
 	 *
 	 * @throws APIException
-	 */
-	public function update(array $modules): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
-		$modules = zbx_toArray($modules);
-		$rules = [
-			'type' => API_OBJECT,
-			'fields' => [
-				'moduleid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'status' => ['type' => API_INT32, 'in' => MODULE_STATUS_DISABLED.','.MODULE_STATUS_ENABLED]
-			]
-		];
-		$this->validate($rules, $modules);
-
-		$db_modules = DB::select($this->tableName, [
-			'output' => ['moduleid', 'id', 'status'],
-			'filter' => ['moduleid' => zbx_objectValues($modules, 'moduleid')],
-			'preservekeys' => true
-		]);
-		$diff = array_diff_key(zbx_objectValues($modules, 'moduleid'), array_keys($db_modules));
-
-		if ($diff) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$update = [];
-
-		foreach ($modules as $module) {
-			$moduleid = $module['moduleid'];
-			unset($module['moduleid']);
-
-			if (array_key_exists('config', $module)) {
-				$module['config'] = json_encode($module['config']);
-			}
-
-			$update[] = [
-				'values' => $module,
-				'where' => ['moduleid' => $moduleid]
-			];
-		}
-
-		DB::update($this->tableName, $update);
-
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MODULE, $modules, $db_modules);
-
-		return ['moduleids' => array_keys($db_modules)];
-	}
-
-	/**
-	 * Delete modules
-	 *
-	 * @param array $moduleids Array of module ids to be deleted.
 	 *
 	 * @return array
-	 *
-	 * @throws APIException
 	 */
 	public function delete(array $moduleids): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $moduleids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_modules = DB::select($this->tableName, [
-			'output' => [$this->pk, 'id'],
+		$db_modules = DB::select('module', [
+			'output' => ['moduleid', 'id'],
 			'moduleids' => $moduleids,
 			'preservekeys' => true
 		]);
 
-		if ($moduleids) {
-			DB::delete($this->tableName, [$this->pk => $moduleids]);
-
-			$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MODULE, $db_modules);
+		if (count($db_modules) != count($moduleids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
+		DB::delete('module', ['moduleid' => $moduleids]);
+
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MODULE, $db_modules);
 
 		return ['moduleids' => $moduleids];
-	}
-
-	/**
-	 * Validate module data.
-	 *
-	 * @param array $rules          API validation rules for module object.
-	 * @param array $modules        Array of modules data to be validated.
-	 *
-	 * @throws APIException
-	 */
-	protected function validate(array $rules, array $modules): void {
-		foreach ($modules as $module) {
-			if (array_key_exists('config', $module) && !is_array($module['config'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', 'config', _('an array is expected'))
-				);
-			}
-
-			unset($module['config']);
-			if (!CApiInputValidator::validate($rules, $module, '', $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
 	}
 }

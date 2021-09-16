@@ -18,9 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/regexp.inc.php';
 
 class CControllerRegExEdit extends CController {
+
+	protected $db_regex = [];
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -50,26 +51,17 @@ class CControllerRegExEdit extends CController {
 		}
 
 		if ($this->hasInput('regexid')) {
-			$db_regex = DBfetch(DBSelect('SELECT * FROM regexps'.
-				' WHERE '.dbConditionInt('regexpid', (array) $this->getInput('regexid'))
-			));
+			$db_regexs = API::Regexp()->get([
+				'output' => ['name', 'test_string'],
+				'selectExpressions' => ['expression_type', 'expression', 'exp_delimiter', 'case_sensitive'],
+				'regexpids' => [$this->getInput('regexid')]
+			]);
 
-			if (!$db_regex) {
+			if (!$db_regexs) {
 				return false;
 			}
 
-			$this->regex = [
-				'name' => $this->getInput('name', $db_regex['name']),
-				'test_string' => $this->getInput('test_string', $db_regex['test_string']),
-				'regexid' => $this->getInput('regexid', $db_regex['regexpid'])
-			];
-		}
-		else {
-			$this->regex = [
-				'name' => $this->getInput('name', ''),
-				'test_string' =>  $this->getInput('test_string', ''),
-				'regexid' => 0
-			];
+			$this->db_regex = $db_regexs[0];
 		}
 
 		return true;
@@ -77,43 +69,40 @@ class CControllerRegExEdit extends CController {
 
 	protected function doAction() {
 		$data = [
-			'regexid'      => $this->regex['regexid'],
+			'regexid' => $this->getInput('regexid', 0),
+			'name' => $this->hasInput('regexid')
+				? $this->getInput('name', $this->db_regex['name'])
+				: $this->getInput('name', ''),
+			'test_string'  => $this->hasInput('regexid')
+				? $this->getInput('test_string', $this->db_regex['test_string'])
+				: $this->getInput('test_string', ''),
 			'expressions'  => [],
-			'name'         => $this->regex['name'],
-			'test_string'  => $this->regex['test_string'],
 			'form_refresh' => $this->getInput('form_refresh', 0)
 		];
 
 		if ($data['form_refresh'] == 0) {
-			if ($this->regex['regexid'] == 0) {
-				$data['expressions'][] = [
-					'expression' => '',
+			if ($data['regexid'] == 0) {
+				$data['expressions'] = [[
 					'expression_type' => EXPRESSION_TYPE_INCLUDED,
+					'expression' => '',
 					'exp_delimiter' => ',',
 					'case_sensitive' => 0
-				];
+				]];
 			}
 			else {
-				$data['expressions'] = DBfetchArray(DBselect(
-					'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
-					' FROM expressions e'.
-					' WHERE '.dbConditionInt('e.regexpid', (array) $this->regex['regexid']).
-					' ORDER BY e.expression_type'
-				));
+				$data['expressions'] = $this->db_regex['expressions'];
 			}
 		}
 		else {
 			$data['expressions'] = $this->getInput('expressions', [[
-				'expression' => '',
 				'expression_type' => EXPRESSION_TYPE_INCLUDED,
+				'expression' => '',
 				'exp_delimiter' => ',',
 				'case_sensitive' => 0
 			]]);
 
 			foreach ($data['expressions'] as &$expression) {
-				if (!array_key_exists('case_sensitive', $expression)) {
-					$expression['case_sensitive'] = 0;
-				}
+				$expression += ['exp_delimiter' => ',', 'case_sensitive' => 0];
 			}
 			unset($expression);
 		}

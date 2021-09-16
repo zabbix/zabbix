@@ -101,8 +101,15 @@ class CAudit {
 	 * @var array
 	 */
 	private const TABLE_NAMES = [
+		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'config',
+		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_MEDIA_TYPE => 'media_type',
+		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_REGEXP => 'regexps',
+		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
@@ -114,8 +121,15 @@ class CAudit {
 	 * @var array
 	 */
 	private const FIELD_NAMES = [
+		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_AUTOREGISTRATION => null,
+		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_MEDIA_TYPE => 'name',
+		self::RESOURCE_MODULE => 'id',
+		self::RESOURCE_REGEXP => 'name',
+		self::RESOURCE_SCHEDULED_REPORT => 'name',
+		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
@@ -127,8 +141,15 @@ class CAudit {
 	 * @var array
 	 */
 	private const API_NAMES = [
+		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_MEDIA_TYPE => 'mediatype',
+		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_REGEXP => 'regexp',
+		self::RESOURCE_SETTINGS => 'settings',
+		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
@@ -139,7 +160,9 @@ class CAudit {
 	 * @var array
 	 */
 	private const MASKED_PATHS = [
+		self::RESOURCE_AUTHENTICATION => ['paths' => ['authentication.ldap_bind_password']],
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
+		self::RESOURCE_AUTOREGISTRATION => ['paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']],
 		// self::RESOURCE_MACRO => [
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
@@ -157,6 +180,9 @@ class CAudit {
 	private const NESTED_OBJECTS_TABLE_NAMES = [
 		'mediatype.message_templates' => 'media_type_message',
 		'mediatype.parameters' => 'media_type_param',
+		'regexp.expressions' => 'expressions',
+		'report.users' => 'report_user',
+		'report.user_groups' => 'report_usrgrp',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
@@ -173,6 +199,9 @@ class CAudit {
 	private const NESTED_OBJECTS_IDS = [
 		'mediatype.message_templates' => 'mediatype_messageid',
 		'mediatype.parameters' => 'mediatype_paramid',
+		'regexp.expressions' => 'expressionid',
+		'report.users' => 'reportuserid',
+		'report.user_groups' => 'reportusrgrpid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
