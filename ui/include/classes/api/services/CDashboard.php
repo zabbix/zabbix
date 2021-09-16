@@ -495,7 +495,6 @@ class CDashboard extends CDashboardGeneral {
 		$ins_dashboard_users = [];
 		$upd_dashboard_users = [];
 		$del_dashboard_userids = [];
-		$dashboard_userids = [];
 
 		foreach ($dashboards as &$dashboard) {
 			if (!array_key_exists('users', $dashboard)) {
@@ -524,11 +523,7 @@ class CDashboard extends CDashboardGeneral {
 					unset($db_dashboard_users[$userid]);
 				}
 				else {
-					$ins_dashboard_users[] = [
-						'dashboardid' => $dashboardid,
-						'userid' => $userid,
-						'permission' => $dashboard_user['permission']
-					];
+					$ins_dashboard_users[] = ['dashboardid' => $dashboardid] + $dashboard_user;
 				}
 			}
 			unset($dashboard_user);
@@ -577,7 +572,6 @@ class CDashboard extends CDashboardGeneral {
 		$ins_dashboard_usrgrps = [];
 		$upd_dashboard_usrgrps = [];
 		$del_dashboard_usrgrpids = [];
-		$dashboard_usrgrpids = [];
 
 		foreach ($dashboards as &$dashboard) {
 			if (!array_key_exists('userGroups', $dashboard)) {
@@ -606,11 +600,7 @@ class CDashboard extends CDashboardGeneral {
 					unset($db_dashboard_groups[$usrgrpid]);
 				}
 				else {
-					$ins_dashboard_usrgrps[] = [
-						'dashboardid' => $dashboardid,
-						'usrgrpid' => $usrgrpid,
-						'permission' => $dashboard_group['permission']
-					];
+					$ins_dashboard_usrgrps[] = ['dashboardid' => $dashboardid] + $dashboard_group;
 				}
 			}
 			unset($dashboard_group);
