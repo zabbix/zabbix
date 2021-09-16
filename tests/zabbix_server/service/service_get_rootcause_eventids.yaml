@@ -258,4 +258,64 @@ in:
   service: S1
 out:
   events: [3, 5, 6, 7]
+---
+test case: Applying min-status to events (min)
+in:
+  services: 
+  - name: S1
+    status: 2
+    children: [S2]
+    algorithm: OK
+    rules:
+    - {"type": N_GE, "limit":3, "value":1, "status":3}
+  - name: S2
+    status: 3
+    children: [S3, S4]
+    algorithm: MIN
+    status: 3
+  - name: S3
+    status: 3
+    events: 
+    - {"id":1, "severity":1}
+    - {"id":2, "severity":2}
+    - {"id":3, "severity":3}
+  - name: S4
+    status: 3
+    events: 
+    - {"id":4, "severity":1}
+    - {"id":5, "severity":2}
+    - {"id":6, "severity":3}
+  service: S1
+out:
+  events: [3, 6]
+---
+test case: Applying min-status to events (max)
+in:
+  services: 
+  - name: S1
+    status: 2
+    children: [S2]
+    algorithm: OK
+    rules:
+    - {"type": N_GE, "limit":3, "value":1, "status":3}
+  - name: S2
+    status: 3
+    children: [S3, S4]
+    algorithm: MAX
+    status: 3
+  - name: S3
+    status: 3
+    events: 
+    - {"id":1, "severity":1}
+    - {"id":2, "severity":2}
+    - {"id":3, "severity":3}
+  - name: S4
+    status: 3
+    events: 
+    - {"id":4, "severity":1}
+    - {"id":5, "severity":2}
+    - {"id":6, "severity":3}
+  service: S1
+out:
+  events: [1, 2, 3, 4, 5, 6]
 ...
