@@ -547,7 +547,8 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 						items[i].count, items[i].interval, items[i].size, items[i].timeout,
 						error, sizeof(error));
 
-			process_values(items, first_index, i + 1, hosts, hosts_count, &ts, ping_result, error);
+			if (FAIL != ping_result)
+				process_values(items, first_index, i + 1, hosts, hosts_count, &ts, ping_result, error);
 
 			hosts_count = 0;
 			first_index = i + 1;
