@@ -371,11 +371,4 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 zbx_uint32_t get_thread_global_mutex_flag(void);
 #endif
 
-#define ZBX_SYSTEM_HOSTNAME_TYPE_HOST		0
-#define ZBX_SYSTEM_HOSTNAME_TYPE_SHORTHOST	1
-#define ZBX_SYSTEM_HOSTNAME_TYPE_NETBIOS	2
-
-#define ZBX_SYSTEM_HOSTNAME_TRANSFORM_NONE	0
-#define ZBX_SYSTEM_HOSTNAME_TRANSFORM_LOWER	1
-
 #endif
