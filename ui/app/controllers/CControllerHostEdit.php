@@ -227,6 +227,10 @@ class CControllerHostEdit extends CController {
 			unset($macro);
 		}
 
+		if ($this->hasInput('groupids')) {
+			$data['groupids'] = $this->getInput('groupids', []);
+		}
+
 		// Extend data for view.
 		$data['groups_ms'] = $this->hostGroupsForMultiselect($data['host']['groups']);
 		unset($data['groups']);

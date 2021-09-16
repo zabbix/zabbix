@@ -29,7 +29,6 @@ $popup_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'host.edit');
 
 if ($data['hostid'] == 0) {
-	// TODO VM: currently not working
 	if (array_key_exists('groupids', $data) && $data['groupids']) {
 		$popup_url->setArgument('groupids', $data['groupids']);
 	}
