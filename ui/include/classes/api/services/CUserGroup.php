@@ -251,30 +251,7 @@ class CUserGroup extends CApiService {
 	public function update($usrgrps) {
 		$this->validateUpdate($usrgrps, $db_usrgrps);
 
-		$upd_usrgrps = [];
-
-		foreach ($usrgrps as $usrgrp) {
-			$db_usrgrp = $db_usrgrps[$usrgrp['usrgrpid']];
-
-			$upd_usrgrp = DB::getUpdatedValues('usrgrp', $usrgrp, $db_usrgrp);
-
-			if ($upd_usrgrp) {
-				$upd_usrgrps[] = [
-					'values' => $upd_usrgrp,
-					'where' => ['usrgrpid' => $usrgrp['usrgrpid']]
-				];
-			}
-		}
-
-		if ($upd_usrgrps) {
-			DB::update('usrgrp', $upd_usrgrps);
-		}
-
-		self::updateRights($usrgrps, __FUNCTION__, $db_usrgrps);
-		self::updateTagFilters($usrgrps, __FUNCTION__, $db_usrgrps);
-		self::updateUsersGroups($usrgrps, __FUNCTION__, $db_usrgrps);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
+		self::updateForce($usrgrps, $db_usrgrps);
 
 		return ['usrgrpids'=> array_column($usrgrps, 'usrgrpid')];
 	}
@@ -624,6 +601,39 @@ class CUserGroup extends CApiService {
 				);
 			}
 		}
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array $usrgrps
+	 * @param array $db_usrgrps
+	 */
+	public static function updateForce($usrgrps, $db_usrgrps): void {
+		$upd_usrgrps = [];
+
+		foreach ($usrgrps as $usrgrp) {
+			$db_usrgrp = $db_usrgrps[$usrgrp['usrgrpid']];
+
+			$upd_usrgrp = DB::getUpdatedValues('usrgrp', $usrgrp, $db_usrgrp);
+
+			if ($upd_usrgrp) {
+				$upd_usrgrps[] = [
+					'values' => $upd_usrgrp,
+					'where' => ['usrgrpid' => $usrgrp['usrgrpid']]
+				];
+			}
+		}
+
+		if ($upd_usrgrps) {
+			DB::update('usrgrp', $upd_usrgrps);
+		}
+
+		self::updateRights($usrgrps, 'update', $db_usrgrps);
+		self::updateTagFilters($usrgrps, 'update', $db_usrgrps);
+		self::updateUsersGroups($usrgrps, 'update', $db_usrgrps);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 	}
 
 	/**
