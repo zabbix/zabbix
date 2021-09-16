@@ -174,7 +174,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function create(array $mediatypes): array {
-		$this->validateCreate($mediatypes);
+		self::validateCreate($mediatypes);
 
 		$mediatypeids = DB::insert('media_type', $mediatypes);
 
@@ -183,8 +183,8 @@ class CMediatype extends CApiService {
 		}
 		unset($mediatype);
 
-		$this->updateParameters($mediatypes, __FUNCTION__);
-		$this->updateMessageTemplates($mediatypes, __FUNCTION__);
+		self::updateParameters($mediatypes, __FUNCTION__);
+		self::updateMessageTemplates($mediatypes, __FUNCTION__);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes);
 
@@ -192,11 +192,13 @@ class CMediatype extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array $mediatypes
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateCreate(array &$mediatypes): void {
+	private static function validateCreate(array &$mediatypes): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
@@ -260,7 +262,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function update(array $mediatypes): array {
-		$this->validateUpdate($mediatypes, $db_mediatypes);
+		self::validateUpdate($mediatypes, $db_mediatypes);
 
 		$upd_mediatypes = [];
 
@@ -279,8 +281,8 @@ class CMediatype extends CApiService {
 			DB::update('media_type', $upd_mediatypes);
 		}
 
-		$this->updateParameters($mediatypes, __FUNCTION__, $db_mediatypes);
-		$this->updateMessageTemplates($mediatypes, __FUNCTION__, $db_mediatypes);
+		self::updateParameters($mediatypes, __FUNCTION__, $db_mediatypes);
+		self::updateMessageTemplates($mediatypes, __FUNCTION__, $db_mediatypes);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes, $db_mediatypes);
 
@@ -288,12 +290,14 @@ class CMediatype extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array      $mediatypes
 	 * @param array|null $db_mediatypes
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateUpdate(array &$mediatypes, array &$db_mediatypes = null): void {
+	private static function validateUpdate(array &$mediatypes, ?array &$db_mediatypes): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'mediatypeid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'type' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])],
@@ -346,7 +350,7 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_mediatypes = $this->get([
+		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
@@ -364,7 +368,7 @@ class CMediatype extends CApiService {
 		self::checkDuplicates($mediatypes, $db_mediatypes);
 		self::checkRequiredFieldsByType($mediatypes, $db_mediatypes);
 
-		$this->addAffectedObjects($mediatypes, $db_mediatypes);
+		self::addAffectedObjects($mediatypes, $db_mediatypes);
 	}
 
 	/**
@@ -579,17 +583,42 @@ class CMediatype extends CApiService {
 				break;
 		}
 
+		$api_input_rules['fields'] += [
+			'smtp_server' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'smtp_server')],
+			'smtp_helo' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'smtp_helo')],
+			'smtp_email' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'smtp_email')],
+			'exec_path' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'exec_path')],
+			'gsm_modem' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'gsm_modem')],
+			'username' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'username')],
+			'passwd' =>						['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'passwd')],
+			'smtp_port' =>					['type' => API_INT32, 'in' => DB::getDefault('mediatype', 'smtp_port')],
+			'smtp_security' =>				['type' => API_INT32, 'in' => DB::getDefault('mediatype', 'smtp_security')],
+			'smtp_verify_peer' =>			['type' => API_INT32, 'in' => DB::getDefault('mediatype', 'smtp_verify_peer')],
+			'smtp_verify_host' =>			['type' => API_INT32, 'in' => DB::getDefault('mediatype', 'smtp_verify_host')],
+			'smtp_authentication' =>		['type' => API_INT32, 'in' => DB::getDefault('mediatype', 'smtp_authentication')],
+			'exec_params' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'exec_params')],
+			'content_type' =>				['type' => API_INT32, 'in' => DB::getDefault('mediatype', 'content_type')],
+			'script' =>						['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'script')],
+			'timeout' =>					['type' => API_TIME_UNIT, 'in' => DB::getDefault('mediatype', 'timeout')],
+			'process_tags' =>				['type' => API_INT32, 'in' => DB::getDefault('mediatype', 'process_tags')],
+			'show_event_menu' =>			['type' => API_INT32, 'in' => DB::getDefault('mediatype', 'show_event_menu')],
+			'event_menu_url' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'event_menu_url')],
+			'event_menu_name' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('mediatype', 'event_menu_name')]
+		];
+
 		return $api_input_rules;
 	}
 
 	/**
 	 * Update table "media_type_param" and populate mediatype.parameters by "mediatype_paramid" property.
 	 *
+	 * @static
+	 *
 	 * @param array      $mediatypes
 	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 */
-	private function updateParameters(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function updateParameters(array &$mediatypes, string $method, array $db_mediatypes = null): void {
 		$ins_params = [];
 		$upd_params = [];
 		$del_paramids = [];
@@ -661,11 +690,13 @@ class CMediatype extends CApiService {
 	/**
 	 * Update table "media_type_message" and populate mediatype.message_templates by "mediatype_messageid" property.
 	 *
+	 * @static
+	 *
 	 * @param array      $mediatypes
 	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 */
-	private function updateMessageTemplates(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function updateMessageTemplates(array &$mediatypes, string $method, array $db_mediatypes = null): void {
 		$ins_messages = [];
 		$upd_messages = [];
 		$del_messageids = [];
@@ -842,10 +873,12 @@ class CMediatype extends CApiService {
 	 * Add existing webhook parameters and message templates to $db_mediatypes, regardless of whether they will be
 	 * affected by the update.
 	 *
+	 * @static
+	 *
 	 * @param array $mediatypes
 	 * @param array $db_mediatypes
 	 */
-	private function addAffectedObjects(array $mediatypes, array &$db_mediatypes): void {
+	private static function addAffectedObjects(array $mediatypes, array &$db_mediatypes): void {
 		$mediatypeids = ['parameters' => [], 'message_templates' => []];
 
 		foreach ($mediatypes as $mediatype) {
