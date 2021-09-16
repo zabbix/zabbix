@@ -192,7 +192,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 			while ($db_group = DBfetch($db_groups)) {
 				$db_dashboards[$db_group['dashboardid']]['userGroups'][$db_group['dashboard_usrgrpid']] =
-					array_filter($db_group, array_flip(['dashboardid']));
+					array_diff_key($db_group, array_flip(['dashboardid']));
 			}
 		}
 
