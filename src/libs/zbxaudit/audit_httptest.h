@@ -66,14 +66,14 @@ void	zbx_audit_httptest_update_json_add_httptest_httpstep(zbx_uint64_t httptesti
 void	zbx_audit_httptest_update_json_httpstep_update_##resource(zbx_uint64_t httptestid,	\
 		zbx_uint64_t httpstepid, type1 resource##_old, type1 resource##_new);
 
-PREPARE_AUDIT_HTTPSTEP_UPDATE_H(url, const char*);
-PREPARE_AUDIT_HTTPSTEP_UPDATE_H(posts, const char*);
-PREPARE_AUDIT_HTTPSTEP_UPDATE_H(required, const char*);
-PREPARE_AUDIT_HTTPSTEP_UPDATE_H(status_codes, const char*);
-PREPARE_AUDIT_HTTPSTEP_UPDATE_H(timeout, const char*);
-PREPARE_AUDIT_HTTPSTEP_UPDATE_H(follow_redirects, int);
-PREPARE_AUDIT_HTTPSTEP_UPDATE_H(retrieve_mode, int);
-PREPARE_AUDIT_HTTPSTEP_UPDATE_H(post_type, int);
+PREPARE_AUDIT_HTTPSTEP_UPDATE_H(url, const char*)
+PREPARE_AUDIT_HTTPSTEP_UPDATE_H(posts, const char*)
+PREPARE_AUDIT_HTTPSTEP_UPDATE_H(required, const char*)
+PREPARE_AUDIT_HTTPSTEP_UPDATE_H(status_codes, const char*)
+PREPARE_AUDIT_HTTPSTEP_UPDATE_H(timeout, const char*)
+PREPARE_AUDIT_HTTPSTEP_UPDATE_H(follow_redirects, int)
+PREPARE_AUDIT_HTTPSTEP_UPDATE_H(retrieve_mode, int)
+PREPARE_AUDIT_HTTPSTEP_UPDATE_H(post_type, int)
 
 void	zbx_audit_httptest_update_json_add_httptest_field(zbx_uint64_t httptestid, zbx_uint64_t httptestfieldid,
 		int type, const char *name, const char *value);

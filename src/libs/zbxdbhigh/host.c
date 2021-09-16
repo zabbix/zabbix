@@ -5428,7 +5428,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 						httpfield->type, httpfield->name, httpfield->value);
 
 				zbx_audit_httptest_update_json_add_httpstep_field(httptest->httptestid,
-						httpstepid, httpstepfieldid, httpfield->type, httpfield->name,
+						httpstep->hoststepid, httpstepfieldid, httpfield->type, httpfield->name,
 						httpfield->value);
 				httpstepfieldid++;
 			}
