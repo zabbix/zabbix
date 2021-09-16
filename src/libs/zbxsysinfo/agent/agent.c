@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "modbtype.h"
 
 extern char			*CONFIG_HOSTNAMES;
 extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
@@ -37,6 +38,7 @@ ZBX_METRIC	parameters_agent[] =
 	{"agent.hostmetadata",	0,		AGENT_HOSTMETADATA,	NULL},
 	{"agent.ping",		0,		AGENT_PING,		NULL},
 	{"agent.version",	0,		AGENT_VERSION,		NULL},
+	{"modbus.get",		CF_HAVEPARAMS,	MODBUS_GET,		"tcp://127.0.0.1"},
 	{NULL}
 };
 
