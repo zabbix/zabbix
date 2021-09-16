@@ -2869,9 +2869,6 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 		if (0 == eventids.values_num)
 			continue;
 
-		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 		zbx_service_serialize_rootcause(&data, &data_alloc, &data_offset, serviceids.values[i], &eventids);
 		zbx_vector_uint64_clear(&eventids);
 	}
