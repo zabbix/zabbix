@@ -142,28 +142,27 @@ PREPARE_AUDIT_HTTPTEST_UPDATE(verify_host, int, int)
 
 int	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids)
 {
-	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	id;
-
-	result = DBselect("%s", sql);
 
 	if (NULL == (result = DBselect("%s", sql)))
-			goto out;
+		return FAIL;
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_t	id;
+
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(ids, id);
 
 		zbx_audit_httptest_create_entry(AUDIT_ACTION_DELETE, id, row[1]);
 	}
+
 	DBfree_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-out:
-	return ret;
+
+	return SUCCEED;
 }
 
 void	zbx_audit_httptest_update_json_add_httptest_tag(zbx_uint64_t httptestid, zbx_uint64_t tagid, const char *tag,
