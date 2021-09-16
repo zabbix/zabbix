@@ -77,6 +77,7 @@ class CAudit {
 	public const RESOURCE_USER_ROLE = 44;
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
+	public const RESOURCE_GLOBAL_USER_MACRO = 47;
 
 	/**
 	 * Audit details actions.
@@ -104,6 +105,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'config',
+		self::RESOURCE_GLOBAL_USER_MACRO => 'globalmacro',
 		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_REGEXP => 'regexps',
@@ -123,6 +125,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_AUTOREGISTRATION => null,
+		self::RESOURCE_GLOBAL_USER_MACRO => 'macro',
 		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_REGEXP => 'name',
@@ -142,6 +145,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_GLOBAL_USER_MACRO => 'usermacro',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_REGEXP => 'regexp',
@@ -164,6 +168,10 @@ class CAudit {
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		// ],
+		self::RESOURCE_GLOBAL_USER_MACRO => [
+			'paths' => ['usermacro.value'],
+			'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
+		],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
@@ -359,7 +367,7 @@ class CAudit {
 			return in_array($path, self::MASKED_PATHS[$resource]['paths']);
 		}
 
-		if (in_array($path, self::MASKED_PATHS[$resource])) {
+		if (in_array($path, self::MASKED_PATHS[$resource]['paths'])) {
 			$all_counditions = count(self::MASKED_PATHS[$resource]['conditions']);
 			$true_conditions = 0;
 
@@ -568,14 +576,19 @@ class CAudit {
 				}
 			}
 			else {
-				$is_value_to_mask = self::isValueToMask($resource, $path, $full_object);
-				if ($is_value_to_mask || $value != $db_value) {
+				if ($value != $db_value) {
 					if (self::isNestedObjectProperty($path)) {
 						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
 					}
 
-					if ($is_value_to_mask) {
-						$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
+					$is_value_to_mask = self::isValueToMask($resource, $path, $full_object);
+					$is_db_value_to_mask = self::isValueToMask($resource, $path, $db_object);
+
+					if ($is_value_to_mask || $is_db_value_to_mask) {
+						$secret_value = $is_value_to_mask ? ZBX_SECRET_MASK : $value;
+						$db_secret_value = $is_db_value_to_mask ? ZBX_SECRET_MASK : $db_value;
+
+						$result[$path] = [self::DETAILS_ACTION_UPDATE, $secret_value, $db_secret_value];
 					}
 					else {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];

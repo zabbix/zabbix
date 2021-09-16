@@ -240,7 +240,8 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_USER => _('User'),
 			CAudit::RESOURCE_USER_GROUP => _('User group'),
 			CAudit::RESOURCE_USER_ROLE => _('User role'),
-			CAudit::RESOURCE_VALUE_MAP => _('Value map')
+			CAudit::RESOURCE_VALUE_MAP => _('Value map'),
+			CAudit::RESOURCE_GLOBAL_USER_MACRO => _('Global macro')
 		];
 	}
 
