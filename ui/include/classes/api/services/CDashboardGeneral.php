@@ -223,26 +223,29 @@ abstract class CDashboardGeneral extends CApiService {
 				unset($db_widget);
 
 				if ($widgetids) {
-					$db_widget_fields = DB::select('widget_field', [
+					$options = [
 						'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
 							'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid'
 						],
-						'filter' => ['widgetid' => $widgetids],
-						'preservekeys' => true
-					]);
+						'filter' => ['widgetid' => $widgetids]
+					];
+					$db_widget_fields = DBselect(DB::makeSql('widget_field', $options));
 
-					foreach ($db_widget_fields as $widget_fieldid => $db_widget_field) {
-						$db_widgets[$db_widget_field['widgetid']]['fields'][$widget_fieldid] = $db_widget_field;
+					while ($db_widget_field = DBfetch($db_widget_fields)) {
+						$db_widgets[$db_widget_field['widgetid']]['fields'][$db_widget_field['widget_fieldid']] =
+							array_diff_key($db_widget_field, array_flip(['widgetid']));
 					}
 				}
 
 				foreach ($db_widgets as $widgetid => $db_widget) {
-					$db_dashboard_pages[$db_widget['dashboard_pageid']]['widgets'][$widgetid] = $db_widget;
+					$db_dashboard_pages[$db_widget['dashboard_pageid']]['widgets'][$widgetid] =
+						array_diff_key($db_widget, array_flip(['dashboard_pageid']));
 				}
 			}
 
 			foreach ($db_dashboard_pages as $dashboard_pageid => $db_dashboard_page) {
-				$db_dashboards[$db_dashboard_page['dashboardid']]['pages'][$dashboard_pageid] = $db_dashboard_page;
+				$db_dashboards[$db_dashboard_page['dashboardid']]['pages'][$dashboard_pageid] =
+					array_diff_key($db_dashboard_page, array_flip(['dashboardid']));
 			}
 		}
 	}
