@@ -51,14 +51,16 @@ void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, 
 
 void	zbx_audit_httptest_update_json_add_data(zbx_uint64_t httptestid, zbx_uint64_t templateid, const char *name,
 		const char *delay, unsigned char status, const char *agent, unsigned char authentication,
-		const char *httpuser, const char *http_proxy, int retries,
-		zbx_uint64_t hostid)
+		const char *httpuser, const char *http_proxy, int retries,  const char *ssl_cert_file,
+		const char *ssl_key_file, int verify_peer, int verify_host, zbx_uint64_t hostid)
 {
 	char	audit_key_templateid[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_delay[AUDIT_DETAILS_KEY_LEN], audit_key_status[AUDIT_DETAILS_KEY_LEN],
 		audit_key_agent[AUDIT_DETAILS_KEY_LEN], audit_key_authentication[AUDIT_DETAILS_KEY_LEN],
 		audit_key_httpuser[AUDIT_DETAILS_KEY_LEN], audit_key_http_proxy[AUDIT_DETAILS_KEY_LEN],
-		audit_key_retries[AUDIT_DETAILS_KEY_LEN], audit_key_hostid[AUDIT_DETAILS_KEY_LEN];
+		audit_key_retries[AUDIT_DETAILS_KEY_LEN], audit_key_ssl_cert_file[AUDIT_DETAILS_KEY_LEN],
+		audit_key_ssl_key_file[AUDIT_DETAILS_KEY_LEN], audit_key_verify_peer[AUDIT_DETAILS_KEY_LEN],
+		audit_key_verify_host[AUDIT_DETAILS_KEY_LEN], audit_key_hostid[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
@@ -73,6 +75,10 @@ void	zbx_audit_httptest_update_json_add_data(zbx_uint64_t httptestid, zbx_uint64
 	AUDIT_KEY_SNPRINTF(httpuser)
 	AUDIT_KEY_SNPRINTF(http_proxy)
 	AUDIT_KEY_SNPRINTF(retries)
+	AUDIT_KEY_SNPRINTF(ssl_cert_file)
+	AUDIT_KEY_SNPRINTF(ssl_key_file)
+	AUDIT_KEY_SNPRINTF(verify_peer)
+	AUDIT_KEY_SNPRINTF(verify_host)
 	AUDIT_KEY_SNPRINTF(hostid)
 #undef AUDIT_KEY_SNPRINTF
 #define ADD_STR(r) zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
@@ -89,6 +95,12 @@ void	zbx_audit_httptest_update_json_add_data(zbx_uint64_t httptestid, zbx_uint64
 				ZBX_MACRO_SECRET_MASK);
 	ADD_STR(http_proxy)
 	ADD_INT(retries)
+	ADD_STR(ssl_cert_file)
+	ADD_STR(ssl_key_file)
+	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, "httptest.ssl_key_password",
+			ZBX_MACRO_SECRET_MASK);
+	ADD_INT(verify_peer)
+	ADD_INT(verify_host)
 	ADD_UINT64(hostid)
 #undef ADD_STR
 #undef ADD_UINT64
@@ -232,7 +244,7 @@ void	zbx_audit_httptest_update_json_httpstep_update_##resource(zbx_uint64_t http
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(buf, sizeof(buf), "httptest.steps[" ZBX_FS_UI64 "]", httpstepid);				\
+	zbx_snprintf(buf, sizeof(buf), "httptest.steps[" ZBX_FS_UI64 "]."#resource, httpstepid);		\
 														\
 	zbx_audit_update_json_update_##type2(httptestid, buf, resource##_old, resource##_new);			\
 }
