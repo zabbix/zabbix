@@ -731,6 +731,7 @@ abstract class CDashboardGeneral extends CApiService {
 						unset($db_widgets[$widget['widgetid']]);
 					}
 					else {
+						unset($widget['fields']);
 						$ins_widgets[] = ['dashboard_pageid' => $dashboard_page['dashboard_pageid']] + $widget;
 					}
 				}
@@ -743,10 +744,6 @@ abstract class CDashboardGeneral extends CApiService {
 
 		if ($upd_widgets) {
 			DB::update('widget', $upd_widgets);
-		}
-
-		if ($db_widgets) {
-			self::deleteWidgets(array_keys($db_widgets));
 		}
 
 		foreach ($dashboards as &$dashboard) {
@@ -771,6 +768,10 @@ abstract class CDashboardGeneral extends CApiService {
 		unset($dashboard);
 
 		$this->updateWidgetFields($dashboards, $db_dashboards);
+
+		if ($db_widgets) {
+			self::deleteWidgets(array_keys($db_widgets));
+		}
 	}
 
 	/**
@@ -785,7 +786,6 @@ abstract class CDashboardGeneral extends CApiService {
 		$ins_widget_fields = [];
 		$upd_widget_fields = [];
 		$del_widget_fieldids = [];
-		$widget_fieldids = [];
 
 		foreach ($dashboards as &$dashboard) {
 			if (!array_key_exists('pages', $dashboard)) {
@@ -812,23 +812,19 @@ abstract class CDashboardGeneral extends CApiService {
 						? $db_widgets[$widget['widgetid']]['fields']
 						: [];
 
-					$widget_fields = [];
-
-					foreach ($db_widget_fields as $db_widget_field) {
-						$widget_fields[$db_widget_field['type']][$db_widget_field['name']][] = $db_widget_field['widget_fieldid'];
-					}
-
 					foreach ($widget['fields'] as &$widget_field) {
 						$widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']]] = $widget_field['value'];
 						unset($widget_field['value']);
 
-						if (array_key_exists($widget_field['type'], $widget_fields)
-								&& array_key_exists($widget_field['name'], $widget_fields[$widget_field['type']])
-								&& $widget_fields[$widget_field['type']][$widget_field['name']]) {
-							$db_widget_fieldid = array_shift($widget_fields[$widget_field['type']][$widget_field['name']]);
-							$db_widget_field = $db_widget_fields[$db_widget_fieldid];
+						$db_widget_field = current(
+							array_filter($db_widget_fields, function (array $db_widget_field) use ($widget_field): bool {
+								return ($widget_field['type'] == $db_widget_field['type']
+									&& $widget_field['name'] === $db_widget_field['name']);
+							})
+						);
 
-							$widget_field['widget_fieldid'] = $db_widget_fieldid;
+						if ($db_widget_field) {
+							$widget_field['widget_fieldid'] = $db_widget_field['widget_fieldid'];
 
 							$upd_widget_field = DB::getUpdatedValues('widget_field', $widget_field, $db_widget_field);
 
@@ -839,7 +835,7 @@ abstract class CDashboardGeneral extends CApiService {
 								];
 							}
 
-							unset($db_widget_fields[$db_widget_fieldid]);
+							unset($db_widget_fields[$db_widget_field['widget_fieldid']]);
 						}
 						else {
 							$ins_widget_fields[] = ['widgetid' => $widget['widgetid']] + $widget_field;
@@ -847,7 +843,7 @@ abstract class CDashboardGeneral extends CApiService {
 					}
 					unset($widget_field);
 
-					$del_widget_fieldids = array_merge($del_widget_fieldids, array_keys($db_widget_fields));
+					$del_widget_fieldids += $db_widget_fields;
 				}
 				unset($widget);
 			}
@@ -864,7 +860,7 @@ abstract class CDashboardGeneral extends CApiService {
 		}
 
 		if ($del_widget_fieldids) {
-			DB::delete('widget_field', ['widget_fieldid' => $del_widget_fieldids]);
+			DB::delete('widget_field', ['widget_fieldid' => array_keys($del_widget_fieldids)]);
 		}
 
 		foreach ($dashboards as &$dashboard) {
