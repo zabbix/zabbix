@@ -250,8 +250,8 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkDuplicates($mediatypes);
-		self::checkRequiredFieldsByType($mediatypes);
+		self::checkDuplicates($mediatypes, 'create');
+		self::checkRequiredFieldsByType($mediatypes, 'create');
 	}
 
 	/**
@@ -365,8 +365,8 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkDuplicates($mediatypes, $db_mediatypes);
-		self::checkRequiredFieldsByType($mediatypes, $db_mediatypes);
+		self::checkDuplicates($mediatypes, 'update', $db_mediatypes);
+		self::checkRequiredFieldsByType($mediatypes, 'update', $db_mediatypes);
 
 		self::addAffectedObjects($mediatypes, $db_mediatypes);
 	}
@@ -377,11 +377,12 @@ class CMediatype extends CApiService {
 	 * @static
 	 *
 	 * @param array      $mediatypes
+	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 *
 	 * @throws APIException if a media type name is not unique.
 	 */
-	private static function checkDuplicates(array $mediatypes, array $db_mediatypes = null): void {
+	private static function checkDuplicates(array $mediatypes, string $method, array $db_mediatypes = null): void {
 		$names = [];
 
 		foreach ($mediatypes as $mediatype) {
@@ -389,7 +390,7 @@ class CMediatype extends CApiService {
 				continue;
 			}
 
-			if ($db_mediatypes === null || $mediatype['name'] !== $db_mediatypes[$mediatype['mediatypeid']]['name']) {
+			if ($method === 'create' || $mediatype['name'] !== $db_mediatypes[$mediatype['mediatypeid']]['name']) {
 				$names[] = $mediatype['name'];
 			}
 		}
@@ -413,11 +414,12 @@ class CMediatype extends CApiService {
 	 * @static
 	 *
 	 * @param array      $mediatypes
+	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 *
 	 * @throws APIException
 	 */
-	private static function checkRequiredFieldsByType(array &$mediatypes, array $db_mediatypes = null): void {
+	private static function checkRequiredFieldsByType(array &$mediatypes, string $method, array $db_mediatypes = null): void {
 		if ($db_mediatypes !== null) {
 			$default_values = DB::getDefaults('media_type');
 			$default_values['parameters'] = [];
@@ -454,7 +456,7 @@ class CMediatype extends CApiService {
 				$type_changed = $type != $db_type;
 			}
 
-			$api_input_rules = self::getExtraValidationRules($type, $db_type);
+			$api_input_rules = self::getExtraValidationRules($type, $method, $db_type);
 			$data = array_intersect_key($mediatype, $api_input_rules['fields']);
 
 			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($i + 1), $error)) {
@@ -516,11 +518,12 @@ class CMediatype extends CApiService {
 	 * @static
 	 *
 	 * @param int      $type
+	 * @param string   $method
 	 * @param int|null $db_type
 	 *
 	 * @return array
 	 */
-	private static function getExtraValidationRules(int $type, ?int $db_type): array {
+	private static function getExtraValidationRules(int $type, string $method, ?int $db_type): array {
 		$api_input_rules = ['type' => API_OBJECT];
 
 		switch ($type) {
@@ -531,7 +534,7 @@ class CMediatype extends CApiService {
 					'smtp_email' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
 				];
 
-				if ($type !== $db_type) {
+				if ($method === 'create' || $type != $db_type) {
 					foreach ($api_input_rules['fields'] as &$field) {
 						$field['flags'] |= API_REQUIRED;
 					}
@@ -544,7 +547,7 @@ class CMediatype extends CApiService {
 					'exec_path' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
 				];
 
-				if ($type !== $db_type) {
+				if ($method === 'create' || $type != $db_type) {
 					$api_input_rules['fields']['exec_path']['flags'] |= API_REQUIRED;
 				}
 				break;
@@ -554,7 +557,7 @@ class CMediatype extends CApiService {
 					'gsm_modem' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
 				];
 
-				if ($type !== $db_type) {
+				if ($method === 'create' || $type != $db_type) {
 					$api_input_rules['fields']['gsm_modem']['flags'] |= API_REQUIRED;
 				}
 				break;
@@ -577,7 +580,7 @@ class CMediatype extends CApiService {
 					]]
 				];
 
-				if ($type !== $db_type) {
+				if ($method === 'create' || $type != $db_type) {
 					$api_input_rules['fields']['script']['flags'] |= API_REQUIRED;
 				}
 				break;
@@ -775,6 +778,7 @@ class CMediatype extends CApiService {
 	 */
 	public function delete(array $mediatypeids): array {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $mediatypeids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
