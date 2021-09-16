@@ -72,6 +72,8 @@ class CControllerHostEdit extends CController {
 										(0 | HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
 			'tls_subject'		=> 'db hosts.tls_subject',
 			'tls_issuer'		=> 'db hosts.tls_issuer',
+			'tls_psk_identity'	=> 'db hosts.tls_psk_identity',
+			'tls_psk'			=> 'db hosts.tls_psk',
 			'inventory_mode'	=> 'db host_inventory.inventory_mode|in '.implode(',', [HOST_INVENTORY_DISABLED,
 										HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC
 									]),
@@ -180,6 +182,7 @@ class CControllerHostEdit extends CController {
 			'full_clone' => $this->hasInput('full_clone') ? 1 : null,
 			'clone_hostid' => $clone_hostid,
 			'host' => $this->host,
+			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'warning' => null,
 			'user' => [
@@ -425,8 +428,8 @@ class CControllerHostEdit extends CController {
 
 			$this->getInputs($inputs, [
 				'host', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-				'ipmi_password', 'tls_connect', 'tls_accept', 'tls_subject', 'tls_issuer', 'tags', 'inventory_mode',
-				'host_inventory'
+				'ipmi_password', 'tls_connect', 'tls_accept', 'tls_subject', 'tls_issuer', 'tls_psk_identity',
+				'tls_psk', 'tags', 'inventory_mode', 'host_inventory'
 			]);
 
 			$field_add_templates = $this->getInput('add_templates', []);
@@ -492,6 +495,8 @@ class CControllerHostEdit extends CController {
 			'tls_accept' => HOST_ENCRYPTION_NONE,
 			'tls_issuer' => '',
 			'tls_subject' => '',
+			'tls_psk_identity' => '',
+			'tls_psk' => '',
 			'tags' => [],
 			'groups' => [],
 			'parentTemplates' => [],

@@ -489,7 +489,7 @@ $encryption_tab = (new CFormGrid())
 		])
 	])
 	->addItem(
-		(($data['hostid'] || $data['clone_hostid']) && $is_psk_set)
+		($is_psk_set && !$data['is_psk_edit'] && ($data['hostid'] || $data['clone_hostid']))
 		? [
 			(new CLabel(_('PSK'), 'change_psk'))->setAsteriskMark(),
 			new CFormField(
@@ -504,7 +504,9 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('tls_psk_identity', '', false, DB::getFieldLength('hosts', 'tls_psk_identity')))
+			(new CTextBox('tls_psk_identity', $data['host']['tls_psk_identity'], false,
+				DB::getFieldLength('hosts', 'tls_psk_identity')
+			))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAriaRequired()
 		)
@@ -512,7 +514,7 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('tls_psk', '', false, DB::getFieldLength('hosts', 'tls_psk')))
+			(new CTextBox('tls_psk', $data['host']['tls_psk'], false, DB::getFieldLength('hosts', 'tls_psk')))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAriaRequired()
 				->disableAutocomplete()

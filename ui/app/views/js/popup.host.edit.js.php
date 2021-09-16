@@ -178,6 +178,6 @@ window.host_edit_popup = {
 			// Display confirmation message.
 			e.preventDefault();
 			e.returnValue = '';
-		},
+		}
 	}
 }

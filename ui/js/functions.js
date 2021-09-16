@@ -777,22 +777,24 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		}
 	}
 
-	if (Array.isArray(messages) && messages.length > 0) {
-		jQuery.map(messages, function(message) {
+	if (messages.length > 0) {
+		if (Array.isArray(messages)) {
+			jQuery.map(messages, function (message) {
+				jQuery('<li>')
+					.text(message)
+					.appendTo($list);
+				return null;
+			});
+
+			$msg_box.append($msg_details);
+		}
+		else {
 			jQuery('<li>')
-				.text(message)
+				.text(messages ? messages : ' ')
 				.appendTo($list);
-			return null;
-		});
 
-		$msg_box.append($msg_details);
-	}
-	else {
-		jQuery('<li>')
-			.text(messages ? messages : ' ')
-			.appendTo($list);
-
-		$msg_box.append($msg_details);
+			$msg_box.append($msg_details);
+		}
 	}
 
 	if (show_close_box) {
