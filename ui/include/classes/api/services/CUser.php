@@ -1522,6 +1522,10 @@ class CUser extends CApiService {
 				- (time() - $db_user['attempt_clock']);
 
 			if ($sec_left > 0) {
+				self::addAuditLogByUser($db_user['userid'], $db_user['userip'], $db_user['username'],
+					CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
+				);
+
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('Incorrect user name or password or account is temporarily blocked.')
 				);
