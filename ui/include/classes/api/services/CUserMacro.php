@@ -256,7 +256,7 @@ class CUserMacro extends CApiService {
 		}
 		unset($globalmacro);
 
-		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_GLOBAL_USER_MACRO, $globalmacros);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MACRO, $globalmacros);
 
 		return ['globalmacroids' => $globalmacroids];
 	}
@@ -311,7 +311,7 @@ class CUserMacro extends CApiService {
 			DB::update('globalmacro', $upd_globalmacros);
 		}
 
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_GLOBAL_USER_MACRO, $globalmacros, $db_globalmacros);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MACRO, $globalmacros, $db_globalmacros);
 
 		return ['globalmacroids' => array_column($globalmacros, 'globalmacroid')];
 	}
@@ -422,7 +422,7 @@ class CUserMacro extends CApiService {
 
 		DB::delete('globalmacro', ['globalmacroid' => $globalmacroids]);
 
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_GLOBAL_USER_MACRO, $db_globalmacros);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MACRO, $db_globalmacros);
 
 		return ['globalmacroids' => $globalmacroids];
 	}

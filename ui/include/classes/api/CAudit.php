@@ -77,7 +77,6 @@ class CAudit {
 	public const RESOURCE_USER_ROLE = 44;
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
-	public const RESOURCE_GLOBAL_USER_MACRO = 47;
 
 	/**
 	 * Audit details actions.
@@ -105,8 +104,8 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'config',
-		self::RESOURCE_GLOBAL_USER_MACRO => 'globalmacro',
 		self::RESOURCE_HOUSEKEEPING => 'config',
+		self::RESOURCE_MACRO => 'globalmacro',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
@@ -125,8 +124,8 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_AUTOREGISTRATION => null,
-		self::RESOURCE_GLOBAL_USER_MACRO => 'macro',
 		self::RESOURCE_HOUSEKEEPING => null,
+		self::RESOURCE_MACRO => 'macro',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
@@ -145,8 +144,8 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
-		self::RESOURCE_GLOBAL_USER_MACRO => 'usermacro',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
+		self::RESOURCE_MACRO => 'usermacro',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_SETTINGS => 'settings',
@@ -168,7 +167,7 @@ class CAudit {
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		// ],
-		self::RESOURCE_GLOBAL_USER_MACRO => [
+		self::RESOURCE_MACRO => [
 			'paths' => ['usermacro.value'],
 			'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		],
