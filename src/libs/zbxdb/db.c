@@ -2666,8 +2666,12 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 			version_info->min_version, version_info->max_version, version_info->min_supported_version);
 
 #elif defined(HAVE_POSTGRESQL)
+	zbx_uint32_t major;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = PQserverVersion(conn);
+
+	major = RIGHT2(ZBX_PG_SVERSION/10000);
 
 	version_info->database = "PostgreSQL";
 
@@ -2676,8 +2680,16 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	version_info->max_version = ZBX_POSTGRESQL_MAX_VERSION;
 	version_info->min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION;
 
-	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", RIGHT2(ZBX_PG_SVERSION/10000),
-			RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
+	if (10 > major)
+	{
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", major,
+				RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
+	}
+	else
+	{
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d", major, RIGHT2(ZBX_PG_SVERSION));
+	}
+
 	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY;
 	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY;
 	version_info->friendly_min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_FRIENDLY;
