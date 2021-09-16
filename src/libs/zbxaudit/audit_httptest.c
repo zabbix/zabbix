@@ -33,17 +33,20 @@ void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, 
 
 	found_audit_httptest_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
 			&(local_audit_httptest_entry_x));
+
 	if (NULL == found_audit_httptest_entry)
 	{
 		zbx_audit_entry_t	*local_audit_httptest_entry_insert;
 
 		local_audit_httptest_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL,
 				sizeof(zbx_audit_entry_t));
+
 		local_audit_httptest_entry_insert->id = httptestid;
 		local_audit_httptest_entry_insert->name = zbx_strdup(NULL, name);
 		local_audit_httptest_entry_insert->audit_action = audit_action;
 		local_audit_httptest_entry_insert->resource_type = AUDIT_RESOURCE_SCENARIO;
 		zbx_json_init(&(local_audit_httptest_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_httptest_entry_insert,
 				sizeof(local_audit_httptest_entry_insert));
 	}
@@ -171,10 +174,9 @@ void	zbx_audit_httptest_update_json_add_httptest_tag(zbx_uint64_t httptestid, zb
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "httptest.tags[" ZBX_FS_UI64 "]", tagid);
-	zbx_snprintf(audit_key_tag, AUDIT_DETAILS_KEY_LEN, "httptest.tags[" ZBX_FS_UI64 "].tag", tagid);
-	zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN, "httptest.tags[" ZBX_FS_UI64 "].value",
-			tagid);
+	zbx_snprintf(audit_key, sizeof(audit_key), "httptest.tags[" ZBX_FS_UI64 "]", tagid);
+	zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "httptest.tags[" ZBX_FS_UI64 "].tag", tagid);
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "httptest.tags[" ZBX_FS_UI64 "].value", tagid);
 
 	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key);
 	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_tag, tag);
@@ -183,13 +185,13 @@ void	zbx_audit_httptest_update_json_add_httptest_tag(zbx_uint64_t httptestid, zb
 
 void	zbx_audit_httptest_update_json_delete_tags(zbx_uint64_t httptestid, zbx_uint64_t tagid)
 {
-	char	audit_key[AUDIT_DETAILS_KEY_LEN];
+	char	buf[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "httptest.tags[" ZBX_FS_UI64 "]", tagid);
+	zbx_snprintf(buf, sizeof(buf), "httptest.tags[" ZBX_FS_UI64 "]", tagid);
 
-	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
+	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
 
 void	zbx_audit_httptest_update_json_add_httptest_httpstep(zbx_uint64_t httptestid, zbx_uint64_t httpstepid,
@@ -205,21 +207,21 @@ void	zbx_audit_httptest_update_json_add_httptest_httpstep(zbx_uint64_t httptesti
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "]", httpstepid);
-	zbx_snprintf(audit_key_name,  AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].name", httpstepid);
-	zbx_snprintf(audit_key_no,  AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].no", httpstepid);
-	zbx_snprintf(audit_key_url,  AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].url", httpstepid);
-	zbx_snprintf(audit_key_timeout,  AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].timeout", httpstepid);
-	zbx_snprintf(audit_key_posts,  AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].posts", httpstepid);
-	zbx_snprintf(audit_key_required,  AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].required",
+	zbx_snprintf(audit_key, sizeof(audit_key), "httptest.steps[" ZBX_FS_UI64 "]", httpstepid);
+	zbx_snprintf(audit_key_name, sizeof(audit_key_name), "httptest.steps[" ZBX_FS_UI64 "].name", httpstepid);
+	zbx_snprintf(audit_key_no, sizeof(audit_key_no), "httptest.steps[" ZBX_FS_UI64 "].no", httpstepid);
+	zbx_snprintf(audit_key_url, sizeof(audit_key_url), "httptest.steps[" ZBX_FS_UI64 "].url", httpstepid);
+	zbx_snprintf(audit_key_timeout, sizeof(audit_key_timeout), "httptest.steps[" ZBX_FS_UI64 "].timeout", httpstepid);
+	zbx_snprintf(audit_key_posts, sizeof(audit_key_posts), "httptest.steps[" ZBX_FS_UI64 "].posts", httpstepid);
+	zbx_snprintf(audit_key_required, sizeof(audit_key_required), "httptest.steps[" ZBX_FS_UI64 "].required",
 			httpstepid);
-	zbx_snprintf(audit_key_status_codes,  AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].status_codes",
-			httpstepid);
-	zbx_snprintf(audit_key_follow_redirects,  AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_status_codes, sizeof(audit_key_status_codes),
+			"httptest.steps[" ZBX_FS_UI64 "].status_codes", httpstepid);
+	zbx_snprintf(audit_key_follow_redirects, sizeof(audit_key_follow_redirects),
 			"httptest.steps[" ZBX_FS_UI64 "].follow_redirects", httpstepid);
-	zbx_snprintf(audit_key_retrieve_mode,  AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].retrieve_mode",
-			httpstepid);
-	zbx_snprintf(audit_key_post_type,  AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].post_type",
+	zbx_snprintf(audit_key_retrieve_mode, sizeof(audit_key_retrieve_mode),
+			"httptest.steps[" ZBX_FS_UI64 "].retrieve_mode", httpstepid);
+	zbx_snprintf(audit_key_post_type, sizeof(audit_key_post_type), "httptest.steps[" ZBX_FS_UI64 "].post_type",
 			httpstepid);
 
 	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key);
@@ -280,7 +282,7 @@ static const char *field_type_to_name(int type)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "unexpected http field typed: ->%d<-", type);
+		zabbix_log(LOG_LEVEL_CRIT, "unexpected http field type: ->%d<-", type);
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
@@ -294,11 +296,11 @@ void	zbx_audit_httptest_update_json_add_httptest_field(zbx_uint64_t httptestid, 
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_type, AUDIT_DETAILS_KEY_LEN, "%s", field_type_to_name(type));
-	zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "httptest.%s[" ZBX_FS_UI64 "]", audit_key_type, httptestfieldid);
-	zbx_snprintf(audit_key_name, AUDIT_DETAILS_KEY_LEN, "httptest.%s[" ZBX_FS_UI64 "].name", audit_key_type,
+	zbx_snprintf(audit_key_type, sizeof(audit_key_type), "%s", field_type_to_name(type));
+	zbx_snprintf(audit_key, sizeof(audit_key), "httptest.%s[" ZBX_FS_UI64 "]", audit_key_type, httptestfieldid);
+	zbx_snprintf(audit_key_name, sizeof(audit_key_name), "httptest.%s[" ZBX_FS_UI64 "].name", audit_key_type,
 			httptestfieldid);
-	zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN, "httptest.%s[" ZBX_FS_UI64 "].value", audit_key_type,
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "httptest.%s[" ZBX_FS_UI64 "].value", audit_key_type,
 			httptestfieldid);
 
 	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key);
@@ -312,8 +314,8 @@ void	zbx_audit_httptest_update_json_delete_httptest_field(zbx_uint64_t httptesti
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_type, AUDIT_DETAILS_KEY_LEN, "%s", field_type_to_name(type));
-	zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "httptest.%s[" ZBX_FS_UI64 "]",audit_key_type, fieldid);
+	zbx_snprintf(audit_key_type, sizeof(audit_key_type), "%s", field_type_to_name(type));
+	zbx_snprintf(audit_key, sizeof(audit_key), "httptest.%s[" ZBX_FS_UI64 "]",audit_key_type, fieldid);
 
 	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
@@ -326,12 +328,12 @@ void	zbx_audit_httptest_update_json_add_httpstep_field(zbx_uint64_t httptestid, 
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_type, AUDIT_DETAILS_KEY_LEN, "%s", field_type_to_name(type));
-	zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].%s[" ZBX_FS_UI64 "]",
+	zbx_snprintf(audit_key_type, sizeof(audit_key_type), "%s", field_type_to_name(type));
+	zbx_snprintf(audit_key, sizeof(audit_key), "httptest.steps[" ZBX_FS_UI64 "].%s[" ZBX_FS_UI64 "]",
 			httpstepid, audit_key_type, httpstepfieldid);
-	zbx_snprintf(audit_key_name, AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].%s[" ZBX_FS_UI64 "].name",
+	zbx_snprintf(audit_key_name, sizeof(audit_key_name), "httptest.steps[" ZBX_FS_UI64 "].%s[" ZBX_FS_UI64 "].name",
 			httpstepid, audit_key_type,  httpstepfieldid);
-	zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN,
+	zbx_snprintf(audit_key_value, sizeof(audit_key_value),
 			"httptest.steps[" ZBX_FS_UI64 "].%s[" ZBX_FS_UI64 "].value", httpstepid, audit_key_type,
 			httpstepfieldid);
 
@@ -347,8 +349,8 @@ void	zbx_audit_httptest_update_json_delete_httpstep_field(zbx_uint64_t httptesti
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key_type, AUDIT_DETAILS_KEY_LEN, "%s", field_type_to_name(type));
-	zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "httptest.steps[" ZBX_FS_UI64 "].%s[" ZBX_FS_UI64 "]",
+	zbx_snprintf(audit_key_type, sizeof(audit_key_type), "%s", field_type_to_name(type));
+	zbx_snprintf(audit_key, sizeof(audit_key), "httptest.steps[" ZBX_FS_UI64 "].%s[" ZBX_FS_UI64 "]",
 			httpstepid, audit_key_type, fieldid);
 
 	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
