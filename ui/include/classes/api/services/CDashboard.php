@@ -533,7 +533,9 @@ class CDashboard extends CDashboardGeneral {
 			}
 			unset($dashboard_user);
 
-			$del_dashboard_userids = array_merge($del_dashboard_userids, array_keys($db_dashboard_users));
+			$del_dashboard_userids = array_merge($del_dashboard_userids,
+				array_column($db_dashboard_users, 'dashboard_userid')
+			);
 		}
 		unset($dashboard);
 
@@ -613,7 +615,9 @@ class CDashboard extends CDashboardGeneral {
 			}
 			unset($dashboard_group);
 
-			$del_dashboard_usrgrpids = array_merge($del_dashboard_usrgrpids, array_keys($db_dashboard_groups));
+			$del_dashboard_usrgrpids = array_merge($del_dashboard_usrgrpids,
+				array_column($db_dashboard_groups, 'dashboard_usrgrpid')
+			);
 		}
 		unset($dashboard);
 
