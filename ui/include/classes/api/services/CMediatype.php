@@ -905,11 +905,8 @@ class CMediatype extends CApiService {
 			$db_params = DBselect(DB::makeSql('media_type_param', $options));
 
 			while ($db_param = DBfetch($db_params)) {
-				$db_mediatypes[$db_param['mediatypeid']]['parameters'][$db_param['mediatype_paramid']] = [
-					'mediatype_paramid' => $db_param['mediatype_paramid'],
-					'name' => $db_param['name'],
-					'value' => $db_param['value']
-				];
+				$db_mediatypes[$db_param['mediatypeid']]['parameters'][$db_param['mediatype_paramid']] =
+					array_diff_key($db_param, array_flip(['mediatypeid']));
 			}
 		}
 
@@ -921,13 +918,8 @@ class CMediatype extends CApiService {
 			$db_messages = DBselect(DB::makeSql('media_type_message', $options));
 
 			while ($db_message = DBfetch($db_messages)) {
-				$db_mediatypes[$db_message['mediatypeid']]['message_templates'][$db_message['mediatype_messageid']] = [
-					'mediatype_messageid' => $db_message['mediatype_messageid'],
-					'eventsource' => $db_message['eventsource'],
-					'recovery' => $db_message['recovery'],
-					'subject' => $db_message['subject'],
-					'message' => $db_message['message']
-				];
+				$db_mediatypes[$db_message['mediatypeid']]['message_templates'][$db_message['mediatype_messageid']] =
+					array_diff_key($db_message, array_flip(['mediatypeid']));
 			}
 		}
 	}

@@ -341,7 +341,7 @@ class CRegexp extends CApiService {
 
 		self::checkDuplicates($regexs, $db_regexs);
 
-		$this->addAffectedObjects($regexs, $db_regexs);
+		self::addAffectedObjects($regexs, $db_regexs);
 	}
 
 	/**
@@ -404,10 +404,12 @@ class CRegexp extends CApiService {
 	/**
 	 * Add the existing expressions to $db_regexs whether these are affected by the update.
 	 *
+	 * @static
+	 *
 	 * @param array $regexs
 	 * @param array $db_regexs
 	 */
-	private function addAffectedObjects(array $regexs, array &$db_regexs): void {
+	private static function addAffectedObjects(array $regexs, array &$db_regexs): void {
 		$regexids = [];
 
 		foreach ($regexs as $regex) {
@@ -427,13 +429,8 @@ class CRegexp extends CApiService {
 			$db_expressions = DBselect(DB::makeSql('expressions', $options));
 
 			while ($db_expression = DBfetch($db_expressions)) {
-				$db_regexs[$db_expression['regexpid']]['expressions'][$db_expression['expressionid']] = [
-					'expressionid' => $db_expression['expressionid'],
-					'expression' => $db_expression['expression'],
-					'expression_type' => $db_expression['expression_type'],
-					'exp_delimiter' => $db_expression['exp_delimiter'],
-					'case_sensitive' => $db_expression['case_sensitive']
-				];
+				$db_regexs[$db_expression['regexpid']]['expressions'][$db_expression['expressionid']] =
+					array_diff_key($db_expression, array_flip(['regexpid']));
 			}
 		}
 	}
