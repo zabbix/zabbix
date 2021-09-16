@@ -538,7 +538,7 @@ class CDashboard extends CDashboardGeneral {
 		unset($dashboard);
 
 		if ($ins_dashboard_users) {
-			$dashboard_userids = DB::insertBatch('dashboard_user', $ins_dashboard_users);
+			$dashboard_userids = DB::insert('dashboard_user', $ins_dashboard_users);
 		}
 
 		if ($upd_dashboard_users) {
@@ -618,7 +618,7 @@ class CDashboard extends CDashboardGeneral {
 		unset($dashboard);
 
 		if ($ins_dashboard_usrgrps) {
-			$dashboard_usrgrpids = DB::insertBatch('dashboard_usrgrp', $ins_dashboard_usrgrps);
+			$dashboard_usrgrpids = DB::insert('dashboard_usrgrp', $ins_dashboard_usrgrps);
 		}
 
 		if ($upd_dashboard_usrgrps) {
