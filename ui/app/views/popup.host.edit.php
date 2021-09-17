@@ -45,7 +45,6 @@ if ($data['hostid'] == 0) {
 
 	$buttons = [
 		[
-			'id' => 'host-add',
 			'title' => _('Add'),
 			'class' => '',
 			'keepOpen' => true,

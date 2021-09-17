@@ -32,7 +32,7 @@ $data += [
 	'form_name' => 'host-form',
 	'buttons' => ($data['hostid'] == 0)
 		? [
-			(new CSubmit('add', _('Add')))->setAttribute('id', 'host-add'),
+			new CSubmit('add', _('Add')),
 			$cancel_button
 		]
 		: [
