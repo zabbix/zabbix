@@ -114,15 +114,16 @@ class CScript extends CApiService {
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$sql_parts = [
-			'select'	=> ['scripts' => 's.scriptid'],
-			'from'		=> ['scripts' => 'scripts s'],
-			'where'		=> [],
-			'order'		=> []
+			'select' =>	['scripts' => 's.scriptid'],
+			'from' =>	['scripts' => 'scripts s'],
+			'where' =>	[],
+			'order' =>	[]
 		];
 
 		// editable + permission check
@@ -237,24 +238,15 @@ class CScript extends CApiService {
 		$this->validateCreate($scripts);
 
 		$scriptids = DB::insert('scripts', $scripts);
-		$scripts_params = [];
 
 		foreach ($scripts as $index => &$script) {
 			$script['scriptid'] = $scriptids[$index];
-
-			if ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK && array_key_exists('parameters', $script)) {
-				foreach ($script['parameters'] as $param) {
-					$scripts_params[] = ['scriptid' => $script['scriptid']] + $param;
-				}
-			}
 		}
 		unset($script);
 
-		if ($scripts_params) {
-			DB::insertBatch('script_param', $scripts_params);
-		}
+		self::updateParams($scripts, __FUNCTION__);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_SCRIPT, $scripts);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_SCRIPT, $scripts);
 
 		return ['scriptids' => $scriptids];
 	}
@@ -265,10 +257,6 @@ class CScript extends CApiService {
 	 * @throws APIException if the input is invalid
 	 */
 	protected function validateCreate(array &$scripts) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
 		/*
 		 * Get general validation rules and firstly validate name uniqueness and all the possible fields, so that there
 		 * are no invalid fields for any of the script types. Unfortunaly there is also a drawback, since field types
@@ -285,7 +273,6 @@ class CScript extends CApiService {
 		 * fields. Then in case the type is SSH and authtype is set, validate parameters again.
 		 */
 		$i = 0;
-		$check_names = [];
 
 		foreach ($scripts as $script) {
 			$path = '/'.++$i;
@@ -307,18 +294,9 @@ class CScript extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
-
-			$check_names[$script['name']] = true;
 		}
 
-		$db_script_names = API::getApiService()->select('scripts', [
-			'output' => ['scriptid'],
-			'filter' => ['name' => array_keys($check_names)]
-		]);
-
-		if ($db_script_names) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
-		}
+		self::checkDuplicates($scripts);
 
 		// Finally check User and Host IDs.
 		$this->checkUserGroups($scripts);
@@ -334,7 +312,6 @@ class CScript extends CApiService {
 		$this->validateUpdate($scripts, $db_scripts);
 
 		$upd_scripts = [];
-		$scripts_params = [];
 
 		foreach ($scripts as $script) {
 			$scriptid = $script['scriptid'];
@@ -348,21 +325,7 @@ class CScript extends CApiService {
 
 			$upd_script = [];
 
-			// strings
-			foreach (['name', 'command', 'description', 'confirmation', 'timeout', 'menu_path', 'username', 'publickey',
-					'privatekey', 'password'] as $field_name) {
-				if (array_key_exists($field_name, $script) && $script[$field_name] !== $db_script[$field_name]) {
-					$upd_script[$field_name] = $script[$field_name];
-				}
-			}
-
-			// integers
-			foreach (['type', 'execute_on', 'usrgrpid', 'groupid', 'host_access', 'scope', 'port', 'authtype']
-					as $field_name) {
-				if (array_key_exists($field_name, $script) && $script[$field_name] != $db_script[$field_name]) {
-					$upd_script[$field_name] = $script[$field_name];
-				}
-			}
+			$upd_script = DB::getUpdatedValues('scripts', $script, $db_script);
 
 			// No mattter what the old type was, clear and reset all unnecessary fields from any other types.
 			if ($type != $db_type) {
@@ -420,20 +383,8 @@ class CScript extends CApiService {
 				$upd_script['confirmation'] = '';
 			}
 
-			if ($type == ZBX_SCRIPT_TYPE_WEBHOOK && array_key_exists('parameters', $script)) {
-				$params = [];
-
-				foreach ($script['parameters'] as $param) {
-					$params[$param['name']] = $param['value'];
-				}
-
-				$scripts_params[$scriptid] = $params;
-				unset($script['parameters']);
-			}
-
 			if ($type != $db_type && $db_type == ZBX_SCRIPT_TYPE_WEBHOOK) {
 				$upd_script['timeout'] = DB::getDefault('scripts', 'timeout');
-				$scripts_params[$scriptid] = [];
 			}
 
 			if ($upd_script) {
@@ -448,57 +399,11 @@ class CScript extends CApiService {
 			DB::update('scripts', $upd_scripts);
 		}
 
-		if ($scripts_params) {
-			$insert_script_param = [];
-			$delete_script_param = [];
-			$update_script_param = [];
-			$db_scripts_params = DB::select('script_param', [
-				'output' => ['script_paramid', 'scriptid', 'name', 'value'],
-				'filter' => ['scriptid' => array_keys($scripts_params)]
-			]);
+		self::updateParams($scripts, __FUNCTION__, $db_scripts);
 
-			foreach ($db_scripts_params as $param) {
-				$scriptid = $param['scriptid'];
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SCRIPT, $scripts, $db_scripts);
 
-				if (!array_key_exists($param['name'], $scripts_params[$scriptid])) {
-					$delete_script_param[] = $param['script_paramid'];
-				}
-				elseif ($scripts_params[$scriptid][$param['name']] !== $param['value']) {
-					$update_script_param[] = [
-						'values' => ['value' => $scripts_params[$scriptid][$param['name']]],
-						'where' => ['script_paramid' => $param['script_paramid']]
-					];
-					unset($scripts_params[$scriptid][$param['name']]);
-				}
-				else {
-					unset($scripts_params[$scriptid][$param['name']]);
-				}
-			}
-
-			$scripts_params = array_filter($scripts_params);
-
-			foreach ($scripts_params as $scriptid => $params) {
-				foreach ($params as $name => $value) {
-					$insert_script_param[] = compact('scriptid', 'name', 'value');
-				}
-			}
-
-			if ($delete_script_param) {
-				DB::delete('script_param', ['script_paramid' => array_keys(array_flip($delete_script_param))]);
-			}
-
-			if ($update_script_param) {
-				DB::update('script_param', $update_script_param);
-			}
-
-			if ($insert_script_param) {
-				DB::insert('script_param', $insert_script_param);
-			}
-		}
-
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SCRIPT, $scripts, $db_scripts);
-
-		return ['scriptids' => zbx_objectValues($scripts, 'scriptid')];
+		return ['scriptids' => array_column($scripts, 'scriptid')];
 	}
 
 	/**
@@ -508,10 +413,6 @@ class CScript extends CApiService {
 	 * @throws APIException if the input is invalid
 	 */
 	protected function validateUpdate(array &$scripts, array &$db_scripts = null) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
 		/*
 		 * Get general validation rules and firstly validate name uniqueness and all the possible fields, so that there
 		 * are no invalid fields for any of the script types. Unfortunaly there is also a drawback, since field types
@@ -529,40 +430,17 @@ class CScript extends CApiService {
 				'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username', 'password',
 				'publickey', 'privatekey', 'menu_path'
 			],
-			'scriptids' => zbx_objectValues($scripts, 'scriptid'),
+			'scriptids' => array_column($scripts, 'scriptid'),
 			'preservekeys' => true
 		]);
 
-		$check_names = [];
-		foreach ($scripts as $script) {
-			if (!array_key_exists($script['scriptid'], $db_scripts)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			if (array_key_exists('name', $script)) {
-				$check_names[$script['name']] = true;
-			}
+		if (count($db_scripts) != count($scripts)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if ($check_names) {
-			$db_script_names = API::getApiService()->select('scripts', [
-				'output' => ['scriptid', 'name'],
-				'filter' => ['name' => array_keys($check_names)]
-			]);
-			$db_script_names = zbx_toHash($db_script_names, 'name');
+		self::checkDuplicates($scripts, $db_scripts);
 
-			foreach ($scripts as $script) {
-				if (array_key_exists('name', $script)
-						&& array_key_exists($script['name'], $db_script_names)
-						&& !idcmp($db_script_names[$script['name']]['scriptid'], $script['scriptid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Script "%1$s" already exists.', $script['name'])
-					);
-				}
-			}
-		}
+		$this->addAffectedObjects($scripts, $db_scripts);
 
 		// Validate if scripts belong to actions and scope can be changed.
 		$action_scriptids = [];
@@ -721,7 +599,7 @@ class CScript extends CApiService {
 			$common_fields['command']['flags'] |= API_REQUIRED;
 		}
 		else {
-			$api_input_rules['uniq'] =  [['scriptid'], ['name']];
+			$api_input_rules['uniq'] = [['scriptid'], ['name']];
 			$common_fields += ['scriptid' => ['type' => API_ID, 'flags' => API_REQUIRED]];
 		}
 
@@ -949,7 +827,7 @@ class CScript extends CApiService {
 
 		DB::delete('scripts', ['scriptid' => $scriptids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_SCRIPT, $db_scripts);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_SCRIPT, $db_scripts);
 
 		return ['scriptids' => $scriptids];
 	}
@@ -961,11 +839,8 @@ class CScript extends CApiService {
 	 * @throws APIException if the input is invalid
 	 */
 	protected function validateDelete(array &$scriptids, array &$db_scripts = null) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $scriptids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -976,12 +851,8 @@ class CScript extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($scriptids as $scriptid) {
-			if (!array_key_exists($scriptid, $db_scripts)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($db_scripts) != count($scriptids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		// Check if deleted scripts used in actions.
@@ -1267,15 +1138,16 @@ class CScript extends CApiService {
 				$result[$scriptid]['parameters'] = [];
 			}
 
-			$parameters = DB::select('script_param', [
-				'output' => ['scriptid', 'name', 'value'],
+			$param_options = [
+				'output' => ['script_paramid', 'scriptid', 'name', 'value'],
 				'filter' => ['scriptid' => array_keys($result)]
-			]);
+			];
+			$db_parameters = DBselect(DB::makeSql('script_param', $param_options));
 
-			foreach ($parameters as $parameter) {
-				$result[$parameter['scriptid']]['parameters'][] = [
-					'name' => $parameter['name'],
-					'value' => $parameter['value']
+			while ($db_param = DBfetch($db_parameters)) {
+				$result[$db_param['scriptid']]['parameters'][] = [
+					'name' => $db_param['name'],
+					'value' => $db_param['value']
 				];
 			}
 		}
@@ -1428,5 +1300,144 @@ class CScript extends CApiService {
 		unset($script);
 
 		return $result;
+	}
+
+	private static function checkDuplicates(array $scripts, array $db_scripts = null): void {
+		$names = [];
+
+		foreach ($scripts as $script) {
+			if (!array_key_exists('name', $script)) {
+				continue;
+			}
+
+			if ($db_scripts === null || $script['name'] !== $db_scripts[$script['scriptid']]['name']) {
+				$names[] = $script['name'];
+			}
+		}
+
+		if (!$names) {
+			return;
+		}
+
+		$duplicate = DBfetch(DBselect('SELECT s.name FROM scripts s WHERE '.dbConditionString('s.name', $names), 1));
+
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Script "%1$s" already exists.', $duplicate['name'])
+			);
+		}
+	}
+
+	private static function updateParams(array &$scripts, string $method, array $db_scripts = null): void {
+		$script_paramids = [];
+		$ins_params = [];
+		$upd_params = [];
+		$del_paramids = [];
+
+		foreach ($scripts as &$script) {
+			$params = [];
+			$param_name_by_index = [];
+			$db_script = ($method === 'update') ? $db_scripts[$script['scriptid']] : [];
+
+			if ($method === 'update') {
+				$db_type = $db_script['type'];
+				$type = array_key_exists('type', $script) ? $script['type'] : $db_type;
+			}
+			else {
+				$type = $script['type'];
+			}
+
+			if ($type != ZBX_SCRIPT_TYPE_WEBHOOK && ($method === 'update' && $db_type != ZBX_SCRIPT_TYPE_WEBHOOK)) {
+				continue;
+			}
+
+			if ($type == ZBX_SCRIPT_TYPE_WEBHOOK && array_key_exists('parameters', $script)) {
+				foreach ($script['parameters'] as $index => $param) {
+					$params[$param['name']] = $param['value'];
+					$param_name_by_index[$param['name']] = $index;
+				}
+			}
+
+			if (array_key_exists('parameters', $db_script)) {
+				foreach ($db_script['parameters'] as $db_param) {
+					if (array_key_exists($db_param['name'], $params)) {
+						$script['parameters'][$param_name_by_index[$db_param['name']]]['script_paramid']
+							= $db_param['script_paramid'];
+
+						if ($params[$db_param['name']] != $db_param['value']) {
+							$upd_params[] = [
+								'values' => ['value' => $params[$db_param['name']]],
+								'where' => ['script_paramid' => $db_param['script_paramid']]
+							];
+						}
+
+						unset($params[$db_param['name']]);
+					}
+					else {
+						$del_paramids[] = $db_param['script_paramid'];
+					}
+				}
+			}
+
+			foreach ($params as $param_name => $param_value) {
+				$ins_params[] = [
+					'name' => $param_name,
+					'value' => $param_value,
+					'scriptid' => $script['scriptid']
+				];
+			}
+		}
+		unset($script);
+
+		if ($ins_params) {
+			$script_paramids = DB::insertBatch('script_param', $ins_params);
+		}
+
+		if ($upd_params) {
+			DB::update('script_param', $upd_params);
+		}
+
+		if ($del_paramids) {
+			DB::delete('script_param', ['script_paramid' => $del_paramids]);
+		}
+
+		foreach ($scripts as &$script) {
+			if (array_key_exists('parameters', $script)) {
+				foreach ($script['parameters'] as &$param) {
+					if (!array_key_exists('script_paramid', $param)) {
+						$param['script_paramid'] = array_shift($script_paramids);
+					}
+				}
+				unset($param);
+			}
+		}
+		unset($script);
+	}
+
+	private function addAffectedObjects(array $scripts, array &$db_scripts): void {
+		$scriptids = [];
+
+		foreach ($scripts as $script) {
+			$scriptids[] = $script['scriptid'];
+			$db_scripts[$script['scriptid']]['parameters'] = [];
+		}
+
+		if (!$scriptids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['script_paramid', 'scriptid', 'name', 'value'],
+			'filter' => ['scriptid' => $scriptids]
+		];
+		$db_parameters = DBselect(DB::makeSql('script_param', $options));
+
+		while ($db_param = DBfetch($db_parameters)) {
+			$db_scripts[$db_param['scriptid']]['parameters'][$db_param['script_paramid']] = [
+				'script_paramid' => $db_param['script_paramid'],
+				'name' => $db_param['name'],
+				'value' => $db_param['value']
+			];
+		}
 	}
 }

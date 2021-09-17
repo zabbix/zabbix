@@ -109,6 +109,7 @@ class CAudit {
 		self::RESOURCE_PROXY => 'hosts',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'scripts',
 		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
@@ -139,6 +140,7 @@ class CAudit {
 		self::RESOURCE_PROXY => 'host',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
+		self::RESOURCE_SCRIPT => 'name',
 		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
@@ -158,8 +160,9 @@ class CAudit {
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexp',
-		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'script',
+		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
@@ -193,6 +196,7 @@ class CAudit {
 		'regexp.expressions' => 'expressions',
 		'report.users' => 'report_user',
 		'report.user_groups' => 'report_usrgrp',
+		'script.parameters' => 'script_param',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
@@ -211,6 +215,7 @@ class CAudit {
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
+		'script.parameters' => 'script_paramid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
