@@ -4954,9 +4954,8 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
  *                                                                            *
  * Function: DBsave_httptests                                                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
-static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
+static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httptests)
 {
 	char			*sql;
 	size_t			sql_alloc = 512, sql_offset = 0;
@@ -5034,8 +5033,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			int type;
-			zbx_uint64_t httpfieldid, testid;
+			zbx_uint64_t	httpfieldid, testid;
+			int		type;
 
 			ZBX_STR2UINT64(httpfieldid, row[0]);
 			ZBX_STR2UINT64(testid, row[1]);
@@ -5058,7 +5057,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_uint64_t httptagid, testid;
+			zbx_uint64_t	httptagid, testid;
 
 			ZBX_STR2UINT64(httptagid, row[0]);
 			ZBX_STR2UINT64(testid, row[1]);
@@ -5078,14 +5077,14 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 				" join httpstep s on s.httpstepid=sf.httpstepid"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sf.httpstepid", httpupdstepids.values,
-						httpupdstepids.values_num);
+				httpupdstepids.values_num);
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			int type;
-			zbx_uint64_t stepfieldid, testid, stepid;
+			zbx_uint64_t	stepfieldid, stepid, testid;
+			int		type;
 
 			ZBX_STR2UINT64(stepfieldid, row[0]);
 			ZBX_STR2UINT64(stepid, row[1]);
