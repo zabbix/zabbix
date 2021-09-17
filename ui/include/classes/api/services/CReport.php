@@ -679,8 +679,6 @@ class CReport extends CApiService {
 		$report_params = [];
 
 		foreach ($reports as $report) {
-			$report_params[$report['reportid']] = [];
-
 			foreach ($params_by_name as $name => $param) {
 				if (!array_key_exists($param, $report)) {
 					continue;
@@ -734,7 +732,9 @@ class CReport extends CApiService {
 
 		foreach ($report_params as $reportid => $report_param) {
 			foreach ($report_param as $param) {
-				$ins_report_params[] = ['reportid' => $reportid] + $param;
+				if ($param['value'] !== '') {
+					$ins_report_params[] = ['reportid' => $reportid] + $param;
+				}
 			}
 		}
 
