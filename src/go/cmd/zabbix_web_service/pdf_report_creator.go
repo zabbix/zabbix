@@ -93,7 +93,16 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := chromedp.NewContext(context.Background())
+	opts := chromedp.DefaultExecAllocatorOptions[:]
+
+	if options.IgnoreBrowserCertErrors == 1 {
+		opts = append(opts, chromedp.Flag("ignore-certificate-errors", "1"))
+	}
+
+	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer cancel()
+
+	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
 
 	width, err := strconv.ParseInt(req.Parameters["width"], 10, 64)
