@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-20 19:54+0300\n"
-"PO-Revision-Date: 2021-06-14 04:53+0300\n"
+"POT-Creation-Date: 2021-09-10 19:55+0300\n"
+"PO-Revision-Date: 2021-09-07 11:59+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1623639237.000000\n"
+"X-POOTLE-MTIME: 1631008775.000000\n"
 
 #: include/classes/items/CHelpItems.php:1073
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -461,7 +461,7 @@ msgstr "モジュールへのアクセス"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66
-#: include/actions.inc.php:153 include/blocks.inc.php:717
+#: include/actions.inc.php:153 include/blocks.inc.php:721
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:287
@@ -620,7 +620,7 @@ msgstr "アクションを更新しました"
 #: app/views/administration.mediatype.edit.php:282
 #: app/views/configuration.discovery.edit.php:79
 #: app/views/monitoring.dashboard.view.php:116
-#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:718
+#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:722
 #: include/classes/helpers/CMenuHelper.php:177
 #: include/classes/helpers/CRoleHelper.php:435
 #: include/classes/screens/CScreenProblem.php:869
@@ -848,6 +848,11 @@ msgstr "新しいインターフェースの追加"
 msgid "Add new override"
 msgstr "新しいオーバーライドの追加"
 
+#: app/views/js/configuration.dashboard.edit.js.php:197
+#: app/views/js/monitoring.dashboard.view.js.php:307
+msgid "Add page"
+msgstr "ページの追加"
+
 #: include/classes/helpers/CRoleHelper.php:495
 msgid "Add problem comments"
 msgstr "障害対応メッセージの追加"
@@ -886,6 +891,8 @@ msgstr "ユーザーを追加"
 msgid "Add user group"
 msgstr "ユーザーグループを追加"
 
+#: app/views/js/configuration.dashboard.edit.js.php:193
+#: app/views/js/monitoring.dashboard.view.js.php:303
 #: app/views/monitoring.dashboard.widget.edit.php:34
 msgid "Add widget"
 msgstr "ウィジェットの追加"
@@ -3088,6 +3095,7 @@ msgid "Change per second"
 msgstr "1秒あたりの差分"
 
 #: app/views/popup.acknowledge.edit.php:71
+#: include/classes/helpers/CRoleHelper.php:496
 msgid "Change severity"
 msgstr "深刻度の変更"
 
@@ -5647,7 +5655,7 @@ msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "マップ\"%2$s\"のためのユーザーグループ内のusrgrpid \"%1$s\"が重複しています。"
 
 #: app/views/hintbox.eventlist.php:75
-#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:716
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:720
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:286
@@ -6427,6 +6435,8 @@ msgstr "失敗"
 
 #: app/controllers/CControllerDashboardUpdate.php:142
 #: app/controllers/CControllerTemplateDashboardUpdate.php:136
+#: app/views/js/configuration.dashboard.edit.js.php:150
+#: app/views/js/monitoring.dashboard.view.js.php:258
 msgid "Failed to create dashboard"
 msgstr "ダッシュボードの作成に失敗しました"
 
@@ -6445,6 +6455,8 @@ msgstr "ウィジェットの貼り付けに失敗しました。"
 
 #: app/controllers/CControllerDashboardUpdate.php:137
 #: app/controllers/CControllerTemplateDashboardUpdate.php:131
+#: app/views/js/configuration.dashboard.edit.js.php:151
+#: app/views/js/monitoring.dashboard.view.js.php:259
 msgid "Failed to update dashboard"
 msgstr "ダッシュボードの更新に失敗しました"
 
@@ -6455,6 +6467,10 @@ msgstr "ダッシュボードページのプロパティの変更に失敗しま
 #: jsLoader.php:154
 msgid "Failed to update dashboard properties."
 msgstr "ダッシュボードのプロパティの変更に失敗しました。"
+
+#: app/views/js/monitoring.dashboard.view.js.php:452
+msgid "Failed to update dashboard sharing."
+msgstr ""
 
 #: include/classes/api/services/CTemplate.php:624
 msgid "Failed to update template."
@@ -6964,7 +6980,7 @@ msgstr "グラフ\"%1$s\"は\"%2$s\"にすでに存在します (アイテムは
 #: include/classes/api/services/CGraphGeneral.php:1129
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" as a graph created from graph prototype."
-msgstr ""
+msgstr "グラフ\"%1$s\"はグラフプロトタイプによって作成されたグラフとして\"%2$s\"上に既に存在します。"
 
 #: include/classes/api/services/CGraphGeneral.php:1032
 #: include/classes/api/services/CGraphGeneral.php:1240
@@ -7423,7 +7439,7 @@ msgstr "横位置"
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:92 app/views/popup.massupdate.host.php:290
 #: app/views/search.php:30 httpconf.php:212 httpconf.php:481
-#: include/actions.inc.php:50 include/blocks.inc.php:713
+#: include/actions.inc.php:50 include/blocks.inc.php:717
 #: include/classes/screens/CScreenHttpTest.php:112
 #: include/classes/screens/CScreenProblem.php:863
 #: include/classes/screens/CScreenProblem.php:887
@@ -7483,7 +7499,7 @@ msgstr "ホストアクセス"
 msgid "Host added"
 msgstr "ホストを追加しました"
 
-#: app/controllers/CControllerPopupItemTest.php:1292
+#: app/controllers/CControllerPopupItemTest.php:1303
 #: app/views/popup.itemtestedit.view.php:98
 msgid "Host address"
 msgstr "ホストのアドレス"
@@ -7561,7 +7577,7 @@ msgstr "ホストグループのラベルタイプ"
 #: include/classes/api/services/CDashboardGeneral.php:514
 #: include/classes/api/services/CScript.php:937
 #: include/classes/api/services/CSettings.php:276
-#: include/classes/api/services/CUserGroup.php:452
+#: include/classes/api/services/CUserGroup.php:445
 #, c-format
 msgid "Host group with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"のホストグループは使用できません。"
@@ -8985,9 +9001,9 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:91
 #: app/controllers/CControllerPopupItemTestGetValue.php:104
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupItemTestSend.php:143
 #: app/controllers/CControllerPopupItemTestSend.php:172
 #: app/controllers/CControllerPopupItemTestSend.php:181
@@ -9182,7 +9198,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/classes/api/services/CTriggerGeneral.php:820
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CTriggerGeneral.php:833
-#: include/classes/api/services/CUserGroup.php:470
+#: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:697
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:240
@@ -9268,7 +9284,7 @@ msgstr "無限大"
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/actions.inc.php:1772 include/actions.inc.php:1866
-#: include/blocks.inc.php:712 include/classes/screens/CScreenProblem.php:862
+#: include/blocks.inc.php:716 include/classes/screens/CScreenProblem.php:862
 #: include/classes/screens/CScreenProblem.php:886
 #: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.graph.list.php:140
@@ -11106,10 +11122,10 @@ msgstr "OSがサポートしている最大ファイルオープン数。整数�
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "OSがサポートしている最大プロセス数。整数値を返す。"
 
-#: include/blocks.inc.php:630
+#: include/blocks.inc.php:632
 #, c-format
-msgid "Maximum required database version is %1$s."
-msgstr "要求されるデータベースの最大バージョンは%1$sです。"
+msgid "Maximum required %1$s database version is %2$s."
+msgstr "要求される%1$sデータベースの最大バージョンは%2$sです。"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:259
@@ -11310,6 +11326,11 @@ msgstr "中央"
 msgid "Min"
 msgstr "最小値"
 
+#: include/blocks.inc.php:626
+#, c-format
+msgid "Minimum required %1$s database version is %2$s."
+msgstr "要求される%1$sデータベースの最小バージョンは%2$sです。"
+
 #: include/classes/setup/CFrontendSetup.php:124
 #, c-format
 msgid "Minimum required PHP memory limit is %1$s (configuration option \"memory_limit\")."
@@ -11324,11 +11345,6 @@ msgstr "PHPアップロードファイルサイズの最小値は%1$sです (\"u
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr "最低限必要なPHPのバージョンは%1$sです。"
-
-#: include/blocks.inc.php:626
-#, c-format
-msgid "Minimum required database version is %1$s."
-msgstr "要求されるデータベースの最小バージョンは%1$sです。"
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -11876,7 +11892,7 @@ msgstr "次のステップ"
 #: app/views/popup.massupdate.item.php:379
 #: app/views/popup.massupdate.trigger.php:67 include/actions.inc.php:33
 #: include/blocks.inc.php:532 include/blocks.inc.php:610
-#: include/blocks.inc.php:839 include/blocks.inc.php:843
+#: include/blocks.inc.php:843 include/blocks.inc.php:847
 #: include/classes/screens/CScreenProblem.php:1098
 #: include/classes/screens/CScreenProblem.php:1102
 #: include/classes/screens/CScreenProblem.php:1244 include/events.inc.php:195
@@ -12264,7 +12280,7 @@ msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 #: include/classes/api/services/CProxy.php:733
 #: include/classes/api/services/CProxy.php:767
 #: include/classes/api/services/CProxy.php:854
-#: include/classes/api/services/CReport.php:925
+#: include/classes/api/services/CReport.php:903
 #: include/classes/api/services/CRole.php:388
 #: include/classes/api/services/CRole.php:805
 #: include/classes/api/services/CScript.php:540
@@ -12291,8 +12307,8 @@ msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 #: include/classes/api/services/CTriggerPrototype.php:515
 #: include/classes/api/services/CTriggerPrototype.php:693
 #: include/classes/api/services/CTriggerPrototype.php:711
-#: include/classes/api/services/CUserGroup.php:336
-#: include/classes/api/services/CUserGroup.php:884
+#: include/classes/api/services/CUserGroup.php:329
+#: include/classes/api/services/CUserGroup.php:877
 #: include/classes/api/services/CUserMacro.php:353
 #: include/classes/api/services/CUserMacro.php:463
 #: include/classes/api/services/CUserMacro.php:550
@@ -12807,7 +12823,7 @@ msgstr "特権管理者のみがホストグループを作成できます。"
 msgid "Only Super Admins can create media types."
 msgstr "特権管理者のみがメディアタイプを作成できます。"
 
-#: include/classes/api/services/CUserGroup.php:212
+#: include/classes/api/services/CUserGroup.php:205
 msgid "Only Super Admins can create user groups."
 msgstr "特権管理者のみがユーザーグループを作成できます。"
 
@@ -12815,7 +12831,7 @@ msgstr "特権管理者のみがユーザーグループを作成できます。
 msgid "Only Super Admins can delete media types."
 msgstr "特権管理者のみがメディアタイプを削除できます。"
 
-#: include/classes/api/services/CUserGroup.php:864
+#: include/classes/api/services/CUserGroup.php:857
 msgid "Only Super Admins can delete user groups."
 msgstr "特権管理者のみがユーザーグループを削除できます。"
 
@@ -12823,7 +12839,7 @@ msgstr "特権管理者のみがユーザーグループを削除できます。
 msgid "Only Super Admins can edit media types."
 msgstr "特権管理者のみがメディアタイプを修正できます。"
 
-#: include/classes/api/services/CUserGroup.php:299
+#: include/classes/api/services/CUserGroup.php:292
 msgid "Only Super Admins can update user groups."
 msgstr "特権管理者のみがユーザーグループを更新できます。"
 
@@ -12925,7 +12941,7 @@ msgstr "操作対象のグループがありません。"
 msgid "Operation has no template to operate."
 msgstr "操作対象のテンプレートがありません。"
 
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:715
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:719
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:1159 include/events.inc.php:181
 #: include/views/configuration.trigger.prototype.edit.php:84
@@ -13496,7 +13512,13 @@ msgstr "パスワードは内部認証タイプ以外には必須ではありま
 msgid "Paste"
 msgstr "貼り付け"
 
-#: jsLoader.php:157
+#: app/views/js/configuration.dashboard.edit.js.php:212
+#: app/views/js/monitoring.dashboard.view.js.php:322
+msgid "Paste page"
+msgstr "ページの貼り付け"
+
+#: app/views/js/configuration.dashboard.edit.js.php:205
+#: app/views/js/monitoring.dashboard.view.js.php:315 jsLoader.php:157
 msgid "Paste widget"
 msgstr "ウィジェットの貼り付け"
 
@@ -13678,7 +13700,7 @@ msgstr "ポーランド語 (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "ホストインベントリフィールドの自動設定"
 
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/partials/monitoring.host.filter.php:113
 #: app/views/administration.authentication.edit.php:101
 #: app/views/administration.proxy.edit.php:54
@@ -13853,7 +13875,7 @@ msgstr "特権レベル"
 #: app/partials/monitoring.problem.filter.php:97
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:714
+#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:718
 #: include/classes/helpers/CMediatypeHelper.php:45
 #: include/classes/screens/CScreenProblem.php:865
 #: include/classes/screens/CScreenProblem.php:888
@@ -14987,7 +15009,7 @@ msgstr "SNMP OID"
 msgid "SNMP agent"
 msgstr "SNMPエージェント"
 
-#: app/controllers/CControllerPopupItemTest.php:1284
+#: app/controllers/CControllerPopupItemTest.php:1295
 #: app/views/popup.discovery.check.php:68
 #: app/views/popup.itemtestedit.view.php:140
 #: include/views/js/configuration.host.edit.js.php:89
@@ -16164,6 +16186,7 @@ msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmode
 #: app/views/administration.module.list.php:77
 #: app/views/administration.token.list.php:92
 #: app/views/administration.token.list.php:149
+#: app/views/administration.user.edit.php:254
 #: app/views/administration.usergroup.list.php:49
 #: app/views/administration.usergroup.list.php:77
 #: app/views/administration.user.list.php:116
@@ -16569,7 +16592,7 @@ msgstr "タグの値"
 #: app/views/popup.massupdate.template.php:131
 #: app/views/popup.massupdate.template.php:149
 #: app/views/popup.massupdate.trigger.php:78
-#: app/views/popup.massupdate.trigger.php:153 include/blocks.inc.php:719
+#: app/views/popup.massupdate.trigger.php:153 include/blocks.inc.php:723
 #: include/classes/screens/CScreenHttpTest.php:117
 #: include/classes/screens/CScreenProblem.php:839
 #: include/classes/screens/CScreenProblem.php:895
@@ -17034,7 +17057,7 @@ msgstr "終了"
 #: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1645
 #: include/actions.inc.php:1699 include/actions.inc.php:1772
 #: include/actions.inc.php:1866 include/actions.inc.php:1921
-#: include/blocks.inc.php:694 include/classes/screens/CScreenProblem.php:816
+#: include/blocks.inc.php:698 include/classes/screens/CScreenProblem.php:816
 #: include/classes/screens/CScreenProblem.php:1154
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -17684,7 +17707,7 @@ msgstr "設定APIの引数が読み込めません。"
 msgid "Unable to overwrite the existing configuration file."
 msgstr "設定ファイルが上書きできません。"
 
-#: include/blocks.inc.php:634
+#: include/blocks.inc.php:638
 msgid "Unable to retrieve database version."
 msgstr "データベースのバージョンを取得できません。"
 
@@ -18043,7 +18066,7 @@ msgstr "アクションで使用"
 msgid "User"
 msgstr "ユーザー"
 
-#: include/classes/api/services/CUserGroup.php:618
+#: include/classes/api/services/CUserGroup.php:611
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "ユーザー\"%1$s\"にユーザーグループを設定してください。"
@@ -18090,7 +18113,7 @@ msgstr "ユーザーを追加しました"
 msgid "User agent string"
 msgstr "ユーザーエージェント文字列"
 
-#: include/classes/api/services/CUserGroup.php:543
+#: include/classes/api/services/CUserGroup.php:536
 #: include/classes/api/services/CUser.php:917
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "ユーザーは無効のグループやGUIアクセスが無効のグループに自分自身を追加できません。"
@@ -18120,27 +18143,27 @@ msgstr[0] "ユーザーを削除しました"
 msgid "User group"
 msgstr "ユーザーグループ"
 
-#: include/classes/api/services/CUserGroup.php:372
+#: include/classes/api/services/CUserGroup.php:365
 #, c-format
 msgid "User group \"%1$s\" already exists."
 msgstr "ユーザーグループ\"%1$s\"はすでに存在します。"
 
-#: include/classes/api/services/CUserGroup.php:940
+#: include/classes/api/services/CUserGroup.php:933
 #, c-format
 msgid "User group \"%1$s\" is report \"%2$s\" recipient."
 msgstr "ユーザーグループ\"%1$s\"はレポート\"%2$s\"の受信者です。"
 
-#: include/classes/api/services/CUserGroup.php:905
+#: include/classes/api/services/CUserGroup.php:898
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
 msgstr "ユーザーグループ\"%1$s\"は\"%2$s\"アクション内で使用されています。"
 
-#: include/classes/api/services/CUserGroup.php:926
+#: include/classes/api/services/CUserGroup.php:919
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "ユーザーグループ\"%1$s\"はデータベース停止メッセージの設定に利用されています。"
 
-#: include/classes/api/services/CUserGroup.php:918
+#: include/classes/api/services/CUserGroup.php:911
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "ユーザーグループ\"%1$s\"はスクリプト\"%2$s\"に利用されています。"
@@ -18290,7 +18313,7 @@ msgstr "ユーザーを更新しました"
 #: include/classes/api/services/CReport.php:413
 #: include/classes/api/services/CToken.php:248
 #: include/classes/api/services/CToken.php:259
-#: include/classes/api/services/CUserGroup.php:409
+#: include/classes/api/services/CUserGroup.php:402
 #, c-format
 msgid "User with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"のユーザーは使用できません。"
@@ -19266,8 +19289,8 @@ msgstr "毎年"
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:68 include/actions.inc.php:32
-#: include/blocks.inc.php:532 include/blocks.inc.php:839
-#: include/blocks.inc.php:843 include/classes/screens/CScreenProblem.php:1098
+#: include/blocks.inc.php:532 include/blocks.inc.php:843
+#: include/blocks.inc.php:847 include/classes/screens/CScreenProblem.php:1098
 #: include/classes/screens/CScreenProblem.php:1102
 #: include/classes/screens/CScreenProblem.php:1244 include/events.inc.php:195
 #: include/events.inc.php:199 include/events.inc.php:389
@@ -19569,7 +19592,7 @@ msgstr "abs() - 絶対値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:288
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
-msgstr ""
+msgstr "acos() - 角度の値のアークコサイン、ラジアンで示す"
 
 #: include/forms.inc.php:157
 msgid "affects only filtered data"
@@ -19701,7 +19724,7 @@ msgstr "ascii() - 値の左端の文字のASCIIコードを返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:302
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
-msgstr ""
+msgstr "asin() - 角度の値のアークサイン、ラジアンで示す"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:71
 #: app/controllers/CControllerScheduledReportCreate.php:83
@@ -19715,11 +19738,11 @@ msgstr "少なくとも1つのオーバーライドオプションを指定す�
 
 #: app/controllers/CControllerPopupTriggerExpr.php:309
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
-msgstr ""
+msgstr "atan() - 角度の値のアークタンジェント、ラジアンで示す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:316
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
-msgstr ""
+msgstr "atan2() - ラジアンで表された角度として指定された縦座標(exprue)と横座標のアークタンジェント"
 
 #: include/events.inc.php:62
 msgid "autoregistered host"
@@ -19803,9 +19826,9 @@ msgstr "変更できません"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:141
 #: app/controllers/CControllerAuthenticationUpdate.php:213
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupLldOperation.php:131
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/controllers/CControllerPopupLldOperation.php:143
@@ -19874,7 +19897,7 @@ msgstr "変更できません"
 #: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
-#: include/classes/api/services/CUserGroup.php:470
+#: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:697
 #: include/classes/api/services/CUser.php:857
 #: include/classes/import/CConfigurationImport.php:744
@@ -19981,15 +20004,15 @@ msgstr "含む"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:480
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
-msgstr ""
+msgstr "cos() - 値のコサイン、ラジアンで示された角度の値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:487
 msgid "cosh() - The hyperbolic cosine of a value"
-msgstr ""
+msgstr "cosh() - 値のハイパボリックコサイン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:494
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
-msgstr ""
+msgstr "cot() - 値のコタンジェント、ラジアンで示された角度の値"
 
 #: include/graphs.inc.php:82
 msgid "count"
@@ -20001,7 +20024,7 @@ msgstr "count() - 期間Tで収集された値V(オペレータOを満たす)の
 
 #: app/controllers/CControllerPopupTriggerExpr.php:508
 msgid "countunique() - The number of unique values"
-msgstr ""
+msgstr "countunique() - ユニークな値の数"
 
 #: include/func.inc.php:579 jsLoader.php:213
 msgctxt "day short"
@@ -20041,7 +20064,7 @@ msgstr "デフォルト"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:533
 msgid "degrees() - Converts a value from radians to degrees"
-msgstr ""
+msgstr "degrees() - 値をラジアンから角度に変換"
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
@@ -20116,7 +20139,7 @@ msgstr "一致しない"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:540
 msgid "e() - Returns Euler's number"
-msgstr ""
+msgstr "e() - オイラー数を返す"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/correlation.inc.php:31
@@ -20142,11 +20165,11 @@ msgstr "存在する"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:545
 msgid "exp() - Euler's number at a power of a value"
-msgstr ""
+msgstr "exp() - オイラー数の累乗値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:552
 msgid "expm1() - Euler's number at a power of a value minus 1"
-msgstr ""
+msgstr "expm1() - オイラー数の累乗値マイナス1"
 
 #: include/classes/parsers/CConditionFormula.php:214
 msgid "expression is empty"
@@ -20158,7 +20181,7 @@ msgstr "JSONの解析に失敗しました"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:559
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
-msgstr ""
+msgstr "find() - 期間TでのパターンV(演算子0を満たす)の発生チェック(1 - 合致する、0 - 合致しない)"
 
 #: app/views/popup.maintenance.period.php:124 include/graphs.inc.php:86
 #: include/maintenances.inc.php:105
@@ -20172,7 +20195,7 @@ msgstr "最初のパラメータを指定してください"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:566
 msgid "first() - The oldest value in the specified time interval"
-msgstr ""
+msgstr "first() - 指定された時間間隔で最も古い値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "floor() - Rounds down to the nearest smaller integer"
@@ -20301,7 +20324,7 @@ msgstr "関数\"%1$s\"の使い方が正しくありません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:607
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
-msgstr ""
+msgstr "insert() - 文字列内の指定した開始位置から指定した文字列かスペースを挿入する"
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -20423,7 +20446,7 @@ msgstr "キーが設定されていません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:630
 msgid "kurtosis() - Measures the \"tailedness\" of the probability distribution"
-msgstr ""
+msgstr "kurtosis() - 確率分布の「テールネス」を測定"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1377
 #: include/classes/graphdraw/CPieGraphDraw.php:296 include/graphs.inc.php:88
@@ -20447,11 +20470,11 @@ msgstr "左"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:644
 msgid "left() - Returns the leftmost count characters"
-msgstr ""
+msgstr "left() - 左端の文字列の数を返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:657
 msgid "length() - Length of last (most recent) T value in characters"
-msgstr ""
+msgstr "length() - 文字列内の最後(最新)のT値の長さ"
 
 #: include/forms.inc.php:1282 include/views/js/item.preprocessing.js.php:134
 msgid "list of characters"
@@ -20483,7 +20506,7 @@ msgstr "ローレベルディスカバリルール"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:698
 msgid "ltrim() - Remove specified characters from the beginning of a string"
-msgstr ""
+msgstr "ltrim() - 文字列の先頭から指定した文字列を削除"
 
 #: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
 msgctxt "minute short"
@@ -20515,7 +20538,7 @@ msgstr "マクロ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:711
 msgid "mad() - Median absolute deviation"
-msgstr ""
+msgstr "mad() - 中央絶対偏差"
 
 #: include/classes/validators/CHistFunctionValidator.php:91
 #, c-format
@@ -20601,7 +20624,7 @@ msgstr "mm"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:750
 msgid "mod() - Division remainder"
-msgstr ""
+msgstr "mod() - 割り算の余り"
 
 #: include/func.inc.php:583
 msgctxt "millisecond short"
@@ -20611,7 +20634,7 @@ msgstr "ms"
 #: include/classes/validators/CApiInputValidator.php:2298
 #, c-format
 msgid "must be %1$s characters long"
-msgstr ""
+msgstr "%1$s文字の長さにしてください"
 
 #: app/views/administration.authentication.edit.php:131
 msgid "must be a valid LDAP user"
@@ -20809,7 +20832,7 @@ msgstr "障害パターン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:801
 msgid "radians() - Converts a value from degrees to radians"
-msgstr ""
+msgstr "radians() - 値を角度からラジアンに変換"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:808
 msgid "rand() - A random integer value"
@@ -20841,7 +20864,7 @@ msgstr "正規表現"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:813
 msgid "repeat() - Returns a string composed of value repeated count times"
-msgstr ""
+msgstr "repeat() - カウント回数だけ値を繰り返した文字列を返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:826
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
@@ -20857,7 +20880,7 @@ msgstr "右"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:844
 msgid "right() - Returns the rightmost count characters"
-msgstr ""
+msgstr "right() - 右端の文字列の数を返す"
 
 #: app/views/popup.services.php:59 app/views/popup.services.php:62
 #: app/views/popup.services.php:64 app/views/popup.services.php:65
@@ -20872,7 +20895,7 @@ msgstr "round() - 小数点以下桁数で四捨五入"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:870
 msgid "rtrim() - Removes specified characters from the end of a string"
-msgstr ""
+msgstr "rtrim() - 文字列の最後から指定した文字列を削除"
 
 #: include/classes/api/services/CItemGeneral.php:2260
 msgid "ruleid of dependent item and master item should match"
@@ -20961,19 +20984,19 @@ msgstr "ゲストとしてサインイン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:883
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
-msgstr ""
+msgstr "signum() - 値が負なら-1、値が0なら0、値が正なら1を返す"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:890
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
-msgstr ""
+msgstr "sin() - 値のサイン、ラジアンで示された角度の値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:897
 msgid "sinh() - The hyperbolic sine of a value"
-msgstr ""
+msgstr "sinh() - 値のハイパボリックサイン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:904
 msgid "skewness() - Measures the asymmetry of the probability distribution"
-msgstr ""
+msgstr "skewness() - 確率分布の非対称性を測定"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:911
 msgid "sqrt() - Square root of a value"
@@ -20981,11 +21004,11 @@ msgstr "sqrt() - 値の平方根"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:918
 msgid "stddevpop() - Population standard deviation"
-msgstr ""
+msgstr "stddevpop() - 母標準偏差"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:925
 msgid "stddevsamp() - Sample standard deviation"
-msgstr ""
+msgstr "stddevsamp() - サンプル標準偏差"
 
 #: include/graphs.inc.php:84
 msgid "sum"
@@ -20997,7 +21020,7 @@ msgstr "sum() - 期間Tでの合計値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:939
 msgid "sumofsquares() - The sum of squares"
-msgstr ""
+msgstr "sumofsquares() - 平方和"
 
 #: include/classes/api/services/CUser.php:1893
 msgid "supplied credentials are not unique"
@@ -21009,7 +21032,7 @@ msgstr "指定された資格情報はユニークではありません"
 #: app/partials/monitoring.problem.filter.php:172
 #: app/partials/monitoring.problem.filter.php:353
 #: app/views/administration.usergroup.edit.php:182
-#: include/classes/api/services/CUserGroup.php:470
+#: include/classes/api/services/CUserGroup.php:463
 #: include/classes/helpers/CTagFilterFieldHelper.php:63
 #: include/classes/helpers/CTagFilterFieldHelper.php:117
 #: include/classes/widgets/CWidgetHelper.php:506
@@ -21022,7 +21045,7 @@ msgstr "タグ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:946
 msgid "tan() - The tangent of a value"
-msgstr ""
+msgstr "tan() - 値のタンジェント"
 
 #: include/classes/api/services/CHostBase.php:64
 #, c-format
@@ -21107,7 +21130,7 @@ msgstr "trendavg() - 期間のシフトを含む期間Tでの平均値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:973
 msgid "trendcount() - Number of successfully retrieved values for period T"
-msgstr ""
+msgstr "trendcount() - 期間Tで正常に取得した値の数"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:980
 msgid "trendmax() - Maximum value for period T with exact period shift"
@@ -21145,7 +21168,7 @@ msgstr "リンクのあるトリガーは他のテンプレートやホストに
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1001
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
-msgstr ""
+msgstr "trim() - 文字列の先頭から最後までより指定した文字列を削除"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1014
 msgid "truncate() - Truncates a value to decimal places"

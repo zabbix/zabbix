@@ -80,7 +80,7 @@ class CControllerModuleScan extends CController {
 					'id' => $manifest['id'],
 					'relative_path' => $relative_path,
 					'status' => MODULE_STATUS_DISABLED,
-					'config' => []
+					'config' => $manifest['config']
 				];
 				$db_modules_create_names[] = $manifest['name'];
 			}

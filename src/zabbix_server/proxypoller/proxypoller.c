@@ -31,6 +31,7 @@
 #include "proxy.h"
 #include "zbxcrypto.h"
 #include "../trapper/proxydata.h"
+#include "zbxcompress.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -84,16 +85,14 @@ out:
 	return ret;
 }
 
-static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const char *data, size_t size)
+static int	send_data_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, const char *data, size_t size,
+		size_t reserved, int flags)
 {
-	int	ret, flags = ZBX_TCP_PROTOCOL;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, data);
 
-	if (0 != proxy->auto_compress)
-		flags |= ZBX_TCP_COMPRESS;
-
-	if (FAIL == (ret = zbx_tcp_send_ext(sock, data, size, flags, 0)))
+	if (FAIL == (ret = zbx_tcp_send_ext(sock, data, size, reserved, flags, 0)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot send data to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
 
@@ -157,7 +156,9 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 {
 	zbx_socket_t	s;
 	struct zbx_json	j;
-	int		ret;
+	int		ret, flags = ZBX_TCP_PROTOCOL;
+	char		*buffer = NULL;
+	size_t		buffer_size, reserved = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __func__, request);
 
@@ -165,13 +166,38 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
 
+	if (0 != proxy->auto_compress)
+	{
+		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+		{
+			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+			ret = FAIL;
+			goto out;
+		}
+
+		flags |= ZBX_TCP_COMPRESS;
+		reserved = j.buffer_size;
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+	}
+
 	if (SUCCEED == (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 	{
 		/* get connection timestamp if required */
 		if (NULL != ts)
 			zbx_timespec(ts);
 
-		if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size)))
+		if (0 != proxy->auto_compress)
+		{
+			ret = send_data_to_proxy(proxy, &s, buffer, buffer_size, reserved, flags);
+			zbx_free(buffer);
+		}
+		else
+		{
+			ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, 0, flags);
+			zbx_json_free(&j);
+		}
+
+		if (SUCCEED == ret)
 		{
 			if (SUCCEED == (ret = recv_data_from_proxy(proxy, &s)))
 			{
@@ -180,13 +206,13 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 
 				if (!ZBX_IS_RUNNING())
 				{
-					int	flags = ZBX_TCP_PROTOCOL;
+					int	flags_response = ZBX_TCP_PROTOCOL;
 
 					if (0 != (s.protocol & ZBX_TCP_COMPRESS))
-						flags |= ZBX_TCP_COMPRESS;
+						flags_response |= ZBX_TCP_COMPRESS;
 
 					zbx_send_response_ext(&s, FAIL, "Zabbix server shutdown in progress", NULL,
-							flags, CONFIG_TIMEOUT);
+							flags_response, CONFIG_TIMEOUT);
 
 					zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy data from passive proxy at"
 							" \"%s\": Zabbix server shutdown in progress", s.peer);
@@ -204,8 +230,9 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 
 		disconnect_proxy(&s);
 	}
-
+out:
 	zbx_json_free(&j);
+	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -229,10 +256,11 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
  ******************************************************************************/
 static int	proxy_send_configuration(DC_PROXY *proxy)
 {
-	char		*error = NULL;
-	int		ret;
+	char		*error = NULL, *buffer = NULL;
+	int		ret, flags = ZBX_TCP_PROTOCOL;
 	zbx_socket_t	s;
 	struct zbx_json	j;
+	size_t		buffer_size, reserved = 0;
 
 	zbx_json_init(&j, 512 * ZBX_KIBIBYTE);
 
@@ -246,16 +274,44 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 		goto out;
 	}
 
+	if (0 != proxy->auto_compress)
+	{
+		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+		{
+			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+			ret = FAIL;
+			goto out;
+		}
+
+		flags |= ZBX_TCP_COMPRESS;
+		reserved = j.buffer_size;
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+	}
+
 	if (SUCCEED != (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 		goto out;
 
-	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen " ZBX_FS_SIZE_T,
-			proxy->host, s.peer, (zbx_fs_size_t)j.buffer_size);
-
-	if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size)))
+	if (0 != proxy->auto_compress)
 	{
-		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+				ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy->host,
+				s.peer, (zbx_fs_size_t)reserved, (zbx_fs_size_t)buffer_size,
+				(double)reserved / buffer_size);
 
+		ret = send_data_to_proxy(proxy, &s, buffer, buffer_size, reserved, flags);
+		zbx_free(buffer);		/* json buffer can be large, free as fast as possible */
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+				ZBX_FS_SIZE_T, proxy->host, s.peer, (zbx_fs_size_t)j.buffer_size);
+
+		ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, reserved, flags);
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+	}
+
+	if (SUCCEED == ret)
+	{
 		if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
@@ -281,6 +337,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	disconnect_proxy(&s);
 out:
+	zbx_free(buffer);
 	zbx_free(error);
 	zbx_json_free(&j);
 

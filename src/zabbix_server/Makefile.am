@@ -69,6 +69,7 @@ zabbix_server_LDADD = \
 	preprocessor/libpreprocessor.a \
 	availability/libavailability.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
+	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
 	libzbxserver.a \

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-20 19:54+0300\n"
+"POT-Creation-Date: 2021-09-10 19:55+0300\n"
 "PO-Revision-Date: 2014-06-04 11:22+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -502,7 +502,7 @@ msgstr "Dostęp do modułów"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66
-#: include/actions.inc.php:153 include/blocks.inc.php:717
+#: include/actions.inc.php:153 include/blocks.inc.php:721
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:287
@@ -665,7 +665,7 @@ msgstr "Zaktualizowano akcję"
 #: app/views/administration.mediatype.edit.php:282
 #: app/views/configuration.discovery.edit.php:79
 #: app/views/monitoring.dashboard.view.php:116
-#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:718
+#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:722
 #: include/classes/helpers/CMenuHelper.php:177
 #: include/classes/helpers/CRoleHelper.php:435
 #: include/classes/screens/CScreenProblem.php:869
@@ -893,6 +893,11 @@ msgstr "Dodaj nowy interfejs"
 msgid "Add new override"
 msgstr "Dodaj nowe sterowanie"
 
+#: app/views/js/configuration.dashboard.edit.js.php:197
+#: app/views/js/monitoring.dashboard.view.js.php:307
+msgid "Add page"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:495
 msgid "Add problem comments"
 msgstr "Dodaj komentarz do problemu"
@@ -931,6 +936,8 @@ msgstr ""
 msgid "Add user group"
 msgstr ""
 
+#: app/views/js/configuration.dashboard.edit.js.php:193
+#: app/views/js/monitoring.dashboard.view.js.php:303
 #: app/views/monitoring.dashboard.widget.edit.php:34
 msgid "Add widget"
 msgstr "Dodaj widżet"
@@ -3233,6 +3240,7 @@ msgid "Change per second"
 msgstr "Zmień na sekundy"
 
 #: app/views/popup.acknowledge.edit.php:71
+#: include/classes/helpers/CRoleHelper.php:496
 msgid "Change severity"
 msgstr "Stopień zmian"
 
@@ -5806,7 +5814,7 @@ msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Powtórzone usrgrpid (id grupy użytkowników) \"%1$s\" w grupie użytkowników dla mapy \"%2$s\"."
 
 #: app/views/hintbox.eventlist.php:75
-#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:716
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:720
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:286
@@ -6588,6 +6596,8 @@ msgstr "Niepowodzenie"
 
 #: app/controllers/CControllerDashboardUpdate.php:142
 #: app/controllers/CControllerTemplateDashboardUpdate.php:136
+#: app/views/js/configuration.dashboard.edit.js.php:150
+#: app/views/js/monitoring.dashboard.view.js.php:258
 msgid "Failed to create dashboard"
 msgstr "Stworzenie widoku nieudane"
 
@@ -6606,6 +6616,8 @@ msgstr ""
 
 #: app/controllers/CControllerDashboardUpdate.php:137
 #: app/controllers/CControllerTemplateDashboardUpdate.php:131
+#: app/views/js/configuration.dashboard.edit.js.php:151
+#: app/views/js/monitoring.dashboard.view.js.php:259
 msgid "Failed to update dashboard"
 msgstr "Nie udało się zaktualizować widoku"
 
@@ -6615,6 +6627,10 @@ msgstr ""
 
 #: jsLoader.php:154
 msgid "Failed to update dashboard properties."
+msgstr ""
+
+#: app/views/js/monitoring.dashboard.view.js.php:452
+msgid "Failed to update dashboard sharing."
 msgstr ""
 
 #: include/classes/api/services/CTemplate.php:624
@@ -7588,7 +7604,7 @@ msgstr "Ułożenie poziome"
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:92 app/views/popup.massupdate.host.php:290
 #: app/views/search.php:30 httpconf.php:212 httpconf.php:481
-#: include/actions.inc.php:50 include/blocks.inc.php:713
+#: include/actions.inc.php:50 include/blocks.inc.php:717
 #: include/classes/screens/CScreenHttpTest.php:112
 #: include/classes/screens/CScreenProblem.php:863
 #: include/classes/screens/CScreenProblem.php:887
@@ -7650,7 +7666,7 @@ msgstr "Dostęp do hosta"
 msgid "Host added"
 msgstr "Dodano hosta"
 
-#: app/controllers/CControllerPopupItemTest.php:1292
+#: app/controllers/CControllerPopupItemTest.php:1303
 #: app/views/popup.itemtestedit.view.php:98
 msgid "Host address"
 msgstr ""
@@ -7732,7 +7748,7 @@ msgstr "Typ etykiety grupy hostów"
 #: include/classes/api/services/CDashboardGeneral.php:514
 #: include/classes/api/services/CScript.php:937
 #: include/classes/api/services/CSettings.php:276
-#: include/classes/api/services/CUserGroup.php:452
+#: include/classes/api/services/CUserGroup.php:445
 #, c-format
 msgid "Host group with ID \"%1$s\" is not available."
 msgstr "Grupa hosta o ID \"%1$s\" jest niedostępna."
@@ -9158,9 +9174,9 @@ msgstr "Błędna wartość dla pola \"%1$s\"."
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:91
 #: app/controllers/CControllerPopupItemTestGetValue.php:104
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupItemTestSend.php:143
 #: app/controllers/CControllerPopupItemTestSend.php:172
 #: app/controllers/CControllerPopupItemTestSend.php:181
@@ -9355,7 +9371,7 @@ msgstr "Błędna wartość dla pola \"%1$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:820
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CTriggerGeneral.php:833
-#: include/classes/api/services/CUserGroup.php:470
+#: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:697
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:240
@@ -9441,7 +9457,7 @@ msgstr "Nieskończoność"
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/actions.inc.php:1772 include/actions.inc.php:1866
-#: include/blocks.inc.php:712 include/classes/screens/CScreenProblem.php:862
+#: include/blocks.inc.php:716 include/classes/screens/CScreenProblem.php:862
 #: include/classes/screens/CScreenProblem.php:886
 #: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.graph.list.php:140
@@ -11299,9 +11315,9 @@ msgstr "Maksymalna liczba otwartych plików obsługiwana przez OS. Zwraca liczb�
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Maksymalna liczba procesów obsługiwana przez OS. Zwraca liczbę całkowitą"
 
-#: include/blocks.inc.php:630
+#: include/blocks.inc.php:632
 #, c-format
-msgid "Maximum required database version is %1$s."
+msgid "Maximum required %1$s database version is %2$s."
 msgstr ""
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:249
@@ -11511,6 +11527,11 @@ msgstr "Środek"
 msgid "Min"
 msgstr "Minimalny"
 
+#: include/blocks.inc.php:626
+#, c-format
+msgid "Minimum required %1$s database version is %2$s."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:124
 #, c-format
 msgid "Minimum required PHP memory limit is %1$s (configuration option \"memory_limit\")."
@@ -11525,11 +11546,6 @@ msgstr "Wymagany minimalny rozmiar pliku do wgrania dla PHP jest %1$s (konfigura
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr "Wymagana minimalna wersja PHP to %1$s."
-
-#: include/blocks.inc.php:626
-#, c-format
-msgid "Minimum required database version is %1$s."
-msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -12087,7 +12103,7 @@ msgstr "Następny krok"
 #: app/views/popup.massupdate.item.php:379
 #: app/views/popup.massupdate.trigger.php:67 include/actions.inc.php:33
 #: include/blocks.inc.php:532 include/blocks.inc.php:610
-#: include/blocks.inc.php:839 include/blocks.inc.php:843
+#: include/blocks.inc.php:843 include/blocks.inc.php:847
 #: include/classes/screens/CScreenProblem.php:1098
 #: include/classes/screens/CScreenProblem.php:1102
 #: include/classes/screens/CScreenProblem.php:1244 include/events.inc.php:195
@@ -12475,7 +12491,7 @@ msgstr "Brak uprawnień do wywołania \"%1$s.%2$s\"."
 #: include/classes/api/services/CProxy.php:733
 #: include/classes/api/services/CProxy.php:767
 #: include/classes/api/services/CProxy.php:854
-#: include/classes/api/services/CReport.php:925
+#: include/classes/api/services/CReport.php:903
 #: include/classes/api/services/CRole.php:388
 #: include/classes/api/services/CRole.php:805
 #: include/classes/api/services/CScript.php:540
@@ -12502,8 +12518,8 @@ msgstr "Brak uprawnień do wywołania \"%1$s.%2$s\"."
 #: include/classes/api/services/CTriggerPrototype.php:515
 #: include/classes/api/services/CTriggerPrototype.php:693
 #: include/classes/api/services/CTriggerPrototype.php:711
-#: include/classes/api/services/CUserGroup.php:336
-#: include/classes/api/services/CUserGroup.php:884
+#: include/classes/api/services/CUserGroup.php:329
+#: include/classes/api/services/CUserGroup.php:877
 #: include/classes/api/services/CUserMacro.php:353
 #: include/classes/api/services/CUserMacro.php:463
 #: include/classes/api/services/CUserMacro.php:550
@@ -13018,7 +13034,7 @@ msgstr "Tylko Super Administratorzy mogą tworzyć grupy hostów."
 msgid "Only Super Admins can create media types."
 msgstr "Tylko Super Administratorzy mogą tworzyć typy mediów."
 
-#: include/classes/api/services/CUserGroup.php:212
+#: include/classes/api/services/CUserGroup.php:205
 msgid "Only Super Admins can create user groups."
 msgstr ""
 
@@ -13026,7 +13042,7 @@ msgstr ""
 msgid "Only Super Admins can delete media types."
 msgstr "Tylko Super Administratorzy mogą usuwać typy mediów."
 
-#: include/classes/api/services/CUserGroup.php:864
+#: include/classes/api/services/CUserGroup.php:857
 msgid "Only Super Admins can delete user groups."
 msgstr "Tylko Super Administratorzy mogą usuwać grupy użytkowników."
 
@@ -13034,7 +13050,7 @@ msgstr "Tylko Super Administratorzy mogą usuwać grupy użytkowników."
 msgid "Only Super Admins can edit media types."
 msgstr "Tylko Super Administratorzy mogą zmieniać typy mediów."
 
-#: include/classes/api/services/CUserGroup.php:299
+#: include/classes/api/services/CUserGroup.php:292
 msgid "Only Super Admins can update user groups."
 msgstr "Tylko Super Administrator może aktualizować grupy użytkoniwków."
 
@@ -13138,7 +13154,7 @@ msgstr "Operacja nie ma grupy, na której może działać."
 msgid "Operation has no template to operate."
 msgstr "Operacja nie ma szablonu, na którym może działać."
 
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:715
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:719
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:1159 include/events.inc.php:181
 #: include/views/configuration.trigger.prototype.edit.php:84
@@ -13709,7 +13725,13 @@ msgstr "Hasło nie jest obowiązkowe dla niewewnętrznych rodzajów autentykacji
 msgid "Paste"
 msgstr "Wklej"
 
-#: jsLoader.php:157
+#: app/views/js/configuration.dashboard.edit.js.php:212
+#: app/views/js/monitoring.dashboard.view.js.php:322
+msgid "Paste page"
+msgstr ""
+
+#: app/views/js/configuration.dashboard.edit.js.php:205
+#: app/views/js/monitoring.dashboard.view.js.php:315 jsLoader.php:157
 msgid "Paste widget"
 msgstr "Wklej widżet"
 
@@ -13891,7 +13913,7 @@ msgstr "Polski (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Powielaj pola inwentarza hosta"
 
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/partials/monitoring.host.filter.php:113
 #: app/views/administration.authentication.edit.php:101
 #: app/views/administration.proxy.edit.php:54
@@ -14066,7 +14088,7 @@ msgstr "Poziom uprawnień"
 #: app/partials/monitoring.problem.filter.php:97
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:714
+#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:718
 #: include/classes/helpers/CMediatypeHelper.php:45
 #: include/classes/screens/CScreenProblem.php:865
 #: include/classes/screens/CScreenProblem.php:888
@@ -15204,7 +15226,7 @@ msgstr "OID SNMP"
 msgid "SNMP agent"
 msgstr "Agent SNMP"
 
-#: app/controllers/CControllerPopupItemTest.php:1284
+#: app/controllers/CControllerPopupItemTest.php:1295
 #: app/views/popup.discovery.check.php:68
 #: app/views/popup.itemtestedit.view.php:140
 #: include/views/js/configuration.host.edit.js.php:89
@@ -16389,6 +16411,7 @@ msgstr "Statystyki i dostępności zapisu pamięci Zabbix. Pamięć - jedna z wa
 #: app/views/administration.module.list.php:77
 #: app/views/administration.token.list.php:92
 #: app/views/administration.token.list.php:149
+#: app/views/administration.user.edit.php:254
 #: app/views/administration.usergroup.list.php:49
 #: app/views/administration.usergroup.list.php:77
 #: app/views/administration.user.list.php:116
@@ -16794,7 +16817,7 @@ msgstr "Wartość znacznika"
 #: app/views/popup.massupdate.template.php:131
 #: app/views/popup.massupdate.template.php:149
 #: app/views/popup.massupdate.trigger.php:78
-#: app/views/popup.massupdate.trigger.php:153 include/blocks.inc.php:719
+#: app/views/popup.massupdate.trigger.php:153 include/blocks.inc.php:723
 #: include/classes/screens/CScreenHttpTest.php:117
 #: include/classes/screens/CScreenProblem.php:839
 #: include/classes/screens/CScreenProblem.php:895
@@ -17263,7 +17286,7 @@ msgstr "Do"
 #: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1645
 #: include/actions.inc.php:1699 include/actions.inc.php:1772
 #: include/actions.inc.php:1866 include/actions.inc.php:1921
-#: include/blocks.inc.php:694 include/classes/screens/CScreenProblem.php:816
+#: include/blocks.inc.php:698 include/classes/screens/CScreenProblem.php:816
 #: include/classes/screens/CScreenProblem.php:1154
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -17921,7 +17944,7 @@ msgstr "Nie można załadować parametrów API do ustawień."
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Nie można nadpisać istniejącego pliku konfiguracji."
 
-#: include/blocks.inc.php:634
+#: include/blocks.inc.php:638
 msgid "Unable to retrieve database version."
 msgstr ""
 
@@ -18282,7 +18305,7 @@ msgstr "Wykorzystywane w akcjach"
 msgid "User"
 msgstr "Użytkownik"
 
-#: include/classes/api/services/CUserGroup.php:618
+#: include/classes/api/services/CUserGroup.php:611
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "Użytkownik \"%1$s\" nie może istnieć bez grupy użytkowników."
@@ -18329,7 +18352,7 @@ msgstr "Dodano użytkownika"
 msgid "User agent string"
 msgstr "Ciąg znaków agenta użytkownika"
 
-#: include/classes/api/services/CUserGroup.php:543
+#: include/classes/api/services/CUserGroup.php:536
 #: include/classes/api/services/CUser.php:917
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Użytkownik nie może dodać samego siebie do wyłączonej grupy lub do grupy z wyłączonym dostępem do interfejsu użytkownika."
@@ -18361,27 +18384,27 @@ msgstr[2] ""
 msgid "User group"
 msgstr "Grupa użytkowników"
 
-#: include/classes/api/services/CUserGroup.php:372
+#: include/classes/api/services/CUserGroup.php:365
 #, c-format
 msgid "User group \"%1$s\" already exists."
 msgstr "Grupa użytkowników \"%1$s\" już istnieje."
 
-#: include/classes/api/services/CUserGroup.php:940
+#: include/classes/api/services/CUserGroup.php:933
 #, c-format
 msgid "User group \"%1$s\" is report \"%2$s\" recipient."
 msgstr ""
 
-#: include/classes/api/services/CUserGroup.php:905
+#: include/classes/api/services/CUserGroup.php:898
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
 msgstr "Grupa użytkownika \"%1$s\" używa w akcji \"%2$s\"."
 
-#: include/classes/api/services/CUserGroup.php:926
+#: include/classes/api/services/CUserGroup.php:919
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "Grupa użytkowników \"%1$s\" została użyta w konfiguracji dla komunikatów zatrzymania bazy danych."
 
-#: include/classes/api/services/CUserGroup.php:918
+#: include/classes/api/services/CUserGroup.php:911
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "Grupa użytkowników \"%1$s\" jest wykorzystywana w skrypcie \"%2$s\"."
@@ -18539,7 +18562,7 @@ msgstr "Zaktualizowano użytkownika"
 #: include/classes/api/services/CReport.php:413
 #: include/classes/api/services/CToken.php:248
 #: include/classes/api/services/CToken.php:259
-#: include/classes/api/services/CUserGroup.php:409
+#: include/classes/api/services/CUserGroup.php:402
 #, c-format
 msgid "User with ID \"%1$s\" is not available."
 msgstr "Użytkownik o ID \"%1$s\" jest niedostępny."
@@ -19519,8 +19542,8 @@ msgstr "Rocznie"
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:68 include/actions.inc.php:32
-#: include/blocks.inc.php:532 include/blocks.inc.php:839
-#: include/blocks.inc.php:843 include/classes/screens/CScreenProblem.php:1098
+#: include/blocks.inc.php:532 include/blocks.inc.php:843
+#: include/blocks.inc.php:847 include/classes/screens/CScreenProblem.php:1098
 #: include/classes/screens/CScreenProblem.php:1102
 #: include/classes/screens/CScreenProblem.php:1244 include/events.inc.php:195
 #: include/events.inc.php:199 include/events.inc.php:389
@@ -20056,9 +20079,9 @@ msgstr "nie może być zmieniony"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:141
 #: app/controllers/CControllerAuthenticationUpdate.php:213
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupLldOperation.php:131
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/controllers/CControllerPopupLldOperation.php:143
@@ -20127,7 +20150,7 @@ msgstr "nie może być zmieniony"
 #: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
-#: include/classes/api/services/CUserGroup.php:470
+#: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:697
 #: include/classes/api/services/CUser.php:857
 #: include/classes/import/CConfigurationImport.php:744
@@ -21262,7 +21285,7 @@ msgstr "dostarczone dane logowania nie są unikalne"
 #: app/partials/monitoring.problem.filter.php:172
 #: app/partials/monitoring.problem.filter.php:353
 #: app/views/administration.usergroup.edit.php:182
-#: include/classes/api/services/CUserGroup.php:470
+#: include/classes/api/services/CUserGroup.php:463
 #: include/classes/helpers/CTagFilterFieldHelper.php:63
 #: include/classes/helpers/CTagFilterFieldHelper.php:117
 #: include/classes/widgets/CWidgetHelper.php:506
