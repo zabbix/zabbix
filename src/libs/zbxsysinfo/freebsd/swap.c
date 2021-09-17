@@ -67,44 +67,35 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		(*mib_dev)++;
 	}
 
-	if ((0 == total || 0 == getpagesize()) && (NULL == mode || 0 != strcmp(mode, "total")))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "free"))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot be calculated because swap file size is 0."));
-		return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, (total - used) * getpagesize());
+	}
+	else if (0 == strcmp(mode, "total"))
+	{
+		SET_UI64_RESULT(result, total * getpagesize());
+	}
+	else if (0 == strcmp(mode, "used"))
+	{
+		SET_UI64_RESULT(result, used * getpagesize());
+	}
+	else if (0 == strcmp(mode, "pfree"))
+	{
+		SET_DBL_RESULT(result, 0 != total ? ((double)(total - used) * 100.0 / (double)total) : 100.0);
+	}
+	else if (0 == strcmp(mode, "pused"))
+	{
+		SET_DBL_RESULT(result, 0 != total ? ((double)used * 100.0 / (double)total) : 0.0);
 	}
 	else
 	{
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "free"))
-		{
-			SET_UI64_RESULT(result, (total - used) * getpagesize());
-		}
-		else if (0 == strcmp(mode, "total"))
-		{
-			SET_UI64_RESULT(result, total * getpagesize());
-		}
-		else if (0 == strcmp(mode, "used"))
-		{
-			SET_UI64_RESULT(result, used * getpagesize());
-		}
-		else if (0 == strcmp(mode, "pfree"))
-		{
-			SET_DBL_RESULT(result, (double)(total - used) * 100.0 / (double)total);
-		}
-		else if (0 == strcmp(mode, "pused"))
-		{
-			SET_DBL_RESULT(result, (double)used * 100.0 / (double)total);
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-			return SYSINFO_RET_FAIL;
-		}
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
 	}
 
 	return SYSINFO_RET_OK;
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"xswdev\" structure."));
-
 	return SYSINFO_RET_FAIL;
 #endif
 }

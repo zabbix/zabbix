@@ -1356,6 +1356,7 @@ define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 define('API_PRESERVE_KEYS',				0x0800);
 define('API_ALLOW_MACRO',				0x1000);
 define('API_ALLOW_GLOBAL_REGEX',		0x2000);
+define('API_ALLOW_UNEXPECTED',			0x4000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

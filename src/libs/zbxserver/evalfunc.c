@@ -584,7 +584,7 @@ clean:
  * Purpose: replace value by value mapping or by units                        *
  *                                                                            *
  * Parameters: value      - [IN/OUT] value for replacing                      *
- *             valuemapid - [IN] identificator of value map                   *
+ *             valuemapid - [IN] identifier of value map                      *
  *             units      - [IN] units                                        *
  *             value_type - [IN] value type; ITEM_VALUE_TYPE_*                *
  *                                                                            *
