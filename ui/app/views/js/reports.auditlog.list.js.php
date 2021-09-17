@@ -71,8 +71,6 @@
 		getActionsByResource(resource) {
 			// [Action => [Resources]]
 			const resources = <?php echo json_encode([
-					CAudit::ACTION_LOGIN => [CAudit::RESOURCE_USER],
-					CAudit::ACTION_LOGOUT => [CAudit::RESOURCE_USER],
 					CAudit::ACTION_ADD => [
 						CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTH_TOKEN, CAudit::RESOURCE_AUTOREGISTRATION,
 						CAudit::RESOURCE_DASHBOARD, CAudit::RESOURCE_DISCOVERY_RULE, CAudit::RESOURCE_GRAPH,
@@ -113,7 +111,10 @@
 						CAudit::RESOURCE_TRIGGER, CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER,
 						CAudit::RESOURCE_USER_GROUP, CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP
 					],
-					CAudit::ACTION_EXECUTE => [CAudit::RESOURCE_SCRIPT]
+					CAudit::ACTION_LOGOUT => [CAudit::RESOURCE_USER],
+					CAudit::ACTION_EXECUTE => [CAudit::RESOURCE_SCRIPT],
+					CAudit::ACTION_LOGIN_SUCCESS => [CAudit::RESOURCE_USER],
+					CAudit::ACTION_LOGIN_FAILED => [CAudit::RESOURCE_USER]
 				]); ?>
 			// Add action "All" to every resource.
 			const arr = [OPTION_ALL];
