@@ -6374,13 +6374,17 @@ z-select,
 	}
 }
 
-#host-form #macrosFormList {
-	.table-forms-td-left {
-		display:none;
-	}
+.overlay-dialogue #host-form {
+	#tagsFormList,
+	#macrosFormList,
+	#valuemap-formlist {
+		.table-forms-td-left {
+			display: none;
+		}
 
-	.table-forms-td-right {
-		width: 100%;
+		.table-forms-td-right {
+			width: 100%;
+		}
 	}
 }
 
