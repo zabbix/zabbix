@@ -194,6 +194,10 @@ PREPARE_AUDIT_TRIGGER_UPDATE(discover, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(event_name, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(type, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_TRIGGER_UPDATE(description, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(priority, int, int)
+PREPARE_AUDIT_TRIGGER_UPDATE(comments, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(url, const char*, string)
 
 #undef PREPARE_AUDIT_ITEM_UPDATE
 #undef TR_OR_TRP
@@ -313,3 +317,22 @@ void	zbx_audit_trigger_update_json_delete_tags(zbx_uint64_t triggerid, int flags
 
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
+
+#define PREPARE_AUDIT_TRIGGER_UPDATE_TAG(resource, type1, type2)						\
+void	zbx_audit_trigger_update_json_update_tag_##resource(zbx_uint64_t triggerid, zbx_uint64_t triggertagid,	\
+		type1 resource##_old, type1 resource##_new)							\
+{														\
+	char	buf[AUDIT_DETAILS_KEY_LEN];									\
+														\
+	RETURN_IF_AUDIT_OFF();											\
+														\
+	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);		\
+														\
+	zbx_audit_update_json_update_##type2(triggerid, buf, resource##_old, resource##_new);			\
+}
+
+PREPARE_AUDIT_TRIGGER_UPDATE_TAG(tag, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE_TAG(value, const char*, string)
+
+#undef PREPARE_AUDIT_TRIGGER_UPDATE_TAG
+
