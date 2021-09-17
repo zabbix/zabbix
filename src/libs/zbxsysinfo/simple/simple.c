@@ -68,6 +68,18 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 		goto lbl_ret;
 	}
 
+	#ifdef LDAP_OPT_SOCKET_BIND_ADDRESSES
+	if (NULL != CONFIG_SOURCE_IP)
+	{
+		if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_SOCKET_BIND_ADDRESSES, CONFIG_SOURCE_IP)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "LDAP - failed to set source ip address [%s]",
+					ldap_err2string(ldapErr));
+			goto lbl_ret;
+		}
+	}
+	#endif
+
 	if (LDAP_SUCCESS != (ldapErr = ldap_search_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0, &res)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - searching failed [%s] [%s]", host, ldap_err2string(ldapErr));
