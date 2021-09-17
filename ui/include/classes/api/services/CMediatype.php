@@ -521,16 +521,16 @@ class CMediatype extends CApiService {
 						if (array_key_exists('smtp_authentication', $mediatype)
 								&& $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE) {
 							$mediatype = [
-								'smtp_verify_peer' => DB::getDefault('media_type', 'smtp_verify_peer'),
-								'smtp_verify_host' => DB::getDefault('media_type', 'smtp_verify_host')
+								'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
+								'smtp_verify_host' => $db_defaults['smtp_verify_host']
 							] + $mediatype;
 						}
 
 						if (array_key_exists('smtp_authentication', $mediatype)
 								&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NONE) {
 							$mediatype = [
-								'username' => DB::getDefault('media_type', 'username'),
-								'passwd' => DB::getDefault('media_type', 'passwd')
+								'username' => $db_defaults['username'],
+								'passwd' => $db_defaults['passwd']
 							] + $mediatype;
 						}
 						break;
@@ -539,8 +539,8 @@ class CMediatype extends CApiService {
 						if (array_key_exists('show_event_menu', $mediatype)
 								&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
 							$mediatype = [
-								'event_menu_url' => DB::getDefault('media_type', 'event_menu_url'),
-								'event_menu_name' => DB::getDefault('media_type', 'event_menu_name')
+								'event_menu_url' => $db_defaults['event_menu_url'],
+								'event_menu_name' => $db_defaults['event_menu_name']
 							] + $mediatype;
 						}
 						break;
