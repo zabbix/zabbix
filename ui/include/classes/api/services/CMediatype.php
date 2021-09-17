@@ -374,7 +374,7 @@ class CMediatype extends CApiService {
 		$names = [];
 
 		foreach ($mediatypes as $mediatype) {
-			if (!array_key_exists('name', $mediatype)) {
+			if ($method === 'update' && !array_key_exists('name', $mediatype)) {
 				continue;
 			}
 
@@ -408,11 +408,11 @@ class CMediatype extends CApiService {
 	 * @throws APIException
 	 */
 	private static function validateByType(array &$mediatypes, string $method, array $db_mediatypes = null): void {
-		if ($method === 'update') {
-			$db_defaults = DB::getDefaults('media_type');
-			$db_defaults['parameters'] = [];
+		$db_defaults = DB::getDefaults('media_type');
+		$db_defaults['parameters'] = [];
 
-			$type_switch_fields = [
+		if ($method === 'update') {
+			$type_fields = [
 				MEDIA_TYPE_EMAIL => [
 					'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type'
@@ -431,88 +431,34 @@ class CMediatype extends CApiService {
 		}
 
 		foreach ($mediatypes as $i => &$mediatype) {
-			$data = $mediatype;
-
 			if ($method === 'create') {
+				$db_mediatype = $db_defaults;
 				$type = $mediatype['type'];
-				$db_type = null;
-				$type_changed = false;
 			}
 			else {
 				$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
 				$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_mediatype['type'];
-				$db_type = $db_mediatype['type'];
-				$type_changed = $type != $db_type;
 			}
 
-			switch ($type) {
-				case MEDIA_TYPE_EMAIL:
-					if ($method === 'create') {
-						if (!array_key_exists('smtp_security', $mediatype)) {
-							$data['smtp_security'] = $db_defaults['smtp_security'];
-						}
+			$api_input_rules = self::getValidationRulesByType($mediatype, $db_mediatype, $method);
+			$type_data = array_intersect_key($mediatype, $api_input_rules['fields']);
 
-						if (!array_key_exists('smtp_authentication', $mediatype)) {
-							$data['smtp_authentication'] = $db_defaults['smtp_authentication'];
-						}
-
-						break;
-					}
-
-					if (!array_key_exists('smtp_security', $mediatype)) {
-						$data['smtp_security'] = $db_mediatype['smtp_security'];
-					}
-
-					if (!array_key_exists('smtp_authentication', $mediatype)) {
-						$data['smtp_authentication'] = $db_mediatype['smtp_authentication'];
-					}
-
-					break;
-
-				case MEDIA_TYPE_EXEC:
-					if (array_key_exists('exec_params', $mediatype) && $mediatype['exec_params'] !== '') {
-						$pos = strrpos($mediatype['exec_params'], "\n");
-
-						if ($pos === false || strlen($mediatype['exec_params']) != $pos + 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
-								$mediatype['exec_params'],
-								$mediatype['name']
-							));
-						}
-					}
-					break;
-
-				case MEDIA_TYPE_WEBHOOK:
-					if ($method === 'create' && !array_key_exists('show_event_menu', $mediatype)) {
-						$data['show_event_menu'] = $db_defaults['show_event_menu'];
-
-						break;
-					}
-
-					if (!array_key_exists('show_event_menu', $mediatype)) {
-						$data['show_event_menu'] = $db_mediatype['show_event_menu'];
-					}
-
-					$data += [
-						'event_menu_url' => $db_defaults['event_menu_url'],
-						'event_menu_name' => $db_defaults['event_menu_name']
-					];
-
-					break;
-			}
-
-			$api_input_rules = self::getValidationRulesByType($type, $method, $db_type);
-			$data = array_intersect_key($data, $api_input_rules['fields']);
-
-			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($i + 1), $error)) {
+			if (!CApiInputValidator::validate($api_input_rules, $type_data, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
-			if ($type != MEDIA_TYPE_WEBHOOK && array_key_exists('parameters', $mediatype) && $mediatype['parameters']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/parameters', _('value must be empty'))
-				);
+			if ($type == MEDIA_TYPE_EXEC) {
+				if (array_key_exists('exec_params', $mediatype) && $mediatype['exec_params'] !== '') {
+					$pos = strrpos($mediatype['exec_params'], "\n");
+
+					if ($pos === false || strlen($mediatype['exec_params']) != $pos + 1) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
+							$mediatype['exec_params'],
+							$mediatype['name']
+						));
+					}
+				}
 			}
 
 			if ($method === 'update') {
@@ -520,35 +466,35 @@ class CMediatype extends CApiService {
 					case MEDIA_TYPE_EMAIL:
 						if (array_key_exists('smtp_authentication', $mediatype)
 								&& $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE) {
-							$mediatype = [
+							$mediatype += [
 								'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
 								'smtp_verify_host' => $db_defaults['smtp_verify_host']
-							] + $mediatype;
+							];
 						}
 
 						if (array_key_exists('smtp_authentication', $mediatype)
 								&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NONE) {
-							$mediatype = [
+							$mediatype += [
 								'username' => $db_defaults['username'],
 								'passwd' => $db_defaults['passwd']
-							] + $mediatype;
+							];
 						}
 						break;
 
 					case MEDIA_TYPE_WEBHOOK:
 						if (array_key_exists('show_event_menu', $mediatype)
 								&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
-							$mediatype = [
+							$mediatype += [
 								'event_menu_url' => $db_defaults['event_menu_url'],
 								'event_menu_name' => $db_defaults['event_menu_name']
-							] + $mediatype;
+							];
 						}
 						break;
 				}
 
-				if ($type_changed) {
-					$mediatype = array_intersect_key($db_defaults, array_flip($type_switch_fields[$db_type]))
-						+ $mediatype;
+				if ($type != $db_mediatype['type']) {
+					$mediatype =
+						array_intersect_key($db_defaults, array_flip($type_fields[$db_mediatype['type']])) + $mediatype;
 				}
 			}
 		}
@@ -560,13 +506,15 @@ class CMediatype extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param int      $type
-	 * @param string   $method
-	 * @param int|null $db_type
+	 * @param int    $type
+	 * @param array  $mediatype
+	 * @param array  $db_mediatype
+	 * @param string $method
 	 *
 	 * @return array
 	 */
-	private static function getValidationRulesByType(int $type, string $method, ?int $db_type): array {
+	private static function getValidationRulesByType(array $mediatype, array $db_mediatype, string $method): array {
+		$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_mediatype['type'];
 		$api_input_rules = ['type' => API_OBJECT];
 
 		switch ($type) {
@@ -577,30 +525,31 @@ class CMediatype extends CApiService {
 					'smtp_email' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_email')],
 					'smtp_port' =>				['type' => API_INT32, 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
 					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_CONNECTION_SECURITY_NONE, SMTP_CONNECTION_SECURITY_STARTTLS, SMTP_CONNECTION_SECURITY_SSL_TLS])],
-					'smtp_verify_peer' =>		['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'smtp_security', 'in' => SMTP_CONNECTION_SECURITY_NONE], 'type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_verify_peer')],
-													['if' => ['field' => 'smtp_security', 'in' => implode(',', [SMTP_CONNECTION_SECURITY_STARTTLS, SMTP_CONNECTION_SECURITY_SSL_TLS])], 'type' => API_INT32, 'in' => '0,1']
-					]],
-					'smtp_verify_host' =>		['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'smtp_security', 'in' => SMTP_CONNECTION_SECURITY_NONE], 'type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_verify_host')],
-													['if' => ['field' => 'smtp_security', 'in' => implode(',', [SMTP_CONNECTION_SECURITY_STARTTLS, SMTP_CONNECTION_SECURITY_SSL_TLS])], 'type' => API_INT32, 'in' => '0,1']
-					]],
 					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL])],
-					'username' =>				['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'smtp_authentication', 'in' => SMTP_AUTHENTICATION_NONE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'username')],
-													['if' => ['field' => 'smtp_authentication', 'in' => SMTP_AUTHENTICATION_NORMAL], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'username')]
-					]],
-					'passwd' =>					['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'smtp_authentication', 'in' => SMTP_AUTHENTICATION_NONE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'passwd')],
-													['if' => ['field' => 'smtp_authentication', 'in' => SMTP_AUTHENTICATION_NORMAL], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'username')]
-					]],
 					'content_type' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_MESSAGE_FORMAT_PLAIN_TEXT, SMTP_MESSAGE_FORMAT_HTML])]
 				];
 
-				if ($method === 'create' || $type != $db_type) {
+				if ($method === 'create' || $type != $db_mediatype['type']) {
 					foreach (['smtp_server', 'smtp_helo', 'smtp_email'] as $field) {
 						$api_input_rules['fields'][$field]['flags'] |= API_REQUIRED;
 					}
+				}
+
+				$mediatype += array_intersect_key($db_mediatype, array_flip(['smtp_security', 'smtp_authentication']));
+
+				if ($mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_STARTTLS
+						|| $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_SSL_TLS) {
+					$api_input_rules += [
+						'smtp_verify_peer' =>	['type' => API_INT32, 'in' => '0,1'],
+						'smtp_verify_host' =>	['type' => API_INT32, 'in' => '0,1']
+					];
+				}
+
+				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+					$api_input_rules += [
+						'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'username')],
+						'passwd' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'passwd')]
+					];
 				}
 				break;
 
@@ -610,7 +559,7 @@ class CMediatype extends CApiService {
 					'exec_params' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'exec_path')]
 				];
 
-				if ($method === 'create' || $type != $db_type) {
+				if ($method === 'create' || $type != $db_mediatype['type']) {
 					$api_input_rules['fields']['exec_path']['flags'] |= API_REQUIRED;
 				}
 				break;
@@ -621,7 +570,7 @@ class CMediatype extends CApiService {
 					'maxsessions' =>	['type' => API_INT32, 'in' => DB::getDefault('media_type', 'maxsessions')]
 				];
 
-				if ($method === 'create' || $type != $db_type) {
+				if ($method === 'create' || $type != $db_mediatype['type']) {
 					$api_input_rules['fields']['gsm_modem']['flags'] |= API_REQUIRED;
 				}
 				break;
@@ -632,22 +581,23 @@ class CMediatype extends CApiService {
 					'timeout' =>			['type' => API_TIME_UNIT, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('media_type', 'timeout')],
 					'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
 					'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
-					'event_menu_url' =>		['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'show_event_menu', 'in' => ZBX_EVENT_MENU_HIDE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_url'), 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
-												['if' => ['field' => 'show_event_menu', 'in' => ZBX_EVENT_MENU_SHOW], 'type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_url')]
-					]],
-					'event_menu_name' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'show_event_menu', 'in' => ZBX_EVENT_MENU_HIDE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_name'), 'length' => DB::getFieldLength('media_type', 'event_menu_name')],
-												['if' => ['field' => 'show_event_menu', 'in' => ZBX_EVENT_MENU_SHOW], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_name')]
-					]],
 					'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 						'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 						'value' =>				['type' => API_STRING_UTF8]
 					]]
 				];
 
-				if ($method === 'create' || $type != $db_type) {
+				if ($method === 'create' || $type != $db_mediatype['type']) {
 					$api_input_rules['fields']['script']['flags'] |= API_REQUIRED;
+				}
+
+				$mediatype += array_intersect_key($db_mediatype, array_flip(['show_event_menu']));
+
+				if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_SHOW) {
+					$api_input_rules += [
+						'event_menu_url' =>		['type' => API_URL, 'flags' => API_REQUIRED | API_ALLOW_EVENT_TAGS_MACRO | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
+						'event_menu_name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_name')]
+					];
 				}
 				break;
 		}
@@ -673,7 +623,8 @@ class CMediatype extends CApiService {
 			'process_tags' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'process_tags')],
 			'show_event_menu' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type', 'show_event_menu')],
 			'event_menu_url' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_url')],
-			'event_menu_name' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_name')]
+			'event_menu_name' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_name')],
+			'parameters' =>				['type' => API_OBJECTS, 'fields' => []]
 		];
 
 		return $api_input_rules;
