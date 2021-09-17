@@ -4071,7 +4071,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 			}
 			if (0 != strcmp(snmp->contextname, contextname))
 			{
-				snmp->contextname_orig = zbx_strdup(NULL, snmp->contextname);
+				snmp->contextname_orig = zbx_strdup(NULL, contextname);
 				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT;
 			}
 		}
