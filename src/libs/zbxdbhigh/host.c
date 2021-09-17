@@ -5257,10 +5257,10 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		}
 		else
 		{
-			char		*str_esc;
 			const char	*d = ",";
 
 			zbx_audit_httptest_create_entry(AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update httptest"
 					" set templateid=" ZBX_FS_UI64, httptest->templateid);
 
@@ -5273,7 +5273,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 #define PREPARE_UPDATE_HTTPTEST_STR(FLAG, field)								\
 		if (0 != (httptest->upd_flags & FLAG))								\
 		{												\
-			str_esc = DBdyn_escape_string(httptest->field);						\
+			char	*str_esc = DBdyn_escape_string(httptest->field);				\
+														\
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"='%s'", d, str_esc);	\
 			d = ",";										\
 			zbx_free(str_esc);									\
@@ -5285,7 +5286,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 #define PREPARE_UPDATE_HTTPTEST_STR_SECRET(FLAG, field)								\
 		if (0 != (httptest->upd_flags & FLAG))								\
 		{												\
-			str_esc = DBdyn_escape_string(httptest->field);						\
+			char	*str_esc = DBdyn_escape_string(httptest->field);				\
+														\
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"='%s'", d, str_esc);	\
 			d = ",";										\
 			zbx_free(str_esc);									\
@@ -5345,7 +5347,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 #define PREPARE_UPDATE_HTTPSTEP_STR(FLAG, field)								\
 		if (0 != (httpstep->upd_flags & FLAG))								\
 		{												\
-			str_esc = DBdyn_escape_string(httpstep->field);						\
+			char	*str_esc = DBdyn_escape_string(httpstep->field);				\
+														\
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"='%s'", d, str_esc);	\
 			d = ",";										\
 			zbx_free(str_esc);									\
@@ -5419,6 +5422,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		for (j = 0; j < httptest->httpsteps.values_num; j++)
 		{
 			httpstep = (httpstep_t *)httptest->httpsteps.values[j];
+
 			for (k = 0; k < httpstep->fields.values_num; k++)
 			{
 				httpfield = (httpfield_t *)httpstep->fields.values[k];
