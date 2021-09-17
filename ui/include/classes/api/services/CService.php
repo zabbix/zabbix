@@ -84,16 +84,17 @@ class CService extends CApiService {
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>			['type' => API_BOOLEAN, 'default' => false],
-			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder', 'weight', 'propagation_rule', 'propagation_value', 'readonly']), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'selectParents' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder', 'weight', 'propagation_rule', 'propagation_value', 'readonly']), 'default' => null],
 			'selectChildren' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder', 'weight', 'propagation_rule', 'propagation_value', 'readonly']), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'selectProblemTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'operator', 'value']), 'default' => null],
+			'selectProblemEvents' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['eventid', 'severity', 'name']), 'default' => null],
 			'selectTimes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'ts_from', 'ts_to', 'note']), 'default' => null],
 			'selectStatusRules' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'limit_value', 'limit_status', 'new_status']), 'default' => null],
 			'selectAlarms' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['clock', 'value']), 'default' => null],
@@ -676,6 +677,101 @@ class CService extends CApiService {
 			}
 		}
 
+		if ($options['selectProblemEvents'] !== null) {
+			$db_links = DB::select('services_links', [
+				'output' => ['serviceupid', 'servicedownid']
+			]);
+
+			$relations = [];
+
+			foreach ($db_links as $db_link) {
+				$relations[$db_link['serviceupid']][$db_link['servicedownid']] = true;
+			}
+
+			$services_all = [];
+			$services_without_children = [];
+
+			$parents = $result;
+
+			while ($parents) {
+				$next_parents = [];
+
+				foreach (array_keys($parents) as $serviceid) {
+					$services_all[$serviceid] = true;
+
+					if (array_key_exists($serviceid, $relations)) {
+						$next_parents += $relations[$serviceid];
+					}
+					else {
+						$services_without_children[$serviceid] = true;
+					}
+				}
+
+				$parents = $next_parents;
+			}
+
+			$services = $this->doGet([
+				'output' => ['status', 'algorithm', 'weight', 'propagation_rule', 'propagation_value'],
+				'selectStatusRules' => ['type', 'limit_value', 'limit_status', 'new_status'],
+				'filter' => ['serviceid' => array_keys($services_all)],
+				'preservekeys' => true
+			]);
+
+			if ($options['selectProblemEvents'] === API_OUTPUT_COUNT) {
+				$output = ['serviceid'];
+			}
+			elseif ($options['selectProblemEvents'] === API_OUTPUT_EXTEND) {
+				$output = ['serviceid', 'eventid', 'severity', 'name'];
+			}
+			else {
+				$output = array_unique(array_merge(['serviceid', 'eventid'], $options['selectProblemEvents']));
+			}
+
+			$output_name = in_array('name', $output);
+
+			if ($output_name) {
+				$output = array_diff($output, ['name']);
+			}
+
+			$service_problems_ungrouped = DB::select('service_problem', [
+				'output' => $output,
+				'filter' => ['serviceid' => array_keys($services_without_children)],
+				'preservekeys' => true
+			]);
+
+			if ($service_problems_ungrouped && $output_name) {
+				$events = DB::select('events', [
+					'output' => ['name'],
+					'filter' => ['eventid' => array_column($service_problems_ungrouped, 'eventid')],
+					'preservekeys' => true
+				]);
+
+				foreach ($service_problems_ungrouped as &$service_problem) {
+					$service_problem['name'] = $events[$service_problem['eventid']]['name'];
+				}
+				unset($service_problem);
+			}
+
+			$service_problems = array_fill_keys(array_keys($services_without_children), []);
+
+			foreach ($service_problems_ungrouped as $service_problemid => $service_problem) {
+				$service_problems[$service_problem['serviceid']][$service_problemid] = $service_problem;
+			}
+
+			foreach ($result as $serviceid => &$service) {
+				$problem_events = $services[$serviceid]['status'] != ZBX_SEVERITY_OK
+					? self::getProblemEvents((string) $serviceid, $services, $relations, $service_problems)
+					: [];
+
+				$service['problem_events'] = $options['selectProblemEvents'] === API_OUTPUT_COUNT
+					? count($problem_events)
+					: $this->unsetExtraFields($problem_events, ['serviceid', 'eventid'],
+						$options['selectProblemEvents']
+					);
+			}
+			unset($service);
+		}
+
 		if ($options['selectTimes'] !== null) {
 			if ($options['selectTimes'] === API_OUTPUT_COUNT) {
 				$output = ['timeid', 'serviceid'];
@@ -763,6 +859,226 @@ class CService extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param string   $parent_serviceid
+	 * @param array    $services
+	 * @param array    $relations
+	 * @param array    $service_problems
+	 * @param int|null $min_status
+	 *
+	 * @return array
+	 */
+	private static function getProblemEvents(string $parent_serviceid, array $services, array $relations,
+			array $service_problems, int $min_status = null): array {
+		$parent = $services[$parent_serviceid];
+
+		if (!array_key_exists($parent_serviceid, $relations)) {
+			if ($min_status !== null) {
+				return array_filter($service_problems[$parent_serviceid],
+					static function (array $problem) use ($min_status): bool {
+						return $problem['severity'] >= $min_status;
+					}
+				);
+			}
+
+			return $service_problems[$parent_serviceid];
+		}
+
+		$children = array_filter(array_intersect_key($services, $relations[$parent_serviceid]),
+			static function (array $service): bool {
+				return $service['propagation_rule'] != ZBX_SERVICE_STATUS_PROPAGATION_IGNORE;
+			}
+		);
+
+		$children_upstream_status = [];
+
+		foreach ($children as $child_serviceid => $child) {
+			if ($child['status'] == ZBX_SEVERITY_OK) {
+				$status = ZBX_SEVERITY_OK;
+			}
+			else {
+				switch ($child['propagation_rule']) {
+					case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+						$status = min(TRIGGER_SEVERITY_COUNT - 1, $child['status'] + $child['propagation_value']);
+						break;
+
+					case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+						$status = max(TRIGGER_SEVERITY_NOT_CLASSIFIED, $child['status'] - $child['propagation_value']);
+						break;
+
+					case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+						$status = $child['propagation_value'];
+						break;
+
+					default:
+						$status = $child['status'];
+						break;
+				}
+			}
+
+			$children_upstream_status[$child_serviceid] = $status;
+		}
+
+		$not_ok_children = array_intersect_key($children, array_filter($children_upstream_status,
+			static function (int $status): bool {
+				return $status != ZBX_SEVERITY_OK;
+			}
+		));
+
+		switch ($parent['algorithm']) {
+			case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL:
+				if (count($not_ok_children) == count($children)) {
+					$evaluate_children = array_fill_keys(array_keys($not_ok_children), null);
+					$evaluate_additional_rules = false;
+				}
+				else {
+					$evaluate_children = [];
+					$evaluate_additional_rules = true;
+				}
+
+				break;
+
+			case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE:
+				if ($min_status !== null) {
+					$evaluate_children = [];
+
+					foreach ($not_ok_children as $child_serviceid => $child) {
+						if ($child['status'] < $min_status) {
+							continue;
+						}
+
+						switch ($child['propagation_rule']) {
+							case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+								$reverse_min_status = max(TRIGGER_SEVERITY_NOT_CLASSIFIED,
+									$min_status - $child['propagation_value']
+								);
+								break;
+
+							case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+								$reverse_min_status = min(TRIGGER_SEVERITY_COUNT - 1,
+									$min_status + $child['propagation_value']
+								);
+								break;
+
+							case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+								$reverse_min_status = null;
+								break;
+
+							default:
+								$reverse_min_status = $min_status;
+								break;
+						}
+
+						$evaluate_children[$child_serviceid] = $reverse_min_status;
+					}
+
+					$evaluate_additional_rules = true;
+				}
+				else {
+					$evaluate_children = array_fill_keys(array_keys($not_ok_children), null);
+					$evaluate_additional_rules = false;
+				}
+
+				break;
+
+			default:
+				$evaluate_children = [];
+				$evaluate_additional_rules = true;
+		}
+
+		if ($evaluate_additional_rules) {
+			foreach ($parent['status_rules'] as $status_rule) {
+				if ($min_status !== null && $status_rule['new_status'] < $min_status) {
+					continue;
+				}
+
+				$is_less_than = in_array($status_rule['type'], [
+					ZBX_SERVICE_STATUS_RULE_TYPE_N_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_W_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+				]);
+
+				$is_weight = in_array($status_rule['type'], [
+					ZBX_SERVICE_STATUS_RULE_TYPE_W_GE,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE,
+					ZBX_SERVICE_STATUS_RULE_TYPE_W_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+				]);
+
+				$is_percentage = in_array($status_rule['type'], [
+					ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE,
+					ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+				]);
+
+				$rule_children = array_filter($children,
+					static function (array $child) use ($status_rule, $is_less_than, $is_weight): bool {
+						$status_matched = $is_less_than
+							? $child['status'] > $status_rule['limit_status']
+							: $child['status'] >= $status_rule['limit_status'];
+
+						$weight_matched = !$is_weight || $child['weight'] > 0;
+
+						return $status_matched && $weight_matched;
+					}
+				);
+
+				if ($is_weight) {
+					$value = 0;
+
+					foreach ($rule_children as $child) {
+						$value += $child['weight'];
+					}
+
+					$value_total = 0;
+
+					foreach ($children as $child) {
+						$value_total += $child['weight'];
+					}
+				}
+				else {
+					$value = count($rule_children);
+					$value_total = count($children);
+				}
+
+				$limit_value = $is_percentage
+					? $status_rule['limit_value'] * $value_total / 100
+					: $status_rule['limit_value'];
+
+				$rule_qualifies = $is_less_than ? $value_total - $value < $limit_value : $value >= $limit_value;
+
+				if ($rule_qualifies) {
+					$rule_min_status = $is_less_than ? $status_rule['limit_status'] + 1 : $status_rule['limit_status'];
+
+					foreach ($rule_children as $child_serviceid => $child) {
+						if (array_key_exists($child_serviceid, $evaluate_children)) {
+							if ($evaluate_children[$child_serviceid] !== null) {
+								$evaluate_children[$child_serviceid] = min($evaluate_children[$child_serviceid],
+									$rule_min_status
+								);
+							}
+						}
+						else {
+							$evaluate_children[$child_serviceid] = $rule_min_status;
+						}
+					}
+				}
+			}
+		}
+
+		$problem_events = [];
+
+		foreach ($evaluate_children as $child_serviceid => $child_min_status) {
+			$problem_events += self::getProblemEvents((string) $child_serviceid, $services, $relations, $service_problems,
+				$child_min_status
+			);
+		}
+
+		return $problem_events;
 	}
 
 	/**
@@ -1543,7 +1859,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function getPermissions(): array {
+	private static function getPermissions(): array {
 		$role = API::Role()->get([
 			'output' => [],
 			'selectRules' => ['services.read.mode', 'services.read.list', 'services.read.tag', 'services.write.mode',
