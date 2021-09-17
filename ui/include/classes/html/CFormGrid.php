@@ -39,4 +39,30 @@ class CFormGrid extends CTag {
 
 		$this->addClass(self::ZBX_STYLE_CLASS);
 	}
+
+	/**
+	 * Shorthand to generate a label and form field row structure, optionally with common CSS class name for toggling.
+	 *
+	 * @param mixed $label             Element to be used as label column.
+	 * @param mixed $field             Element to be used as form field column.
+	 * @param string|null $css_class   String to addClass to both elements.
+	 *
+	 * @return CFormGrid
+	 */
+	public function addFormRow($label, $field, $css_class = null): CFormGrid {
+		if (!($label instanceof CLabel)) {
+			$label = new CLabel($label);
+		}
+
+		if (!($field instanceof CFormField)) {
+			$field = new CFormField($field);
+		}
+
+		if ($css_class !== null) {
+			$label->addClass($css_class);
+			$field->addClass($css_class);
+		}
+
+		return $this->addItem([$label, $field]);
+	}
 }

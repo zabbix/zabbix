@@ -20,52 +20,54 @@
 
 var globalAllObjForViewSwitcher = {};
 
-var CViewSwitcher = function(objId, objAction, confData, disableDDItems) {
-	this.mainObj = document.getElementById(objId);
-	this.objAction = objAction;
+class CViewSwitcher {
+	mainObj = null;
+	depObjects = {};
+	lastValue = null;
 
-	if (is_null(this.mainObj)) {
-		throw('ViewSwitcher error: main object not found!');
-	}
-	this.depObjects = {};
+	constructor(objId, objAction, confData, disableDDItems) {
+		this.mainObj = document.getElementById(objId);
+		this.objAction = objAction;
 
-	if (disableDDItems) {
-		this.disableDDItems = disableDDItems;
-	}
-
-	for (var key in confData) {
-		if (empty(confData[key])) {
-			continue;
+		if (is_null(this.mainObj)) {
+			throw ('ViewSwitcher error: main object not found!');
 		}
-		this.depObjects[key] = {};
 
-		for (var vKey in confData[key]) {
-			if (empty(confData[key][vKey])) {
+		this.depObjects = {};
+
+		if (disableDDItems) {
+			this.disableDDItems = disableDDItems;
+		}
+
+		for (var key in confData) {
+			if (empty(confData[key])) {
 				continue;
 			}
 
-			if (is_string(confData[key][vKey])) {
-				this.depObjects[key][vKey] = {'id': confData[key][vKey]};
-			}
-			else if (is_object(confData[key][vKey])) {
-				this.depObjects[key][vKey] = confData[key][vKey];
+			this.depObjects[key] = {};
+
+			for (var vKey in confData[key]) {
+				if (empty(confData[key][vKey])) {
+					continue;
+				}
+
+				if (is_string(confData[key][vKey])) {
+					this.depObjects[key][vKey] = { 'id': confData[key][vKey] };
+				}
+				else if (is_object(confData[key][vKey])) {
+					this.depObjects[key][vKey] = confData[key][vKey];
+				}
 			}
 		}
+
+		jQuery(this.mainObj).on(objAction, this.rebuildView.bindAsEventListener(this));
+		globalAllObjForViewSwitcher[objId] = this;
+
+		this.hideAllObjs();
+		this.rebuildView();
 	}
 
-	jQuery(this.mainObj).on(objAction, this.rebuildView.bindAsEventListener(this));
-	globalAllObjForViewSwitcher[objId] = this;
-
-	this.hideAllObjs();
-	this.rebuildView();
-};
-
-CViewSwitcher.prototype = {
-	mainObj: null,
-	depObjects: {},
-	lastValue: null,
-
-	rebuildView: function(e) {
+	rebuildView() {
 		var myValue = this.objValue(this.mainObj);
 
 		// enable previously disabled dropdown items
@@ -126,9 +128,9 @@ CViewSwitcher.prototype = {
 			}
 		}
 		this.lastValue = myValue;
-	},
+	}
 
-	objValue: function(obj) {
+	objValue(obj) {
 		if (is_null(obj)) {
 			return null;
 		}
@@ -147,9 +149,9 @@ CViewSwitcher.prototype = {
 		}
 
 		return null;
-	},
+	}
 
-	setObjValue : function (obj, value) {
+	setObjValue(obj, value) {
 		if (is_null(obj) || !isset('tagName', obj)) {
 			return null;
 		}
@@ -163,23 +165,26 @@ CViewSwitcher.prototype = {
 					}
 				}
 				break;
+
 			case 'input':
 				var inpType = obj.getAttribute('type');
-				if (!is_null(inpType) && inpType.toLowerCase() == 'checkbox') {
+
+				if (!is_null(inpType) && inpType.toLowerCase() === 'checkbox') {
 					obj.checked = true;
-					obj.value == value;
+					obj.value = value;
 					break;
 				}
 			case 'textarea':
 			default:
 				obj.value = value;
 		}
-	},
+	}
 
-	objDisplay: function(obj) {
+	objDisplay(obj) {
 		if (is_null(obj) || !isset('tagName', obj)) {
 			return null;
 		}
+
 		switch (obj.tagName.toLowerCase()) {
 			case 'th':
 			case 'td':
@@ -199,80 +204,98 @@ CViewSwitcher.prototype = {
 			default:
 				obj.style.display = 'inline';
 		}
-	},
+	}
 
-	disableObj: function(obj, disable) {
+	disableObj(obj, disable) {
 		if (is_null(obj) || !isset('tagName', obj)) {
 			return null;
 		}
+
 		obj.disabled = disable;
+
 		if (obj == this.mainObj) {
 			this.rebuildView();
 		}
-	},
+	}
 
-	hideObj: function(data) {
-		var element = document.getElementById(data.id);
-		if (element === null) {
+	selectElements(id) {
+		return document.querySelectorAll('#' + id + ', .' + id);
+	}
+
+	hideObj(data, elements) {
+		if (typeof elements === 'undefined') {
+			elements = this.selectElements(data.id);
+
+			if (elements.length == 0) {
+				return true;
+			}
+		}
+
+		elements.forEach((element) => {
+			this.disableObj(element, true);
+			element.style.display = 'none';
+		});
+	}
+
+	showObj(data) {
+		var elements = this.selectElements(data.id);
+
+		if (elements.length == 0) {
 			return true;
 		}
-		this.disableObj(element, true);
-		element.style.display = 'none';
-	},
 
-	showObj: function(data) {
-		var element = document.getElementById(data.id);
-		if (element === null) {
-			return true;
-		}
-		this.disableObj(element, false);
+		elements.forEach((element) => {
+			this.disableObj(element, false)
 
-		if (!is_null(data)) {
-			var objValue = this.objValue(element);
-			var defaultValue = false;
+			if (!is_null(data)) {
+				var objValue = this.objValue(element);
+				var defaultValue = false;
 
-			for (var i in this.depObjects) {
-				for (var j in this.depObjects[i]) {
-					if (this.depObjects[i][j]['id'] == data.id
-						&& isset('defaultValue', this.depObjects[i][j])
-						&& this.depObjects[i][j]['defaultValue'] != ''
-						&& this.depObjects[i][j]['defaultValue'] == objValue) {
-						defaultValue = true;
+				for (var i in this.depObjects) {
+					for (var j in this.depObjects[i]) {
+						if (this.depObjects[i][j]['id'] == data.id
+							&& isset('defaultValue', this.depObjects[i][j])
+							&& this.depObjects[i][j]['defaultValue'] != ''
+							&& this.depObjects[i][j]['defaultValue'] == objValue) {
+							defaultValue = true;
+						}
 					}
 				}
-			}
-			if ((objValue == '' || defaultValue) && isset('defaultValue', data)) {
-				this.setObjValue(element, data.defaultValue);
-			}
-		}
-		this.objDisplay(element);
-	},
 
-	hideAllObjs: function() {
+				if ((objValue == '' || defaultValue) && isset('defaultValue', data)) {
+					this.setObjValue(element, data.defaultValue);
+				}
+			}
+
+			this.objDisplay(element);
+		});
+	}
+
+	hideAllObjs() {
 		var hidden = {};
+
 		for (var i in this.depObjects) {
 			if (empty(this.depObjects[i])) {
 				continue;
 			}
+
 			for (var a in this.depObjects[i]) {
-				if (empty(this.depObjects[i][a])) {
-					continue;
-				}
-				if (isset(this.depObjects[i][a].id, hidden)) {
+				if (empty(this.depObjects[i][a]) || isset(this.depObjects[i][a].id, hidden)) {
 					continue;
 				}
 
 				hidden[this.depObjects[i][a].id] = true;
+				var elements = this.selectElements(this.depObjects[i][a].id);
 
-				var elm = document.getElementById(this.depObjects[i][a].id);
-				if (elm === null) {
+				if (elements.length == 0) {
 					continue;
 				}
-				this.hideObj(this.depObjects[i][a]);
+
+				this.hideObj(this.depObjects[i][a], elements);
 			}
 		}
 	}
-};
+}
 
 function ActionProcessor(actions) {
 	this.actions = actions || {};

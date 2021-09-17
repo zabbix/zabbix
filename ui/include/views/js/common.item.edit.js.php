@@ -215,18 +215,18 @@ zbx_subarray_push($this->data['typeDisable'], ITEM_TYPE_CALCULATED, [ITEM_VALUE_
 		key_field: null,
 		item_tab_type_field: null,
 		preprocessing_tab_type_field: null,
-		preprocessing_tab_type_row: null,
+		preprocessing_tab_type_row_nodes: [],
 		last_lookup: '',
 		inferred_type: null,
 		debounce_id: null,
 
 		init: function() {
-			this.form = document.getElementById('item-form');
+			this.form = document.querySelector('#item-form, #item-prototype-form');
 			this.key_field = this.form.querySelector('[name=key]');
 			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
 			this.item_tab_type_field_hint = this.form.querySelector('.js-item-type-hint');
 			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
-			this.preprocessing_tab_type_row = this.preprocessing_tab_type_field.closest('li');
+			this.preprocessing_tab_type_row_nodes = this.form.querySelectorAll('.js-preprocessing-type-row');
 
 			this.initPreprocessignTabField();
 			this.initItemTabField();
@@ -276,8 +276,8 @@ zbx_subarray_push($this->data['typeDisable'], ITEM_TYPE_CALCULATED, [ITEM_VALUE_
 
 		updatePreprocessingState: function() {
 			this.preprocessing_active = (this.form.querySelector('.preprocessing-step') != null);
-			this.preprocessing_tab_type_row.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>,
-				!this.preprocessing_active
+			this.preprocessing_tab_type_row_nodes.forEach((element) => element.classList
+				.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, !this.preprocessing_active)
 			);
 			this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
 		},

@@ -47,27 +47,28 @@ if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);
 }
 
-// Create form list.
-$form_list = new CFormList('itemFormList');
+$item_tab = (new CFormGrid())->setId('itemFormList');
 
 if (!empty($data['templates'])) {
-	$form_list->addRow(_('Parent items'), $data['templates']);
+	$item_tab->addFormRow(_('Parent items'), $data['templates']);
 }
 
 $discovered_item = (array_key_exists('item', $data) && $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 $readonly = ($data['limited'] || $discovered_item);
 
 if ($discovered_item) {
-	$form_list->addRow(_('Discovered by'), new CLink($data['item']['discoveryRule']['name'],
-		(new CUrl('disc_prototypes.php'))
+	$item_tab->addFormRow(
+		_('Discovered by'),
+		new CLink($data['item']['discoveryRule']['name'], (new CUrl('disc_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['item']['discoveryRule']['itemid'])
 			->setArgument('itemid', $data['item']['itemDiscovery']['parent_itemid'])
 			->setArgument('context', 'host')
-	));
+		)
+	);
 }
 
-$form_list->addRow(
+$item_tab->addFormRow(
 	(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 	(new CTextBox('name', $data['name'], $readonly))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -76,7 +77,8 @@ $form_list->addRow(
 );
 
 // Append type to form list.
-$form_list->addRow((new CLabel(_('Type'), 'label-type')),
+$item_tab->addFormRow(
+	new CLabel(_('Type'), 'label-type'),
 	(new CSelect('type'))
 		->setId('type')
 		->setFocusableElementId('label-type')
@@ -120,9 +122,9 @@ elseif (!$readonly) {
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
 $query_fields->items = [json_encode($query_fields_data)];
-
 // Prepare ITEM_TYPE_SCRIPT parameters.
 $parameters_data = [];
+
 if ($data['parameters']) {
 	$parameters_data = $data['parameters'];
 }
@@ -162,16 +164,15 @@ if ($parameters_data) {
 	}
 }
 
-$parameters_table->addRow([
-	(new CButton('parameter_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-add')
-		->setEnabled(!$readonly)
-]);
+$parameters_table->addRow((new CButton('parameter_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')
+	->setEnabled(!$readonly)
+);
 
-$form_list
+$item_tab
 	// Append ITEM_TYPE_HTTPAGENT Query fields to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Query fields'), 'query_fields_pairs'),
 		(new CDiv([
 			(new CTable())
@@ -231,14 +232,15 @@ $form_list
 				]))
 			)
 	)
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Parameters'), $parameters_table->getId()),
 		(new CDiv($parameters_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 		'parameters_row'
 	)
-	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
+	->addFormRow(
+		(new CLabel(_('Script'), 'script'))->setAsteriskMark(),
 		(new CMultilineInput('script', $data['params'], [
 			'title' => _('JavaScript'),
 			'placeholder' => _('script'),
@@ -253,7 +255,7 @@ $form_list
 		'script_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request type to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Request type'), 'label-request-method'),
 		(new CSelect('request_method'))
 			->setId('request_method')
@@ -269,7 +271,7 @@ $form_list
 		'request_method_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
-	->addRow(
+	->addFormRow(
 		(new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 		(new CTextBox('timeout', $data['timeout'], $readonly))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -277,7 +279,7 @@ $form_list
 		'timeout_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Request body type'), 'post_type'),
 		(new CRadioButtonList('post_type', (int) $data['post_type']))
 			->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
@@ -288,7 +290,7 @@ $form_list
 		'post_type_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request body to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Request body'), 'posts'),
 		(new CTextArea('posts', $data['posts'], compact('readonly')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'posts_row'
@@ -304,12 +306,13 @@ if (is_array($data['headers']) && $data['headers']) {
 elseif (!$readonly) {
 	$headers_data[] = ['name' => '', 'value' => ''];
 }
+
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
 $headers->items = [json_encode($headers_data)];
 
-$form_list
+$item_tab
 	// Append ITEM_TYPE_HTTPAGENT Headers fields to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Headers'), 'headers_pairs'),
 		(new CDiv([
 			(new CTable())
@@ -349,14 +352,14 @@ $form_list
 		'headers_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Required status codes to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Required status codes'), 'status_codes'),
 		(new CTextBox('status_codes', $data['status_codes'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'status_codes_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Follow redirects to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Follow redirects'), 'follow_redirects'),
 		(new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
 			->setEnabled(!$readonly)
@@ -364,7 +367,7 @@ $form_list
 		'follow_redirects_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Retrieve mode to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Retrieve mode'), 'retrieve_mode'),
 		(new CRadioButtonList('retrieve_mode', (int) $data['retrieve_mode']))
 			->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
@@ -375,7 +378,7 @@ $form_list
 		'retrieve_mode_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Convert to JSON to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Convert to JSON'), 'output_format'),
 		(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
 			->setEnabled(!$readonly)
@@ -383,7 +386,7 @@ $form_list
 		'output_format_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP proxy to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('HTTP proxy'), 'http_proxy'),
 		(new CTextBox('http_proxy', $data['http_proxy'], $readonly, DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -392,7 +395,7 @@ $form_list
 		'http_proxy_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('HTTP authentication'), 'label-http-authtype'),
 		(new CSelect('http_authtype'))
 			->setId('http_authtype')
@@ -403,7 +406,7 @@ $form_list
 		'http_authtype_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT User name to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('User name'), 'http_username'),
 		(new CTextBox('http_username', $data['http_username'], $readonly, DB::getFieldLength('items', 'username')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -411,7 +414,7 @@ $form_list
 		'http_username_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Password to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('Password'), 'http_password'),
 		(new CTextBox('http_password', $data['http_password'], $readonly, DB::getFieldLength('items', 'password')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -419,7 +422,7 @@ $form_list
 		'http_password_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('SSL verify peer'), 'verify_peer'),
 		(new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
 			->setEnabled(!$readonly)
@@ -427,7 +430,7 @@ $form_list
 		'verify_peer_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL verify host to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('SSL verify host'), 'verify_host'),
 		(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
 			->setEnabled(!$readonly)
@@ -435,21 +438,21 @@ $form_list
 		'verify_host_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL certificate file to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('SSL certificate file'), 'ssl_cert_file'),
 		(new CTextBox('ssl_cert_file', $data['ssl_cert_file'], $readonly, DB::getFieldLength('items', 'ssl_cert_file')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'ssl_cert_file_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL key file to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('SSL key file'), 'ssl_key_file'),
 		(new CTextBox('ssl_key_file', $data['ssl_key_file'], $readonly, DB::getFieldLength('items', 'ssl_key_file')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'ssl_key_file_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL key password to form list.
-	->addRow(
+	->addFormRow(
 		new CLabel(_('SSL key password'), 'ssl_key_password'),
 		(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly,
 			DB::getFieldLength('items', 'ssl_key_password')
@@ -459,7 +462,7 @@ $form_list
 		'ssl_key_password_row'
 	)
 	// Append master item select to form list.
-	->addRow(
+	->addFormRow(
 		(new CLabel(_('Master item'), 'master_itemid_ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'master_itemid',
@@ -501,7 +504,8 @@ if ($data['display_interfaces']) {
 			$interface = $data['interfaces'][$data['interfaceid']];
 
 			$form->addVar('selectedInterfaceId', $data['interfaceid']);
-			$form_list->addRow((new CLabel(_('Host interface'), 'interface'))->setAsteriskMark(),
+			$item_tab->addFormRow(
+				(new CLabel(_('Host interface'), 'interface'))->setAsteriskMark(),
 				(new CTextBox('interface', getHostInterface($interface), true))->setAriaRequired(),
 				'interface_row'
 			);
@@ -515,7 +519,7 @@ if ($data['display_interfaces']) {
 			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
 
-		$form_list->addRow(
+		$item_tab->addFormRow(
 			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))->setAsteriskMark(),
 			[
 				$select_interface,
@@ -523,31 +527,31 @@ if ($data['display_interfaces']) {
 					->setId('interface_not_defined')
 					->addClass(ZBX_STYLE_RED)
 					->setAttribute('style', 'display: none;')
-			], 'interface_row');
+			],
+			'interface_row'
+		);
 		$form->addVar('selectedInterfaceId', $data['interfaceid']);
 	}
 }
 
-$form_list
-	// Append SNMP common fields fields.
-	->addRow(
-		(new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
-		(new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))
-			->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		'row_snmp_oid'
-	);
-
-$form_list
-
-->addRow(_('IPMI sensor'),
-	(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	'row_ipmi_sensor'
+// Append SNMP common fields fields.
+$item_tab->addFormRow(
+	(new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
+	(new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))
+		->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired(),
+	'row_snmp_oid'
 );
 
-$form_list
-	->addRow(new CLabel(_('Authentication method'), 'label-authtype'),
+$item_tab
+	->addFormRow(
+		_('IPMI sensor'),
+		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'row_ipmi_sensor'
+	)
+	->addFormRow(
+		new CLabel(_('Authentication method'), 'label-authtype'),
 		(new CSelect('authtype'))
 			->setId('authtype')
 			->setValue($data['authtype'])
@@ -559,39 +563,42 @@ $form_list
 			->setReadonly($discovered_item),
 		'row_authtype'
 	)
-	->addRow((new CLabel(_('JMX endpoint'), 'jmx_endpoint'))->setAsteriskMark(),
+	->addFormRow(
+		(new CLabel(_('JMX endpoint'), 'jmx_endpoint'))->setAsteriskMark(),
 		(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], $discovered_item, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'row_jmx_endpoint'
 	)
-	->addRow(_('User name'),
+	->addFormRow(
+		_('User name'),
 		(new CTextBox('username', $data['username'], $discovered_item, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete(),
 		'row_username'
 	)
-	->addRow(
+	->addFormRow(
 		(new CLabel(_('Public key file'), 'publickey'))->setAsteriskMark(),
 		(new CTextBox('publickey', $data['publickey'], $discovered_item, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired(),
 		'row_publickey'
 	)
-	->addRow(
+	->addFormRow(
 		(new CLabel(_('Private key file'), 'privatekey'))->setAsteriskMark(),
 		(new CTextBox('privatekey', $data['privatekey'], $discovered_item, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired(),
 		'row_privatekey'
 	)
-	->addRow(_('Password'),
+	->addFormRow(
+		_('Password'),
 		(new CTextBox('password', $data['password'], $discovered_item, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete(),
 		'row_password'
 	)
-	->addRow(
+	->addFormRow(
 		(new CLabel(_('Executed script'), 'params_es'))->setAsteriskMark(),
 		(new CTextArea('params_es', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
@@ -600,7 +607,7 @@ $form_list
 			->setReadonly($discovered_item),
 		'label_executed_script'
 	)
-	->addRow(
+	->addFormRow(
 		(new CLabel(_('SQL query'), 'params_ap'))->setAsteriskMark(),
 		(new CTextArea('params_ap', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
@@ -609,7 +616,7 @@ $form_list
 			->setReadonly($discovered_item),
 		'label_params'
 	)
-	->addRow(
+	->addFormRow(
 		(new CLabel(_('Formula'), 'params_f'))->setAsteriskMark(),
 		(new CTextArea('params_f', $data['params'], $discovered_item))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
@@ -631,11 +638,14 @@ $type_mismatch_hint = (new CSpan(makeWarningIcon(_('Type may not match Key.'))))
 	->addClass('js-item-type-hint')
 	->addClass(ZBX_STYLE_DISPLAY_NONE);
 
-$form_list
+$item_tab
 	// Append item key to form list.
-	->addRow((new CLabel(_('Key'), 'key'))->setAsteriskMark(), $key_controls)
-	// Append ITEM_TYPE_HTTPAGENT URL field to for list.
-	->addRow(
+	->addFormRow(
+		(new CLabel(_('Key'), 'key'))->setAsteriskMark(),
+		$key_controls
+	)
+	// Append ITEM_TYPE_HTTPAGENT URL field to form list.
+	->addFormRow(
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 		[
 			(new CTextBox('url', $data['url'], $readonly, DB::getFieldLength('items', 'url')))
@@ -649,22 +659,27 @@ $form_list
 		],
 		'url_row'
 	)
-	->addRow(new CLabel(_('Type of information'), 'label-value-type'), [
-		(new CSelect('value_type'))
-			->setFocusableElementId('label-value-type')
-			->setId('value_type')
-			->setValue($data['value_type'])
-			->addOptions($item_type_options)
-			->setReadonly($readonly),
-		$type_mismatch_hint
-	]);
+	->addFormRow(
+		new CLabel(_('Type of information'), 'label-value-type'),
+		[
+			(new CSelect('value_type'))
+				->setFocusableElementId('label-value-type')
+				->setId('value_type')
+				->setValue($data['value_type'])
+				->addOptions($item_type_options)
+				->setReadonly($readonly),
+			$type_mismatch_hint
+		]
+	);
 
-$form_list
-	->addRow(_('Units'),
+$item_tab
+	->addFormRow(
+		_('Units'),
 		(new CTextBox('units', $data['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_units'
 	)
-	->addRow((new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
+	->addFormRow(
+		(new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
 		(new CTextBox('delay', $data['delay'], $discovered_item))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired(),
@@ -728,7 +743,8 @@ if (!$discovered_item) {
 		->addClass('element-table-add')]);
 }
 
-$form_list->addRow(_('Custom intervals'),
+$item_tab->addFormRow(
+	_('Custom intervals'),
 	(new CDiv($delayFlexTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
@@ -747,7 +763,7 @@ if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MON
 				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
-	$keep_history_hint = (new CDiv(makeWarningIcon([
+	$keep_history_hint = (new CSpan(makeWarningIcon([
 		' '._x('Overridden by', 'item_form').' ',
 		$link,
 		' ('.$data['config']['hk_history'].')'
@@ -756,8 +772,9 @@ if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MON
 		->setId('history_mode_hint');
 }
 
-$form_list->addRow((new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
-	(new CDiv([
+$item_tab->addFormRow(
+	(new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
+	[
 		(new CRadioButtonList('history_mode', (int) $data['history_mode']))
 			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
 			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
@@ -768,7 +785,7 @@ $form_list->addRow((new CLabel(_('History storage period'), 'history'))->setAste
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired(),
 		$keep_history_hint
-	]))->addClass('wrap-multiple-controls')
+	]
 );
 
 // Append trend storage to form list.
@@ -783,7 +800,7 @@ if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONIT
 				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
-	$keep_trend_hint = (new CDiv(makeWarningIcon([
+	$keep_trend_hint = (new CSpan(makeWarningIcon([
 		' '._x('Overridden by', 'item_form').' ',
 		$link,
 		' ('.$data['config']['hk_trends'].')'
@@ -792,9 +809,10 @@ if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONIT
 		->setId('trends_mode_hint');
 }
 
-$form_list
-	->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAsteriskMark(),
-		(new CDiv([
+$item_tab
+	->addFormRow(
+		(new CLabel(_('Trend storage period'), 'trends'))->setAsteriskMark(),
+		[
 			(new CRadioButtonList('trends_mode', (int) $data['trends_mode']))
 				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
 				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
@@ -805,16 +823,18 @@ $form_list
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired(),
 			$keep_trend_hint
-		]))->addClass('wrap-multiple-controls'),
+		],
 		'row_trends'
 	)
-	->addRow(_('Log time format'),
+	->addFormRow(
+		_('Log time format'),
 		(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_logtimefmt'
 	);
 
 if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$form_list->addRow(new CLabel(_('Value mapping'), 'valuemapid_ms'),
+	$item_tab->addFormRow(
+		new CLabel(_('Value mapping'), 'valuemapid_ms'),
 		(new CMultiSelect([
 			'name' => 'valuemapid',
 			'object_name' => 'valuemaps',
@@ -838,8 +858,8 @@ if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 }
 
-$form_list
-	->addRow(
+$item_tab
+	->addFormRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		[
 			$discovered_item ? new CVar('allow_traps', $data['allow_traps']) : null,
@@ -849,7 +869,8 @@ $form_list
 		],
 		'allow_traps_row'
 	)
-	->addRow(_('Allowed hosts'),
+	->addFormRow(
+		_('Allowed hosts'),
 		(new CTextBox('trapper_hosts', $data['trapper_hosts'], $discovered_item))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_trapper_hosts'
@@ -882,27 +903,31 @@ else {
 		}
 	}
 
-	$form_list->addRow(new CLabel(_('Populates host inventory field'), $host_inventory_select->getFocusableElementId()),
-		$host_inventory_select, 'row_inventory_link'
+	$item_tab->addFormRow(
+		new CLabel(_('Populates host inventory field'), $host_inventory_select->getFocusableElementId()),
+		$host_inventory_select,
+		'row_inventory_link'
 	);
 }
 
 // Append description to form list.
-$form_list
-	->addRow(_('Description'),
+$item_tab
+	->addFormRow(
+		_('Description'),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('items', 'description'))
 			->setReadonly($discovered_item)
 	)
 	// Append status to form list.
-	->addRow(_('Enabled'),
+	->addFormRow(
+		_('Enabled'),
 		(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE)
 	);
 
 // Append tabs to form.
-$itemTab = (new CTabView())
-	->addTab('itemTab', $data['caption'], $form_list)
+$item_tabs = (new CTabView())
+	->addTab('itemTab', $data['caption'], $item_tab)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
 			'source' => 'item',
@@ -913,22 +938,26 @@ $itemTab = (new CTabView())
 		TAB_INDICATOR_TAGS
 	)
 	->addTab('preprocTab', _('Preprocessing'),
-		(new CFormList('item_preproc_list'))
-			->addRow(_('Preprocessing steps'),
+		(new CFormGrid())
+			->setId('item_preproc_list')
+			->addFormRow(
+				_('Preprocessing steps'),
 				getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
 			)
-			->addRow(new CLabel(_('Type of information'), 'label-value-type-steps'),
+			->addFormRow(
+				new CLabel(_('Type of information'), 'label-value-type-steps'),
 				(new CSelect('value_type_steps'))
 					->setFocusableElementId('label-value-type-steps')
 					->setValue($data['value_type'])
 					->addOptions($item_type_options)
-					->setReadonly($readonly)
+					->setReadonly($readonly),
+				'js-preprocessing-type-row'
 			),
 		TAB_INDICATOR_PREPROCESSING
 	);
 
 if (!hasRequest('form_refresh')) {
-	$itemTab->setSelected(0);
+	$item_tabs->setSelected(0);
 }
 
 // Append buttons to form.
@@ -959,16 +988,16 @@ if ($data['itemid'] != 0) {
 		->setEnabled(!$data['limited']);
 	$buttons[] = new CButtonCancel(url_params(['hostid', 'context']));
 
-	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$item_tabs->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$itemTab->setFooter(makeFormFooter(
+	$item_tabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_params(['hostid', 'context']))]
 	));
 }
 
-$form->addItem($itemTab);
+$form->addItem($item_tabs);
 $widget->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
