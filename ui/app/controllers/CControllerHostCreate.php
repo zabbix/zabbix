@@ -66,7 +66,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 		try {
 			DBstart();
 
-			$host = array_filter([
+			$host = [
 				'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
 				'proxy_hostid' => $this->getInput('proxy_hostid', 0),
 				'groups' => $this->processHostGroups($this->getInput('groups', [])),
@@ -81,12 +81,11 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 					: [],
 				'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
 				'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
-			]);
+			];
 
 			$this->getInputs($host, [
-				'host', 'visiblename', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege',
-				'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk',
-				'inventory_mode'
+				'host', 'visiblename', 'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+				'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
 			]);
 
 			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
