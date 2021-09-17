@@ -49,18 +49,13 @@ if (!empty($data['itemid'])) {
 
 // Create form list.
 $form_list = new CFormList('itemFormList');
+
 if (!empty($data['templates'])) {
 	$form_list->addRow(_('Parent items'), $data['templates']);
 }
 
-$discovered_item = false;
-if (array_key_exists('item', $data) && $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	$discovered_item = true;
-}
-$readonly = false;
-if ($data['limited'] || $discovered_item) {
-	$readonly = true;
-}
+$discovered_item = (array_key_exists('item', $data) && $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
+$readonly = ($data['limited'] || $discovered_item);
 
 if ($discovered_item) {
 	$form_list->addRow(_('Discovered by'), new CLink($data['item']['discoveryRule']['name'],
@@ -110,25 +105,6 @@ if (!$readonly) {
 				',{itemtype: jQuery("#type").val()}), null, this);'
 		);
 }
-
-$form_list
-	// Append item key to form list.
-	->addRow((new CLabel(_('Key'), 'key'))->setAsteriskMark(), $key_controls)
-	// Append ITEM_TYPE_HTTPAGENT URL field to for list.
-	->addRow(
-		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
-		[
-			(new CTextBox('url', $data['url'], $readonly, DB::getFieldLength('items', 'url')))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('httpcheck_parseurl', _('Parse')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->setEnabled(!$readonly)
-				->setAttribute('data-action', 'parse_url')
-		],
-		'url_row'
-	);
 
 // Prepare ITEM_TYPE_HTTPAGENT query fields.
 $query_fields_data = [];
@@ -643,21 +619,47 @@ $form_list
 		'label_formula'
 	);
 
+$item_type_options = CSelect::createOptionsFromArray([
+	ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+	ITEM_VALUE_TYPE_STR => _('Character'),
+	ITEM_VALUE_TYPE_LOG => _('Log'),
+	ITEM_VALUE_TYPE_TEXT => _('Text')
+]);
+$type_mismatch_hint = (new CSpan(makeWarningIcon(_('Type may not match Key.'))))
+	->addStyle('margin: 5px 0 0 5px;')
+	->addClass('js-item-type-hint')
+	->addClass(ZBX_STYLE_DISPLAY_NONE);
+
 $form_list
-	->addRow(new CLabel(_('Type of information'), 'label-value-type'),
+	// Append item key to form list.
+	->addRow((new CLabel(_('Key'), 'key'))->setAsteriskMark(), $key_controls)
+	// Append ITEM_TYPE_HTTPAGENT URL field to for list.
+	->addRow(
+		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
+		[
+			(new CTextBox('url', $data['url'], $readonly, DB::getFieldLength('items', 'url')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton('httpcheck_parseurl', _('Parse')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->setEnabled(!$readonly)
+				->setAttribute('data-action', 'parse_url')
+		],
+		'url_row'
+	)
+	->addRow(new CLabel(_('Type of information'), 'label-value-type'), [
 		(new CSelect('value_type'))
 			->setFocusableElementId('label-value-type')
 			->setId('value_type')
 			->setValue($data['value_type'])
-			->addOptions(CSelect::createOptionsFromArray([
-				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-				ITEM_VALUE_TYPE_STR => _('Character'),
-				ITEM_VALUE_TYPE_LOG => _('Log'),
-				ITEM_VALUE_TYPE_TEXT => _('Text')
-			]))
-			->setReadonly($readonly)
-	)
+			->addOptions($item_type_options)
+			->setReadonly($readonly),
+		$type_mismatch_hint
+	]);
+
+$form_list
 	->addRow(_('Units'),
 		(new CTextBox('units', $data['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_units'
@@ -745,7 +747,7 @@ if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MON
 				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
-	$keep_history_hint = (new CDiv(makeInformationIcon([
+	$keep_history_hint = (new CDiv(makeWarningIcon([
 		' '._x('Overridden by', 'item_form').' ',
 		$link,
 		' ('.$data['config']['hk_history'].')'
@@ -781,7 +783,7 @@ if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONIT
 				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
-	$keep_trend_hint = (new CDiv(makeInformationIcon([
+	$keep_trend_hint = (new CDiv(makeWarningIcon([
 		' '._x('Overridden by', 'item_form').' ',
 		$link,
 		' ('.$data['config']['hk_trends'].')'
@@ -914,6 +916,13 @@ $itemTab = (new CTabView())
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
 				getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
+			)
+			->addRow(new CLabel(_('Type of information'), 'label-value-type-steps'),
+				(new CSelect('value_type_steps'))
+					->setFocusableElementId('label-value-type-steps')
+					->setValue($data['value_type'])
+					->addOptions($item_type_options)
+					->setReadonly($readonly)
 			),
 		TAB_INDICATOR_PREPROCESSING
 	);
@@ -965,3 +974,7 @@ $widget->addItem($form);
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 
 $widget->show();
+
+(new CScriptTag('item_type_lookup.init();'))
+	->setOnDocumentReady()
+	->show();

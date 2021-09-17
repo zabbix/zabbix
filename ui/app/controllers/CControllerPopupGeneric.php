@@ -26,14 +26,16 @@ require_once dirname(__FILE__).'/../../include/users.inc.php';
 require_once dirname(__FILE__).'/../../include/js.inc.php';
 require_once dirname(__FILE__).'/../../include/discovery.inc.php';
 
-function get_window_opener($field, $value) {
+function get_window_opener($field, $value, $fire_event = null) {
 	if ($field === '') {
 		return '';
 	}
 
 	return '
 		try {'.
-			"document.getElementById(".zbx_jsvalue($field).").value=".zbx_jsvalue($value)."; ".
+			'let target = document.getElementById('.zbx_jsvalue($field).');'.
+			'target.value='.zbx_jsvalue($value).';'.
+			($fire_event === null ? '' : 'target.dispatchEvent(new CustomEvent('.zbx_jsvalue($fire_event).'));').
 		'} catch(e) {'.
 			'throw("Error: Target not found")'.
 		'}'."\n";

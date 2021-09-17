@@ -208,6 +208,138 @@ zbx_subarray_push($this->data['typeDisable'], ITEM_TYPE_CALCULATED, [ITEM_VALUE_
 
 ?>
 <script type="text/javascript">
+	const item_type_lookup = {
+		mapping: <?=json_encode((new CHelpItems())->getTypeMapping()) ?>,
+		preprocessing_active: false,
+		form: null,
+		key_field: null,
+		item_tab_type_field: null,
+		preprocessing_tab_type_field: null,
+		preprocessing_tab_type_row: null,
+		last_lookup: '',
+		inferred_type: null,
+		debounce_id: null,
+
+		init: function() {
+			this.form = document.getElementById('item-form');
+			this.key_field = this.form.querySelector('[name=key]');
+			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
+			this.item_tab_type_field_hint = this.form.querySelector('.js-item-type-hint');
+			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
+			this.preprocessing_tab_type_row = this.preprocessing_tab_type_field.closest('li');
+
+			this.initPreprocessignTabField();
+			this.initItemTabField();
+			this.initLookupHooks();
+			this.initPreprocessingObserver();
+			this.updatePreprocessingState();
+
+			this.lookup(this.key_field.value, false);
+		},
+
+		initPreprocessignTabField: function() {
+			this.preprocessing_tab_type_field.readOnly = this.item_tab_type_field.readOnly;
+
+			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
+				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
+			});
+		},
+
+		initItemTabField: function() {
+			this.item_tab_type_field.addEventListener('change', (e) => {
+				this.preprocessing_tab_type_field.value = this.item_tab_type_field.value;
+
+				this.item_tab_type_field_hint.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, (
+					this.preprocessing_active || this.inferred_type === null
+							|| this.item_tab_type_field.value == this.inferred_type
+				));
+			});
+		},
+
+		initLookupHooks: function() {
+			['change', 'keyup', 'focusout', 'paste'].forEach((event_type) => {
+				this.key_field.addEventListener(event_type, (e) => {
+					if (this.preprocessing_active) {
+						return this.lookup(this.key_field.value, false);
+					}
+
+					if (event_type === 'keyup') {
+						window.clearTimeout(this.debounce_id);
+						this.debounce_id = window.setTimeout(() => this.lookup(e.target.value), 500);
+						return;
+					}
+
+					this.lookup(e.target.value);
+				});
+			});
+		},
+
+		updatePreprocessingState: function() {
+			this.preprocessing_active = (this.form.querySelector('.preprocessing-step') != null);
+			this.preprocessing_tab_type_row.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>,
+				!this.preprocessing_active
+			);
+			this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
+		},
+
+		initPreprocessingObserver: function() {
+			new MutationObserver((mutationList, _observer) => this.updatePreprocessingState())
+				.observe(this.form.querySelector('.preprocessing-list'), {childList: true});
+		},
+
+		/**
+		 * Infer expected Item value type from (partial) key name.
+		 *
+		 * Best case scenario a direct match to a key name is found, as tested by adding '[' to entered string.
+		 * Otherwise a check is performed to see that key names matching so far are of the same type.
+		 * Else type is undetermined (null).
+		 *
+		 * @param {string}  key_part           Key name part entered.
+		 * @param {boolean} set_to_field=true  Pass False to perform background lookup, not updating input states.
+		 * @return {void}
+		 */
+		lookup: function(key_part, set_to_field = true) {
+			key_part = key_part
+				.split('[')
+				.shift()
+				.trimLeft()
+				.toLowerCase();
+
+			if (key_part === this.last_lookup) {
+				return;
+			}
+
+			this.last_lookup = key_part;
+			this.inferred_type = null;
+
+			if (this.last_lookup + '[' in this.mapping) {
+				this.inferred_type = this.mapping[this.last_lookup + '['];
+			}
+			else {
+				const matches = Object.entries(this.mapping)
+						.filter(([key_name, value_type]) => key_name.startsWith(this.last_lookup));
+
+				if (matches.length > 0) {
+					const sample_type = matches[0][1];
+
+					if (matches.length == 1 || matches.every(([key_name, value_type]) => value_type === sample_type)) {
+						this.inferred_type = sample_type;
+					}
+				}
+			}
+
+			if (this.inferred_type === null) {
+				return;
+			}
+
+			if (set_to_field) {
+				this.item_tab_type_field.value = this.inferred_type;
+			}
+
+			this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
+		}
+	};
+
 	function setAuthTypeLabel() {
 		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
 				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {

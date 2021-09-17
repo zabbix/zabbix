@@ -366,7 +366,7 @@ switch ($data['popup_type']) {
 
 	case 'help_items':
 		foreach ($data['table_records'] as $item) {
-			$action = get_window_opener($options['dstfld1'], $item[$options['srcfld1']]);
+			$action = get_window_opener($options['dstfld1'], $item[$options['srcfld1']], 'paste');
 			$action .= 'updateItemFormElements();';
 			$action .= $options['srcfld2']
 				? get_window_opener($options['dstfld2'], $item[$options['srcfld2']])
