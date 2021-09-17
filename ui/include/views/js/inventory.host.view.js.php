@@ -86,5 +86,5 @@
 				location.href = new Curl('hostinventories.php', false).getUrl();
 			}
 		}
-	}
+	};
 </script>

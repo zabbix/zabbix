@@ -161,5 +161,5 @@
 			clearMessages();
 			addMessage(message_box);
 		}
-	}
+	};
 </script>

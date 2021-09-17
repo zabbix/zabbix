@@ -60,5 +60,5 @@
 				location.href = location.href;
 			}
 		}
-	}
+	};
 </script>

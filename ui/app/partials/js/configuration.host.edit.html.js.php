@@ -164,7 +164,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 						return;
 					}
 
-					var clear_tmpl = document.createElement('input');
+					const clear_tmpl = document.createElement('input');
 					clear_tmpl.setAttribute('type', 'hidden');
 					clear_tmpl.setAttribute('name', 'clear_templates[]');
 					clear_tmpl.setAttribute('value', element.dataset.templateid);
@@ -180,9 +180,9 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		 * Replaces template multiselect with a copy that has disabled templates updated.
 		 */
 		resetNewTemplatesField() {
-			var $old_multiselect = $('#add_templates_'),
-				$new_multiselect = $('<div>'),
-				data = $old_multiselect.multiSelect('getData');
+			const $old_multiselect = $('#add_templates_');
+			const $new_multiselect = $('<div>');
+			const data = $old_multiselect.multiSelect('getData');
 
 			$('#add_templates_').parent().html($new_multiselect);
 
@@ -246,7 +246,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 			]) ?>);
 
 			$('#host-tabs').on('tabscreate tabsactivate', (e, ui) => {
-				var panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
+				const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 				if (panel.attr('id') === 'macros-tab') {
 					let macros_initialized = (panel.data('macros_initialized') || false);

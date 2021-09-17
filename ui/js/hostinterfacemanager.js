@@ -55,7 +55,7 @@ class HostInterfaceManager {
 			[this.INTERFACE_TYPE_IPMI]: t('S_IPMI')
 		};
 
-		for (let [prop, value] of Object.entries({...options.interface_properties, ...options.styles})) {
+		for (const [prop, value] of Object.entries({...options.interface_properties, ...options.styles})) {
 			this[prop] = value;
 		}
 

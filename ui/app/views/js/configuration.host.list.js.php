@@ -41,7 +41,7 @@
 		initFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
-				.on('afteradd.dynamicRows', function() {
+				.on('afteradd.dynamicRows', function () {
 					const rows = this.querySelectorAll('.form_row');
 					new CTagFilterItem(rows[rows.length - 1]);
 				});
@@ -153,5 +153,5 @@
 				location.href = location.href;
 			}
 		}
-	}
+	};
 </script>

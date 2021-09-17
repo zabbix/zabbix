@@ -28,7 +28,7 @@ class HostMacrosManager {
 		this.$container = $('#macros_container .table-forms-td-right');
 
 		// defines
-		for (let [prop, value] of Object.entries({...options.properties, ...options.defines})) {
+		for (const [prop, value] of Object.entries({...options.properties, ...options.defines})) {
 			this[prop] = value;
 		}
 	}

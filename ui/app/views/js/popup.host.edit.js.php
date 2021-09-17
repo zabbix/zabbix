@@ -180,4 +180,4 @@ window.host_edit_popup = {
 			e.returnValue = '';
 		}
 	}
-}
+};

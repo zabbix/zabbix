@@ -108,8 +108,8 @@
 	 * @returns {array|getAddTemplates.templateids}
 	 */
 	function getAddTemplates($ms) {
-		var $ms = $('#add_templates_'),
-			templateids = [];
+		const $ms = $('#add_templates_');
+		let templateids = [];
 
 		// Readonly forms don't have multiselect.
 		if ($ms.length) {

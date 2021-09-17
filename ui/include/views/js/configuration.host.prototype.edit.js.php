@@ -249,20 +249,20 @@
 
 		jQuery('input[name=inventory_mode]').click(function() {
 			// Action depending on which button was clicked.
-			var inventoryFields = jQuery('#inventorylist :input:gt(2)');
+			const $inventory_fields = jQuery('#inventorylist :input:gt(2)');
 
 			switch (this.value) {
 				case '<?= HOST_INVENTORY_DISABLED ?>':
-					inventoryFields.prop('disabled', true);
+					$inventory_fields.prop('disabled', true);
 					jQuery('.populating_item').hide();
 					break;
 				case '<?= HOST_INVENTORY_MANUAL ?>':
-					inventoryFields.prop('disabled', false);
+					$inventory_fields.prop('disabled', false);
 					jQuery('.populating_item').hide();
 					break;
 				case '<?= HOST_INVENTORY_AUTOMATIC ?>':
-					inventoryFields.prop('disabled', false);
-					inventoryFields.filter('.linked_to_item').prop('disabled', true);
+					$inventory_fields.prop('disabled', false);
+					$inventory_fields.filter('.linked_to_item').prop('disabled', true);
 					jQuery('.populating_item').show();
 					break;
 			}
