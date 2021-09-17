@@ -433,7 +433,7 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	private function checkUiRules(string $name, int $type, array $rules, array $db_rules = null): void {
-		if (!array_key_exists('ui.default_access', $rules) && !array_key_exists('ui', $rules)) {
+		if (!array_key_exists('ui', $rules)) {
 			return;
 		}
 
@@ -454,16 +454,14 @@ class CRole extends CApiService {
 			$ui_rules[$ui_rule_name] = $default_access == ZBX_ROLE_RULE_ENABLED;
 		}
 
-		if (array_key_exists('ui', $rules)) {
-			foreach ($rules['ui'] as $ui_rule) {
-				if (!array_key_exists($ui_rule['name'], $ui_rules)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('UI element "%2$s" is not available for user role "%1$s".', $name, $ui_rule['name'])
-					);
-				}
-
-				$ui_rules[$ui_rule['name']] = $ui_rule['status'] == ZBX_ROLE_RULE_ENABLED;
+		foreach ($rules['ui'] as $ui_rule) {
+			if (!array_key_exists($ui_rule['name'], $ui_rules)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('UI element "%2$s" is not available for user role "%1$s".', $name, $ui_rule['name'])
+				);
 			}
+
+			$ui_rules[$ui_rule['name']] = $ui_rule['status'] == ZBX_ROLE_RULE_ENABLED;
 		}
 
 		if (!in_array(true, $ui_rules)) {
@@ -614,6 +612,9 @@ class CRole extends CApiService {
 		}
 		elseif ($db_rules !== null) {
 			$mode = $db_rules['services.write.mode'];
+		}
+		elseif (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			$mode = ZBX_ROLE_RULE_SERVICES_ACCESS_ALL;
 		}
 		else {
 			$mode = ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM;

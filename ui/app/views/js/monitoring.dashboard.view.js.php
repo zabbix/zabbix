@@ -256,7 +256,7 @@
 		},
 
 		events: {
-			addClick: (e) => {
+			addClick(e) {
 				const menu = [
 					{
 						items: [
@@ -300,7 +300,7 @@
 				});
 			},
 
-			beforeUnload: (e) => {
+			beforeUnload(e) {
 				if (ZABBIX.Dashboard.isUnsaved()) {
 					// Display confirmation message.
 					e.preventDefault();
@@ -308,7 +308,7 @@
 				}
 			},
 
-			popState: (e) => {
+			popState(e) {
 				const host = (e.state !== null && 'host' in e.state) ? e.state.host : null;
 
 				jQuery('#dynamic_hostid').multiSelect('addData', host ? [host] : [], false);
@@ -316,7 +316,7 @@
 				ZABBIX.Dashboard.setDynamicHost(host ? host.id : null);
 			},
 
-			dynamicHostChange: () => {
+			dynamicHostChange() {
 				const hosts = jQuery('#dynamic_hostid').multiSelect('getData');
 				const host = hosts.length ? hosts[0] : null;
 				const curl = new Curl('zabbix.php', false);
@@ -343,7 +343,7 @@
 				updateUserProfile('web.dashboard.hostid', host ? host.id : 1);
 			},
 
-			applyProperties: () => {
+			applyProperties() {
 				const dashboard_data = ZABBIX.Dashboard.getData();
 
 				document.getElementById('<?= ZBX_STYLE_PAGE_TITLE ?>').textContent = dashboard_data.name;
