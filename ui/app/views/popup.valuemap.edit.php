@@ -46,7 +46,7 @@ foreach (array_values($data['valuemap_names']) as $index => $name) {
 	$form->addVar('valuemap_names['.$index.']', $name);
 }
 
-$form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED);
+$form_grid = new CFormGrid();
 
 $header_row = ['', _('Type'), _('Value'), '', _('Mapped to'), _('Action'), ''];
 $mappings = (new CDiv([

@@ -3094,6 +3094,19 @@ $form-icon-btn: (
 		margin: 0 0 10px;
 	}
 
+	.form-grid {
+		// 100px label column width for use in popup forms.
+		grid-template-columns: minmax(100px, max-content) auto;
+
+		&.form-grid-1-1 {
+			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+		}
+
+		&.form-grid-3-1 {
+			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+		}
+	}
+
 	.list-table {
 		white-space: normal;
 		border: 0;
@@ -6361,13 +6374,17 @@ z-select,
 	}
 }
 
-#host-form #macrosFormList {
-	.table-forms-td-left {
-		display:none;
-	}
+.overlay-dialogue #host-form {
+	#tagsFormList,
+	#macrosFormList,
+	#valuemap-formlist {
+		.table-forms-td-left {
+			display: none;
+		}
 
-	.table-forms-td-right {
-		width: 100%;
+		.table-forms-td-right {
+			width: 100%;
+		}
 	}
 }
 

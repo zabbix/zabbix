@@ -84,7 +84,6 @@ $ipmi_interfaces = (new CDiv())
 	->setAttribute('data-type', 'ipmi');
 
 $host_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem($discovered_by)
 	->addItem([
 		(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
@@ -171,7 +170,7 @@ $host_tab = (new CFormGrid())
 	]);
 
 // Templates tab.
-$templates_tab = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED);
+$templates_tab = new CFormGrid();
 
 if ($host_is_discovered) {
 	$linked_template_table = (new CTable())
@@ -300,7 +299,6 @@ else {
 }
 
 $ipmi_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		new CLabel(_('Authentication algorithm'), 'ipmi_authtype'),
 		new CFormField($ipmi_authtype_select)
@@ -327,36 +325,29 @@ $ipmi_tab = (new CFormGrid())
 	]);
 
 // Tags tab.
-$tags_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
-	->addItem(new CPartial('configuration.tags.tab', [
-		'source' => 'host',
-		'tags' => $data['host']['tags'],
-		'readonly' => $host_is_discovered,
-		'tabs_id' => 'host-tabs'
-	]));
+$tags_tab = new CPartial('configuration.tags.tab', [
+	'source' => 'host',
+	'tags' => $data['host']['tags'],
+	'readonly' => $host_is_discovered,
+	'tabs_id' => 'host-tabs'
+]);
 
 // Macros tab.
-$macros_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
-	->addItem(
-		(new CFormList('macrosFormList'))
-			->addRow(null, (new CRadioButtonList('show_inherited_macros', 0))
-				->addValue(_('Host macros'), 0)
-				->addValue(_('Inherited and host macros'), 1)
-				->setModern(true)
-			)
-			->addRow(null,
-				new CPartial('hostmacros.list.html', [
-					'macros' => $data['host']['macros'],
-					'readonly' => $host_is_discovered
-				]), 'macros_container'
-			)
+$macros_tab = (new CFormList('macrosFormList'))
+	->addRow(null, (new CRadioButtonList('show_inherited_macros', 0))
+		->addValue(_('Host macros'), 0)
+		->addValue(_('Inherited and host macros'), 1)
+		->setModern(true)
+	)
+	->addRow(null,
+		new CPartial('hostmacros.list.html', [
+			'macros' => $data['host']['macros'],
+			'readonly' => $host_is_discovered
+		]), 'macros_container'
 	);
 
 // Inventory tab.
 $inventory_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		null,
 		new CFormField([
@@ -430,7 +421,6 @@ $tls_accept = (int) $data['host']['tls_accept'];
 $is_psk_set = ($data['host']['tls_connect'] == HOST_ENCRYPTION_PSK || $tls_accept & HOST_ENCRYPTION_PSK);
 
 $encryption_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		new CLabel(_('Connections to host')),
 		new CFormField(
@@ -518,16 +508,13 @@ $encryption_tab = (new CFormGrid())
 
 // Value mapping tab.
 if (!$host_is_discovered) {
-	$value_mapping_tab = (new CFormGrid())
-		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
-		->addItem((new CFormList('valuemap-formlist'))
-			->addRow(null, new CPartial('configuration.valuemap', [
-				'source' => 'host',
-				'valuemaps' => $data['host']['valuemaps'],
-				'readonly' => $host_is_discovered,
-				'form' => 'host'
-			]))
-		);
+	$value_mapping_tab = (new CFormList('valuemap-formlist'))
+		->addRow(null, new CPartial('configuration.valuemap', [
+			'source' => 'host',
+			'valuemaps' => $data['host']['valuemaps'],
+			'readonly' => $host_is_discovered,
+			'form' => 'host'
+		]));
 }
 
 // main output

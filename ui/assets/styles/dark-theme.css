@@ -654,8 +654,6 @@ footer {
   row-gap: 10px;
   column-gap: 10px;
   grid-template-columns: minmax(15%, max-content) auto; }
-  .form-grid.label-width-fixed {
-    grid-template-columns: minmax(100px, max-content) auto; }
   .form-grid.label-width-true {
     grid-template-columns: max-content auto; }
   .form-grid > label {
@@ -682,14 +680,10 @@ footer {
     padding: 0 5px 5px 0; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
-    .form-grid.form-grid-1-1.label-width-fixed {
-      grid-template-columns: repeat(2, minmax(100px, max-content) auto); }
     .form-grid.form-grid-1-1.label-width-true {
       grid-template-columns: repeat(2, max-content auto); }
   .form-grid.form-grid-3-1 {
     grid-template-columns: minmax(15%, max-content) 3fr max-content auto; }
-    .form-grid.form-grid-3-1.label-width-fixed {
-      grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
     .form-grid.form-grid-3-1.label-width-true {
       grid-template-columns: max-content auto 3fr max-content auto; }
   .form-grid.form-grid-1-1 .form-field:not(.field-fluid), .form-grid.form-grid-3-1 .form-field:not(.field-fluid) {
@@ -4260,6 +4254,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 0;
     z-index: 4;
     margin: 0 0 10px; }
+  .overlay-dialogue .form-grid {
+    grid-template-columns: minmax(100px, max-content) auto; }
+    .overlay-dialogue .form-grid.form-grid-1-1 {
+      grid-template-columns: repeat(2, minmax(100px, max-content) auto); }
+    .overlay-dialogue .form-grid.form-grid-3-1 {
+      grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
   .overlay-dialogue .list-table {
     white-space: normal;
     border: 0; }
@@ -6506,9 +6506,13 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     float: left;
     margin-left: -1em; }
 
-#host-form #macrosFormList .table-forms-td-left {
+.overlay-dialogue #host-form #tagsFormList .table-forms-td-left,
+.overlay-dialogue #host-form #macrosFormList .table-forms-td-left,
+.overlay-dialogue #host-form #valuemap-formlist .table-forms-td-left {
   display: none; }
-#host-form #macrosFormList .table-forms-td-right {
+.overlay-dialogue #host-form #tagsFormList .table-forms-td-right,
+.overlay-dialogue #host-form #macrosFormList .table-forms-td-right,
+.overlay-dialogue #host-form #valuemap-formlist .table-forms-td-right {
   width: 100%; }
 
 .audit-details-popup-wrapper {

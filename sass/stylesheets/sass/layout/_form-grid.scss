@@ -7,11 +7,6 @@
 	// 15% label column width for use in standalone forms.
 	grid-template-columns: minmax(15%, max-content) auto;
 
-	// 100px label column width for use in popup forms.
-	&.label-width-fixed {
-		grid-template-columns: minmax(100px, max-content) auto;
-	}
-
 	// True label column width for use in filter forms.
 	&.label-width-true {
 		grid-template-columns: max-content auto;
@@ -68,10 +63,6 @@
 	&.form-grid-1-1 {
 		grid-template-columns: repeat(2, minmax(15%, max-content) auto);
 
-		&.label-width-fixed {
-			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
-		}
-
 		&.label-width-true {
 			grid-template-columns: repeat(2, max-content auto);
 		}
@@ -79,10 +70,6 @@
 
 	&.form-grid-3-1 {
 		grid-template-columns: minmax(15%, max-content) 3fr max-content auto;
-
-		&.label-width-fixed {
-			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
-		}
 
 		&.label-width-true {
 			grid-template-columns: max-content auto 3fr max-content auto;

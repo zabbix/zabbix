@@ -92,7 +92,6 @@ else {
 }
 
 $form_grid = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		(new CLabel(_('Recipient'), 'recipientid'))->setAsteriskMark(),
 		new CFormField($recipient_multiselect->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
