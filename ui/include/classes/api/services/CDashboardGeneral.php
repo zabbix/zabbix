@@ -232,8 +232,12 @@ abstract class CDashboardGeneral extends CApiService {
 					$db_widget_fields = DBselect(DB::makeSql('widget_field', $options));
 
 					while ($db_widget_field = DBfetch($db_widget_fields)) {
-						$db_widgets[$db_widget_field['widgetid']]['fields'][$db_widget_field['widget_fieldid']] =
-							array_diff_key($db_widget_field, array_flip(['widgetid']));
+						$db_widgets[$db_widget_field['widgetid']]['fields'][$db_widget_field['widget_fieldid']] = [
+							'widget_fieldid' => $db_widget_field['widget_fieldid'],
+							'type' => $db_widget_field['type'],
+							'name' => $db_widget_field['name'],
+							'value' => $db_widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_widget_field['type']]]
+						];
 					}
 				}
 
@@ -400,8 +404,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 						foreach ($db_widget['fields'] as $db_widget_field) {
 							if (array_key_exists($db_widget_field['type'], $ids)) {
-								$value = $db_widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_widget_field['type']]];
-								$stored_widget_fields[$db_widget_field['type']][$value] = true;
+								$stored_widget_fields[$db_widget_field['type']][$db_widget_field['value']] = true;
 							}
 						}
 					}
@@ -813,9 +816,6 @@ abstract class CDashboardGeneral extends CApiService {
 						: [];
 
 					foreach ($widget['fields'] as &$widget_field) {
-						$widget_field[self::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']]] = $widget_field['value'];
-						unset($widget_field['value']);
-
 						$db_widget_field = current(
 							array_filter($db_widget_fields, function (array $db_widget_field) use ($widget_field): bool {
 								return ($widget_field['type'] == $db_widget_field['type']
@@ -826,7 +826,14 @@ abstract class CDashboardGeneral extends CApiService {
 						if ($db_widget_field) {
 							$widget_field['widget_fieldid'] = $db_widget_field['widget_fieldid'];
 
-							$upd_widget_field = DB::getUpdatedValues('widget_field', $widget_field, $db_widget_field);
+							$upd_widget_field = DB::getUpdatedValues('widget_field',
+								CArrayHelper::renameKeys($widget_field, [
+									'value' => self::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']]
+								]),
+								CArrayHelper::renameKeys($db_widget_field, [
+									'value' => self::WIDGET_FIELD_TYPE_COLUMNS[$db_widget_field['type']]
+								])
+							);
 
 							if ($upd_widget_field) {
 								$upd_widget_fields[] = [
