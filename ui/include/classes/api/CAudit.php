@@ -379,17 +379,20 @@ class CAudit {
 	private static function convertKeysToPaths(string $prefix, array $object): array {
 		$result = [];
 
+		if (!preg_match('/\[[0-9]+\]$/', $prefix)) {
+			$object_prefix = preg_replace('/\[[0-9]+\]/', '', $prefix);
+			$is_nested_object = array_key_exists($object_prefix, self::NESTED_OBJECTS_IDS);
+		}
+		else {
+			$is_nested_object = false;
+		}
+
 		foreach ($object as $key => $value) {
 			$index = '.'.$key;
 
-			$is_prefix_has_last_id = preg_match('/\[[0-9]+\]$/', $prefix);
-			if (!$is_prefix_has_last_id) {
-				$object_prefix = preg_replace('/\[[0-9]+\]/', '', $prefix);
-
-				if (array_key_exists($object_prefix, self::NESTED_OBJECTS_IDS)) {
-					$index = '['.$value[self::NESTED_OBJECTS_IDS[$object_prefix]].']';
-					unset($value[self::NESTED_OBJECTS_IDS[$object_prefix]]);
-				}
+			if ($is_nested_object) {
+				$index = '['.$value[self::NESTED_OBJECTS_IDS[$object_prefix]].']';
+				unset($value[self::NESTED_OBJECTS_IDS[$object_prefix]]);
 			}
 
 			$new_prefix = $prefix.$index;
