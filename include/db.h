@@ -546,9 +546,9 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-zbx_uint32_t	DBextract_version(struct zbx_json *json);
-void		DBflush_version_requirements(const char *version);
-int		DBcheck_capabilities(zbx_uint32_t db_version);
+void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
+void	DBflush_version_requirements(const char *version);
+int	DBcheck_capabilities(zbx_uint32_t db_version);
 
 #ifdef HAVE_POSTGRESQL
 char	*zbx_db_get_schema_esc(void);

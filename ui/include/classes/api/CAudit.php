@@ -102,12 +102,27 @@ class CAudit {
 	 * @var array
 	 */
 	private const TABLE_NAMES = [
+		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'config',
+		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_PROXY => 'hosts',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
+	];
+
+	/**
+	 * Table primary keys of audit resources.
+	 * resource => table key
+	 *
+	 * @var array
+	 */
+	private const TABLE_PKS = [
+		self::RESOURCE_PROXY => 'proxyid'
 	];
 
 	/**
@@ -117,10 +132,15 @@ class CAudit {
 	 * @var array
 	 */
 	private const FIELD_NAMES = [
+		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_AUTOREGISTRATION => null,
+		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_MODULE => 'id',
+		self::RESOURCE_PROXY => 'host',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
+		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
@@ -132,9 +152,14 @@ class CAudit {
 	 * @var array
 	 */
 	private const API_NAMES = [
+		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexp',
+		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -146,46 +171,62 @@ class CAudit {
 	 * @var array
 	 */
 	private const MASKED_PATHS = [
+		self::RESOURCE_AUTHENTICATION => ['paths' => ['authentication.ldap_bind_password']],
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
+		self::RESOURCE_AUTOREGISTRATION => ['paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']],
 		// self::RESOURCE_MACRO => [
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		// ],
+		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
 	/**
-	 * Table names of nested objects.
+	 * Table names of nested objects to check default values.
 	 * path => table name
 	 *
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'proxy.hosts' => 'hosts',
+		'proxy.interface' => 'interface',
+		'regexp.expressions' => 'expressions',
 		'report.users' => 'report_user',
 		'report.user_groups' => 'report_usrgrp',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
-		'regexp.expressions' => 'expressions',
 		'usergroup.rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
 		'usergroup.users' => 'users_groups'
 	];
 
 	/**
-	 * ID field names of nested objects.
+	 * ID field names for arrays of nested objects.
 	 * path => id field
 	 *
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'proxy.hosts' => 'hostid',
+		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
-		'regexp.expressions' => 'expressionid',
 		'usergroup.rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
 		'usergroup.users' => 'id'
+	];
+
+	/**
+	 * ID field names for single nested objects.
+	 * path => id field
+	 *
+	 * @var array
+	 */
+	private const NESTED_SINGLE_OBJECTS_IDS = [
+		'proxy.interface' => 'interfaceid'
 	];
 
 	/**
@@ -237,7 +278,9 @@ class CAudit {
 				break;
 
 			default:
-				$table_key = DB::getPk(self::TABLE_NAMES[$resource]);
+				$table_key = array_key_exists($resource, self::TABLE_PKS)
+					? self::TABLE_PKS[$resource]
+					: DB::getPk(self::TABLE_NAMES[$resource]);
 
 				foreach ($objects as $object) {
 					$resourceid = $object[$table_key];
@@ -333,15 +376,15 @@ class CAudit {
 		}
 
 		$api_name = self::API_NAMES[$resource];
-		$object = self::convertKeysToPaths($api_name, $object);
+		$details = self::convertKeysToPaths($api_name, $object);
 
 		switch ($action) {
 			case self::ACTION_ADD:
-				return self::handleAdd($resource, $object);
+				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
-				$db_object = self::convertKeysToPaths($api_name, $db_object);
-				return self::handleUpdate($resource, $object, $db_object);
+				$db_details = self::convertKeysToPaths($api_name, array_intersect_key($db_object, $object));
+				return self::handleUpdate($resource, $details, $db_details);
 		}
 	}
 
@@ -395,11 +438,16 @@ class CAudit {
 		$result = [];
 
 		foreach ($object as $key => $value) {
-			$index = '.'.$key;
-
-			if (array_key_exists($prefix, self::NESTED_OBJECTS_IDS)) {
-				$index = '['.$value[self::NESTED_OBJECTS_IDS[$prefix]].']';
-				unset($value[self::NESTED_OBJECTS_IDS[$prefix]]);
+			if (array_key_exists($prefix, self::NESTED_SINGLE_OBJECTS_IDS)) {
+				$pk = self::NESTED_SINGLE_OBJECTS_IDS[$prefix];
+				$index = '['.$object[$pk].'].'.$key;
+			}
+			elseif (array_key_exists($prefix, self::NESTED_OBJECTS_IDS)) {
+				$pk = self::NESTED_OBJECTS_IDS[$prefix];
+				$index = '['.$value[$pk].']';
+			}
+			else {
+				$index = '.'.$key;
 			}
 
 			$new_prefix = $prefix.$index;
@@ -575,19 +623,16 @@ class CAudit {
 					$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 				}
 			}
-			else {
-				$is_value_to_mask = self::isValueToMask($resource, $path, $full_object);
-				if ($is_value_to_mask || $value != $db_value) {
-					if (self::isNestedObjectProperty($path)) {
-						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
-					}
+			elseif ($value != $db_value) {
+				if (self::isNestedObjectProperty($path)) {
+					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
+				}
 
-					if ($is_value_to_mask) {
-						$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
-					}
-					else {
-						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
-					}
+				if (self::isValueToMask($resource, $path, $full_object)) {
+					$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
+				}
+				else {
+					$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
 				}
 			}
 		}
