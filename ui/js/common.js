@@ -857,14 +857,14 @@ function post(url, params) {
 
 	const domBody = document.getElementsByTagName('body')[0];
 	const postForm = document.createElement('form');
-	domBody.appendChild(postForm);
+	postForm.setAttribute('action', url);
 	postForm.setAttribute('method', 'post');
 
 	for (const [key, value] of Object.entries(params)) {
 		addVars(postForm, key, value);
 	}
 
-	postForm.setAttribute('action', url);
+	domBody.appendChild(postForm);
 	postForm.submit();
 }
 
