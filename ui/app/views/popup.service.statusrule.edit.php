@@ -34,7 +34,6 @@ $form = (new CForm())
 $form->addItem((new CInput('submit'))->addStyle('display: none;'));
 
 $form_grid = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		new CLabel(_('Set status to'), 'service-status-rule-new-status-focusable'),
 		new CFormField(

@@ -25,10 +25,6 @@
 
 $form_grid = new CFormGrid();
 
-if ($data['source'] == 'popup') {
-	$form_grid->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED);
-}
-
 $user_multiselect = (new CMultiSelect([
 	'name' => 'userid',
 	'object_name' => 'users',

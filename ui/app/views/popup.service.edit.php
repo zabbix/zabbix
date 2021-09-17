@@ -43,7 +43,6 @@ $parent_services = (new CMultiSelect([
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $service_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
@@ -235,7 +234,6 @@ $times->addItem(
 );
 
 $sla_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		new CLabel(_('SLA'), 'showsla'),
 		new CFormField(
@@ -257,7 +255,6 @@ $sla_tab = (new CFormGrid())
 // Tags tab.
 
 $tags_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		new CLabel(_('Tags')),
 		new CFormField(
@@ -299,7 +296,6 @@ $child_services = (new CTable())
 	);
 
 $child_services_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		new CLabel(_('Child services')),
 		new CFormField([
