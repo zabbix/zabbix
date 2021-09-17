@@ -845,7 +845,10 @@ abstract class CDashboardGeneral extends CApiService {
 							unset($db_widget_fields[$db_widget_field['widget_fieldid']]);
 						}
 						else {
-							$ins_widget_fields[] = ['widgetid' => $widget['widgetid']] + $widget_field;
+							$ins_widget_fields[] = ['widgetid' => $widget['widgetid']] +
+								CArrayHelper::renameKeys($widget_field, [
+									'value' => self::WIDGET_FIELD_TYPE_COLUMNS[$widget_field['type']]
+								]);
 						}
 					}
 					unset($widget_field);
