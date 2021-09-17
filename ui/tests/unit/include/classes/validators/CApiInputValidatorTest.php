@@ -275,6 +275,18 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/name": value must be one of xml, json.'
 			],
 			[
+				['type' => API_STRING_UTF8, 'in' => '\\,,.'],
+				',',
+				'/1/name',
+				','
+			],
+			[
+				['type' => API_STRING_UTF8, 'in' => ''],
+				'abc',
+				'/output',
+				'Invalid parameter "/output": value must be empty.'
+			],
+			[
 				['type' => API_STRINGS_UTF8],
 				['hostid', 'name'],
 				'/output',
@@ -370,6 +382,18 @@ class CApiInputValidatorTest extends TestCase {
 				['hostid', 'name', 'name'],
 				'/output',
 				'Invalid parameter "/output/3": value (name) already exists.'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => '\\,,.,/,'],
+				[',', '.', '/', ''],
+				'/output',
+				[',', '.', '/', '']
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => '\\,,.,/,'],
+				['abc', '.', '/', ''],
+				'/output',
+				'Invalid parameter "/output/1": value must be empty or one of ,, ., /.'
 			],
 			[
 				['type' => API_INT32],
@@ -1231,6 +1255,20 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/": unexpected parameter "name".'
 			],
 			[
+				['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'host' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				]
+			],
+			[
 				['type' => API_OBJECT, 'fields' => [
 					'host' => ['type' => API_STRING_UTF8],
 					'name' => ['type' => API_STRING_UTF8]
@@ -1423,6 +1461,12 @@ class CApiInputValidatorTest extends TestCase {
 				[['host' => 'Zabbix server']],
 				'/',
 				'Invalid parameter "/1": unexpected parameter "host".'
+			],
+			[
+				['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
+				[['host' => 'Zabbix server']],
+				'/',
+				[['host' => 'Zabbix server']]
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [

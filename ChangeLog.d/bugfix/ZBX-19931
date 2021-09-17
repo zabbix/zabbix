@@ -1,0 +1,1 @@
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)

@@ -595,8 +595,8 @@ static const char	*__zbx_json_rbracket(const char *p)
  ******************************************************************************/
 int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 {
-	char	*error = NULL;
-	int	len;
+	char		*error = NULL;
+	zbx_int64_t	len;
 
 	SKIP_WHITESPACE(buffer);
 

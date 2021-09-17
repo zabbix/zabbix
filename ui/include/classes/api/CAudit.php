@@ -101,8 +101,15 @@ class CAudit {
 	 * @var array
 	 */
 	private const TABLE_NAMES = [
+		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'config',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_HOUSEKEEPING => 'config',
+		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_REGEXP => 'regexps',
+		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
@@ -115,8 +122,15 @@ class CAudit {
 	 * @var array
 	 */
 	private const FIELD_NAMES = [
+		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
+		self::RESOURCE_AUTOREGISTRATION => null,
 		self::RESOURCE_DASHBOARD => 'name',
+		self::RESOURCE_HOUSEKEEPING => null,
+		self::RESOURCE_MODULE => 'id',
+		self::RESOURCE_REGEXP => 'name',
+		self::RESOURCE_SCHEDULED_REPORT => 'name',
+		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
@@ -129,8 +143,15 @@ class CAudit {
 	 * @var array
 	 */
 	private const API_NAMES = [
+		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
+		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
+		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_REGEXP => 'regexp',
+		self::RESOURCE_SETTINGS => 'settings',
+		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -142,7 +163,9 @@ class CAudit {
 	 * @var array
 	 */
 	private const MASKED_PATHS = [
+		self::RESOURCE_AUTHENTICATION => ['paths' => ['authentication.ldap_bind_password']],
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
+		self::RESOURCE_AUTOREGISTRATION => ['paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']],
 		// self::RESOURCE_MACRO => [
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
@@ -162,6 +185,9 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_page',
 		'dashboard.pages.widgets' => 'widget',
 		'dashboard.pages.widgets.fields' => 'widget_field',
+		'regexp.expressions' => 'expressions',
+		'report.users' => 'report_user',
+		'report.user_groups' => 'report_usrgrp',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
@@ -184,6 +210,9 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_pageid',
 		'dashboard.pages.widgets' => 'widgetid',
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
+		'regexp.expressions' => 'expressionid',
+		'report.users' => 'reportuserid',
+		'report.user_groups' => 'reportusrgrpid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
