@@ -23,7 +23,7 @@ class CControllerProxyHostDisable extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'proxyids' =>	'required|array_db hosts.hostid'
+			'proxyids' => 'required|array_db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
