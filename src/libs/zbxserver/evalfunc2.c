@@ -2825,6 +2825,12 @@ out:
 	return ret;
 }
 
+int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
+{
+	return evaluate_RATE(value, item, parameters, ts, error);
+}
+
 static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
 		zbx_vector_dbl_t *values)
 {
