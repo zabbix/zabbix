@@ -107,12 +107,23 @@ class CAudit {
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_PROXY => 'hosts',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
+	];
+
+	/**
+	 * Table primary keys of audit resources.
+	 * resource => table key
+	 *
+	 * @var array
+	 */
+	private const TABLE_PKS = [
+		self::RESOURCE_PROXY => 'proxyid'
 	];
 
 	/**
@@ -128,6 +139,7 @@ class CAudit {
 		self::RESOURCE_DASHBOARD => 'name',
 		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_MODULE => 'id',
+		self::RESOURCE_PROXY => 'host',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
 		self::RESOURCE_SETTINGS => null,
@@ -149,6 +161,7 @@ class CAudit {
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_MODULE => 'module',
+		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
@@ -170,11 +183,12 @@ class CAudit {
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		// ],
+		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
 	/**
-	 * Table names of nested objects.
+	 * Table names of nested objects to check default values.
 	 * path => table name
 	 *
 	 * @var array
@@ -185,6 +199,8 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_page',
 		'dashboard.pages.widgets' => 'widget',
 		'dashboard.pages.widgets.fields' => 'widget_field',
+		'proxy.hosts' => 'hosts',
+		'proxy.interface' => 'interface',
 		'regexp.expressions' => 'expressions',
 		'report.users' => 'report_user',
 		'report.user_groups' => 'report_usrgrp',
@@ -199,7 +215,7 @@ class CAudit {
 	];
 
 	/**
-	 * ID field names of nested objects.
+	 * ID field names for arrays of nested objects.
 	 * path => id field
 	 *
 	 * @var array
@@ -210,6 +226,7 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_pageid',
 		'dashboard.pages.widgets' => 'widgetid',
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
+		'proxy.hosts' => 'hostid',
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
@@ -221,6 +238,16 @@ class CAudit {
 		'usergroup.rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
 		'usergroup.users' => 'id'
+	];
+
+	/**
+	 * ID field names for single nested objects.
+	 * path => id field
+	 *
+	 * @var array
+	 */
+	private const NESTED_SINGLE_OBJECTS_IDS = [
+		'proxy.interface' => 'interfaceid'
 	];
 
 	/**
@@ -249,7 +276,9 @@ class CAudit {
 		}
 
 		$auditlog = [];
-		$table_key = DB::getPk(self::TABLE_NAMES[$resource]);
+		$table_key = array_key_exists($resource, self::TABLE_PKS)
+			? self::TABLE_PKS[$resource]
+			: DB::getPk(self::TABLE_NAMES[$resource]);
 		$clock = time();
 		$ip = substr($ip, 0, DB::getFieldLength('auditlog', 'ip'));
 		$recordsetid = self::getRecordSetId();
@@ -347,15 +376,15 @@ class CAudit {
 		}
 
 		$api_name = self::API_NAMES[$resource];
-		$object = self::convertKeysToPaths($api_name, $object);
+		$details = self::convertKeysToPaths($api_name, $object);
 
 		switch ($action) {
 			case self::ACTION_ADD:
-				return self::handleAdd($resource, $object);
+				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
-				$db_object = self::convertKeysToPaths($api_name, $db_object);
-				return self::handleUpdate($resource, $object, $db_object);
+				$db_details = self::convertKeysToPaths($api_name, array_intersect_key($db_object, $object));
+				return self::handleUpdate($resource, $details, $db_details);
 		}
 	}
 
@@ -408,20 +437,29 @@ class CAudit {
 	private static function convertKeysToPaths(string $prefix, array $object): array {
 		$result = [];
 
-		if (!preg_match('/\[[0-9]+\]$/', $prefix)) {
+		$is_nested_single_object = array_key_exists($prefix, self::NESTED_SINGLE_OBJECTS_IDS);
+		$is_nested_object = false;
+
+		if ($is_nested_single_object) {
+			$pk = self::NESTED_SINGLE_OBJECTS_IDS[$prefix];
+		}
+		elseif (!preg_match('/\[[0-9]+\]$/', $prefix)) {
 			$object_prefix = preg_replace('/\[[0-9]+\]/', '', $prefix);
 			$is_nested_object = array_key_exists($object_prefix, self::NESTED_OBJECTS_IDS);
-		}
-		else {
-			$is_nested_object = false;
+			if ($is_nested_object) {
+				$pk = self::NESTED_OBJECTS_IDS[$object_prefix];
+			}
 		}
 
 		foreach ($object as $key => $value) {
-			$index = '.'.$key;
-
+			if ($is_nested_single_object) {
+				$index = '['.$object[$pk].'].'.$key;
+			}
 			if ($is_nested_object) {
-				$index = '['.$value[self::NESTED_OBJECTS_IDS[$object_prefix]].']';
-				unset($value[self::NESTED_OBJECTS_IDS[$object_prefix]]);
+				$index = '['.$value[$pk].']';
+			}
+			else {
+				$index = '.'.$key;
 			}
 
 			$new_prefix = $prefix.$index;
@@ -597,19 +635,16 @@ class CAudit {
 					$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 				}
 			}
-			else {
-				$is_value_to_mask = self::isValueToMask($resource, $path, $full_object);
-				if ($is_value_to_mask || $value != $db_value) {
-					if (self::isNestedObjectProperty($path)) {
-						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
-					}
+			elseif ($value != $db_value) {
+				if (self::isNestedObjectProperty($path)) {
+					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
+				}
 
-					if ($is_value_to_mask) {
-						$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
-					}
-					else {
-						$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
-					}
+				if (self::isValueToMask($resource, $path, $full_object)) {
+					$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
+				}
+				else {
+					$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
 				}
 			}
 		}
