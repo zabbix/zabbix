@@ -2856,7 +2856,6 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 					trigger->event_name);
 			zbx_audit_trigger_update_json_add_expr(triggerid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->expression);
-
 			zbx_audit_trigger_update_json_add_rexpr(triggerid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->recovery_expression);
 
