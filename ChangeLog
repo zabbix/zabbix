@@ -1,11 +1,17 @@
 Changes for 5.4.5rc1
 
 New features:
+...G...PS. [ZBXNEXT-6840] improved protocol to support Zabbix proxy configuration of size up to 16 GB; improved performance and memory usage by freeing uncompressed data as fast as possible and compressing before connection (vso)
+...G...... [ZBXNEXT-6784] removed item being unsupported when swap is not configured (dgoloscapov)
 ..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
 ........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
 .........T [ZBXNEXT-6789] added template for Travis CI (abiba)
 
 Bug fixes:
+A......... [ZBX-19954] fixed updating of the "subject" and "message" parameters in scheduled reports (Sasha)
+........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
+...G...PS. [ZBX-19952] removed libmodbus linkage from server and proxy (yurii)
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)
 ........S. [ZBX-19440] added utf-8 support to zbx_set_json_strerror (dgoloscapov)
 .........T [ZBX-19864] fixed preprocessing of "Checkpoint sync time" item, fixed the regex in preprocessing in the "Ping time" item, fixed SQL request in the "Get transactions" item in "DB PostgreSQL" template (mchudinov)
 ...G...... [ZBX-19614] fixed proc.num,proc.cpu.utilization,proc.mem metrics not working properly when compiled with unsupported Go version and improved performance by using functions introduced in Go 1.16 (esneiders, vso)
