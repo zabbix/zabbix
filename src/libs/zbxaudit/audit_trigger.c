@@ -198,6 +198,8 @@ PREPARE_AUDIT_TRIGGER_UPDATE(description, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(priority, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(comments, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(url, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(expression, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 
 #undef PREPARE_AUDIT_ITEM_UPDATE
 #undef TR_OR_TRP

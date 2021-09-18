@@ -2610,7 +2610,8 @@ out:
 static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigger_prototypes,
 		const zbx_vector_ptr_t *triggers)
 {
-	int					ret = SUCCEED, i, j, new_triggers = 0, upd_triggers = 0, new_functions = 0,
+	int					ret = SUCCEED, i, j, new_triggers = 0, upd_triggers = 0,
+						new_functions = 0,
 						new_dependencies = 0, new_tags = 0, upd_tags = 0;
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
 	zbx_lld_trigger_t			*trigger;
@@ -2618,12 +2619,14 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 	zbx_lld_dependency_t			*dependency;
 	zbx_lld_tag_t				*tag;
 	zbx_vector_ptr_t			upd_functions;	/* the ordered list of functions which will be updated */
-	zbx_vector_uint64_t			del_functionids, del_triggerdepids, del_triggertagids, trigger_protoids;
-	zbx_uint64_t				triggerid = 0, functionid = 0, triggerdepid = 0, triggerid_up, triggertagid;
+	zbx_vector_uint64_t			del_functionids, del_triggerdepids, del_triggertagids,
+						trigger_protoids;
+	zbx_uint64_t				triggerid = 0, functionid = 0, triggerdepid = 0, triggerid_up,
+						triggertagid;
 	char					*sql = NULL, *function_esc, *parameter_esc;
 	size_t					sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
-	zbx_db_insert_t				db_insert, db_insert_tdiscovery, db_insert_tfunctions, db_insert_tdepends,
-						db_insert_ttags;
+	zbx_db_insert_t				db_insert, db_insert_tdiscovery, db_insert_tfunctions,
+						db_insert_tdepends, db_insert_ttags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2851,6 +2854,11 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 					ZBX_FLAG_DISCOVERY_CREATED, trigger_prototype->correlation_mode,
 					trigger->correlation_tag, trigger_prototype->manual_close, trigger->opdata, 0,
 					trigger->event_name);
+			zbx_audit_trigger_update_json_add_expr(triggerid,
+					(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->expression);
+
+			zbx_audit_trigger_update_json_add_rexpr(triggerid,
+					(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->recovery_expression);
 
 			zbx_db_insert_add_values(&db_insert_tdiscovery, triggerid, trigger->parent_triggerid);
 
@@ -2885,8 +2893,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_free(expression_esc);
 				d = ",";
 
-				zbx_audit_trigger_update_json_add_expr(trigger->triggerid,
-						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->expression);
+				lld_expression_create(trigger, &trigger->expression_orig, &trigger->functions);
+				zbx_audit_trigger_update_json_update_expression(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->expression_orig,
+						trigger->expression);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
@@ -2897,8 +2907,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_free(expression_esc);
 				d = ",";
 
-				zbx_audit_trigger_update_json_add_rexpr(trigger->triggerid,
-						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->recovery_expression);
+				lld_expression_create(trigger, &trigger->recovery_expression_orig, &trigger->functions);
+				zbx_audit_trigger_update_json_update_recovery_expression(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->recovery_expression_orig,
+						trigger->recovery_expression);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE))
