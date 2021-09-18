@@ -2231,6 +2231,8 @@ New features:
 ..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
 
 Bug fixes:
+........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)
 ..F....... [ZBX-19580] fixed date format mismatch in UI elements that are loaded via JavaScript (jfreibergs)
 ........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
 A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
