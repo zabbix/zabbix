@@ -701,6 +701,9 @@ class CProxy extends CApiService {
 							));
 						}
 					}
+
+					$proxy['interface']['type'] = INTERFACE_TYPE_UNKNOWN;
+					$proxy['interface']['main'] = INTERFACE_PRIMARY;
 				}
 			}
 		}
@@ -905,7 +908,7 @@ class CProxy extends CApiService {
 		}
 
 		$options = [
-			'output' => ['interfaceid', 'hostid', 'useip', 'ip', 'dns', 'port'],
+			'output' => ['interfaceid', 'hostid', 'type', 'main', 'useip', 'ip', 'dns', 'port'],
 			'filter' => ['hostid' => $proxyids['interface']]
 		];
 		$db_interfaces = DBselect(DB::makeSql('interface', $options));
