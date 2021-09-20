@@ -575,7 +575,14 @@ class CProxy extends CApiService {
 			return;
 		}
 
-		$duplicate = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE '.dbConditionString('h.host', $names), 1));
+		$options = [
+			'output' => ['host'],
+			'filter' => [
+				'host' => $names,
+				'status' => [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]
+			]
+		];
+		$duplicate = DBfetch(DBselect(DB::makeSql('hosts', $options), 1));
 
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%1$s" already exists.', $duplicate['host']));
