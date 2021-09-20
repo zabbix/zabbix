@@ -297,7 +297,9 @@ class CControllerHostEdit extends CController {
 				$groups_ms[] = [
 					'id' => $group['groupid'],
 					'name' => $groups_all[$group['groupid']]['name'],
-					'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw)
+					'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
+						&& !array_key_exists($group['groupid'], $groups_rw
+					)
 				];
 			}
 		}
