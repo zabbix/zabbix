@@ -764,18 +764,16 @@ static void	lld_dependencies_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vecto
  * Purpose: retrieve trigger tags                                             *
  *                                                                            *
  ******************************************************************************/
-static void	lld_tags_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
+static void	lld_tags_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
 {
 	DB_RESULT			result;
 	DB_ROW				row;
 	zbx_vector_uint64_t		triggerids;
-	int				i, index;
+	int				i;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	zbx_lld_trigger_t		*trigger;
-	zbx_lld_tag_t			*tag;
 	char				*sql = NULL;
 	size_t				sql_alloc = 256, sql_offset = 0;
-	zbx_uint64_t			triggerid;
 
 	zbx_vector_uint64_create(&triggerids);
 
@@ -812,7 +810,9 @@ static void	lld_tags_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t 
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		tag = (zbx_lld_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_tag_t));
+		int		index;
+		zbx_uint64_t	triggerid;
+		zbx_lld_tag_t	*tag = (zbx_lld_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_tag_t));
 
 		ZBX_STR2UINT64(tag->triggertagid, row[0]);
 		ZBX_STR2UINT64(triggerid, row[1]);
@@ -839,10 +839,10 @@ static void	lld_tags_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t 
 		else
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			zbx_ptr_free(tag);
+			lld_tag_free(tag);
 		}
-
 	}
+
 	DBfree_result(result);
 
 	for (i = 0; i < trigger_prototypes->values_num; i++)
