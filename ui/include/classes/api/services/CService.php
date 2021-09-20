@@ -1152,8 +1152,8 @@ class CService extends CApiService {
 		$problem_events = [];
 
 		foreach ($evaluate_children as $child_serviceid => $child_min_status) {
-			$problem_events += self::getProblemEvents((string) $child_serviceid, $services, $relations, $service_problems,
-				$child_min_status
+			$problem_events += self::getProblemEvents((string) $child_serviceid, $services, $relations,
+				$service_problems, (int) $child_min_status
 			);
 		}
 
