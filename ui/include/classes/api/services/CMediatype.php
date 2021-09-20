@@ -374,7 +374,7 @@ class CMediatype extends CApiService {
 		$names = [];
 
 		foreach ($mediatypes as $mediatype) {
-			if ($method === 'update' && !array_key_exists('name', $mediatype)) {
+			if (!array_key_exists('name', $mediatype)) {
 				continue;
 			}
 
@@ -803,8 +803,7 @@ class CMediatype extends CApiService {
 
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'name'],
-			'mediatypeids' => $mediatypeids,
-			'preservekeys' => true
+			'mediatypeids' => $mediatypeids
 		]);
 
 		if (count($db_mediatypes) != count($mediatypeids)) {
