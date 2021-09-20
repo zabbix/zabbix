@@ -32,12 +32,12 @@ $data += [
 	'form_name' => 'host-form',
 	'buttons' => ($data['hostid'] == 0)
 		? [
-			new CSubmit('add', _('Add')),
+			(new CSubmit('add', _('Add')))
+				->removeAttribute('id'),
 			$cancel_button
 		]
 		: [
 			(new CSubmit('update', _('Update')))
-				->onClick('view.submit(event, this);')
 				->removeAttribute('id'),
 			(new CSimpleButton(_('Clone')))
 				->onClick('view.clone();')

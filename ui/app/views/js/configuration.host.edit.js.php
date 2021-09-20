@@ -30,13 +30,12 @@
 
 		init({form_name}) {
 			this.form = document.getElementById(form_name);
+			this.form.addEventListener('submit', this.events.submit);
 
 			host_edit.init({form_name});
 		},
 
-		submit(e, button) {
-			e.preventDefault();
-
+		submit(button) {
 			this.setLoading(button);
 
 			const fields = host_edit.preprocessFormFields(getFormFields(this.form));
@@ -160,6 +159,15 @@
 
 			clearMessages();
 			addMessage(message_box);
+		},
+
+		events: {
+			submit(event) {
+				event.preventDefault();
+				const submit_button = view.form.querySelector('.tfoot-buttons button[type="submit"]');
+
+				view.submit(submit_button);
+			}
 		}
 	};
 </script>
