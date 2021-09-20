@@ -446,6 +446,7 @@ class CAudit {
 		elseif (!preg_match('/\[[0-9]+\]$/', $prefix)) {
 			$object_prefix = preg_replace('/\[[0-9]+\]/', '', $prefix);
 			$is_nested_object = array_key_exists($object_prefix, self::NESTED_OBJECTS_IDS);
+
 			if ($is_nested_object) {
 				$pk = self::NESTED_OBJECTS_IDS[$object_prefix];
 			}
@@ -455,7 +456,7 @@ class CAudit {
 			if ($is_nested_single_object) {
 				$index = '['.$object[$pk].'].'.$key;
 			}
-			if ($is_nested_object) {
+			elseif ($is_nested_object) {
 				$index = '['.$value[$pk].']';
 			}
 			else {
