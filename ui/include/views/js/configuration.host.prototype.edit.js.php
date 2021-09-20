@@ -186,7 +186,7 @@
 						'INTERFACE_USE_IP' => INTERFACE_USE_IP,
 						'SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 						'SNMPV3_SECURITYLEVEL_AUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
-						'SNMPV3_SECURITYLEVEL_AUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,
+						'SNMPV3_SECURITYLEVEL_AUTHPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,
 						'SNMPV3_AUTHPROTOCOL_MD5' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
 						'SNMPV3_PRIVPROTOCOL_DES' => ITEM_SNMPV3_PRIVPROTOCOL_DES
 					],
@@ -208,6 +208,7 @@
 						'interface_row' => (new CPartial('configuration.host.interface.row'))->getOutput(),
 						'no_interface_msg' => (new CDiv(_('No interfaces are defined.')))
 							->addClass(ZBX_STYLE_GREY)
+							->addStyle('padding: 5px 0px;')
 							->toString()
 					]
 				])

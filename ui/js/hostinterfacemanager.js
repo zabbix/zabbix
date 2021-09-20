@@ -136,16 +136,29 @@ class HostInterfaceManager {
 
 		new CViewSwitcher(`interfaces_${iface.interfaceid}_details_version`, 'change',
 			{
-				[this.SNMP_V1]: [`row_snmp_community_${iface.interfaceid}`],
-				[this.SNMP_V2C]: [`row_snmp_community_${iface.interfaceid}`],
+				[this.SNMP_V1]: [
+					`snmp_community_label_${iface.interfaceid}`,
+					`snmp_community_field_${iface.interfaceid}`
+				],
+				[this.SNMP_V2C]: [
+					`snmp_community_label_${iface.interfaceid}`,
+					`snmp_community_field_${iface.interfaceid}`
+				],
 				[this.SNMP_V3]: [
-					`row_snmpv3_contextname_${iface.interfaceid}`,
-					`row_snmpv3_securityname_${iface.interfaceid}`,
-					`row_snmpv3_securitylevel_${iface.interfaceid}`,
-					`row_snmpv3_authprotocol_${iface.interfaceid}`,
-					`row_snmpv3_authpassphrase_${iface.interfaceid}`,
-					`row_snmpv3_privprotocol_${iface.interfaceid}`,
-					`row_snmpv3_privpassphrase_${iface.interfaceid}`,
+					`snmpv3_contextname_label_${iface.interfaceid}`,
+					`snmpv3_contextname_field_${iface.interfaceid}`,
+					`snmpv3_securityname_label_${iface.interfaceid}`,
+					`snmpv3_securityname_field_${iface.interfaceid}`,
+					`snmpv3_securitylevel_label_${iface.interfaceid}`,
+					`snmpv3_securitylevel_field_${iface.interfaceid}`,
+					`snmpv3_authprotocol_label_${iface.interfaceid}`,
+					`snmpv3_authprotocol_field_${iface.interfaceid}`,
+					`snmpv3_authpassphrase_label_${iface.interfaceid}`,
+					`snmpv3_authpassphrase_field_${iface.interfaceid}`,
+					`snmpv3_privprotocol_label_${iface.interfaceid}`,
+					`snmpv3_privprotocol_field_${iface.interfaceid}`,
+					`snmpv3_privpassphrase_label_${iface.interfaceid}`,
+					`snmpv3_privpassphrase_field_${iface.interfaceid}`
 				]
 			}
 		);
@@ -158,14 +171,20 @@ class HostInterfaceManager {
 					{
 						[this.SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV]: [],
 						[this.SNMPV3_SECURITYLEVEL_AUTHNOPRIV]: [
-							'row_snmpv3_authprotocol_' + iface.interfaceid,
-							'row_snmpv3_authpassphrase_' + iface.interfaceid,
+							`snmpv3_authprotocol_label_${iface.interfaceid}`,
+							`snmpv3_authprotocol_field_${iface.interfaceid}`,
+							`snmpv3_authpassphrase_label_${iface.interfaceid}`,
+							`snmpv3_authpassphrase_field_${iface.interfaceid}`
 						],
-						[this.SNMPV3_SECURITYLEVEL_AUTHNOPRIV]: [
-							'row_snmpv3_authprotocol_' + iface.interfaceid,
-							'row_snmpv3_authpassphrase_' + iface.interfaceid,
-							'row_snmpv3_privprotocol_' + iface.interfaceid,
-							'row_snmpv3_privpassphrase_' + iface.interfaceid
+						[this.SNMPV3_SECURITYLEVEL_AUTHPRIV]: [
+							`snmpv3_authprotocol_label_${iface.interfaceid}`,
+							`snmpv3_authprotocol_field_${iface.interfaceid}`,
+							`snmpv3_authpassphrase_label_${iface.interfaceid}`,
+							`snmpv3_authpassphrase_field_${iface.interfaceid}`,
+							`snmpv3_privprotocol_label_${iface.interfaceid}`,
+							`snmpv3_privprotocol_field_${iface.interfaceid}`,
+							`snmpv3_privpassphrase_label_${iface.interfaceid}`,
+							`snmpv3_privpassphrase_field_${iface.interfaceid}`
 						]
 					}
 				);

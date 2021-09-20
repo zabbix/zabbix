@@ -6288,7 +6288,8 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     .interface-container .interface-row:not(:first-of-type) {
       margin-top: 5px; }
     .interface-container .interface-row[data-type] .interface-cell-details {
-      display: none; }
+      display: none;
+      grid-column: 1/-1; }
     .interface-container .interface-row .interface-cell {
       align-self: center; }
       .interface-container .interface-row .interface-cell .interface-btn-toggle {
