@@ -2181,7 +2181,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		{
 			char	*err, *msg = *GET_MSG_RESULT(result);
 
-			*msg = tolower(*msg);
+			*msg = (char)tolower(*msg);
 			err = zbx_dsprintf(NULL, "Counter %s for datastore %s is not available for hypervisor %s: %s",
 					perfcounter, datastore->name,
 					ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]), msg);
