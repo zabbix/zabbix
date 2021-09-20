@@ -531,9 +531,9 @@ class CProxy extends CApiService {
 			]],
 			'interface' =>			['type' => API_OBJECT, 'fields' => [
 				'useip' => 				['type' => API_INT32, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
-				'ip' => 				['type' => API_IP, 'length' => DB::getFieldLength('interface', 'ip')],
-				'dns' =>				['type' => API_DNS, 'length' => DB::getFieldLength('interface', 'dns')],
-				'port' =>				['type' => API_PORT, 'length' => DB::getFieldLength('interface', 'port')]
+				'ip' => 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
+				'dns' =>				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
+				'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'port')]
 			]]
 		]];
 
@@ -827,9 +827,9 @@ class CProxy extends CApiService {
 			]],
 			'interface' =>			['type' => API_OBJECT, 'fields' => [
 				'useip' => 				['type' => API_INT32, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
-				'ip' => 				['type' => API_IP, 'length' => DB::getFieldLength('interface', 'ip')],
-				'dns' =>				['type' => API_DNS, 'length' => DB::getFieldLength('interface', 'dns')],
-				'port' =>				['type' => API_PORT, 'length' => DB::getFieldLength('interface', 'port')]
+				'ip' => 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
+				'dns' =>				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
+				'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'port')]
 			]]
 		]];
 
