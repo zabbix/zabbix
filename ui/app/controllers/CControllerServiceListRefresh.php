@@ -51,7 +51,11 @@ class CControllerServiceListRefresh extends CControllerServiceListGeneral {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
+			return false;
+		}
+
+		return parent::checkPermissions();
 	}
 
 	protected function doAction(): void {

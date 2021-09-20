@@ -54,22 +54,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			return false;
 		}
 
-		if ($this->hasInput('serviceid')) {
-			$db_service = API::Service()->get([
-				'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
-				'serviceids' => $this->getInput('serviceid'),
-				'selectParents' => ['serviceid'],
-				'selectTags' => ['tag', 'value']
-			]);
-
-			if (!$db_service) {
-				return false;
-			}
-
-			$this->service = $db_service[0];
-		}
-
-		return true;
+		return parent::checkPermissions();
 	}
 
 	/**

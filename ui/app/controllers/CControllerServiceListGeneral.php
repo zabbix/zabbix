@@ -33,6 +33,30 @@ abstract class CControllerServiceListGeneral extends CController {
 	protected $service;
 
 	/**
+	 * @return bool
+
+	 * @throws APIException
+	 */
+	protected function checkPermissions(): bool {
+		if ($this->hasInput('serviceid')) {
+			$db_service = API::Service()->get([
+				'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+				'serviceids' => $this->getInput('serviceid'),
+				'selectParents' => ['serviceid'],
+				'selectTags' => ['tag', 'value']
+			]);
+
+			if (!$db_service) {
+				return false;
+			}
+
+			$this->service = $db_service[0];
+		}
+
+		return true;
+	}
+
+	/**
 	 * @throws APIException
 	 */
 	protected function canEdit(): bool {
