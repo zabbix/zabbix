@@ -153,16 +153,13 @@ abstract class CDashboardGeneral extends CApiService {
 				$db_dashboards[$dashboard['dashboardid']]['pages'] = [];
 
 				foreach ($dashboard['pages'] as $dashboard_page) {
-					if (array_key_exists('dashboard_pageid', $dashboard_page)) {
-						if (array_key_exists('widgets', $dashboard_page)) {
-							$dashboard_pageids[] = $dashboard_page['dashboard_pageid'];
+					if (array_key_exists('dashboard_pageid', $dashboard_page)
+							&& array_key_exists('widgets', $dashboard_page)) {
+						$dashboard_pageids[] = $dashboard_page['dashboard_pageid'];
 
-							foreach ($dashboard_page['widgets'] as $widget) {
-								if (array_key_exists('widgetid', $widget)) {
-									if (array_key_exists('fields', $widget)) {
-										$widgetids[] = $widget['widgetid'];
-									}
-								}
+						foreach ($dashboard_page['widgets'] as $widget) {
+							if (array_key_exists('widgetid', $widget) && array_key_exists('fields', $widget)) {
+								$widgetids[] = $widget['widgetid'];
 							}
 						}
 					}
@@ -817,10 +814,12 @@ abstract class CDashboardGeneral extends CApiService {
 
 					foreach ($widget['fields'] as &$widget_field) {
 						$db_widget_field = current(
-							array_filter($db_widget_fields, function (array $db_widget_field) use ($widget_field): bool {
-								return ($widget_field['type'] == $db_widget_field['type']
-									&& $widget_field['name'] === $db_widget_field['name']);
-							})
+							array_filter($db_widget_fields,
+								static function (array $db_widget_field) use ($widget_field): bool {
+									return ($widget_field['type'] == $db_widget_field['type']
+										&& $widget_field['name'] === $db_widget_field['name']);
+								}
+							)
 						);
 
 						if ($db_widget_field) {
