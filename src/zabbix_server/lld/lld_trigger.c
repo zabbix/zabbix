@@ -447,6 +447,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		const zbx_lld_trigger_prototype_t	*trigger_prototype;
 		zbx_lld_trigger_t			*trigger;
 		int					index;
+		unsigned char				uc;
 
 		ZBX_STR2UINT64(parent_triggerid, row[0]);
 
@@ -473,9 +474,9 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 
 		trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
-		if ((unsigned char)atoi(row[4]) != trigger_prototype->type)
+		if (trigger_prototype->type != (uc = (unsigned char)atoi(row[4])))
 		{
-			trigger->type_orig = (unsigned char)atoi(row[4]);
+			trigger->type_orig = uc;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_TYPE;
 		}
 
@@ -485,21 +486,21 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		trigger->correlation_mode_orig = 0;
 		trigger->recovery_mode_orig = 0;
 
-		if ((unsigned char)atoi(row[9]) != trigger_prototype->recovery_mode)
+		if (trigger_prototype->recovery_mode != (uc = (unsigned char)atoi(row[9])))
 		{
-			trigger->recovery_mode_orig = (unsigned char)atoi(row[9]);
+			trigger->recovery_mode_orig = uc;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE;
 		}
 
-		if ((unsigned char)atoi(row[10]) != trigger_prototype->correlation_mode)
+		if (trigger_prototype->correlation_mode != (uc = (unsigned char)atoi(row[10])))
 		{
-			trigger->correlation_mode_orig = (unsigned char)atoi(row[10]);
+			trigger->correlation_mode_orig = uc;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_MODE;
 		}
 
-		if ((unsigned char)atoi(row[12]) != trigger_prototype->manual_close)
+		if (trigger_prototype->manual_close != (uc = (unsigned char)atoi(row[12])))
 		{
-			trigger->manual_close_orig = (unsigned char)atoi(row[12]);
+			trigger->manual_close_orig = uc;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_MANUAL_CLOSE;
 		}
 
