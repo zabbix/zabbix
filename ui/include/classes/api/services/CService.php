@@ -796,9 +796,11 @@ class CService extends CApiService {
 		]);
 
 		if ($service_problems_ungrouped && $do_output_name) {
+			$eventids = array_column($service_problems_ungrouped, 'eventid', 'eventid');
+
 			$events = API::Event()->get([
 				'output' => ['name'],
-				'eventids' => array_column($service_problems_ungrouped, 'eventid'),
+				'eventids' => $eventids,
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE,
@@ -806,7 +808,7 @@ class CService extends CApiService {
 				'preservekeys' => true
 			]);
 
-			if (count($events) != count($service_problems_ungrouped)) {
+			if (count($events) != count($eventids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
