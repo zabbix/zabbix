@@ -2516,7 +2516,13 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 	zbx_json_addstring(json, "min_version", info->friendly_min_version, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "max_version", info->friendly_max_version, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "min_supported_version", info->friendly_min_supported_version, ZBX_JSON_TYPE_STRING);
+
+	if (NULL != info->friendly_min_supported_version)
+	{
+		zbx_json_addstring(json, "min_supported_version", info->friendly_min_supported_version,
+				ZBX_JSON_TYPE_STRING);
+	}
+
 	zbx_json_addint64(json, "flag", info->flag);
 	zbx_json_close(json);
 }
