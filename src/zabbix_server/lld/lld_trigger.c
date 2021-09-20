@@ -2649,8 +2649,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 			upd_triggers++;
 
 		if (0 != trigger->triggerid)
+		{
 			zbx_audit_trigger_create_entry(AUDIT_ACTION_UPDATE, trigger->triggerid, trigger->description,
 					(int)ZBX_FLAG_DISCOVERY_CREATED);
+		}
 
 		for (j = 0; j < trigger->functions.values_num; j++)
 		{
