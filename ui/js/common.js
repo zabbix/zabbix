@@ -1063,7 +1063,7 @@ function uncheckTableRows(page, keepids = []) {
 	if (keepids) {
 		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		let keepids_formatted = {};
-		for(const id of Object.values(keepids)) {
+		for (const id of Object.values(keepids)) {
 			keepids_formatted[id] = id;
 		}
 
