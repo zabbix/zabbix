@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-13T15:31:37Z'
+  date: '2021-09-20T14:49:58Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -47,10 +47,10 @@ zabbix_export:
               tag: Data
               value: Raw
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
+              tag: transport
               value: HTTP
         -
           uuid: f8f514943c9040d7b41f14db92ca6c91
@@ -79,13 +79,13 @@ zabbix_export:
           url: '{$INFLUXDB.URL}/health'
           tags:
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
+              tag: transport
               value: HTTP
             -
-              tag: Type
+              tag: type
               value: State
           triggers:
             -
@@ -96,7 +96,7 @@ zabbix_export:
               description: 'The InfluxDB instance is not available or unhealthy.'
         -
           uuid: 56b1a9f2eb454a9b96a0e0a73d5439cf
-          name: 'InfluxDB: Boltdb reads rate'
+          name: 'InfluxDB: Boltdb reads, rate'
           type: DEPENDENT
           key: influxdb.boltdb_reads.rate
           delay: '0'
@@ -117,20 +117,20 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Boltdb
+              tag: resource
+              value: boltdb
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Rate
+              tag: type
+              value: rate
         -
           uuid: 7bd505a8abb944c2bed17f8e4e5a8c84
-          name: 'InfluxDB: Boltdb writes rate'
+          name: 'InfluxDB: Boltdb writes, rate'
           type: DEPENDENT
           key: influxdb.boltdb_writes.rate
           delay: '0'
@@ -151,20 +151,20 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Boltdb
+              tag: resource
+              value: boltdb
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Rate
+              tag: type
+              value: rate
         -
           uuid: 5d5e26ee272a4af6ac979e69a83de74d
-          name: 'InfluxDB: Buckets total'
+          name: 'InfluxDB: Buckets, total'
           type: DEPENDENT
           key: influxdb.buckets.total
           delay: '0'
@@ -184,20 +184,20 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Buckets
+              tag: resource
+              value: buckets
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: 1c5931f514804a95ac4bfba3ec4a7d82
-          name: 'InfluxDB: Dashboards total'
+          name: 'InfluxDB: Dashboards, total'
           type: DEPENDENT
           key: influxdb.dashboards.total
           delay: '0'
@@ -217,20 +217,20 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Dashboards
+              tag: resource
+              value: dashboards
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: 915f00d9dc9847bb8bc8007d034bb80d
-          name: 'InfluxDB: Organizations total'
+          name: 'InfluxDB: Organizations, total'
           type: DEPENDENT
           key: influxdb.organizations.total
           delay: '0'
@@ -250,20 +250,20 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Organizations
+              tag: resource
+              value: organizations
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: e05aa2c424c140afa3794878ed2c3baa
-          name: 'InfluxDB: Scrapers total'
+          name: 'InfluxDB: Scrapers, total'
           type: DEPENDENT
           key: influxdb.scrapers.total
           delay: '0'
@@ -283,17 +283,17 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Scrapers
+              tag: resource
+              value: scrapers
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: f77894d5ede9481381a268670bc88766
           name: 'InfluxDB: Task runs failed, rate'
@@ -316,22 +316,22 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Tasks
+              tag: resource
+              value: tasks
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Rate
+              tag: type
+              value: rate
           triggers:
             -
               uuid: f0d2137905bc477f979d035c06111844
               expression: 'min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}'
-              name: 'InfluxDB: Too many tasks runs failures (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
+              name: 'InfluxDB: Too many tasks failures (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Too many tasks failed runs across all tasks."'
         -
@@ -356,17 +356,17 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Tasks
+              tag: resource
+              value: tasks
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Rate
+              tag: type
+              value: rate
         -
           uuid: c3f147a2afb3438d8bacbb41fac6b1d0
           name: 'InfluxDB: Workers currently running'
@@ -385,17 +385,17 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Tasks
+              tag: resource
+              value: tasks
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: 25595754557d49fca7c671df3f6a898c
           name: 'InfluxDB: Workers busy, pct'
@@ -415,20 +415,20 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Tasks
+              tag: resource
+              value: tasks
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: 94d98714ecce4847be0bdb7b8802f1ec
-          name: 'InfluxDB: Telegrafs total'
+          name: 'InfluxDB: Telegrafs, total'
           type: DEPENDENT
           key: influxdb.telegrafs.total
           delay: '0'
@@ -448,20 +448,20 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Telegraf
+              tag: resource
+              value: telegraf
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: 23bad615af024a2e9f06d4541cf6f910
-          name: 'InfluxDB: Telegraf plugins total'
+          name: 'InfluxDB: Telegraf plugins, total'
           type: DEPENDENT
           key: influxdb.telegraf_plugins.total
           delay: '0'
@@ -481,20 +481,20 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Telegraf
+              tag: resource
+              value: telegraf
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: 079c1eee7d93484b9126598b23921e9d
-          name: 'InfluxDB: Tokens total'
+          name: 'InfluxDB: Tokens, total'
           type: DEPENDENT
           key: influxdb.tokens.total
           delay: '0'
@@ -514,17 +514,17 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Tokens
+              tag: resource
+              value: tokens
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: 8699e951b7944659993422334a4cddc0
           name: 'InfluxDB: Uptime'
@@ -544,17 +544,17 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Uptime
+              tag: resource
+              value: uptime
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
           triggers:
             -
               uuid: 335f27fb002544838f7150b11238d86b
@@ -565,7 +565,7 @@ zabbix_export:
               manual_close: 'YES'
         -
           uuid: 86357d43721f4e6aa6b1dd7e63dd2f47
-          name: 'InfluxDB: Users total'
+          name: 'InfluxDB: Users, total'
           type: DEPENDENT
           key: influxdb.users.total
           delay: '0'
@@ -585,17 +585,17 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Tokens
+              tag: resource
+              value: tokens
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
             -
-              tag: Type
-              value: Gauge
+              tag: type
+              value: gauge
         -
           uuid: d31e0d0823af4f6c999cae3d49b3815b
           name: 'InfluxDB: Version'
@@ -619,14 +619,17 @@ zabbix_export:
             key: influx.get_metrics
           tags:
             -
-              tag: Resource
-              value: Version
+              tag: resource
+              value: version
             -
-              tag: Target
+              tag: target
               value: InfluxDB
             -
-              tag: Transport
-              value: Dependent
+              tag: transport
+              value: dependent
+            -
+              tag: type
+              value: text
           triggers:
             -
               uuid: d2b02cc426c748608968ae08c0823461
@@ -654,10 +657,11 @@ zabbix_export:
                 macro: '{#ORG_NAME}'
                 value: '{$INFLUXDB.ORG_NAME.MATCHES}'
                 formulaid: B
+          description: 'Discovery pf organizations merics.'
           item_prototypes:
             -
               uuid: c84ae278bd7c4387873bc8bbf6d8ba8f
-              name: 'InfluxDB: [{#ORG_NAME}]: Query response bytes, failed'
+              name: 'InfluxDB: [{#ORG_NAME}] Query response bytes, failed'
               type: DEPENDENT
               key: 'influxdb.org.http_query_response_bytes.failed.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -679,23 +683,23 @@ zabbix_export:
                 key: influx.get_metrics
               tags:
                 -
-                  tag: Organization
+                  tag: organization
                   value: '{#ORG_NAME}'
                 -
-                  tag: Resource
-                  value: Queries
+                  tag: resource
+                  value: queries
                 -
-                  tag: Target
+                  tag: target
                   value: InfluxDB
                 -
-                  tag: Transport
-                  value: Dependent
+                  tag: transport
+                  value: dependent
                 -
-                  tag: Type
-                  value: Rate
+                  tag: type
+                  value: rate
             -
               uuid: fb13e133cf054e8783ba6bf5deaf1686
-              name: 'InfluxDB: [{#ORG_NAME}]: Query response bytes, success'
+              name: 'InfluxDB: [{#ORG_NAME}] Query response bytes, success'
               type: DEPENDENT
               key: 'influxdb.org.http_query_response_bytes.success.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -717,23 +721,23 @@ zabbix_export:
                 key: influx.get_metrics
               tags:
                 -
-                  tag: Organization
+                  tag: organization
                   value: '{#ORG_NAME}'
                 -
-                  tag: Resource
-                  value: Queries
+                  tag: resource
+                  value: queries
                 -
-                  tag: Target
+                  tag: target
                   value: InfluxDB
                 -
-                  tag: Transport
-                  value: Dependent
+                  tag: transport
+                  value: dependent
                 -
-                  tag: Type
-                  value: Rate
+                  tag: type
+                  value: rate
             -
               uuid: 9688861c4268455193772389a957264f
-              name: 'InfluxDB: [{#ORG_NAME}]: Query requests, failed'
+              name: 'InfluxDB: [{#ORG_NAME}] Query requests, failed'
               type: DEPENDENT
               key: 'influxdb.org.query_request.failed.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -755,20 +759,20 @@ zabbix_export:
                 key: influx.get_metrics
               tags:
                 -
-                  tag: Organization
+                  tag: organization
                   value: '{#ORG_NAME}'
                 -
-                  tag: Resource
-                  value: Queries
+                  tag: resource
+                  value: queries
                 -
-                  tag: Target
+                  tag: target
                   value: InfluxDB
                 -
-                  tag: Transport
-                  value: Dependent
+                  tag: transport
+                  value: dependent
                 -
-                  tag: Type
-                  value: Rate
+                  tag: type
+                  value: rate
               trigger_prototypes:
                 -
                   uuid: 893fa5755b514c36aa177c4f4e25b254
@@ -778,7 +782,7 @@ zabbix_export:
                   description: '"Too many query requests failed."'
             -
               uuid: da53d3185ba744c38fc264993c72b1b9
-              name: 'InfluxDB: [{#ORG_NAME}]: Query requests, success'
+              name: 'InfluxDB: [{#ORG_NAME}] Query requests, success'
               type: DEPENDENT
               key: 'influxdb.org.query_request.success.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -800,23 +804,23 @@ zabbix_export:
                 key: influx.get_metrics
               tags:
                 -
-                  tag: Organization
+                  tag: organization
                   value: '{#ORG_NAME}'
                 -
-                  tag: Resource
-                  value: Queries
+                  tag: resource
+                  value: queries
                 -
-                  tag: Target
+                  tag: target
                   value: InfluxDB
                 -
-                  tag: Transport
-                  value: Dependent
+                  tag: transport
+                  value: dependent
                 -
-                  tag: Type
-                  value: Rate
+                  tag: type
+                  value: rate
             -
               uuid: 4f8dbb16f7a842678e4fb4343c88b560
-              name: 'InfluxDB: [{#ORG_NAME}]: Query requests bytes, failed'
+              name: 'InfluxDB: [{#ORG_NAME}] Query requests bytes, failed'
               type: DEPENDENT
               key: 'influxdb.org.query_request_bytes.failed.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -838,23 +842,23 @@ zabbix_export:
                 key: influx.get_metrics
               tags:
                 -
-                  tag: Organization
+                  tag: organization
                   value: '{#ORG_NAME}'
                 -
-                  tag: Resource
-                  value: Queries
+                  tag: resource
+                  value: queries
                 -
-                  tag: Target
+                  tag: target
                   value: InfluxDB
                 -
-                  tag: Transport
-                  value: Dependent
+                  tag: transport
+                  value: dependent
                 -
-                  tag: Type
-                  value: Rate
+                  tag: type
+                  value: rate
             -
               uuid: 6bbeb22e5c9b46a2bf480dcf41b4eb0e
-              name: 'InfluxDB: [{#ORG_NAME}]: Query requests bytes, success'
+              name: 'InfluxDB: [{#ORG_NAME}] Query requests bytes, success'
               type: DEPENDENT
               key: 'influxdb.org.query_request_bytes.success.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -876,20 +880,20 @@ zabbix_export:
                 key: influx.get_metrics
               tags:
                 -
-                  tag: Organization
+                  tag: organization
                   value: '{#ORG_NAME}'
                 -
-                  tag: Resource
-                  value: Queries
+                  tag: resource
+                  value: queries
                 -
-                  tag: Target
+                  tag: target
                   value: InfluxDB
                 -
-                  tag: Transport
-                  value: Dependent
+                  tag: transport
+                  value: dependent
                 -
-                  tag: Type
-                  value: Rate
+                  tag: type
+                  value: rate
           graph_prototypes:
             -
               uuid: 925d6b2f79b2479ab031118d795811fb
