@@ -25,9 +25,44 @@
 ?>
 
 <script type="text/javascript">
-	$(() => {
-		$('z-select[name="severity_min"]').on('change', (e) => {
-			document.forms['map.view'].submit();
-		});
-	});
+	const view = {
+		init() {
+			$('z-select[name="severity_min"]').on('change', (e) => {
+				document.forms['map.view'].submit();
+			});
+		},
+
+		editHost(hostid) {
+			this.openHostPopup({hostid});
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			}
+		}
+	};
 </script>
