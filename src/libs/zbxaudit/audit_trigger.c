@@ -179,7 +179,7 @@ void	zbx_audit_trigger_update_json_update_##resource(zbx_uint64_t triggerid, int
 	RETURN_IF_AUDIT_OFF();											\
 														\
 	resource_type = trigger_flag_to_resource_type(flags);							\
-													\
+														\
 	zbx_snprintf(buf, sizeof(buf), TR_OR_TRP(resource));							\
 														\
 	zbx_audit_update_json_update_##type2(triggerid, buf, resource##_old, resource##_new);			\
@@ -271,7 +271,7 @@ void	zbx_audit_trigger_update_json_delete_dependency(zbx_uint64_t triggerdepid, 
 
 	RETURN_IF_AUDIT_OFF();
 
-		zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "trigger.dependencies[" ZBX_FS_UI64 "]", triggerdepid);
+	zbx_snprintf(audit_key, sizeof(audit_key), "trigger.dependencies[" ZBX_FS_UI64 "]", triggerdepid);
 
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
@@ -339,7 +339,7 @@ void	zbx_audit_trigger_update_json_update_tag_##resource(zbx_uint64_t triggerid,
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	zbx_snprintf(buf, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);		\
+	zbx_snprintf(buf, sizeof(buf), "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);				\
 														\
 	zbx_audit_update_json_update_##type2(triggerid, buf, resource##_old, resource##_new);			\
 }
@@ -348,4 +348,3 @@ PREPARE_AUDIT_TRIGGER_UPDATE_TAG(tag, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE_TAG(value, const char*, string)
 
 #undef PREPARE_AUDIT_TRIGGER_UPDATE_TAG
-
