@@ -1,11 +1,27 @@
 Changes for 6.0.0alpha3
 
 New features:
+A......... [ZBXNEXT-6470,ZBXNEXT-6887] implemented audit logging of report API object (agriscenko)
+A.F.I..... [ZBXNEXT-6470,ZBXNEXT-6718] restored audit logging of user login and logout actions; implemented logging of failed login attempts by non-existing users; added new API method user.unblock (agriscenko, vmaksimovs)
+........S. [ZBXNEXT-6871] implemented audit for server (processing Web scenarios) (akozlovs)
+..F....PS. [ZBXNEXT-6898] added restriction that prevents server and proxy from working with old unsupported databases (MVekslers, yurii)
+A......... [ZBXNEXT-6470,ZBXNEXT-6889] implemented audit logging of proxy API object (rlataria)
+A......... [ZBXNEXT-6470,ZBXNEXT-6909] implemented audit logging of authentication, autoregistration, housekeeping and settings API objects (agriscenko, rlataria)
+A......... [ZBXNEXT-6470,ZBXNEXT-6901] implemented audit logging of module API object (agriscenko, Sasha)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6717] added RegExp API object (rlataria, Sasha)
+...G...PS. [ZBXNEXT-6840] improved protocol to support Zabbix proxy configuration of size up to 16 GB; improved performance and memory usage by freeing uncompressed data as fast as possible and compressing before connection (vso)
+...G...... [ZBXNEXT-6784] removed item being unsupported when swap is not configured (dgoloscapov)
 ........S. [ZBXNEXT-6856] implemented audit for server (linking templates - graphs, graph prototypes) (arimdjonoks)
 ........S. [ZBXNEXT-6855] implemented audit for server (linking templates - triggers, trigger prototypes) (arimdjonoks)
 ..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL; replaced Zabbix Share link with link to Zabbix Integrations (agriscenko)
 
 Bug fixes:
+A......... [ZBX-19954] fixed updating of the "subject" and "message" parameters in scheduled reports (Sasha)
+........S. [ZBX-19923] fixed incorrect audit after context name change in host prototype (akozlovs)
+........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
+...G...PS. [ZBX-19952] removed libmodbus linkage from server and proxy (yurii)
+........S. [ZBX-19914] fixed Web scenarios fields update during template linking (akozlovs)
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)
 ........S. [ZBX-19440] added utf-8 support to zbx_set_json_strerror (dgoloscapov)
 .........T [ZBX-19864] fixed preprocessing of "Checkpoint sync time" item, fixed the regex in preprocessing in the "Ping time" item, fixed SQL request in the "Get transactions" item in "DB PostgreSQL" template (mchudinov)
 ...G...... [ZBX-19614] fixed proc.num,proc.cpu.utilization,proc.mem metrics not working properly when compiled with unsupported Go version and improved performance by using functions introduced in Go 1.16 (esneiders, vso)
@@ -75,11 +91,17 @@ Bug fixes:
 Changes for 5.4.5rc1
 
 New features:
+...G...PS. [ZBXNEXT-6840] improved protocol to support Zabbix proxy configuration of size up to 16 GB; improved performance and memory usage by freeing uncompressed data as fast as possible and compressing before connection (vso)
+...G...... [ZBXNEXT-6784] removed item being unsupported when swap is not configured (dgoloscapov)
 ..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
 ........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
 .........T [ZBXNEXT-6789] added template for Travis CI (abiba)
 
 Bug fixes:
+A......... [ZBX-19954] fixed updating of the "subject" and "message" parameters in scheduled reports (Sasha)
+........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
+...G...PS. [ZBX-19952] removed libmodbus linkage from server and proxy (yurii)
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)
 ........S. [ZBX-19440] added utf-8 support to zbx_set_json_strerror (dgoloscapov)
 .........T [ZBX-19864] fixed preprocessing of "Checkpoint sync time" item, fixed the regex in preprocessing in the "Ping time" item, fixed SQL request in the "Get transactions" item in "DB PostgreSQL" template (mchudinov)
 ...G...... [ZBX-19614] fixed proc.num,proc.cpu.utilization,proc.mem metrics not working properly when compiled with unsupported Go version and improved performance by using functions introduced in Go 1.16 (esneiders, vso)
@@ -1094,10 +1116,14 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.16rc1
 
 New features:
+...G...PS. [ZBXNEXT-6840] improved protocol to support Zabbix proxy configuration of size up to 16 GB; improved performance and memory usage by freeing uncompressed data as fast as possible and compressing before connection (vso)
+...G...... [ZBXNEXT-6784] removed item being unsupported when swap is not configured (dgoloscapov)
 ..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
 ........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
 
 Bug fixes:
+........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)
 ........S. [ZBX-19440] added utf-8 support to zbx_set_json_strerror (dgoloscapov)
 .........T [ZBX-19864] fixed preprocessing of "Checkpoint sync time" item, fixed the regex in preprocessing in the "Ping time" item, fixed SQL request in the "Get transactions" item in "DB PostgreSQL" template (mchudinov)
 ...G...... [ZBX-19614] fixed proc.num,proc.cpu.utilization,proc.mem metrics not working properly when compiled with unsupported Go version and improved performance by using functions introduced in Go 1.16 (esneiders, vso)
@@ -3324,6 +3350,8 @@ New features:
 ..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
 
 Bug fixes:
+........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)
 ..F....... [ZBX-19580] fixed date format mismatch in UI elements that are loaded via JavaScript (jfreibergs)
 ........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
 A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
