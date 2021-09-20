@@ -221,7 +221,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service, const char *type, const char *id,
-		zbx_uint64_t counterid, const char *instance, int coeff, int unit, AGENT_RESULT *result)
+		zbx_uint64_t counterid, const char *instance, unsigned int coeff, int unit, AGENT_RESULT *result)
 {
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
@@ -361,7 +361,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_counter_value_by_path(zbx_vmware_service_t *service, const char *type,
-		const char *id, const char *path, const char *instance, int coeff, AGENT_RESULT *result)
+		const char *id, const char *path, const char *instance, unsigned int coeff, AGENT_RESULT *result)
 {
 	zbx_uint64_t	counterid;
 	int		unit;
@@ -376,7 +376,7 @@ static int	vmware_service_get_counter_value_by_path(zbx_vmware_service_t *servic
 }
 
 static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const char *uuid, const char *instance,
-		const char *path, int coeff, AGENT_RESULT *result)
+		const char *path, unsigned int coeff, AGENT_RESULT *result)
 {
 	zbx_vmware_vm_t	*vm;
 	int		ret = SYSINFO_RET_FAIL;
@@ -3161,7 +3161,8 @@ int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, con
 {
 	zbx_vmware_service_t	*service;
 	const char		*path, *url, *uuid, *instance, *mode;
-	int 			coeff, ret = SYSINFO_RET_FAIL;
+	unsigned int 		coeff;
+	int 			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3223,7 +3224,8 @@ int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, co
 {
 	zbx_vmware_service_t	*service;
 	const char		*path, *url, *uuid, *instance, *mode;
-	int 			coeff, ret = SYSINFO_RET_FAIL;
+	unsigned int 		coeff;
+	int 			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3410,7 +3412,8 @@ int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, 
 {
 	zbx_vmware_service_t	*service;
 	const char		*path, *url, *uuid, *instance, *mode;
-	int			coeff, ret = SYSINFO_RET_FAIL;
+	unsigned int 		coeff;
+	int 			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3472,7 +3475,8 @@ int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username,
 {
 	zbx_vmware_service_t	*service;
 	const char		*path, *url, *uuid, *instance, *mode;
-	int			coeff, ret = SYSINFO_RET_FAIL;
+	unsigned int 		coeff;
+	int 			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
