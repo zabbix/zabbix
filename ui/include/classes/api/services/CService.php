@@ -588,13 +588,13 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array $options
-	 * @param array $result
-	 * @param array $permissions
+	 * @param array      $options
+	 * @param array      $result
+	 * @param array|null $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function addRelatedParents(array $options, array &$result, array $permissions): void {
+	private function addRelatedParents(array $options, array &$result, ?array $permissions): void {
 		if ($options['selectParents'] === null) {
 			return;
 		}
@@ -620,13 +620,13 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array $options
-	 * @param array $result
-	 * @param array $permissions
+	 * @param array      $options
+	 * @param array      $result
+	 * @param array|null $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function addRelatedChildren(array $options, array &$result, array $permissions): void {
+	private function addRelatedChildren(array $options, array &$result, ?array $permissions): void {
 		if ($options['selectChildren'] === null) {
 			return;
 		}
@@ -783,9 +783,9 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['serviceid', 'eventid'], $options['selectProblemEvents']));
 		}
 
-		$output_name = in_array('name', $output);
+		$do_output_name = in_array('name', $output);
 
-		if ($output_name) {
+		if ($do_output_name) {
 			$output = array_diff($output, ['name']);
 		}
 
@@ -795,12 +795,22 @@ class CService extends CApiService {
 			'preservekeys' => true
 		]);
 
-		if ($service_problems_ungrouped && $output_name) {
-			$events = DB::select('events', [
+		if ($service_problems_ungrouped && $do_output_name) {
+			$events = API::Event()->get([
 				'output' => ['name'],
-				'filter' => ['eventid' => array_column($service_problems_ungrouped, 'eventid')],
+				'eventids' => array_column($service_problems_ungrouped, 'eventid'),
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'value' => TRIGGER_VALUE_TRUE,
+				'nopermissions' => true,
 				'preservekeys' => true
 			]);
+
+			if (count($events) != count($service_problems_ungrouped)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 
 			foreach ($service_problems_ungrouped as &$service_problem) {
 				$service_problem['name'] = $events[$service_problem['eventid']]['name'];
