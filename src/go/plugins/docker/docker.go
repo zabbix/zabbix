@@ -190,6 +190,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
+		data.setCPUPercentUsage()
+
 		result, err = json.Marshal(data)
 		if err != nil {
 			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
@@ -205,4 +207,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	}
 
 	return string(result), nil
+}
+
+func (s *Stats) setCPUPercentUsage() {
+	// based on formula from docker api doc.
+	delta := s.CPUStats.CPUUsage.TotalUsage - s.PreCPUStats.CPUUsage.TotalUsage
+	systemDelta := s.CPUStats.SystemUsage - s.PreCPUStats.SystemUsage
+	cpuNum := s.CPUStats.OnlineCPUs
+	s.CPUStats.CPUUsage.PercentUsage = (float64(delta) / float64(systemDelta)) * float64(cpuNum) * 100.0
 }
