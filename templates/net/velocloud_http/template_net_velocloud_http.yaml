@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-15T16:56:34Z'
+  date: '2021-09-16T16:19:25Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -402,7 +402,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'API Version of VMware SD-WAN Orchestrator API.'
+          description: 'Version of VMware SD-WAN Orchestrator API.'
           preprocessing:
             -
               type: JSONPATH
@@ -871,12 +871,12 @@ zabbix_export:
             conditions:
               -
                 macro: '{#ID}'
-                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''AppLinks''}'
+                value: '{$VELOCLOUD.LLD.APP.LINKS.FILTER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
               -
                 macro: '{#ID}'
-                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''AppLinks''}'
+                value: '{$VELOCLOUD.LLD.APP.LINKS.FILTER.MATCHES}'
                 formulaid: B
           description: 'Metrics for app links statistics.'
           item_prototypes:
@@ -1202,12 +1202,12 @@ zabbix_export:
             conditions:
               -
                 macro: '{#NAME}'
-                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''Edges''}'
+                value: '{$VELOCLOUD.LLD.EDGES.FILTER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
               -
                 macro: '{#NAME}'
-                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''Edges''}'
+                value: '{$VELOCLOUD.LLD.EDGES.FILTER.MATCHES}'
                 formulaid: B
           description: 'Metrics for edges statistics.'
           item_prototypes:
@@ -1359,10 +1359,10 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 075d35e3ed074b9daf01864b111945c7
-                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])<>1'
-                  name: 'Edge {#NAME}: HA state is not "READY"'
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])=3'
+                  name: 'Edge {#NAME}: HA state is in "FAILED" state'
                   priority: WARNING
-                  description: 'High availability state is not "READY".'
+                  description: 'High availability state is "FAILED".'
             -
               uuid: fdb55947147249109da453009d6bd443
               name: 'Edge {#NAME}: Model number'
@@ -1541,10 +1541,10 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 962d2d0c6f124424b2e5a7aca89d293f
-                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])<>1'
-                  name: 'Edge {#NAME}: Edge is not in "CONNECTED" state'
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0'
+                  name: 'Edge {#NAME}: Edge is in "OFFLINE" state'
                   priority: AVERAGE
-                  description: 'Edge state is different from "CONNECTED".'
+                  description: 'Edge state is "OFFLINE".'
             -
               uuid: a86c1fa26d4d4481bdfb099338c27989
               name: 'Edge {#NAME}: System uptime'
@@ -1631,12 +1631,12 @@ zabbix_export:
             conditions:
               -
                 macro: '{#NAME}'
-                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''Enterprises''}'
+                value: '{$VELOCLOUD.LLD.ENTERPRISES.FILTER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
               -
                 macro: '{#NAME}'
-                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''Enterprises''}'
+                value: '{$VELOCLOUD.LLD.ENTERPRISES.FILTER.MATCHES}'
                 formulaid: B
           description: 'Metrics for enterprises.'
           item_prototypes:
@@ -1655,6 +1655,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enterpriseEvents.{#ID}'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return JSON.parse(value).length ? value : ""'
               master_item:
                 key: velocloud.get_logs
               tags:
@@ -1688,6 +1692,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.firewallLogs.{#ID}'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return JSON.parse(value).length ? value : ""'
               master_item:
                 key: velocloud.get_logs
               tags:
@@ -1721,6 +1729,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.operatorEvents.{#ID}'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return JSON.parse(value).length ? value : ""'
               master_item:
                 key: velocloud.get_logs
               tags:
@@ -1768,12 +1780,12 @@ zabbix_export:
             conditions:
               -
                 macro: '{#NAME}'
-                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''Gateways''}'
+                value: '{$VELOCLOUD.LLD.GATEWAYS.FILTER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
               -
                 macro: '{#NAME}'
-                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''Gateways''}'
+                value: '{$VELOCLOUD.LLD.GATEWAYS.FILTER.MATCHES}'
                 formulaid: B
           description: 'Metrics for gateways statistics.'
           item_prototypes:
@@ -2192,8 +2204,8 @@ zabbix_export:
                   value: Gauge
           graph_prototypes:
             -
-              uuid: 31d28f37fd134831b708e9b574069062
-              name: 'Link {#IP}({#NAME}): Packets summary'
+              uuid: d8d9b176f439436ba6fe69ec8bc6409e
+              name: 'Gateway {#NAME}: Utilization'
               graph_items:
                 -
                   color: 1A7C11
@@ -2201,34 +2213,17 @@ zabbix_export:
                     host: 'VMWare SD-WAN VeloCloud by HTTP'
                     key: 'velocloud.gateway.utilization.cpu[{#ID}]'
                 -
-                  color: 1A7C11
-                  item:
-                    host: 'VMWare SD-WAN VeloCloud by HTTP'
-                    key: 'velocloud.link.packets_rx[{#ID}]'
-                -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'VMWare SD-WAN VeloCloud by HTTP'
                     key: 'velocloud.gateway.utilization.load[{#ID}]'
                 -
-                  sortorder: '1'
-                  color: 2774A4
-                  item:
-                    host: 'VMWare SD-WAN VeloCloud by HTTP'
-                    key: 'velocloud.link.packets_tx[{#ID}]'
-                -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'VMWare SD-WAN VeloCloud by HTTP'
                     key: 'velocloud.gateway.utilization.memory[{#ID}]'
-                -
-                  sortorder: '2'
-                  color: F63100
-                  item:
-                    host: 'VMWare SD-WAN VeloCloud by HTTP'
-                    key: 'velocloud.link.total_packets[{#ID}]'
                 -
                   sortorder: '3'
                   color: A54F10
@@ -2270,12 +2265,12 @@ zabbix_export:
             conditions:
               -
                 macro: '{#ID}'
-                value: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:''Links''}'
+                value: '{$VELOCLOUD.LLD.LINKS.FILTER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
               -
                 macro: '{#ID}'
-                value: '{$VELOCLOUD.LLD.FILTER.MATCHES:''Links''}'
+                value: '{$VELOCLOUD.LLD.LINKS.FILTER.MATCHES}'
                 formulaid: B
           description: 'Metrics for links statistics.'
           item_prototypes:
@@ -2687,7 +2682,7 @@ zabbix_export:
                   value: Gauge
           graph_prototypes:
             -
-              uuid: 9de909aaf73a40c09b001eb03fa2f897
+              uuid: d117ffc6c5f245099209ca3a471cc63f
               name: 'Link {#IP}({#NAME}): Best loss'
               graph_items:
                 -
@@ -2722,6 +2717,27 @@ zabbix_export:
                   item:
                     host: 'VMWare SD-WAN VeloCloud by HTTP'
                     key: 'velocloud.link.total_bytes[{#ID}]'
+            -
+              uuid: c656365e5c77496fac4c0a7d80d6cfd3
+              name: 'Link {#IP}({#NAME}): Packets summary'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.packets_rx[{#ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.packets_tx[{#ID}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.total_packets[{#ID}]'
           master_item:
             key: velocloud.get
           lld_macro_paths:
@@ -3354,16 +3370,45 @@ zabbix_export:
           value: '600'
           description: 'Interval of gathering apps data in seconds.'
         -
-          macro: '{$VELOCLOUD.LLD.FILTER.MATCHES}'
+          macro: '{$VELOCLOUD.LLD.APP.LINKS.FILTER.MATCHES}'
           value: '.*'
-          description: 'Filter for discoverable objects. Can be used with following contexts: ''Edges'', ''Gateways'', ''Links'', ''Enterprises'', ''AppLinks'''
+          description: 'Filter for discoverable app links.'
         -
-          macro: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES}'
-          value: '.*'
-          description: 'Filter to exclude discovered objects. Can be used with following contexts: ''Edges'', ''Gateways'', ''Links'', ''Enterprises'', ''AppLinks'''
-        -
-          macro: '{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:"AppLinks"}'
+          macro: '{$VELOCLOUD.LLD.APP.LINKS.FILTER.NOT_MATCHES}'
           value: '-1'
+          description: 'Filter to exclude discovered app links'
+        -
+          macro: '{$VELOCLOUD.LLD.EDGES.FILTER.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable edges.'
+        -
+          macro: '{$VELOCLOUD.LLD.EDGES.FILTER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered edges.'
+        -
+          macro: '{$VELOCLOUD.LLD.ENTERPRISES.FILTER.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable enterprises.'
+        -
+          macro: '{$VELOCLOUD.LLD.ENTERPRISES.FILTER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered enterprises.'
+        -
+          macro: '{$VELOCLOUD.LLD.GATEWAYS.FILTER.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable gateways.'
+        -
+          macro: '{$VELOCLOUD.LLD.GATEWAYS.FILTER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered gateways.'
+        -
+          macro: '{$VELOCLOUD.LLD.LINKS.FILTER.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable links.'
+        -
+          macro: '{$VELOCLOUD.LLD.LINKS.FILTER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered links.'
         -
           macro: '{$VELOCLOUD.LOGS.GATHER.INTERVAL}'
           value: '1200'

@@ -33,9 +33,16 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$VELOCLOUD.APPS.GATHER.INTERVAL} |<p>Interval of gathering apps data in seconds.</p> |`600` |
-|{$VELOCLOUD.LLD.FILTER.MATCHES} |<p>Filter for discoverable objects. Can be used with following contexts: 'Edges', 'Gateways', 'Links', 'Enterprises', 'AppLinks'</p> |`.*` |
-|{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:"AppLinks"} | |`-1` |
-|{$VELOCLOUD.LLD.FILTER.NOT_MATCHES} |<p>Filter to exclude discovered objects. Can be used with following contexts: 'Edges', 'Gateways', 'Links', 'Enterprises', 'AppLinks'</p> |`.*` |
+|{$VELOCLOUD.LLD.APP.LINKS.FILTER.MATCHES} |<p>Filter for discoverable app links.</p> |`.*` |
+|{$VELOCLOUD.LLD.APP.LINKS.FILTER.NOT_MATCHES} |<p>Filter to exclude discovered app links</p> |`-1` |
+|{$VELOCLOUD.LLD.EDGES.FILTER.MATCHES} |<p>Filter for discoverable edges.</p> |`.*` |
+|{$VELOCLOUD.LLD.EDGES.FILTER.NOT_MATCHES} |<p>Filter to exclude discovered edges.</p> |`CHANGE_IF_NEEDED` |
+|{$VELOCLOUD.LLD.ENTERPRISES.FILTER.MATCHES} |<p>Filter for discoverable enterprises.</p> |`.*` |
+|{$VELOCLOUD.LLD.ENTERPRISES.FILTER.NOT_MATCHES} |<p>Filter to exclude discovered enterprises.</p> |`CHANGE_IF_NEEDED` |
+|{$VELOCLOUD.LLD.GATEWAYS.FILTER.MATCHES} |<p>Filter for discoverable gateways.</p> |`.*` |
+|{$VELOCLOUD.LLD.GATEWAYS.FILTER.NOT_MATCHES} |<p>Filter to exclude discovered gateways.</p> |`CHANGE_IF_NEEDED` |
+|{$VELOCLOUD.LLD.LINKS.FILTER.MATCHES} |<p>Filter for discoverable links.</p> |`.*` |
+|{$VELOCLOUD.LLD.LINKS.FILTER.NOT_MATCHES} |<p>Filter to exclude discovered links.</p> |`CHANGE_IF_NEEDED` |
 |{$VELOCLOUD.LOGS.GATHER.INTERVAL} |<p>Interval of gathering log and events data in seconds.</p> |`1200` |
 |{$VELOCLOUD.TOKEN} |<p>VMware SD-WAN Orchestrator API Token.</p> |`` |
 |{$VELOCLOUD.URL} |<p>VMware SD-WAN Orchestrator URL. e.g vco.velocloud.net.</p> |`` |
@@ -48,12 +55,12 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Edges metrics discovery |<p>Metrics for edges statistics.</p> |DEPENDENT |velocloud.edges.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.edges`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:'Edges'}`</p><p>- B: {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.MATCHES:'Edges'}`</p> |
-|Gateways metrics discovery |<p>Metrics for gateways statistics.</p> |DEPENDENT |velocloud.gateways.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.gateways`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:'Gateways'}`</p><p>- B: {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.MATCHES:'Gateways'}`</p> |
-|Links metrics discovery |<p>Metrics for links statistics.</p> |DEPENDENT |velocloud.links.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.links`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#ID} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:'Links'}`</p><p>- B: {#ID} MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.MATCHES:'Links'}`</p> |
+|Edges metrics discovery |<p>Metrics for edges statistics.</p> |DEPENDENT |velocloud.edges.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.edges`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.EDGES.FILTER.NOT_MATCHES}`</p><p>- B: {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.EDGES.FILTER.MATCHES}`</p> |
+|Gateways metrics discovery |<p>Metrics for gateways statistics.</p> |DEPENDENT |velocloud.gateways.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.gateways`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.GATEWAYS.FILTER.NOT_MATCHES}`</p><p>- B: {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.GATEWAYS.FILTER.MATCHES}`</p> |
+|Links metrics discovery |<p>Metrics for links statistics.</p> |DEPENDENT |velocloud.links.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.links`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#ID} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.LINKS.FILTER.NOT_MATCHES}`</p><p>- B: {#ID} MATCHES_REGEX `{$VELOCLOUD.LLD.LINKS.FILTER.MATCHES}`</p> |
 |App metrics discovery |<p>Metrics for app statistics.</p> |DEPENDENT |velocloud.app.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.apps`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|App links metrics discovery |<p>Metrics for app links statistics.</p> |DEPENDENT |velocloud.app_links.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.appsLinks`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#ID} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:'AppLinks'}`</p><p>- B: {#ID} MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.MATCHES:'AppLinks'}`</p> |
-|Enterprises metrics discovery |<p>Metrics for enterprises.</p> |DEPENDENT |velocloud.enterprises.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enterprises`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.NOT_MATCHES:'Enterprises'}`</p><p>- B: {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.FILTER.MATCHES:'Enterprises'}`</p> |
+|App links metrics discovery |<p>Metrics for app links statistics.</p> |DEPENDENT |velocloud.app_links.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.appsLinks`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#ID} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.APP.LINKS.FILTER.NOT_MATCHES}`</p><p>- B: {#ID} MATCHES_REGEX `{$VELOCLOUD.LLD.APP.LINKS.FILTER.MATCHES}`</p> |
+|Enterprises metrics discovery |<p>Metrics for enterprises.</p> |DEPENDENT |velocloud.enterprises.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.enterprises`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.ENTERPRISES.FILTER.NOT_MATCHES}`</p><p>- B: {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.ENTERPRISES.FILTER.MATCHES}`</p> |
 |SDWAN peers metrics discovery |<p>Metrics for SDWAN peers.</p> |DEPENDENT |velocloud.sdwanpeers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWan`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |SDWAN peers path metrics discovery |<p>Metrics for SDWAN peers path.</p> |DEPENDENT |velocloud.sdwanpath.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWanPath`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
@@ -61,7 +68,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Velocloud |Velocloud: Orchestrator API version |<p>API Version of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.api_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.apiVersion`</p> |
+|Velocloud |Velocloud: Orchestrator API version |<p>Version of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.api_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.apiVersion`</p> |
 |Velocloud |Velocloud: Orchestrator build |<p>Build of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.build<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.build`</p> |
 |Velocloud |Velocloud: Orchestrator version |<p>Version of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.version`</p> |
 |Velocloud |Velocloud: Script item errors |<p>Errors of script item.</p> |DEPENDENT |velocloud.get.error<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -108,9 +115,9 @@ There are no template links in this template.
 |Velocloud |App link {#EDGE}:{#NAME}:{#LINK.ID}: Total bytes |<p>App link total bytes.</p> |DEPENDENT |velocloud.app_link.total_bytes[{{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.appsLinks[?(@.linkId=='{#ID}')].totalBytes.first()`</p> |
 |Velocloud |App link {#EDGE}:{#NAME}:{#LINK.ID}: Total packets |<p>App link total packets.</p> |DEPENDENT |velocloud.app_link.total_packets[{{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.appsLinks[?(@.linkId=='{#ID}')].totalPackets.first()`</p> |
 |Velocloud |App link {#EDGE}:{#NAME}:{#LINK.ID}: Flow count |<p>App link flow count.</p> |DEPENDENT |velocloud.app_link.flow_count[{{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.appsLinks[?(@.linkId=='{#ID}')].flowCount.first()`</p> |
-|Velocloud |Enterprise {#NAME}: Enterprise events |<p>Events of enterprise.</p> |DEPENDENT |velocloud.enterprise.events[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.enterpriseEvents.{#ID}`</p> |
-|Velocloud |Enterprise {#NAME}: Operator events |<p>Operator events of enterprise.</p> |DEPENDENT |velocloud.enterprise.operator_events[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.operatorEvents.{#ID}`</p> |
-|Velocloud |Enterprise {#NAME}: Firewall logs |<p>Firewall logs of enterprise.</p> |DEPENDENT |velocloud.enterprise.firewall_logs[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.firewallLogs.{#ID}`</p> |
+|Velocloud |Enterprise {#NAME}: Enterprise events |<p>Events of enterprise.</p> |DEPENDENT |velocloud.enterprise.events[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.enterpriseEvents.{#ID}`</p><p>- JAVASCRIPT: `return JSON.parse(value).length ? value : ""`</p> |
+|Velocloud |Enterprise {#NAME}: Operator events |<p>Operator events of enterprise.</p> |DEPENDENT |velocloud.enterprise.operator_events[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.operatorEvents.{#ID}`</p><p>- JAVASCRIPT: `return JSON.parse(value).length ? value : ""`</p> |
+|Velocloud |Enterprise {#NAME}: Firewall logs |<p>Firewall logs of enterprise.</p> |DEPENDENT |velocloud.enterprise.firewall_logs[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.firewallLogs.{#ID}`</p><p>- JAVASCRIPT: `return JSON.parse(value).length ? value : ""`</p> |
 |Velocloud |SDWAN Peer {#NAME}({#TYPE}): Description |<p>Description of SDWAN peer.</p> |DEPENDENT |velocloud.sdwanpeer.description[{#EDGE.ID}/{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWan[?(@.deviceLogicalId=='{#ID}' && @.edgeId=='{#EDGE.ID}')].description.first()`</p> |
 |Velocloud |SDWAN Peer {#NAME}({#TYPE}): Stable path |<p>Count of stable path of SDWAN peer.</p> |DEPENDENT |velocloud.sdwanpeer.stable_path[{#EDGE.ID}/{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWan[?(@.deviceLogicalId=='{#ID}' && @.edgeId=='{#EDGE.ID}')].pathStatusCount.stable.first()`</p> |
 |Velocloud |SDWAN Peer {#NAME}({#TYPE}): Unstable path |<p>Count of unstable path of SDWAN peer.</p> |DEPENDENT |velocloud.sdwanpeer.unstable_path[{#EDGE.ID}/{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWan[?(@.deviceLogicalId=='{#ID}' && @.edgeId=='{#EDGE.ID}')].pathStatusCount.unstable.first()`</p> |
@@ -137,8 +144,8 @@ There are no template links in this template.
 |Velocloud: Failed to fetch aggregate data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.api_version,30m)=1` |AVERAGE |<p>Manual close: YES</p> |
 |Velocloud: There are errors in script item requests |<p>There are errors in script item requests.</p> |`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0` |WARNING | |
 |Velocloud: System properties have changed |<p>System properties have changed.</p> |`change(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties)=1` |INFO |<p>Manual close: YES</p> |
-|Edge {#NAME}: HA state is not "READY" |<p>High availability state is not "READY".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])<>1` |WARNING | |
-|Edge {#NAME}: Edge is not in "CONNECTED" state |<p>Edge state is different from "CONNECTED".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])<>1` |AVERAGE | |
+|Edge {#NAME}: HA state is in "FAILED" state |<p>High availability state is "FAILED".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])=3` |WARNING | |
+|Edge {#NAME}: Edge is in "OFFLINE" state |<p>Edge state is "OFFLINE".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0` |AVERAGE | |
 |Edge {#NAME}: Edge uptime is less than 10m |<p>Edge was restarted.</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600` |WARNING | |
 |Gateway {#NAME}: The number of connected edges is changed |<p>The number of connected edges is changed.</p> |`change(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}])=1` |WARNING |<p>Manual close: YES</p> |
 |Gateway {#NAME}: Gateway uptime is less that 10m |<p>Gateway was restarted.</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600` |WARNING | |
