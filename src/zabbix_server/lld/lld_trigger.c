@@ -1917,14 +1917,11 @@ static void	lld_trigger_dependencies_make(const zbx_vector_ptr_t *trigger_protot
  * Purpose: create a trigger tag                                              *
  *                                                                            *
  ******************************************************************************/
-static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype,
-		zbx_hashset_t *items_triggers, zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
+static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
+		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
 {
 	zbx_lld_trigger_t	*trigger;
 	int			i;
-	zbx_lld_tag_t		*tag;
-	char			*buffer = NULL;
-	const char		*key, *value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1935,6 +1932,9 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 
 	for (i = 0; i < trigger_prototype->tags.values_num + trigger->override_tags.values_num; i++)
 	{
+		zbx_lld_tag_t	*tag;
+		const char	*key, *value;
+
 		if (i < trigger_prototype->tags.values_num)
 		{
 			zbx_lld_tag_t	*tag_proto;
@@ -1954,15 +1954,17 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 
 		if (i < trigger->tags.values_num)
 		{
+			char	*buffer = NULL;
+
 			tag = (zbx_lld_tag_t *)trigger->tags.values[i];
 
 			buffer = zbx_strdup(buffer, key);
 			substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
 			if (0 != strcmp(buffer, tag->tag))
 			{
-				tag->tag_orig = zbx_strdup(NULL, tag->tag);
-				zbx_free(tag->tag);
+				tag->tag_orig = tag->tag;
 				tag->tag = buffer;
 				buffer = NULL;
 				tag->flags |= ZBX_FLAG_LLD_TAG_UPDATE_TAG;
@@ -1971,14 +1973,16 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 			buffer = zbx_strdup(buffer, value);
 			substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
 			if (0 != strcmp(buffer, tag->value))
 			{
-				tag->value_orig = zbx_strdup(NULL, tag->value);
-				zbx_free(tag->value);
+				tag->value_orig = tag->value;
 				tag->value = buffer;
 				buffer = NULL;
 				tag->flags |= ZBX_FLAG_LLD_TAG_UPDATE_VALUE;
 			}
+
+			zbx_free(buffer);
 		}
 		else
 		{
@@ -1999,14 +2003,11 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 			tag->flags = ZBX_FLAG_LLD_TAG_UNSET;
 
 			zbx_vector_ptr_append(&trigger->tags, tag);
-
 		}
 
 		tag->flags |= ZBX_FLAG_LLD_TAG_DISCOVERED;
 	}
 out:
-	zbx_free(buffer);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
