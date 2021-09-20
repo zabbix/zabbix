@@ -1302,6 +1302,16 @@ class CScript extends CApiService {
 		return $result;
 	}
 
+	/**
+	 * Check for unique script names.
+	 *
+	 * @static
+	 *
+	 * @param array      $scripts
+	 * @param array|null $db_scripts
+	 *
+	 * @throws APIException if script names are not unique.
+	 */
 	private static function checkDuplicates(array $scripts, array $db_scripts = null): void {
 		$names = [];
 
@@ -1328,6 +1338,15 @@ class CScript extends CApiService {
 		}
 	}
 
+	/**
+	 * Update "script_param" table and populate script.parameters by "script_paramid" property.
+	 *
+	 * @static
+	 *
+	 * @param array      $scripts
+	 * @param string     $method
+	 * @param array|null $db_scripts
+	 */
 	private static function updateParams(array &$scripts, string $method, array $db_scripts = null): void {
 		$script_paramids = [];
 		$ins_params = [];
@@ -1414,6 +1433,12 @@ class CScript extends CApiService {
 		unset($script);
 	}
 
+	/**
+	 * Add the existing paramters to $db_scripts whether these are affected by the update.
+	 *
+	 * @param array $scripts
+	 * @param array $db_scripts
+	 */
 	private function addAffectedObjects(array $scripts, array &$db_scripts): void {
 		$scriptids = [];
 
