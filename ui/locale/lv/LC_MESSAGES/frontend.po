@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-17 19:55+0300\n"
+"POT-Creation-Date: 2021-09-20 10:47+0300\n"
 "PO-Revision-Date: 2013-10-15 07:19+0300\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -9914,12 +9914,12 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:682
 #: include/classes/api/services/CProxy.php:693
 #: include/classes/api/services/CProxy.php:699
-#: include/classes/api/services/CProxy.php:734
-#: include/classes/api/services/CProxy.php:751
-#: include/classes/api/services/CProxy.php:764
-#: include/classes/api/services/CProxy.php:770
-#: include/classes/api/services/CProxy.php:779
-#: include/classes/api/services/CProxy.php:791
+#: include/classes/api/services/CProxy.php:737
+#: include/classes/api/services/CProxy.php:754
+#: include/classes/api/services/CProxy.php:767
+#: include/classes/api/services/CProxy.php:773
+#: include/classes/api/services/CProxy.php:782
+#: include/classes/api/services/CProxy.php:794
 #: include/classes/api/services/CReport.php:194
 #: include/classes/api/services/CReport.php:200
 #: include/classes/api/services/CReport.php:206
@@ -12679,7 +12679,7 @@ msgstr ""
 #: include/classes/api/services/CModule.php:246
 #: include/classes/api/services/CProxy.php:388
 #: include/classes/api/services/CProxy.php:623
-#: include/classes/api/services/CProxy.php:847
+#: include/classes/api/services/CProxy.php:850
 #: include/classes/api/services/CRegexp.php:339
 #: include/classes/api/services/CRegexp.php:369
 #: include/classes/api/services/CReport.php:549
@@ -20467,7 +20467,7 @@ msgstr ""
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
 #: include/classes/api/services/CProxy.php:700
-#: include/classes/api/services/CProxy.php:771
+#: include/classes/api/services/CProxy.php:774
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:473
@@ -21592,8 +21592,8 @@ msgstr "īss apraksts"
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CProxy.php:651
 #: include/classes/api/services/CProxy.php:676
-#: include/classes/api/services/CProxy.php:780
-#: include/classes/api/services/CProxy.php:792
+#: include/classes/api/services/CProxy.php:783
+#: include/classes/api/services/CProxy.php:795
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:583
@@ -21703,7 +21703,7 @@ msgstr "veidne ID \"%1$s\" ir nodota %2$s reizes"
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CProxy.php:683
 #: include/classes/api/services/CProxy.php:694
-#: include/classes/api/services/CProxy.php:765
+#: include/classes/api/services/CProxy.php:768
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
@@ -21895,8 +21895,8 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
-#: include/classes/api/services/CProxy.php:735
-#: include/classes/api/services/CProxy.php:752
+#: include/classes/api/services/CProxy.php:738
+#: include/classes/api/services/CProxy.php:755
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""

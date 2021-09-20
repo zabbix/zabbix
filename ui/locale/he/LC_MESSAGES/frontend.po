@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-17 19:55+0300\n"
-"PO-Revision-Date: 2021-08-31 08:35+0300\n"
+"POT-Creation-Date: 2021-09-20 10:47+0300\n"
+"PO-Revision-Date: 2021-09-19 07:04+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1630391739.000000\n"
+"X-POOTLE-MTIME: 1632027850.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -484,7 +484,7 @@ msgstr "גישה למודולים"
 #: app/views/administration.user.edit.php:480
 #: app/views/administration.userrole.edit.php:135
 msgid "Access to services"
-msgstr ""
+msgstr "גישה לשירותים"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66
@@ -605,7 +605,7 @@ msgstr "למשימה „%1$s” לא הוגדרו פעולות."
 #: include/classes/api/services/CRole.php:742
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "המשימה „%2$s” אינה זמינה לתפקיד משתמש „%1$s”."
 
 #: actionconf.php:178
 msgid "Action added"
@@ -891,7 +891,7 @@ msgstr "הוספת מעקף חדש"
 #: app/views/js/configuration.dashboard.edit.js.php:202
 #: app/views/js/monitoring.dashboard.view.js.php:268
 msgid "Add page"
-msgstr ""
+msgstr "הוספת עמוד"
 
 #: app/views/js/popup.service.edit.js.php:325 jsLoader.php:392
 msgid "Add parent services"
@@ -913,7 +913,7 @@ msgstr "הוספת דוח מתוזמן"
 
 #: app/views/js/administration.userrole.edit.js.php:207
 msgid "Add services"
-msgstr ""
+msgstr "הוספת שירותים"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
@@ -958,11 +958,11 @@ msgstr "נוסף, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "כלל נוסף"
 
 #: app/views/popup.service.edit.php:154
 msgid "Additional rules"
-msgstr ""
+msgstr "כללים נוספים"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -975,7 +975,7 @@ msgstr "ניהול"
 
 #: app/views/popup.service.edit.php:126
 msgid "Advanced configuration"
-msgstr ""
+msgstr "הגדרות מתקדמות"
 
 #: include/views/monitoring.sysmap.edit.php:158
 msgid "Advanced labels"
@@ -1272,7 +1272,7 @@ msgstr "חשבוני"
 
 #: include/classes/helpers/CServiceHelper.php:146
 msgid "As is"
-msgstr ""
+msgstr "כפי שזה"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
@@ -1322,7 +1322,7 @@ msgstr "יש לסמן לפחות רכיב מנשק משתמש אחד."
 #: include/classes/api/services/CRole.php:471
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "יש להפעיל לפחות רכיב מנשק משתמש אחד לתפקיד המשתמש „%1$s”."
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
@@ -1554,11 +1554,11 @@ msgstr "ממוצע"
 
 #: include/classes/items/CHelpItems.php:1125
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "מספר ממוצע של בקשות קריאה ממתינות לכונן הווירטואלי במשך מקטע האיסוף, <url> - כתובת שירות VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware,‏ <instance> - מופע של התקן כונן"
 
 #: include/classes/items/CHelpItems.php:1145
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "מספר ממוצע של בקשות כתיבה ממתינות לכונן הווירטואלי במשך מקטע האיסוף, <url> - כתובת שירות VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware,‏ <instance> - מופע של התקן כונן"
 
 #: app/views/administration.authentication.edit.php:94
 msgid "Avoid easy-to-guess passwords"
@@ -1729,7 +1729,7 @@ msgstr "עומס על המעבד. מחזירה שבר עשרוני"
 
 #: include/classes/items/CHelpItems.php:1025
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "זמן המעבד שהושקע בהמתנה לכניסה לזיכרון ההחלפה,<url> - כתובת שירות VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware,‏ <instance> - מופע של מעבד"
 
 #: include/classes/items/CHelpItems.php:885
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -1999,7 +1999,7 @@ msgstr "לא ניתן לבנות עץ ביטויים: %1$s."
 
 #: include/classes/api/services/CRole.php:773
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "אי אפשר לשנות את סוג המשתמש של תפקיד עצמי."
 
 #: httpconf.php:219 httpconf.php:493 items.php:962
 msgid "Cannot clear history"
@@ -2106,7 +2106,7 @@ msgstr "לא ניתן ליצור דוח מתוזמן"
 #: include/classes/api/services/CService.php:1827
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "לא ניתן ליצור את השירות „%1$s”:‏ %2$s."
 
 #: include/classes/setup/CSetupWizard.php:678
 msgid "Cannot create the configuration file."
@@ -2135,7 +2135,7 @@ msgstr "לא ניתן למחוק את המשימה"
 #: include/classes/api/services/CRole.php:357
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "לא ניתן למחוק את תפקיד המשתמש המוקצה „%1$s”."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2311,7 +2311,7 @@ msgstr[1] "לא ניתן למחוק שירותים"
 #: include/classes/api/services/CService.php:479
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "לא ניתן למחוק את השירות „%1$s”:‏ %2$s."
 
 #: templates.php:427 templates.php:441 templates.php:474
 msgid "Cannot delete template"
@@ -3141,7 +3141,7 @@ msgstr "לא ניתן לעדכן את היקף הסקריפט. הסקריפט �
 #: include/classes/api/services/CService.php:1861
 #, c-format
 msgid "Cannot update service \"%1$s\": %2$s."
-msgstr ""
+msgstr "לא ניתן לעדכן את השירות „%1$s”:‏ %2$s."
 
 #: app/controllers/CControllerPopupMassupdateService.php:157
 msgid "Cannot update services"
@@ -4782,7 +4782,7 @@ msgstr "מקומות עשרוניים"
 
 #: include/classes/helpers/CServiceHelper.php:148
 msgid "Decrease by"
-msgstr ""
+msgstr "הקטנה בשיעור"
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
@@ -6652,7 +6652,7 @@ msgstr "נכשל"
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
-msgstr ""
+msgstr "כניסה שנכשלה"
 
 #: app/controllers/CControllerDashboardUpdate.php:142
 #: app/controllers/CControllerTemplateDashboardUpdate.php:136
@@ -6944,7 +6944,7 @@ msgstr "קבוע"
 
 #: include/classes/helpers/CServiceHelper.php:150
 msgid "Fixed status"
-msgstr ""
+msgstr "מצב קבוע"
 
 #: app/views/js/popup.massupdate.tmpl.js.php:81
 #: app/views/popup.lldoperation.php:124
@@ -9485,7 +9485,7 @@ msgstr "ערך שגוי עבור השדה „%1$s”:‏ %2$s."
 
 #: include/classes/helpers/CServiceHelper.php:147
 msgid "Increase by"
-msgstr ""
+msgstr "הגדלה בשיעור"
 
 #: include/locales.inc.php:60
 msgid "Indonesian (id_ID)"
@@ -9595,7 +9595,7 @@ msgstr "שם המתקין"
 
 #: include/classes/helpers/CMenuHelper.php:344
 msgid "Integrations"
-msgstr ""
+msgstr "שילובים"
 
 #: app/partials/monitoring.host.view.html.php:30
 #: app/views/administration.proxy.edit.php:77 disc_prototypes.php:42
@@ -9702,7 +9702,7 @@ msgstr "משך"
 #: include/classes/api/services/CRole.php:719
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
-msgstr ""
+msgstr "שיטת API שגויה „%2$s” לתפקיד משתמש „%1$s”."
 
 #: include/classes/api/services/CHostInterface.php:829
 #, c-format
@@ -9830,12 +9830,12 @@ msgstr "הפרמטרים לשיטה שגויים."
 #: include/classes/api/services/CProxy.php:682
 #: include/classes/api/services/CProxy.php:693
 #: include/classes/api/services/CProxy.php:699
-#: include/classes/api/services/CProxy.php:734
-#: include/classes/api/services/CProxy.php:751
-#: include/classes/api/services/CProxy.php:764
-#: include/classes/api/services/CProxy.php:770
-#: include/classes/api/services/CProxy.php:779
-#: include/classes/api/services/CProxy.php:791
+#: include/classes/api/services/CProxy.php:737
+#: include/classes/api/services/CProxy.php:754
+#: include/classes/api/services/CProxy.php:767
+#: include/classes/api/services/CProxy.php:773
+#: include/classes/api/services/CProxy.php:782
+#: include/classes/api/services/CProxy.php:794
 #: include/classes/api/services/CReport.php:194
 #: include/classes/api/services/CReport.php:200
 #: include/classes/api/services/CReport.php:206
@@ -10769,13 +10769,13 @@ msgstr "קישור"
 #: include/classes/api/services/CMap.php:1476
 #, c-format
 msgid "Link \"selementid1\" field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "הקישור בשדה „selementid1” מצביע למזהה selement במפה שאינו קיים „%1$s” במפה „%2$s”."
 
 #: include/classes/api/services/CMap.php:1014
 #: include/classes/api/services/CMap.php:1484
 #, c-format
 msgid "Link \"selementid2\" field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "הקישור בשדה „selementid2” מצביע למזהה selement במפה שאינו קיים „%1$s” במפה „%2$s”."
 
 #: include/views/js/monitoring.sysmaps.js.php:737
 #: include/views/js/monitoring.sysmaps.js.php:748
@@ -11388,7 +11388,7 @@ msgstr "מספר התהליכים המרבי שנתמך על ידי מערכת �
 #: include/blocks.inc.php:632
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
-msgstr ""
+msgstr "גרסת מסד הנתונים %1$s העדכנית ביותר הנדרשת היא %2$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:259
@@ -11600,7 +11600,7 @@ msgstr "אורך ססמה מזערי"
 #: include/blocks.inc.php:626
 #, c-format
 msgid "Minimum required %1$s database version is %2$s."
-msgstr ""
+msgstr "גרסת מסד הנתונים %1$s הישנה ביותר הנדרשת היא %2$s."
 
 #: include/classes/setup/CFrontendSetup.php:124
 #, c-format
@@ -11739,7 +11739,7 @@ msgstr "עודכן מודול: %1$s."
 #: include/classes/api/services/CRole.php:695
 #, c-format
 msgid "Module with ID \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "המודול עם המזהה „%2$s” אינו זמין לתפקיד המשתמש „%1$s”."
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -11824,11 +11824,11 @@ msgstr "יותר מתרשים אחד עם השם „%1$s” במארח."
 
 #: include/classes/helpers/CServiceHelper.php:27
 msgid "Most critical if all children have problems"
-msgstr ""
+msgstr "הכי קריטי אם לכל הצאצאים יש תקלות"
 
 #: include/classes/helpers/CServiceHelper.php:26
 msgid "Most critical of child services"
-msgstr ""
+msgstr "הכי קריטי מבין שירותי הצאצאים"
 
 #: include/httptest.inc.php:405
 msgid "Mozilla Firefox"
@@ -11854,14 +11854,14 @@ msgstr "שלי"
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
 msgid "N"
-msgstr ""
+msgstr "כ"
 
 #: include/classes/helpers/CServiceHelper.php:42
 #: include/classes/helpers/CServiceHelper.php:52
 #: include/classes/helpers/CServiceHelper.php:62
 #: include/classes/helpers/CServiceHelper.php:72
 msgid "N%"
-msgstr ""
+msgstr "כ%"
 
 #: include/discovery.inc.php:53
 msgid "NNTP"
@@ -12121,7 +12121,7 @@ msgstr "מעולם לא"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
-msgstr ""
+msgstr "כלל נוסף חדש"
 
 #: app/controllers/CControllerPopupConditionActions.php:94
 #: app/controllers/CControllerPopupConditionEventCorr.php:87
@@ -12576,7 +12576,7 @@ msgstr "אין הרשאות לקרוא ל־„%1$s.%2$s”."
 #: include/classes/api/services/CModule.php:246
 #: include/classes/api/services/CProxy.php:388
 #: include/classes/api/services/CProxy.php:623
-#: include/classes/api/services/CProxy.php:847
+#: include/classes/api/services/CProxy.php:850
 #: include/classes/api/services/CRegexp.php:339
 #: include/classes/api/services/CRegexp.php:369
 #: include/classes/api/services/CReport.php:549
@@ -13759,7 +13759,7 @@ msgstr "תרחישי רשת הורה"
 #: include/classes/api/services/CService.php:795
 #, c-format
 msgid "Parent-child relation conflict in services \"%1$s\" and \"%2$s\"."
-msgstr ""
+msgstr "סתירה ביחס הורה-צאצא בשירותים „%1$s” ו־„%2$s”."
 
 #: app/views/popup.httpstep.php:58
 #: include/views/configuration.host.discovery.edit.php:86
@@ -13840,7 +13840,7 @@ msgstr "הדבקה"
 #: app/views/js/configuration.dashboard.edit.js.php:217
 #: app/views/js/monitoring.dashboard.view.js.php:283
 msgid "Paste page"
-msgstr ""
+msgstr "הדבקת עמוד"
 
 #: app/views/js/configuration.dashboard.edit.js.php:210
 #: app/views/js/monitoring.dashboard.view.js.php:276 jsLoader.php:155
@@ -14515,12 +14515,12 @@ msgstr "קריאה-בלבד"
 #: app/views/administration.user.edit.php:552
 #: app/views/administration.userrole.edit.php:180
 msgid "Read-only access to services"
-msgstr ""
+msgstr "גישה לקריאה בלבד מהשירותים"
 
 #: app/views/administration.user.edit.php:561
 #: app/views/administration.userrole.edit.php:204
 msgid "Read-only access to services with tag"
-msgstr ""
+msgstr "גישה לקריאה בלבד מהשירותים עם תגית"
 
 #: app/partials/administration.usergroup.grouprights.html.php:69
 #: app/views/administration.usergroup.edit.php:132
@@ -14536,12 +14536,12 @@ msgstr "קריאה-כתיבה"
 #: app/views/administration.user.edit.php:507
 #: app/views/administration.userrole.edit.php:139
 msgid "Read-write access to services"
-msgstr ""
+msgstr "גישה לקריאה-כתיבה לשירותים"
 
 #: app/views/administration.user.edit.php:516
 #: app/views/administration.userrole.edit.php:163
 msgid "Read-write access to services with tag"
-msgstr ""
+msgstr "גישה לקריאה-כתיבה לשירותים עם תגית"
 
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:471
@@ -14588,7 +14588,7 @@ msgstr "נמענים"
 #: app/views/reports.auditlog.list.php:74
 #: app/views/reports.auditlog.list.php:96
 msgid "Recordset ID"
-msgstr ""
+msgstr "מזהה סדרת רשומות"
 
 #: app/views/administration.user.edit.php:684
 #: include/classes/screens/CScreenProblem.php:1067
@@ -15968,7 +15968,7 @@ msgstr[1] "שירותים נמחקו"
 #: app/views/administration.userrole.edit.php:145
 #: app/views/administration.userrole.edit.php:186
 msgid "Service list"
-msgstr ""
+msgstr "רשימת שירותים"
 
 #: include/actions.inc.php:68
 msgid "Service name"
@@ -16020,7 +16020,7 @@ msgstr "השירות עודכן"
 #: include/classes/api/services/CRole.php:520
 #, c-format
 msgid "Service with ID \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "השירות עם המזהה „%2$s” אינו זמין לתפקיד המשתמש „%1$s”."
 
 #: app/controllers/CControllerServiceListEdit.php:191
 #: app/controllers/CControllerServiceListEditRefresh.php:146
@@ -16080,11 +16080,11 @@ msgstr "הגדרת ערך חדש"
 
 #: app/views/popup.service.statusrule.edit.php:39
 msgid "Set status to"
-msgstr ""
+msgstr "הגדרת מצב לכדי"
 
 #: include/classes/helpers/CServiceHelper.php:28
 msgid "Set status to OK"
-msgstr ""
+msgstr "הגדרת מצב לתקין"
 
 #: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1416
 #: include/views/js/item.preprocessing.js.php:67
@@ -16649,7 +16649,7 @@ msgstr "מצב"
 #: app/views/popup.service.edit.php:114 app/views/popup.service.edit.php:285
 #: app/views/popup.services.php:59
 msgid "Status calculation rule"
-msgstr ""
+msgstr "כלל חישוב מצב"
 
 #: include/views/configuration.httpconf.edit.php:206
 msgid "Status codes"
@@ -16682,7 +16682,7 @@ msgstr "מצב תקלה"
 
 #: app/views/popup.service.edit.php:166
 msgid "Status propagation rule"
-msgstr ""
+msgstr "כלל הפצת מצב"
 
 #: include/actions.inc.php:1921
 #: include/classes/screens/CScreenHttpTestDetails.php:81
@@ -18013,7 +18013,7 @@ msgstr "סוגים"
 #: include/classes/api/services/CRole.php:461
 #, c-format
 msgid "UI element \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "רכיב מנשק המשתמש „%2$s” אינו זמין לתפקיד המשתמש „%1$s”."
 
 #: app/views/js/administration.regex.edit.js.php:194
 #: include/translateDefines.inc.php:25
@@ -18535,7 +18535,7 @@ msgstr "הדוח „%2$s” נוצר בשם המשתמש „%1$s”."
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
 msgid "User \"%1$s\" unblocked."
-msgstr ""
+msgstr "החסימה על המשתמש „%1$s” שוחררה."
 
 #: include/actions.inc.php:1976
 msgid "User action"
@@ -18688,7 +18688,7 @@ msgstr "תפקיד משתמש"
 #: include/classes/api/services/CRole.php:396
 #, c-format
 msgid "User role \"%1$s\" already exists."
-msgstr ""
+msgstr "תפקיד המשתמש „%1$s” כבר קיים."
 
 #: app/controllers/CControllerUserroleCreate.php:141
 msgid "User role created"
@@ -19325,7 +19325,7 @@ msgstr "שם התצוגה לא יכול להיות ריק אם אין שם מא�
 #: include/classes/helpers/CServiceHelper.php:57
 #: include/classes/helpers/CServiceHelper.php:67
 msgid "W"
-msgstr ""
+msgstr "מ"
 
 #: jsLoader.php:242
 msgctxt "Wednesday short"
@@ -19351,7 +19351,7 @@ msgstr "הודעת אזהרה"
 #: include/blocks.inc.php:649
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
-msgstr ""
+msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות לפחות (%2$s)"
 
 #: jsLoader.php:289
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -19451,7 +19451,7 @@ msgstr "שבועי"
 
 #: app/views/popup.service.edit.php:204
 msgid "Weight"
-msgstr ""
+msgstr "משקל"
 
 #: include/classes/setup/CSetupWizard.php:45
 msgid "Welcome"
@@ -19834,7 +19834,7 @@ msgstr "Zabbix"
 
 #: include/classes/helpers/CMenuHelper.php:347
 msgid "Zabbix Integrations"
-msgstr ""
+msgstr "שילובים מול Zabbix"
 
 #: include/classes/helpers/CMenuHelper.php:340
 msgid "Zabbix Technical Support"
@@ -20345,7 +20345,7 @@ msgstr "לא ניתן לשנות"
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
 #: include/classes/api/services/CProxy.php:700
-#: include/classes/api/services/CProxy.php:771
+#: include/classes/api/services/CProxy.php:774
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:473
@@ -21076,11 +21076,11 @@ msgstr "mod()‎ - שארית החילוק"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:783
 msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
-msgstr ""
+msgstr "monodec()‎ - בדיקת הקטנת ערך פריט באופן רציף (1 - הנתון הוא מונוטוני, 0 - אחרת), מצב (strict - דורש מונוטוניות קשיחה)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:790
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
-msgstr ""
+msgstr "monoinc()‎ - בדיקת גדילת ערך פריט באופן רציף (1 - הנתון הוא מונוטוני, 0 - אחרת), מצב (strict - דורש מונוטוניות קשיחה)"
 
 #: include/func.inc.php:583
 msgctxt "millisecond short"
@@ -21334,7 +21334,7 @@ msgstr "rand()‎ - ערך מספרי שלם אקראי"
 #: include/classes/api/services/CService.php:1822
 #, c-format
 msgid "read-write access to the child service \"%1$s\" is required"
-msgstr ""
+msgstr "דרושה גישה לקריאה-כתיבה לשירות הצאצא „%1$s”"
 
 #: include/classes/api/services/CService.php:476
 #, c-format
@@ -21345,7 +21345,7 @@ msgstr ""
 #: include/classes/api/services/CService.php:1739
 #: include/classes/api/services/CService.php:1799
 msgid "read-write access to the service is required"
-msgstr ""
+msgstr "דרושה גישה לקריאה-כתיבה לשירות"
 
 #: include/classes/api/services/CService.php:1798
 #: include/classes/api/services/CService.php:1860
@@ -21470,8 +21470,8 @@ msgstr "תיאור קצר"
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CProxy.php:651
 #: include/classes/api/services/CProxy.php:676
-#: include/classes/api/services/CProxy.php:780
-#: include/classes/api/services/CProxy.php:792
+#: include/classes/api/services/CProxy.php:783
+#: include/classes/api/services/CProxy.php:795
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:583
@@ -21581,7 +21581,7 @@ msgstr "מזהה התבנית %1$s מועבר %2$s פעמים"
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CProxy.php:683
 #: include/classes/api/services/CProxy.php:694
-#: include/classes/api/services/CProxy.php:765
+#: include/classes/api/services/CProxy.php:768
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
@@ -21773,8 +21773,8 @@ msgstr "הטקסט „%1$s“ בלתי צפוי"
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
-#: include/classes/api/services/CProxy.php:735
-#: include/classes/api/services/CProxy.php:752
+#: include/classes/api/services/CProxy.php:738
+#: include/classes/api/services/CProxy.php:755
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""
@@ -21904,12 +21904,12 @@ msgstr "הערך חייב להיות בין „%1$s” לבין „%2$s”"
 
 #: include/classes/validators/CApiInputValidator.php:514
 msgid "value must be empty"
-msgstr ""
+msgstr "הערך חייב להיות ריק"
 
 #: include/classes/validators/CApiInputValidator.php:511
 #, c-format
 msgid "value must be empty or one of %1$s"
-msgstr ""
+msgstr "הערך חייב להיות ריק או אחד מבין %1$s"
 
 #: include/classes/validators/CNewValidator.php:230
 #, c-format
