@@ -266,37 +266,64 @@ abstract class CControllerServiceListGeneral extends CController {
 		return array_keys($filtered_serviceids);
 	}
 
-	protected function getProblemEvents(array $serviceids): array {
-		$sla = API::Service()->getSla([
-			'serviceids' => $serviceids,
-			'intervals' => [['from' => 0, 'to' => 0]]
-		]);
-
-		$eventids_by_service = [];
+	/**
+	 * @param array $services
+	 */
+	protected static function extendProblemEvents(array &$services): void {
 		$eventids = [];
 
-		foreach ($sla as $serviceid => $service_sla) {
-			$eventids_by_service[$serviceid] = array_column($service_sla['problems'], 'eventid', 'eventid');
-			$eventids += $eventids_by_service[$serviceid];
+		foreach (array_column($services, 'problem_events') as $problem_events) {
+			$eventids += array_column($problem_events, 'eventid', 'eventid');
 		}
 
 		$events = API::Event()->get([
-			'output' => ['name', 'objectid', 'severity'],
+			'output' => ['objectid'],
 			'eventids' => $eventids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_VALUE_TRUE,
 			'preservekeys' => true
 		]);
 
-		CArrayHelper::sort($events, [
-			['field' => 'severity', 'order' => ZBX_SORT_DOWN],
-			['field' => 'name', 'order' => ZBX_SORT_UP]
-		]);
+		foreach ($services as &$service) {
+			$problem_events = [];
 
-		$events_sorted = [];
+			foreach ($service['problem_events'] as $problem_event) {
+				$triggerid = array_key_exists($problem_event['eventid'], $events)
+					? $events[$problem_event['eventid']]['objectid']
+					: 0;
 
-		foreach ($eventids_by_service as $serviceid => $service_events) {
-			$events_sorted[$serviceid] = array_intersect_key($events, $service_events);
+				if (!array_key_exists($triggerid, $problem_events)) {
+					$problem_events[$triggerid] = [];
+				}
+
+				if (!array_key_exists($problem_event['name'], $problem_events[$triggerid])) {
+					$problem_events[$triggerid][$problem_event['name']] = $problem_event['severity'];
+				}
+				else {
+					$problem_events[$triggerid][$problem_event['name']] = max($problem_event['severity'],
+						$problem_events[$triggerid][$problem_event['name']]
+					);
+				}
+			}
+
+			$service['problem_events'] = [];
+
+			foreach ($problem_events as $triggerid => $problem_events) {
+				foreach ($problem_events as $name => $severity) {
+					$service['problem_events'][] = [
+						'triggerid' => $triggerid != 0 ? $triggerid : null,
+						'name' => $name,
+						'severity' => $severity
+					];
+				}
+			}
+
+			CArrayHelper::sort($service['problem_events'], [
+				['field' => 'severity', 'order' => ZBX_SORT_DOWN],
+				['field' => 'name', 'order' => ZBX_SORT_UP]
+			]);
 		}
-
-		return $events_sorted;
+		unset($service);
 	}
 }

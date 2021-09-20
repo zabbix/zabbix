@@ -176,6 +176,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
 			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
+			'selectProblemEvents' => ['eventid', 'severity', 'name'],
 			'selectTags' => ['tag', 'value'],
 			'serviceids' => $db_serviceids,
 			'sortfield' => ['sortorder', 'name'],
@@ -183,7 +184,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'preservekeys' => true
 		]);
 
-		$data['events'] = $this->getProblemEvents($db_serviceids);
+		self::extendProblemEvents($data['services']);
 
 		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 
