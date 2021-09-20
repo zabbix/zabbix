@@ -575,290 +575,359 @@ class CService extends CApiService {
 	protected function addRelatedObjects(array $options, array $result, array $permissions = null): array {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$serviceids = array_keys($result);
-
-		if ($options['selectParents'] !== null) {
-			$relation_map = $this->createRelationMap($result, 'servicedownid', 'serviceupid', 'services_links');
-
-			$parents = $this->doGet([
-				'output' => ($options['selectParents'] === API_OUTPUT_COUNT) ? [] : $options['selectParents'],
-				'serviceids' => $relation_map->getRelatedIds(),
-				'sortfield' => $options['sortfield'],
-				'sortorder' => $options['sortorder'],
-				'preservekeys' => true
-			], $permissions);
-
-			$result = $relation_map->mapMany($result, $parents, 'parents');
-
-			if ($options['selectParents'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['parents'] = (string) count($row['parents']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectChildren'] !== null) {
-			$relation_map = $this->createRelationMap($result, 'serviceupid', 'servicedownid', 'services_links');
-
-			$children = $this->doGet([
-				'output' => ($options['selectChildren'] === API_OUTPUT_COUNT) ? [] : $options['selectChildren'],
-				'serviceids' => $relation_map->getRelatedIds(),
-				'sortfield' => $options['sortfield'],
-				'sortorder' => $options['sortorder'],
-				'preservekeys' => true
-			], $permissions);
-
-			$result = $relation_map->mapMany($result, $children, 'children');
-
-			if ($options['selectChildren'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['children'] = (string) count($row['children']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectTags'] !== null) {
-			if ($options['selectTags'] === API_OUTPUT_COUNT) {
-				$output = ['servicetagid', 'serviceid'];
-			}
-			elseif ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$output = ['servicetagid', 'serviceid', 'tag', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['servicetagid', 'serviceid'], $options['selectTags']));
-			}
-
-			$tags = DB::select('service_tag', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($tags, 'serviceid', 'servicetagid');
-			$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $tags, 'tags');
-
-			if ($options['selectTags'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['tags'] = (string) count($row['tags']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectProblemTags'] !== null) {
-			if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
-				$output = ['service_problem_tagid', 'serviceid'];
-			}
-			elseif ($options['selectProblemTags'] === API_OUTPUT_EXTEND) {
-				$output = ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['service_problem_tagid', 'serviceid'],
-					$options['selectProblemTags']
-				));
-			}
-
-			$problem_tags = DB::select('service_problem_tag', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($problem_tags, 'serviceid', 'service_problem_tagid');
-			$problem_tags = $this->unsetExtraFields($problem_tags, ['service_problem_tagid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $problem_tags, 'problem_tags');
-
-			if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['problem_tags'] = (string) count($row['problem_tags']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectProblemEvents'] !== null) {
-			$db_links = DB::select('services_links', [
-				'output' => ['serviceupid', 'servicedownid']
-			]);
-
-			$relations = [];
-
-			foreach ($db_links as $db_link) {
-				$relations[$db_link['serviceupid']][$db_link['servicedownid']] = true;
-			}
-
-			$services_all = [];
-			$services_without_children = [];
-
-			$parents = $result;
-
-			while ($parents) {
-				$next_parents = [];
-
-				foreach (array_keys($parents) as $serviceid) {
-					$services_all[$serviceid] = true;
-
-					if (array_key_exists($serviceid, $relations)) {
-						$next_parents += $relations[$serviceid];
-					}
-					else {
-						$services_without_children[$serviceid] = true;
-					}
-				}
-
-				$parents = $next_parents;
-			}
-
-			$services = $this->doGet([
-				'output' => ['status', 'algorithm', 'weight', 'propagation_rule', 'propagation_value'],
-				'selectStatusRules' => ['type', 'limit_value', 'limit_status', 'new_status'],
-				'filter' => ['serviceid' => array_keys($services_all)],
-				'preservekeys' => true
-			]);
-
-			if ($options['selectProblemEvents'] === API_OUTPUT_COUNT) {
-				$output = ['serviceid'];
-			}
-			elseif ($options['selectProblemEvents'] === API_OUTPUT_EXTEND) {
-				$output = ['serviceid', 'eventid', 'severity', 'name'];
-			}
-			else {
-				$output = array_unique(array_merge(['serviceid', 'eventid'], $options['selectProblemEvents']));
-			}
-
-			$output_name = in_array('name', $output);
-
-			if ($output_name) {
-				$output = array_diff($output, ['name']);
-			}
-
-			$service_problems_ungrouped = DB::select('service_problem', [
-				'output' => $output,
-				'filter' => ['serviceid' => array_keys($services_without_children)],
-				'preservekeys' => true
-			]);
-
-			if ($service_problems_ungrouped && $output_name) {
-				$events = DB::select('events', [
-					'output' => ['name'],
-					'filter' => ['eventid' => array_column($service_problems_ungrouped, 'eventid')],
-					'preservekeys' => true
-				]);
-
-				foreach ($service_problems_ungrouped as &$service_problem) {
-					$service_problem['name'] = $events[$service_problem['eventid']]['name'];
-				}
-				unset($service_problem);
-			}
-
-			$service_problems = array_fill_keys(array_keys($services_without_children), []);
-
-			foreach ($service_problems_ungrouped as $service_problemid => $service_problem) {
-				$service_problems[$service_problem['serviceid']][$service_problemid] = $service_problem;
-			}
-
-			foreach ($result as $serviceid => &$service) {
-				$problem_events = $services[$serviceid]['status'] != ZBX_SEVERITY_OK
-					? self::getProblemEvents((string) $serviceid, $services, $relations, $service_problems)
-					: [];
-
-				$service['problem_events'] = $options['selectProblemEvents'] === API_OUTPUT_COUNT
-					? count($problem_events)
-					: $this->unsetExtraFields($problem_events, ['serviceid', 'eventid'],
-						$options['selectProblemEvents']
-					);
-			}
-			unset($service);
-		}
-
-		if ($options['selectTimes'] !== null) {
-			if ($options['selectTimes'] === API_OUTPUT_COUNT) {
-				$output = ['timeid', 'serviceid'];
-			}
-			elseif ($options['selectTimes'] === API_OUTPUT_EXTEND) {
-				$output = ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'];
-			}
-			else {
-				$output = array_unique(array_merge(['timeid', 'serviceid'], $options['selectTimes']));
-			}
-
-			$times = DB::select('services_times', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($times, 'serviceid', 'timeid');
-			$times = $this->unsetExtraFields($times, ['timeid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $times, 'times');
-
-			if ($options['selectTimes'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['times'] = (string) count($row['times']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectStatusRules'] !== null) {
-			if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
-				$output = ['service_status_ruleid', 'serviceid'];
-			}
-			elseif ($options['selectStatusRules'] === API_OUTPUT_EXTEND) {
-				$output = ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'];
-			}
-			else {
-				$output = array_unique(array_merge(['service_status_ruleid', 'serviceid'],
-					$options['selectStatusRules']
-				));
-			}
-
-			$status_rules = DB::select('service_status_rule', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($status_rules, 'serviceid', 'service_status_ruleid');
-			$status_rules = $this->unsetExtraFields($status_rules, ['service_status_ruleid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $status_rules, 'status_rules');
-
-			if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['status_rules'] = (string) count($row['status_rules']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectAlarms'] !== null) {
-			if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
-				$output = ['servicealarmid', 'serviceid'];
-			}
-			elseif ($options['selectAlarms'] === API_OUTPUT_EXTEND) {
-				$output = ['servicealarmid', 'serviceid', 'clock', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['servicealarmid', 'serviceid'], $options['selectAlarms']));
-			}
-
-			$alarms = DB::select('service_alarms', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($alarms, 'serviceid', 'servicealarmid');
-			$alarms = $this->unsetExtraFields($alarms, ['servicealarmid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $alarms, 'alarms');
-
-			if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['alarms'] = (string) count($row['alarms']);
-				}
-				unset($row);
-			}
-		}
+		$this->addRelatedParents($options, $result, $permissions);
+		$this->addRelatedChildren($options, $result, $permissions);
+		$this->addRelatedTags($options, $result);
+		$this->addRelatedProblemTags($options, $result);
+		$this->addRelatedProblemEvents($options, $result);
+		$this->addRelatedTimes($options, $result);
+		$this->addRelatedStatusRules($options, $result);
+		$this->addRelatedAlarms($options, $result);
 
 		return $result;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 * @param array $permissions
+	 *
+	 * @throws APIException
+	 */
+	private function addRelatedParents(array $options, array &$result, array $permissions): void {
+		if ($options['selectParents'] === null) {
+			return;
+		}
+
+		$relation_map = $this->createRelationMap($result, 'servicedownid', 'serviceupid', 'services_links');
+
+		$parents = $this->doGet([
+			'output' => ($options['selectParents'] === API_OUTPUT_COUNT) ? [] : $options['selectParents'],
+			'serviceids' => $relation_map->getRelatedIds(),
+			'sortfield' => $options['sortfield'],
+			'sortorder' => $options['sortorder'],
+			'preservekeys' => true
+		], $permissions);
+
+		$result = $relation_map->mapMany($result, $parents, 'parents');
+
+		if ($options['selectParents'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['parents'] = (string) count($row['parents']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 * @param array $permissions
+	 *
+	 * @throws APIException
+	 */
+	private function addRelatedChildren(array $options, array &$result, array $permissions): void {
+		if ($options['selectChildren'] === null) {
+			return;
+		}
+
+		$relation_map = $this->createRelationMap($result, 'serviceupid', 'servicedownid', 'services_links');
+
+		$children = $this->doGet([
+			'output' => ($options['selectChildren'] === API_OUTPUT_COUNT) ? [] : $options['selectChildren'],
+			'serviceids' => $relation_map->getRelatedIds(),
+			'sortfield' => $options['sortfield'],
+			'sortorder' => $options['sortorder'],
+			'preservekeys' => true
+		], $permissions);
+
+		$result = $relation_map->mapMany($result, $children, 'children');
+
+		if ($options['selectChildren'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['children'] = (string)count($row['children']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedTags(array $options, array &$result): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		if ($options['selectTags'] === API_OUTPUT_COUNT) {
+			$output = ['servicetagid', 'serviceid'];
+		}
+		elseif ($options['selectTags'] === API_OUTPUT_EXTEND) {
+			$output = ['servicetagid', 'serviceid', 'tag', 'value'];
+		}
+		else {
+			$output = array_unique(array_merge(['servicetagid', 'serviceid'], $options['selectTags']));
+		}
+
+		$tags = DB::select('service_tag', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($tags, 'serviceid', 'servicetagid');
+		$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $tags, 'tags');
+
+		if ($options['selectTags'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['tags'] = (string)count($row['tags']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedProblemTags(array $options, array &$result): void {
+		if ($options['selectProblemTags'] === null) {
+			return;
+		}
+
+		if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
+			$output = ['service_problem_tagid', 'serviceid'];
+		}
+		elseif ($options['selectProblemTags'] === API_OUTPUT_EXTEND) {
+			$output = ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'];
+		}
+		else {
+			$output = array_unique(array_merge(['service_problem_tagid', 'serviceid'], $options['selectProblemTags']));
+		}
+
+		$problem_tags = DB::select('service_problem_tag', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($problem_tags, 'serviceid', 'service_problem_tagid');
+		$problem_tags = $this->unsetExtraFields($problem_tags, ['service_problem_tagid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $problem_tags, 'problem_tags');
+
+		if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['problem_tags'] = (string)count($row['problem_tags']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 *
+	 * @throws APIException
+	 */
+	private function addRelatedProblemEvents(array $options, array &$result): void {
+		if ($options['selectProblemEvents'] === null) {
+			return;
+		}
+
+		$db_links = DB::select('services_links', [
+			'output' => ['serviceupid', 'servicedownid']
+		]);
+
+		$relations = [];
+
+		foreach ($db_links as $db_link) {
+			$relations[$db_link['serviceupid']][$db_link['servicedownid']] = true;
+		}
+
+		$services_all = [];
+		$services_without_children = [];
+
+		$parents = $result;
+
+		while ($parents) {
+			$next_parents = [];
+
+			foreach (array_keys($parents) as $serviceid) {
+				$services_all[$serviceid] = true;
+
+				if (array_key_exists($serviceid, $relations)) {
+					$next_parents += $relations[$serviceid];
+				}
+				else {
+					$services_without_children[$serviceid] = true;
+				}
+			}
+
+			$parents = $next_parents;
+		}
+
+		$services = $this->doGet([
+			'output' => ['status', 'algorithm', 'weight', 'propagation_rule', 'propagation_value'],
+			'selectStatusRules' => ['type', 'limit_value', 'limit_status', 'new_status'],
+			'filter' => ['serviceid' => array_keys($services_all)],
+			'preservekeys' => true
+		]);
+
+		if ($options['selectProblemEvents'] === API_OUTPUT_COUNT) {
+			$output = ['serviceid'];
+		}
+		elseif ($options['selectProblemEvents'] === API_OUTPUT_EXTEND) {
+			$output = ['serviceid', 'eventid', 'severity', 'name'];
+		}
+		else {
+			$output = array_unique(array_merge(['serviceid', 'eventid'], $options['selectProblemEvents']));
+		}
+
+		$output_name = in_array('name', $output);
+
+		if ($output_name) {
+			$output = array_diff($output, ['name']);
+		}
+
+		$service_problems_ungrouped = DB::select('service_problem', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($services_without_children)],
+			'preservekeys' => true
+		]);
+
+		if ($service_problems_ungrouped && $output_name) {
+			$events = DB::select('events', [
+				'output' => ['name'],
+				'filter' => ['eventid' => array_column($service_problems_ungrouped, 'eventid')],
+				'preservekeys' => true
+			]);
+
+			foreach ($service_problems_ungrouped as &$service_problem) {
+				$service_problem['name'] = $events[$service_problem['eventid']]['name'];
+			}
+			unset($service_problem);
+		}
+
+		$service_problems = array_fill_keys(array_keys($services_without_children), []);
+
+		foreach ($service_problems_ungrouped as $service_problemid => $service_problem) {
+			$service_problems[$service_problem['serviceid']][$service_problemid] = $service_problem;
+		}
+
+		foreach ($result as $serviceid => &$service) {
+			$problem_events = $services[$serviceid]['status'] != ZBX_SEVERITY_OK
+				? self::getProblemEvents((string)$serviceid, $services, $relations, $service_problems)
+				: [];
+
+			$service['problem_events'] = $options['selectProblemEvents'] === API_OUTPUT_COUNT
+				? count($problem_events)
+				: $this->unsetExtraFields($problem_events, ['serviceid', 'eventid'], $options['selectProblemEvents']);
+		}
+		unset($service);
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedTimes(array $options, array &$result): void {
+		if ($options['selectTimes'] === null) {
+			return;
+		}
+
+		if ($options['selectTimes'] === API_OUTPUT_COUNT) {
+			$output = ['timeid', 'serviceid'];
+		}
+		elseif ($options['selectTimes'] === API_OUTPUT_EXTEND) {
+			$output = ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'];
+		}
+		else {
+			$output = array_unique(array_merge(['timeid', 'serviceid'], $options['selectTimes']));
+		}
+
+		$times = DB::select('services_times', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($times, 'serviceid', 'timeid');
+		$times = $this->unsetExtraFields($times, ['timeid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $times, 'times');
+
+		if ($options['selectTimes'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['times'] = (string)count($row['times']);
+			}
+			unset($row);
+		}
+	}
+
+	private function addRelatedStatusRules(array $options, array &$result): void {
+		if ($options['selectStatusRules'] === null) {
+			return;
+		}
+
+		if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
+			$output = ['service_status_ruleid', 'serviceid'];
+		}
+		elseif ($options['selectStatusRules'] === API_OUTPUT_EXTEND) {
+			$output = ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'];
+		}
+		else {
+			$output = array_unique(array_merge(['service_status_ruleid', 'serviceid'], $options['selectStatusRules']));
+		}
+
+		$status_rules = DB::select('service_status_rule', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($status_rules, 'serviceid', 'service_status_ruleid');
+		$status_rules = $this->unsetExtraFields($status_rules, ['service_status_ruleid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $status_rules, 'status_rules');
+
+		if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['status_rules'] = (string) count($row['status_rules']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedAlarms(array $options, array &$result): void {
+		if ($options['selectAlarms'] === null) {
+			return;
+		}
+
+		if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
+			$output = ['servicealarmid', 'serviceid'];
+		}
+		elseif ($options['selectAlarms'] === API_OUTPUT_EXTEND) {
+			$output = ['servicealarmid', 'serviceid', 'clock', 'value'];
+		}
+		else {
+			$output = array_unique(array_merge(['servicealarmid', 'serviceid'], $options['selectAlarms']));
+		}
+
+		$alarms = DB::select('service_alarms', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($alarms, 'serviceid', 'servicealarmid');
+		$alarms = $this->unsetExtraFields($alarms, ['servicealarmid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $alarms, 'alarms');
+
+		if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['alarms'] = (string) count($row['alarms']);
+			}
+			unset($row);
+		}
 	}
 
 	/**
