@@ -1107,17 +1107,19 @@ class CService extends CApiService {
 					ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
 				]);
 
-				$rule_children = array_filter($children,
-					static function (array $child) use ($status_rule, $is_less_than, $is_weight): bool {
-						$status_matched = $is_less_than
-							? $child['status'] > $status_rule['limit_status']
-							: $child['status'] >= $status_rule['limit_status'];
+				$rule_children = [];
 
-						$weight_matched = !$is_weight || $child['weight'] > 0;
+				foreach ($children as $child_serviceid => $child) {
+					$status_matched = $is_less_than
+						? $children_upstream_status[$child_serviceid] > $status_rule['limit_status']
+						: $children_upstream_status[$child_serviceid] >= $status_rule['limit_status'];
 
-						return $status_matched && $weight_matched;
+					$weight_matched = !$is_weight || $child['weight'] > 0;
+
+					if ($status_matched && $weight_matched) {
+						$rule_children[$child_serviceid] = $child;
 					}
-				);
+				}
 
 				if ($is_weight) {
 					$value = 0;
