@@ -2658,7 +2658,6 @@ zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = PQserverVersion(conn);
-
 	major = RIGHT2(ZBX_PG_SVERSION/10000);
 
 	if (10 >= major)
@@ -2670,7 +2669,6 @@ zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
 	{
 		version_friendly = zbx_dsprintf(NULL, "%d.%d", major, RIGHT2(ZBX_PG_SVERSION));
 	}
-
 
 	flag = zbx_db_version_check("PostgreSQL", ZBX_PG_SVERSION, ZBX_POSTGRESQL_MIN_VERSION,
 			ZBX_POSTGRESQL_MAX_VERSION);
