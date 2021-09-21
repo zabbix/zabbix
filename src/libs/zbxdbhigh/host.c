@@ -26,6 +26,7 @@
 #include "../../libs/zbxaudit/audit_host.h"
 #include "../../libs/zbxaudit/audit_item.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
+#include "../../libs/zbxaudit/audit_httptest.h"
 #include "../../libs/zbxaudit/audit_graph.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
@@ -1612,7 +1613,7 @@ static void	DBdelete_template_httptests(zbx_uint64_t hostid, const zbx_vector_ui
 	zbx_vector_uint64_create(&httptestids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select h.httptestid"
+			"select h.httptestid,h.name"
 			" from httptest h"
 				" join httptest t"
 					" on");
@@ -1621,10 +1622,11 @@ static void	DBdelete_template_httptests(zbx_uint64_t hostid, const zbx_vector_ui
 						" and t.httptestid=h.templateid"
 			" where h.hostid=" ZBX_FS_UI64, hostid);
 
-	DBselect_uint64(sql, &httptestids);
+	if (FAIL == zbx_audit_DBselect_delete_for_httptest(sql, &httptestids))
+		goto clean;
 
 	DBdelete_httptests(&httptestids);
-
+clean:
 	zbx_vector_uint64_destroy(&httptestids);
 	zbx_free(sql);
 
@@ -4952,9 +4954,8 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
  *                                                                            *
  * Function: DBsave_httptests                                                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
-static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
+static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httptests)
 {
 	char			*sql;
 	size_t			sql_alloc = 512, sql_offset = 0;
@@ -5014,13 +5015,17 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 				num_httpstepfields += httpstep->fields.values_num;
 				zbx_vector_uint64_append(&httpupdstepids, httpstep->hoststepid);
 			}
+
+			zbx_audit_httptest_create_entry(AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
 		}
 	}
 
 	if (0 != httpupdtestids.values_num)
 	{
 		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,	"select httptest_fieldid from httptest_field where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select httptest_fieldid,httptestid,type"
+				" from httptest_field where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", httpupdtestids.values,
 				httpupdtestids.values_num);
 
@@ -5028,16 +5033,23 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_uint64_t httpfieldid;
+			zbx_uint64_t	httpfieldid, testid;
+			int		type;
 
 			ZBX_STR2UINT64(httpfieldid, row[0]);
+			ZBX_STR2UINT64(testid, row[1]);
+			type = atoi(row[2]);
 			zbx_vector_uint64_append(&deletefieldsids, httpfieldid);
+			zbx_audit_httptest_update_json_delete_httptest_field(testid, httpfieldid, type);
 		}
 
 		DBfree_result(result);
 
 		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,	"select httptesttagid from httptest_tag where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select httptesttagid,httptestid"
+				" from httptest_tag where"
+				);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", httpupdtestids.values,
 				httpupdtestids.values_num);
 
@@ -5045,10 +5057,12 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_uint64_t httptagid;
+			zbx_uint64_t	httptagid, testid;
 
 			ZBX_STR2UINT64(httptagid, row[0]);
+			ZBX_STR2UINT64(testid, row[1]);
 			zbx_vector_uint64_append(&deletetagids, httptagid);
+			zbx_audit_httptest_update_json_delete_tags(testid, httptagid);
 		}
 
 		DBfree_result(result);
@@ -5057,18 +5071,27 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	if (0 != httpupdstepids.values_num)
 	{
 		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,	"select httpstep_fieldid from httpstep_field where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid", httpupdstepids.values,
-						httpupdstepids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select sf.httpstep_fieldid,sf.httpstepid,s.httptestid,sf.type"
+				" from httpstep_field sf"
+				" join httpstep s on s.httpstepid=sf.httpstepid"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sf.httpstepid", httpupdstepids.values,
+				httpupdstepids.values_num);
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_uint64_t stepfieldid;
+			zbx_uint64_t	stepfieldid, stepid, testid;
+			int		type;
 
 			ZBX_STR2UINT64(stepfieldid, row[0]);
+			ZBX_STR2UINT64(stepid, row[1]);
+			ZBX_STR2UINT64(testid, row[2]);
+			type = atoi(row[3]);
 			zbx_vector_uint64_append(&deletestepfieldsids, stepfieldid);
+			zbx_audit_httptest_update_json_delete_httpstep_field(testid, stepid, stepfieldid, type);
 		}
 
 		DBfree_result(result);
@@ -5172,12 +5195,20 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 		{
 			httptest->httptestid = httptestid++;
 
+			zbx_audit_httptest_create_entry(AUDIT_ACTION_ADD, httptest->httptestid, httptest->name);
+
 			zbx_db_insert_add_values(&db_insert_htest, httptest->httptestid, httptest->name,
 					httptest->delay, (int)httptest->status, httptest->agent,
 					(int)httptest->authentication, httptest->http_user, httptest->http_password,
 					httptest->http_proxy, httptest->retries, hostid, httptest->templateid,
 					httptest->ssl_cert_file, httptest->ssl_key_file, httptest->ssl_key_password,
 					httptest->verify_peer, httptest->verify_host);
+
+			zbx_audit_httptest_update_json_add_data(httptest->httptestid, httptest->templateid,
+					httptest->name, httptest->delay, (int)httptest->status, httptest->agent,
+					(int)httptest->authentication, httptest->http_user, httptest->http_proxy,
+					httptest->retries, httptest->ssl_cert_file, httptest->ssl_key_file,
+					httptest->verify_peer, httptest->verify_host, hostid);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
@@ -5190,6 +5221,12 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 						httpstep->post_type);
 
 				httpstep->hoststepid = httpstepid;
+
+				zbx_audit_httptest_update_json_add_httptest_httpstep(httptest->httptestid, httpstepid,
+						httpstep->name, httpstep->no, httpstep->url, httpstep->timeout,
+						httpstep->posts, httpstep->required, httpstep->status_codes,
+						httpstep->follow_redirects, httpstep->retrieve_mode,
+						httpstep->post_type);
 
 				for (k = 0; k < httpstep->httpstepitems.values_num; k++)
 				{
@@ -5220,52 +5257,80 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 		}
 		else
 		{
-			char		*str_esc;
 			const char	*d = ",";
+
+			zbx_audit_httptest_create_entry(AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update httptest"
 					" set templateid=" ZBX_FS_UI64, httptest->templateid);
 
+			zbx_audit_httptest_update_json_update_templateid(httptest->httptestid,
+					httptest->templateid_host, httptest->templateid);
+
 			if (0 != (httptest->upd_flags & ZBX_FLAG_HTTPTEST_UPDATE))
 			{
 
-#define PREPARE_UPDATE_STR(FLAG, field, s)									\
-		if (0 != (s->upd_flags & FLAG))									\
+#define PREPARE_UPDATE_HTTPTEST_STR(FLAG, field)								\
+		if (0 != (httptest->upd_flags & FLAG))								\
 		{												\
-			str_esc = DBdyn_escape_string(s->field);						\
+			char	*str_esc = DBdyn_escape_string(httptest->field);				\
+														\
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"='%s'", d, str_esc);	\
 			d = ",";										\
 			zbx_free(str_esc);									\
+														\
+			zbx_audit_httptest_update_json_update_##field(httptest->httptestid,			\
+					httptest->field##_orig, httptest->field);				\
 		}
 
-#define PREPARE_UPDATE_INT(FLAG, field, s)									\
-		if (0 != (s->upd_flags & FLAG))									\
+#define PREPARE_UPDATE_HTTPTEST_STR_SECRET(FLAG, field)								\
+		if (0 != (httptest->upd_flags & FLAG))								\
 		{												\
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"=%d", d, s->field);	\
+			char	*str_esc = DBdyn_escape_string(httptest->field);				\
+														\
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"='%s'", d, str_esc);	\
 			d = ",";										\
+			zbx_free(str_esc);									\
+														\
+			zbx_audit_httptest_update_json_update_##field(httptest->httptestid,			\
+				ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);					\
 		}
 
-#define PREPARE_UPDATE_UC(FLAG, field, s)									\
-		if (0 != (s->upd_flags & FLAG))									\
+#define PREPARE_UPDATE_HTTPTEST_INT(FLAG, field)								\
+		if (0 != (httptest->upd_flags & FLAG))								\
 		{												\
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"=%d", d, (int)s->field);	\
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"=%d", d, httptest->field);	\
 			d = ",";										\
+														\
+			zbx_audit_httptest_update_json_update_##field(httptest->httptestid,			\
+					httptest->field##_orig, httptest->field);				\
 		}
-				PREPARE_UPDATE_STR(ZBX_FLAG_HTTPTEST_UPDATE_DELAY, delay, httptest);
-				PREPARE_UPDATE_STR(ZBX_FLAG_HTTPTEST_UPDATE_AGENT, agent, httptest);
-				PREPARE_UPDATE_STR(ZBX_FLAG_HTTPTEST_UPDATE_HTTP_USER, http_user, httptest);
-				PREPARE_UPDATE_STR(ZBX_FLAG_HTTPTEST_UPDATE_HTTP_PASSWORD, http_password, httptest);
-				PREPARE_UPDATE_STR(ZBX_FLAG_HTTPTEST_UPDATE_HTTP_PROXY, http_proxy, httptest);
-				PREPARE_UPDATE_INT(ZBX_FLAG_HTTPTEST_UPDATE_RETRIES, retries, httptest);
-				PREPARE_UPDATE_UC(ZBX_FLAG_HTTPTEST_UPDATE_STATUS, status, httptest);
-				PREPARE_UPDATE_UC(ZBX_FLAG_HTTPTEST_UPDATE_AUTHENTICATION, authentication, httptest);
-				PREPARE_UPDATE_STR(ZBX_FLAG_HTTPTEST_UPDATE_SSL_CERT_FILE, ssl_cert_file, httptest);
-				PREPARE_UPDATE_STR(ZBX_FLAG_HTTPTEST_UPDATE_SSL_KEY_FILE, ssl_key_file, httptest);
-				PREPARE_UPDATE_STR(ZBX_FLAG_HTTPTEST_UPDATE_SSL_KEY_PASSWORD, ssl_key_password,
-						httptest);
-				PREPARE_UPDATE_INT(ZBX_FLAG_HTTPTEST_UPDATE_VERIFY_PEER, verify_peer, httptest);
-				PREPARE_UPDATE_INT(ZBX_FLAG_HTTPTEST_UPDATE_VERIFY_HOST, verify_host, httptest);
-				ZBX_UNUSED(d);
+
+#define PREPARE_UPDATE_HTTPTEST_UC(FLAG, field)									\
+		if (0 != (httptest->upd_flags & FLAG))								\
+		{												\
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"=%d", d,			\
+					(int)httptest->field);							\
+			d = ",";										\
+														\
+			zbx_audit_httptest_update_json_update_##field(httptest->httptestid,			\
+					httptest->field##_orig, httptest->field);				\
+		}
+				PREPARE_UPDATE_HTTPTEST_STR(ZBX_FLAG_HTTPTEST_UPDATE_DELAY, delay)
+				PREPARE_UPDATE_HTTPTEST_STR(ZBX_FLAG_HTTPTEST_UPDATE_AGENT, agent)
+				PREPARE_UPDATE_HTTPTEST_STR(ZBX_FLAG_HTTPTEST_UPDATE_HTTP_USER, http_user)
+				PREPARE_UPDATE_HTTPTEST_STR_SECRET(ZBX_FLAG_HTTPTEST_UPDATE_HTTP_PASSWORD,
+						http_password)
+				PREPARE_UPDATE_HTTPTEST_STR(ZBX_FLAG_HTTPTEST_UPDATE_HTTP_PROXY, http_proxy)
+				PREPARE_UPDATE_HTTPTEST_INT(ZBX_FLAG_HTTPTEST_UPDATE_RETRIES, retries)
+				PREPARE_UPDATE_HTTPTEST_UC(ZBX_FLAG_HTTPTEST_UPDATE_STATUS, status)
+				PREPARE_UPDATE_HTTPTEST_UC(ZBX_FLAG_HTTPTEST_UPDATE_AUTHENTICATION, authentication)
+				PREPARE_UPDATE_HTTPTEST_STR(ZBX_FLAG_HTTPTEST_UPDATE_SSL_CERT_FILE, ssl_cert_file)
+				PREPARE_UPDATE_HTTPTEST_STR(ZBX_FLAG_HTTPTEST_UPDATE_SSL_KEY_FILE, ssl_key_file)
+				PREPARE_UPDATE_HTTPTEST_STR_SECRET(ZBX_FLAG_HTTPTEST_UPDATE_SSL_KEY_PASSWORD,
+						ssl_key_password)
+				PREPARE_UPDATE_HTTPTEST_INT(ZBX_FLAG_HTTPTEST_UPDATE_VERIFY_PEER, verify_peer)
+				PREPARE_UPDATE_HTTPTEST_INT(ZBX_FLAG_HTTPTEST_UPDATE_VERIFY_HOST, verify_host)
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where httptestid=" ZBX_FS_UI64 ";\n",
@@ -5277,26 +5342,52 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 				if (0 != (httpstep->upd_flags & ZBX_FLAG_HTTPSTEP_UPDATE))
 				{
+
+#define PREPARE_UPDATE_HTTPSTEP_STR(FLAG, field)								\
+		if (0 != (httpstep->upd_flags & FLAG))								\
+		{												\
+			char	*str_esc = DBdyn_escape_string(httpstep->field);				\
+														\
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"='%s'", d, str_esc);	\
+			d = ",";										\
+			zbx_free(str_esc);									\
+														\
+			zbx_audit_httptest_update_json_httpstep_update_##field(httptest->httptestid,		\
+					httpstep->httpstepid, httpstep->field##_orig, httpstep->field);		\
+		}
+
+#define PREPARE_UPDATE_HTTPSTEP_INT(FLAG, field)								\
+		if (0 != (httpstep->upd_flags & FLAG))								\
+		{												\
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s"#field"=%d", d, httpstep->field);	\
+			d = ",";										\
+														\
+			zbx_audit_httptest_update_json_httpstep_update_##field(httptest->httptestid,		\
+					httpstep->httpstepid, httpstep->field##_orig, httpstep->field);		\
+		}
+
 					d = "";
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update httpstep set ");
 
-					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_URL, url, httpstep);
-					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_POSTS, posts, httpstep);
-					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_REQUIRED, required, httpstep);
-					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_STATUS_CODES, status_codes,
-							httpstep);
-					PREPARE_UPDATE_STR(ZBX_FLAG_HTTPSTEP_UPDATE_TIMEOUT, timeout, httpstep);
-					PREPARE_UPDATE_INT(ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECTS, follow_redirects,
-							httpstep);
-					PREPARE_UPDATE_INT(ZBX_FLAG_HTTPSTEP_UPDATE_RETRIEVE_MODE, retrieve_mode,
-							httpstep);
-					PREPARE_UPDATE_INT(ZBX_FLAG_HTTPSTEP_UPDATE_POST_TYPE, post_type, httpstep);
-					ZBX_UNUSED(d);
+					PREPARE_UPDATE_HTTPSTEP_STR(ZBX_FLAG_HTTPSTEP_UPDATE_URL, url)
+					PREPARE_UPDATE_HTTPSTEP_STR(ZBX_FLAG_HTTPSTEP_UPDATE_POSTS, posts)
+					PREPARE_UPDATE_HTTPSTEP_STR(ZBX_FLAG_HTTPSTEP_UPDATE_REQUIRED, required)
+					PREPARE_UPDATE_HTTPSTEP_STR(ZBX_FLAG_HTTPSTEP_UPDATE_STATUS_CODES,
+							status_codes)
+					PREPARE_UPDATE_HTTPSTEP_STR(ZBX_FLAG_HTTPSTEP_UPDATE_TIMEOUT, timeout)
+					PREPARE_UPDATE_HTTPSTEP_INT(ZBX_FLAG_HTTPSTEP_UPDATE_FOLLOW_REDIRECTS,
+							follow_redirects)
+					PREPARE_UPDATE_HTTPSTEP_INT(ZBX_FLAG_HTTPSTEP_UPDATE_RETRIEVE_MODE,
+							retrieve_mode)
+					PREPARE_UPDATE_HTTPSTEP_INT(ZBX_FLAG_HTTPSTEP_UPDATE_POST_TYPE, post_type)
 
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							" where httpstepid=" ZBX_FS_UI64 ";\n", httpstep->hoststepid);
 				}
 			}
+
+			zbx_audit_httptest_update_json_update_templateid(httptest->httptestid,
+					httptest->templateid_host, httptest->templateid);
 		}
 
 		for (j = 0; j < httptest->fields.values_num; j++)
@@ -5305,6 +5396,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 			zbx_db_insert_add_values(&db_insert_tfield, httptestfieldid, httptest->httptestid,
 					httpfield->type, httpfield->name, httpfield->value);
+
+			zbx_audit_httptest_update_json_add_httptest_field(httptest->httptestid, httptestfieldid,
+						httpfield->type, httpfield->name, httpfield->value);
 
 			httptestfieldid++;
 		}
@@ -5318,12 +5412,16 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			zbx_db_insert_add_values(&db_insert_httag, httptesttagid, httptest->httptestid,
 					httptesttag->tag, httptesttag->value);
 
+			zbx_audit_httptest_update_json_add_httptest_tag(httptest->httptestid, httptesttagid,
+					httptesttag->tag, httptesttag->value);
+
 			httptesttagid++;
 		}
 
 		for (j = 0; j < httptest->httpsteps.values_num; j++)
 		{
 			httpstep = (httpstep_t *)httptest->httpsteps.values[j];
+
 			for (k = 0; k < httpstep->fields.values_num; k++)
 			{
 				httpfield = (httpfield_t *)httpstep->fields.values[k];
@@ -5331,6 +5429,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 				zbx_db_insert_add_values(&db_insert_sfield, httpstepfieldid, httpstep->hoststepid,
 						httpfield->type, httpfield->name, httpfield->value);
 
+				zbx_audit_httptest_update_json_add_httpstep_field(httptest->httptestid,
+						httpstep->hoststepid, httpstepfieldid, httpfield->type, httpfield->name,
+						httpfield->value);
 				httpstepfieldid++;
 			}
 		}

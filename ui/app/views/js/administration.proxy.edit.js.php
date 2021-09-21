@@ -181,6 +181,10 @@
 		function getTlsAccept() {
 			var tls_accept = 0x00;
 
+			if ($('input[name=status]:checked').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>) {
+				return <?= HOST_ENCRYPTION_NONE ?>;
+			}
+
 			if ($('#tls_in_none').is(':checked')) {
 				tls_accept |= <?= HOST_ENCRYPTION_NONE ?>;
 			}

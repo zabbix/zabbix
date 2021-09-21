@@ -30,7 +30,8 @@ class testPageReportsAudit extends CLegacyWebTest {
 		0 /* CAudit::ACTION_ADD */ => 'Add',
 		2 /* CAudit::ACTION_DELETE */ => 'Delete',
 		7 /* CAudit::ACTION_EXECUTE */ => 'Execute',
-		3 /* CAudit::ACTION_LOGIN */ => 'Login',
+		9 /* CAudit::ACTION_LOGIN_FAILED */ => 'Failed login',
+		8 /* CAudit::ACTION_LOGIN_SUCCESS */ => 'Login',
 		4 /* CAudit::ACTION_LOGOUT */ => 'Logout',
 		1 /* CAudit::ACTION_UPDATE */ => 'Update'
 	];
@@ -181,12 +182,12 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 				case 'Authentication':
 				case 'Configuration of Zabbix':
-					$this->assertEquals(['Add', 'Delete', 'Execute', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Add', 'Delete', 'Execute', 'Failed login', 'Login', 'Logout'], $disabled);
 					break;
 
 				case 'Discovery rule':
 				case 'Host':
-					$this->assertEquals(['Execute', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Execute', 'Failed login', 'Login', 'Logout'], $disabled);
 					break;
 
 				case 'Event correlation':
@@ -200,7 +201,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 					break;
 
 				case 'Script':
-					$this->assertEquals(['Login', 'Logout'], $disabled);
+					$this->assertEquals(['Failed login', 'Login', 'Logout'], $disabled);
 					break;
 
 				case 'User':
@@ -208,7 +209,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 					break;
 
 				default:
-					$this->assertEquals(['Execute', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Execute', 'Failed login', 'Login', 'Logout'], $disabled);
 			}
 		}
 	}
