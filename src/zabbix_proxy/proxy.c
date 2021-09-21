@@ -314,6 +314,8 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
+zbx_vector_ptr_t	zbx_addrs;
+
 volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -584,13 +586,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE && FAIL == is_supported_ip(CONFIG_SERVER) &&
-			FAIL == zbx_validate_hostname(CONFIG_SERVER))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Server\" configuration parameter: '%s'", CONFIG_SERVER);
-		err = 1;
-	}
-	else if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
+	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
 		zbx_free(ch_error);
@@ -660,6 +656,36 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (0 != err)
 		exit(EXIT_FAILURE);
+}
+
+static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames)
+{
+	int	i;
+
+	ZBX_UNUSED(hostnames);
+
+/*	for (i = 0; i < destinations_count; i++)
+	{
+		if (0 == strcmp(destinations[i].host, host) && destinations[i].port == port)
+			return FAIL;
+	}*/
+
+	zbx_vector_ptr_create(&zbx_addrs);
+
+	for (i = 0; i < addrs->values_num; i++)
+	{
+		const zbx_addr_t	*addr;
+		zbx_addr_t		*addr_ptr;
+
+		addr = (const zbx_addr_t *)addrs->values[i];
+
+		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
+		addr_ptr->port = addr->port;
+		zbx_vector_ptr_append(&zbx_addrs, addr_ptr);
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -888,6 +914,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
 
 	zbx_validate_config(task);
+
+	if (ZBX_PROXYMODE_PASSIVE != CONFIG_PROXYMODE)
+		zbx_set_data_destination_hosts(CONFIG_SERVER, proxy_add_serveractive_host_cb, NULL);
+
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	zbx_db_validate_config();
 #endif

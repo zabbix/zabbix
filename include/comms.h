@@ -21,6 +21,7 @@
 #define ZABBIX_COMMS_H
 
 #include "zbxtypes.h"
+#include "zbxalgo.h"
 
 #ifdef _WINDOWS
 #	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
@@ -196,6 +197,7 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 		zbx_send_response_ext(sock, result, info, ZABBIX_VERSION, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, timeout)
 
 int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
+int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, int retry_interval);
 
 #ifdef HAVE_IPV6
 #	define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)		\

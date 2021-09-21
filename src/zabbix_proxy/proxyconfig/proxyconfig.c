@@ -56,11 +56,12 @@ static void	zbx_proxyconfig_sigusr_handler(int flags)
  ******************************************************************************/
 static void	process_configuration_sync(size_t *data_size)
 {
-	zbx_socket_t	sock;
-	struct		zbx_json_parse jp;
-	char		value[16], *error = NULL, *buffer = NULL;
-	size_t		buffer_size, reserved;
-	struct zbx_json	j;
+	zbx_socket_t		sock;
+	struct	zbx_json_parse	jp;
+	char			value[16], *error = NULL, *buffer = NULL;
+	size_t			buffer_size, reserved;
+	struct zbx_json		j;
+	extern zbx_vector_ptr_t	zbx_addrs;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -81,7 +82,7 @@ static void	process_configuration_sync(size_t *data_size)
 	reserved = j.buffer_size;
 	zbx_json_free(&j);
 
-	if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
+	if (FAIL == connect_to_server(&sock, &zbx_addrs, 600, CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
 		goto out;
 
 	if (SUCCEED != get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))

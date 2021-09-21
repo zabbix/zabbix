@@ -100,6 +100,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 	zbx_timespec_t		ts;
 	char			*error = NULL, *buffer = NULL;
 	zbx_vector_ptr_t	tasks;
+	extern zbx_vector_ptr_t	zbx_addrs;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -185,7 +186,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
 		/* retry till have a connection */
-		if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY))
+		if (FAIL == connect_to_server(&sock, &zbx_addrs, 600, CONFIG_PROXYDATA_FREQUENCY))
 			goto clean;
 
 		upload_state = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);

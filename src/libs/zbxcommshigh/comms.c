@@ -21,6 +21,113 @@
 #include "comms.h"
 #include "zbxjson.h"
 #include "log.h"
+#include "daemon.h"
+#include "zbxalgo.h"
+#include "cfg.h"
+extern char		*CONFIG_SOURCE_IP;
+extern unsigned int	configured_tls_connect_mode;
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+extern char	*CONFIG_TLS_SERVER_CERT_ISSUER;
+extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
+extern char	*CONFIG_TLS_PSK_IDENTITY;
+#endif
+
+static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+{
+	int	ret, i;
+
+	for (i = 0; i < addrs->values_num; i++)
+	{
+		zbx_addr_t	*addr;
+
+		addr = (zbx_addr_t *)addrs->values[0];
+
+		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, timeout, tls_connect, tls_arg1,
+				tls_arg2)))
+		{
+			if (0 != i)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Connected to the alternative server [%s]:%d",
+						((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port);
+			}
+
+			break;
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]",
+				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+				zbx_socket_strerror());
+
+		zbx_vector_ptr_remove(addrs, 0);
+		zbx_vector_ptr_append(addrs, addr);
+	}
+
+	return ret;
+}
+
+int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, int retry_interval)
+{
+	int	res, lastlogtime, now;
+	char	*tls_arg1, *tls_arg2;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d]",
+			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout);
+
+	switch (configured_tls_connect_mode)
+	{
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			tls_arg1 = NULL;
+			tls_arg2 = NULL;
+			break;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		case ZBX_TCP_SEC_TLS_CERT:
+			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+			break;
+		case ZBX_TCP_SEC_TLS_PSK:
+			tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
+			break;
+#endif
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	if (FAIL == (res = zbx_tcp_connect_failover(sock, CONFIG_SOURCE_IP, addrs, timeout,
+			configured_tls_connect_mode, tls_arg1, tls_arg2)))
+	{
+		if (0 != retry_interval)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Could not to connect to server. Will retry every %d second(s)",
+					retry_interval);
+
+			lastlogtime = (int)time(NULL);
+
+			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, CONFIG_SOURCE_IP,
+					addrs, timeout, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+			{
+				now = (int)time(NULL);
+
+				if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
+					lastlogtime = now;
+				}
+
+				sleep(retry_interval);
+			}
+
+			if (FAIL != res)
+				zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
+		}
+	}
+
+	return res;
+}
 
 /******************************************************************************
  *                                                                            *
