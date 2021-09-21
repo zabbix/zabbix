@@ -104,7 +104,7 @@ PREPARE_AUDIT_HOST_UPDATE_H(custom_interfaces, int)
 #undef PREPARE_AUDIT_HOST_UPDATE_H
 
 void	zbx_audit_host_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
-
+void	zbx_audit_host_prototype_update_json_delete_inventory_mode(zbx_uint64_t hostid);
 void	zbx_audit_host_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
 		const char *macro, const char *value, const char *description, int type);
 
@@ -140,7 +140,7 @@ void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *hos
 		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces);
 void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname);
 void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid, const char *name,
-		int status, int discover, int custom_interfaces);
+		int status, int discover, int custom_interfaces, int inventory_mode);
 void	zbx_audit_host_prototype_update_json_update_templateid(zbx_uint64_t hostid, zbx_uint64_t templateid_orig,
 		zbx_uint64_t templateid);
 
@@ -152,6 +152,7 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(name, const char*)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(status, int)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(discover, int)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(custom_interfaces, int)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE_H(inventory_mode, int)
 
 void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
 		const char* name, zbx_uint64_t groupid, zbx_uint64_t templateid);

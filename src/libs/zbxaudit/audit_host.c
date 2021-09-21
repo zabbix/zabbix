@@ -513,7 +513,7 @@ void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname)
 }
 
 void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid,
-		const char *name, int status, int discover, int custom_interfaces)
+		const char *name, int status, int discover, int custom_interfaces, int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF();
 
@@ -524,6 +524,8 @@ void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_u
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.discover", discover);
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.custom_interfaces",
 			custom_interfaces);
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.inventory_mode",
+			inventory_mode);
 }
 
 void	zbx_audit_host_prototype_update_json_update_templateid(zbx_uint64_t hostid, zbx_uint64_t templateid_orig,
@@ -547,6 +549,7 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(name, const char*, string)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(status, int, int)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(discover, int, int)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(custom_interfaces, int, int)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(inventory_mode, int, int)
 #undef PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE
 
 void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,
@@ -664,6 +667,17 @@ void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, 
 	RETURN_IF_AUDIT_OFF();
 
 	zbx_snprintf(buf, sizeof(buf), "hostprototype.interfaces[" ZBX_FS_UI64 "]", interfaceid);
+
+	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, buf);
+}
+
+void	zbx_audit_host_prototype_update_json_delete_inventory_mode(zbx_uint64_t hostid)
+{
+	char	buf[AUDIT_DETAILS_KEY_LEN];
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_snprintf(buf, sizeof(buf), "hostprototype.inventory_mode");
 
 	zbx_audit_update_json_delete(hostid, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
