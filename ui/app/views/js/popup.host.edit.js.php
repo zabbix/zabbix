@@ -124,8 +124,7 @@ window.host_edit_popup = {
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
 					detail: {
-						success: response.success,
-						hostid: hostid
+						success: response.success
 					}
 				}));
 			})

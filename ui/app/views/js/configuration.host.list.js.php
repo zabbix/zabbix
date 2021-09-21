@@ -164,10 +164,7 @@
 					}
 				}
 
-				if ('hostid' in data) {
-					uncheckTableRow('hosts', data.hostid);
-				}
-
+				uncheckTableRows('hosts');
 				location.href = location.href;
 			}
 		}

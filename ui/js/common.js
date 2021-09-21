@@ -1051,29 +1051,6 @@ function openMassupdatePopup(elem, popup_name, data = {}) {
 }
 
 /**
- * Remove one marker of checked table rows.
- *
- * @param {string}         page
- * @param {integer|string} remove_id
- */
-function uncheckTableRow(page, remove_id) {
-	// This key only works for new MVC pages.
-	const key = 'cb_zabbix_'+page;
-	const selected_ids = sessionStorage.getItem(key) === null
-		? {}
-		: JSON.parse(sessionStorage.getItem(key));
-
-	delete selected_ids[remove_id];
-
-	if (Object.keys(selected_ids).length > 0) {
-		sessionStorage.setItem(key, JSON.stringify(selected_ids));
-	}
-	else {
-		sessionStorage.removeItem(key);
-	}
-}
-
-/**
  * Clears session storage from markers of checked table rows.
  * Or keeps only accessible IDs in the list of checked rows.
  *
@@ -1082,9 +1059,9 @@ function uncheckTableRow(page, remove_id) {
  */
 function uncheckTableRows(page, keepids = []) {
 	// This key only works for new MVC pages.
-	const key = 'cb_zabbix_'+page;
+	const key = (page === '') ? 'cb_zabbix' : 'cb_zabbix_'+page;
 
-	if (keepids) {
+	if (keepids.length) {
 		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		let keepids_formatted = {};
 		for (const id of Object.values(keepids)) {
