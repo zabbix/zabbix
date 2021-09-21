@@ -401,6 +401,7 @@ class CUserMacro extends CApiService {
 
 		$options = ['output' => ['macro']];
 		$db_globalmacros = DBselect(DB::makeSql('globalmacro', $options));
+
 		while ($db_globalmacro = DBfetch($db_globalmacros)) {
 			$db_macros[CApiInputValidator::trimMacro($db_globalmacro['macro'])] = true;
 		}
