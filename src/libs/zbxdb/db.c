@@ -2652,13 +2652,26 @@ zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
 
 	zbx_free(version_friendly);
 #elif defined(HAVE_POSTGRESQL)
-	int	flag;
-	char	*version_friendly;
+	int		flag;
+	char		*version_friendly;
+	zbx_uint32_t	major;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = PQserverVersion(conn);
-	version_friendly = zbx_dsprintf(NULL, "%d.%d.%d", RIGHT2(ZBX_PG_SVERSION/10000),
-			RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
+
+	major = RIGHT2(ZBX_PG_SVERSION/10000);
+
+	if (10 >= major)
+	{
+		version_friendly = zbx_dsprintf(NULL, "%d.%d.%d", major, RIGHT2(ZBX_PG_SVERSION/100),
+				RIGHT2(ZBX_PG_SVERSION));
+	}
+	else
+	{
+		version_friendly = zbx_dsprintf(NULL, "%d.%d", major, RIGHT2(ZBX_PG_SVERSION));
+	}
+
+
 	flag = zbx_db_version_check("PostgreSQL", ZBX_PG_SVERSION, ZBX_POSTGRESQL_MIN_VERSION,
 			ZBX_POSTGRESQL_MAX_VERSION);
 	zbx_db_version_json_create(json, "PostgreSQL", version_friendly,
