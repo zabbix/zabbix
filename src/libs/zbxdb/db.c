@@ -2660,7 +2660,7 @@ zbx_uint32_t	zbx_dbms_version_extract(struct zbx_json *json)
 	ZBX_PG_SVERSION = PQserverVersion(conn);
 	major = RIGHT2(ZBX_PG_SVERSION/10000);
 
-	if (10 >= major)
+	if (10 > major)
 	{
 		version_friendly = zbx_dsprintf(NULL, "%d.%d.%d", major, RIGHT2(ZBX_PG_SVERSION/100),
 				RIGHT2(ZBX_PG_SVERSION));
