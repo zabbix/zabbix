@@ -813,6 +813,7 @@ function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
 }
 
 /**
+ * Send parameters to given url using natural HTML form submission.
  *
  * @param {string} url
  * @param {Object} params
@@ -821,29 +822,28 @@ function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
  * @return {boolean}
  */
 function post(url, params) {
-	function addVars(postForm, name, value) {
+	function addVars(post_form, name, value) {
 		if (Array.isArray(value)) {
 			for (let i = 0; i < value.length; i++) {
-				addVars(postForm, `${name}[]`, value[i]);
+				addVars(post_form, `${name}[]`, value[i]);
 			}
 		}
 		else if (typeof value === 'object' && value !== null) {
 			for (const [key, _value] of Object.entries(value)) {
-				addVars(postForm, `${name}[${key}]`, _value);
+				addVars(post_form, `${name}[${key}]`, _value);
 			}
 		}
 		else {
-			addVar(postForm, name, value);
+			addVar(post_form, name, value);
 		}
 	}
 
-	function addVar(postForm, name, value) {
+	function addVar(post_form, name, value) {
 		const is_multiline = /\r|\n/.exec(value);
 		let input;
 
 		if (is_multiline) {
 			input = document.createElement('textarea');
-			input.style.display = 'none';
 		}
 		else {
 			input = document.createElement('input');
@@ -852,20 +852,21 @@ function post(url, params) {
 
 		input.name = name;
 		input.value = value;
-		postForm.appendChild(input);
+		post_form.appendChild(input);
 	}
 
-	const domBody = document.getElementsByTagName('body')[0];
-	const postForm = document.createElement('form');
-	postForm.setAttribute('action', url);
-	postForm.setAttribute('method', 'post');
+	const dom_body = document.getElementsByTagName('body')[0];
+	const post_form = document.createElement('form');
+	post_form.setAttribute('action', url);
+	post_form.setAttribute('method', 'post');
+	post_form.style.display = 'none';
 
 	for (const [key, value] of Object.entries(params)) {
-		addVars(postForm, key, value);
+		addVars(post_form, key, value);
 	}
 
-	domBody.appendChild(postForm);
-	postForm.submit();
+	dom_body.appendChild(post_form);
+	post_form.submit();
 }
 
 function showHide(obj) {
