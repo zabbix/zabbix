@@ -531,9 +531,9 @@ class CProxy extends CApiService {
 			]],
 			'interface' =>			['type' => API_OBJECT, 'fields' => [
 				'useip' => 				['type' => API_INT32, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
-				'ip' => 				['type' => API_IP, 'length' => DB::getFieldLength('interface', 'ip')],
-				'dns' =>				['type' => API_DNS, 'length' => DB::getFieldLength('interface', 'dns')],
-				'port' =>				['type' => API_PORT, 'length' => DB::getFieldLength('interface', 'port')]
+				'ip' => 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
+				'dns' =>				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
+				'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'port')]
 			]]
 		]];
 
@@ -575,7 +575,14 @@ class CProxy extends CApiService {
 			return;
 		}
 
-		$duplicate = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE '.dbConditionString('h.host', $names), 1));
+		$options = [
+			'output' => ['host'],
+			'filter' => [
+				'host' => $names,
+				'status' => [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]
+			]
+		];
+		$duplicate = DBfetch(DBselect(DB::makeSql('hosts', $options), 1));
 
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%1$s" already exists.', $duplicate['host']));
@@ -701,6 +708,9 @@ class CProxy extends CApiService {
 							));
 						}
 					}
+
+					$proxy['interface']['type'] = INTERFACE_TYPE_UNKNOWN;
+					$proxy['interface']['main'] = INTERFACE_PRIMARY;
 				}
 			}
 		}
@@ -824,9 +834,9 @@ class CProxy extends CApiService {
 			]],
 			'interface' =>			['type' => API_OBJECT, 'fields' => [
 				'useip' => 				['type' => API_INT32, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
-				'ip' => 				['type' => API_IP, 'length' => DB::getFieldLength('interface', 'ip')],
-				'dns' =>				['type' => API_DNS, 'length' => DB::getFieldLength('interface', 'dns')],
-				'port' =>				['type' => API_PORT, 'length' => DB::getFieldLength('interface', 'port')]
+				'ip' => 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
+				'dns' =>				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
+				'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('interface', 'port')]
 			]]
 		]];
 
@@ -905,7 +915,7 @@ class CProxy extends CApiService {
 		}
 
 		$options = [
-			'output' => ['interfaceid', 'hostid', 'useip', 'ip', 'dns', 'port'],
+			'output' => ['interfaceid', 'hostid', 'type', 'main', 'useip', 'ip', 'dns', 'port'],
 			'filter' => ['hostid' => $proxyids['interface']]
 		];
 		$db_interfaces = DBselect(DB::makeSql('interface', $options));

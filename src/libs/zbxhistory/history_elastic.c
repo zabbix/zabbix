@@ -1116,6 +1116,7 @@ out:
 	db_version_info.friendly_current_version = version_friendly;
 	db_version_info.friendly_min_version = ZBX_ELASTIC_MIN_VERSION_FRIENDLY;
 	db_version_info.friendly_max_version = "";
+	db_version_info.friendly_min_supported_version = NULL;
 	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,
 			ZBX_DBVERSION_UNDEFINED, ZBX_DBVERSION_UNDEFINED);
 
