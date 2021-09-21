@@ -99,14 +99,7 @@ function deleteHistoryByHttpTestIds(array $http_testids) {
 	}
 
 	if ($itemids) {
-		$items = API::Item()->get([
-			'output' => ['itemid', 'value_type'],
-			'itemids' => $itemids,
-			'editable' => true,
-			'webitems' => true
-		]);
-
-		return Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
+		return API::Item()->clear($itemids);
 	}
 
 	return true;

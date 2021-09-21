@@ -1061,59 +1061,13 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 // clean history for selected items
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
-	$result = false;
+	$result = API::Item()->clear(getRequest('group_itemid'));
 
-	if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
-		$error_message = _('History cleanup is not supported if compression is enabled');
-	}
-	else {
-		$error_message = _('Cannot clear history: at least one of the selected items doesn\'t belong to any monitored host');
-
-		$itemIds = getRequest('group_itemid');
-
-		$items = API::Item()->get([
-			'output' => ['itemid', 'key_', 'value_type'],
-			'itemids' => $itemIds,
-			'selectHosts' => ['name', 'status'],
-			'editable' => true
-		]);
-
-		if ($items) {
-			// Check items belong only to hosts.
-			$hosts_status = [];
-			foreach ($items as $item) {
-				$hosts_status[$item['hosts'][0]['status']] = true;
-			}
-
-			if (array_key_exists(HOST_STATUS_TEMPLATE, $hosts_status)) {
-				$result = false;
-			}
-			else {
-				DBstart();
-
-				$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
-
-				// if ($result) {
-				// 	foreach ($items as $item) {
-				// 		$host = reset($item['hosts']);
-
-				// 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-				// 			_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
-				// 				_('History cleared')
-				// 		);
-				// 	}
-				// }
-
-				$result = DBend($result);
-
-				if ($result) {
-					uncheckTableRows(getRequest('checkbox_hash'));
-				}
-			}
-		}
+	if ($result) {
+		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 
-	show_messages($result, _('History cleared'), $error_message);
+	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
 	$group_itemid = getRequest('group_itemid');

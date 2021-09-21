@@ -186,35 +186,11 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('del_history') && hasRequest('httptestid')) {
-	$result = true;
-
-	$httpTestId = getRequest('httptestid');
-
-	$httpTests = API::HttpTest()->get([
-		'output' => ['name'],
-		'httptestids' => [$httpTestId],
-		'selectHosts' => ['name'],
-		'editable' => true
-	]);
-
-	if ($httpTests) {
-		DBstart();
-
-		$result = deleteHistoryByHttpTestIds([$httpTestId]);
-		$result = ($result && DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httpTestId)));
-
-		// if ($result) {
-		// 	$httpTest = reset($httpTests);
-		// 	$host = reset($httpTest['hosts']);
-
-		// 	add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
-		// 		_('Web scenario').' ['.$httpTest['name'].'] ['.$httpTestId.'] '.
-		// 			_('Host').' ['.$host['name'].'] '._('History cleared')
-		// 	);
-		// }
-
-		$result = DBend($result);
-	}
+	DBstart();
+	$httptestid = getRequest('httptestid');
+	$result = deleteHistoryByHttpTestIds([$httptestid]);
+	$result = ($result && DBexecute('UPDATE httptest SET nextcheck=0 WHERE httptestid='.zbx_dbstr($httptestid)));
+	$result = DBend($result);
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }

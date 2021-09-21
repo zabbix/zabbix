@@ -35,6 +35,7 @@ class CAudit {
 	public const ACTION_EXECUTE = 7;
 	public const ACTION_LOGIN_SUCCESS = 8;
 	public const ACTION_LOGIN_FAILED = 9;
+	public const ACTION_HISTORY_CLEAR = 10;
 
 	/**
 	 * Audit resources.
@@ -106,6 +107,7 @@ class CAudit {
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'config',
 		self::RESOURCE_HOUSEKEEPING => 'config',
+		self::RESOURCE_ITEM => 'items',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'hosts',
 		self::RESOURCE_REGEXP => 'regexps',
@@ -136,6 +138,7 @@ class CAudit {
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_AUTOREGISTRATION => null,
 		self::RESOURCE_HOUSEKEEPING => null,
+		self::RESOURCE_ITEM => 'name',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'host',
 		self::RESOURCE_REGEXP => 'name',
@@ -156,6 +159,7 @@ class CAudit {
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
+		self::RESOURCE_ITEM => 'item',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexp',
@@ -306,6 +310,7 @@ class CAudit {
 						'details' => (count($diff) == 0) ? '' : json_encode($diff)
 					];
 				}
+				break;
 		}
 
 		DB::insertBatch('auditlog', $auditlog);
