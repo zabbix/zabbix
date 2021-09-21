@@ -828,12 +828,20 @@ class CService extends CApiService {
 
 		foreach ($result as $serviceid => &$service) {
 			$problem_events = $services[$serviceid]['status'] != ZBX_SEVERITY_OK
-				? self::getProblemEvents((string)$serviceid, $services, $relations, $service_problems)
+				? self::getProblemEvents((string) $serviceid, $services, $relations, $service_problems)
 				: [];
 
-			$service['problem_events'] = $options['selectProblemEvents'] === API_OUTPUT_COUNT
-				? count($problem_events)
-				: $this->unsetExtraFields($problem_events, ['serviceid', 'eventid'], $options['selectProblemEvents']);
+			if ($options['selectProblemEvents'] === API_OUTPUT_COUNT) {
+				$service['problem_events'] = count($problem_events);
+			}
+			else {
+				$problem_events = $this->unsetExtraFields($problem_events, ['serviceid']);
+				$problem_events = $this->unsetExtraFields($problem_events, ['eventid'],
+					$options['selectProblemEvents']
+				);
+
+				$service['problem_events'] = array_values($problem_events);
+			}
 		}
 		unset($service);
 	}
@@ -957,14 +965,17 @@ class CService extends CApiService {
 
 		if (!array_key_exists($parent_serviceid, $relations)) {
 			if ($min_status !== null) {
-				return array_filter($service_problems[$parent_serviceid],
+				$problem_events = array_filter($service_problems[$parent_serviceid],
 					static function (array $problem) use ($min_status): bool {
 						return $problem['severity'] >= $min_status;
 					}
 				);
 			}
+			else {
+				$problem_events = $service_problems[$parent_serviceid];
+			}
 
-			return $service_problems[$parent_serviceid];
+			return array_column($problem_events, null, 'eventid');
 		}
 
 		$children = array_filter(array_intersect_key($services, $relations[$parent_serviceid]),
