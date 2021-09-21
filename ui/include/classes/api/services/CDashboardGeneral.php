@@ -128,7 +128,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array $db_dashboards
 	 */
 	protected function addAffectedObjects(array $dashboards, array &$db_dashboards): void {
-		// Select pages, useres and user groups of these dashboards.
+		// Select pages, users and user groups of these dashboards.
 		$dashboardids = ['pages' => [], 'users' => [], 'userGroups' => []];
 
 		// Select widgets of these pages.
