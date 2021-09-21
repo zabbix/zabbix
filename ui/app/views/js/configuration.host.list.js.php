@@ -25,7 +25,7 @@
 ?>
 
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate(); ?>
+	<?= CTagFilterFieldHelper::getTemplate() ?>
 </script>
 
 <script>
@@ -85,7 +85,7 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -148,6 +148,24 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
+				}
+
+				location.href = location.href;
+			},
+
+			hostDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				if ('hostid' in data) {
+					uncheckTableRow('hosts', data.hostid);
 				}
 
 				location.href = location.href;
