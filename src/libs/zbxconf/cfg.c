@@ -593,6 +593,12 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 	return SUCCEED;
 }
 
+void	zbx_addr_free(zbx_addr_t *addr)
+{
+	zbx_free(addr->ip);
+	zbx_free(addr);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_data_destination_hosts                                   *
@@ -603,31 +609,50 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
  ******************************************************************************/
 void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb, zbx_vector_str_t *hostnames)
 {
-	char	*l = active_hosts, *r;
+	char			*l = active_hosts, *r, *r_node;
+	zbx_vector_ptr_t	addrs;
+
+	zbx_vector_ptr_create(&addrs);
 
 	do
 	{
-		char		*host = NULL;
-		unsigned short	port;
-
 		if (NULL != (r = strchr(l, ',')))
 			*r = '\0';
 
-		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
+		do
 		{
-			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" is invalid", l);
-			exit(EXIT_FAILURE);
-		}
+			zbx_addr_t	*addr;
 
-		if (SUCCEED != cb(host, port, hostnames))
+			if (NULL != (r_node = strchr(l, ';')))
+				*r_node = '\0';
+
+			addr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+			addr->ip = NULL;
+
+			if (SUCCEED != parse_serveractive_element(l, &addr->ip, &addr->port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
+			{
+				zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" is invalid", l);
+				exit(EXIT_FAILURE);
+			}
+
+			if (NULL != r_node)
+			{
+				*r_node = ';';
+				l = r_node + 1;
+			}
+
+			zbx_vector_ptr_append(&addrs, addr);
+		}
+		while(NULL != r_node);
+
+		if (SUCCEED != cb(&addrs, hostnames))
 		{
 			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than"
 					" once", l);
-			zbx_free(host);
 			exit(EXIT_FAILURE);
 		}
 
-		zbx_free(host);
+		zbx_vector_ptr_clear_ext(&addrs, (zbx_clean_func_t)zbx_addr_free);
 
 		if (NULL != r)
 		{
@@ -636,4 +661,6 @@ void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f 
 		}
 	}
 	while (NULL != r);
+
+	zbx_vector_ptr_destroy(&addrs);
 }

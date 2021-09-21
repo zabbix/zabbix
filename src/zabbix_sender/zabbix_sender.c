@@ -350,8 +350,7 @@ static char	*ZABBIX_KEY_VALUE = NULL;
 
 typedef struct
 {
-	char			*host;
-	unsigned short		port;
+	zbx_vector_ptr_t	addrs;
 	ZBX_THREAD_HANDLE	*thread;
 }
 zbx_send_destinations_t;
@@ -464,7 +463,9 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, cons
 			{
 				if (destinations[j].thread == &threads[i])
 				{
-					zbx_free(destinations[j].host);
+					zbx_vector_ptr_clear_ext(&destinations[j].addrs,
+							(zbx_clean_func_t)zbx_addr_free);
+					zbx_vector_ptr_destroy(&destinations[j].addrs);
 					destinations[j] = destinations[--destinations_count];
 					break;
 				}
@@ -743,8 +744,8 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
 
 		thread_args->args = &sendval_args[i];
 
-		sendval_args[i].server = destinations[i].host;
-		sendval_args[i].port = destinations[i].port;
+		sendval_args[i].server = ((zbx_addr_t *)destinations[i].addrs.values[0])->ip;
+		sendval_args[i].port = ((zbx_addr_t *)destinations[i].addrs.values[0])->port;
 
 		if (0 != i)
 		{
@@ -784,17 +785,17 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_host_cb(const char *host, unsigned short port, zbx_vector_str_t *hostnames)
+static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames)
 {
 	int	i;
 
 	ZBX_UNUSED(hostnames);
 
-	for (i = 0; i < destinations_count; i++)
-	{
-		if (0 == strcmp(destinations[i].host, host) && destinations[i].port == port)
-			return FAIL;
-	}
+//	for (i = 0; i < destinations_count; i++)
+//	{
+//		if (0 == strcmp(destinations[i].host, host) && destinations[i].port == port)
+//			return FAIL;
+//	}
 
 	destinations_count++;
 #if defined(_WINDOWS)
@@ -808,8 +809,20 @@ static int	sender_add_serveractive_host_cb(const char *host, unsigned short port
 	destinations = (zbx_send_destinations_t *)zbx_realloc(destinations,
 			sizeof(zbx_send_destinations_t) * destinations_count);
 
-	destinations[destinations_count - 1].host = zbx_strdup(NULL, host);
-	destinations[destinations_count - 1].port = port;
+	zbx_vector_ptr_create(&destinations[destinations_count - 1].addrs);
+
+	for (i = 0; i < addrs->values_num; i++)
+	{
+		const zbx_addr_t	*addr;
+		zbx_addr_t		*addr_ptr;
+
+		addr = (const zbx_addr_t *)addrs->values[i];
+
+		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
+		addr_ptr->port = addr->port;
+		zbx_vector_ptr_append(&destinations[destinations_count - 1].addrs, addr_ptr);
+	}
 
 	return SUCCEED;
 }
@@ -1070,11 +1083,14 @@ static void	parse_commandline(int argc, char **argv)
 
 	if (NULL != ZABBIX_SERVER)
 	{
-		unsigned short	port;
+		zbx_vector_ptr_t	addrs;
+		zbx_addr_t		addr;
+
+		addr.ip = ZABBIX_SERVER;
 
 		if (NULL != ZABBIX_SERVER_PORT)
 		{
-			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &port) || MIN_ZABBIX_PORT > port)
+			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &addr.port) || MIN_ZABBIX_PORT > addr.port)
 			{
 				zbx_error("option \"-p\" used with invalid port number \"%s\", valid port numbers are"
 						" %d-%d", ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT,
@@ -1083,9 +1099,14 @@ static void	parse_commandline(int argc, char **argv)
 			}
 		}
 		else
-			port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
+			addr.port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
 
-		sender_add_serveractive_host_cb(ZABBIX_SERVER, port, NULL);
+		zbx_vector_ptr_create(&addrs);
+
+		zbx_vector_ptr_append(&addrs, &addr);
+		sender_add_serveractive_host_cb(&addrs, NULL);
+
+		zbx_vector_ptr_destroy(&addrs);
 	}
 
 	/* every option may be specified only once */

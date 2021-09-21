@@ -557,7 +557,7 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	refresh_active_checks(const char *host, unsigned short port)
+static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret;
@@ -565,7 +565,8 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	zbx_socket_t			s;
 	struct zbx_json			json;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __func__, host, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __func__, ((zbx_addr_t *)addrs->values[0])->ip,
+			((zbx_addr_t *)addrs->values[0])->port);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -628,8 +629,9 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 			goto out;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
-			configured_tls_connect_mode, tls_arg1, tls_arg2)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, ((zbx_addr_t *)addrs->values[0])->ip,
+			((zbx_addr_t *)addrs->values[0])->port, CONFIG_TIMEOUT, configured_tls_connect_mode,
+			tls_arg1, tls_arg2)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -644,9 +646,11 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 				if (SUCCEED != last_ret)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%hu]"
-							" is working again", host, port);
+							" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
+							((zbx_addr_t *)addrs->values[0])->port);
 				}
-				parse_list_of_checks(s.buffer, host, port);
+				parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port);
 			}
 		}
 
@@ -657,7 +661,8 @@ out:
 	{
 		zabbix_log(LOG_LEVEL_WARNING,
 				"active check configuration update from [%s:%hu] started to fail (%s)",
-				host, port, zbx_socket_strerror());
+				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+				zbx_socket_strerror());
 	}
 
 	last_ret = ret;
@@ -725,7 +730,7 @@ static int	check_response(char *response)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	send_buffer(const char *host, unsigned short port)
+static int	send_buffer(zbx_vector_ptr_t *addrs)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
 	int				ret = SUCCEED, i, now;
@@ -736,7 +741,8 @@ static int	send_buffer(const char *host, unsigned short port)
 	struct zbx_json 		json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
-			__func__, host, port, buffer.count, CONFIG_BUFFER_SIZE);
+			__func__, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+			buffer.count, CONFIG_BUFFER_SIZE);
 
 	if (0 == buffer.count)
 		goto ret;
@@ -823,7 +829,8 @@ static int	send_buffer(const char *host, unsigned short port)
 			goto out;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, ((zbx_addr_t *)addrs->values[0])->ip,
+			((zbx_addr_t *)addrs->values[0])->port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		zbx_timespec(&ts);
@@ -877,7 +884,7 @@ out:
 		if (0 != buffer.first_error)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] is working again",
-					host, port);
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port);
 			buffer.first_error = 0;
 		}
 	}
@@ -886,7 +893,8 @@ out:
 		if (0 == buffer.first_error)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] started to fail (%s%s)",
-					host, port, err_send_step, zbx_socket_strerror());
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+					err_send_step, zbx_socket_strerror());
 			buffer.first_error = now;
 		}
 		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s%s", err_send_step, zbx_socket_strerror());
@@ -934,7 +942,7 @@ ret:
  *           process_log(), process_logrt(), zbx_read2() and their callers.   *
  *                                                                            *
  ******************************************************************************/
-static int	process_value(const char *server, unsigned short port, const char *host, const char *key,
+static int	process_value(zbx_vector_ptr_t *addrs, const char *host, const char *key,
 		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
@@ -967,7 +975,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 				CONFIG_BUFFER_SIZE <= buffer.count ||
 				0 != strcmp(el->key, key) || 0 != strcmp(el->host, host))
 		{
-			send_buffer(server, port);
+			send_buffer(addrs);
 		}
 	}
 
@@ -1086,12 +1094,11 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-static int	process_eventlog_check(char *server, unsigned short port, zbx_vector_ptr_t *regular_expressions,
+static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regular_expressions,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		char **error)
 {
-	ZBX_UNUSED(server);
-	ZBX_UNUSED(port);
+	ZBX_UNUSED(addrs);
 	ZBX_UNUSED(regular_expressions);
 	ZBX_UNUSED(metric);
 	ZBX_UNUSED(process_value_cb);
@@ -1101,11 +1108,11 @@ static int	process_eventlog_check(char *server, unsigned short port, zbx_vector_
 	return FAIL;
 }
 #else
-int	process_eventlog_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, char **error);
 #endif
 
-static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric, char **error)
+static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric, char **error)
 {
 	int		ret;
 	AGENT_RESULT	result;
@@ -1124,7 +1131,7 @@ static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_ME
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
-		process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
+		process_value(addrs, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
 				NULL, NULL, NULL, NULL, metric->flags);
 	}
 out:
@@ -1133,12 +1140,13 @@ out:
 	return ret;
 }
 
-static void	process_active_checks(char *server, unsigned short port)
+static void	process_active_checks(zbx_vector_ptr_t *addrs)
 {
 	char	*error = NULL;
 	int	i, now, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, server, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, ((zbx_addr_t *)addrs->values[0])->ip,
+			((zbx_addr_t *)addrs->values[0])->port);
 
 	now = (int)time(NULL);
 
@@ -1168,13 +1176,13 @@ static void	process_active_checks(char *server, unsigned short port)
 		}
 		else if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
 		{
-			ret = process_log_check(server, port, &regexps, metric, process_value, &lastlogsize_sent,
+			ret = process_log_check(addrs, &regexps, metric, process_value, &lastlogsize_sent,
 					&mtime_sent, &error);
 		}
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
-			ret = process_eventlog_check(server, port, &regexps, metric, process_value, &lastlogsize_sent, &error);
+			ret = process_eventlog_check(addrs, &regexps, metric, process_value, &lastlogsize_sent, &error);
 		else
-			ret = process_common_check(server, port, metric, &error);
+			ret = process_common_check(addrs, metric, &error);
 
 		if (SUCCEED != ret)
 		{
@@ -1188,7 +1196,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
 
-			process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
+			process_value(addrs, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
 					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags);
 
 			zbx_free(error);
@@ -1211,7 +1219,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						lastlogsize_last, mtime_last))
 				{
 					/* meta information update */
-					process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL,
+					process_value(addrs, CONFIG_HOSTNAME, metric->key_orig, NULL,
 							metric->state, &metric->lastlogsize, &metric->mtime, NULL, NULL,
 							NULL, NULL, metric->flags);
 				}
@@ -1221,7 +1229,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			}
 		}
 
-		send_buffer(server, port);
+		send_buffer(addrs);
 		metric->nextcheck = (int)time(NULL) + metric->refresh;
 	}
 
@@ -1258,7 +1266,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	time_t	nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0;
+	time_t			nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0;
+	const zbx_vector_ptr_t	*addrs;
+	int			i;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1270,8 +1280,22 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
-	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
+	zbx_vector_ptr_create(&activechk_args.addrs);
+
+	addrs = &((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->addrs;
+	for (i = 0; i < addrs->values_num; i++)
+	{
+		const zbx_addr_t	*addr;
+		zbx_addr_t		*addr_ptr;
+
+		addr = (const zbx_addr_t *)addrs->values[i];
+
+		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
+		addr_ptr->port = addr->port;
+		zbx_vector_ptr_append(&activechk_args.addrs, addr_ptr);
+	}
+
 	CONFIG_HOSTNAME = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->hostname);
 
 	zbx_free(args);
@@ -1289,7 +1313,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if ((now = time(NULL)) >= nextsend)
 		{
-			send_buffer(activechk_args.host, activechk_args.port);
+			send_buffer(&activechk_args.addrs);
 			nextsend = time(NULL) + 1;
 		}
 
@@ -1297,7 +1321,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			zbx_setproctitle("active checks #%d [getting list of active checks]", process_num);
 
-			if (FAIL == refresh_active_checks(activechk_args.host, activechk_args.port))
+			if (FAIL == refresh_active_checks(&activechk_args.addrs))
 			{
 				nextrefresh = time(NULL) + 60;
 			}
@@ -1311,7 +1335,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			zbx_setproctitle("active checks #%d [processing active checks]", process_num);
 
-			process_active_checks(activechk_args.host, activechk_args.port);
+			process_active_checks(&activechk_args.addrs);
 
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
 				continue;

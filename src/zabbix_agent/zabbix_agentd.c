@@ -733,15 +733,15 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = CONFIG_MAX_LINES_PER_SECOND;
 }
 
-static int	add_serveractive_host_cb(const char *host, unsigned short port, zbx_vector_str_t *hostnames)
+static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames)
 {
 	int	i, forks, new_forks;
 
-	for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
+	/*for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
 	{
 		if (0 == strcmp(CONFIG_ACTIVE_ARGS[i].host, host) && CONFIG_ACTIVE_ARGS[i].port == port)
 			return FAIL;
-	}
+	}*/
 
 	/* add at least one fork */
 	new_forks = 0 < hostnames->values_num ? hostnames->values_num : 1;
@@ -753,8 +753,23 @@ static int	add_serveractive_host_cb(const char *host, unsigned short port, zbx_v
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
-		CONFIG_ACTIVE_ARGS[forks].host = zbx_strdup(NULL, host);
-		CONFIG_ACTIVE_ARGS[forks].port = port;
+		int		j;
+
+		zbx_vector_ptr_create(&CONFIG_ACTIVE_ARGS[forks].addrs);
+
+		for (j = 0; j < addrs->values_num; j++)
+		{
+			const zbx_addr_t	*addr;
+			zbx_addr_t		*addr_ptr;
+
+			addr = (const zbx_addr_t *)addrs->values[j];
+
+			addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+			addr_ptr->ip = zbx_strdup(NULL, addr->ip);
+			addr_ptr->port = addr->port;
+			zbx_vector_ptr_append(&CONFIG_ACTIVE_ARGS[forks].addrs, addr_ptr);
+		}
+
 		CONFIG_ACTIVE_ARGS[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");
 	}

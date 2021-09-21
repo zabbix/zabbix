@@ -885,7 +885,7 @@ out:
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	process_eventslog6(const char *server, unsigned short port, const char *eventlog_name, EVT_HANDLE *render_context,
+int	process_eventslog6(zbx_vector_ptr_t addrs, const char *eventlog_name, EVT_HANDLE *render_context,
 		EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID, zbx_uint64_t LastID,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
 		const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
@@ -1061,7 +1061,7 @@ int	process_eventslog6(const char *server, unsigned short port, const char *even
 
 			if (1 == match)
 			{
-				send_err = process_value_cb(server, port, CONFIG_HOSTNAME, metric->key_orig,
+				send_err = process_value_cb(addrs, CONFIG_HOSTNAME, metric->key_orig,
 						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
 						evt_provider, &evt_severity, &evt_eventid,
 						metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
@@ -1704,7 +1704,7 @@ out:
 	return ret;
 }
 
-int	process_eventlog_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, char **error)
 {
 	int 		ret = FAIL;
@@ -1820,7 +1820,7 @@ int	process_eventlog_check(char *server, unsigned short port, zbx_vector_ptr_t *
 				goto out;
 			}
 
-			ret = process_eventslog6(server, port, filename, &eventlog6_render_context, &eventlog6_query,
+			ret = process_eventslog6(addrs, filename, &eventlog6_render_context, &eventlog6_query,
 					lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps, pattern,
 					key_severity, key_source, key_logeventid, rate, process_value_cb, metric,
 					lastlogsize_sent, error);
