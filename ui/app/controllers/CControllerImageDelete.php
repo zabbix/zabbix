@@ -41,7 +41,7 @@ class CControllerImageDelete extends CController {
 			return false;
 		}
 
-		$images = API::Image()->get(['imageids' => [$this->getInput('imageid')]]);
+		$images = API::Image()->get(['imageids' => $this->getInput('imageid')]);
 		if (!$images) {
 			return false;
 		}

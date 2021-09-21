@@ -40,7 +40,7 @@ class CControllerIconMapUpdate extends CController {
 		if ($this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return (bool) API::IconMap()->get([
 				'output' => [],
-				'iconmapids' => [$this->getInput('iconmapid')]
+				'iconmapids' => $this->getInput('iconmapid')
 			]);
 		}
 

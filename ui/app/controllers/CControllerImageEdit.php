@@ -60,7 +60,7 @@ class CControllerImageEdit extends CController {
 			return true;
 		}
 
-		$images = API::Image()->get(['imageids' => [$this->getInput('imageid')]]);
+		$images = API::Image()->get(['imageids' => $this->getInput('imageid')]);
 		if (!$images) {
 			return false;
 		}

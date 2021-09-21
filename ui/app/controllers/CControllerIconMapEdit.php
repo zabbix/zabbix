@@ -49,14 +49,14 @@ class CControllerIconMapEdit extends CController {
 			$iconmaps = API::IconMap()->get([
 				'output' => ['iconmapid', 'name', 'default_iconid'],
 				'selectMappings' => ['inventory_link', 'expression', 'iconid', 'sortorder'],
-				'iconmapids' => [$this->getInput('iconmapid')]
+				'iconmapids' => $this->getInput('iconmapid')
 			]);
 
 			if (!$iconmaps) {
 				return false;
 			}
 
-			$this->iconmap = $this->getInput('iconmap', []) + reset($iconmaps);
+			$this->iconmap = $this->getInput('iconmap', []) + $iconmaps[0];
 		}
 		else {
 			$this->iconmap = $this->getInput('iconmap', []) + [
@@ -72,25 +72,14 @@ class CControllerIconMapEdit extends CController {
 	protected function doAction() {
 		order_result($this->iconmap['mappings'], 'sortorder');
 
-		$inventory_list = getHostInventories();
-		foreach ($inventory_list as &$field) {
-			$field = $field['title'];
-		}
-		unset($field);
-
 		$images = API::Image()->get([
-			'output' => ['name'],
+			'output' => ['imageid', 'name'],
 			'filter' => ['imagetype' => IMAGE_TYPE_ICON],
-			'sortfield' => ['name'],
-			'preservekeys' => true
+			'sortfield' => ['name']
 		]);
 
 		order_result($images, 'name');
-
-		foreach ($images as &$icon) {
-			$icon = $icon['name'];
-		}
-		unset($icon);
+		$images = array_column($images, 'name', 'imageid');
 
 		$default_imageid = key($images);
 
@@ -102,10 +91,9 @@ class CControllerIconMapEdit extends CController {
 			'iconmapid' => $this->getInput('iconmapid', 0),
 			'icon_list' => $images,
 			'iconmap' => $this->iconmap,
-			'inventory_list' => $inventory_list
+			'inventory_list' => array_column(getHostInventories(), 'title', 'nr'),
+			'default_imageid' => $default_imageid
 		];
-
-		$data['default_imageid'] = $default_imageid;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of icon mapping'));

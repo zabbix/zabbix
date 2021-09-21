@@ -58,7 +58,7 @@ class CControllerImageUpdate extends CController {
 			return false;
 		}
 
-		$images = API::Image()->get(['imageids' => [$this->getInput('imageid')]]);
+		$images = API::Image()->get(['imageids' => $this->getInput('imageid')]);
 		if (!$images) {
 			return false;
 		}
@@ -119,7 +119,7 @@ class CControllerImageUpdate extends CController {
 				'name' => $this->getInput('name'),
 			];
 
-			if ($image) {
+			if ($image !== null) {
 				$options['image'] = $image;
 			}
 
@@ -131,7 +131,7 @@ class CControllerImageUpdate extends CController {
 				'name' => $this->getInput('name'),
 			];
 
-			if ($image) {
+			if ($image !== null) {
 				$options['image'] = $image;
 			}
 
