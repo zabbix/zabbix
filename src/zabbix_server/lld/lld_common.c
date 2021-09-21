@@ -22,6 +22,7 @@
 #include "db.h"
 
 #include "../../libs/zbxaudit/audit_item.h"
+#include "../../libs/zbxaudit/audit_graph.h"
 
 /******************************************************************************
  *                                                                            *
@@ -118,6 +119,11 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 				if (0 == strcmp(table, "item_discovery"))
 				{
 					zbx_audit_item_create_entry_for_delete(id, name,
+							(int)ZBX_FLAG_DISCOVERY_CREATED);
+				}
+				else if (0 == strcmp(table, "graph_discovery"))
+				{
+					zbx_audit_graph_create_entry(AUDIT_ACTION_DELETE, id, name,
 							(int)ZBX_FLAG_DISCOVERY_CREATED);
 				}
 			}
