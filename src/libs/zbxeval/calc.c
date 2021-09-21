@@ -110,16 +110,6 @@ err:
 	return FAIL;
 }
 
-static int	zbx_vector_dbl_compare(const void *d1, const void *d2)
-{
-	const double	*p1 = (const double *)d1;
-	const double	*p2 = (const double *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(*p1, *p2);
-
-	return 0;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: find_median                                                      *
@@ -134,7 +124,7 @@ static int	zbx_vector_dbl_compare(const void *d1, const void *d2)
  ******************************************************************************/
 static double	find_median(zbx_vector_dbl_t *v)
 {
-	zbx_vector_dbl_sort(v, zbx_vector_dbl_compare);
+	zbx_vector_dbl_sort(v, ZBX_DEFAULT_DBL_COMPARE_FUNC);
 
 	if (0 == v->values_num % 2)	/* number of elements is even */
 		return (v->values[v->values_num / 2 - 1] + v->values[v->values_num / 2]) / 2.0;
