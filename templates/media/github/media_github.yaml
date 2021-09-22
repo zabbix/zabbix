@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-09-20T16:23:10Z'
+  date: '2021-09-22T18:29:21Z'
   media_types:
     -
       name: Github
@@ -79,7 +79,7 @@ zabbix_export:
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.log(3, '[ Github Webhook ] Sending request: ' + url + ((typeof data === 'string')
+                Zabbix.log(4, '[ Github Webhook ] Sending request: ' + url + ((typeof data === 'string')
                     ? ('\n' + data)
                     : ''));
         
@@ -96,7 +96,7 @@ zabbix_export:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.log(3, '[ Github Webhook ] Received response with status code ' +
+                Zabbix.log(4, '[ Github Webhook ] Received response with status code ' +
                     request.getStatus() + '\n' + response);
         
                 if (response !== null) {
@@ -112,7 +112,7 @@ zabbix_export:
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
                     var message = 'Request failed with status code ' + request.getStatus();
         
-                    if (response !== null && typeof response.message !== 'undefined') {
+                    if (response.message) {
                         message += ': ' + response.message;
                     }
         
@@ -171,10 +171,8 @@ zabbix_export:
             }
         
             //check for backslash in the end of url
-            if (typeof github.url === 'string') {
-                if (!github.url.endsWith('/')) {
-                    github.url += '/';
-                }
+            if (typeof github.url === 'string' && !github.url.endsWith('/')) {
+                github.url += '/';
             }
         
             // Default url for creating issue
@@ -208,13 +206,13 @@ zabbix_export:
             // Leave a comment if comment_data present
             if (typeof comment_data === 'object') {
                 url = github.url + 'repos/' + github.repo + '/issues/' + github.issue_number + '/comments';
-                Github.request("post", url, comment_data)
+                Github.request("post", url, comment_data);
             }
         
             if (process_tags) {
-                result.tags.__zbx_github_issue_number = response.number
-                result.tags.__zbx_github_repo = github.repo
-                result.tags.__zbx_github_link = response.html_url
+                result.tags.__zbx_github_issue_number = response.number;
+                result.tags.__zbx_github_repo = github.repo;
+                result.tags.__zbx_github_link = response.html_url;
             }
         
             Zabbix.log(4, '[ Github Webhook ] Result: ' + JSON.stringify(result));
