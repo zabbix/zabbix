@@ -2249,8 +2249,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 	/* selects host prototypes from templates */
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hi.itemid,th.hostid,th.host,th.name,th.status,th.discover,th.custom_interfaces"
-				",hinv.inventory_mode"
+			"select hi.itemid,th.hostid,th.host,th.name,th.status,th.discover,th.custom_interfaces,"
+				"hinv.inventory_mode"
 			" from items hi,items ti,host_discovery thd,hosts th"
 			" left join host_inventory hinv on hinv.hostid=th.hostid"
 			" where hi.templateid=ti.itemid"
@@ -2312,8 +2312,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select i.itemid,h.hostid,h.host,h.name,h.status,h.discover,h.custom_interfaces"
-				",h.templateid,hinv.inventory_mode"
+				"select i.itemid,h.hostid,h.host,h.name,h.status,h.discover,h.custom_interfaces,"
+					"h.templateid,hinv.inventory_mode"
 				" from items i,host_discovery hd,hosts h"
 				" left join host_inventory hinv on hinv.hostid=h.hostid"
 				" where i.itemid=hd.parent_itemid"
