@@ -397,18 +397,22 @@ static void	zbx_socket_timeout_cleanup(zbx_socket_t *s)
  *                                                                            *
  ******************************************************************************/
 static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, socklen_t addrlen, int timeout,
-		char **error)
+		int connect_timeout, char **error)
 {
 #ifdef _WINDOWS
 	u_long		mode = 1;
 	FD_SET		fdw, fde;
 	int		res;
 	struct timeval	tv, *ptv;
-#endif
+
 	if (0 != timeout)
+	{
 		zbx_socket_timeout_set(s, timeout);
 
-#ifdef _WINDOWS
+		if (0 == connect_timeout)
+			connect_timeout = timeout;
+	}
+
 	if (0 != ioctlsocket(s->socket, FIONBIO, &mode))
 	{
 		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
@@ -421,9 +425,9 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	FD_ZERO(&fde);
 	FD_SET(s->socket, &fde);
 
-	if (0 != timeout)
+	if (0 != connect_timeout)
 	{
-		tv.tv_sec = timeout;
+		tv.tv_sec = connect_timeout;
 		tv.tv_usec = 0;
 		ptv = &tv;
 	}
@@ -476,10 +480,23 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 		return FAIL;
 	}
 #else
+	if (0 != connect_timeout)
+		zbx_socket_timeout_set(s, connect_timeout);
+	else if (0 != timeout)
+		zbx_socket_timeout_set(s, timeout);
+
 	if (ZBX_PROTO_ERROR == connect(s->socket, addr, addrlen))
 	{
 		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
 		return FAIL;
+	}
+
+	if (0 != connect_timeout)
+	{
+		zbx_socket_timeout_cleanup(s);
+
+		if (0 != timeout)
+			zbx_socket_timeout_set(s, timeout);
 	}
 #endif
 	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
@@ -503,7 +520,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
  ******************************************************************************/
 #ifdef HAVE_IPV6
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
@@ -582,7 +599,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		}
 	}
 
-	if (SUCCEED != zbx_socket_connect(s, ai->ai_addr, (socklen_t)ai->ai_addrlen, timeout, &error))
+	if (SUCCEED != zbx_socket_connect(s, ai->ai_addr, (socklen_t)ai->ai_addrlen, timeout, connect_timeout, &error))
 	{
 		func_socket_close(s);
 		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
@@ -733,7 +750,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #endif	/* HAVE_IPV6 */
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+		int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	if (ZBX_TCP_SEC_UNENCRYPTED != tls_connect && ZBX_TCP_SEC_TLS_CERT != tls_connect &&
 			ZBX_TCP_SEC_TLS_PSK != tls_connect)
@@ -742,7 +759,7 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 		return FAIL;
 	}
 
-	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
+	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, connect_timeout, tls_connect, tls_arg1, tls_arg2);
 }
 
 static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
@@ -2394,7 +2411,7 @@ const char	*zbx_tcp_connection_type_name(unsigned int type)
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
-	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL);
+	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL);
 }
 
 int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout)

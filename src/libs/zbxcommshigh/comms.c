@@ -24,6 +24,9 @@
 #include "daemon.h"
 #include "zbxalgo.h"
 #include "cfg.h"
+
+#define		ZBX_TCP_CONNECT_FAILOVER_TIMEOUT	30
+
 extern char		*CONFIG_SOURCE_IP;
 extern unsigned int	configured_tls_connect_mode;
 
@@ -44,8 +47,8 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 
 		addr = (zbx_addr_t *)addrs->values[0];
 
-		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, timeout, tls_connect, tls_arg1,
-				tls_arg2)))
+		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, timeout,
+				ZBX_TCP_CONNECT_FAILOVER_TIMEOUT, tls_connect, tls_arg1, tls_arg2)))
 		{
 			if (0 != i)
 			{

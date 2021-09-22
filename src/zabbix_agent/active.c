@@ -561,7 +561,6 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret;
-	char				*tls_arg1, *tls_arg2;
 	zbx_socket_t			s;
 	struct zbx_json			json;
 

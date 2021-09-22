@@ -675,7 +675,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	}
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
-			CONFIG_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+			CONFIG_SENDER_TIMEOUT, ZBX_TCP_COMMON_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		if (1 == sendval_args->sync_timestamp)
 		{
