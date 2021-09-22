@@ -76,12 +76,6 @@ class CApiInputValidator {
 			case API_COLOR:
 				return self::validateColor($rule, $data, $path, $error);
 
-			case API_MULTIPLE:
-				if ($parent_data !== null) {
-					return self::validateMultiple($rule, $data, $path, $error, $parent_data);
-				}
-				break;
-
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
 
@@ -416,33 +410,6 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Multiple data types validator.
-	 *
-	 * @param array  $rule
-	 * @param array  $rule['rules']
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 * @param array  $parent_data
-	 *
-	 * @return bool
-	 */
-	private static function validateMultiple($rule, &$data, $path, &$error, array $parent_data) {
-		foreach ($rule['rules'] as $field_rule) {
-			if (self::isInRange($parent_data[$field_rule['if']['field']], $field_rule['if']['in'])) {
-				unset($field_rule['if']);
-
-				return self::validateData($field_rule, $data, $path, $error);
-			}
-		}
-
-		// This message can be untranslated because warn about incorrect validation rules at a development stage.
-		$error = 'Incorrect validation rules.';
-
-		return false;
-	}
-
-	/**
 	 * Returns unescaped array of "in" rules.
 	 *
 	 * @static
@@ -508,7 +475,9 @@ class CApiInputValidator {
 					$error = _s('value must be one of %1$s', implode(', ', $in));
 				}
 				elseif ($in) {
-					$error = _s('value must be empty or one of %1$s', implode(', ', $in));
+					$error = _n('value must be empty or %1$s','value must be empty or one of %1$s', implode(', ', $in),
+						count($in)
+					);
 				}
 				else {
 					$error = _s('value must be empty');
@@ -844,7 +813,9 @@ class CApiInputValidator {
 
 		if (!$valid) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_s('value must be one of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']))
+				_n('value must be %1$s', 'value must be one of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']),
+					(str_replace([',', ':'], '', $rule['in']) != $rule['in']) ? 2 : 1
+				)
 			);
 		}
 
@@ -1068,6 +1039,24 @@ class CApiInputValidator {
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
 			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
+
+			if ($field_rule['type'] === API_MULTIPLE) {
+				foreach ($field_rule['rules'] as $multiple_rule) {
+					if (self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+						$field_rule = $multiple_rule;
+						break;
+					}
+				}
+
+				if ($field_rule['type'] === API_MULTIPLE) {
+					$error = 'Incorrect validation rules.';
+					return false;
+				}
+
+				if (array_key_exists('flags', $field_rule)) {
+					$flags = $multiple_rule['flags'];
+				}
+			}
 
 			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
 				$data[$field_name] = $field_rule['default'];
