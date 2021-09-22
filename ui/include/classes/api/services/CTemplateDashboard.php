@@ -201,7 +201,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 		$this->updatePages($dashboards);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE_DASHBOARD, $dashboards);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE_DASHBOARD, $dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}
@@ -233,7 +233,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 		$this->updatePages($dashboards, $db_dashboards);
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD, $dashboards, $db_dashboards);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD, $dashboards, $db_dashboards);
 
 		return ['dashboardids' => array_column($dashboards, 'dashboardid')];
 	}
