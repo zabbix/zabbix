@@ -991,7 +991,7 @@ static void	lld_eval_expression_index_functions(zbx_eval_context_t *ctx, zbx_vec
 		{
 			function = (zbx_lld_function_t *)functions->values[index];
 
-			function->index = index + 1;
+			function->index = (zbx_uint64_t)(index + 1);
 			zbx_variant_set_ui64(&token->value, function->index);
 		}
 	}
@@ -1720,7 +1720,7 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 {
 	zbx_lld_trigger_t			*trigger, *dep_trigger;
 	const zbx_lld_trigger_prototype_t	*dep_trigger_prototype;
-	zbx_lld_dependency_t			*dependency;
+	zbx_lld_dependency_t			*dependency = NULL;
 	zbx_uint64_t				triggerid_up;
 	int					i, j, index;
 
@@ -3812,7 +3812,7 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
 	/* This will give some consistency in choosing what dependencies should be deleted in the case of   */
 	/* recursion.                                                                                       */
 	zbx_vector_ptr_create(&nodes);
-	zbx_vector_ptr_reserve(&nodes, cache.num_data);
+	zbx_vector_ptr_reserve(&nodes, (size_t)cache.num_data);
 
 	zbx_hashset_iter_reset(&cache, &iter);
 	while (NULL != (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_iter_next(&iter)))
