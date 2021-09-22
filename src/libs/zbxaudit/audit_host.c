@@ -111,13 +111,14 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(funcname)									\
 PREPARE_AUDIT_SNMP_INTERFACE(host, host)
 PREPARE_AUDIT_SNMP_INTERFACE(host_prototype, hostprototype)
 
-void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid,
-		const char *hostname)
+void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(zbx_uint64_t hostid,
+		zbx_uint64_t proxy_hostid, const char *hostname, int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF();
 
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD, "host.proxy_hostid", proxy_hostid);
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.host", hostname);
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.inventory_mode", inventory_mode);
 }
 
 void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, int tls_connect, int tls_accept,

@@ -2290,7 +2290,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		if (SUCCEED == DBis_null(row[7]))
 			host_prototype->inventory_mode = HOST_INVENTORY_DISABLED;
 		else
-			host_prototype->inventory_mode = atoi(row[7]);
+			host_prototype->inventory_mode = (char)atoi(row[7]);
 
 		host_prototype->inventory_mode_orig = HOST_INVENTORY_DISABLED;
 
@@ -2335,7 +2335,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 				if (host_prototype->itemid == itemid && 0 == strcmp(host_prototype->host, row[2]))
 				{
-					int	inventory_mode_null_processed;
+					char	inventory_mode_null_processed;
 
 					ZBX_STR2UINT64(host_prototype->hostid, row[1]);
 
@@ -2366,7 +2366,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 					if (SUCCEED == DBis_null(row[8]))
 						inventory_mode_null_processed = HOST_INVENTORY_DISABLED;
 					else
-						inventory_mode_null_processed = atoi(row[8]);
+						inventory_mode_null_processed = (char)atoi(row[8]);
 
 					if (host_prototype->inventory_mode != inventory_mode_null_processed)
 					{
@@ -3132,7 +3132,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 	/* replace existing tags with the new tags */
 	if (0 != hostids.values_num)
 	{
-		int	tag_index;
+		int	tag_index = 0;
 
 		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
