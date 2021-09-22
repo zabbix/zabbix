@@ -370,7 +370,6 @@ static void	sender_signal_handler(int sig)
 
 	switch (sig)
 	{
-		CASE_LOG_WARNING(SIGALRM);
 		CASE_LOG_WARNING(SIGINT);
 		CASE_LOG_WARNING(SIGQUIT);
 		CASE_LOG_WARNING(SIGTERM);
@@ -629,6 +628,33 @@ static int	check_response(char *response, const char *server, unsigned short por
 	return ret;
 }
 
+static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
+{
+	ZBX_UNUSED(sig);
+	ZBX_UNUSED(siginfo);
+	ZBX_UNUSED(context);
+
+	zbx_alarm_flag_set();	/* set alarm flag */
+}
+#if !defined(_WINDOWS)
+static void	zbx_set_sender_signal_handlers(void)
+{
+	struct sigaction	phan;
+
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = SA_SIGINFO;
+
+	phan.sa_sigaction = alarm_signal_handler;
+	sigaction(SIGALRM, &phan, NULL);
+
+	signal(SIGINT, sender_signal_handler);
+	signal(SIGQUIT, sender_signal_handler);
+	signal(SIGTERM, sender_signal_handler);
+	signal(SIGHUP, sender_signal_handler);
+	signal(SIGPIPE, sender_signal_handler);
+}
+#endif
+
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
@@ -636,11 +662,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	zbx_socket_t		sock;
 
 #if !defined(_WINDOWS)
-	signal(SIGINT, sender_signal_handler);
-	signal(SIGQUIT, sender_signal_handler);
-	signal(SIGTERM, sender_signal_handler);
-	signal(SIGHUP, sender_signal_handler);
-	signal(SIGPIPE, sender_signal_handler);
+	zbx_set_sender_signal_handlers();
 #endif
 
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
