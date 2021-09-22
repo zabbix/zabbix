@@ -198,7 +198,17 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if (isset($data['groupids'])) {
-			API::HostGroup()->massRemove($data);
+			$options = ['groupids' => $data['groupids']];
+
+			if ($data['hostids']) {
+				$options['hostids'] = $data['hostids'];
+			}
+
+			if ($data['templateids']) {
+				$options['templateids'] = $data['templateids'];
+			}
+
+			API::HostGroup()->massRemove($options);
 		}
 
 		return [$this->pkOption() => $data[$this->pkOption()]];
