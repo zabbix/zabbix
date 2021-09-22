@@ -37,7 +37,7 @@ extern char	*CONFIG_TLS_PSK_IDENTITY;
 #endif
 
 static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
-		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	int	ret, i;
 
@@ -48,7 +48,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		addr = (zbx_addr_t *)addrs->values[0];
 
 		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, timeout,
-				ZBX_TCP_CONNECT_FAILOVER_TIMEOUT, tls_connect, tls_arg1, tls_arg2)))
+				connect_timeout, tls_connect, tls_arg1, tls_arg2)))
 		{
 			if (0 != i)
 			{
@@ -76,8 +76,9 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 	int	res, lastlogtime, now;
 	char	*tls_arg1, *tls_arg2;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d]",
-			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout);
+	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d, connection timeout:%d]",
+			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
+			ZBX_TCP_CONNECT_FAILOVER_TIMEOUT);
 
 	switch (configured_tls_connect_mode)
 	{
@@ -101,7 +102,7 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 	}
 
 	if (FAIL == (res = zbx_tcp_connect_failover(sock, CONFIG_SOURCE_IP, addrs, timeout,
-			configured_tls_connect_mode, tls_arg1, tls_arg2)))
+			ZBX_TCP_CONNECT_FAILOVER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		if (0 != retry_interval)
 		{
@@ -111,7 +112,8 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 			lastlogtime = (int)time(NULL);
 
 			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, CONFIG_SOURCE_IP,
-					addrs, timeout, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+					addrs, timeout, ZBX_TCP_CONNECT_FAILOVER_TIMEOUT, configured_tls_connect_mode,
+					tls_arg1, tls_arg2)))
 			{
 				now = (int)time(NULL);
 
