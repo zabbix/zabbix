@@ -103,11 +103,9 @@
 	/**
 	 * Collects IDs selected in "Add templates" multiselect.
 	 *
-	 * @param {jQuery} $ms  jQuery object of multiselect.
-	 *
 	 * @returns {array|getAddTemplates.templateids}
 	 */
-	function getAddTemplates($ms) {
+	function getAddTemplates() {
 		const $ms = $('#add_templates_');
 		let templateids = [];
 
