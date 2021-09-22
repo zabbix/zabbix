@@ -22,7 +22,6 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "eval.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1
@@ -46,15 +45,6 @@ typedef enum
 	FUNCTION_OPTYPE_TRIM_RIGHT
 }
 zbx_function_trim_optype_t;
-
-typedef struct
-{
-	double	upper;
-	double	count;
-}
-zbx_histogram_t;
-ZBX_VECTOR_DECL(histogram, zbx_histogram_t)
-ZBX_VECTOR_IMPL(histogram, zbx_histogram_t)
 
 /******************************************************************************
  *                                                                            *
@@ -2303,47 +2293,6 @@ out:
 	return SUCCEED;
 }
 
-static void	remove_duplicate_backet(zbx_vector_histogram_t *h)
-{
-	zbx_histogram_t	b, last = h->values[0];
-	int		i, inx = 0;
-
-	for (i = 1; i < h->values_num; i++)
-	{
-		b = h->values[i];
-
-		if (b.upper == last.upper)
-		{
-			last.count += b.count;
-		}
-		else
-		{
-			h->values[inx] = last;
-			last = b;
-			inx++;
-		}
-	}
-
-	h->values[inx] = last;
-
-	for (;h->values_num > inx + 1;)
-		zbx_vector_histogram_remove_noorder(h, h->values_num - 1);
-}
-
-static void	ensure_monotonic(zbx_vector_histogram_t *h)
-{
-	double	max = h->values[0].count;
-	int	i;
-
-	for (i = 1; i < h->values_num; i++)
-	{
-		if (h->values[i].count > max)
-			max = h->values[i].count;
-		else if (h->values[i].count < max)
-			h->values[i].count = max;
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: eval_execute_function_histogram_quantile                         *
@@ -2362,17 +2311,15 @@ static void	ensure_monotonic(zbx_vector_histogram_t *h)
 static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-#	define LAST(v)		v.values[v.values_num - 1]
-
 	int			i, ret;
 	zbx_variant_t		value;
-	zbx_vector_histogram_t	histogram;
-	double			q, total, rank, count, end, start;
+	zbx_vector_dbl_t	values, *v = NULL;
+	double			q, result;
+	const char		*err_fn = ctx->expression + token->loc.l;
 
 	if (2 > token->opt || (2 > token->opt && (token->opt % 2 == 0)))
 	{
-		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
-				ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"", err_fn);
 		return FAIL;
 	}
 
@@ -2385,15 +2332,14 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 	{
 		if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
 		{
-			*error = zbx_dsprintf(*error, "invalid type of second argument for function at \"%s\"",
-					ctx->expression + token->loc.l);
+			*error = zbx_dsprintf(*error, "invalid type of second argument for function at \"%s\"", err_fn);
 			return FAIL;
 		}
 
 		if (output->values[i].data.dbl_vector->values_num % 2 != 0)
 		{
 			*error = zbx_dsprintf(*error, "invalid values number of second argument for function at \"%s\"",
-					ctx->expression + token->loc.l);
+					err_fn);
 			return FAIL;
 		}
 	}
@@ -2402,7 +2348,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 		if ((output->values_num - i) % 2 != 0)
 		{
 			*error = zbx_dsprintf(*error, "invalid number of histogram arguments for function at \"%s\"",
-					ctx->expression + token->loc.l);
+					err_fn);
 			return FAIL;
 		}
 
@@ -2425,113 +2371,36 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 
 	if (q < 0 || q > 1 )
 	{
-		*error = zbx_dsprintf(*error, "invalid value of quantile for function at \"%s\"",
-				ctx->expression + token->loc.l);
+		*error = zbx_dsprintf(*error, "invalid value of quantile for function at \"%s\"", err_fn);
 		return FAIL;
 	}
 
-	zbx_vector_histogram_create(&histogram);
 	i = output->values_num - token->opt + 1;
 
 	if (2 == token->opt)
 	{
-		zbx_histogram_t		hg;
-		zbx_vector_dbl_t	*v;
-
 		v = output->values[i].data.dbl_vector;
-
-		for (i = 0; i < v->values_num;)
-		{
-			hg.upper = v->values[i++];
-			hg.count = v->values[i++];
-			zbx_vector_histogram_append(&histogram, hg);
-		}
 	}
 	else
 	{
-		zbx_histogram_t	hg;
+		zbx_vector_dbl_create(&values);
 
 		for (; i < output->values_num;)
 		{
-			hg.upper = output->values[i++].data.dbl;
-			hg.count = output->values[i++].data.dbl;;
-			zbx_vector_histogram_append(&histogram, hg);
+			zbx_vector_dbl_append(&values, output->values[i++].data.dbl);
 		}
 	}
 
-	if (histogram.values_num < 2)
+	if (SUCCEED == (ret = zbx_eval_calc_histogram_quantile(q, NULL != v ? v : &values, err_fn, &result, error)))
 	{
-		*error = zbx_dsprintf(*error, "invalid number of backets for function at \"%s\"",
-				ctx->expression + token->loc.l);
-		goto out;
+		zbx_variant_set_dbl(&value, result);
+		eval_function_return(token->opt, &value, output);
 	}
 
-	zbx_vector_histogram_sort(&histogram, ZBX_DEFAULT_DBL_COMPARE_FUNC);
+	if (NULL == v)
+		zbx_vector_dbl_destroy(&values);
 
-	if (ZBX_INFINITY != LAST(histogram).upper)
-	{
-		*error = zbx_dsprintf(*error, "invalid last infinity backet for function at \"%s\"",
-				ctx->expression + token->loc.l);
-		goto out;
-	}
-
-	remove_duplicate_backet(&histogram);
-
-	if (histogram.values_num < 2)
-	{
-		*error = zbx_dsprintf(*error, "invalid number of backets with duplicate for function at \"%s\"",
-				ctx->expression + token->loc.l);
-		goto out;
-	}
-
-	ensure_monotonic(&histogram);
-
-	if (0 == (total = LAST(histogram).count))
-	{
-		*error = zbx_dsprintf(*error, "invalid number value of infinity backet for function at \"%s\"",
-				ctx->expression + token->loc.l);
-		goto out;
-	}
-
-	rank = q * total;
-
-	for (i = 0; i < histogram.values_num - 1; i++)
-	{
-		if (histogram.values[i].count >= rank)
-			break;
-	}
-
-	if (i == histogram.values_num - 1)
-	{
-		zbx_variant_set_dbl(&value, histogram.values[histogram.values_num - 2].upper);
-		zbx_vector_histogram_destroy(&histogram);
-		return SUCCEED;
-	}
-
-	if (0 == i && 0 >= histogram.values[0].upper)
-	{
-		zbx_variant_set_dbl(&value, histogram.values[0].upper);
-		zbx_vector_histogram_destroy(&histogram);
-		return SUCCEED;
-	}
-
-	start = 0;
-	end = histogram.values[i].upper;
-	count = histogram.values[i].count;
-
-	if (i > 0)
-	{
-		start = histogram.values[i - 1].upper;
-		count -= histogram.values[i - 1].count;
-		rank -= histogram.values[i - 1].count;
-	}
-
-	zbx_variant_set_dbl(&value, start + (end - start) *  (rank / count));
-	eval_function_return(token->opt, &value, output);
-out:
-	zbx_vector_histogram_destroy(&histogram);
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************

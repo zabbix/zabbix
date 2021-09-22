@@ -1068,7 +1068,8 @@ out:
 #define ZBX_VALUE_FUNC_LAST	6
 #define ZBX_ITEM_FUNC_EXISTS	7
 #define ZBX_ITEM_FUNC_ITEMCOUNT	8
-#define ZBX_MIXVALUE_FUNC_BRATE	9
+#define ZBX_ITEM_FUNC_BPERCENTL	9
+#define ZBX_MIXVALUE_FUNC_BRATE	10
 
 #define MATCH_STRING(x, name, len)	ZBX_CONST_STRLEN(x) == len && 0 == memcmp(name, x, len)
 
@@ -1098,6 +1099,9 @@ static int	get_function_by_name(const char *name, size_t len)
 
 	if (MATCH_STRING("item_count", name, len))
 		return ZBX_ITEM_FUNC_ITEMCOUNT;
+
+	if (MATCH_STRING("bucket_percentile", name, len))
+		return ZBX_ITEM_FUNC_BPERCENTL;
 
 	if (MATCH_STRING("bucket_rate_foreach", name, len))
 		return ZBX_MIXVALUE_FUNC_BRATE;
@@ -1385,29 +1389,31 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
  *                                                                            *
  * Purpose: evaluate functions 'bucket_rate_foreach' for 'histogram_quantile' *
  *                                                                            *
- * Parameters: eval     - [IN] the evaluation data                            *
- *             query    - [IN] the calculated item query                      *
- *             args_num - [IN] the number of function arguments               *
- *             args     - [IN] an array of the function arguments.            *
- *             data     - [IN] the caller data used for function evaluation   *
- *             ts       - [IN] the function execution time                    *
- *             value    - [OUT] the function return value                     *
- *             error    - [OUT] the error message if function failed          *
+ * Parameters: eval      - [IN] the evaluation data                           *
+ *             query     - [IN] the calculated item query                     *
+ *             args_num  - [IN] the number of function arguments              *
+ *             args      - [IN] an array of the function arguments.           *
+ *             data      - [IN] the caller data used for function evaluation  *
+ *             ts        - [IN] the function execution time                   *
+ *             item_func - [IN] the function id                               *
+ *             value     - [OUT] the function return value                    *
+ *             error     - [OUT] the error message if function failed         *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_query_t *query,
-		int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value,
+		int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, int item_func, zbx_variant_t *value,
 		char **error)
 {
 	zbx_expression_query_many_t	*data;
 	int				i, pos, ret = FAIL;
 	zbx_vector_dbl_t		*results = NULL;
 	char				*param = NULL, *backet = NULL;
+	double				percentage, result;
 
-	if (1 > args_num || 2 < args_num)
+	if (1 > args_num || 2 < args_num || (ZBX_ITEM_FUNC_BPERCENTL == item_func && 2 != args_num))
 	{
 		*error = zbx_strdup(NULL, "invalid number of function parameters");
 		goto out;
@@ -1434,7 +1440,31 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 		zbx_variant_clear(&arg);
 	}
 
-	if (2 == args_num)
+	if (ZBX_ITEM_FUNC_BPERCENTL == item_func)
+	{
+		if (ZBX_VARIANT_DBL == args[1].type)
+		{
+			percentage = args[1].data.dbl;
+		}
+		else
+		{
+			zbx_variant_t	val_copy;
+
+			zbx_variant_copy(&val_copy, &args[1]);
+
+			if (SUCCEED != zbx_variant_convert(&val_copy, ZBX_VARIANT_DBL))
+			{
+				zbx_variant_clear(&val_copy);
+				*error = zbx_strdup(NULL, "invalid third parameter");
+				goto out;
+			}
+
+			percentage = val_copy.data.dbl;
+		}
+
+		pos = 1;
+	}
+	else if (2 == args_num)
 	{
 		if (ZBX_VARIANT_STR == args[1].type)
 		{
@@ -1505,9 +1535,17 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 		zbx_vector_dbl_append(results, rate.data.dbl);
 	}
 
-	zbx_variant_set_dbl_vector(value, results);
-	results = NULL;
-	ret = SUCCEED;
+	if (ZBX_MIXVALUE_FUNC_BRATE == item_func)
+	{
+		zbx_variant_set_dbl_vector(value, results);
+		results = NULL;
+		ret = SUCCEED;
+	}
+	else if (SUCCEED == (ret = zbx_eval_calc_histogram_quantile(percentage, results, "bucket_percentile", &result,
+			error)))
+	{
+		zbx_variant_set_dbl(value, result);
+	}
 out:
 	zbx_free(param);
 	zbx_free(backet);
@@ -1615,8 +1653,9 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			count = 0;
 
 			break;
+		case ZBX_ITEM_FUNC_BPERCENTL:
 		case ZBX_MIXVALUE_FUNC_BRATE:
-			ret = expression_eval_brate(eval, query, args_num, args, ts, value, error);
+			ret = expression_eval_brate(eval, query, args_num, args, ts, item_func, value, error);
 			goto out;
 		default:
 			*error = zbx_strdup(NULL, "unsupported function");
@@ -1687,7 +1726,7 @@ static int	expression_eval_history(const char *name, size_t len, int args_num, c
 		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	int			ret = FAIL;
-	zbx_expression_eval_t		*eval;
+	zbx_expression_eval_t	*eval;
 	zbx_expression_query_t	*query;
 	char			*errmsg = NULL;
 
