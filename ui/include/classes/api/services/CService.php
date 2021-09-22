@@ -1416,6 +1416,15 @@ class CService extends CApiService {
 			}
 		}
 
+		foreach (array_keys(array_intersect_key($add_references, $del_references)) as $parent_serviceid) {
+			$common_references = array_intersect_key($add_references[$parent_serviceid],
+				$del_references[$parent_serviceid]
+			);
+
+			$add_references[$parent_serviceid] = array_diff_key($add_references[$parent_serviceid], $common_references);
+			$del_references[$parent_serviceid] = array_diff_key($del_references[$parent_serviceid], $common_references);
+		}
+
 		if ($this->hasCircularReferences($add_references, $del_references)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Services form a circular dependency.'));
 		}
@@ -1430,9 +1439,9 @@ class CService extends CApiService {
 	private function hasCircularReferences(array $add_references, array $del_references): bool {
 		$reverse_references = [];
 
-		foreach ($add_references as $child_serviceid => $parents) {
-			foreach (array_keys($parents) as $parent_serviceid) {
-				$reverse_references[$parent_serviceid][$child_serviceid] = true;
+		foreach ($add_references as $parent_serviceid => $children) {
+			foreach (array_keys($children) as $child_serviceid) {
+				$reverse_references[$child_serviceid][$parent_serviceid] = true;
 			}
 		}
 
@@ -1445,29 +1454,29 @@ class CService extends CApiService {
 			$db_parents = [];
 
 			foreach ($db_links as $db_link) {
-				if (!array_key_exists($db_link['servicedownid'], $del_references)
-						|| !array_key_exists($db_link['serviceupid'], $del_references[$db_link['servicedownid']])) {
+				if (!array_key_exists($db_link['serviceupid'], $del_references)
+						|| !array_key_exists($db_link['servicedownid'], $del_references[$db_link['serviceupid']])) {
 					$db_parents[$db_link['servicedownid']][$db_link['serviceupid']] = true;
 				}
 			}
 
 			$next_references = [];
 
-			foreach ($add_references as $child_serviceid => $parents) {
-				foreach (array_keys($parents) as $parent_serviceid) {
+			foreach ($add_references as $parent_serviceid => $children) {
+				foreach (array_keys($children) as $child_serviceid) {
 					if ((string) $child_serviceid === (string) $parent_serviceid) {
 						return true;
 					}
 
-					if (array_key_exists($child_serviceid, $reverse_references)) {
-						foreach (array_keys($reverse_references[$child_serviceid]) as $serviceid) {
-							$next_references[$serviceid][$parent_serviceid] = true;
+					if (array_key_exists($parent_serviceid, $reverse_references)) {
+						foreach (array_keys($reverse_references[$parent_serviceid]) as $serviceid) {
+							$next_references[$serviceid][$child_serviceid] = true;
 						}
 					}
 
-					if (array_key_exists($child_serviceid, $db_parents)) {
-						foreach (array_keys($db_parents[$child_serviceid]) as $serviceid) {
-							$next_references[$serviceid][$parent_serviceid] = true;
+					if (array_key_exists($parent_serviceid, $db_parents)) {
+						foreach (array_keys($db_parents[$parent_serviceid]) as $serviceid) {
+							$next_references[$serviceid][$child_serviceid] = true;
 						}
 					}
 				}
