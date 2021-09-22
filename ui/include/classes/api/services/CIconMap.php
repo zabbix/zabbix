@@ -423,33 +423,32 @@ class CIconMap extends CApiService {
 
 			$db_mappings = ($method === 'update') ? $db_iconmaps[$iconmap['iconmapid']]['mappings'] : [];
 
-			foreach ($iconmap['mappings'] as &$mapping) {
-				$db_mapping = array_values(array_filter($db_mappings, function (array $value) use ($mapping): bool {
-					return ($mapping['expression'] === $value['expression']
-							&& $mapping['inventory_link'] == $value['inventory_link']);
-				}));
+			foreach ($iconmap['mappings'] as $index => &$mapping) {
+				$mapping['sortorder'] = $index;
+
+				$db_mapping = current(array_filter($db_mappings,
+					static function (array $db_mapping) use ($mapping): bool {
+						return ($mapping['inventory_link'] == $db_mapping['inventory_link']
+								&& $mapping['expression'] === $db_mapping['expression']);
+					}
+				));
 
 				if ($db_mapping) {
-					$mapping['iconmappingid'] = $db_mapping[0]['iconmappingid'];
+					$mapping['iconmappingid'] = $db_mapping['iconmappingid'];
 
-					$upd_mapping = DB::getUpdatedValues('icon_mapping', $mapping, $db_mapping[0]);
+					$upd_mapping = DB::getUpdatedValues('icon_mapping', $mapping, $db_mapping);
 
 					if ($upd_mapping) {
 						$upd_mappings[] = [
 							'values' => $upd_mapping,
-							'where' => ['iconmappingid' => $db_mapping[0]['iconmappingid']]
+							'where' => ['iconmappingid' => $db_mapping['iconmappingid']]
 						];
 					}
 
-					unset($db_mappings[$db_mapping[0]['iconmappingid']]);
+					unset($db_mappings[$db_mapping['iconmappingid']]);
 				}
 				else {
-					$ins_mappings[] = [
-						'iconmapid' => $iconmap['iconmapid'],
-						'iconid' => $mapping['iconid'],
-						'expression' => $mapping['expression'],
-						'inventory_link' => $mapping['inventory_link']
-					];
+					$ins_mappings[] = ['iconmapid' => $iconmap['iconmapid']] + $mapping;
 				}
 			}
 			unset($mapping);
@@ -459,7 +458,7 @@ class CIconMap extends CApiService {
 		unset($iconmap);
 
 		if ($ins_mappings) {
-			$iconmappingids = DB::insertBatch('icon_mapping', $ins_mappings);
+			$iconmappingids = DB::insert('icon_mapping', $ins_mappings);
 		}
 
 		if ($upd_mappings) {
@@ -591,7 +590,7 @@ class CIconMap extends CApiService {
 
 		if ($iconmapids) {
 			$options = [
-				'output' => ['iconmappingid', 'iconmapid', 'iconid', 'inventory_link', 'expression'],
+				'output' => ['iconmappingid', 'iconmapid', 'iconid', 'inventory_link', 'expression', 'sortorder'],
 				'filter' => ['iconmapid' => $iconmapids]
 			];
 			$db_mappings = DBselect(DB::makeSql('icon_mapping', $options));
