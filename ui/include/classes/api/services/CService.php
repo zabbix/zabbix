@@ -963,9 +963,6 @@ class CService extends CApiService {
 			array $service_problems, int $min_status = null): array {
 		$parent = $services[$parent_serviceid];
 
-//		var_dump($service_problems);
-//		exit;
-
 		if (!array_key_exists($parent_serviceid, $relations)) {
 			if ($min_status !== null) {
 				$problem_events = array_filter($service_problems[$parent_serviceid],
