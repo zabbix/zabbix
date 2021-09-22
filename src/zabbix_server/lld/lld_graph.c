@@ -181,7 +181,6 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_lld_graph_t	*graph;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -196,7 +195,7 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		graph = (zbx_lld_graph_t *)zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
+		zbx_lld_graph_t	*graph = (zbx_lld_graph_t *)zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
 
 		ZBX_STR2UINT64(graph->graphid, row[0]);
 		graph->name = zbx_strdup(NULL, row[1]);
@@ -289,7 +288,6 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 {
 	int			i, index;
 	zbx_lld_graph_t		*graph;
-	zbx_lld_gitem_t		*gitem;
 	zbx_uint64_t		graphid;
 	zbx_vector_uint64_t	graphids;
 	DB_RESULT		result;
@@ -326,7 +324,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		gitem = (zbx_lld_gitem_t *)zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
+		zbx_lld_gitem_t		*gitem = (zbx_lld_gitem_t *)zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
 
 		ZBX_STR2UINT64(gitem->gitemid, row[0]);
 		ZBX_STR2UINT64(graphid, row[1]);
@@ -1001,8 +999,6 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
 	int			ret = SUCCEED, i, j, new_graphs = 0, upd_graphs = 0, new_gitems = 0;
-	zbx_lld_graph_t		*graph;
-	zbx_lld_gitem_t		*gitem;
 	zbx_vector_ptr_t	upd_gitems; 	/* the ordered list of graphs_items which will be updated */
 	zbx_vector_uint64_t	del_gitemids;
 
@@ -1018,7 +1014,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	for (i = 0; i < graphs->values_num; i++)
 	{
-		graph = (zbx_lld_graph_t *)graphs->values[i];
+		zbx_lld_graph_t	*graph = (zbx_lld_graph_t *)graphs->values[i];
 
 		if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
 			continue;
@@ -1036,7 +1032,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 		for (j = 0; j < graph->gitems.values_num; j++)
 		{
-			gitem = (zbx_lld_gitem_t *)graph->gitems.values[j];
+			zbx_lld_gitem_t	*gitem = (zbx_lld_gitem_t *)graph->gitems.values[j];
 
 			if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_DELETE))
 			{
@@ -1104,7 +1100,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	for (i = 0; i < graphs->values_num; i++)
 	{
-		graph = (zbx_lld_graph_t *)graphs->values[i];
+		zbx_lld_graph_t	*graph = (zbx_lld_graph_t *)graphs->values[i];
 
 		if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
 			continue;
@@ -1307,7 +1303,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 		for (j = 0; j < graph->gitems.values_num; j++)
 		{
-			gitem = (zbx_lld_gitem_t *)graph->gitems.values[j];
+			zbx_lld_gitem_t	*gitem = (zbx_lld_gitem_t *)graph->gitems.values[j];
 
 			if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_DELETE))
 				continue;
@@ -1334,8 +1330,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 	for (i = 0; i < upd_gitems.values_num; i++)
 	{
 		const char	*d = "";
-
-		gitem = (zbx_lld_gitem_t *)upd_gitems.values[i];
+		zbx_lld_gitem_t	*gitem = (zbx_lld_gitem_t *)upd_gitems.values[i];
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update graphs_items set ");
 
