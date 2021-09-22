@@ -178,7 +178,7 @@ class CImage extends CApiService {
 	public function create($images) {
 		global $DB;
 
-		$this->validateCreate($images);
+		self::validateCreate($images);
 
 		foreach ($images as &$image) {
 			list(,, $img_type) = getimagesizefromstring($image['image']);
@@ -249,13 +249,13 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * Validate create.
+	 * @static
 	 *
 	 * @param array $images
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateCreate(array &$images): void {
+	protected static function validateCreate(array &$images): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'imagetype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('images', 'name')],
@@ -349,15 +349,13 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * Validate update.
-	 *
 	 * @param array      $images
 	 * @param array|null $db_images
 	 *
 	 * @throws APIException if the input is invalid
 	 */
 	protected function validateUpdate(array &$images, array &$db_images = null): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['imageid'], ['name']], 'fields' => [
 			'imageid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('images', 'name')],
 			'image' =>		['type' => API_IMAGE, 'flags' => API_NOT_EMPTY]
@@ -368,7 +366,7 @@ class CImage extends CApiService {
 		}
 
 		$db_images = $this->get([
-			'output' => ['name', 'imagetype'],
+			'output' => ['imageid', 'name'],
 			'imageids' => array_column($images, 'imageid'),
 			'preservekeys' => true
 		]);
@@ -504,10 +502,14 @@ class CImage extends CApiService {
 			return;
 		}
 
-		$duplicate = DBfetch(DBselect('SELECT i.name FROM images i WHERE '.dbConditionString('i.name', $names), 1));
+		$duplicates = DB::select('images', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
 
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $duplicate['name']));
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $duplicates[0]['name']));
 		}
 	}
 
@@ -536,10 +538,9 @@ class CImage extends CApiService {
 		}
 
 		if ($used) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_n('The image is used in icon map %1$s.', 'The image is used in icon maps %1$s.',
-					'"'.implode('", "', $used).'"', count($used))
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _n('The image is used in icon map %1$s.',
+				'The image is used in icon maps %1$s.', '"'.implode('", "', $used).'"', count($used)
+			));
 		}
 	}
 
@@ -573,10 +574,9 @@ class CImage extends CApiService {
 		}
 
 		if ($used) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_n('The image is used in map %1$s.', 'The image is used in maps %1$s.',
-				'"'.implode('", "', $used).'"', count($used))
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _n('The image is used in map %1$s.',
+				'The image is used in maps %1$s.', '"'.implode('", "', $used).'"', count($used)
+			));
 		}
 	}
 }
