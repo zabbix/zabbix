@@ -152,7 +152,7 @@ class CIconMap extends CApiService {
 	 * @return array
 	 */
 	public function create(array $iconmaps) {
-		$this->validateCreate($iconmaps);
+		self::validateCreate($iconmaps);
 
 		$ins_iconmaps = [];
 
@@ -176,11 +176,13 @@ class CIconMap extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateCreate(array &$iconmaps) {
+	private static function validateCreate(array &$iconmaps) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('icon_map', 'name')],
 			'default_iconid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
@@ -207,14 +209,12 @@ class CIconMap extends CApiService {
 	 * @return array
 	 */
 	public function update(array $iconmaps) {
-		$this->validateUpdate($iconmaps, $db_iconmaps);
+		self::validateUpdate($iconmaps, $db_iconmaps);
 
 		$upd_iconmaps = [];
 
 		foreach ($iconmaps as $iconmap) {
-			$db_iconmap = $db_iconmaps[$iconmap['iconmapid']];
-
-			$upd_iconmap = DB::getUpdatedValues('icon_map', $iconmap, $db_iconmap);
+			$upd_iconmap = DB::getUpdatedValues('icon_map', $iconmap, $db_iconmaps[$iconmap['iconmapid']]);
 
 			if ($upd_iconmap) {
 				$upd_iconmaps[] = [
@@ -236,11 +236,13 @@ class CIconMap extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateUpdate(array &$iconmaps, array &$db_iconmaps = null) {
+	private static function validateUpdate(array &$iconmaps, array &$db_iconmaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['iconmapid'], ['name']], 'fields' => [
 			'iconmapid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('icon_map', 'name')],
@@ -257,7 +259,7 @@ class CIconMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_iconmaps = $this->get([
+		$db_iconmaps = DB::select('icon_map', [
 			'output' => ['iconmapid', 'name', 'default_iconid'],
 			'iconmapids' => array_column($iconmaps, 'iconmapid'),
 			'preservekeys' => true
@@ -267,7 +269,7 @@ class CIconMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->addAffectedObjects($iconmaps, $db_iconmaps);
+		self::addAffectedObjects($iconmaps, $db_iconmaps);
 
 		self::checkDuplicates($iconmaps, $db_iconmaps);
 		self::checkMappings($iconmaps);
@@ -276,6 +278,8 @@ class CIconMap extends CApiService {
 
 	/**
 	 * Check for duplicated icon maps.
+	 *
+	 * @static
 	 *
 	 * @param array      $iconmaps
 	 * @param array|null $db_iconmaps
@@ -299,10 +303,14 @@ class CIconMap extends CApiService {
 			return;
 		}
 
-		$duplicate = DBfetch(DBselect('SELECT im.name FROM icon_map im WHERE '.dbConditionString('im.name', $names), 1));
+		$duplicates = DB::select('icon_map', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
 
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%1$s" already exists.', $duplicate['name']));
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%1$s" already exists.', $duplicates[0]['name']));
 		}
 	}
 
@@ -335,12 +343,12 @@ class CIconMap extends CApiService {
 		if ($names) {
 			$names = array_keys($names);
 
-			$db_regexps = API::Regexp()->get([
+			$db_regexps = DB::select('regexps', [
 				'output' => ['name'],
 				'filter' => ['name' => $names]
 			]);
 
-			$db_regexps = zbx_toHash($db_regexps, 'name');
+			$db_regexps = array_column($db_regexps, null, 'name');
 
 			foreach ($names as $name) {
 				if (!array_key_exists($name, $db_regexps)) {
@@ -404,7 +412,6 @@ class CIconMap extends CApiService {
 	 * @param array|null $db_iconmaps
 	 */
 	private static function updateMappings(array &$iconmaps, string $method, array $db_iconmaps = null): void {
-		$mappingids = [];
 		$ins_mappings = [];
 		$upd_mappings = [];
 		$del_mappingids = [];
@@ -452,7 +459,7 @@ class CIconMap extends CApiService {
 		unset($iconmap);
 
 		if ($ins_mappings) {
-			$mappingids = DB::insertBatch('icon_mapping', $ins_mappings);
+			$iconmappingids = DB::insertBatch('icon_mapping', $ins_mappings);
 		}
 
 		if ($upd_mappings) {
@@ -470,7 +477,7 @@ class CIconMap extends CApiService {
 
 			foreach ($iconmap['mappings'] as &$mapping) {
 				if (!array_key_exists('iconmappingid', $mapping)) {
-					$mapping['iconmappingid'] = array_shift($mappingids);
+					$mapping['iconmappingid'] = array_shift($iconmappingids);
 				}
 			}
 			unset($mapping);
@@ -484,7 +491,7 @@ class CIconMap extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $iconmapids) {
-		$this->validateDelete($iconmapids, $db_iconmaps);
+		self::validateDelete($iconmapids, $db_iconmaps);
 
 		DB::delete('icon_mapping', ['iconmapid' => $iconmapids]);
 		DB::delete('icon_map', ['iconmapid' => $iconmapids]);
@@ -495,22 +502,23 @@ class CIconMap extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array      $iconmapids
 	 * @param array|null $db_iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$iconmapids, array &$db_iconmaps = null) {
+	private static function validateDelete(array &$iconmapids, array &$db_iconmaps = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $iconmapids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_iconmaps = $this->get([
+		$db_iconmaps = DB::select('icon_map', [
 			'output' => ['iconmapid', 'name'],
 			'iconmapids' => $iconmapids,
-			'editable' => true,
 			'preservekeys' => true
 		]);
 
@@ -521,6 +529,14 @@ class CIconMap extends CApiService {
 		self::checkUsedSysMaps($iconmapids, $db_iconmaps);
 	}
 
+	/**
+	 * @static
+	 *
+	 * @param array      $iconmapids
+	 * @param array|null $db_iconmaps
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
 	private static function checkUsedSysMaps(array $iconmapids, array $db_iconmaps): void {
 		$db_sysmaps = DB::select('sysmaps', [
 			'output' => ['name', 'iconmapid'],
@@ -558,10 +574,12 @@ class CIconMap extends CApiService {
 	/**
 	 * Add the existing mappings to $db_iconmaps whether these are affected by the update.
 	 *
+	 * @static
+	 *
 	 * @param array $iconmaps
 	 * @param array $db_iconmaps
 	 */
-	private function addAffectedObjects(array $iconmaps, array &$db_iconmaps): void {
+	private static function addAffectedObjects(array $iconmaps, array &$db_iconmaps): void {
 		$iconmapids = [];
 
 		foreach ($iconmaps as $iconmap) {
@@ -579,9 +597,8 @@ class CIconMap extends CApiService {
 			$db_mappings = DBselect(DB::makeSql('icon_mapping', $options));
 
 			while ($db_mapping = DBfetch($db_mappings)) {
-				$db_iconmaps[$db_mapping['iconmapid']]['mappings'][$db_mapping['iconmappingid']] = array_diff_key(
-					$db_mapping, ['iconmapid' => 1]
-				);
+				$db_iconmaps[$db_mapping['iconmapid']]['mappings'][$db_mapping['iconmappingid']] =
+					array_diff_key($db_mapping, array_flip(['iconmapid']));
 			}
 		}
 	}

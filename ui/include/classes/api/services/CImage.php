@@ -268,7 +268,9 @@ class CImage extends CApiService {
 			}
 		}
 
-		DB::update('images', $upd_images);
+		if ($upd_images) {
+			DB::update('images', $upd_images);
+		}
 
 		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
 			foreach ($images as $index => &$image) {
@@ -301,7 +303,7 @@ class CImage extends CApiService {
 		global $DB;
 
 		foreach ($images as $image) {
-			if ($db_images !== null && $db_images[$image['imageid']]['image'] === $image['image']) {
+			if ($db_images !== null && $image['image'] === $db_images[$image['imageid']]['image']) {
 				continue;
 			}
 
