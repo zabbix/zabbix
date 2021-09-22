@@ -3544,6 +3544,8 @@ static void	DBhost_prototypes_interface_snmp_prepare_sql(zbx_uint64_t hostid, co
 	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
+
+	DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
 }
 
 /******************************************************************************
@@ -3840,9 +3842,10 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
+
+			DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 		}
 
-		DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 
 		for (j = 0; j < host_prototype->lnk_templateids.values_num; j++)
 		{
@@ -3878,6 +3881,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 						" set templateid=" ZBX_FS_UI64
 						" where group_prototypeid=" ZBX_FS_UI64 ";\n",
 						group_prototype->templateid, group_prototype->group_prototypeid);
+
+				DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 
 				zbx_audit_host_prototype_update_json_update_group_details(host_prototype->hostid,
 						group_prototype->group_prototypeid, group_prototype->name,
@@ -3954,6 +3959,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where hostmacroid=" ZBX_FS_UI64 ";\n", hostmacro->hostmacroid);
+				DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 			}
 		}
 
@@ -4060,6 +4066,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
+
+				DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 			}
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
@@ -4100,8 +4108,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				}
 			}
 		}
-
-		DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 	}
 
 	if (0 != upd_tags.values_num)
