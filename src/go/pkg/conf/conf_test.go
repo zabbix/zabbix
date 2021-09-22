@@ -1,3 +1,4 @@
+//go:build linux && amd64
 // +build linux,amd64
 
 /*
@@ -504,5 +505,27 @@ func TestRawAccess(t *testing.T) {
 
 	if !reflect.DeepEqual(expectedOpts, returnedOpts) {
 		t.Errorf("Expected '%+v' while got '%+v'", expectedOpts, returnedOpts)
+	}
+}
+
+func Test_checkGlobPattern(t *testing.T) {
+	type args struct {
+		path string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"+success", args{"/foo/bar"}, false},
+		{"-invalid_prefix", args{"*/foo/bar"}, true},
+		{"-invalid_string", args{"*"}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := checkGlobPattern(tt.args.path); (err != nil) != tt.wantErr {
+				t.Errorf("checkGlobPattern() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }

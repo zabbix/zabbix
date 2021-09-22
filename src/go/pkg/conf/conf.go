@@ -406,6 +406,9 @@ func hasMeta(path string) bool {
 
 func loadInclude(root *Node, path string) (err error) {
 	path = filepath.Clean(path)
+	if err := checkGlobPattern(path); err != nil {
+		return newIncludeError(root, &path, err.Error())
+	}
 
 	absPath, err := filepath.Abs(path)
 	if err != nil {
@@ -457,9 +460,6 @@ func loadInclude(root *Node, path string) (err error) {
 		if fi.IsDir() {
 			continue
 		}
-		if !filepath.IsAbs(path) {
-			return newIncludeError(root, &path, "relative paths are not supported")
-		}
 
 		var file std.File
 		if file, err = stdOs.Open(path); err != nil {
@@ -477,6 +477,14 @@ func loadInclude(root *Node, path string) (err error) {
 		}
 	}
 	return
+}
+
+func checkGlobPattern(path string) error {
+	if strings.HasPrefix(path, "*") {
+		return errors.New("path should be absolute")
+	}
+
+	return nil
 }
 
 func parseConfig(root *Node, data []byte) (err error) {
