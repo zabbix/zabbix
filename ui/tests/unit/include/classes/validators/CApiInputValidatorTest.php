@@ -399,7 +399,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_STRINGS_UTF8, 'in' => ''],
 				['abc'],
 				'/output',
-				'Invalid parameter "/output/1": value must be empty'
+				'Invalid parameter "/output/1": value must be empty.'
 			],
 			[
 				['type' => API_STRINGS_UTF8, 'in' => 'a'],
@@ -1796,8 +1796,8 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				[
-					['type' => '1'],
-					['type' => '2']
+					['type' => 1],
+					['type' => 2]
 				]
 			],
 			[
@@ -1843,9 +1843,9 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				[
-					['type' => '1', 'value' => '-5'],
-					['type' => '2', 'value' => '125'],
-					['type' => '3', 'value' => 'def']
+					['type' => 1, 'value' => -5],
+					['type' => 2, 'value' => 125],
+					['type' => 3, 'value' => 'def']
 				]
 			],
 			[

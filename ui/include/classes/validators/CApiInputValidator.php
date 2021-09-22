@@ -472,7 +472,7 @@ class CApiInputValidator {
 				}
 
 				if ($i === false) {
-					$error = _s('value must be one of %1$s', implode(', ', $in));
+					$error = _s('value must be %1$s', 'value must be one of %1$s', implode(', ', $in), count($in));
 				}
 				elseif ($in) {
 					$error = _n('value must be empty or %1$s','value must be empty or one of %1$s', implode(', ', $in),
