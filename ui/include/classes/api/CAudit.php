@@ -105,12 +105,14 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'config',
+		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'hosts',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SETTINGS => 'config',
+		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
@@ -135,12 +137,14 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_AUTOREGISTRATION => null,
+		self::RESOURCE_DASHBOARD => 'name',
 		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'host',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
 		self::RESOURCE_SETTINGS => null,
+		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
 	];
@@ -155,12 +159,14 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
@@ -189,11 +195,19 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'dashboard.users' => 'dashboard_user',
+		'dashboard.userGroups' => 'dashboard_usrgrp',
+		'dashboard.pages' => 'dashboard_page',
+		'dashboard.pages.widgets' => 'widget',
+		'dashboard.pages.widgets.fields' => 'widget_field',
 		'proxy.hosts' => 'hosts',
 		'proxy.interface' => 'interface',
 		'regexp.expressions' => 'expressions',
 		'report.users' => 'report_user',
 		'report.user_groups' => 'report_usrgrp',
+		'templatedashboard.pages' => 'dashboard_page',
+		'templatedashboard.pages.widgets' => 'widget',
+		'templatedashboard.pages.widgets.fields' => 'widget_field',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'usergroup.rights' => 'rights',
@@ -208,10 +222,18 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'dashboard.users' => 'dashboard_userid',
+		'dashboard.userGroups' => 'dashboard_usrgrpid',
+		'dashboard.pages' => 'dashboard_pageid',
+		'dashboard.pages.widgets' => 'widgetid',
+		'dashboard.pages.widgets.fields' => 'widget_fieldid',
 		'proxy.hosts' => 'hostid',
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
+		'templatedashboard.pages' => 'dashboard_pageid',
+		'templatedashboard.pages.widgets' => 'widgetid',
+		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'usergroup.rights' => 'rightid',
@@ -437,13 +459,26 @@ class CAudit {
 	private static function convertKeysToPaths(string $prefix, array $object): array {
 		$result = [];
 
+		$is_nested_single_object = array_key_exists($prefix, self::NESTED_SINGLE_OBJECTS_IDS);
+		$is_nested_object = false;
+
+		if ($is_nested_single_object) {
+			$pk = self::NESTED_SINGLE_OBJECTS_IDS[$prefix];
+		}
+		elseif (!preg_match('/\[[0-9]+\]$/', $prefix)) {
+			$object_prefix = preg_replace('/\[[0-9]+\]/', '', $prefix);
+			$is_nested_object = array_key_exists($object_prefix, self::NESTED_OBJECTS_IDS);
+
+			if ($is_nested_object) {
+				$pk = self::NESTED_OBJECTS_IDS[$object_prefix];
+			}
+		}
+
 		foreach ($object as $key => $value) {
-			if (array_key_exists($prefix, self::NESTED_SINGLE_OBJECTS_IDS)) {
-				$pk = self::NESTED_SINGLE_OBJECTS_IDS[$prefix];
+			if ($is_nested_single_object) {
 				$index = '['.$object[$pk].'].'.$key;
 			}
-			elseif (array_key_exists($prefix, self::NESTED_OBJECTS_IDS)) {
-				$pk = self::NESTED_OBJECTS_IDS[$prefix];
+			elseif ($is_nested_object) {
 				$index = '['.$value[$pk].']';
 			}
 			else {
