@@ -341,7 +341,7 @@ static int	WITH_TIMESTAMPS = 0;
 static int	WITH_NS = 0;
 static int	REAL_TIME = 0;
 
-static char	*CONFIG_SOURCE_IP = NULL;
+char		*CONFIG_SOURCE_IP = NULL;
 static char	*ZABBIX_SERVER = NULL;
 static char	*ZABBIX_SERVER_PORT = NULL;
 static char	*ZABBIX_HOSTNAME = NULL;
@@ -407,13 +407,12 @@ static void	main_signal_handler(int sig)
 
 typedef struct
 {
-	char		*server;
-	unsigned short	port;
-	struct zbx_json	json;
+	zbx_vector_ptr_t		*addrs;
+	struct zbx_json			json;
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
 #endif
-	int		sync_timestamp;
+	int				sync_timestamp;
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
@@ -634,7 +633,6 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 	int			tcp_ret, ret = FAIL;
-	char			*tls_arg1, *tls_arg2;
 	zbx_socket_t		sock;
 
 #if !defined(_WINDOWS)
@@ -642,7 +640,6 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGQUIT, sender_signal_handler);
 	signal(SIGTERM, sender_signal_handler);
 	signal(SIGHUP, sender_signal_handler);
-	signal(SIGALRM, sender_signal_handler);
 	signal(SIGPIPE, sender_signal_handler);
 #endif
 
@@ -653,29 +650,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	switch (configured_tls_connect_mode)
-	{
-		case ZBX_TCP_SEC_UNENCRYPTED:
-			tls_arg1 = NULL;
-			tls_arg2 = NULL;
-			break;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		case ZBX_TCP_SEC_TLS_CERT:
-			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
-			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
-			break;
-		case ZBX_TCP_SEC_TLS_PSK:
-			tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
-			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
-			break;
-#endif
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			goto out;
-	}
-
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
-			CONFIG_SENDER_TIMEOUT, ZBX_TCP_COMMON_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+	if (SUCCEED == (tcp_ret = connect_to_server(&sock, sendval_args->addrs, CONFIG_SENDER_TIMEOUT, 0)))
 	{
 		if (1 == sendval_args->sync_timestamp)
 		{
@@ -693,11 +668,14 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", sock.buffer);
 
-				if (FAIL == (ret = check_response(sock.buffer, sendval_args->server,
-						sendval_args->port)))
+				if (FAIL == (ret = check_response(sock.buffer,
+						((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
+						((zbx_addr_t *)sendval_args->addrs->values[0])->port)))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
-							sendval_args->server, sendval_args->port, sock.buffer);
+							((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
+							((zbx_addr_t *)sendval_args->addrs->values[0])->port,
+							sock.buffer);
 				}
 			}
 		}
@@ -707,7 +685,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 	if (FAIL == tcp_ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_socket_strerror());
-out:
+
 	zbx_thread_exit(ret);
 }
 
@@ -744,8 +722,7 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
 
 		thread_args->args = &sendval_args[i];
 
-		sendval_args[i].server = ((zbx_addr_t *)destinations[i].addrs.values[0])->ip;
-		sendval_args[i].port = ((zbx_addr_t *)destinations[i].addrs.values[0])->port;
+		sendval_args[i].addrs = &destinations[i].addrs;
 
 		if (0 != i)
 		{

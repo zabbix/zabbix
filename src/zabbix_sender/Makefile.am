@@ -9,6 +9,7 @@ zabbix_sender_LDADD = \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
