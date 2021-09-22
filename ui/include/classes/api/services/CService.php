@@ -963,6 +963,9 @@ class CService extends CApiService {
 			array $service_problems, int $min_status = null): array {
 		$parent = $services[$parent_serviceid];
 
+//		var_dump($service_problems);
+//		exit;
+
 		if (!array_key_exists($parent_serviceid, $relations)) {
 			if ($min_status !== null) {
 				$problem_events = array_filter($service_problems[$parent_serviceid],
@@ -1149,15 +1152,37 @@ class CService extends CApiService {
 					$rule_min_status = $is_less_than ? $status_rule['limit_status'] + 1 : $status_rule['limit_status'];
 
 					foreach ($rule_children as $child_serviceid => $child) {
+						switch ($child['propagation_rule']) {
+							case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+								$reverse_rule_min_status = max(TRIGGER_SEVERITY_NOT_CLASSIFIED,
+									$rule_min_status - $child['propagation_value']
+								);
+								break;
+
+							case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+								$reverse_rule_min_status = min(TRIGGER_SEVERITY_COUNT - 1,
+									$rule_min_status + $child['propagation_value']
+								);
+								break;
+
+							case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+								$reverse_rule_min_status = null;
+								break;
+
+							default:
+								$reverse_rule_min_status = $rule_min_status;
+								break;
+						}
+
 						if (array_key_exists($child_serviceid, $evaluate_children)) {
 							if ($evaluate_children[$child_serviceid] !== null) {
 								$evaluate_children[$child_serviceid] = min($evaluate_children[$child_serviceid],
-									$rule_min_status
+									$reverse_rule_min_status
 								);
 							}
 						}
 						else {
-							$evaluate_children[$child_serviceid] = $rule_min_status;
+							$evaluate_children[$child_serviceid] = $reverse_rule_min_status;
 						}
 					}
 				}
