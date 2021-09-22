@@ -289,7 +289,7 @@ class testFormMonitoringServices extends CWebTest {
 		}
 	}
 
-	public function getServiceData() {
+	public function getServicesData() {
 		// This is what I meant, when asked to combine validation GOOD and BAD cases.
 		// Please, based on my arrays, consider adding some more cases, for ex. Status calculation rule, Advanced configuration,
 		// Additional rules, Status propagation rule, etc.
@@ -558,7 +558,7 @@ class testFormMonitoringServices extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getServiceData
+	 * @dataProvider getServicesData
 	 *
 	 * This annotation is necessary, in order to DB check in update scenario be working.
 	 * @backupOnce services
@@ -568,13 +568,19 @@ class testFormMonitoringServices extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getServiceData
+	 * @dataProvider getServicesData
 	 */
 	public function testFormMonitoringServices_Update($data) {
 		$this->checkForm($data, self::UPDATE);
 	}
 
 	// This is what I meant when asked to combine  create and update scenario.
+	/**
+	 * Function for checking Service create or update form, successful submitting and validation.
+	 *
+	 * @param array	    $data      data provider
+	 * @param boolean	$update    true if it is update scenario, false if create(default)
+	 */
 	private function checkForm($data, $update = false) {
 		// Default value is TEST_GOOD (3rd param) so we even may not write it in the data provider arrays.
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
@@ -801,7 +807,7 @@ class testFormMonitoringServices extends CWebTest {
 					->waitUntilClickable()->one()->click();
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
-			// Check that all form field were filled in correctly.
+			// Check that all form fields were saved correctly.
 			$form->checkValue($data['fields']);
 			// Check parent field separately, because it was not present in data[fields] array.
 			$this->assertEquals([$data['parent']], $form->getField('Parent services')->getValue());
@@ -818,7 +824,7 @@ class testFormMonitoringServices extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 		// Again, I find particular row by service name, it is the most stable and easy readable variant.
 		$table->findRow('Name', $parent, true)->query('link', $parent)
-					->waitUntilClickable()->one()->click();
+				->waitUntilClickable()->one()->click();
 		// Open Info tab in case it is not opened yet.
 		$this->query('link:Info')->one()->waitUntilClickable()->click();
 		// Find edit button for parent.
@@ -832,8 +838,9 @@ class testFormMonitoringServices extends CWebTest {
 		$service_table->findRow('Service', $child, true)->query('button:Remove')
 				->waitUntilClickable()->one()->click();
 		// Make sure that Name disappeared right after removing.
-		// This is not idel implementation, maybe it was possible to work with it as with table row, but xpath was faster to write.
-		$this->assertFalse($service_table->query('xpath:.//table[@id="children"]//td[contains(text(),'.$child.')]')->exists());
+		// This is not ideal implementation, maybe it was possible to work with it as with table row, but xpath was faster to write.
+		$this->assertFalse($service_table->query("xpath:.//table[@id=\"children\"]//td[contains(text(),".
+				CXPathHelper::escapeQuotes($child).")]")->exists());
 		$form->submit();
 		// Again, checking success or fail message is mandatory every time when it appears.
 		$this->assertMessage(TEST_GOOD, 'Service updated');
@@ -841,12 +848,12 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertTableData([]);
 		// Check that both parent and child remained in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					zbx_dbstr($parent)));
+				zbx_dbstr($parent)));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					zbx_dbstr($child)));
+				zbx_dbstr($child)));
 		// Check that service linking is disappeared from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-					self::$parentid.'AND servicedownid ='.self::$childid));
+				self::$parentid.'AND servicedownid ='.self::$childid));
 	}
 
 	// Please, after learning all my code and comments in testFormMonitoringServices_DeleteChild, rewrite this scenario in similar way.
