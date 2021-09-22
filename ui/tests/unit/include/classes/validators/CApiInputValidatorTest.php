@@ -3093,7 +3093,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OUTPUT],
 				'count',
 				'/output',
-				'Invalid parameter "/output": value must be one of extend.'
+				'Invalid parameter "/output": value must be extend.'
 			],
 			[
 				['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT],
@@ -3105,7 +3105,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OUTPUT],
 				'',
 				'/output',
-				'Invalid parameter "/output": value must be one of extend.'
+				'Invalid parameter "/output": value must be extend.'
 			],
 			[
 				['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT],
