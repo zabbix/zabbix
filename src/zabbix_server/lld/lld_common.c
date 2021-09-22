@@ -124,7 +124,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 				else if (0 == strcmp(table, "trigger_discovery"))
 				{
 					zbx_audit_trigger_create_entry(AUDIT_ACTION_DELETE, id, name,
-							(int)ZBX_FLAG_DISCOVERY_CREATED);
+							ZBX_FLAG_DISCOVERY_CREATED);
 				}
 			}
 			else if (object_ts_delete != ts_delete)
