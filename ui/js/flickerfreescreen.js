@@ -118,9 +118,11 @@
 						'screenitemid'
 					]
 				},
-				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default';
-				ajax_url = new Curl('jsrpc.php'),
+				params_index = type_params[screen.resourcetype] ? screen.resourcetype : 'default',
 				self = this;
+
+			const ajax_url = new Curl('jsrpc.php');
+			const post_data = {};
 
 			ajax_url.setArgument('type', 9); // PAGE_TYPE_TEXT
 			ajax_url.setArgument('method', 'screen.get');
@@ -128,7 +130,9 @@
 			ajax_url.setArgument('timestamp', screen.timestampActual);
 
 			$.each(type_params[params_index], function (i, name) {
-				ajax_url.setArgument(name, empty(screen[name]) ? null : screen[name]);
+				if (!empty(screen[name])) {
+					post_data[name] = screen[name];
+				}
 			});
 
 			// set actual timestamp
@@ -166,7 +170,7 @@
 
 				// SCREEN_RESOURCE_PLAIN_TEXT
 				case 3:
-					self.refreshHtml(id, ajax_url);
+					self.refreshHtml(id, ajax_url, post_data);
 					break;
 
 				// SCREEN_RESOURCE_CLOCK
@@ -183,12 +187,12 @@
 						if ('itemids' in screen.data) {
 							$.each(screen.data.itemids, function (i, value) {
 								if (!empty(value)) {
-									ajax_url.setArgument('itemids[' + value + ']', value);
+									post_data['itemids[' + value + ']'] = value;
 								}
 							});
 						}
 						else {
-							ajax_url.setArgument('graphid', screen.data.graphid);
+							post_data['graphid'] = screen.data.graphid;
 						}
 
 						$.each({
@@ -198,11 +202,11 @@
 							'action': screen.data.action
 						}, function (ajax_key, value) {
 							if (!empty(value)) {
-								ajax_url.setArgument(ajax_key, value);
+								post_data[ajax_key] = value;
 							}
 						});
 
-						self.refreshHtml(id, ajax_url);
+						self.refreshHtml(id, ajax_url, post_data);
 					}
 					break;
 
@@ -210,11 +214,11 @@
 				// SCREEN_RESOURCE_LLD_GRAPH
 				case 20:
 				case 19:
-					self.refreshProfile(id, ajax_url);
+					self.refreshProfile(id, ajax_url, post_data);
 					break;
 
 				default:
-					self.refreshHtml(id, ajax_url);
+					self.refreshHtml(id, ajax_url, post_data);
 					break;
 			}
 
@@ -249,7 +253,7 @@
 			}
 		},
 
-		refreshHtml: function(id, ajaxUrl) {
+		refreshHtml: function(id, ajaxUrl, post_data = {}) {
 			var screen = this.screens[id],
 				request_start = new CDate().getTime();
 
@@ -265,7 +269,7 @@
 					url: ajaxUrl.getUrl(),
 					type: 'post',
 					cache: false,
-					data: {},
+					data: post_data,
 					dataType: 'html',
 					success: function(html) {
 						var html = $(html);
@@ -452,7 +456,7 @@
 			return null;
 		},
 
-		refreshProfile: function(id, ajaxUrl) {
+		refreshProfile: function(id, ajaxUrl, post_data) {
 			var screen = this.screens[id];
 
 			if (screen.isRefreshing) {
@@ -465,7 +469,7 @@
 				var ajaxRequest = $.ajax({
 					url: ajaxUrl.getUrl(),
 					type: 'post',
-					data: {},
+					data: post_data,
 					success: function(data) {
 						screen.timestamp = new CDate().getTime();
 						screen.isRefreshing = false;
