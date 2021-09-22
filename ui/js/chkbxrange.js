@@ -26,7 +26,6 @@ var chkbxRange = {
 	chkboxes:			{},		// ckbx list
 	prefix:				null,	// prefix for session storage variable name
 	pageGoName:			null,	// which checkboxes should be counted by Go button and saved to session storage
-	selectedIds:		{},		// ids of selected objects
 	footerButtons:		{},		// action buttons at the bottom of page
 	sessionStorageName:	null,
 
@@ -50,13 +49,11 @@ var chkbxRange = {
 
 		// load selected checkboxes from session storage or cache
 		if (this.pageGoName != null) {
-			this.selectedIds = sessionStorage.getItem(this.sessionStorageName) === null
-				? {}
-				: JSON.parse(sessionStorage.getItem(this.sessionStorageName));
+			const selected_ids = this.getSelectedIds();
 
 			// check if checkboxes should be selected from session storage
-			if (!jQuery.isEmptyObject(this.selectedIds)) {
-				var objectIds = jQuery.map(this.selectedIds, function(id) { return id });
+			if (!jQuery.isEmptyObject(selected_ids)) {
+				var objectIds = jQuery.map(selected_ids, function(id) { return id });
 			}
 			// no checkboxes selected, check browser cache if checkboxes are still checked and update state
 			else {
@@ -94,10 +91,16 @@ var chkbxRange = {
 
 		if (objName == this.pageGoName) {
 			var objId = jQuery(obj).val();
-			if (isset(objId, this.selectedIds)) {
+			if (isset(objId, this.getSelectedIds())) {
 				obj.checked = true;
 			}
 		}
+	},
+
+	getSelectedIds() {
+		const session_selected_ids = sessionStorage.getItem(this.sessionStorageName);
+
+		return session_selected_ids === null ? {} : JSON.parse(session_selected_ids);
 	},
 
 	/**
@@ -124,7 +127,6 @@ var chkbxRange = {
 		}
 
 		this.update(object);
-		this.saveSessionStorage(object);
 
 		this.startbox = checkbox;
 	},
@@ -175,6 +177,8 @@ var chkbxRange = {
 	 * @param {bool}    checked
 	 */
 	checkObjects: function(object, objectIds, checked) {
+		const selected_ids = this.getSelectedIds();
+
 		jQuery.each(this.getObjectCheckboxes(object), jQuery.proxy(function(i, checkbox) {
 			var objectId = this.getObjectIdFromName(checkbox.name);
 
@@ -186,13 +190,15 @@ var chkbxRange = {
 				jQuery(checkbox).closest('tr').filter('*[class=""]').removeAttr('class');
 
 				if (checked) {
-					this.selectedIds[objectId] = objectId;
+					selected_ids[objectId] = objectId;
 				}
 				else {
-					delete this.selectedIds[objectId];
+					delete selected_ids[objectId];
 				}
 			}
 		}, this));
+
+		this.saveSessionStorage(object, selected_ids);
 	},
 
 	/**
@@ -253,7 +259,7 @@ var chkbxRange = {
 	 */
 	updateGoButton: function() {
 		var count = 0;
-		jQuery.each(this.selectedIds, function() {
+		jQuery.each(this.getSelectedIds(), function() {
 			count++;
 		});
 
@@ -300,10 +306,16 @@ var chkbxRange = {
 	 * Save the state of the checkboxes belonging to the given object group in SessionStorage.
 	 *
 	 * @param {string} object
+	 * @param {Object} selected_ids  key/value pairs of selected ids.
 	 */
-	saveSessionStorage: function(object) {
-		if (this.pageGoName == object) {
-			sessionStorage.setItem(this.sessionStorageName, JSON.stringify(this.selectedIds));
+	saveSessionStorage: function(object, selected_ids) {
+		if (Object.keys(selected_ids).length > 0) {
+			if (this.pageGoName == object) {
+				sessionStorage.setItem(this.sessionStorageName, JSON.stringify(selected_ids));
+			}
+		}
+		else {
+			sessionStorage.removeItem(this.sessionStorageName);
 		}
 	},
 
@@ -339,8 +351,9 @@ var chkbxRange = {
 			return false;
 		}
 
-		for (var key in this.selectedIds) {
-			if (this.selectedIds.hasOwnProperty(key) && this.selectedIds[key] !== null) {
+		const selected_ids = this.getSelectedIds();
+		for (let key in selected_ids) {
+			if (selected_ids.hasOwnProperty(key) && selected_ids[key] !== null) {
 				create_var(form.attr('name'), this.pageGoName + '[' + key + ']', key, false);
 			}
 		}

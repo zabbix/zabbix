@@ -105,7 +105,7 @@
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData({hostids: chkbxRange.selectedIds})
+				body: urlEncodeData({hostids: chkbxRange.getSelectedIds()})
 			})
 				.then((response) => response.json())
 				.then((response) => {
