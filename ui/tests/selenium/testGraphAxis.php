@@ -163,7 +163,7 @@ class testGraphAxis extends CWebTest {
 		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
 		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')
 				->waitUntilReady()->asTable()->one();
-		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->click();
+		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->query('tag:a')->one()->click();
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();
 		$this->query('id:from')->one()->fill($data['start_period']);

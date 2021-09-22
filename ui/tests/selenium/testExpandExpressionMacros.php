@@ -172,7 +172,7 @@ class testExpandExpressionMacros extends CWebTest {
 		// Create graphs with expression macros in names.
 		CDataHelper::call('graph.create', [
 			[
-				'name' => 'Last trapper value: {?last(/Host for expression macro/trapper)}',
+				'name' => 'Last trapper value: {?last(/Host for expression macro Last/trapper)}',
 				'width' => 900,
 				'height' => 200,
 				'gitems' => [
@@ -194,7 +194,7 @@ class testExpandExpressionMacros extends CWebTest {
 				]
 			],
 			[
-				'name' => 'Max trapper value: {?max(/Host for expression macro/trapper,1w)}',
+				'name' => 'Max trapper value: {?max(/Host for expression macro Min/trapper,1w)}',
 				'width' => 900,
 				'height' => 200,
 				'gitems' => [
@@ -266,14 +266,18 @@ class testExpandExpressionMacros extends CWebTest {
 				->waitUntilReady();
 		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')->waitUntilReady()
 				->asTable()->one();
-		$column = $table->findRow('Name', $data['host_name'])->getColumn('Graphs');
-		$column->query('link:Graphs')->one()->click();
+		$table->findRow('Name', $data['host_name'])->getColumn('Graphs')->query('tag:a')->one()->click();
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();
-		$this->page->waitUntilReady();
 		// TODO: This sleep is added here because of DEV-1908.
 		sleep(1);
-		$this->assertScreenshot($this->waitUntilGraphIsLoaded(), $data['host_name']);
+		$covered_region = [
+			'x' => 80,
+			'y' => 33,
+			'width' => 1144,
+			'height' => 279
+		];
+		$this->assertScreenshotExcept($this->waitUntilGraphIsLoaded(), $covered_region, $data['host_name']);
 	}
 
 	/**
