@@ -179,68 +179,30 @@ class CImage extends CApiService {
 
 		self::validateCreate($images);
 
-		foreach ($images as &$image) {
-			list(,, $img_type) = getimagesizefromstring($image['image']);
+		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+			$upd_images_data = [];
 
-			if (!in_array($img_type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
-				// Converting to PNG all images except PNG, JPEG and GIF
-				$image['image'] = self::convertToPng($image['image']);
+			foreach ($images as $index => &$image) {
+				$upd_images_data[$index]['image'] = $image['image'];
+				unset($image['image']);
 			}
+			unset($image);
+		}
 
-			$imageid = get_dbid('images', 'imageid');
-			$values = [
-				'imageid' => $imageid,
-				'name' => zbx_dbstr($image['name']),
-				'imagetype' => zbx_dbstr($image['imagetype'])
-			];
+		$imageids = DB::insert('images', $images);
 
-			switch ($DB['TYPE']) {
-				case ZBX_DB_POSTGRESQL:
-					$values['image'] = "'".pg_escape_bytea($image['image'])."'";
-					$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-					if (!DBexecute($sql)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-					}
-					break;
-
-				case ZBX_DB_MYSQL:
-						$values['image'] = zbx_dbstr($image['image']);
-						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-						if (!DBexecute($sql)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-						}
-					break;
-
-				case ZBX_DB_ORACLE:
-					$values['image'] = 'EMPTY_BLOB()';
-
-					$lob = oci_new_descriptor($DB['DB'], OCI_D_LOB);
-
-					$sql = 'INSERT INTO images ('.implode(' ,', array_keys($values)).') VALUES ('.implode(',', $values).')'.
-						' returning image into :imgdata';
-					$stmt = oci_parse($DB['DB'], $sql);
-					if (!$stmt) {
-						$e = oci_error($DB['DB']);
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parse SQL error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
-					}
-
-					oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
-					if (!oci_execute($stmt, OCI_DEFAULT)) {
-						$e = oci_error($stmt);
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Execute SQL error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
-					}
-					if (!$lob->save($image['image'])) {
-						$e = oci_error($stmt);
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image load error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
-					}
-					$lob->free();
-					oci_free_statement($stmt);
-					break;
+		foreach ($images as $index => &$image) {
+			if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+				$upd_images_data[$index]['imageid'] = $imageids[$index];
+				$image['image'] = $upd_images_data[$index]['image'];
 			}
-
-			$image['imageid'] = $imageid;
+			$image['imageid'] = $imageids[$index];
 		}
 		unset($image);
+
+		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+			self::updateOracleImagesData($upd_images_data);
+		}
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_IMAGE, $images);
 
@@ -254,7 +216,7 @@ class CImage extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected static function validateCreate(array &$images): void {
+	private static function validateCreate(array &$images): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'imagetype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('images', 'name')],
@@ -266,6 +228,7 @@ class CImage extends CApiService {
 		}
 
 		self::checkDuplicates($images);
+		self::prepareImages($images);
 	}
 
 	/**
@@ -278,67 +241,45 @@ class CImage extends CApiService {
 	public function update($images) {
 		global $DB;
 
-		$this->validateUpdate($images, $db_images);
+		self::validateUpdate($images, $db_images);
+
+		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+			$upd_images_data = [];
+
+			foreach ($images as $index => &$image) {
+				if (array_key_exists('image', $image)) {
+					$upd_images_data[$index] = array_intersect_key($image, array_flip(['imageid', 'image']));
+					unset($image['image']);
+				}
+			}
+			unset($image);
+		}
+
+		$upd_images = [];
 
 		foreach ($images as $image) {
-			$values = [];
+			$upd_image = DB::getUpdatedValues('images', $image, $db_images[$image['imageid']]);
 
-			if (array_key_exists('name', $image)) {
-				$values['name'] = zbx_dbstr($image['name']);
+			if ($upd_image) {
+				$upd_images[] = [
+					'values' => $upd_image,
+					'where' => ['imageid' => $image['imageid']]
+				];
 			}
+		}
 
-			if (array_key_exists('image', $image)) {
-				list(,, $img_type) = getimagesizefromstring($image['image']);
+		DB::update('images', $upd_images);
 
-				if (!in_array($img_type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
-					// Converting to PNG all images except PNG, JPEG and GIF
-					$image['image'] = self::convertToPng($image['image']);
-				}
-
-				switch ($DB['TYPE']) {
-					case ZBX_DB_POSTGRESQL:
-						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
-						break;
-
-					case ZBX_DB_MYSQL:
-						$values['image'] = zbx_dbstr($image['image']);
-						break;
-
-					case ZBX_DB_ORACLE:
-						$sql = 'SELECT i.image FROM images i WHERE i.imageid='.zbx_dbstr($image['imageid']).' FOR UPDATE';
-
-						if (!$stmt = oci_parse($DB['DB'], $sql)) {
-							$e = oci_error($DB['DB']);
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-						}
-
-						if (!oci_execute($stmt, OCI_DEFAULT)) {
-							$e = oci_error($stmt);
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-						}
-
-						if (false === ($row = oci_fetch_assoc($stmt))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-						}
-
-						$row['IMAGE']->truncate();
-						$row['IMAGE']->save($image['image']);
-						$row['IMAGE']->free();
-						break;
+		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+			foreach ($images as $index => &$image) {
+				if (array_key_exists($index, $upd_images_data)) {
+					$image['image'] = $upd_images_data[$index]['image'];
 				}
 			}
+			unset($image);
 
-			if ($values) {
-				$sqlUpd = [];
-				foreach ($values as $field => $value) {
-					$sqlUpd[] = $field.'='.$value;
-				}
-				$sql = 'UPDATE images SET '.implode(', ', $sqlUpd).' WHERE imageid='.zbx_dbstr($image['imageid']);
-				$result = DBexecute($sql);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Could not save image!'));
-				}
+			if ($upd_images_data) {
+				self::updateOracleImagesData($upd_images_data, $db_images);
 			}
 		}
 
@@ -348,12 +289,56 @@ class CImage extends CApiService {
 	}
 
 	/**
+	 * Saving image data to ORACLE database.
+	 *
+	 * @static
+	 *
+	 * @param array      $images
+	 * @param string     $images[]['image']
+	 * @param array|null $db_images
+	 */
+	private static function updateOracleImagesData(array $images, array $db_images = null): void {
+		global $DB;
+
+		foreach ($images as $image) {
+			if ($db_images !== null && $db_images[$image['imageid']]['image'] === $image['image']) {
+				continue;
+			}
+
+			$options = [
+				'output' => ['image'],
+				'imageids' => $image['imageid']
+			];
+
+			if (!$stmt = oci_parse($DB['DB'], DB::makeSql('images', $options).' FOR UPDATE')) {
+				$e = oci_error($DB['DB']);
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+			}
+
+			if (!oci_execute($stmt, OCI_DEFAULT)) {
+				$e = oci_error($stmt);
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+			}
+
+			if (false === ($row = oci_fetch_assoc($stmt))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			}
+
+			$row['IMAGE']->truncate();
+			$row['IMAGE']->save($image['image']);
+			$row['IMAGE']->free();
+		}
+	}
+
+	/**
+	 * @static
+	 *
 	 * @param array      $images
 	 * @param array|null $db_images
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateUpdate(array &$images, array &$db_images = null): void {
+	private static function validateUpdate(array &$images, array &$db_images = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['imageid'], ['name']], 'fields' => [
 			'imageid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('images', 'name')],
@@ -364,8 +349,8 @@ class CImage extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_images = $this->get([
-			'output' => ['imageid', 'name'],
+		$db_images = DB::select('images', [
+			'output' => ['imageid', 'name', 'image'],
 			'imageids' => array_column($images, 'imageid'),
 			'preservekeys' => true
 		]);
@@ -375,6 +360,7 @@ class CImage extends CApiService {
 		}
 
 		self::checkDuplicates($images, $db_images);
+		self::prepareImages($images);
 	}
 
 	/**
@@ -385,7 +371,7 @@ class CImage extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $imageids) {
-		$this->validateDelete($imageids, $db_images);
+		self::validateDelete($imageids, $db_images);
 
 		DB::update('sysmaps_elements', ['values' => ['iconid_off' => 0], 'where' => ['iconid_off' => $imageids]]);
 		DB::update('sysmaps_elements', ['values' => ['iconid_on' => 0], 'where' => ['iconid_on' => $imageids]]);
@@ -400,19 +386,21 @@ class CImage extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array      $imageids
 	 * @param array|null $db_images
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateDelete(array &$imageids, array &$db_images = null): void {
+	private static function validateDelete(array &$imageids, array &$db_images = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $imageids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_images = $this->get([
+		$db_images = DB::select('images', [
 			'output' => ['imageid', 'name'],
 			'imageids' => $imageids,
 			'preservekeys' => true
@@ -509,6 +497,31 @@ class CImage extends CApiService {
 
 		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $duplicates[0]['name']));
+		}
+	}
+
+	/**
+	 * Preparing images before saving to the DB.
+	 *
+	 * @static
+	 *
+	 * @param array  $images
+	 * @param string $images[]['image']  (optional)
+	 *
+	 * @return string
+	 */
+	private static function prepareImages(array &$images): void {
+		foreach ($images as &$image) {
+			if (!array_key_exists('image', $image)) {
+				continue;
+			}
+
+			list(,, $img_type) = getimagesizefromstring($image['image']);
+
+			// Converting to PNG all images except PNG, JPEG and GIF
+			if (!in_array($img_type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+				$image['image'] = self::convertToPng($image['image']);
+			}
 		}
 	}
 
