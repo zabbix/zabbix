@@ -2957,7 +2957,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
-				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)host->inventory_mode);
+			{
+				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid,
+						(int)host->inventory_mode);
+			}
 
 			zbx_audit_host_update_json_add_details(host->hostid, host->host, proxy_hostid,
 					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username, ipmi_password,

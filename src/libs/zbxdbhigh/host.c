@@ -3638,9 +3638,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE))
 			{
 				if (HOST_INVENTORY_DISABLED == host_prototype->inventory_mode)
-				{
 					zbx_vector_uint64_append(&del_inventory_modes_hostids, host_prototype->hostid);
-				}
 				else if (HOST_INVENTORY_DISABLED == host_prototype->inventory_mode_orig)
 					new_inventory_modes++;
 				else
@@ -3906,7 +3904,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE))
 			{
-				/* new host inventory value which is 'disabled' is handled later by vector deletion */
+				/* new host inventory value which is 'disabled' is handled later */
 				if (HOST_INVENTORY_DISABLED != host_prototype->inventory_mode)
 				{
 					if (HOST_INVENTORY_DISABLED == host_prototype->inventory_mode_orig)
