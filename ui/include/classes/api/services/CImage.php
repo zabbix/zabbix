@@ -158,7 +158,6 @@ class CImage extends CApiService {
 			$dbImg = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.dbConditionInt('i.imageid', $imageids));
 			while ($img = DBfetch($dbImg)) {
 				// PostgreSQL images are stored escaped in the DB
-				$img['image'] = zbx_unescape_image($img['image']);
 				$result[$img['imageid']]['image'] = base64_encode($img['image']);
 			}
 		}
