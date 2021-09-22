@@ -2110,8 +2110,8 @@ typedef struct
 	unsigned char		discover;
 	unsigned char		custom_interfaces_orig;
 	unsigned char		custom_interfaces;
-	int			inventory_mode_orig;
-	int			inventory_mode;
+	char			inventory_mode_orig;
+	char			inventory_mode;
 	zbx_uint64_t		templateid_host;
 }
 zbx_host_prototype_t;
@@ -2368,8 +2368,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 					else
 						inventory_mode_null_processed = atoi(row[8]);
 
-					if (host_prototype->inventory_mode != inventory_mode_null_processed /*&&
-					HOST_INVENTORY_DISABLED != host_prototype->inventory_mode*/)
+					if (host_prototype->inventory_mode != inventory_mode_null_processed)
 					{
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE;
 						host_prototype->inventory_mode_orig = inventory_mode_null_processed;
@@ -3904,29 +3903,29 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
-		}
 
-		if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE))
-		{
-			/* new host inventory value which is 'disabled' is handled later by del vector delection */
-			if (HOST_INVENTORY_DISABLED != host_prototype->inventory_mode)
+			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE))
 			{
-				if (HOST_INVENTORY_DISABLED == host_prototype->inventory_mode_orig)
+				/* new host inventory value which is 'disabled' is handled later by vector deletion */
+				if (HOST_INVENTORY_DISABLED != host_prototype->inventory_mode)
 				{
+					if (HOST_INVENTORY_DISABLED == host_prototype->inventory_mode_orig)
+					{
 						zbx_db_insert_add_values(&db_insert_inventory_mode,
 								host_prototype->hostid, host_prototype->inventory_mode);
+					}
+					else
+					{
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+								"update host_inventory set inventory_mode=%d"
+								" where hostid=" ZBX_FS_UI64 ";\n",
+								host_prototype->inventory_mode, host_prototype->hostid);
+					}
 				}
-				else
-				{
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-							"update host_inventory set inventory_mode=%d"
-							" where hostid=" ZBX_FS_UI64 ";\n",
-							host_prototype->inventory_mode, host_prototype->hostid);
-				}
-			}
 
-			zbx_audit_host_prototype_update_json_update_inventory_mode(host_prototype->hostid,
-					host_prototype->inventory_mode_orig, host_prototype->inventory_mode);
+				zbx_audit_host_prototype_update_json_update_inventory_mode(host_prototype->hostid,
+						host_prototype->inventory_mode_orig, host_prototype->inventory_mode);
+			}
 		}
 
 		DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
