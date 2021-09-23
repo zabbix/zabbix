@@ -1403,20 +1403,22 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_query_t *query,
+static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expression_query_t *query,
 		int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, int item_func, zbx_variant_t *value,
 		char **error)
 {
 	zbx_expression_query_many_t	*data;
 	int				i, pos, ret = FAIL;
 	zbx_vector_dbl_t		*results = NULL;
-	char				*param = NULL, *backet = NULL;
 	double				percentage, result;
+	char				*param = NULL, *backet = NULL;
+	const char			*log_fn = (ZBX_ITEM_FUNC_BPERCENTL == item_func ?
+							"bucket_percentile" : "bucket_rate_foreach");
 
 	if (1 > args_num || 2 < args_num || (ZBX_ITEM_FUNC_BPERCENTL == item_func && 2 != args_num))
 	{
 		*error = zbx_strdup(NULL, "invalid number of function parameters");
-		goto out;
+		goto err;
 	}
 
 	if (ZBX_VARIANT_STR == args[0].type)
@@ -1433,7 +1435,7 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 		{
 			zbx_variant_clear(&arg);
 			*error = zbx_strdup(NULL, "invalid second parameter");
-			goto out;
+			goto err;
 		}
 
 		param = zbx_strdup(NULL, arg.data.str);
@@ -1456,7 +1458,7 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 			{
 				zbx_variant_clear(&val_copy);
 				*error = zbx_strdup(NULL, "invalid third parameter");
-				goto out;
+				goto err;
 			}
 
 			percentage = val_copy.data.dbl;
@@ -1471,7 +1473,7 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 			if (SUCCEED != is_ushort(args[1].data.str, &pos) || 0 >= pos)
 			{
 				*error = zbx_strdup(NULL, "invalid third parameter");
-				goto out;
+				goto err;
 			}
 		}
 		else if (ZBX_VARIANT_UI64 == args[1].type)
@@ -1479,13 +1481,13 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 			if (0 >= (pos = (int)args[1].data.ui64))
 			{
 				*error = zbx_strdup(NULL, "invalid third parameter");
-				goto out;
+				goto err;
 			}
 		}
 		else
 		{
 			*error = zbx_strdup(NULL, "invalid third parameter");
-			goto out;
+			goto err;
 		}
 	}
 	else
@@ -1502,6 +1504,7 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 		DC_ITEM		*dcitem;
 		zbx_variant_t	rate;
 		double		le;
+		const char	*s;
 
 
 		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
@@ -1518,7 +1521,10 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 
 		zbx_free(backet);
 
-		if (NULL == (backet = get_param_dyn(dcitem->key, pos, NULL)))
+		for (s = dcitem->key_orig; SUCCEED == is_key_char(*s); s++)
+			;
+
+		if (dcitem->key_orig == s || NULL == (backet = get_param_dyn(s, pos, NULL)))	/* the key is empty */
 			continue;
 
 		zbx_strupper(backet);
@@ -1529,7 +1535,7 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 			continue;
 
 		if (SUCCEED != (ret = zbx_evaluate_RATE(&rate, dcitem, param, ts, error)))
-			goto out;
+			goto err;
 
 		zbx_vector_dbl_append(results, le);
 		zbx_vector_dbl_append(results, rate.data.dbl);
@@ -1541,12 +1547,11 @@ static int	expression_eval_brate(zbx_expression_eval_t *eval, zbx_expression_que
 		results = NULL;
 		ret = SUCCEED;
 	}
-	else if (SUCCEED == (ret = zbx_eval_calc_histogram_quantile(percentage, results, "bucket_percentile", &result,
-			error)))
+	else if (SUCCEED == (ret = zbx_eval_calc_histogram_quantile(percentage / 100, results, log_fn, &result, error)))
 	{
 		zbx_variant_set_dbl(value, result);
 	}
-out:
+err:
 	zbx_free(param);
 	zbx_free(backet);
 
@@ -1655,7 +1660,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			break;
 		case ZBX_ITEM_FUNC_BPERCENTL:
 		case ZBX_MIXVALUE_FUNC_BRATE:
-			ret = expression_eval_brate(eval, query, args_num, args, ts, item_func, value, error);
+			ret = expression_eval_bucket_rate(eval, query, args_num, args, ts, item_func, value, error);
 			goto out;
 		default:
 			*error = zbx_strdup(NULL, "unsupported function");

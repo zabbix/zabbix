@@ -2704,7 +2704,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts_end = *ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() params:%s", __func__, parameters);
 
 	zbx_history_record_vector_create(&values);
 

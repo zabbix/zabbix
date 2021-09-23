@@ -2311,7 +2311,7 @@ out:
 static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	int			i, ret;
+	int			i, ret = FAIL;
 	zbx_variant_t		value;
 	zbx_vector_dbl_t	values, *v = NULL;
 	double			q, result;
@@ -2320,11 +2320,11 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 	if (2 > token->opt || (2 > token->opt && (token->opt % 2 == 0)))
 	{
 		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"", err_fn);
-		return FAIL;
+		goto out;
 	}
 
 	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
-		return ret;
+		goto out;
 
 	i = output->values_num - token->opt + 1;
 
@@ -2333,14 +2333,14 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 		if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
 		{
 			*error = zbx_dsprintf(*error, "invalid type of second argument for function at \"%s\"", err_fn);
-			return FAIL;
+			goto out;
 		}
 
 		if (output->values[i].data.dbl_vector->values_num % 2 != 0)
 		{
 			*error = zbx_dsprintf(*error, "invalid values number of second argument for function at \"%s\"",
 					err_fn);
-			return FAIL;
+			goto out;
 		}
 	}
 	else
@@ -2349,13 +2349,13 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 		{
 			*error = zbx_dsprintf(*error, "invalid number of histogram arguments for function at \"%s\"",
 					err_fn);
-			return FAIL;
+			goto out;
 		}
 
 		for (; i < output->values_num; i++)
 		{
 			if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i], error))
-				return FAIL;
+				goto out;
 		}
 	}
 
@@ -2364,7 +2364,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 	if (ZBX_VARIANT_DBL != output->values[i].type &&
 			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i], error))
 	{
-		return FAIL;
+		goto out;
 	}
 
 	q = output->values[i].data.dbl;
@@ -2372,7 +2372,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 	if (q < 0 || q > 1 )
 	{
 		*error = zbx_dsprintf(*error, "invalid value of quantile for function at \"%s\"", err_fn);
-		return FAIL;
+		goto out;
 	}
 
 	i = output->values_num - token->opt + 1;
@@ -2385,7 +2385,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 	{
 		zbx_vector_dbl_create(&values);
 
-		for (; i < output->values_num;)
+		while (i < output->values_num)
 		{
 			zbx_vector_dbl_append(&values, output->values[i++].data.dbl);
 		}
@@ -2399,7 +2399,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 
 	if (NULL == v)
 		zbx_vector_dbl_destroy(&values);
-
+out:
 	return ret;
 }
 

@@ -562,6 +562,12 @@ int	zbx_eval_calc_histogram_quantile(double q, zbx_vector_dbl_t *values, const c
 	zbx_histogram_t		hg;
 	int			i, ret = FAIL;
 
+	if (0 == values->values_num)
+	{
+		*error = zbx_dsprintf(*error, "invalid zero number of rate buckets for function at \"%s\"",err_fn);
+		return FAIL;
+	}
+
 	zbx_vector_histogram_create(&histogram);
 
 	for (i = 0; i < values->values_num;)
@@ -573,7 +579,7 @@ int	zbx_eval_calc_histogram_quantile(double q, zbx_vector_dbl_t *values, const c
 
 	if (histogram.values_num < 2)
 	{
-		*error = zbx_dsprintf(*error, "invalid number of backets for function at \"%s\"",err_fn);
+		*error = zbx_dsprintf(*error, "invalid number of rate buckets for function at \"%s\"",err_fn);
 		goto err;
 	}
 
@@ -581,7 +587,7 @@ int	zbx_eval_calc_histogram_quantile(double q, zbx_vector_dbl_t *values, const c
 
 	if (FP_INFINITE != fpclassify(LAST(histogram).upper))
 	{
-		*error = zbx_dsprintf(*error, "invalid last infinity backet for function at \"%s\"", err_fn);
+		*error = zbx_dsprintf(*error, "invalid last infinity rate buckets for function at \"%s\"", err_fn);
 		goto err;
 	}
 
@@ -589,7 +595,8 @@ int	zbx_eval_calc_histogram_quantile(double q, zbx_vector_dbl_t *values, const c
 
 	if (histogram.values_num < 2)
 	{
-		*error = zbx_dsprintf(*error, "invalid number of backets with duplicate for function at \"%s\"", err_fn);
+		*error = zbx_dsprintf(*error,
+				"invalid number of rate buckets with duplicates for function at \"%s\"", err_fn);
 		goto err;
 	}
 
@@ -598,7 +605,7 @@ int	zbx_eval_calc_histogram_quantile(double q, zbx_vector_dbl_t *values, const c
 
 	if (FP_ZERO == fpclassify(total))
 	{
-		*error = zbx_dsprintf(*error, "invalid number value of infinity backet for function at \"%s\"", err_fn);
+		*error = zbx_dsprintf(*error, "invalid zero value of infinity bucket for function at \"%s\"", err_fn);
 		goto err;
 	}
 
@@ -648,5 +655,4 @@ err:
 	zbx_vector_histogram_destroy(&histogram);
 
 	return ret;
-
 }
