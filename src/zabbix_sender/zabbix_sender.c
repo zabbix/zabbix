@@ -786,8 +786,6 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
  ******************************************************************************/
 static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames)
 {
-	int	i;
-
 	ZBX_UNUSED(hostnames);
 
 	destinations_count++;
@@ -804,18 +802,7 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_ve
 
 	zbx_vector_ptr_create(&destinations[destinations_count - 1].addrs);
 
-	for (i = 0; i < addrs->values_num; i++)
-	{
-		const zbx_addr_t	*addr;
-		zbx_addr_t		*addr_ptr;
-
-		addr = (const zbx_addr_t *)addrs->values[i];
-
-		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
-		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
-		addr_ptr->port = addr->port;
-		zbx_vector_ptr_append(&destinations[destinations_count - 1].addrs, addr_ptr);
-	}
+	zbx_addr_copy(&destinations[destinations_count - 1].addrs, addrs);
 
 	return SUCCEED;
 }

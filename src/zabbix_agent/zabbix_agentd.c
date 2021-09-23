@@ -747,22 +747,8 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
-		int		j;
-
 		zbx_vector_ptr_create(&CONFIG_ACTIVE_ARGS[forks].addrs);
-
-		for (j = 0; j < addrs->values_num; j++)
-		{
-			const zbx_addr_t	*addr;
-			zbx_addr_t		*addr_ptr;
-
-			addr = (const zbx_addr_t *)addrs->values[j];
-
-			addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
-			addr_ptr->ip = zbx_strdup(NULL, addr->ip);
-			addr_ptr->port = addr->port;
-			zbx_vector_ptr_append(&CONFIG_ACTIVE_ARGS[forks].addrs, addr_ptr);
-		}
+		zbx_addr_copy(&CONFIG_ACTIVE_ARGS[forks].addrs, addrs);
 
 		CONFIG_ACTIVE_ARGS[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");

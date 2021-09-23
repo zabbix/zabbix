@@ -67,6 +67,7 @@ typedef struct
 }
 zbx_addr_t;
 
+void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from);
 void	zbx_addr_free(zbx_addr_t *addr);
 
 typedef int	(*cfg_custom_parameter_parser_t)(const char *value, struct cfg_line *cfg);

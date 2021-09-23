@@ -1217,8 +1217,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
 	time_t			nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0;
-	const zbx_vector_ptr_t	*addrs;
-	int			i;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1232,20 +1230,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	zbx_vector_ptr_create(&activechk_args.addrs);
 
-	addrs = &((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->addrs;
-	for (i = 0; i < addrs->values_num; i++)
-	{
-		const zbx_addr_t	*addr;
-		zbx_addr_t		*addr_ptr;
-
-		addr = (const zbx_addr_t *)addrs->values[i];
-
-		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
-		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
-		addr_ptr->port = addr->port;
-		zbx_vector_ptr_append(&activechk_args.addrs, addr_ptr);
-	}
-
+	zbx_addr_copy(&activechk_args.addrs, &((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->addrs);
 	CONFIG_HOSTNAME = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->hostname);
 
 	zbx_free(args);

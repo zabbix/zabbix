@@ -668,22 +668,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames)
 {
-	int	i;
-
 	ZBX_UNUSED(hostnames);
 
-	for (i = 0; i < addrs->values_num; i++)
-	{
-		const zbx_addr_t	*addr;
-		zbx_addr_t		*addr_ptr;
-
-		addr = (const zbx_addr_t *)addrs->values[i];
-
-		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
-		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
-		addr_ptr->port = addr->port;
-		zbx_vector_ptr_append(&zbx_addrs, addr_ptr);
-	}
+	zbx_addr_copy(&zbx_addrs, addrs);
 
 	return SUCCEED;
 }

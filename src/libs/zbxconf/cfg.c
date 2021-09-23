@@ -599,6 +599,24 @@ void	zbx_addr_free(zbx_addr_t *addr)
 	zbx_free(addr);
 }
 
+void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from)
+{
+	int	j;
+
+	for (j = 0; j < addr_from->values_num; j++)
+	{
+		const zbx_addr_t	*addr;
+		zbx_addr_t		*addr_ptr;
+
+		addr = (const zbx_addr_t *)addr_from->values[j];
+
+		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
+		addr_ptr->port = addr->port;
+		zbx_vector_ptr_append(addr_to, addr_ptr);
+	}
+}
+
 static int	addr_compare_func(const void *d1, const void *d2)
 {
 	const zbx_addr_t	*a1 = *(const zbx_addr_t **)d1;
