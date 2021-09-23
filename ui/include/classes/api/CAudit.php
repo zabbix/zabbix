@@ -182,12 +182,15 @@ class CAudit {
 	private const MASKED_PATHS = [
 		self::RESOURCE_AUTHENTICATION => ['paths' => ['authentication.ldap_bind_password']],
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
-		self::RESOURCE_AUTOREGISTRATION => ['paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']],
+		self::RESOURCE_AUTOREGISTRATION => [
+			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
+		],
 		// self::RESOURCE_MACRO => [
 		// 	'paths' => ['usermacro.value'],
 		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		// ],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
+		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
