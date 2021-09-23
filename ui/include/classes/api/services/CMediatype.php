@@ -440,7 +440,7 @@ class CMediatype extends CApiService {
 				$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_mediatype['type'];
 			}
 
-			$api_input_rules = self::getValidationRulesByType($mediatype, $db_mediatype, $method);
+			$api_input_rules = self::getValidationRulesByType($mediatype, $method, $db_mediatype);
 			$type_data = array_intersect_key($mediatype, $api_input_rules['fields']);
 
 			if (!CApiInputValidator::validate($api_input_rules, $type_data, '/'.($i + 1), $error)) {
@@ -506,14 +506,13 @@ class CMediatype extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param int    $type
 	 * @param array  $mediatype
-	 * @param array  $db_mediatype
 	 * @param string $method
+	 * @param array  $db_mediatype
 	 *
 	 * @return array
 	 */
-	private static function getValidationRulesByType(array $mediatype, array $db_mediatype, string $method): array {
+	private static function getValidationRulesByType(array $mediatype, string $method, array $db_mediatype): array {
 		$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_mediatype['type'];
 		$api_input_rules = ['type' => API_OBJECT];
 
@@ -528,12 +527,6 @@ class CMediatype extends CApiService {
 					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL])],
 					'content_type' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_MESSAGE_FORMAT_PLAIN_TEXT, SMTP_MESSAGE_FORMAT_HTML])]
 				];
-
-				if ($method === 'create' || $type != $db_mediatype['type']) {
-					foreach (['smtp_server', 'smtp_helo', 'smtp_email'] as $field) {
-						$api_input_rules['fields'][$field]['flags'] |= API_REQUIRED;
-					}
-				}
 
 				$mediatype += array_intersect_key($db_mediatype, array_flip(['smtp_security', 'smtp_authentication']));
 
@@ -551,12 +544,18 @@ class CMediatype extends CApiService {
 						'passwd' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'passwd')]
 					];
 				}
+
+				if ($method === 'create' || $type != $db_mediatype['type']) {
+					foreach (['smtp_server', 'smtp_helo', 'smtp_email'] as $field) {
+						$api_input_rules['fields'][$field]['flags'] |= API_REQUIRED;
+					}
+				}
 				break;
 
 			case MEDIA_TYPE_EXEC:
 				$api_input_rules['fields'] = [
 					'exec_path' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'exec_path')],
-					'exec_params' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'exec_path')]
+					'exec_params' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'exec_params')]
 				];
 
 				if ($method === 'create' || $type != $db_mediatype['type']) {
@@ -582,8 +581,8 @@ class CMediatype extends CApiService {
 					'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
 					'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
 					'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-						'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-						'value' =>				['type' => API_STRING_UTF8]
+						'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_param', 'name')],
+						'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_param', 'value')]
 					]]
 				];
 
