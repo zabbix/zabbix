@@ -790,12 +790,6 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_ve
 
 	ZBX_UNUSED(hostnames);
 
-//	for (i = 0; i < destinations_count; i++)
-//	{
-//		if (0 == strcmp(destinations[i].host, host) && destinations[i].port == port)
-//			return FAIL;
-//	}
-
 	destinations_count++;
 #if defined(_WINDOWS)
 	if (MAXIMUM_WAIT_OBJECTS < destinations_count)

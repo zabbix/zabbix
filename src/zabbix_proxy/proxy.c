@@ -586,7 +586,15 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
+	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE)
+	{
+		if (NULL != strchr(CONFIG_SERVER, ','))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter must not contain comma");
+			err = 1;
+		}
+	}
+	else if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
 		zbx_free(ch_error);
@@ -663,14 +671,6 @@ static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vec
 	int	i;
 
 	ZBX_UNUSED(hostnames);
-
-/*	for (i = 0; i < destinations_count; i++)
-	{
-		if (0 == strcmp(destinations[i].host, host) && destinations[i].port == port)
-			return FAIL;
-	}*/
-
-	zbx_vector_ptr_create(&zbx_addrs);
 
 	for (i = 0; i < addrs->values_num; i++)
 	{
@@ -914,6 +914,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
 
 	zbx_validate_config(task);
+
+	zbx_vector_ptr_create(&zbx_addrs);
 
 	if (ZBX_PROXYMODE_PASSIVE != CONFIG_PROXYMODE)
 		zbx_set_data_destination_hosts(CONFIG_SERVER, proxy_add_serveractive_host_cb, NULL);

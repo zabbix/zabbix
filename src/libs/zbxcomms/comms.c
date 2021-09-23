@@ -2411,7 +2411,8 @@ const char	*zbx_tcp_connection_type_name(unsigned int type)
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
-	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL);
+	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout, ZBX_TCP_COMMON_TIMEOUT,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL);
 }
 
 int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout)

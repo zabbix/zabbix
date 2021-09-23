@@ -599,6 +599,16 @@ void	zbx_addr_free(zbx_addr_t *addr)
 	zbx_free(addr);
 }
 
+static int	addr_compare_func(const void *d1, const void *d2)
+{
+	const zbx_addr_t	*a1 = *(const zbx_addr_t **)d1;
+	const zbx_addr_t	*a2 = *(const zbx_addr_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(a1->port, a2->port);
+
+	return strcmp(a1->ip, a2->ip);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_data_destination_hosts                                   *
@@ -610,9 +620,10 @@ void	zbx_addr_free(zbx_addr_t *addr)
 void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb, zbx_vector_str_t *hostnames)
 {
 	char			*l = active_hosts, *r, *r_node;
-	zbx_vector_ptr_t	addrs;
+	zbx_vector_ptr_t	addrs, cluster_addrs;
 
 	zbx_vector_ptr_create(&addrs);
+	zbx_vector_ptr_create(&cluster_addrs);
 
 	do
 	{
@@ -635,24 +646,33 @@ void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f 
 				exit(EXIT_FAILURE);
 			}
 
+			if (FAIL == is_supported_ip(addr->ip) && FAIL == zbx_validate_hostname(addr->ip))
+			{
+				zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" is invalid", l);
+				exit(EXIT_FAILURE);
+			}
+
+			if (SUCCEED == zbx_vector_ptr_search(&addrs, addr, addr_compare_func))
+			{
+				zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" specified"
+						" more than once", l);
+				exit(EXIT_FAILURE);
+			}
+
 			if (NULL != r_node)
 			{
 				*r_node = ';';
 				l = r_node + 1;
 			}
 
+			zbx_vector_ptr_append(&cluster_addrs, addr);
 			zbx_vector_ptr_append(&addrs, addr);
 		}
-		while(NULL != r_node);
+		while (NULL != r_node);
 
-		if (SUCCEED != cb(&addrs, hostnames))
-		{
-			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than"
-					" once", l);
-			exit(EXIT_FAILURE);
-		}
+		cb(&cluster_addrs, hostnames);
 
-		zbx_vector_ptr_clear_ext(&addrs, (zbx_clean_func_t)zbx_addr_free);
+		cluster_addrs.values_num = 0;
 
 		if (NULL != r)
 		{
@@ -662,5 +682,7 @@ void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f 
 	}
 	while (NULL != r);
 
+	zbx_vector_ptr_destroy(&cluster_addrs);
+	zbx_vector_ptr_clear_ext(&addrs, (zbx_clean_func_t)zbx_addr_free);
 	zbx_vector_ptr_destroy(&addrs);
 }
