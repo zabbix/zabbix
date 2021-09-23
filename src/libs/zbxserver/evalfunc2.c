@@ -2817,7 +2817,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rate=%f error:%s", __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rate=" ZBX_FS_DBL " error:%s", __func__, zbx_result_string(ret),
 			(FAIL == ret ? 0 : value->data.dbl), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
