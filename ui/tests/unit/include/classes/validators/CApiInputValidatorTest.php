@@ -1233,7 +1233,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OBJECT, 'fields' => []],
 				['host' => 'Zabbix server'],
 				'/',
-				'Invalid parameter "/": unexpected parameter "host".'
+				'Invalid parameter "/": should be empty.'
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
@@ -1460,7 +1460,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OBJECTS, 'fields' => []],
 				[['host' => 'Zabbix server']],
 				'/',
-				'Invalid parameter "/1": unexpected parameter "host".'
+				'Invalid parameter "/1": should be empty.'
 			],
 			[
 				['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
