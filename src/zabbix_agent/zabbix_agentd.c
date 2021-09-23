@@ -737,12 +737,6 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 {
 	int	i, forks, new_forks;
 
-	/*for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
-	{
-		if (0 == strcmp(CONFIG_ACTIVE_ARGS[i].host, host) && CONFIG_ACTIVE_ARGS[i].port == port)
-			return FAIL;
-	}*/
-
 	/* add at least one fork */
 	new_forks = 0 < hostnames->values_num ? hostnames->values_num : 1;
 
@@ -995,7 +989,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	parse_hostnames(CONFIG_HOSTNAMES, &hostnames);
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
-		zbx_set_data_destination_hosts(active_hosts, add_serveractive_host_cb, &hostnames);
+		zbx_set_data_destination_hosts(active_hosts, "ServerActive", add_serveractive_host_cb, &hostnames);
 
 	zbx_free(active_hosts);
 

@@ -906,7 +906,10 @@ static void	zbx_load_config(const char *config_file)
 	if (NULL == ZABBIX_SERVER)
 	{
 		if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
-			zbx_set_data_destination_hosts(cfg_active_hosts, sender_add_serveractive_host_cb, NULL);
+		{
+			zbx_set_data_destination_hosts(cfg_active_hosts, "ServerActive",
+					sender_add_serveractive_host_cb, NULL);
+		}
 	}
 	zbx_free(cfg_active_hosts);
 
