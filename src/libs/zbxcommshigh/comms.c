@@ -21,7 +21,9 @@
 #include "comms.h"
 #include "zbxjson.h"
 #include "log.h"
+#if !defined(_WINDOWS) && !defined(__MINGW32)
 #include "daemon.h"
+#endif
 #include "zbxalgo.h"
 #include "cfg.h"
 
@@ -104,6 +106,7 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 	{
 		if (0 != retry_interval)
 		{
+#if !defined(_WINDOWS) && !defined(__MINGW32)
 			zabbix_log(LOG_LEVEL_WARNING, "Could not to connect to server. Will retry every %d second(s)",
 					retry_interval);
 
@@ -126,6 +129,9 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 
 			if (FAIL != res)
 				zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
+#else
+			zabbix_log(LOG_LEVEL_WARNING, "Could not to connect to server.");
+#endif
 		}
 	}
 

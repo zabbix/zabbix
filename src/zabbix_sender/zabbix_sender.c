@@ -627,7 +627,7 @@ static int	check_response(char *response, const char *server, unsigned short por
 
 	return ret;
 }
-
+#if !defined(_WINDOWS) && !defined(__MINGW32)
 static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 	ZBX_UNUSED(sig);
@@ -636,7 +636,7 @@ static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	zbx_alarm_flag_set();	/* set alarm flag */
 }
-#if !defined(_WINDOWS)
+
 static void	zbx_set_sender_signal_handlers(void)
 {
 	struct sigaction	phan;

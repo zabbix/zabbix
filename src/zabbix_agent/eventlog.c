@@ -885,7 +885,7 @@ out:
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	process_eventslog6(zbx_vector_ptr_t addrs, const char *eventlog_name, EVT_HANDLE *render_context,
+int	process_eventslog6(zbx_vector_ptr_t *addrs, const char *eventlog_name, EVT_HANDLE *render_context,
 		EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID, zbx_uint64_t LastID,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
 		const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
@@ -1411,7 +1411,7 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	process_eventslog(const char *server, unsigned short port, const char *eventlog_name, zbx_vector_ptr_t *regexps,
+int	process_eventslog(zbx_vector_ptr_t *addrs, const char *eventlog_name, zbx_vector_ptr_t *regexps,
 		const char *pattern, const char *key_severity, const char *key_source, const char *key_logeventid,
 		int rate, zbx_process_value_func_t process_value_cb, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, char **error)
@@ -1650,7 +1650,7 @@ int	process_eventslog(const char *server, unsigned short port, const char *event
 
 				if (1 == match)
 				{
-					send_err = process_value_cb(server, port, CONFIG_HOSTNAME, metric->key_orig,
+					send_err = process_value_cb(addrs, CONFIG_HOSTNAME, metric->key_orig,
 							value, ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp,
 							source, &severity, &logeventid,
 							metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
@@ -1834,7 +1834,7 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, Z
 	}
 	else if (versionInfo.dwMajorVersion < 6)    /* Windows versions before Vista */
 	{
-		ret = process_eventslog(server, port, filename, regexps, pattern, key_severity, key_source,
+		ret = process_eventslog(addrs, filename, regexps, pattern, key_severity, key_source,
 				key_logeventid, rate, process_value_cb, metric, lastlogsize_sent, error);
 	}
 out:
