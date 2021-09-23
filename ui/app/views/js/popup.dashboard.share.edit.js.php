@@ -129,7 +129,7 @@ window.dashboard_share_edit_popup = {
 					break;
 
 				case 'usrgrpid':
-					if (document.getElementById(`user-group-shares_${value.usrgrpid}`) !== null) {
+					if (document.getElementById(`user-group-shares-${value.usrgrpid}`) !== null) {
 						continue;
 					}
 

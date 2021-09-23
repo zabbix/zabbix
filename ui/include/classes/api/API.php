@@ -340,6 +340,13 @@ class API {
 	}
 
 	/**
+	 * @return CRegexp
+	 */
+	public static function Regexp() {
+		return self::getApi('regexp');
+	}
+
+	/**
 	 * @return CRole
 	 */
 	public static function Role() {

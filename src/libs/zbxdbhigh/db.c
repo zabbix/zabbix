@@ -863,20 +863,16 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBextract_version                                                *
+ * Function: DBextract_version_info                                           *
  *                                                                            *
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	DBextract_version(struct zbx_json *json)
+void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
 {
-	zbx_uint32_t	ret;
-
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	ret = zbx_dbms_version_extract(json);
+	zbx_dbms_version_info_extract(version_info);
 	DBclose();
-
-	return ret;
 }
 
 /******************************************************************************
@@ -892,12 +888,8 @@ void	DBflush_version_requirements(const char *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", version))
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
-
-	DBclose();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1776,7 +1768,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	zbx_uint64_t		autoreg_hostid;
+	zbx_uint64_t		autoreg_hostid = 0;
 	zbx_db_insert_t		db_insert;
 	int			i, create = 0, update = 0;
 	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;

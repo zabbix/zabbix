@@ -63,12 +63,8 @@ void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const ch
 	{
 		zbx_audit_entry_t	*local_audit_item_entry_insert;
 
-		local_audit_item_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
-		local_audit_item_entry_insert->id = itemid;
-		local_audit_item_entry_insert->name = zbx_strdup(NULL, name);
-		local_audit_item_entry_insert->audit_action = audit_action;
-		local_audit_item_entry_insert->resource_type = resource_type;
-		zbx_json_init(&(local_audit_item_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		local_audit_item_entry_insert = zbx_audit_entry_init(itemid, name, audit_action, resource_type);
+
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_item_entry_insert,
 				sizeof(local_audit_item_entry_insert));
 	}
@@ -372,13 +368,7 @@ void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, const char *name, i
 	{
 		zbx_audit_entry_t	*local_audit_item_entry_insert;
 
-		local_audit_item_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
-		local_audit_item_entry_insert->id = id;
-		local_audit_item_entry_insert->name = zbx_strdup(NULL, name);
-		local_audit_item_entry_insert->audit_action = AUDIT_ACTION_DELETE;
-		local_audit_item_entry_insert->resource_type = resource_type;
-
-		zbx_json_init(&(local_audit_item_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		local_audit_item_entry_insert = zbx_audit_entry_init(id, name, AUDIT_ACTION_DELETE, resource_type);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_item_entry_insert,
 				sizeof(local_audit_item_entry_insert));
 	}

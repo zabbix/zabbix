@@ -44,7 +44,7 @@ zbx_dcheck_source_t;
  * Purpose: select hostid of discovered host                                  *
  *                                                                            *
  * Parameters: event          - [IN] source event data                        *
- *             hostname       - [OUT] hostname where event occured            *
+ *             hostname       - [OUT] hostname where event occurred           *
  *                                                                            *
  * Return value: hostid - existing hostid, 0 - if not found                   *
  *                                                                            *
@@ -134,8 +134,8 @@ exit:
  *                                                                            *
  * Purpose: add group to host if not added already                            *
  *                                                                            *
- * Parameters: hostid         - [IN]  host identificator                      *
- *             groupids       - [IN]  array of group identificators           *
+ * Parameters: hostid         - [IN]  host identifier                         *
+ *             groupids       - [IN]  array of group identifiers              *
  *                                                                            *
  ******************************************************************************/
 static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)

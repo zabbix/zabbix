@@ -785,6 +785,13 @@ static int	DBpatch_5050068(void)
 	return ret;
 }
 
+static int	DBpatch_5050069(void)
+{
+	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("auditlog", &field);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -854,5 +861,6 @@ DBPATCH_ADD(5050065, 0, 1)
 DBPATCH_ADD(5050066, 0, 1)
 DBPATCH_ADD(5050067, 0, 1)
 DBPATCH_ADD(5050068, 0, 1)
+DBPATCH_ADD(5050069, 0, 1)
 
 DBPATCH_END()

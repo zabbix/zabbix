@@ -145,7 +145,7 @@ static void	lld_graphs_free(zbx_vector_ptr_t *graphs)
  * Purpose: retrieve graphs which were created by the specified graph         *
  *          prototype                                                         *
  *                                                                            *
- * Parameters: parent_graphid - [IN] graph prototype identificator            *
+ * Parameters: parent_graphid - [IN] graph prototype identifier               *
  *             graphs         - [OUT] sorted list of graphs                   *
  *                                                                            *
  ******************************************************************************/
@@ -1299,8 +1299,8 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
  *                                                                            *
  * Purpose: add or update graphs for discovery item                           *
  *                                                                            *
- * Parameters: hostid  - [IN] host identificator from database                *
- *             agent   - [IN] discovery item identificator from database      *
+ * Parameters: hostid  - [IN] host identifier from database                   *
+ *             agent   - [IN] discovery item identifier from database         *
  *             jp_data - [IN] received data                                   *
  *                                                                            *
  * Return value: SUCCEED - if graphs were successfully added/updated or       *

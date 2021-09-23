@@ -2273,7 +2273,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 
 static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset_t *lld_items)
 {
-	zbx_uint64_t			overrideid, override_operationid, override_conditionid;
+	zbx_uint64_t			overrideid, override_operationid = 0, override_conditionid = 0;
 	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus,
 					db_insert_opdiscover, db_insert_opperiod, db_insert_ophistory,
 					db_insert_optrends, db_insert_opseverity, db_insert_optag, db_insert_optemplate,
