@@ -293,4 +293,8 @@ class testExpandExpressionMacros extends CWebTest {
 
 		return $this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()->one();
 	}
+
+	public function testExpandExpressionMacros_Map($data) {
+
+	}
 }
