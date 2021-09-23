@@ -2695,9 +2695,9 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 {
 #	define HVT(v) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? v.dbl : v.ui64)
 #	define HVT_SET(v,r) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? (v.dbl = r) : (v.ui64 = r))
-#	define TS2NS(t) (t.sec * 1000000000 + t.ns)
-#	define LAST(v) v.values[v.values_num - 1]
-#	define FIRST(v) v.values[0]
+#	define TS2DBL(t) (t.sec + t.ns / 1e9)
+#	define LAST(v) (v.values[0])
+#	define FIRST(v) (v.values[v.values_num - 1])
 
 	int				arg1, time_shift, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_value_type_t		arg1_type;
@@ -2747,19 +2747,18 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 		goto out;
 	}
 
-	if (0 < values.values_num)
+	if (1 < values.values_num)
 	{
 		history_value_t	rate, delta, last = {0};
 		int		i;
-		double		start, end, sampled_interval, average_duration_between_samples,
-				threshold, interval;
-		zbx_uint64_t	range_start, range_end;
+		double		gap_start, gap_end, sampled_interval, average_duration_between_samples,
+				threshold, interval, range, range_start, range_end;
 
 		/* Reset detection */
 
 		HVT_SET(delta, HVT(LAST(values).value) - HVT(FIRST(values).value));
 
-		for (i = 0; i < values.values_num; i++)
+		for (i = values.values_num - 1; i >= 0; i--)
 		{
 			if (HVT(values.values[i].value) < HVT(last))
 				HVT_SET(delta, HVT(delta) + HVT(values.values[i].value));
@@ -2771,56 +2770,55 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 		if (ZBX_VALUE_NVALUES == arg1_type)
 		{
-			range_start = TS2NS(ts_end) - (TS2NS(LAST(values).timestamp) - TS2NS(FIRST(values).timestamp));
+			range = TS2DBL(LAST(values).timestamp) - TS2DBL(FIRST(values).timestamp);
 		}
 		else
 		{
-			range_start = TS2NS(ts_end) - seconds * 1000000000;
+			range = seconds;
 		}
 
-
-		range_end = TS2NS(ts_end);
-		start = (double)(TS2NS(FIRST(values).timestamp) - range_start) / 1000000000;
-		end = (double)(range_end - TS2NS(LAST(values).timestamp)) / 1000000000;
-		sampled_interval = (double)(TS2NS(ts_end) - (TS2NS(LAST(values).timestamp) -
-				TS2NS(FIRST(values).timestamp))) / 1000000000;
+		range_start = TS2DBL(ts_end) - range;
+		range_end = TS2DBL(ts_end);
+		gap_start = TS2DBL(FIRST(values).timestamp) - range_start;
+		gap_end = range_end - TS2DBL(LAST(values).timestamp);
+		sampled_interval = TS2DBL(LAST(values).timestamp) - TS2DBL(FIRST(values).timestamp);
 		average_duration_between_samples = sampled_interval / (values.values_num - 1);
 
 		if (HVT(delta) > 0 && HVT(FIRST(values).value) >= 0)
 		{
-			double	dt_zero = sampled_interval * (HVT(FIRST(values).value) / HVT(delta));
+			double	zero = sampled_interval * (HVT(FIRST(values).value) / HVT(delta));
 
-			if (dt_zero < start)
-				start = dt_zero;
+			if (zero < gap_start)
+				gap_start = zero;
 		}
 
 		threshold = average_duration_between_samples * 1.1;
 		interval = sampled_interval;
 
-		if (start < threshold)
-			interval += start;
+		if (gap_start < threshold)
+			interval += gap_start;
 		else
 			interval += average_duration_between_samples / 2;
 
-		if (end < threshold)
-			interval += end;
+		if (gap_end < threshold)
+			interval += gap_end;
 		else
 			interval += average_duration_between_samples / 2;
 
-		rate.dbl = (double)HVT(delta) / (interval / sampled_interval);
+		rate.dbl = (double)(HVT(delta) * (interval / sampled_interval)) / range;
 		zbx_history_value2variant(&rate, ITEM_VALUE_TYPE_FLOAT, value);
 
 		ret = SUCCEED;
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "result for RATE is empty");
 		*error = zbx_strdup(*error, "not enough data");
 	}
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rate=%f error:%s", __func__, zbx_result_string(ret),
+			(FAIL == ret ? 0 : value->data.dbl), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
 }
